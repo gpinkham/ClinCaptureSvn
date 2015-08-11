@@ -598,6 +598,172 @@
 <div class="tablebox_center">
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="crf_annotation" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.crfAnnotation == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="dynamic_group" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.dynamicGroup == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="calendared_visits" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.calendaredVisits == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="interactive_dashboards" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.interactiveDashboards == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="item_level_sdv" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.itemLevelSDV == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="subject_casebook_in_pdf" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.subjectCasebookInPDF == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="crfs_masking" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.crfMasking == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="sas_extracts" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.sasExtracts == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="study_evaluator" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.studyEvaluator == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="randomization_cap" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.randomization == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="medical_coding" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.medicalCoding == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 	<tr valign="top">
 		<td class="table_header_column">
 			<fmt:message key="collect_subject" bundle="${resword}" />

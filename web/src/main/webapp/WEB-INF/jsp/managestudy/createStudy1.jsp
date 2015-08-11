@@ -82,6 +82,132 @@
 
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0">
+
+	<tr valign="top">
+		<td style="color: rgb(170, 98, 198);">Features:</td>
+		<td class="formlabel">
+	        <fmt:message key="crf_annotation" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="crfAnnotation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="crfAnnotation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="dynamic_group" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="dynamicGroup" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="dynamicGroup" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>				
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="calendared_visits" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="calendaredVisits" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="calendaredVisits" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="interactive_dashboards" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="interactiveDashboards" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="interactiveDashboards" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="item_level_sdv" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="itemLevelSDV" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="itemLevelSDV" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="subject_casebook_in_pdf" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="subjectCasebookInPDF" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="subjectCasebookInPDF" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="crfs_masking" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="crfMasking" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="crfMasking" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="sas_extracts" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="sasExtracts" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="sasExtracts" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="study_evaluator" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="studyEvaluator" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="studyEvaluator" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="randomization_cap" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td></td>
+	    <td class="formlabel">
+	        <fmt:message key="medical_coding" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<input type="radio" checked name="medicalCoding" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="medicalCoding" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+		</td>
+	</tr>
+	
+</table>
+  </div>
+  </div></div></div></div></div></div></div></div>
+   </div>
+	
+	
+ <div style="width: 600px">
+<!-- These DIVs define shaded box borders -->
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+
+<div class="textbox_center">
+<table border="0" cellpadding="0" cellspacing="0">	
+		
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</a></td><td><div class="formfieldXL_BG">
   <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="formlabel alert">*</td></tr>

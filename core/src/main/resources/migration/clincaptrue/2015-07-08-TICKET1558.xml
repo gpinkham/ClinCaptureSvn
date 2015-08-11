@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	
+	<changeSet author="vincent" id="2015-07-07-TICKET1558">
+	
+		<comment>Add features level</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" value="80" />
+			<column name="handle" value="crfAnnotation" />
+			<column name="name" value="crfAnnotation" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="81" />
+			<column name="handle" value="dynamicGroup" />
+			<column name="name" value="dynamicGroup" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="82" />
+			<column name="handle" value="calendaredVisits" />
+			<column name="name" value="calendaredVisits" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="83" />
+			<column name="handle" value="interactiveDashboards" />
+			<column name="name" value="interactiveDashboards" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="84" />
+			<column name="handle" value="itemLevelSDV" />
+			<column name="name" value="itemLevelSDV" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="85" />
+			<column name="handle" value="subjectCasebookInPDF" />
+			<column name="name" value="subjectCasebookInPDF" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="86" />
+			<column name="handle" value="crfMasking" />
+			<column name="name" value="crfMasking" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="87" />
+			<column name="handle" value="sasExtracts" />
+			<column name="name" value="sasExtracts" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="88" />
+			<column name="handle" value="studyEvaluator" />
+			<column name="name" value="blabla" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="89" />
+			<column name="handle" value="randomization" />
+			<column name="name" value="blabla" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+		<insert tableName="study_parameter">
+		<column name="study_parameter_id" value="90" />
+			<column name="handle" value="medicalCoding" />
+			<column name="name" value="medicalCoding" />
+			<column name="default_value" value="yes" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

@@ -130,6 +130,19 @@ public class StudyParameterConfig {
 	private String autoTabbing = "yes";
 	private String showYearsInCalendar = "yes";
 	private String instanceType = "development";
+	
+	// features
+	private String crfAnnotation = "yes";
+	private String dynamicGroup = "yes";
+	private String calendaredVisits = "yes";
+	private String interactiveDashboards = "yes";
+	private String itemLevelSDV = "yes";
+	private String subjectCasebookInPDF = "yes";
+	private String crfMasking = "yes";
+	private String sasExtracts = "yes";
+	private String studyEvaluator = "yes";
+	private String randomization = "yes";
+	private String medicalCoding = "yes";
 
 	/**
 	 * This is base constructor to set all default values.
@@ -771,4 +784,170 @@ public class StudyParameterConfig {
 	public void setInstanceType(String instanceType) {
 		this.instanceType = instanceType;
 	}
+	
+	/**
+	 * @return Returns the crfAnnotation.
+	 */
+	public String getCrfAnnotation() {
+		return crfAnnotation;
+	}
+
+	/**
+	 * @param crfAnnotation
+	 *            the crfAnnotation to set
+	 */
+	public void setCrfAnnotation(String crfAnnotation) {
+		this.crfAnnotation = crfAnnotation;
+	}
+	
+	/**
+	 * @return Returns the dynamicGroup.
+	 */
+	public String getDynamicGroup() {
+		return dynamicGroup;
+	}
+
+	/**
+	 * @param dynamicGroup
+	 *            the dynamicGroup to set
+	 */
+	public void setDynamicGroup(String dynamicGroup) {
+		this.dynamicGroup = dynamicGroup;
+	}
+	
+	/**
+	 * @return Returns the calendaredVisits.
+	 */
+	public String getCalendaredVisits() {
+		return calendaredVisits;
+	}
+
+	/**
+	 * @param calendaredVisits
+	 *            the calendaredVisits to set
+	 */
+	public void setCalendaredVisits(String calendaredVisits) {
+		this.calendaredVisits = calendaredVisits;
+	}
+	
+	/**
+	 * @return Returns the interactiveDashboards.
+	 */
+	public String getInteractiveDashboards() {
+		return interactiveDashboards;
+	}
+
+	/**
+	 * @param interactiveDashboards
+	 *            the interactiveDashboards to set
+	 */
+	public void setInteractiveDashboards(String interactiveDashboards) {
+		this.interactiveDashboards = interactiveDashboards;
+	}
+	
+	/**
+	 * @return Returns the itemLevelSDV.
+	 */
+	public String getItemLevelSDV() {
+		return itemLevelSDV;
+	}
+
+	/**
+	 * @param itemLevelSDV
+	 *            the itemLevelSDV to set
+	 */
+	public void setItemLevelSDV(String itemLevelSDV) {
+		this.itemLevelSDV = itemLevelSDV;
+	}
+	
+	/**
+	 * @return Returns the subjectCasebookInPDF.
+	 */
+	public String getSubjectCasebookInPDF() {
+		return subjectCasebookInPDF;
+	}
+	
+	/**
+	 * @param subjectCasebookInPDF
+	 *            the subjectCasebookInPDF to set
+	 */
+	public void setSubjectCasebookInPDF(String subjectCasebookInPDF) {
+		this.subjectCasebookInPDF = subjectCasebookInPDF;
+	}
+	
+	/**
+	 * @return Returns the crfMasking.
+	 */
+	public String getCrfMasking() {
+		return crfMasking;
+	}
+
+	/**
+	 * @param crfMasking
+	 *            the crfMasking to set
+	 */
+	public void setCrfMasking(String crfMasking) {
+		this.crfMasking = crfMasking;
+	}
+	
+	/**
+	 * @return Returns the sasExtracts.
+	 */
+	public String getSasExtracts() {
+		return sasExtracts;
+	}
+
+	/**
+	 * @param sasExtracts
+	 *            the sasExtracts to set
+	 */
+	public void setSasExtracts(String sasExtracts) {
+		this.sasExtracts = sasExtracts;
+	}
+	
+	/**
+	 * @return Returns the studyEvaluator.
+	 */
+	public String getStudyEvaluator() {
+		return studyEvaluator;
+	}
+
+	/**
+	 * @param studyEvaluator
+	 *            the studyEvaluator to set
+	 */
+	public void setStudyEvaluator(String studyEvaluator) {
+		this.studyEvaluator = studyEvaluator;
+	}
+	
+	/**
+	 * @return Returns the randomization.
+	 */
+	public String getRandomization() {
+		return randomization;
+	}
+
+	/**
+	 * @param randomization
+	 *            the randomization to set
+	 */
+	public void setRandomization(String randomization) {
+		this.randomization = randomization;
+	}
+	
+	/**
+	 * @return Returns the medicalCoding.
+	 */
+	public String getMedicalCoding() {
+		return medicalCoding;
+	}
+	
+	/**
+	 * @param medicalCoding
+	 *            the medicalCoding to set
+	 */
+	public void setMedicalCoding(String medicalCoding) {
+		this.medicalCoding = medicalCoding;
+	}
+	
 }

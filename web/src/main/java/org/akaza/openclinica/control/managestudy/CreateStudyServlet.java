@@ -232,6 +232,7 @@ public class CreateStudyServlet extends Controller {
 				studyBean.setStatus(Status.PENDING);
 				studyBean = (StudyBean) sdao.create(studyBean);
 				createDefaultDiscrepancyDescriptions(studyBean.getId());
+				submitStudyParameters(studyBean);
 				StudyBean newstudyBean = (StudyBean) sdao.findByName(studyBean.getName());
 
 				String selectedUserIdStr = fp.getString("selectedUser");
@@ -239,7 +240,6 @@ public class CreateStudyServlet extends Controller {
 				if (selectedUserIdStr != null && selectedUserIdStr.length() > 0) {
 					selectedUserId = Integer.parseInt(fp.getString("selectedUser"));
 				}
-				submitStudyParameters(newstudyBean);
 				createStudyUserRoleForStudy(selectedUserId, newstudyBean, ub);
 
 				addPageMessage(respage.getString("the_new_study_created_succesfully_current"), request);
@@ -568,6 +568,50 @@ public class CreateStudyServlet extends Controller {
 		spv.setParameter("allowDiscrepancyCorrectionForms");
 		spv.setValue(newStudy.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
 		spvdao.create(spv);
+		
+		spv.setParameter("crfAnnotation");
+		spv.setValue(newStudy.getStudyParameterConfig().getCrfAnnotation());
+		spvdao.create(spv);
+		
+		spv.setParameter("dynamicGroup");
+		spv.setValue(newStudy.getStudyParameterConfig().getDynamicGroup());
+		spvdao.create(spv);
+		
+		spv.setParameter("calendaredVisits");
+		spv.setValue(newStudy.getStudyParameterConfig().getCalendaredVisits());
+		spvdao.create(spv);
+		
+		spv.setParameter("interactiveDashboards");
+		spv.setValue(newStudy.getStudyParameterConfig().getInteractiveDashboards());
+		spvdao.create(spv);
+		
+		spv.setParameter("itemLevelSDV");
+		spv.setValue(newStudy.getStudyParameterConfig().getItemLevelSDV());
+		spvdao.create(spv);
+		
+		spv.setParameter("subjectCasebookInPDF");
+		spv.setValue(newStudy.getStudyParameterConfig().getSubjectCasebookInPDF());
+		spvdao.create(spv);
+		
+		spv.setParameter("crfMasking");
+		spv.setValue(newStudy.getStudyParameterConfig().getCrfMasking());
+		spvdao.create(spv);
+		
+		spv.setParameter("sasExtracts");
+		spv.setValue(newStudy.getStudyParameterConfig().getSasExtracts());
+		spvdao.create(spv);
+		
+		spv.setParameter("studyEvaluator");
+		spv.setValue(newStudy.getStudyParameterConfig().getStudyEvaluator());
+		spvdao.create(spv);
+		
+		spv.setParameter("randomization");
+		spv.setValue(newStudy.getStudyParameterConfig().getRandomization());
+		spvdao.create(spv);
+		
+		spv.setParameter("medicalCoding");
+		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCoding());
+		spvdao.create(spv);
 
 		logger.info("study parameters created done");
 	}
@@ -588,13 +632,26 @@ public class CreateStudyServlet extends Controller {
 		newStudy.setSecondaryIdentifier(fp.getString("secondProId"));
 		newStudy.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 		newStudy.setProtocolType(fp.getString("protocolType"));
-
+		
 		newStudy.setSummary(fp.getString("description"));
 		newStudy.setProtocolDescription(fp.getString("protocolDescription"));
 
 		newStudy.setSponsor(fp.getString("sponsor"));
 		newStudy.setCollaborators(fp.getString("collaborators"));
-
+		
+		// Features 
+		newStudy.getStudyParameterConfig().setCrfAnnotation(fp.getString("crfAnnotation"));
+		newStudy.getStudyParameterConfig().setDynamicGroup(fp.getString("dynamicGroup"));
+		newStudy.getStudyParameterConfig().setCalendaredVisits(fp.getString("calendaredVisits"));
+		newStudy.getStudyParameterConfig().setInteractiveDashboards(fp.getString("interactiveDashboards"));
+		newStudy.getStudyParameterConfig().setItemLevelSDV(fp.getString("itemLevelSDV"));
+		newStudy.getStudyParameterConfig().setSubjectCasebookInPDF(fp.getString("subjectCasebookInPDF"));
+		newStudy.getStudyParameterConfig().setCrfMasking(fp.getString("crfMasking"));
+		newStudy.getStudyParameterConfig().setSasExtracts(fp.getString("sasExtracts"));
+		newStudy.getStudyParameterConfig().setStudyEvaluator(fp.getString("studyEvaluator"));
+		newStudy.getStudyParameterConfig().setRandomization(fp.getString("randomization"));
+		newStudy.getStudyParameterConfig().setMedicalCoding(fp.getString("medicalCoding"));
+				
 		return newStudy;
 	}
 

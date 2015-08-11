@@ -81,5 +81,17 @@ public class StudyParameterConfigTest {
 		assertEquals("yes", config.getAutoTabbing());
 		assertEquals("yes", config.getShowYearsInCalendar());
 		assertEquals("development", config.getInstanceType());
+		
+		assertEquals("yes", config.getCrfAnnotation());
+		assertEquals("yes", config.getDynamicGroup());
+		assertEquals("yes", config.getCalendaredVisits());
+		assertEquals("yes", config.getInteractiveDashboards());
+		assertEquals("yes", config.getItemLevelSDV());
+		assertEquals("yes", config.getSubjectCasebookInPDF());
+		assertEquals("yes", config.getCrfMasking());
+		assertEquals("yes", config.getSasExtracts());
+		assertEquals("yes", config.getStudyEvaluator());
+		assertEquals("yes", config.getRandomization());
+		assertEquals("yes", config.getMedicalCoding());
 	}
 }

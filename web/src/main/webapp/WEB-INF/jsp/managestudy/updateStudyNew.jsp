@@ -1319,14 +1319,224 @@
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
 <table border="0" cellpadding="4" cellspacing="0" id="study_param_config">
-<tr valign="top" style="width: 100%;">
-	<td class="formlabel" style="text-align: left;">
-		<fmt:message key="studyParameters" bundle="${resword}"/>:
-	</td>
-	<td style="text-align: left;">
-		&nbsp;
-	</td>
+
+
+<!-- Features Parameters section -->
+
+<c:if test="${userRole.id == 1 || userRole.id == 2}">
+	<c:set var="mode" value="${userRole.id == 2 ? 'disabled' : '' }"/>
+	
+	<tr valign="top" style="width: 100%;">
+		<td class="formlabel" style="text-align: left;">
+			<fmt:message key="features" bundle="${resword}"/>:
+		</td>
+		<td style="text-align: left;">
+			&nbsp;
+		</td>
+	</tr>
+
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="crf_annotation" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.crfAnnotation == 'yes'}">
+					<input type="radio" checked name="crfAnnotation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="crfAnnotation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="crfAnnotation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="crfAnnotation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="dynamic_group" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.dynamicGroup == 'yes'}">
+					<input type="radio" checked name="dynamicGroup" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="dynamicGroup" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="dynamicGroup" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="dynamicGroup" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="calendared_visits" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.calendaredVisits == 'yes'}">
+					<input type="radio" checked name="calendaredVisits" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="calendaredVisits" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="calendaredVisits" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="calendaredVisits" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="interactive_dashboards" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.interactiveDashboards == 'yes'}">
+					<input type="radio" checked name="interactiveDashboards" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="interactiveDashboards" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="interactiveDashboards" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="interactiveDashboards" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="item_level_sdv" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.itemLevelSDV == 'yes'}">
+					<input type="radio" checked name="itemLevelSDV" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="itemLevelSDV" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="itemLevelSDV" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="itemLevelSDV" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="subject_casebook_in_pdf" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.subjectCasebookInPDF == 'yes'}">
+					<input type="radio" checked name="subjectCasebookInPDF" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="subjectCasebookInPDF" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="subjectCasebookInPDF" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="subjectCasebookInPDF" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="crfs_masking" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.crfMasking == 'yes'}">
+					<input type="radio" checked name="crfMasking" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="crfMasking" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="crfMasking" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="crfMasking" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="sas_extracts" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.sasExtracts == 'yes'}">
+					<input type="radio" checked name="sasExtracts" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="sasExtracts" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="sasExtracts" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="sasExtracts" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="study_evaluator" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.studyEvaluator == 'yes'}">
+					<input type="radio" checked name="studyEvaluator" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="studyEvaluator" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="studyEvaluator" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="studyEvaluator" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="randomization_cap" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.randomization == 'yes'}">
+					<input type="radio" checked name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr valign="top">
+	    <td class="formlabel">
+	        <fmt:message key="medical_coding" bundle="${resword}"/>?
+	    </td>
+	    <td>
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.medicalCoding == 'yes'}">
+					<input type="radio" checked name="medicalCoding" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="medicalCoding" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" ${mode} name="medicalCoding" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="medicalCoding" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+
+</c:if>
+
+<!-- /Features Parameters section -->
+
+<tr valign="top" style="border: 1px solid black;width: 100%;">
+    <td class="formlabel" style="border-top: 1px solid black;text-align: left; width:170px">
+        <fmt:message key="studyParameters" bundle="${resword}"/>:
+    </td>
+    <td style=" border-top: 1px solid black; text-align: left;">
+        &nbsp;
+    </td>
 </tr>
+	
 <tr valign="top">
 	<td class="formlabel"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/></td>
 	<td>

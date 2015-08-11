@@ -199,6 +199,28 @@ public class StudyConfigService {
 				spc.setShowYearsInCalendar(spv.getValue());
 			} else if (handle.equalsIgnoreCase("instanceType")) {
 				spc.setInstanceType(spv.getValue());
+			} else if (handle.equalsIgnoreCase("crfAnnotation")) {
+				spc.setCrfAnnotation(spv.getValue());
+			} else if (handle.equalsIgnoreCase("dynamicGroup")) {
+				spc.setDynamicGroup(spv.getValue());
+			} else if (handle.equalsIgnoreCase("calendaredVisits")) {
+				spc.setCalendaredVisits(spv.getValue());
+			} else if (handle.equalsIgnoreCase("interactiveDashboards")) {
+				spc.setInteractiveDashboards(spv.getValue());
+			} else if (handle.equalsIgnoreCase("itemLevelSDV")) {
+				spc.setItemLevelSDV(spv.getValue());
+			} else if (handle.equalsIgnoreCase("subjectCasebookInPDF")) {
+				spc.setSubjectCasebookInPDF(spv.getValue());
+			} else if (handle.equalsIgnoreCase("crfMasking")) {
+				spc.setCrfMasking(spv.getValue());
+			} else if (handle.equalsIgnoreCase("sasExtracts")) {
+				spc.setSasExtracts(spv.getValue());
+			} else if (handle.equalsIgnoreCase("studyEvaluator")) {
+				spc.setStudyEvaluator(spv.getValue());
+			} else if (handle.equalsIgnoreCase("randomization")) {
+				spc.setRandomization(spv.getValue());
+			} else if (handle.equalsIgnoreCase("medicalCoding")) {
+				spc.setMedicalCoding(spv.getValue());
 			}
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);

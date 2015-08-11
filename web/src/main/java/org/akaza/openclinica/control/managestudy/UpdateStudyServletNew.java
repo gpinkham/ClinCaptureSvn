@@ -544,7 +544,20 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 		study.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
 		study.getStudyParameterConfig().setInstanceType(fp.getString("instanceType"));
-
+		
+		// Features 
+		study.getStudyParameterConfig().setCrfAnnotation(fp.getString("crfAnnotation"));
+		study.getStudyParameterConfig().setDynamicGroup(fp.getString("dynamicGroup"));
+		study.getStudyParameterConfig().setCalendaredVisits(fp.getString("calendaredVisits"));
+		study.getStudyParameterConfig().setInteractiveDashboards(fp.getString("interactiveDashboards"));
+		study.getStudyParameterConfig().setItemLevelSDV(fp.getString("itemLevelSDV"));
+		study.getStudyParameterConfig().setSubjectCasebookInPDF(fp.getString("subjectCasebookInPDF"));
+		study.getStudyParameterConfig().setCrfMasking(fp.getString("crfMasking"));
+		study.getStudyParameterConfig().setSasExtracts(fp.getString("sasExtracts"));
+		study.getStudyParameterConfig().setStudyEvaluator(fp.getString("studyEvaluator"));
+		study.getStudyParameterConfig().setRandomization(fp.getString("randomization"));
+		study.getStudyParameterConfig().setMedicalCoding(fp.getString("medicalCoding"));
+		
 		try {
 
 			// Create custom dictionary
@@ -954,6 +967,53 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setParameter("instanceType");
 		spv.setValue(study1.getStudyParameterConfig().getInstanceType());
 		updateParameter(spvdao, spv);
+		
+		if (ub.isSysAdmin()) {
+			
+			spv.setParameter("crfAnnotation");
+			spv.setValue(study1.getStudyParameterConfig().getCrfAnnotation());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("dynamicGroup");
+			spv.setValue(study1.getStudyParameterConfig().getDynamicGroup());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("calendaredVisits");
+			spv.setValue(study1.getStudyParameterConfig().getCalendaredVisits());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("interactiveDashboards");
+			spv.setValue(study1.getStudyParameterConfig().getInteractiveDashboards());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("itemLevelSDV");
+			spv.setValue(study1.getStudyParameterConfig().getItemLevelSDV());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("subjectCasebookInPDF");
+			spv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("crfMasking");
+			spv.setValue(study1.getStudyParameterConfig().getCrfMasking());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("sasExtracts");
+			spv.setValue(study1.getStudyParameterConfig().getSasExtracts());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("studyEvaluator");
+			spv.setValue(study1.getStudyParameterConfig().getStudyEvaluator());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("randomization");
+			spv.setValue(study1.getStudyParameterConfig().getRandomization());
+			updateParameter(spvdao, spv);
+			
+			spv.setParameter("medicalCoding");
+			spv.setValue(study1.getStudyParameterConfig().getMedicalCoding());
+			updateParameter(spvdao, spv);
+		}
 
 		try {
 
@@ -1170,9 +1230,49 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setParameter("showYearsInCalendar");
 			childspv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
 			updateParameter(spvdao, childspv);
-
+			
 			childspv.setParameter("instanceType");
 			childspv.setValue(study1.getStudyParameterConfig().getInstanceType());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("crfAnnotation");
+			childspv.setValue(study1.getStudyParameterConfig().getCrfAnnotation());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("dynamicGroup");
+			childspv.setValue(study1.getStudyParameterConfig().getDynamicGroup());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("calendaredVisits");
+			childspv.setValue(study1.getStudyParameterConfig().getCalendaredVisits());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("interactiveDashboards");
+			childspv.setValue(study1.getStudyParameterConfig().getInteractiveDashboards());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("itemLevelSDV");
+			childspv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("subjectCasebookInPDF");
+			childspv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("sasExtracts");
+			childspv.setValue(study1.getStudyParameterConfig().getCrfMasking());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("studyEvaluator");
+			childspv.setValue(study1.getStudyParameterConfig().getSasExtracts());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("randomization");
+			childspv.setValue(study1.getStudyParameterConfig().getRandomization());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("medicalCoding");
+			childspv.setValue(study1.getStudyParameterConfig().getMedicalCoding());
 			updateParameter(spvdao, childspv);
 		}
 	}
