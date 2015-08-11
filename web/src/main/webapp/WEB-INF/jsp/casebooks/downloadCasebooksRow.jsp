@@ -17,12 +17,16 @@
             <c:out value="${currRow.bean.studyName}"/>
         </b>
     </td>
-    <td class="table_header_column" align="center">
-        <table width=100%>
-            <tr>
-                <td align="center"><a href="<c:out value="${currRow.bean.downloadLink}"/>"><fmt:message key="download" bundle="${resword}"/></a></td>
-                <td align="center"><a href="<c:out value="${currRow.bean.deleteLink}"/>"><fmt:message key="delete" bundle="${resword}"/></a></td>
-            </tr>
-        </table>
-    </td>
+    <td class="table_header_column" align="center" style="width: 80px;">
+		<a href="<c:out value="${currRow.bean.downloadLink}"/>">
+			<img name="bt_Download1" src="images/bt_Download.gif" border="0" align="left" hspace="6"
+				 alt="<fmt:message key="download" bundle="${resword}"/>"
+				 title="<fmt:message key="download" bundle="${resword}"/>"/>
+		</a>
+		<a href="<c:out value="${currRow.bean.deleteLink}"/>">
+			<img name="bt_Delete1" src="images/bt_Delete.gif" border="0"
+				 alt="<fmt:message key="delete" bundle="${resword}"/>"
+				 title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"/>
+		</a>
+	</td>
 </tr>

@@ -654,4 +654,33 @@ public class EntityBeanTable {
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
+
+	/**
+	 * Get column by name.
+	 * @param name String
+	 * @return EntityBeanColumn or null.
+	 */
+	public EntityBeanColumn getColumn(String name) {
+		for (EntityBeanColumn column : (ArrayList<EntityBeanColumn>) columns) {
+			if (column.getName().equals(name)) {
+				return column;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Set Width for column.
+	 * @param name String
+	 * @param width int
+	 * @return true if width was set, false if column was not found.
+	 */
+	public boolean setColumnWidth(String name, int width) {
+		EntityBeanColumn column = getColumn(name);
+		if (column != null) {
+			column.setWidth(width);
+			return true;
+		}
+		return false;
+	}
 }

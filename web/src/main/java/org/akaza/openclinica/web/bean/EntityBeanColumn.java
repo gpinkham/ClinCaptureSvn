@@ -26,10 +26,15 @@ package org.akaza.openclinica.web.bean;
 public class EntityBeanColumn {
 	private String name;
 	private boolean showLink;
+	private int width;
 
+	/**
+	 * Default constructor.
+	 */
 	public EntityBeanColumn() {
 		name = "";
 		showLink = true;
+		width = 0;
 	}
 
 	/**
@@ -60,5 +65,13 @@ public class EntityBeanColumn {
 	 */
 	public void setShowLink(boolean showLink) {
 		this.showLink = showLink;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
 	}
 }

@@ -208,7 +208,7 @@
 						 <td class="table_header_row_left">
 						</c:when>
 						<c:otherwise>
-						<td class="table_header_row" colspan="${columnsStatus.last && colspanValue != null ? ('' + colspanValue) : ''}">
+						<td class="table_header_row" colspan="${columnsStatus.last && colspanValue != null ? ('' + colspanValue) : ''}" width="${column.width != 0 ? column.width : ''}${column.width != 0 ? 'px' : ''}">
 						</c:otherwise>
 						</c:choose>
 							<c:if test="${column.showLink}"><a href="<c:out value="${orderByQuery}"/>"></c:if>

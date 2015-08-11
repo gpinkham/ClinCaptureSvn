@@ -56,13 +56,16 @@ public class DownloadCasebooksTableFactory {
     public EntityBeanTable buildTable() {
         EntityBeanTable table = getEntityBeanTable();
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(getLocale());
-        String[] columns = {resword.getString("study_subject_ID"), resword.getString("study_name"), resword.getString("action")};
+		String action = resword.getString("action");
+		final int actionsWidth = 80;
+        String[] columns = {resword.getString("study_subject_ID"), resword.getString("site_name"), action};
         ArrayList rows = DownloadCasebooksRow.generateRowsFromBeans((ArrayList) getDownloadCasebooksBean(getStudySubjectBeanList()));
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(2);
         table.setQuery("/pages/downloadCasebooks", new HashMap());
         table.setSortingIfNotExplicitlySet(DownloadCasebooksRow.COL_SUBJECT_LABEL, true);
         table.setRows(rows);
+		table.setColumnWidth(action, actionsWidth);
         table.computeDisplay();
         return table;
     }
