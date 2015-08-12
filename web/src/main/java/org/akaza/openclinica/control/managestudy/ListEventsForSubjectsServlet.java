@@ -61,10 +61,10 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+				"1");
 	}
 
 	@Override
@@ -171,8 +171,8 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		request.getSession().setAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
 		String savedUrl = getSavedUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL, request);
 		if (savedUrl != null) {
-			super.saveUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL,
-					savedUrl.replaceAll("findSubjects_mr_=\\d*", "findSubjects_mr_=".concat(pageSize)), request);
+			saveUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL,
+					savedUrl.replaceAll("findSubjects_mr_=\\d*", "findSubjects_mr_=".concat(pageSize)));
 		}
 	}
 

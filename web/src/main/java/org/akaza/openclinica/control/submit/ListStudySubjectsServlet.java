@@ -63,20 +63,18 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		if (currentRole != null
-				&& (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)
-						|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-						|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
-						|| currentRole.getRole().equals(Role.INVESTIGATOR)
-						|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || Role
-							.isMonitor(currentRole.getRole()))) {
+		if (currentRole != null && (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)
+				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
+				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+				|| Role.isMonitor(currentRole.getRole()))) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+				"1");
 	}
 
 	@Override
@@ -86,8 +84,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		if (fp.getString("navBar").equalsIgnoreCase("yes")) {
-			StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(
-					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
+			StudySubjectBean studySubject = getStudySubjectDAO()
+					.findByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
 			if (studySubject.getId() > 0) {
 				Stack<String> visitedURLs = (Stack<String>) request.getSession().getAttribute("visitedURLs");
 				visitedURLs.pop();
@@ -118,11 +116,15 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 	/**
 	 *
-	 * @param request HttpServletRequest
-	 * @param response HttpServletResponse
-	 * @param showMoreLink boolean
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param showMoreLink
+	 *            boolean
 	 * @return String
-	 * @throws Exception exception
+	 * @throws Exception
+	 *             exception
 	 */
 	public String createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink)
 			throws Exception {
@@ -164,17 +166,12 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 		String pageSize = (String) request.getSession().getAttribute(SUBJECT_MATRIX_PAGE_SIZE);
 		pageSize = pageSize == null ? "15" : pageSize;
-		return "?module="
-				+ fp.getString("module")
-				+ "&maxRows="
-				+ pageSize
-				+ "&showMoreLink="
-				+ showMoreLink
-				+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_="
-				+ pageSize
+		return "?module=" + fp.getString("module") + "&maxRows=" + pageSize + "&showMoreLink=" + showMoreLink
+				+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=" + pageSize
 				+ "&findSubjects_s_0_studySubject.createdDate=desc"
-				+ (fp.getString("navBar").equalsIgnoreCase("yes") ? ("&findSubjects_f_studySubject.label=" + fp
-						.getString("findSubjects_f_studySubject.label")) : "");
+				+ (fp.getString("navBar").equalsIgnoreCase("yes")
+						? ("&findSubjects_f_studySubject.label=" + fp.getString("findSubjects_f_studySubject.label"))
+						: "");
 	}
 
 	@Override
@@ -185,9 +182,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		request.getSession().setAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
 		String savedUrl = getSavedUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL, request);
 		if (savedUrl != null) {
-			super.saveUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL,
-					savedUrl.replaceAll("listEventsForSubject_mr_=\\d*", "listEventsForSubject_mr_=".concat(pageSize)),
-					request);
+			saveUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL,
+					savedUrl.replaceAll("listEventsForSubject_mr_=\\d*", "listEventsForSubject_mr_=".concat(pageSize)));
 		}
 	}
 
@@ -199,8 +195,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	@Override
 	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (request.getQueryString() == null) {
-			String currentSubjectMatrixServlet = (String) request.getSession().getAttribute(
-					CURRENT_SUBJECT_MATRIX_SERVLET);
+			String currentSubjectMatrixServlet = (String) request.getSession()
+					.getAttribute(CURRENT_SUBJECT_MATRIX_SERVLET);
 			if (currentSubjectMatrixServlet != null && !currentSubjectMatrixServlet.equals(request.getServletPath())) {
 				response.sendRedirect(request.getContextPath().concat(currentSubjectMatrixServlet));
 				return true;

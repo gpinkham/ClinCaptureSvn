@@ -1,23 +1,3 @@
-/*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
- * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the Lesser GNU General Public License along with this program.
- \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
- ******************************************************************************/
-
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2009 Akaza Research
- */
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
@@ -38,6 +18,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
@@ -54,9 +35,12 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
@@ -64,6 +48,8 @@ import org.springframework.mock.web.MockServletContext;
 
 import com.clinovo.i18n.LocaleResolver;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({CoreResources.class})
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ListStudySubjectsServletTest {
 
@@ -90,6 +76,10 @@ public class ListStudySubjectsServletTest {
 		currentUser.addUserType(UserType.USER);
 		currentRole = new StudyUserRoleBean();
 		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		String url = "http://localhost:8080/clincapture/";
+		PowerMockito.mockStatic(CoreResources.class);
+		PowerMockito.when(CoreResources.getSystemURL()).thenReturn(url);
 
 		StudyDAO studyDAO = Mockito.mock(StudyDAO.class);
 		SubjectDAO subjectDAO = Mockito.mock(SubjectDAO.class);
@@ -135,10 +125,9 @@ public class ListStudySubjectsServletTest {
 		request.getSession().setAttribute("study", currentStudy);
 		request.getSession().setAttribute("userRole", currentRole);
 
-		Mockito.when(
-				studySubjectDAO.getWithFilterAndSort(Mockito.any(StudyBean.class),
-						Mockito.any(FindSubjectsFilter.class), Mockito.any(FindSubjectsSort.class), Mockito.anyInt(),
-						Mockito.anyInt())).thenReturn((ArrayList) studySubjectBeanList);
+		Mockito.when(studySubjectDAO.getWithFilterAndSort(Mockito.any(StudyBean.class),
+				Mockito.any(FindSubjectsFilter.class), Mockito.any(FindSubjectsSort.class), Mockito.anyInt(),
+				Mockito.anyInt())).thenReturn((ArrayList) studySubjectBeanList);
 		Mockito.when(
 				studySubjectDAO.getCountWithFilter(Mockito.any(FindSubjectsFilter.class), Mockito.any(StudyBean.class)))
 				.thenReturn(15);
@@ -146,16 +135,16 @@ public class ListStudySubjectsServletTest {
 
 		Mockito.when(studyDAO.findByPK(Mockito.anyInt())).thenReturn(currentStudy);
 		Mockito.when(subjectDAO.findByPK(Mockito.anyInt())).thenReturn(subjectBean);
-		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class))).thenReturn(
-				(ArrayList) studyEventBeanList);
-		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class))).thenReturn(
-				(ArrayList) studyEventBeanList);
+		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class)))
+				.thenReturn((ArrayList) studyEventBeanList);
+		Mockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class)))
+				.thenReturn((ArrayList) studyEventBeanList);
 		Mockito.when(
 				studyEventDefinitionDAO.findAllActiveByParentStudyId(Mockito.anyInt(), Mockito.any(ArrayList.class)))
 				.thenReturn((ArrayList) studyEventDefinitionBeanList);
 		Mockito.when(studyEventDefinitionDAO.findByPK(Mockito.anyInt())).thenReturn(studyEventDefinitionBean);
-		Mockito.when(dynamicEventDao.findAllDefIdsInActiveDynGroupsByStudyId(Mockito.anyInt())).thenReturn(
-				new ArrayList<StudyEventDefinitionBean>());
+		Mockito.when(dynamicEventDao.findAllDefIdsInActiveDynGroupsByStudyId(Mockito.anyInt()))
+				.thenReturn(new ArrayList<StudyEventDefinitionBean>());
 		Mockito.when(servletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(requestDispatcher);
 
 		Mockito.doReturn(servletContext).when(listStudySubjectsServlet).getServletContext();
@@ -187,7 +176,8 @@ public class ListStudySubjectsServletTest {
 	}
 
 	@Test
-	public void testThatListStudySubjectServletGrantAccessToStudyAdministrator() throws InsufficientPermissionException {
+	public void testThatListStudySubjectServletGrantAccessToStudyAdministrator()
+			throws InsufficientPermissionException {
 		listStudySubjectsServlet.mayProceed(request, response);
 		Assert.assertNull(request.getAttribute("pageMessages"));
 	}

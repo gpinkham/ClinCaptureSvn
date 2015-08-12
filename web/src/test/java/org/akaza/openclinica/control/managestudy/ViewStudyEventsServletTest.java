@@ -6,10 +6,10 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.clinovo.util.RequestUtil;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Assert;
@@ -28,9 +28,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.RequestUtil;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ViewStudyEventsServlet.class, RequestUtil.class})
+@PrepareForTest({ViewStudyEventsServlet.class, RequestUtil.class, CoreResources.class})
 @SuppressWarnings("rawtypes")
 public class ViewStudyEventsServletTest {
 
@@ -56,6 +57,7 @@ public class ViewStudyEventsServletTest {
 		PowerMockito.mockStatic(RequestUtil.class);
 		PowerMockito.when(RequestUtil.getRequest()).thenReturn(request);
 
+		request.setContextPath("clincapture");
 		request.setSession(session);
 		request.setParameter("refreshPage", "1");
 		request.setScheme("http");
@@ -70,6 +72,10 @@ public class ViewStudyEventsServletTest {
 		Mockito.when(viewStudyEventsServlet.getUserAccountBean()).thenReturn(currentUser);
 
 		Whitebox.setInternalState(viewStudyEventsServlet, "logger", LoggerFactory.getLogger("ViewStudyEventsServlet"));
+
+		String url = "http://localhost:8080/clincapture/";
+		PowerMockito.mockStatic(CoreResources.class);
+		PowerMockito.when(CoreResources.getSystemURL()).thenReturn(url);
 	}
 
 	@Test
@@ -90,8 +96,9 @@ public class ViewStudyEventsServletTest {
 		Mockito.doCallRealMethod().when(viewStudyEventsServlet).processRequest(request, response);
 		Mockito.when(viewStudyEventsServlet.getUserAccountBean()).thenReturn(currentUser);
 		Validator validator = PowerMockito.mock(Validator.class);
-		PowerMockito.when(viewStudyEventsServlet,
-				PowerMockito.method(ViewStudyEventsServlet.class, "getValidator", HttpServletRequest.class))
+		PowerMockito
+				.when(viewStudyEventsServlet,
+						PowerMockito.method(ViewStudyEventsServlet.class, "getValidator", HttpServletRequest.class))
 				.withArguments(request).thenReturn(validator);
 		Mockito.when(validator.validate()).thenReturn(new HashMap());
 		request.setMethod("POST");

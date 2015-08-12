@@ -24,8 +24,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.RequestUtil;
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -50,6 +48,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.util.ValidatorHelper;
 
 /**
@@ -88,9 +88,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (!ub.isSysAdmin() && !mayViewData(ub, currentRole)) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+					+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET, restext.getString("not_correct_role"), "1");
 		}
 	}
@@ -101,6 +100,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		if (fp.getString(PRINT).isEmpty() && shouldRedirect(request, response)) {
 			return;
 		}
+
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		// checks which module requests are from
@@ -142,11 +142,12 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 				request.setAttribute("allEvents", allEvents);
 				forwardPage(Page.VIEW_STUDY_EVENTS_PRINT, request, response);
 			} else {
-				List allEvents = genTables(fp, definitions, startDateString, endDateString, sedId, definitionId, statusId);
+				List allEvents = genTables(fp, definitions, startDateString, endDateString, sedId, definitionId,
+						statusId);
 				request.setAttribute("allEvents", allEvents);
-				String queryUrl = INPUT_STARTDATE + "=" + startDateString + "&" + INPUT_ENDDATE + "="
-						+ endDateString + "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "="
-						+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
+				String queryUrl = INPUT_STARTDATE + "=" + startDateString + "&" + INPUT_ENDDATE + "=" + endDateString
+						+ "&" + INPUT_DEF_ID + "=" + definitionId + "&" + INPUT_STATUS_ID + "=" + statusId + "&"
+						+ "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
 				request.setAttribute("queryUrl", queryUrl);
 				request.setAttribute("enablePrint", "yes");
 				forwardPage(Page.VIEW_STUDY_EVENTS, request, response);
@@ -154,8 +155,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		}
 	}
 
-	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, String startDateString,
-			String endDateString, int sedId, int definitionId, int statusId) {
+	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions,
+			String startDateString, String endDateString, int sedId, int definitionId, int statusId) {
 
 		StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		StudyUserRoleBean currentRole = getCurrentRole(fp.getRequest());
@@ -174,8 +175,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 						&& seb.getSubjectEventStatus().isLocked()) {
 					seb.setEditable(false);
 				}
-				ArrayList<StudyEventBean> studyEventList = studyEventDefinitionEventsMap.get(seb
-						.getStudyEventDefinitionId());
+				ArrayList<StudyEventBean> studyEventList = studyEventDefinitionEventsMap
+						.get(seb.getStudyEventDefinitionId());
 				if (studyEventList == null) {
 					studyEventList = new ArrayList<StudyEventBean>();
 					studyEventDefinitionEventsMap.put(seb.getStudyEventDefinitionId(), studyEventList);
@@ -268,8 +269,9 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 			final int columnThree = 3;
 			String[] columns = {
-					currentStudy == null ? resword.getString("study_subject_ID") : currentStudy
-							.getStudyParameterConfig().getStudySubjectIdLabel(),
+					currentStudy == null
+							? resword.getString("study_subject_ID")
+							: currentStudy.getStudyParameterConfig().getStudySubjectIdLabel(),
 					resword.getString("event_date_started"), resword.getString("subject_event_status"),
 					resword.getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
@@ -296,7 +298,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 
 	/**
 	 * Generates an arraylist of study events for printing.
-	 * 
+	 *
 	 * @param definitions
 	 *            ArrayList<StudyEventDefinitionBean>
 	 * @param startDate
@@ -454,9 +456,11 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		int statusId = fp.getInt(INPUT_STATUS_ID);
 		int definitionId = fp.getInt(INPUT_DEF_ID);
 		String startDate = request.getParameter(INPUT_STARTDATE) == null
-				? dateFormatter.print(userDefaultStartDate) : fp.getString(INPUT_STARTDATE);
+				? dateFormatter.print(userDefaultStartDate)
+				: fp.getString(INPUT_STARTDATE);
 		String endDate = request.getParameter(INPUT_ENDDATE) == null
-				? dateFormatter.print(userDefaultEndDate) : fp.getString(INPUT_ENDDATE);
+				? dateFormatter.print(userDefaultEndDate)
+				: fp.getString(INPUT_ENDDATE);
 		try {
 			startDate = URLEncoder.encode(startDate, "UTF-8");
 			endDate = URLEncoder.encode(endDate, "UTF-8");
@@ -470,16 +474,16 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		StringBuilder sb = new StringBuilder();
 		sb.append("").append("?sedId=").append(sedId).append("&statusId=").append(statusId).append("&definitionId=")
 				.append(definitionId).append("&startDate=").append(startDate).append("&endDate=").append(endDate)
-				.append("&ebl_page=1&ebl_sortColumnInd=")
-				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
-				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
-				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
-				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1");
+				.append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0"))
+				.append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1"))
+				.append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0"))
+				.append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : ""))
+				.append("&&ebl_paginated=1");
 		Locale locale = (Locale) request.getSession().getAttribute("viewStudyEventsServletPreviousLocale");
 		boolean localeChanged = locale != null && !LocaleResolver.getLocale(request).equals(locale);
 		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", LocaleResolver.getLocale(request));
 		if (request.getParameter("refreshPage") != null || localeChanged) {
-			saveUrl(getUrlKey(request), request.getRequestURL() + sb.toString(), request);
+			saveUrl(getUrlKey(request), sb.toString(), request);
 		}
 		return sb.toString();
 	}

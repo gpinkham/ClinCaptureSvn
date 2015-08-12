@@ -1,17 +1,19 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
 package org.akaza.openclinica.control.core;
+
+import com.clinovo.util.RequestUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,24 +49,23 @@ public abstract class RememberLastPage extends Controller {
 		String defaultUrl = getDefaultUrl(request);
 		String keyValue = getSavedUrl(key, request);
 		if (keyValue == null && defaultUrl != null) {
-			saveUrl(key, request.getRequestURL() + defaultUrl, request);
+			saveUrl(key, defaultUrl, request);
 		}
 		if (request.getMethod().equalsIgnoreCase("POST")) {
 			String referer = request.getHeader(REFERER);
 			String url = request.getRequestURL().toString();
-			if (referer != null
-					&& !referer.replaceAll("http.*://", "").toLowerCase()
-							.startsWith(url.replaceAll("http.*://", "").toLowerCase())) {
+			if (referer != null && !referer.replaceAll("http.*://.*".concat(request.getContextPath()), "").toLowerCase()
+					.startsWith(url.replaceAll("http.*://.*".concat(request.getContextPath()), "").toLowerCase())) {
 				result = redirect(request, response);
 			} else if (defaultUrl != null) {
-				saveUrl(key, request.getRequestURL() + defaultUrl, request);
+				saveUrl(key, defaultUrl, request);
 			}
 		} else if (request.getMethod().equalsIgnoreCase("GET")) {
 			if (userDoesNotUseJmesaTableForNavigation(request)) {
 				result = redirect(request, response);
 			} else {
 				if (request.getQueryString() != null) {
-					saveUrl(key, request.getRequestURL() + "?" + request.getQueryString(), request);
+					saveUrl(key, "?".concat(request.getQueryString()), request);
 				}
 			}
 		}
@@ -74,8 +75,12 @@ public abstract class RememberLastPage extends Controller {
 		return result;
 	}
 
+	protected void saveUrl(String key, String value) {
+		RequestUtil.getRequest().getSession().setAttribute(key, value);
+	}
+
 	protected void saveUrl(String key, String value, HttpServletRequest request) {
-		request.getSession().setAttribute(key, value);
+		request.getSession().setAttribute(key, request.getContextPath().concat(request.getServletPath()).concat(value));
 	}
 
 	protected String getSavedUrl(String key, HttpServletRequest request) {
