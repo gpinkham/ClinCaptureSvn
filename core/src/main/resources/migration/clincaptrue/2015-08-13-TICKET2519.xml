@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2015-08-13-TICKET2519">
+		<comment>Fix for CRF with sliders</comment>
+		<sql splitStatements="false">
+			<![CDATA[UPDATE section
+SET subtitle = REPLACE(subtitle, '<script src="http://www.google.com/jsapi"></script>
+<script>
+google.load("jqueryui", "1.7.2");
+</script>', '');
+
+
+UPDATE item_form_metadata
+SET header = REPLACE(header, '<script>
+$(document).ready(function () {
+	try {
+    
+    var defVal = $("#BTPMOOD>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider2").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider2").slider("value");
+            $("#BTPMOOD>input").html(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPMOOD>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPMOOD>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim2").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim2").css("display","")
+            }
+            if(uis == 10) $("#estim2").html(value1);
+            if(uis == 0) $("#estim2").html(value0);
+    };
+	} catch (e) {
+	}
+});
+</script>', '<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPMOOD>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider2").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider2").slider("value");
+            $("#BTPMOOD>input").val(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPMOOD>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPMOOD>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim2").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim2").css("display","")
+            }
+            if(uis == 10) $("#estim2").html(value1);
+            if(uis == 0) $("#estim2").html(value0);
+    };
+
+});
+</script>')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+	try {
+    
+    var defVal = $("#BTPMOOD>input").val();%');
+	
+	
+UPDATE item_form_metadata
+SET header = REPLACE(header, '<script>
+$(document).ready(function () {
+    try {
+    var defVal = $("#BTPWLKNG>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider3").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider3").slider("value");
+            $("#BTPWLKNG>input").html(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPWLKNG>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPWLKNG>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim3").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim3").css("display","")
+            }
+            if(uis == 10) $("#estim3").html(value1);
+            if(uis == 0) $("#estim3").html(value0);
+    };
+	} catch (e) {
+	}
+});
+</script>', '<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPWLKNG>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider3").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider3").slider("value");
+            $("#BTPWLKNG>input").val(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPWLKNG>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPWLKNG>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim3").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim3").css("display","")
+            }
+            if(uis == 10) $("#estim3").html(value1);
+            if(uis == 0) $("#estim3").html(value0);
+    };
+
+});
+</script>')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    try {
+    var defVal = $("#BTPWLKNG>input").val();%');	
+	
+	
+UPDATE item_form_metadata
+SET header = REPLACE(header, '<script>
+$(document).ready(function () {
+    try {
+    var defVal = $("#BTPSLEEP>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider6").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider6").slider("value");
+            $("#BTPSLEEP>input").html(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPSLEEP>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPSLEEP>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim6").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim6").css("display","")
+            }
+            if(uis == 10) $("#estim6").html(value1);
+            if(uis == 0) $("#estim6").html(value0);
+    };
+	} catch(e) {
+	}
+});
+</script>', '<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPSLEEP>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider6").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider6").slider("value");
+            $("#BTPSLEEP>input").val(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPSLEEP>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPSLEEP>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim6").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim6").css("display","")
+            }
+            if(uis == 10) $("#estim6").html(value1);
+            if(uis == 0) $("#estim6").html(value0);
+    };
+
+});
+</script>')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    try {
+    var defVal = $("#BTPSLEEP>input").val();%');
+
+
+UPDATE item_form_metadata
+SET header = REPLACE(header, '<script>
+$(document).ready(function () {
+    try {
+    var defVal = $("#BTPENJYMT>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider7").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider7").slider("value");
+            $("#BTPENJYMT>input").html(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPENJYMT>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPENJYMT>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim7").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim7").css("display","")
+            }
+            if(uis == 10) $("#estim7").html(value1);
+            if(uis == 0) $("#estim7").html(value0);
+    };
+	} catch (e) {
+	}
+});
+</script>', '<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPENJYMT>input").val();
+    var show = 0;
+
+    var value0 ="Does not interfere";
+    var value1 ="Completely interferes";
+    
+    checker(defVal);
+    
+    $("#slider7").slider({
+        value: defVal,
+        min: 0,
+        max: 10,
+        step: 1,
+        create: function (event, ui) {
+            val = $("#slider7").slider("value");
+            $("#BTPENJYMT>input").val(val);
+        },
+        slide: function (event, ui) {
+            $("#BTPENJYMT>input").val(ui.value);
+            checker(ui.value);
+        },
+        change: function (event, ui) {
+            changeImage($("#BTPENJYMT>input").get(0));
+        }
+    });
+    
+    function checker (uis){            
+            if (uis == 10 || uis == 0) {
+                show = 1;
+            } 
+            else show = 0;
+            if (show == 0) {
+                $("#estim7").css("display","none")
+            }
+            if (show == 1) {
+                $("#estim7").css("display","")
+            }
+            if(uis == 10) $("#estim7").html(value1);
+            if(uis == 0) $("#estim7").html(value0);
+    };
+
+});
+</script>')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    try {
+    var defVal = $("#BTPENJYMT>input").val();%');
+
+
+UPDATE item_form_metadata
+SET header = REPLACE(header, 'val = $("#slider2").slider("value");
+            $("#BTPMOOD>input").html(val);
+        },', 'val = $("#slider2").slider("value");
+            $("#BTPMOOD>input").val(val);
+        },')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPMOOD>input").val();%');
+	
+	
+UPDATE item_form_metadata
+SET header = REPLACE(header, 'val = $("#slider3").slider("value");
+            $("#BTPWLKNG>input").html(val);
+        },', 'val = $("#slider3").slider("value");
+            $("#BTPWLKNG>input").val(val);
+        },')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPWLKNG>input").val();%');	
+	
+	
+UPDATE item_form_metadata
+SET header = REPLACE(header, 'val = $("#slider6").slider("value");
+            $("#BTPSLEEP>input").html(val);
+        },', 'val = $("#slider6").slider("value");
+            $("#BTPSLEEP>input").val(val);
+        },')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPSLEEP>input").val();%');
+
+
+UPDATE item_form_metadata
+SET header = REPLACE(header, 'val = $("#slider7").slider("value");
+            $("#BTPENJYMT>input").html(val);
+        },', 'val = $("#slider7").slider("value");
+            $("#BTPENJYMT>input").val(val);
+        },')
+WHERE item_form_metadata_id IN (SELECT item_form_metadata_id FROM item_form_metadata
+WHERE header LIKE '%<script>
+$(document).ready(function () {
+    
+    var defVal = $("#BTPENJYMT>input").val();%');
+]]>	
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
