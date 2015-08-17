@@ -117,14 +117,16 @@
 			<select name="groupClassTypeId" onChange="showGroupSection(); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" class="formfieldL">
 				<option value="">--</option>
 				<c:forEach var="type" items="${groupTypes}">    
-				<c:choose>
-					<c:when test="${groupClassTypeId1 == type.id}">   
-						<option value="<c:out value="${type.id}"/>" selected><c:out value="${type.name}"/>
-					</c:when>
-					<c:otherwise>
-						<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>      
-					</c:otherwise>
-				</c:choose> 
+				<c:if test="${study.studyParameterConfig.dynamicGroup != 'no' || type.id != 4}">
+				   <c:choose>
+						<c:when test="${groupClassTypeId1 == type.id}">   
+							<option value="<c:out value="${type.id}"/>" selected><c:out value="${type.name}"/>
+						</c:when>
+						<c:otherwise>
+							<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>      
+						</c:otherwise>
+					</c:choose>
+				 </c:if>
 				</c:forEach>
 			</select>
 			</div>
