@@ -363,7 +363,7 @@
 			       onclick="back_checkEditUserFormState();"/>
 			<input type="submit" name="continue" value="<fmt:message key="continue" bundle="${resword}"/>"
 			       class="button_medium medium_continue"/>
-			<c:if test="${userBean.sysAdmin && editedUser.name != 'root' && isSiteLevelUser}">
+			<c:if test="${userBean.sysAdmin && editedUser.name != 'root' && isSiteLevelUser && study.studyParameterConfig.crfMasking != 'no'}">
 				<input type="button" value="<fmt:message key="crfs_masking" bundle="${resword}"/>" class="button_medium"
 				       onclick="redirectRequestToMaskingPage();"/>
 			</c:if>
