@@ -247,12 +247,12 @@ $(document).ready(function() {
 			</c:choose>
 		</div>
 		<div style="clear:both;"></div> 
-		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
+		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2-1"> 
 			<c:choose>
 				<c:when test="${parentId == 0}">
 					<c:if test="${isRFC}">
-						<div class="formfieldL_BG" id="select${parentId}" style="display:none" >
+						<div class="formfieldL_BG" id="select${parentId}" style="display:none; float: left;" >
 							<select name="description${parentId}" id="selectDescription${parentId}" class="formFieldL formFieldLSelect" disabled>
 								<c:forEach var="rfcTerm" items="${dDescriptionsMap['dnRFCDescriptions']}">
 									<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
@@ -261,7 +261,7 @@ $(document).ready(function() {
 							</select>
 						</div>
 					</c:if>
-					<div id="input${parentId}" style="display:none"> 
+					<div id="input${parentId}" style="display:none; float: left;"> 
 						<div class="formfieldXL_BG">
 							<input type="text" name="description${parentId}" id="inputDescription${parentId}" disabled value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL">
 						</div>
@@ -269,7 +269,7 @@ $(document).ready(function() {
 					</div>	
 				</c:when>
 				<c:otherwise>
-					<div class="formfieldL_BG">
+					<div class="formfieldL_BG" style="float: left;">
 						<select name="description${parentId}" id="selectUpdateDescription${parentId}" class="formFieldL formFieldLSelect">
 							<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
 								<option value="${term.name}"><c:out value="${term.name}"/>
@@ -286,6 +286,7 @@ $(document).ready(function() {
 					</div>
 				</c:otherwise>
 			</c:choose>
+			<span class="alert">*</span>
 		</div>
 		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2">
@@ -309,8 +310,8 @@ $(document).ready(function() {
 			<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
 		</c:when>
 		<c:otherwise>
-			<div class="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
-			<div class="dnBoxCol2"><div class="formfieldL_BG">
+			<div class="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:</div>
+			<div class="dnBoxCol2"><div class="formfieldL_BG" style="float: left;">
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
@@ -343,14 +344,14 @@ $(document).ready(function() {
 				</c:otherwise>
 				</c:choose>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="typeId${parentId}"/></jsp:include>
-			</div></div>
+			</div><span class="alert">*</span></div>
 		</c:otherwise>
 		</c:choose>
 		
 		<span id="res1${parentId}" <c:if test="${parentId eq 0}"> style="display: none;" </c:if> >
-			<div class="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div class="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:</div>
 			<div class="dnBoxCol2">
-				<div class="formfieldL_BG">
+				<div class="formfieldL_BG" style="float: left;">
 				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
 			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL formFieldLSelect" onchange="javascript:showAnotherDescriptions(this.options[selectedIndex].value, ${parentId});">
 					<c:choose>
@@ -374,6 +375,7 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 				</div>
+				<span class="alert">*</span>
 			</div>
 		</span>
 		

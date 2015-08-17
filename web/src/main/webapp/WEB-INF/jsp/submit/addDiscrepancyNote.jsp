@@ -360,10 +360,10 @@ $(document).ready(function() {
 <br>
 <div class="textbox_center">
 
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
+	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:</div>
 	<div class="dnBoxCol2 dnBoxText">
 		<c:if test="${isRFC}">
-			<div class="formfieldL_BG" id="select" style="display:none" >
+			<div class="formfieldL_BG" id="select" style="display:none; float: left;" >
 				<select name="description" id="selectDescription"  class="formFieldL formfieldLSelect" disabled>
 					<c:forEach var="rfcTerm" items="${dDescriptionsMap['dnRFCDescriptions']}">
 						<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
@@ -372,12 +372,13 @@ $(document).ready(function() {
 				</select>
 			</div>
 		</c:if>
-			<div id="input" style="display:none"> 
+			<div id="input" style="display:none; float: left;"> 
 				<div class="formfieldXL_BG" >
 					<input type="text" name="description" id="inputDescription" disabled value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL">
 				</div>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
 			</div>
+			<span class="alert">*</span>
 	</div>
 	
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
@@ -389,8 +390,8 @@ $(document).ready(function() {
 	</div>
 
 <c:if test="${not showStatus}"> <div style="display:none;">  </c:if>
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
-	<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
+	<div class="dnBoxCol1 dnBoxText"><fmt:message key="type" bundle="${resword}"/>:</div>
+	<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG" style="float: left;">
 		<c:choose>
 		<c:when test="${parentId > 0}">
 			<input type="hidden" name="typeId" value="${param.typeId}"/>
@@ -437,11 +438,11 @@ $(document).ready(function() {
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="typeId"/></jsp:include>
 		</c:otherwise>
 		</c:choose>
-	</div></div>
+	</div><span class="alert">*</span></div>
 		
 	<span id="res1${parentId}" style="display: none;">
-		<div class="dnBoxCol1 dnBoxText"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
+		<div class="dnBoxCol1 dnBoxText"><fmt:message key="Set_to_Status" bundle="${resword}"/>:</div>
+		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG" style="float: left;">
 			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
 		    <select name="resStatusId" id="resStatusId" class="formfieldL formFieldLSelect">
 				<c:set var="resStatuses" value="${resolutionStatuses}"/>
@@ -457,7 +458,7 @@ $(document).ready(function() {
 				</c:forEach>
 			</select></div>
 		    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="resStatusId"/></jsp:include>
-		</div>
+		<span class="alert">*</span></div>
 	</span>
 
 	<c:choose>

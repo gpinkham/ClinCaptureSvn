@@ -2129,8 +2129,8 @@ body { margin: 0px; }
 /* initially created for creating new or child dn box */
 .dnBoxCol1 { float:left; width:120; }
 .dnBoxCol1-1 { float:left; width:120; margin-top:10; }
-.dnBoxCol2 { margin: 0 0 0 120; /* 0 right 0 left*/	width: 260; }
-.dnBoxCol2-1 { margin: 0 0 0 120; width: 260; margin-top:10 }
+.dnBoxCol2 { margin: 0 80 0 0; /* 0 right 0 left*/	width: 270; float: left;}
+.dnBoxCol2-1 { margin: 0 80 0 0; width: 270; margin-top:10; float: left;}
 .dnBoxCol3 { float: right; }
 .icon_dnBox { width: 23px; height: 13px; border: 0px; }
 .dnBoxText {
