@@ -12,12 +12,14 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
@@ -52,6 +54,8 @@ public class UpdateStudySubjectServletTest {
 	private SubjectGroupMapDAO mockedSubjectGroupMapDAO;
 	@Mock
 	private StudyGroupClassDAO mockedStudyGroupClassDAO;
+	@Mock
+	private StudyParameterValueDAO mockedStudyParameterValueDAO;
 	@Mock
 	private MockServletContext mockedServletContext;
 	@Mock
@@ -135,6 +139,7 @@ public class UpdateStudySubjectServletTest {
 		Mockito.doReturn(mockedDiscrepancyNoteDAO).when(spiedUpdateStudySubjectServlet).getDiscrepancyNoteDAO();
 		Mockito.doReturn(mockedSubjectGroupMapDAO).when(spiedUpdateStudySubjectServlet).getSubjectGroupMapDAO();
 		Mockito.doReturn(mockedStudyGroupClassDAO).when(spiedUpdateStudySubjectServlet).getStudyGroupClassDAO();
+		Mockito.doReturn(mockedStudyParameterValueDAO).when(spiedUpdateStudySubjectServlet).getStudyParameterValueDAO();
 		Mockito.doNothing()
 				.when(spiedUpdateStudySubjectServlet)
 				.checkStudyLocked(Mockito.any(Page.class), Mockito.any(String.class),

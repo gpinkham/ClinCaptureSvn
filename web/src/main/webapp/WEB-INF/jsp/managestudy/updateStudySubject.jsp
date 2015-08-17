@@ -129,6 +129,9 @@
 																	<jsp:include page="../showMessage.jsp">
 																		<jsp:param name="key" value="label" />
 																	</jsp:include>
+																	<jsp:include page="../showMessage.jsp">
+																		<jsp:param name="key" value="personId" />
+																	</jsp:include>
 																</td>
 																
 																<td><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}" /></td>

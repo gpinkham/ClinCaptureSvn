@@ -36,14 +36,14 @@ public class StudySubjectBean extends AuditableEntityBean {
 
 	private String secondaryLabel = "";
 
-	private String uniqueIdentifier = "";// not in the table, for display
+	private String uniqueIdentifier = ""; // not in the table, for display
 	// purpose
 
-	private String studyName = "";// not in the table, for display purpose
+	private String studyName = ""; // not in the table, for display purpose
 
-	private char gender = 'm';// not in the table, for display purpose
+	private char gender = 'm'; // not in the table, for display purpose
 
-	private Date dateOfBirth;// not in the db
+	private Date dateOfBirth; // not in the db
 
 	/**
 	 * An array of the groups this subject belongs to. Each element is a StudyGroupMapBean object. Not in the database.

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -33,6 +33,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -45,6 +47,8 @@ import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
@@ -62,7 +66,7 @@ import java.util.Map;
 /**
  * Processes request to update a study subject.
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class UpdateStudySubjectServlet extends Controller {
 
@@ -80,12 +84,10 @@ public class UpdateStudySubjectServlet extends Controller {
 		if (currentUser.isSysAdmin()) {
 			return;
 		}
-
 		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
 				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			return;
 		}
-
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
@@ -96,15 +98,11 @@ public class UpdateStudySubjectServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		FormDiscrepancyNotes discNotes;
 		FormProcessor fp = new FormProcessor(request);
-		int defaultDynGroupClassId = 0;
-		String defaultDynGroupClassName = "";
-
 		String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
-		if (StringUtil.isBlank(fromResolvingNotes)) {
 
+		if (StringUtil.isBlank(fromResolvingNotes)) {
 			request.getSession().removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			request.getSession().removeAttribute(ViewNotesServlet.NOTES_TABLE);
 			checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request,
@@ -115,108 +113,101 @@ public class UpdateStudySubjectServlet extends Controller {
 
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		int studySubId = fp.getInt("id", true);
-
 		StudySubjectBean subjectToUpdate = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubId);
 
 		if (subjectToUpdate.getId() == 0) {
-
 			addPageMessage(respage.getString("please_choose_study_subject_to_edit"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
-		} else {
-
-			ArrayList<DiscrepancyNoteBean> dbNotes = (ArrayList<DiscrepancyNoteBean>) dndao
-					.findAllByEntityAndColumnAndStudy(currentStudy, "studySub", studySubId, "enrollment_date");
-			request.setAttribute(HAS_NOTES, dbNotes != null && dbNotes.size() > 0);
-			request.setAttribute(ENROLLMENT_NOTE_STATUS,
-					ResolutionStatus.get(getDiscrepancyNoteResolutionStatus(request, dndao, studySubId, dbNotes)));
-
-			String action = fp.getString("action", true);
-			if (StringUtil.isBlank(action)) {
-
-				addPageMessage(respage.getString("no_action_specified"), request);
-				forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
-				return;
-			}
-
-			StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
-			StudyGroupDAO sgdao = getStudyGroupDAO();
-			SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
-			List<SubjectGroupMapBean> groupMapsForStudySubject = (List<SubjectGroupMapBean>) sgmdao
-					.findAllByStudySubject(studySubId);
-
-			Map<Integer, SubjectGroupMapBean> groupMapsForStudySubjectByGroupClassId = new HashMap<Integer, SubjectGroupMapBean>();
-			for (SubjectGroupMapBean groupMap : groupMapsForStudySubject) {
-				groupMapsForStudySubjectByGroupClassId.put(groupMap.getStudyGroupClassId(), groupMap);
-			}
-
-			List<StudyGroupClassBean> classes;
-			List<StudyGroupClassBean> dynamicClasses;
-			if (!"submit".equalsIgnoreCase(action)) {
-
-				int studyIdToSearchOn = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
-				classes = sgcdao.findAllActiveByStudyId(studyIdToSearchOn, true);
-				dynamicClasses = getDynamicGroupClassesByStudyId(studyIdToSearchOn);
-
-				for (StudyGroupClassBean group : classes) {
-
-					ArrayList<StudyGroupBean> studyGroups = (ArrayList<StudyGroupBean>) sgdao
-							.findAllByGroupClass(group);
-					group.setStudyGroups(studyGroups);
-					SubjectGroupMapBean gMap = groupMapsForStudySubjectByGroupClassId.get(group.getId());
-					if (gMap != null) {
-						group.setStudyGroupId(gMap.getStudyGroupId());
-						group.setGroupNotes(gMap.getNotes());
-					}
-				}
-				request.setAttribute("groups", classes);
-				request.setAttribute("dynamicGroups", dynamicClasses);
-
-				if (dynamicClasses.size() > 0) {
-					if (dynamicClasses.get(0).isDefault()) {
-
-						defaultDynGroupClassId = dynamicClasses.get(0).getId();
-						defaultDynGroupClassName = dynamicClasses.get(0).getName();
-					}
-				}
-				request.setAttribute("defaultDynGroupClassId", defaultDynGroupClassId);
-				request.setAttribute("defaultDynGroupClassName", defaultDynGroupClassName);
-				if (!fp.getString("dynamicGroupClassId").equals("")) {
-					request.getSession().setAttribute("selectedDynGroupClassId", fp.getInt("dynamicGroupClassId"));
-				}
-			}
-
-			if ("back".equalsIgnoreCase(action)) {
-
-				request.setAttribute("groups", request.getSession().getAttribute("groups"));
-				forwardPage(Page.UPDATE_STUDY_SUBJECT, request, response);
-
-			} else if ("show".equalsIgnoreCase(action)) {
-
-				clearSession(request);
-				request.getSession().setAttribute("selectedDynGroupClassId", subjectToUpdate.getDynamicGroupClassId());
-				request.getSession().setAttribute("studySub", subjectToUpdate);
-				discNotes = new FormDiscrepancyNotes();
-				request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-				forwardPage(Page.UPDATE_STUDY_SUBJECT, request, response);
-
-			} else if ("confirm".equalsIgnoreCase(action)) {
-
-				confirm(request, response);
-
-			} else if ("submit".equalsIgnoreCase(action)) {
-
-				getServletContext().setAttribute("groupMapsForStudySubjectByGroupClassId",
-						groupMapsForStudySubjectByGroupClassId);
-				submit(request, response);
-
-			} else {
-
-				addPageMessage(respage.getString("no_action_specified"), request);
-				forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
-
-			}
-
+			return;
 		}
+
+		ArrayList<DiscrepancyNoteBean> dbNotes = (ArrayList<DiscrepancyNoteBean>) dndao
+				.findAllByEntityAndColumnAndStudy(currentStudy, "studySub", studySubId, "enrollment_date");
+		request.setAttribute(HAS_NOTES, dbNotes != null && dbNotes.size() > 0);
+		request.setAttribute(ENROLLMENT_NOTE_STATUS,
+				ResolutionStatus.get(getDiscrepancyNoteResolutionStatus(request, dndao, studySubId, dbNotes)));
+		String action = fp.getString("action", true);
+
+		if (StringUtil.isBlank(action)) {
+			addPageMessage(respage.getString("no_action_specified"), request);
+			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
+			return;
+		}
+
+		Map<Integer, SubjectGroupMapBean> groupMapsForStudySubjectByGroupClassId = getGroupMapsForStudySubjectByGroupClassId(studySubId);
+
+		if (!"submit".equalsIgnoreCase(action)) {
+			proceedGroupMapsToRequest(request, currentStudy, groupMapsForStudySubjectByGroupClassId, fp);
+		}
+		if ("back".equalsIgnoreCase(action)) {
+			request.setAttribute("groups", request.getSession().getAttribute("groups"));
+			forwardPage(Page.UPDATE_STUDY_SUBJECT, request, response);
+		} else if ("show".equalsIgnoreCase(action)) {
+			clearSession(request);
+			request.getSession().setAttribute("selectedDynGroupClassId", subjectToUpdate.getDynamicGroupClassId());
+			request.getSession().setAttribute("studySub", subjectToUpdate);
+			discNotes = new FormDiscrepancyNotes();
+			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+			forwardPage(Page.UPDATE_STUDY_SUBJECT, request, response);
+		} else if ("confirm".equalsIgnoreCase(action)) {
+			confirm(request, response);
+		} else if ("submit".equalsIgnoreCase(action)) {
+			getServletContext().setAttribute("groupMapsForStudySubjectByGroupClassId",
+					groupMapsForStudySubjectByGroupClassId);
+			submit(request, response);
+		} else {
+			addPageMessage(respage.getString("no_action_specified"), request);
+			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
+		}
+	}
+
+	private void proceedGroupMapsToRequest(HttpServletRequest request, StudyBean currentStudy,
+										   Map<Integer, SubjectGroupMapBean> groupMap, FormProcessor fp) {
+
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
+		StudyGroupDAO sgdao = getStudyGroupDAO();
+		List<StudyGroupClassBean> classes;
+		List<StudyGroupClassBean> dynamicClasses;
+		int studyIdToSearchOn = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
+		classes = sgcdao.findAllActiveByStudyId(studyIdToSearchOn, true);
+		dynamicClasses = getDynamicGroupClassesByStudyId(studyIdToSearchOn);
+
+		for (StudyGroupClassBean group : classes) {
+
+			ArrayList<StudyGroupBean> studyGroups = (ArrayList<StudyGroupBean>) sgdao
+					.findAllByGroupClass(group);
+			group.setStudyGroups(studyGroups);
+			SubjectGroupMapBean gMap = groupMap.get(group.getId());
+			if (gMap != null) {
+				group.setStudyGroupId(gMap.getStudyGroupId());
+				group.setGroupNotes(gMap.getNotes());
+			}
+		}
+		request.setAttribute("groups", classes);
+		request.setAttribute("dynamicGroups", dynamicClasses);
+		int defaultDynGroupClassId = 0;
+		String defaultDynGroupClassName = "";
+
+		if (dynamicClasses.size() > 0 && dynamicClasses.get(0).isDefault()) {
+			defaultDynGroupClassId = dynamicClasses.get(0).getId();
+			defaultDynGroupClassName = dynamicClasses.get(0).getName();
+		}
+		request.setAttribute("defaultDynGroupClassId", defaultDynGroupClassId);
+		request.setAttribute("defaultDynGroupClassName", defaultDynGroupClassName);
+		if (!fp.getString("dynamicGroupClassId").equals("")) {
+			request.getSession().setAttribute("selectedDynGroupClassId", fp.getInt("dynamicGroupClassId"));
+		}
+	}
+
+	private HashMap<Integer, SubjectGroupMapBean> getGroupMapsForStudySubjectByGroupClassId(int studySubId) {
+		SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
+		List<SubjectGroupMapBean> groupMapsForStudySubject = (List<SubjectGroupMapBean>) sgmdao
+				.findAllByStudySubject(studySubId);
+		HashMap<Integer, SubjectGroupMapBean> result = new HashMap<Integer, SubjectGroupMapBean>();
+		for (SubjectGroupMapBean groupMap : groupMapsForStudySubject) {
+			result.put(groupMap.getStudyGroupClassId(), groupMap);
+		}
+		return result;
 	}
 
 	private void clearSession(HttpServletRequest request) {
@@ -229,11 +220,9 @@ public class UpdateStudySubjectServlet extends Controller {
 
 	/**
 	 * Processes 'confirm' request, validate the study subject object.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
+	 *
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
 	 * @throws Exception
 	 */
 	private void confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -301,10 +290,10 @@ public class UpdateStudySubjectServlet extends Controller {
 		if (!errors.isEmpty()) {
 			if (StringUtil.isBlank(subjectToUpdate.getLabel())) {
 				addPageMessage(new StringBuilder("").append(respage.getString("must_enter_subject_ID_for_identifying"))
-								.append(respage.getString("this_may_be_external_ID_number"))
-								.append(respage.getString("you_may_enter_study_subject_ID_listed"))
-								.append(respage.getString("study_subject_ID_should_not_contain_protected_information"))
-								.toString(), request);
+						.append(respage.getString("this_may_be_external_ID_number"))
+						.append(respage.getString("you_may_enter_study_subject_ID_listed"))
+						.append(respage.getString("study_subject_ID_should_not_contain_protected_information"))
+						.toString(), request);
 			} else {
 				StudySubjectDAO subdao = getStudySubjectDAO();
 				StudySubjectBean sub1 = (StudySubjectBean) subdao.findAnotherBySameLabel(subjectToUpdate.getLabel(),
@@ -327,8 +316,17 @@ public class UpdateStudySubjectServlet extends Controller {
 		}
 
 		if (!StringUtil.isBlank(fp.getString("label"))) {
-
 			StudySubjectDAO ssdao = getStudySubjectDAO();
+			StudyParameterValueBean personIdRequired = getPersonIdRequired(subjectToUpdate.getStudyId());
+			if (personIdRequired.getValue().equals("copyFromSSID")) {
+				SubjectDAO subjectDAO = getSubjectDAO();
+
+				SubjectBean subjectBean = (SubjectBean) subjectDAO.findByPK(subjectToUpdate.getSubjectId());
+				SubjectBean subjectBean1 = subjectDAO.findByUniqueIdentifier(fp.getString("label").trim());
+				if (subjectBean1.getId() != subjectBean.getId() && !subjectBean1.getUniqueIdentifier().isEmpty()) {
+					Validator.addError(errors, "personId", resexception.getString("subject_person_ID_used_by_another_choose_unique"));
+				}
+			}
 			StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(),
 					currentStudy.getId(), subjectToUpdate.getId());
 			if (sub1.getId() == 0) {
@@ -358,6 +356,14 @@ public class UpdateStudySubjectServlet extends Controller {
 		subjectToUpdate.setDynamicGroupClassId(selectedDynGroupClassId);
 
 		subdao.update(subjectToUpdate);
+		StudyParameterValueBean personIdRequired = getPersonIdRequired(subjectToUpdate.getStudyId());
+		if (personIdRequired != null && personIdRequired.getValue().equals("copyFromSSID")) {
+			SubjectDAO subjectDAO = getSubjectDAO();
+			SubjectBean subjectBean = (SubjectBean) subjectDAO.findByPK(subjectToUpdate.getSubjectId());
+			subjectBean.setUniqueIdentifier(subjectToUpdate.getLabel());
+			subjectBean.setUpdater(currentUser);
+			subjectDAO.update(subjectBean);
+		}
 
 		// save discrepancy notes into DB
 		DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
@@ -421,4 +427,8 @@ public class UpdateStudySubjectServlet extends Controller {
 		response.sendRedirect(response.encodeRedirectURL(viewStudySubjectRequestURL));
 	}
 
+	private StudyParameterValueBean getPersonIdRequired(int studyId) {
+		StudyParameterValueDAO studyParameterValueDAO = getStudyParameterValueDAO();
+		return studyParameterValueDAO.findByHandleAndStudy(studyId, "subjectPersonIdRequired");
+	}
 }
