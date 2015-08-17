@@ -105,6 +105,12 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
 		String hostName = request.getRequestURL().toString().replaceAll("http.{0,1}://", "").replaceAll(":.*|/.*", "");
 		coreResources.setField("currentHostName", hostName);
+		String restoreSessionFlag = request.getParameter("shouldSessionParametersBeRestored");
+		if (restoreSessionFlag != null && restoreSessionFlag.equals("true")) {
+			Controller.setRestoreSessionFlag(restoreSessionFlag);
+		} else {
+			Controller.resetRestoreSessionFlag();
+		}
 
 		String username = obtainUsername(request);
 		String password = obtainPassword(request);

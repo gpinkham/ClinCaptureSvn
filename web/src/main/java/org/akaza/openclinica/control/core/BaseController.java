@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -148,7 +149,14 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public static final String DOMAIN_NAME = "domain_name";
 
-	private static final Map<Integer, Integer> unavailableCRFList = new HashMap<Integer, Integer>();
+	private static final Map<Integer, Integer> UNAVAILABLE_CRF_LIST = new HashMap<Integer, Integer>();
+
+	private static String restoreSessionFlag;
+
+	private static final HashMap<String, HashMap<String, Object>> STORED_SESSION_ATTRIBUTES = new HashMap<String, HashMap<String, Object>>();
+
+	private static final String[] NAMES_OF_ATTRIBUTES_TO_STORE = {"randomizationEnviroment", "panel", "fdnotes",
+			"submittedDNs", "ecb", "dnAdditionalCreatingParameters", "instanceType", "newThemeColor", "visitedURLs"};
 
 	protected static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword,
 			resworkflow;
@@ -256,26 +264,54 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	@Autowired
 	private EventDefinitionService eventDefinitionService;
 
+	/**
+	 * Allow access to this for other users.
+	 * @param userId int
+	 */
 	public static synchronized void removeLockedCRF(int userId) {
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>(UNAVAILABLE_CRF_LIST);
 		for (Integer key : map.keySet()) {
 			int id = map.get(key);
 			if (id == userId) {
-				unavailableCRFList.remove(key);
+				UNAVAILABLE_CRF_LIST.remove(key);
 			}
 		}
 	}
 
+	/**
+	 * Prevent the case when other users can open same CRF for data entry.
+	 * @param ecb EventCRFBean ID
+	 * @param ub UserAccountBean ID
+	 */
 	public static synchronized void lockThisEventCRF(int ecb, int ub) {
-		unavailableCRFList.put(ecb, ub);
+		UNAVAILABLE_CRF_LIST.put(ecb, ub);
 	}
 
+	/**
+	 * Unlock EventCRF.
+	 * @param ecb EventCRFBean ID
+	 */
 	public static synchronized void justRemoveLockedCRF(int ecb) {
-		unavailableCRFList.remove(ecb);
+		UNAVAILABLE_CRF_LIST.remove(ecb);
 	}
 
 	public static Map getUnavailableCRFList() {
-		return unavailableCRFList;
+		return UNAVAILABLE_CRF_LIST;
+	}
+
+	public static String getRestoreSessionFlag() {
+		return restoreSessionFlag;
+	}
+
+	public static void setRestoreSessionFlag(String restoreSessionFlag) {
+		BaseController.restoreSessionFlag = restoreSessionFlag;
+	}
+
+	/**
+	 *
+	 */
+	public static void resetRestoreSessionFlag() {
+		restoreSessionFlag = "";
 	}
 
 	public void setServletContext(ServletContext servletContext) {
@@ -299,10 +335,20 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver.getLocale(request));
 	}
 
+	/**
+	 * Get SessionManager from request.
+	 * @param request HttpServletRequest request
+	 * @return SessionManager
+	 */
 	public SessionManager getSessionManager(HttpServletRequest request) {
 		return (SessionManager) request.getAttribute(SESSION_MANAGER);
 	}
 
+	/**
+	 * Get errors holder.
+	 * @param request HttpServletRequest
+	 * @return HashMap
+	 */
 	public HashMap getErrorsHolder(HttpServletRequest request) {
 		HashMap errors = (HashMap) request.getAttribute(ERRORS_HOLDER);
 		if (errors == null) {
@@ -312,6 +358,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return errors;
 	}
 
+	/**
+	 * Get studyInfoPanel.
+	 * @param request HttpServletRequest
+	 * @return StudyInfoPanel
+	 */
 	public StudyInfoPanel getStudyInfoPanel(HttpServletRequest request) {
 		StudyInfoPanel panel = (StudyInfoPanel) request.getSession().getAttribute(STUDY_INFO_PANEL);
 		if (panel == null) {
@@ -322,14 +373,28 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return panel;
 	}
 
+	/**
+	 * Get current study.
+	 * @param request HttpServletRequest
+	 * @return StudyBean
+	 */
 	public StudyBean getCurrentStudy(HttpServletRequest request) {
 		return (StudyBean) request.getSession().getAttribute(STUDY);
 	}
 
+	/**
+	 * Get current study from RequestUtil.
+	 * @return StudyBean
+	 */
 	public StudyBean getCurrentStudy() {
 		return getCurrentStudy(RequestUtil.getRequest());
 	}
 
+	/**
+	 * Get parent study.
+	 * @param request HttpServletRequest
+	 * @return StudyBean
+	 */
 	public StudyBean getParentStudy(HttpServletRequest request) {
 		return (StudyBean) request.getSession().getAttribute(PARENT_STUDY);
 	}
@@ -338,6 +403,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return getParentStudy(RequestUtil.getRequest());
 	}
 
+	/**
+	 * Get UserAccountBean.
+	 * @param request HttpServletRequest
+	 * @return UserAccountBean
+	 */
 	public UserAccountBean getUserAccountBean(HttpServletRequest request) {
 		return (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 	}
@@ -346,6 +416,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return getUserAccountBean(RequestUtil.getRequest());
 	}
 
+	/**
+	 * Get current role.
+	 * @param request HttpServletRequest
+	 * @return StudyUserRoleBean
+	 */
 	public StudyUserRoleBean getCurrentRole(HttpServletRequest request) {
 		return (StudyUserRoleBean) request.getSession().getAttribute(USER_ROLE);
 	}
@@ -602,10 +677,23 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return simpleConditionalDisplayService;
 	}
 
+	/**
+	 * Get CRF shortcuts analyzer.
+	 * @param request HttpServletRequest
+	 * @param itemSDVService ItemSDVService
+	 * @return CrfShortcutsAnalyzer
+	 */
 	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request, ItemSDVService itemSDVService) {
 		return getCrfShortcutsAnalyzer(request, itemSDVService, false);
 	}
 
+	/**
+	 * Get CRF shortcuts analyzer with recreate flag.
+	 * @param request HttpServletRequest
+	 * @param itemSDVService ItemSDVService
+	 * @param recreate boolean
+	 * @return CrfShortcutsAnalyzer
+	 */
 	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request,
 			ItemSDVService itemSDVService, boolean recreate) {
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = (CrfShortcutsAnalyzer) request
@@ -646,4 +734,47 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public EventDefinitionService getEventDefinitionService() {
 		return eventDefinitionService;
 	}
+
+	public static HashMap<String, HashMap<String, Object>> getStoredSessionAttributes() {
+		return STORED_SESSION_ATTRIBUTES;
+	}
+
+	/**
+	 * Set attributes that should be restored for this user after session.destroy.
+	 * @param session HttpSession
+	 */
+	public static void setStoredSessionAttributes(HttpSession session) {
+		UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
+		if (ub != null) {
+			HashMap<String, Object> attributesToStore = new HashMap<String, Object>();
+			for (String name : NAMES_OF_ATTRIBUTES_TO_STORE) {
+				Object value = session.getAttribute(name);
+				if (value != null) {
+					attributesToStore.put(name, value);
+				}
+			}
+			if (attributesToStore.size() != 0) {
+				getStoredSessionAttributes().put(ub.getName(), attributesToStore);
+			}
+		}
+	}
+
+	/**
+	 * Restore session attributes for the current user.
+	 * @param session HttpSession
+	 * @param userName String
+	 */
+	public static void restoreSavedSessionAttributes(HttpSession session, String userName) {
+		HashMap<String, Object> storedAttributes = getStoredSessionAttributes().get(userName);
+
+		if  (storedAttributes == null || storedAttributes.size() == 0) {
+			return;
+		}
+		for (String key : storedAttributes.keySet()) {
+			session.setAttribute(key, storedAttributes.get(key));
+		}
+		getStoredSessionAttributes().remove(userName);
+	}
+
+
 }

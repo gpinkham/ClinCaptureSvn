@@ -31,12 +31,16 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/js/session_lifetime.js?r=${revisionNumber}"></script>
     <!-- Added for the new Calender -->
 
     <ui:calendar/>
     <!-- End -->
     <!-- *JSP* submit/administrativeEditing.jsp -->
     <ui:theme/>
+
+	<!-- Dialogs.js -->
+	<jsp:include page="/includes/js/dialogs.js.jsp" />
 </head>
 <body class="aka_bodywidth" onload="" onunload="javascript:clsWin();">
 <c:if test='${popUpURL != ""}'><script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script></c:if>
@@ -129,6 +133,7 @@
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
+<input type="hidden" id="currentUser" value="${userBean.name}" />
 <input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />

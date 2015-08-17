@@ -4203,35 +4203,34 @@ function openDialog(params) {
     if($.browser.msie){
     	$(params.dialogDiv).focus();
     }
-    
+
     if(params.cancelButtonValue)
-    	setButtonAttributes(params.cancelButtonValue);
+    	setButtonAttributes(params.cancelButtonValue, params);
     
     if(params.okButtonValue)
-    	setButtonAttributes(params.okButtonValue);    
+    	setButtonAttributes(params.okButtonValue, params);
     
-    setDialogTheme(params);
-    
+    setDialogTheme();
 }
 
-function setButtonAttributes(buttonValue){
-	
-	$('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")')
-    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0')
-        .css('padding','8px 0').attr('id', 'dlgBtn' + buttonValue);
-    $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")')
-        .mouseover(function() {$(this).removeClass("ui-state-hover");})
-        .focus(function () {$(this).removeClass("ui-state-focus");});
-    $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")').blur();
+function setButtonAttributes(buttonValue, params) {
+	var $button = $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")');
+	var lenth = buttonValue.length;
+	var width = lenth > 10 ? 180 : 120;
+	var buttonClass = lenth > 10 ? "button_long" : 'button_medium';
+	var image = lenth > 10 ? '/button_long_BG.gif' : '/button_medium_BG.gif';
+	$button.removeAttr('class').addClass(buttonClass).css('width', width + 'px').css('float', 'left').css('line-height', '0')
+		.css('padding', '8px 0').attr('id', 'dlgBtn' + buttonValue);
+	$button.mouseover(function () {$(this).removeClass("ui-state-hover");}).focus(function () {
+		$(this).removeClass("ui-state-focus");
+	});
+	if (theme.name != 'blue') {
+		$button.css('background-image', 'url(' + params.imagesFolderPath + theme.name + image + ')');
+	}
+	$button.blur();
 }
 
-function setDialogTheme(params) {
-    if (theme.name != 'blue') {
-        if (params.cancelButtonValue)
-            $('.ui-dialog-buttonpane').find('button:contains("' + params.cancelButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + theme.name + '/button_medium_BG.gif)');
-        if (params.okButtonValue)
-            $('.ui-dialog-buttonpane').find('button:contains("' + params.okButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + theme.name + '/button_medium_BG.gif)');
-    }
+function setDialogTheme() {
     $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', theme.mainColor);
 }
 

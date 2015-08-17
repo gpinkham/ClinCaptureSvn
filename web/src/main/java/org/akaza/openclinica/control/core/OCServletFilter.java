@@ -26,6 +26,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -92,9 +93,10 @@ public class OCServletFilter implements javax.servlet.Filter {
 		((HttpServletRequest) request).getSession()
 				.setAttribute("instanceType", getInstanceType((HttpServletRequest) request));
 
+		createSessionLifetimeCookie(request, response, ub);
 		Principal principal = req.getUserPrincipal();
 
-		if ((ub != null) && (null != ub.getName()) && (!ub.getName().equals(""))) {
+		if (wasUserBeanFound(ub)) {
 			username = ub.getName();
 			successfulRegistration = registerUsernameWithLogContext(username);
 		} else if (principal != null) {
@@ -109,6 +111,25 @@ public class OCServletFilter implements javax.servlet.Filter {
 				MDC.remove(LoggingConstants.USERNAME);
 			}
 		}
+	}
+
+	private void createSessionLifetimeCookie(ServletRequest request, ServletResponse response, UserAccountBean ub) {
+
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse resp = (HttpServletResponse) response;
+		final int milliseconds = 1000;
+		long currTime = System.currentTimeMillis();
+		long expiryTime = currTime + req.getSession().getMaxInactiveInterval() * milliseconds;
+		Cookie cookie = new Cookie("serverTime", "" + currTime);
+		cookie.setPath("/");
+		resp.addCookie(cookie);
+		if (wasUserBeanFound(ub)) {
+			cookie = new Cookie("sessionExpiry", "" + expiryTime);
+		} else {
+			cookie = new Cookie("sessionExpiry", "" + currTime);
+		}
+		cookie.setPath("/");
+		resp.addCookie(cookie);
 	}
 
 	/**
@@ -143,5 +164,9 @@ public class OCServletFilter implements javax.servlet.Filter {
 			}
 		}
 		return "";
+	}
+
+	private boolean wasUserBeanFound(UserAccountBean ub) {
+		return ub != null && ub.getName() != null && !ub.getName().equals("");
 	}
 }

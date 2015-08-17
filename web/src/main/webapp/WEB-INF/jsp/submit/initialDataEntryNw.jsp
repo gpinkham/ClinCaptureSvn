@@ -36,8 +36,9 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js?r=${revisionNumber}"></script>
     <script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js?r=${revisionNumber}"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/effects.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/effects.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/js/session_lifetime.js?r=${revisionNumber}"></script>
     <script type="text/javascript" language="JavaScript">
         $(document).ready(function() {
             formChanged = false;
@@ -50,6 +51,8 @@
             checkRandomizationCRF();
         });
     </script>
+	<!-- Dialogs.js -->
+	<jsp:include page="/includes/js/dialogs.js.jsp" />
 
     <!-- Added for the new Calender -->
     <!-- *JSP* submit/initialDataEntryNw.jsp -->
@@ -129,6 +132,7 @@
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
+<input type="hidden" id="currentUser" value="${userBean.name}" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />

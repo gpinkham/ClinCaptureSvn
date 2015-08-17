@@ -487,6 +487,11 @@ public abstract class Controller extends BaseController {
 			SessionManager sm = new SessionManager(ub, userName, applicationContext);
 			request.setAttribute(SESSION_MANAGER, sm);
 
+			String restoreSessionFlag = getRestoreSessionFlag();
+			if (ub == null && sm.getUserBean() != null && restoreSessionFlag != null && restoreSessionFlag.equals("true")) {
+				restoreSavedSessionAttributes(session, userName);
+			}
+
 			ub = sm.getUserBean();
 			request.getSession().setAttribute(USER_BEAN_NAME, ub);
 

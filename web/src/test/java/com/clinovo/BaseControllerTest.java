@@ -37,6 +37,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 	public static final String CODED_ITEM_CONTROLLER = "/codedItems";
 	public static final String SDV_ITEM_CONTROLLER = "/sdvItem";
 	public static final String CONFIGURE_HOME_PAGE = "/configureHomePage";
+	public static final String INCLUDES_CONTROLLER = "/includes/getPageContent";
 	public static final String SAVE_HOME_PAGE = "/saveHomePage";
 	public static final String NDS_ASSIGNED_TO_ME_WIDGET = "/initNdsAssignedToMeWidget";
 	public static final String EVENTS_COMPLETION_WIDGET = "/initEventsCompletionWidget";
