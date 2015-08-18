@@ -740,11 +740,11 @@
 		value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
 		class="button_long" 
 		onclick="javascript:openDocWindow('${pageContext.request.contextPath}/print/metadata/html/print/${parentStudyOid}/*/*')"/>
-	<c:if test = "${showCasebookButton}">
-    <input type="button" name="BTN_Print"
-           value="<fmt:message key="print_site_casebooks" bundle="${resword}"/>"
-           class="button_long"
-           onclick="javascript:runCasebooks()"/>
+	<c:if test = "${showCasebookButton and study.studyParameterConfig.subjectCasebookInPDF != 'no'}">
+        <input type="button" name="BTN_Print"
+               value="<fmt:message key="print_site_casebooks" bundle="${resword}"/>"
+               class="button_long"
+               onclick="javascript:runCasebooks()"/>
 	</c:if>
 </c:if>
  <br><br>

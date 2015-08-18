@@ -470,8 +470,9 @@
 </div>
 </c:if>
 <!-- Group table end -->
-
-<jsp:include page="studySubject/casebookGenerationForm.jsp"/>
+<c:if test="${study.studyParameterConfig.subjectCasebookInPDF != 'no'}">
+	<jsp:include page="studySubject/casebookGenerationForm.jsp"/>
+</c:if>
 
 <div class="table_title_Admin">
 	<a name="events" href="javascript:leftnavExpand('subjectEvents',true);">

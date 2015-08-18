@@ -21,6 +21,8 @@
 <div class="taskLeftColumn">
     <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="datasets" bundle="${resword}"/></a></div>
 </div>
-<div class="taskRightColumn">
-    <div class="taskLink"><a href="${urlPrefix}pages/casebooks"><fmt:message key="casebooks" bundle="${resword}"/></a></div>
-</div>
+<c:if test="${study.studyParameterConfig.subjectCasebookInPDF != 'no'}">
+	<div class="taskRightColumn">
+	    <div class="taskLink"><a href="${urlPrefix}pages/casebooks"><fmt:message key="casebooks" bundle="${resword}"/></a></div>
+	</div>
+</c:if>
