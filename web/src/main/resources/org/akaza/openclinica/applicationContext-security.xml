@@ -60,7 +60,7 @@
 	</bean>
 
 	<bean id="successHandler"
-		class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+		class="com.clinovo.security.AuthenticationSuccessHandler">
 		<property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
 	</bean>
 
