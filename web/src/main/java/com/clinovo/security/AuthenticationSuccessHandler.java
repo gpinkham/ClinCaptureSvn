@@ -59,7 +59,9 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
 		// Use the DefaultSavedRequest URL
 		String targetUrl = savedRequest.getRedirectUrl();
 		String[] urlParts = targetUrl.split(request.getContextPath().concat("/"), 2);
-		getRedirectStrategy().sendRedirect(request, response, "/".concat(urlParts[1]));
+		targetUrl = "/".concat(urlParts[1]);
+		System.out.println("targetUrl: " + targetUrl);
+		getRedirectStrategy().sendRedirect(request, response, targetUrl);
 	}
 
 	public void setRequestCache(RequestCache requestCache) {
