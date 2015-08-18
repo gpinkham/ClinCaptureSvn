@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="words"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="notes"/>
 
 <script>
 	function showSessionExpireDialog() {
@@ -128,4 +129,12 @@
 			}
 		};
 	};
+
+	function getLoginFailureMessage(key) {
+		if (key === "locked") {
+			return '<fmt:message key="account_locked" bundle="${notes}"/>';
+		} else {
+			return '<fmt:message key="password_failed" bundle="${notes}"/>';
+		}
+	}
 </script>

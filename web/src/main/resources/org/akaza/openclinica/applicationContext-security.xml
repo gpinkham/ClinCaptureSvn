@@ -60,12 +60,12 @@
 	</bean>
 
 	<bean id="successHandler"
-		class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+		class="com.clinovo.spring.AjaxAuthenticationSuccessHandler">
 		<property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
 	</bean>
 
 	<bean id="failureHandler"
-		class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler">
+		class="com.clinovo.spring.AjaxAuthenticationFailureHandler">
 		<property name="defaultFailureUrl" value="/pages/login/login?action=errorLogin" />
 		<property name="exceptionMappings">
 			<props>

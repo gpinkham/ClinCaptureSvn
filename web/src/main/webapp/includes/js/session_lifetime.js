@@ -84,13 +84,15 @@ function loginViaAjax() {
 			domain_name: $("[name=domain_name]").val(),
 			shouldSessionParametersBeRestored: "true"
 		},
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader("X-Ajax-call", "true");
+		},
 		success: function (html) {
-			var message = $(html).find(".login_alertbox_center").html();
-			if (message === null) {
+			if (html === "success") {
 				closeDialog("#confirmDialog");
 				setTimeout('prepareSession()', 10000);
 			} else {
-				$("#login").append("<div class='login_alertbox_center'>" + message + "</div>")
+				$("#login").append("<div class='login_alertbox_center'>" + getLoginFailureMessage(html) + "</div>")
 			}
 		},
 		error: function (e) {

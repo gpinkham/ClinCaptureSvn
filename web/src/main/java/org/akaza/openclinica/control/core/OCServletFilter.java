@@ -93,7 +93,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 		((HttpServletRequest) request).getSession()
 				.setAttribute("instanceType", getInstanceType((HttpServletRequest) request));
 
-		createSessionLifetimeCookie(request, response, ub);
+		createSessionLifetimeCookie((HttpServletRequest) request, (HttpServletResponse) response, true);
 		Principal principal = req.getUserPrincipal();
 
 		if (wasUserBeanFound(ub)) {
@@ -113,23 +113,28 @@ public class OCServletFilter implements javax.servlet.Filter {
 		}
 	}
 
-	private void createSessionLifetimeCookie(ServletRequest request, ServletResponse response, UserAccountBean ub) {
+	/**
+	 * Create session lifetime cookies.
+	 * @param request ServletRequest
+	 * @param response ServletResponse
+	 * @param checkUserFlag boolean
+	 */
+	public static void createSessionLifetimeCookie(HttpServletRequest request, HttpServletResponse response, boolean checkUserFlag) {
 
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse resp = (HttpServletResponse) response;
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		final int milliseconds = 1000;
 		long currTime = System.currentTimeMillis();
-		long expiryTime = currTime + req.getSession().getMaxInactiveInterval() * milliseconds;
+		long expiryTime = currTime + request.getSession().getMaxInactiveInterval() * milliseconds;
 		Cookie cookie = new Cookie("serverTime", "" + currTime);
 		cookie.setPath("/");
-		resp.addCookie(cookie);
-		if (wasUserBeanFound(ub)) {
+		response.addCookie(cookie);
+		if (!checkUserFlag || wasUserBeanFound(ub)) {
 			cookie = new Cookie("sessionExpiry", "" + expiryTime);
 		} else {
 			cookie = new Cookie("sessionExpiry", "" + currTime);
 		}
 		cookie.setPath("/");
-		resp.addCookie(cookie);
+		response.addCookie(cookie);
 	}
 
 	/**
@@ -166,7 +171,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 		return "";
 	}
 
-	private boolean wasUserBeanFound(UserAccountBean ub) {
+	private static boolean wasUserBeanFound(UserAccountBean ub) {
 		return ub != null && ub.getName() != null && !ub.getName().equals("");
 	}
 }
