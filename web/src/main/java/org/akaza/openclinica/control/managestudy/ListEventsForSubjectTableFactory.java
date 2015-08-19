@@ -123,7 +123,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private static final int POPUP_BASE_WIDTH = 600;
 
 	private final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
-	private final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>();
 
 	/**
 	 * ListEventsForSubjectTableFactory constructor.
@@ -143,18 +142,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		imageIconPaths.put(index++, "images/icon_Signed.gif");
 		imageIconPaths.put(index++, "images/icon_DoubleCheck.gif");
 		imageIconPaths.put(index, "images/icon_Invalid.gif");
-
-		crfColumnImageIconPaths.put(Status.INVALID.getId(), "images/icon_Invalid.gif");
-		crfColumnImageIconPaths.put(Status.NOT_STARTED.getId(), "images/icon_NotStarted.gif");
-		crfColumnImageIconPaths.put(Status.DATA_ENTRY_STARTED.getId(), "images/icon_InitialDE.gif");
-		crfColumnImageIconPaths.put(Status.INITIAL_DATA_ENTRY_COMPLETED.getId(), "images/icon_InitialDEcomplete.gif");
-		crfColumnImageIconPaths.put(Status.DOUBLE_DATA_ENTRY.getId(), "images/icon_DDE.gif");
-		crfColumnImageIconPaths.put(Status.SOURCE_DATA_VERIFIED.getId(), "images/icon_DoubleCheck.gif");
-		crfColumnImageIconPaths.put(Status.SIGNED.getId(), "images/icon_Signed.gif");
-		crfColumnImageIconPaths.put(Status.COMPLETED.getId(), "images/icon_DEcomplete.gif");
-		crfColumnImageIconPaths.put(Status.LOCKED.getId(), "images/icon_Locked.gif");
-		crfColumnImageIconPaths.put(Status.DELETED.getId(), "images/icon_Invalid.gif");
-
 		this.showMoreLink = showMoreLink;
 	}
 
@@ -886,7 +873,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
 			subject = (SubjectBean) ((HashMap<Object, Object>) item).get("subject");
 			List<StudyEventBean> studyEvents;
-			int eventCRFStatusId;
+			Status eventCRFStatus;
 			int numberOfEvents = (Integer) ((HashMap<Object, Object>) item).get("numberOfEvents");
 
 			StringBuilder url = new StringBuilder();
@@ -895,7 +882,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					url.append("<div class=\"newLine\"></div>");
 				}
 				DisplayBean display = events.get(i);
-				eventCRFStatusId = ((Status) display.getProps().get(property)).getId();
+				eventCRFStatus = (Status) display.getProps().get(property);
 				eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
 				eventCrf = (EventCRFBean) display.getProps().get(property + "_eventCrf");
 				studyEvent = (StudyEventBean) display.getProps().get("event");
@@ -915,9 +902,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				eventDivBuilderWrapper.goingToReplaceHtmlContent = false;
 
 				url.append(eventDivBuilder(eventDivBuilderWrapper));
-
-				url.append("<img src='").append(crfColumnImageIconPaths.get(eventCRFStatusId)).append("' border='0'>");
-
+				url.append("<img src='").append(EventCRFUtil.getEventCRFStatusIconPath(eventCRFStatus))
+						.append("' border='0'>");
 				url.append("</a>");
 
 			}

@@ -28,10 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import com.clinovo.util.CodingFieldsUtil;
+import com.clinovo.util.EventCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,7 +38,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -397,41 +395,25 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
 		private String goToCrfIconBuilder(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefCRFBean, int itemId) {
 			HtmlBuilder builder = new HtmlBuilder();
-			builder.a().name("goToEcrf").append("itemId=\"" + itemId + "\"").append(" onmouseup=\"javascript:setImage('Complete','../images/" + getEventCrfStatusIcon(eventCRFBean) + "');\"")
+			builder.a().name("goToEcrf").append("itemId=\"" + itemId + "\"")
+					.append(" onmouseup=\"javascript:setImage('Complete','../" + getEventCrfStatusIcon(eventCRFBean, eventDefCRFBean) + "');\"")
 					.href("../ViewSectionDataEntry?eventCRFId=" + eventCRFBean.getId()
 							+ "&eventDefinitionCRFId=" + eventDefCRFBean.getId()
 							+ "&tabId=1&eventId=" + eventCRFBean.getStudyEventId() + "&amp;viewFull=yes")
 					.onclick("setAccessedObjected(this)").close()
 					.img().border("0").title(ResourceBundleProvider.getResWord("openCrf")).alt(ResourceBundleProvider.getResWord("openCrf"))
-					.style("height:17px").src("../images/" + getEventCrfStatusIcon(eventCRFBean) + "").close().aEnd();
+					.style("height:17px").src("../" + getEventCrfStatusIcon(eventCRFBean, eventDefCRFBean) + "").close().aEnd();
 
 			return builder.toString();
 		}
 
-		private String getEventCrfStatusIcon(EventCRFBean eventCRFBean) {
+		private String getEventCrfStatusIcon(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefCRFBean) {
 
+			StudySubjectBean studySubject = getSubjectBean(eventCRFBean.getStudySubjectId());
 			StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
-			CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
-			String goToEcrfIcon = "";
-			if (studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped()
-					|| studyEventBean.getSubjectEventStatus().isSkipped() || !crfVersion.getStatus().equals(Status.AVAILABLE)) {
-				goToEcrfIcon = "icon_Locked_long.gif";
-			} else if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-				goToEcrfIcon = "icon_InitialDE_long.gif";
-			} else if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
-				goToEcrfIcon = "icon_InitialDEcomplete.gif";
-			} else if (eventCRFBean.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-				goToEcrfIcon = "icon_DDE.gif";
-			} else if (eventCRFBean.getStage().isDoubleDE_Complete()) {
-				if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-					goToEcrfIcon = "icon_Signed_long.gif";
-				} else if (eventCRFBean.isSdvStatus()) {
-					goToEcrfIcon = "icon_DoubleCheck_long.gif";
-				} else {
-					goToEcrfIcon = "icon_DEcomplete_long.gif";
-				}
-			}
-			return goToEcrfIcon;
+			Status eventCRFStatus = EventCRFUtil.getEventCRFCurrentStatus(studySubject, studyEventBean, eventDefCRFBean,
+					eventCRFBean, crfVersionDAO, eventDefCRFDAO);
+			return EventCRFUtil.getEventCRFStatusLargeIconPath(eventCRFStatus);
 		}
 	}
 

@@ -43,6 +43,7 @@ public class Term extends EntityBean {
 	 */
 	public Term() {
 		super();
+		setDescription("");
 	}
 
 	/**
@@ -57,7 +58,6 @@ public class Term extends EntityBean {
 		setId(id);
 		setName(name);
 		setDescription("");
-
 	}
 
 	/**

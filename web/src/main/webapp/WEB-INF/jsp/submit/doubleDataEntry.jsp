@@ -63,47 +63,9 @@
 <c:set var="submitClassType" value="submit"/>
 <table width="75%"><tr><td>
 <span class="first_level_header"> <b id="crfNameId"> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
-         <c:choose>            <c:when test="${eventCRF.stage.initialDE}">
-                <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
-                     title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-            </c:when>            <c:when
-              test="${eventCRF.stage.initialDE_Complete}">
-                <img src="images/icon_InitialDEcomplete.gif"
-                     alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>"                     title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
-            </c:when>
-            <c:when test="${eventCRF.stage.doubleDE}">
-                <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>"                     title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
-            </c:when>
-            <c:when test="${eventCRF.stage.doubleDE_Complete}">
-                <c:choose>
-                    <c:when test="${studyEvent.subjectEventStatus.signed}">
-                        <img src="images/icon_Signed.gif" alt="<fmt:message key="subjectEventSigned" bundle="${resword}"/>" title="<fmt:message key="subjectEventSigned" bundle="${resword}"/>">
-                    </c:when>
-                    <c:when test="${eventCRF.sdvStatus}">
-                        <img src="images/icon_DoubleCheck.gif" alt="<fmt:message key="sourceDataVerified" bundle="${resword}"/>" title="<fmt:message key="sourceDataVerified" bundle="${resword}"/>">
-                    </c:when>
-                    <c:otherwise>
-                        <img src="images/icon_DEcomplete.gif" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
-                    </c:otherwise>
-                </c:choose>
-            </c:when>
-            <c:when test="${eventCRF.stage.admin_Editing}">
-                <img src="images/icon_AdminEdit.gif"
-                     alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
-            </c:when>
-            <c:when test="${eventCRF.stage.locked}">
-                <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-            </c:when>
-            <c:when test="${eventCRF.status.signed}">
-                <img src="images/icon_Signed.gif" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>">
-            </c:when>
-            <c:when test="${eventCRF.stage.invalid}">
-                <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
-            </c:when>
-            <c:otherwise>
-                <img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
-            </c:otherwise>
-         </c:choose></b>&nbsp;&nbsp;</span></td>
+    <ui:displayEventCRFStatusIcon studySubject="${studySubject}" studyEvent="${studyEvent}"
+                                  eventDefinitionCRF="${toc.eventDefinitionCRF}" eventCrf="${eventCRF}"/>
+</b>&nbsp;&nbsp;</span></td>
     </tr>
     <tr>
         <td>

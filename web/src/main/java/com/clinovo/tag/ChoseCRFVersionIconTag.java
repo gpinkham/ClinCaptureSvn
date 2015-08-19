@@ -2,6 +2,7 @@ package com.clinovo.tag;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.CRFMaskingService;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -54,7 +55,9 @@ public class ChoseCRFVersionIconTag extends TagSupport {
 
 		if (dec != null && subjectBean != null) {
 			edcBean = dec.getEventDefinitionCRF();
-			if (!crfMaskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(), edcBean.getStudyId())) {
+			Status eventCRFStatus = dec.getEventCRF().getStatus();
+			if (!crfMaskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(), edcBean.getStudyId())
+					&& !eventCRFStatus.isPartialDataEntry()) {
 				link = "<a href=\"pages/managestudy/chooseCRFVersion?crfId="
 						+ dec.getEventCRF().getCrf().getId()
 						+ "&crfName="

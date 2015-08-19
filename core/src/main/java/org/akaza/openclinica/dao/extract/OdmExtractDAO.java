@@ -1962,12 +1962,12 @@ public class OdmExtractDAO extends DatasetDAO {
                     if ("0".equals(newValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
-                        auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
+                        auditLog.setNewValue(Status.get(Integer.parseInt(newValue)).getName());
                     }
                     if ("0".equals(oldValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
-                        auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
+                        auditLog.setOldValue(Status.get(Integer.parseInt(oldValue)).getName());
                     }
                 } else {
                     auditLog.setNewValue(newValue);
@@ -2073,12 +2073,12 @@ public class OdmExtractDAO extends DatasetDAO {
                     if ("0".equals(newValue)) {
                         auditLog.setNewValue(Status.INVALID.getName());
                     } else {
-                        auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
+                        auditLog.setNewValue(Status.get(Integer.parseInt(newValue)).getName());
                     }
                     if ("0".equals(oldValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
-                        auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
+                        auditLog.setOldValue(Status.get(Integer.parseInt(oldValue)).getName());
                     }
                 } else if (typeId == 32) {
                     if ("1".equals(newValue)) {
@@ -2140,12 +2140,12 @@ public class OdmExtractDAO extends DatasetDAO {
                     if ("0".equals(newValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
-                        auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
+                        auditLog.setNewValue(Status.get(Integer.parseInt(newValue)).getName());
                     }
                     if ("0".equals(oldValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
-                        auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
+                        auditLog.setOldValue(Status.get(Integer.parseInt(oldValue)).getName());
                     }
                 } else {
                     auditLog.setNewValue(newValue);

@@ -364,30 +364,10 @@
         </c:choose>
 </td>
 
-<c:choose>
-    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
-        <%--<c:when test="${dedc.status.name=='locked'}">--%>
-        <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
-            <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-        </td>
-    </c:when>
-
-    <c:when test="${!studySubject.status.deleted}">
-        <c:choose>
-            <c:when test="${dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted}">
-                <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;"><img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
-            </c:when>
-            <c:otherwise>
-                <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;"><img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
-            </c:otherwise>
-        </c:choose>
-    </c:when>
-
-    <c:otherwise>
-        <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;"><img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="removed" bundle="${resword}"/>"></td>
-    </c:otherwise>
-
-</c:choose>
+    <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
+        <ui:displayEventCRFStatusIcon studySubject="${studySubject}" studyEvent="${studyEvent}"
+                                      eventDefinitionCRF="${dedc.edc}" eventCrf="${dedc.eventCRF}"/>
+    </td>
 
 <td class="table_cell ddeColumn">
     <c:if test="${dedc.eventCRF != null && !dedc.eventCRF.notStarted && dedc.eventCRF.owner != null}">
@@ -431,48 +411,8 @@
 <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6 or userRole.role.id eq 9)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
 <td class="table_cell"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
 <td class="table_cell" bgcolor="#F5F5F5" align="center">
-
-    <c:choose>
-        <c:when test="${dec.eventCRF.notStarted}">
-            <img src="images/icon_NotStarted.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-        </c:when>
-        <c:when test="${dec.stage.initialDE}">
-            <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-        </c:when>
-        <c:when test="${dec.stage.initialDE_Complete}">
-            <img src="images/icon_InitialDEcomplete.gif" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
-        </c:when>
-        <c:when test="${dec.stage.doubleDE}">
-            <c:set var="ddeTitleCode" value="double_data_entry"/>
-            <c:if test="${dec.eventDefinitionCRF.evaluatedCRF && !dec.eventDefinitionCRF.doubleEntry}"><c:set var="ddeTitleCode" value="evaluation"/></c:if>
-            <img src="images/icon_DDE.gif" alt="<fmt:message key="${ddeTitleCode}" bundle="${resword}"/>" title="<fmt:message key="${ddeTitleCode}" bundle="${resword}"/>">
-        </c:when>
-        <c:when test="${dec.stage.doubleDE_Complete}">
-            <c:choose>
-                <c:when test="${studyEvent.subjectEventStatus.signed}">
-                    <img src="images/icon_Signed.gif" alt="<fmt:message key="subjectEventSigned" bundle="${resword}"/>" title="<fmt:message key="subjectEventSigned" bundle="${resword}"/>">
-                </c:when>
-                <c:when test="${dec.eventCRF.sdvStatus}">
-                    <img src="images/icon_DoubleCheck.gif" alt="<fmt:message key="sourceDataVerified" bundle="${resword}"/>" title="<fmt:message key="sourceDataVerified" bundle="${resword}"/>">
-                </c:when>
-                <c:otherwise>
-                    <img src="images/icon_DEcomplete.gif" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
-                </c:otherwise>
-            </c:choose>
-        </c:when>
-
-        <c:when test="${dec.stage.admin_Editing}">
-            <img src="images/icon_AdminEdit.gif" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
-        </c:when>
-
-        <c:when test="${dec.stage.locked}">
-            <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-        </c:when>
-
-        <c:otherwise>
-            <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="removed" bundle="${resword}"/>">
-        </c:otherwise>
-    </c:choose>
+	<ui:displayEventCRFStatusIcon studySubject="${studySubject}" studyEvent="${studyEvent}"
+								  eventDefinitionCRF="${dec.eventDefinitionCRF}" eventCrf="${dec.eventCRF}"/>
 </td>
 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
 <td class="table_cell ddeColumn">

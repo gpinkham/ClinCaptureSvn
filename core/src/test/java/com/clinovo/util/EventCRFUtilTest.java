@@ -545,4 +545,31 @@ public class EventCRFUtilTest {
 		// VERIFY
 		Assert.assertEquals(Status.SIGNED, crfStatus);
 	}
+
+	@Test
+	public void testThatGetEventCRFCurrentStatusReturnsCorrectStatus_24() {
+
+		// SETUP
+		StudySubjectBean studySubject = new StudySubjectBean();
+		studySubject.setStatus(Status.AVAILABLE);
+		StudyEventBean studyEvent  = new StudyEventBean();
+		studyEvent.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+		EventDefinitionCRFBean eventDefCRF = new EventDefinitionCRFBean();
+		EventCRFBean eventCrf = new EventCRFBean();
+		eventCrf.setId(9);
+		eventCrf.setStatus(Status.PARTIAL_DATA_ENTRY);
+		eventCrf.setCRFVersionId(17);
+		eventCrf.setNotStarted(false);
+		CRFVersionBean crfVersion = new CRFVersionBean();
+		crfVersion.setId(17);
+		crfVersion.setStatus(Status.AVAILABLE);
+		Mockito.when(crfVersionDAO.findByPK(eventCrf.getCRFVersionId())).thenReturn(crfVersion);
+
+		// EXECUTE
+		Status crfStatus = EventCRFUtil.getEventCRFCurrentStatus(studySubject, studyEvent, eventDefCRF, eventCrf,
+				crfVersionDAO, eventDefinitionCRFDAO);
+
+		// VERIFY
+		Assert.assertEquals(Status.PARTIAL_DATA_ENTRY, crfStatus);
+	}
 }

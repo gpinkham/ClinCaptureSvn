@@ -215,7 +215,7 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 		if (aeb != null) {
 			aeb.setCreatedDate(dateCreated);
 			aeb.setUpdatedDate(dateUpdated);
-			aeb.setStatus(Status.getFromMap(statusId));
+			aeb.setStatus(Status.get(statusId));
 			aeb.setOwnerId(ownerId.intValue());
 			aeb.setUpdaterId(updateId.intValue());
 		}

@@ -393,7 +393,7 @@ public class EventCRFBean extends AuditableEntityBean {
 			stage = DataEntryStage.UNCOMPLETED;
 		}
 
-		if (status.equals(Status.AVAILABLE)) {
+		if (status.equals(Status.AVAILABLE) || status.isPartialDataEntry()) {
 			stage = DataEntryStage.INITIAL_DATA_ENTRY;
 		}
 

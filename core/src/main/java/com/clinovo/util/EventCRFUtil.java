@@ -25,12 +25,69 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Event CRF bean's utility class.
  */
 public final class EventCRFUtil {
 
+	private static final Map<Integer, String> CRF_STATUS_ICON_PATH = new HashMap<Integer, String>();
+	private static final Map<Integer, String> CRF_STATUS_LARGE_ICON_PATH = new HashMap<Integer, String>();
+	
+	static {
+
+		CRF_STATUS_ICON_PATH.put(Status.INVALID.getId(), "images/icon_Invalid.gif");
+		CRF_STATUS_ICON_PATH.put(Status.NOT_STARTED.getId(), "images/icon_NotStarted.gif");
+		CRF_STATUS_ICON_PATH.put(Status.DATA_ENTRY_STARTED.getId(), "images/icon_InitialDE.gif");
+		CRF_STATUS_ICON_PATH.put(Status.PARTIAL_DATA_ENTRY.getId(), "images/icon_PartialDE.gif");
+		CRF_STATUS_ICON_PATH.put(Status.INITIAL_DATA_ENTRY_COMPLETED.getId(), "images/icon_InitialDEcomplete.gif");
+		CRF_STATUS_ICON_PATH.put(Status.DOUBLE_DATA_ENTRY.getId(), "images/icon_DDE.gif");
+		CRF_STATUS_ICON_PATH.put(Status.SOURCE_DATA_VERIFIED.getId(), "images/icon_DoubleCheck.gif");
+		CRF_STATUS_ICON_PATH.put(Status.SIGNED.getId(), "images/icon_Signed.gif");
+		CRF_STATUS_ICON_PATH.put(Status.COMPLETED.getId(), "images/icon_DEcomplete.gif");
+		CRF_STATUS_ICON_PATH.put(Status.LOCKED.getId(), "images/icon_Locked.gif");
+		CRF_STATUS_ICON_PATH.put(Status.DELETED.getId(), "images/icon_Invalid.gif");
+
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.INVALID.getId(), "images/icon_Invalid.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.NOT_STARTED.getId(), "images/icon_NotStarted.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.DATA_ENTRY_STARTED.getId(), "images/icon_InitialDE_long.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.PARTIAL_DATA_ENTRY.getId(), "images/icon_PartialDE_long.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.INITIAL_DATA_ENTRY_COMPLETED.getId(), "images/icon_InitialDEcomplete.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.DOUBLE_DATA_ENTRY.getId(), "images/icon_DDE.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.SOURCE_DATA_VERIFIED.getId(), "images/icon_DoubleCheck_long.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.SIGNED.getId(), "images/icon_Signed_long.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.COMPLETED.getId(), "images/icon_DEcomplete_long.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.LOCKED.getId(), "images/icon_Locked_long.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.DELETED.getId(), "images/icon_Invalid.gif");
+	}
+
 	private EventCRFUtil() {
+	}
+
+	/**
+	 * Returns relative path to event CRF status small icon.
+	 *
+	 * @param eventCRFStatus Status
+	 * @return String
+	 */
+	public static String getEventCRFStatusIconPath(Status eventCRFStatus) {
+
+		String statusIconPath = CRF_STATUS_ICON_PATH.get(eventCRFStatus.getId());
+		return statusIconPath == null ? CRF_STATUS_ICON_PATH.get(Status.INVALID.getId()) : statusIconPath;
+	}
+
+	/**
+	 * Returns relative path to event CRF status large icon.
+	 *
+	 * @param eventCRFStatus Status
+	 * @return String
+	 */
+	public static String getEventCRFStatusLargeIconPath(Status eventCRFStatus) {
+
+		String statusIconPath = CRF_STATUS_LARGE_ICON_PATH.get(eventCRFStatus.getId());
+		return statusIconPath == null ? CRF_STATUS_LARGE_ICON_PATH.get(Status.INVALID.getId()) : statusIconPath;
 	}
 
 	/**
@@ -100,6 +157,8 @@ public final class EventCRFUtil {
 				eventCRFStatus = Status.LOCKED;
 			} else if (eventCrf.getStatus().isDeleted()) {
 				eventCRFStatus = Status.DELETED;
+			} else if (eventCrf.getStatus().isPartialDataEntry()) {
+				eventCRFStatus = Status.PARTIAL_DATA_ENTRY;
 			} else if (eventCrf.getStage().isInitialDE()) {
 				eventCRFStatus = Status.DATA_ENTRY_STARTED;
 			} else if (eventCrf.getStage().isInitialDE_Complete()) {
@@ -114,5 +173,41 @@ public final class EventCRFUtil {
 			}
 		}
 		return eventCRFStatus;
+	}
+
+	/**
+	 * Returns hint handle for event CRF status icon.
+	 *
+	 * @param eventCRFStatus         Status
+	 * @param eventDefinitionCRFBean EventDefinitionCRFBean
+	 * @return String
+	 */
+	public static String getStatusIconHintHandle(Status eventCRFStatus, EventDefinitionCRFBean eventDefinitionCRFBean) {
+
+		String hintHandle;
+		if (eventCRFStatus.isNotStarted()) {
+			hintHandle = "not_started";
+		} else if (eventCRFStatus.isDataEntryStarted()) {
+			hintHandle = "initial_data_entry";
+		} else if (eventCRFStatus.isPartialDataEntry()) {
+			hintHandle = "partial_data_entry";
+		} else if (eventCRFStatus.isInitialDataEntryCompleted()) {
+			hintHandle = "initial_data_entry_complete";
+		} else if (eventCRFStatus.isDoubleDataEntry()) {
+			hintHandle = eventDefinitionCRFBean.isEvaluatedCRF() ? "evaluation" : "double_data_entry";
+		} else if (eventCRFStatus.isSDVed()) {
+			hintHandle = "sourceDataVerified";
+		} else if (eventCRFStatus.isSigned()) {
+			hintHandle = "subjectEventSigned";
+		} else if (eventCRFStatus.isCompleted()) {
+			hintHandle = "data_entry_complete";
+		} else if (eventCRFStatus.isLocked()) {
+			hintHandle = "locked";
+		} else if (eventCRFStatus.isDeleted()) {
+			hintHandle = "removed";
+		} else {
+			hintHandle = "invalid";
+		}
+		return hintHandle;
 	}
 }
