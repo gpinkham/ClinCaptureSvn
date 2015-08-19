@@ -17,6 +17,7 @@ package com.clinovo.tag;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.EventCRFUtil;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -36,11 +37,13 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.sql.DataSource;
+
 import java.util.Locale;
 
 /**
  * Custom tag for calculation of current status of event CRF.
  */
+@SuppressWarnings("serial")
 public class DisplayEventCRFStatusIconTag extends TagSupport {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DisplayEventCRFStatusIconTag.class);
