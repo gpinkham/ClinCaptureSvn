@@ -2444,6 +2444,10 @@ $(function() {
 ========================================================================================== */
 function randomizeSubject() {
 
+	if ($("input[name='randomizationEnabled']").val() == 'no') {
+		showRandomizationDisabledDialog();
+		return false;
+	}
 	disableRandomizeCRFButtons(true);
 	var crf = $("input:hidden[name='crfId']").val();
 	var eventCrfId = $("input:hidden[name='eventCRFId']").val();

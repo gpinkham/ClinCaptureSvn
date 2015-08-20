@@ -10,12 +10,12 @@
 
 package com.clinovo.clincapture.bean.service;
 
-import static org.junit.Assert.assertEquals;
-
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class StudyParameterConfigTest {
 
@@ -91,7 +91,7 @@ public class StudyParameterConfigTest {
 		assertEquals("yes", config.getCrfMasking());
 		assertEquals("yes", config.getSasExtracts());
 		assertEquals("yes", config.getStudyEvaluator());
-		assertEquals("yes", config.getRandomization());
+		assertEquals("no", config.getRandomization());
 		assertEquals("yes", config.getMedicalCoding());
 	}
 }

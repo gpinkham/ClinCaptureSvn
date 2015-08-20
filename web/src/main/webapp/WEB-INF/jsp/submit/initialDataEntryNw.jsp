@@ -106,7 +106,7 @@
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
 <input type="hidden" name="assignRandomizationResultTo" value="${study.studyParameterConfig.assignRandomizationResultTo}"/>
 <input type="hidden" name="randomizationMessage" value="<fmt:message key="randomization_successful_message" bundle="${restext}"/>"/>
-
+<input type="hidden" name="randomizationEnabled" value="${study.studyParameterConfig.randomization}"/>
 <c:choose>
 	<c:when test="${assignRandomizationResultTo eq 'ssid'}">
 		<input type="hidden" name="subjectLabel" value="${subject.uniqueIdentifier}" />

@@ -22,6 +22,10 @@
 		createDialog(params);
 	}
 
+	function showRandomizationDisabledDialog() {
+		alertDialog({ message: "<fmt:message bundle="${words}" key="randomization_disabled_update_plan"/>", height: 150, width: 500 });
+	}
+
 	/**********************************************************
 	 * Abstract functions.
 	 **********************************************************/

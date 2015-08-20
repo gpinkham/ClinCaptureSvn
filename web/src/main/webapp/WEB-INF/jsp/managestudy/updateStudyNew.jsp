@@ -1496,12 +1496,12 @@
 	    <td>
 			<c:choose>
 				<c:when test="${studyToView.studyParameterConfig.randomization == 'yes'}">
-					<input type="radio" checked name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" ${mode} name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+					<input type="radio" checked name="randomization" value="yes" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="randomization"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="randomization" value="no" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="randomization"><fmt:message key="no" bundle="${resword}"/>
 				</c:when>
 				<c:otherwise>
-					<input type="radio" ${mode} name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" checked name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+					<input type="radio" ${mode} name="randomization" value="yes" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="randomization"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="randomization" value="no" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="randomization"><fmt:message key="no" bundle="${resword}"/>
 				</c:otherwise>
 			</c:choose>
 		</td>
@@ -2194,10 +2194,10 @@
 <!-- / CRFs Parameters section -->
 
 <!-- Randomization Parameters section -->
-<tr>
+<tr class="randomization">
 	<td>&nbsp;</td>
 </tr>
-<tr valign="top" style="border: 1px solid black;width: 100%;">
+<tr  class="randomization" valign="top" style="border: 1px solid black;width: 100%;">
 	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
 		<fmt:message key="randomization_parameters" bundle="${resword}"/>:
 	</td>
@@ -2206,7 +2206,7 @@
 	</td>
 </tr>
 
-<tr valign="top">
+<tr class="randomization" valign="top">
 	<td class="formlabel">
 		<fmt:message key="assign_randomization_parameters_to" bundle="${resword}"/>:
 	</td>
@@ -2221,7 +2221,7 @@
 		<fmt:message key="systemProperty.assignRandomizationResultTo.none.radioLabel" bundle="${resword}"/>
 	</td>
 </tr>
-<tr valign="top">
+<tr class="randomization" valign="top">
 	<td class="formlabel">
 		<fmt:message key="systemProperty.randomizationTrialId.label" bundle="${resword}"/>:
 	</td>
@@ -2229,7 +2229,7 @@
 		<input type="text" name="randomizationTrialId" value="${studyToView.studyParameterConfig.randomizationTrialId}" maxlength="255" size="35">
 	</td>
 </tr>
-<tr valign="top">
+<tr class="randomization" valign="top">
 	<td class="formlabel">
 		<fmt:message key="systemProperty.randomizationEnviroment.label" bundle="${resword}"/>:
 	</td>

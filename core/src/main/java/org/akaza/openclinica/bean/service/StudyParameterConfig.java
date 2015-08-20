@@ -141,7 +141,7 @@ public class StudyParameterConfig {
 	private String crfMasking = "yes";
 	private String sasExtracts = "yes";
 	private String studyEvaluator = "yes";
-	private String randomization = "yes";
+	private String randomization = "no";
 	private String medicalCoding = "yes";
 
 	/**

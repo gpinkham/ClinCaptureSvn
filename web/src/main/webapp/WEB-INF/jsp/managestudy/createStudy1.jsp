@@ -16,50 +16,23 @@
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
-
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
 		<div class="sidebar_tab_content">
         <fmt:message key="enter_the_study_and_protocol" bundle="${resword}"/>
 		</div>
-
 		</td>
-
 	</tr>
 	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
-
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
-<script type="text/JavaScript" language="JavaScript">
-  <!--
- <%--function myCancel() {
-
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-    	confirmDialog({
-    		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-    		height: 150,
-    		width: 500,
-    		redirectLink: 'ListStudy'
-    		});
-     	return false;
-   	}
-    return true;
-
-  }--%>
-   //-->
-</script>
 
 <h1>
 	<span class="first_level_header">
@@ -180,8 +153,8 @@
 	        <fmt:message key="randomization_cap" bundle="${resword}"/>?
 	    </td>
 	    <td>
-			<input type="radio" checked name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-			<input type="radio" name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			<input type="radio" name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" checked name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
 		</td>
 	</tr>
 	<tr valign="top">
@@ -342,11 +315,5 @@
 
 </form>
 <br><br>
-
-<!-- EXPANDING WORKFLOW BOX -->
-
-
-
-<!-- END WORKFLOW BOX -->
 
 <jsp:include page="../include/footer.jsp"/>
