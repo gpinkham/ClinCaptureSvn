@@ -44,6 +44,15 @@ public class SubjectMatrixPage extends BasePage {
     @FindBy(xpath = ".//*[@class='crfListTable']//a[contains(@href,'SignStudySubject')]/img[contains(@src,'icon_SignedBlue.gif')]")
     private WebElementFacade bSignSubject;
     
+    @FindBy(xpath = ".//*[@name='flag_start']")
+    private WebElementFacade lStartDateFlag;
+    
+    @FindBy(xpath = ".//*[@name='flag_end']")
+    private WebElementFacade lEndDateFlag;
+    
+    @FindBy(xpath = ".//*[@name='flag_location']")
+    private WebElementFacade lLocationFlag;
+    
     @FindBy(className = "crfListTable")
     private WebElementFacade tCRFList;
     
@@ -58,6 +67,9 @@ public class SubjectMatrixPage extends BasePage {
     
     @FindBy(xpath = ".//tr[@class='filter']//a[contains(@href,\"onInvokeAction('findSubjects','clear')\")]")
     private WebElementFacade lClearFilter;
+    
+    @FindBy(xpath = ".//*[@id='findSubjects_row1']")
+    private WebElementFacade trFirstRow;
 
     @Override
 	public boolean isOnPage(WebDriver driver) {
@@ -149,5 +161,24 @@ public class SubjectMatrixPage extends BasePage {
 	
 	public WebElementFacade findEventIconOnSM(String studySubjectID, String eventName) {
 		return tFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a/img"));
+	}
+
+	public void check_first_row_is_present_on_SM() {
+		Assert.assertTrue(trFirstRow.isCurrentlyVisible());
+	}
+	
+	public void clickStartDateFlag() {
+		lStartDateFlag.waitUntilVisible();
+		lStartDateFlag.click();
+	}
+
+	public void clickEndDateFlag() {
+		lEndDateFlag.waitUntilVisible();
+		lEndDateFlag.click();
+	}
+
+	public void clickLocationFlag() {
+		lLocationFlag.waitUntilVisible();
+		lLocationFlag.click();
 	}
 }

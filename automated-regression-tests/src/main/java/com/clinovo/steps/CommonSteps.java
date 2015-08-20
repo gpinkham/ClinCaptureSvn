@@ -1,9 +1,11 @@
 package com.clinovo.steps;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebElement;
 
 import com.clinovo.pages.*;
@@ -535,10 +537,24 @@ public class CommonSteps extends ScenarioSteps {
 
 	@Step
 	public void create_DN(DNote dn) {
-		String oldWindowId = switch_to_another_window("");
-		dnPage.fillInAndSaveDN(dn);
+		Map<String, String> fromWinToWin = switch_to_another_window("");
+		String oldWindowId = fromWinToWin.get("from");
+		String newWindowId = fromWinToWin.get("to");
+		switch (dn.getEntityType()) {
+		case "CRF":
+			dnPage.fillInAndSaveDN(dn, newWindowId);
+			break;
+		case "Event":
+			dnPage.fillInAndSaveDNForEvent(dn, newWindowId);
+			break;
+		default:
+			dnPage.fillInAndSaveDN(dn, newWindowId);
+		}
+		
 		switch_to_another_window(oldWindowId);
 	}
+	
+	
 	
 	@Step
 	public void save_crf() {
@@ -554,16 +570,34 @@ public class CommonSteps extends ScenarioSteps {
 		flagIcon.click();
 	}
 	
-	public String switch_to_another_window(String windowId) {
+	public Map<String, String> switch_to_another_window(String windowId) {
 		//Store the current window handle
-		String winHandleBefore = getDriver().getWindowHandle();
+		Map<String, String> fromWinToWin = new HashMap<String, String>();
+		
 		if (windowId.isEmpty()) {
 			//Switch to new window opened
+			int i = 0;
 			for(String winHandle : getDriver().getWindowHandles()){
-				getDriver().switchTo().window(winHandle);
+				if (i == 0) fromWinToWin.put("from", winHandle);
+				if (i == getDriver().getWindowHandles().size() - 1) {
+					fromWinToWin.put("to", winHandle);
+					getDriver().switchTo().window(winHandle);
+				}
+				i++;
 			}
 		} else {
-			getDriver().switchTo().window(windowId);			
+			try {
+				fromWinToWin.put("from", getDriver().getWindowHandle());
+			} catch(NoSuchWindowException e) {
+				fromWinToWin.put("from", "");
+			}
+			
+			for(String winHandle : getDriver().getWindowHandles()){
+				if (windowId.equals(winHandle)) {
+					fromWinToWin.put("to", winHandle);
+					getDriver().switchTo().window(winHandle);
+				}
+			}
 		}
 
 		//Close the new window, if that window no more required
@@ -572,7 +606,7 @@ public class CommonSteps extends ScenarioSteps {
 		//Switch back to original browser (first window)
 		//webdriver.switchTo().window(winHandleBefore);
 		
-		return winHandleBefore;
+		return fromWinToWin;
 	}
 
 	@Step
@@ -587,7 +621,7 @@ public class CommonSteps extends ScenarioSteps {
 	
 	@Step
 	public void update_or_close_DN(DNote dn) {
-		String oldWindowId = switch_to_another_window("");
+		String oldWindowId = switch_to_another_window("").get("from");
 		dnPage.findAndFillInAndClickSubmit(dn);
 		switch_to_another_window(oldWindowId);
 	}
@@ -595,6 +629,13 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_element_on_page(String page, String element) {
 		switch (page) {
+		case AddSubjectPage.PAGE_NAME:
+			switch (element) {
+			case "'Add Next Subject' button":
+				addSubjectPage.clickAddNextSubjectButton();
+				break;
+			}
+			break;
 		case CreateCRFDataCommitedPage.PAGE_NAME:
 			switch (element) {
 			case "'Exit' button":
@@ -660,6 +701,15 @@ public class CommonSteps extends ScenarioSteps {
 			case "'Sign Event' button":
 				click_sign_event_button_in_popup();
 				break;
+			case "'Start Date' flag":
+				click_start_date_flag_in_popup();
+				break;
+			case "'End Date' flag":
+				click_end_date_flag_in_popup();
+				break;
+			case "'Location' flag":
+				click_location_flag_in_popup();
+				break;
 			}
 			break;
 
@@ -668,31 +718,55 @@ public class CommonSteps extends ScenarioSteps {
 		}
 	}
 
+	public void click_start_date_flag_in_popup() {
+		subjectMatrixPage.clickStartDateFlag();
+	}
+	
+	public void click_end_date_flag_in_popup() {
+		subjectMatrixPage.clickEndDateFlag();
+	}
+	
+	public void click_location_flag_in_popup() {
+		subjectMatrixPage.clickLocationFlag();
+	}
+
+	@Step
 	public void browse_file_with_rule(String filepath) {
 		importRuleDataPage.browseRuleFile(filepath);
 	}
 
+	@Step
 	public void see_message(String message) {
 		basePage.message_is_shown(message);
 	}
 
+	@Step
 	public void filter_administer_CRFs_page(CRF crf) {
 		administerCRFsPage.filter(crf);
 	}
 
+	@Step
 	public void check_CRF_row_is_present(CRF crf) {
 		administerCRFsPage.checkCRFRowIsPresent(crf);
 	}
 
+	@Step
 	public void set_CRF_parameters(CRF crf) {
 		previewCRFPage.setCRFParameters(crf);
 	}
 
+	@Step
 	public void filter_manage_event_definitions_page(StudyEventDefinition event) {
 		manageEventDefinitionsPage.filter(event);
 	}
 
+	@Step
 	public void check_event_row_is_present(StudyEventDefinition event) {
 		manageEventDefinitionsPage.checkEventRowIsPresent(event);
+	}
+
+	@Step
+	public void check_row_is_present_on_SM() {
+		subjectMatrixPage.check_first_row_is_present_on_SM();
 	}
 }

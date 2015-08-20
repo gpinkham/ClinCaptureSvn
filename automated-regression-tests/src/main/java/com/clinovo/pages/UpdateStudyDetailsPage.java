@@ -73,6 +73,13 @@ public class UpdateStudyDetailsPage extends BasePage {
 	private RadioButtonGroup rSASNameAnnotation;
 	
 	private RadioButtonGroup rApprovalNeeded;
+	
+	//Event Parameters
+	private RadioButtonGroup rCollectEventLocation;
+    
+    private RadioButtonGroup rCollectStartDate;
+
+	private RadioButtonGroup rCollectStopDate;
 
 	
     public UpdateStudyDetailsPage (WebDriver driver) {
@@ -145,6 +152,11 @@ public class UpdateStudyDetailsPage extends BasePage {
     	rSASNameAnnotation = new RadioButtonGroup(formWithData.findElements(By.name("annotatedCrfSasItemNames")));
     	rApprovalNeeded = new RadioButtonGroup(formWithData.findElements(By.name("medicalCodingApprovalNeeded")));
     	rCodeWithContext = new RadioButtonGroup(formWithData.findElements(By.name("medicalCodingContextNeeded")));
+    	
+    	//Event Parameters
+    	rCollectEventLocation = new RadioButtonGroup(formWithData.findElements(By.name("eventLocationRequired")));
+    	rCollectStartDate = new RadioButtonGroup(formWithData.findElements(By.name("startDateTimeRequired")));
+    	rCollectStopDate = new RadioButtonGroup(formWithData.findElements(By.name("endDateTimeRequired")));
     }
 
 	public void fillInStudyDetailsPage(Study study) {
@@ -223,6 +235,17 @@ public class UpdateStudyDetailsPage extends BasePage {
 		}	
 		if (!study.getCollectPersonID().equals("")) {
 			rCollectPersonID.selectByValue(study.getCollectPersonID());
+		}
+		
+		//Event Parameters:
+		if (!study.getCollectEventLocation().equals("")) {
+			rCollectEventLocation.selectByValue(study.getCollectEventLocation());
+		}
+		if (!study.getCollectStartDate().equals("")) {
+			rCollectStartDate.selectByValue(study.getCollectStartDate());
+		}	
+		if (!study.getCollectStopDate().equals("")) {
+			rCollectStopDate.selectByValue(study.getCollectStopDate());
 		}
 	}
 }

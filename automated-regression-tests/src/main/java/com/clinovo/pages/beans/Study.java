@@ -116,6 +116,13 @@ public class Study {
 	private String codeWithContext = "";
     
 	private String autoCodeDictionaryName = "";
+	
+	//Event Parameters:
+	private String collectEventLocation  = "";
+	
+	private String collectStartDate = "";
+
+	private String collectStopDate = "";
 
 	public String getStudyName() {
 		return studyName;
@@ -495,6 +502,17 @@ public class Study {
     		study.setSASNameAnnotation(row.get("SAS Name Annotation"));
     	}
     	
+    	//Event Parameters: 
+    	if (row.get("Collect Event Location") != null) {
+    		study.setCollectEventLocation(row.get("Collect Event Location"));
+    	}
+    	if (row.get("Collect Start Date") != null) {
+    		study.setCollectStartDate(row.get("Collect Start Date"));
+    	}
+    	if (row.get("Collect Stop Date") != null) {
+    		study.setCollectStopDate(row.get("Collect Stop Date"));
+    	}
+    	
 		return study;		
 	}
 
@@ -729,5 +747,29 @@ public class Study {
 
 	public void setCollectSubjectDateOfBirth(String collectSubjectDateOfBirth) {
 		this.collectSubjectDateOfBirth = collectSubjectDateOfBirth;
+	}
+
+	public String getCollectEventLocation() {
+		return collectEventLocation;
+	}
+
+	public void setCollectEventLocation(String collectEventLocation) {
+		this.collectEventLocation = collectEventLocation;
+	}
+
+	public String getCollectStartDate() {
+		return collectStartDate;
+	}
+
+	public void setCollectStartDate(String collectStartDate) {
+		this.collectStartDate = collectStartDate;
+	}
+
+	public String getCollectStopDate() {
+		return collectStopDate;
+	}
+
+	public void setCollectStopDate(String collectStopDate) {
+		this.collectStopDate = collectStopDate;
 	}
 }

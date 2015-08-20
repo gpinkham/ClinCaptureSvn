@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.clinovo.pages.beans.DNote;
+import com.clinovo.utils.Common;
 import com.clinovo.utils.ItemsUtil;
 
 /**
@@ -75,6 +76,16 @@ public class DNPage extends BasePage {
 	@FindBy(name = "sendEmail0")
     private WebElementFacade cEmailAssignedUser0;
 	
+	// popup for event DN
+	@FindBy(id = "confirmation")
+    private WebElementFacade divDialogMSG;
+	
+	@FindBy(id = "ignoreBoxMSG")
+    private WebElementFacade chIgnoreBoxMSG;
+	
+	@FindBy(xpath = ".//input[@onclick = 'clickOkInMessageBox();']")
+    private WebElementFacade bOKDialog;
+	
     public DNPage (WebDriver driver) {
         super(driver);
     }
@@ -84,7 +95,7 @@ public class DNPage extends BasePage {
     	return (driver.getCurrentUrl().indexOf(PAGE_URL) > -1);
 	}
 
-    public void fillInAndSaveDN(DNote dn) {
+    public void fillInAndSaveDN(DNote dn, String currentWindowId) {
     	bodyWithData.withTimeoutOf(60, TimeUnit.SECONDS).isCurrentlyVisible();
 		if (!beginNewThread.isCurrentlyVisible() && !bSubmitClose0.isCurrentlyVisible()) {
 			if (iDescription.isCurrentlyVisible() && !dn.getType().equals("RFC") && !dn.getType().equals("FVC")) {
@@ -107,6 +118,12 @@ public class DNPage extends BasePage {
 				bSubmit.click();
 			}
 			
+			// popup dialog event DN 
+			Common.waitABit(2000);
+			if (getDriver().getWindowHandles().contains(currentWindowId) && divDialogMSG.isCurrentlyVisible()) {
+				ItemsUtil.fillCheckbox(new Checkbox(chIgnoreBoxMSG), "true");
+				bOKDialog.click();
+			}
 		} else {
 			
 			if (beginNewThread.isCurrentlyVisible()) {
@@ -131,10 +148,20 @@ public class DNPage extends BasePage {
 		}
 	}
 
+    public void fillInAndSaveDNForEvent(DNote dn, String currentWindowId) {
+    	fillInAndSaveDN(dn, currentWindowId);
+		// popup dialog event DN 
+		Common.waitABit(2000);
+		if (getDriver().getWindowHandles().contains(currentWindowId) && divDialogMSG.isCurrentlyVisible()) {
+			ItemsUtil.fillCheckbox(new Checkbox(chIgnoreBoxMSG), "true");
+			bOKDialog.click();
+		}
+	}
+    
 	private String findOptionByUserName(String assignToUserName, String dnParentID) {
 		WebElementFacade assignToUser = sAssignToUser.isCurrentlyVisible()? sAssignToUser : sAssignToUser0;
 		assignToUser = assignToUser.isCurrentlyVisible()? assignToUser : bodyWithData.find(By.xpath(".//select[@id='userAccountId"+dnParentID+"']"));;
-		if (assignToUserName.isEmpty()) return assignToUser.getSelectedValue();
+		if (assignToUserName.isEmpty()) return assignToUser.getSelectedVisibleTextValue();
 		for (String option: assignToUser.getSelectOptions()) {
 			if (option.contains("("+assignToUserName+")")) {
 				return option;

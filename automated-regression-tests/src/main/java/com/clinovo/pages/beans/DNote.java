@@ -38,6 +38,8 @@ public class DNote {
     private String parentDetailedNote = "";
 	
 	private String resolutionStatus = "";
+	
+	private String entityType = "";
 
     public static DNote fillDNoteFromTableRow(
 			Map<String, String> row) {
@@ -303,6 +305,14 @@ public class DNote {
 
 	public void setEntityName(String entityName) {
 		this.entityName = entityName;
+	}
+
+	public String getEntityType() {
+		return entityType;
+	}
+
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
 	}
 }
 

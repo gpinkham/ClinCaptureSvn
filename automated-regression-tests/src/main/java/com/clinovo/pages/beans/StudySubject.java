@@ -11,7 +11,7 @@ import com.clinovo.pages.UpdateStudyDetailsPage;
 
 @SuppressWarnings("unused")
 public class StudySubject {
-	
+
 	private String studySubjectID = "";
     
     private String personID = "";
@@ -25,6 +25,8 @@ public class StudySubject {
 	private String dateOfBirth = "";
     
     private String dynamicGroupName = "";
+    
+    public static final Object STUDY_SUBJECTS_TO_CHECK_EXIST = "study_subjects_to_check_existence";
 
     public static StudySubject fillStudySubjectFromTableRow(
 			Map<String, String> row) {

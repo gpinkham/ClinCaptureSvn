@@ -35,12 +35,23 @@ public class AddSubjectPage extends BasePage {
     @FindBy(name = "dynamicGroupClassId")
     private WebElementFacade sDynamicGroupName;
 
+    @FindBy(id = "GoToPreviousPage")
+    private WebElementFacade bBack;
     
     @FindBy(name = "submitDone")
     private WebElementFacade bSubmit;
-
+    
     @FindBy(name = "StartDataEntry")
     private WebElementFacade bStartDataEntry;
+    
+    @FindBy(name = "submitEvent")
+    private WebElementFacade bSscheduleEvents;
+    
+    @FindBy(name = "submitEnroll")
+    private WebElementFacade bAddNextSubject;
+
+    @FindBy(name = "cancel")
+    private WebElementFacade bCancel;
 
     public AddSubjectPage (WebDriver driver) {
         super(driver);
@@ -52,6 +63,10 @@ public class AddSubjectPage extends BasePage {
 
     public void clickStartDataEntryButton() {
     	bStartDataEntry.click();
+    }
+    
+    public void clickAddNextSubjectButton() {
+    	bAddNextSubject.click();
     }
 
     @Override

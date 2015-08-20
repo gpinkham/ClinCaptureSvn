@@ -46,7 +46,7 @@ public class User {
 		STUDY_MONITOR.setFirstName("Bob");
 		STUDY_MONITOR.setLastName("StudyMon");
 		STUDY_MONITOR.setEmail("study_monitor@google.com");
-		STUDY_MONITOR.setPhone("+375295002020");
+		STUDY_MONITOR.setPhone("");
 		STUDY_MONITOR.setInstitutionalAffiliation("B");
 		STUDY_MONITOR.setActiveStudyIndex(1);
 		STUDY_MONITOR.setRoleValue(Integer.toString(UserRole.STUDY_MONITOR.getUserRoleCCId()));

@@ -8,7 +8,7 @@ I want to use Behaviour-Driven Development
  
 Lifecycle:
 After:
-Outcome: ANY   
+Outcome: ANY
 Given User logs out
 
 
@@ -253,7 +253,7 @@ When User creates study event definitions:
 Then Study event definitions are created
 
 
-Scenario: 13. "CRC" creates subjects
+Scenario: 13.1 "CRC" creates subject
 
 Given User logs in as "CRC"
 And User goes to Add Subject page
@@ -267,11 +267,21 @@ Examples:
 {scope=Scenario}
 |<Study Subject ID>|<Person ID>|<Secondary ID>|<Date of Enrollment for Study>|<Gender>|<Date of Birth>|<Dynamic Group>|
 |StSubj_1          |ss_1       |              |                              |Male    |03-Mar-1985    |               |
-|StSubj_2          |ss_2       |              |                              |Female  |04-Jul-1987    |               |
-|StSubj_3          |ss_3       |              |                              |Male    |16-Mar-1983    |               |
-|StSubj_4          |ss_4       |              |                              |Female  |06-Apr-1982    |               |
-|StSubj_5          |ss_5       |              |                              |Female  |23-Mar-1984    |               |
-|StSubj_6          |ss_6       |              |                              |Male    |27-May-1986    |               |
+
+
+Scenario: 13.2 "CRC" creates subjects
+
+Given User logs in as "CRC"
+And User goes to Add Subject page
+When User creates subjects:
+|Study Subject ID|Person ID|Secondary ID|Date of Enrollment for Study|Gender|Date of Birth|Dynamic Group| 
+|StSubj_2        |ss_2     |            |                            |Female|04-Jul-1987  |             |
+|StSubj_3        |ss_3     |            |                            |Male  |16-Mar-1983  |             |
+|StSubj_4        |ss_4     |            |                            |Female|06-Apr-1982  |             |
+|StSubj_5        |ss_5     |            |                            |Female|23-Mar-1984  |             |
+|StSubj_6        |ss_6     |            |                            |Male  |27-May-1986  |             |
+
+Then Study subjects are created
 
 
 Scenario: 14.1 "CRC" schedules event for subject
@@ -534,8 +544,8 @@ And User clicks 'Save' button
 When User clicks 'Save' button
 Then User is on SM page
 And DN is created:
-|Study Subject ID|Event Name|CRF Name            |Type|Description|Entity Name|
-|StSubj_5        |Event D   |CRF_w_basic_fields_2|FVC |           |           |
+|Study Subject ID|Event Name|CRF Name            |Type|Detailed Note|Entity Name|
+|StSubj_5        |Event D   |CRF_w_basic_fields_2|FVC |             |           |
 
 
 Scenario: 20.9 "CRC" enters data into completed CRF, clicks 'Save' button and creates RFC DN instead of FVC
@@ -556,6 +566,23 @@ Then User is on SM page
 And DNs are created
 
 
+Scenario: 20.10 "Study Admin" creates DNs for Study Event Definition 
+
+GivenStories: com.clinovo.stories/basic_wf/Preconditions.story#{0}
+
+Given User goes to SM page
+When User creates DNs for Events using popup:
+|Study Subject ID|Event Name|Type      |Description|Detailed Note    |Entity Name|
+|StSubj_5        |Event C   |Query     |event_dn_1 |Scenario 20.10...|Start Date |
+|                |          |Annotation|event_dn_2 |Scenario 20.10...|End Date   |
+|                |          |Query     |event_dn_3 |Scenario 20.10...|Location   |
+|StSubj_3        |Event C   |Query     |event_dn_1 |Scenario 20.10...|Start Date |
+
+Then DNs are created
+ 
+Examples:
+|<Collect Event Location>|<Collect Start Date>|<Collect Stop Date>|<Collect Interviewer Name>|<Collect Interview Date>|<Use autotabbing>|
+|optional                |no                  |no                 |                          |                        |                 |
 
 
 

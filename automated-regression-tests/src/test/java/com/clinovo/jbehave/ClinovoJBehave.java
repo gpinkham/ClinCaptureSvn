@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.clinovo.pages.AddSubjectPage;
 import com.clinovo.pages.AdministerCRFsPage;
 import com.clinovo.pages.BuildStudyPage;
 import com.clinovo.pages.ChangeStudyPage;
@@ -680,16 +681,95 @@ public class ClinovoJBehave extends BaseJBehave {
     }
     
     @SuppressWarnings("unchecked")
-	@Then("Study event definitions are created")
-	public void studyEventDefinitionsAreCreated() {
-    	List<StudyEventDefinition> events = (List<StudyEventDefinition>) Thucydides.getCurrentSession().get(StudyEventDefinition.NEW_CREATED_EVENTS);
-    	commonSteps.go_to_page(ManageEventDefinitionsPage.PAGE_NAME);
-    	for (StudyEventDefinition event: events) {
-    		commonSteps.filter_manage_event_definitions_page(event);
-    		commonSteps.check_event_row_is_present(event);
+   	@Then("Study event definitions are created")
+   	public void studyEventDefinitionsAreCreated() {
+       	List<StudyEventDefinition> events = (List<StudyEventDefinition>) Thucydides.getCurrentSession().get(StudyEventDefinition.NEW_CREATED_EVENTS);
+       	commonSteps.go_to_page(ManageEventDefinitionsPage.PAGE_NAME);
+       	for (StudyEventDefinition event: events) {
+       		commonSteps.filter_manage_event_definitions_page(event);
+       		commonSteps.check_event_row_is_present(event);
+       	}
+       	
+       	Thucydides.getCurrentSession().remove(StudyEventDefinition.NEW_CREATED_EVENTS);
+    }
+    
+    @Given("User creates subjects: $activityTable")
+    @When("User creates subjects: $activityTable")
+   	public void userCreatesSubjects(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<StudySubject> sSubjects = new ArrayList<StudySubject>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		StudySubject ssubj = StudySubject.fillStudySubjectFromTableRow(rowParams.values());
+        	commonSteps.fill_in_study_subject_page(ssubj);
+        	commonSteps.click_element_on_page(AddSubjectPage.PAGE_NAME, "'Add Next Subject' button");
+        	sSubjects.add(ssubj);
     	}
     	
-    	Thucydides.getCurrentSession().remove(StudyEventDefinition.NEW_CREATED_EVENTS);
+    	Thucydides.getCurrentSession().put(StudySubject.STUDY_SUBJECTS_TO_CHECK_EXIST, sSubjects);
+    }
+    
+    @Given("User creates DNs for Events using popup: $activityTable")
+    @When("User creates DNs for Events using popup: $activityTable")
+   	public void userCreatesDNsForEventUsingPopup(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	String ssID = "", eventName = "", ssIDFromRow = "", eventNameFromRow = "";
+    	List<DNote> dns = new ArrayList<DNote>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		ssIDFromRow = rowParams.values().get("Study Subject ID");
+    		eventNameFromRow = rowParams.values().get("Event Name");
+    		
+    		//if "Study Subject ID" and "Event Name" are empty, fill them from previous row
+    		
+    		if (ssIDFromRow.isEmpty()) {
+    			rowParams.values().put("Study Subject ID", ssID);
+    		} 
+    		if (eventNameFromRow.isEmpty()) {
+    			rowParams.values().put("Event Name", eventName);
+    		} 
+    		
+    		if ((!ssIDFromRow.isEmpty() && !ssID.equals(ssIDFromRow)) || (!eventNameFromRow.isEmpty() && !ssID.equals(eventNameFromRow))) {
+    			ssID = ssIDFromRow.isEmpty()? ssID : ssIDFromRow;
+    			eventName = eventNameFromRow.isEmpty()? eventName : eventNameFromRow;
+    			if (i > 0) commonSteps.click_schedule_event_button_in_popup();
+    			commonSteps.call_popup_for_subject_and_event(ssID, eventName);
+    		}
+    		
+    		DNote dn = DNote.fillDNoteFromTableRow(rowParams.values());
+        	dn.setEntityType("Event");
+    		switch (dn.getEntityName()) {
+    		case "Start Date":
+    			commonSteps.click_element_on_page("popup", "'Start Date' flag");
+    			break;
+    		case "End Date":
+    			commonSteps.click_element_on_page("popup", "'End Date' flag");
+    			break;
+    		case "Location":
+    			commonSteps.click_element_on_page("popup", "'Location' flag");
+    			break;
+    		}
+        	commonSteps.create_DN(dn);
+        	dns.add(dn);
+        	if (i == table.getRowCount() - 1) commonSteps.click_schedule_event_button_in_popup();
+    	}
+    	
+    	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Then("Study subjects are created")
+	public void studySubjectsAreCreated() {
+    	List<StudySubject> sSubjects= (List<StudySubject>) Thucydides.getCurrentSession().get(StudySubject.STUDY_SUBJECTS_TO_CHECK_EXIST);
+    	commonSteps.go_to_page(SubjectMatrixPage.PAGE_NAME);
+    	for (StudySubject ssubj: sSubjects) {
+    		commonSteps.filter_SM_by_study_subject_id(ssubj.getStudySubjectID());
+    		commonSteps.check_row_is_present_on_SM();
+    	}
+    	
+    	Thucydides.getCurrentSession().remove(StudySubject.STUDY_SUBJECTS_TO_CHECK_EXIST);
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {

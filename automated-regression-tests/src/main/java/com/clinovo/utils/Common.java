@@ -41,4 +41,12 @@ public class Common {
     	
     	return result;	
     }
+
+	public static void waitABit(int milSec) {
+		try {
+			Thread.sleep(milSec);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }
