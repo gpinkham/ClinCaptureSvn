@@ -116,12 +116,12 @@
                     <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                 </c:if>
             </c:if>
-            <c:if test="${showCrfEvaluation && (userBean.name == 'root' || userRole.studyAdministrator)}">
+            <c:if test="${showCrfEvaluation && (userBean.name == 'root' || userRole.studyAdministrator) && evaluationEnabled == true}">
                 <div class="taskLink"><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluated_crf" bundle="${resword}"/></a></div>
             </c:if>
         </div>
         <div class="taskRightColumn">
-            <c:if test="${!showCrfEvaluation && (userBean.name == 'root' || userRole.studyAdministrator)}">
+            <c:if test="${!showCrfEvaluation && (userBean.name == 'root' || userRole.studyAdministrator) && evaluationEnabled == true}">
                 <div class="taskLink"><a href="${urlPrefix}pages/crfEvaluation"><fmt:message key="evaluated_crf" bundle="${resword}"/></a></div>
             </c:if>
             <c:if test="${study.parentStudyId == 0}">

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -22,28 +22,27 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.dao.SystemDAO;
+import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -54,16 +53,14 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import com.clinovo.util.RuleSetServiceUtil;
 
+/**
+ * Build study page.
+ */
 @Controller("studyModuleController")
 @RequestMapping("/studymodule")
 @SessionAttributes("studyModuleStatus")
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyModuleController {
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	@Autowired
-	private SidebarInit sidebarInit;
 
 	@Autowired
 	private StudyModuleStatusDao studyModuleStatusDao;
@@ -72,8 +69,17 @@ public class StudyModuleController {
 	private BasicDataSource dataSource;
 
 	@Autowired
-	private CoreResources coreResources;
+	private SystemDAO systemDao;
 
+	public static final int IN_PROGRESS_ID = 3;
+
+	/**
+	 * Handle Build Study page.
+	 *
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @return ModelMap
+	 */
 	@SuppressWarnings("deprecation")
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
@@ -128,42 +134,42 @@ public class StudyModuleController {
 		if (sms.getCrf() == 0) {
 			sms.setCrf(StudyModuleStatus.NOT_STARTED);
 		}
-		if (sms.getCrf() != 3 && totalCrf > 0) {
+		if (sms.getCrf() != IN_PROGRESS_ID && totalCrf > 0) {
 			sms.setCrf(StudyModuleStatus.IN_PROGRESS);
 		}
 
 		if (sms.getEventDefinition() == 0) {
 			sms.setEventDefinition(StudyModuleStatus.NOT_STARTED);
 		}
-		if (sms.getEventDefinition() != 3 && eventDefinitionCount > 0) {
+		if (sms.getEventDefinition() != IN_PROGRESS_ID && eventDefinitionCount > 0) {
 			sms.setEventDefinition(StudyModuleStatus.IN_PROGRESS);
 		}
 
 		if (sms.getSubjectGroup() == 0) {
 			sms.setSubjectGroup(StudyModuleStatus.NOT_STARTED);
 		}
-		if (sms.getSubjectGroup() != 3 && subjectGroupCount > 0) {
+		if (sms.getSubjectGroup() != IN_PROGRESS_ID && subjectGroupCount > 0) {
 			sms.setSubjectGroup(StudyModuleStatus.IN_PROGRESS);
 		}
 
 		if (sms.getRule() == 0) {
 			sms.setRule(StudyModuleStatus.NOT_STARTED);
 		}
-		if (sms.getRule() != 3 && ruleCount > 0) {
+		if (sms.getRule() != IN_PROGRESS_ID && ruleCount > 0) {
 			sms.setRule(StudyModuleStatus.IN_PROGRESS);
 		}
 
 		if (sms.getSite() == 0) {
 			sms.setSite(StudyModuleStatus.NOT_STARTED);
 		}
-		if (sms.getSite() != 3 && siteCount > 0) {
+		if (sms.getSite() != IN_PROGRESS_ID && siteCount > 0) {
 			sms.setSite(StudyModuleStatus.IN_PROGRESS);
 		}
 
 		if (sms.getUsers() == 0) {
 			sms.setUsers(StudyModuleStatus.NOT_STARTED);
 		}
-		if (sms.getUsers() != 3 && userCount > 0) {
+		if (sms.getUsers() != IN_PROGRESS_ID && userCount > 0) {
 			sms.setUsers(StudyModuleStatus.IN_PROGRESS);
 		}
 
@@ -193,12 +199,24 @@ public class StudyModuleController {
 			request.setAttribute("pageMessages", pageMessages);
 			request.getSession().removeAttribute("pageMessages");
 		}
+		StudyParameterValueDAO studyParameterValueDao = new StudyParameterValueDAO(dataSource);
+		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
+				currentStudy.getId(), systemDao, studyParameterValueDao, studyDao);
+		request.getSession().setAttribute("evaluationEnabled", isEvaluationEnabled);
 		return map;
 	}
 
+	/**
+	 * Process submit request.
+	 *
+	 * @param studyModuleStatus StudyModuleStatus
+	 * @param status            SessionStatus
+	 * @param request           HttpServletRequest
+	 * @return String
+	 */
 	@RequestMapping(method = RequestMethod.POST)
 	public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus,
-			BindingResult result, SessionStatus status, HttpServletRequest request) {
+								SessionStatus status, HttpServletRequest request) {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (request.getParameter("saveStudyStatus") == null) {
 			studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
@@ -221,14 +239,25 @@ public class StudyModuleController {
 		return "redirect:studymodule";
 	}
 
+	/**
+	 * Exception Handler.
+	 *
+	 * @return String
+	 */
 	@ExceptionHandler(HttpSessionRequiredException.class)
-	public String handleSessionRequiredException(HttpSessionRequiredException ex, HttpServletRequest request) {
+	public String handleSessionRequiredException() {
 		return "redirect:/MainMenu";
 	}
 
+	/**
+	 * NPE handler.
+	 *
+	 * @param ex      NullPointerException
+	 * @param request HttpServletRequest
+	 * @return String
+	 */
 	@ExceptionHandler(NullPointerException.class)
-	public String handleNullPointerException(NullPointerException ex, HttpServletRequest request,
-			HttpServletResponse response) {
+	public String handleNullPointerException(NullPointerException ex, HttpServletRequest request) {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (currentStudy == null) {
 			return "redirect:/MainMenu";
@@ -240,6 +269,12 @@ public class StudyModuleController {
 		return dataSource;
 	}
 
+	/**
+	 * Get context path.
+	 *
+	 * @param request HttpServletRequest
+	 * @return String
+	 */
 	public String getContextPath(HttpServletRequest request) {
 		return request.getContextPath().replaceAll("/", "");
 	}
