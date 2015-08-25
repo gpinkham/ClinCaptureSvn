@@ -156,26 +156,28 @@
 		<td class="text">
 			<table border="0" cellpadding="0" cellspacing="0">
             <c:forEach var="extract" items="${extractProperties}" varStatus="loopCounter">
-			<tr>
-				<td class="text">
-                    <c:choose>
-                        <c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
-                            <fmt:message key="${fn:substringAfter(extract.filedescription, '&')}" bundle="${restext}"/>&nbsp;
-                        </c:when>
-                        <c:otherwise>
-                            <c:out value="${extract.filedescription}"/>&nbsp;
-                        </c:otherwise>
-                    </c:choose>
-				</td>
-				<td class="text"><input type="radio" name="formatId" value="<c:out value="${extract.id}"/>" onchange="javascript:changeIcon();"
-					<c:if test="${formatId == extract.id}">
-						checked
-					</c:if>
-				/></td>
-				<c:if test="${loopCounter.count == 1}">
-					<td class="alert">*</td>
+				<c:if test="${extract.id != 10 || study.studyParameterConfig.sasExtracts == 'yes'}">
+					<tr>
+						<td class="text">
+							<c:choose>
+								<c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
+									<fmt:message key="${fn:substringAfter(extract.filedescription, '&')}" bundle="${restext}"/>&nbsp;
+								</c:when>
+								<c:otherwise>
+									<c:out value="${extract.filedescription}"/>&nbsp;
+								</c:otherwise>
+							</c:choose>
+						</td>
+						<td class="text"><input type="radio" name="formatId" value="<c:out value="${extract.id}"/>" onchange="javascript:changeIcon();"
+							<c:if test="${formatId == extract.id}">
+								checked
+							</c:if>
+						/></td>
+						<c:if test="${loopCounter.count == 1}">
+							<td class="alert">*</td>
+						</c:if>
+					</tr>
 				</c:if>
-			</tr>
             </c:forEach>
 			</table>
 		</td>

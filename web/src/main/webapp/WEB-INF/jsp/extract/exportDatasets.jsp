@@ -107,56 +107,27 @@
 		<input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
 		<table border="0" cellpadding="5" width="525" style="margin:2px 0px 2px 10px">
 			<c:forEach var="extract" items="${extractProperties}">
-				<tr valign="top">
-					    <td style="padding:0px">
-							<%-- use fn:startsWith(extract.filedescription, '&') here, for i18n --%>
-							<input type="radio" name="id" value="<c:out value="${extract.id}"/>"  
-								<c:choose><c:when test="${extract.id=='1'}">checked</c:when><c:otherwise></c:otherwise></c:choose>>
-								<c:choose>
-									<c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
-										<fmt:message key="${fn:substringAfter(extract.filedescription, '&')}" bundle="${restext}"/>&nbsp;
-									</c:when>
-									<c:otherwise>
-										<c:out value="${extract.filedescription}"/>&nbsp;
-									</c:otherwise>
-								</c:choose>								
-							</input>
-						</td>
-					</tr>
+				<c:if test="${extract.id != 10 || study.studyParameterConfig.sasExtracts == 'yes'}">
+					<tr valign="top">
+						    <td style="padding:0px">
+								<input type="radio" name="id" value="<c:out value="${extract.id}"/>"  
+									<c:choose><c:when test="${extract.id=='1'}">checked</c:when><c:otherwise></c:otherwise></c:choose>>
+									<c:choose>
+										<c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
+											<fmt:message key="${fn:substringAfter(extract.filedescription, '&')}" bundle="${restext}"/>&nbsp;
+										</c:when>
+										<c:otherwise>
+											<c:out value="${extract.filedescription}"/>&nbsp;
+										</c:otherwise>
+									</c:choose>								
+								</input>
+							</td>
+						</tr>
+				</c:if>
 		    </c:forEach>
 		</table>
 	</form>
 </div><br>
-
-<%--<table border="0" cellpadding="5" width="525" style="margin:15px 10px"><tbody>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="1" checked>CDISC ODM XML 1.3 Full with ClinCapture extensions&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="2">CDISC ODM XML 1.3 Clinical Data with ClinCapture extensions&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="3">CDISC ODM XML 1.3 Clinical Data&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="4">CDISC ODM XML 1.2 Clinical Data with ClinCapture extensions&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="5">CDISC ODM XML 1.2 Clinical Data&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="6">View as HTML&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="7">Excel Spreadsheet&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="8">Tab-delimited Text&nbsp;
-	</td></tr>
-	<tr valign="top"><td style="padding:0px">			
-		<input type="radio" name="id" value="9">SPSS data and syntax&nbsp;
-	</td></tr>
-</tbody></table>--%>
 
 <a href="javascript:leftnavExpand('section3');">
 	<img id="excl_section3" src="images/bt_Collapse.gif" border="0"> 
