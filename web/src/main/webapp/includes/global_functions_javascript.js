@@ -2679,7 +2679,7 @@ codeItem = function(item) {
 
         type: "POST",
         url: url + "/codeItem",
-        beforeSend: function(jqXHR, settings) { showMedicalCodingAlertBox(item, jqXHR);},
+        beforeSend: function(jqXHR, settings) { showMedicalCodingAlertBox(jqXHR);},
 
         data: {
 
@@ -3339,130 +3339,32 @@ codeItemFields = function(item) {
     });
 };
 
-function showMedicalCodingAlertBox(item, ajaxResponse){
-
-    if ($("#alertBox").length == 0) {
-
-        $("<div id='alertBox' title='Medical coding process message'>" +
-            "<div style='clear: both; margin-top: 2%; text-align: center;'>Retrieving medical codes. Please wait...</div>&nbsp;" +
-            "<img style='display:block;margin:auto;' src='../images/ajax-loader-blue.gif'>" +
-            "</div>").appendTo("body");
-
-        $("#alertBox").dialog({
-            autoOpen : true,
-            modal : true,
-            height: 150,
-            width: 450,
-            buttons: { 'Cancel': function() { hideMedicalCodingAlertBox(ajaxResponse); }},
-            open: function(event, ui) {
-
-            	openDialog({ 
-            		dialogDiv: this, 
-            		cancelButtonValue: "Cancel",
-            		imagesFolderPath: determineImagesPath() 
-    			});
-            }
-        });
-    }
-}
-
 function hideMedicalCodingAlertBox(ajaxResponse) {
-
-    if ($("#alertBox").length > 0) {
-
-        ajaxResponse.abort();
-
-        $("#alertBox").remove();
-    }
-
+	var $alertBox = $("#alertBox");
+	if ($alertBox.length > 0) {
+		ajaxResponse.abort();
+		$alertBox.remove();
+	}
 }
 
 function showMedicalCodingUncodeAlertBox(item) {
-	
 	setAccessedObjected(item);
-    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
-        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;
-    });
-    if (isLocked.size() > 0) {
-        var locked_ecrf_message = $("#locked_crf_message").val();
-        alertDialog({ message: locked_ecrf_message, height: 150, width: 500 });
-        return;
-    }
+	var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
+		return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;
+	});
+	if (isLocked.size() > 0) {
+		var locked_ecrf_message = $("#locked_crf_message").val();
+		alertDialog({message: locked_ecrf_message, height: 150, width: 500});
+		return;
+	}
 
-    if ($("#alertBox").length == 0) {
-
-        if($(item).attr("term").length > 0) {
-
-            $("<div id='alertBox' title='Warning message'>" +
-                "<div style='clear: both; margin-top: 2%; text-align: center;'>Check the item you want to delete:<br><br>" +
-                "<input name='answer' type='radio' value='Code'>Code" +
-                "<input name='answer' type='radio' value='Alias'>Alias" +
-                "<input name='answer' type='radio' value='Both'>Both" +
-                "</div></div>").appendTo("body");
-
-            $("#alertBox").dialog({
-                autoOpen : true,
-                closeOnEscape: false,
-                modal : true,
-                height: 150,
-                width: 500,
-                buttons:{ 'Submit': function() {
-	                    var answer = $('input[name=answer]:checked' ).val();
-	                    if(answer == 'Code') {
-	                        uncodeCodeItem(item);
-	                    } else if(answer == 'Alias') {
-	                        deleteTerm(item);
-	                    } else if(answer == 'Both') {
-	                        uncodeCodeItem(item);
-	                        deleteTerm(item);
-	                    }
-	                    $("#alertBox").remove();
-	                },
-                    'Cancel': function() { 
-                    	$("#alertBox").remove(); 
-                	}
-                },
-
-                open: function(event, ui) {
-                	
-                	openDialog({ 
-                		dialogDiv: this, 
-                		cancelButtonValue: "Cancel", 
-                		okButtonValue: "Submit", 
-                		imagesFolderPath: determineImagesPath() 
-        			});
-                }
-            });
-        } else {
-
-            $("<div id='alertBox' title='Warning message'>" +
-                "<div style='clear: both; margin-top: 2%; text-align: center;'>Are you sure you want to delete this code?</div>&nbsp;" +
-                "</div>").appendTo("body");
-
-            $("#alertBox").dialog({
-                autoOpen : true,
-                closeOnEscape: false,
-                modal : true,
-                height: 150,
-                width: 450,
-                buttons: { 'Submit': function() { 
-	                	uncodeCodeItem(item); $("#alertBox").remove(); 
-                	}, 
-                	'Cancel': function() { 
-                		$("#alertBox").remove();
-            		}},
-                open: function(event, ui) {
-
-                	openDialog({ 
-                		dialogDiv: this, 
-                		cancelButtonValue: "Cancel", 
-                		okButtonValue: "Submit", 
-                		imagesFolderPath: determineImagesPath() 
-        			});
-                }
-            });
-        }
-    }
+	if ($("#alertBox").length == 0) {
+		if ($(item).attr("term").length > 0) {
+			showDeleteCodingTermDialog(item);
+		} else {
+			showConfirmDeleteCodingTermDialog(item);
+		}
+	}
 }
 
 function getBrowserClientWidth() {
@@ -4209,28 +4111,33 @@ function openDialog(params) {
     }
 
     if(params.cancelButtonValue)
-    	setButtonAttributes(params.cancelButtonValue, params);
+    	setButtonAttributes(params.cancelButtonValue, params, params.cancelButtonClass);
     
     if(params.okButtonValue)
-    	setButtonAttributes(params.okButtonValue, params);
+    	setButtonAttributes(params.okButtonValue, params, params.okButtonClass);
     
     setDialogTheme();
 }
 
-function setButtonAttributes(buttonValue, params) {
+function setButtonAttributes(buttonValue, params, additionalClass) {
 	var $button = $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")');
-	var lenth = buttonValue.length;
-	var width = lenth > 10 ? 180 : 120;
-	var buttonClass = lenth > 10 ? "button_long" : 'button_medium';
-	var image = lenth > 10 ? '/button_long_BG.gif' : '/button_medium_BG.gif';
-	$button.removeAttr('class').addClass(buttonClass).css('width', width + 'px').css('float', 'left').css('line-height', '0')
-		.css('padding', '8px 0').attr('id', 'dlgBtn' + buttonValue);
+	if (additionalClass) {
+		$button.removeAttr('class').css('width', '120px').addClass(additionalClass).addClass("button_medium").css('float', 'left').css('line-height', '0')
+			.css('padding', '8px 0').attr('id', 'dlgBtn' + buttonValue);
+	} else {
+		var lenth = buttonValue.length;
+		var width = lenth > 10 ? 180 : 120;
+		var buttonClass = lenth > 10 ? "button_long" : 'button_medium';
+		var image = lenth > 10 ? '/button_long_BG.gif' : '/button_medium_BG.gif';
+		$button.removeAttr('class').addClass(buttonClass).css('width', width + 'px').css('float', 'left').css('line-height', '0')
+			.css('padding', '8px 0').attr('id', 'dlgBtn' + buttonValue);
+		if (theme.name != 'blue') {
+			$button.css('background-image', 'url(' + params.imagesFolderPath + theme.name + image + ')');
+		}
+	}
 	$button.mouseover(function () {$(this).removeClass("ui-state-hover");}).focus(function () {
 		$(this).removeClass("ui-state-focus");
 	});
-	if (theme.name != 'blue') {
-		$button.css('background-image', 'url(' + params.imagesFolderPath + theme.name + image + ')');
-	}
 	$button.blur();
 }
 

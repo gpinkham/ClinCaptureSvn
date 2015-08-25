@@ -4,6 +4,86 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="notes"/>
 
 <script>
+	function showMedicalCodingAlertBox(ajaxResponse){
+		if ($("#alertBox").length == 0) {
+			var params = new DefaultDialogParams();
+			params.height = 150;
+			params.bBoxTitle = "<fmt:message bundle="${words}" key="medical_coding_process_message"/>";
+			params.bBoxId = "alertBox";
+			params.selector = "#alertBox";
+			params.message = "<div style='text-align: center;'><fmt:message bundle="${words}" key="retrieving_medical_codes"/><br/>" +
+					"<img style='display:block;margin:auto;' src='../images/ajax-loader-blue.gif'/></div>";
+			params.width = 450;
+			params.buttons = { '<fmt:message bundle="${words}" key="cancel"/>': function() { hideMedicalCodingAlertBox(ajaxResponse); }};
+			params.open = function(event, ui) {
+				openDialog({
+					dialogDiv: this,
+					cancelButtonValue: "<fmt:message bundle="${words}" key="cancel"/>",
+					cancelButtonClass: "medium_cancel",
+					imagesFolderPath: determineImagesPath()
+				});
+			};
+			createDialog(params);
+		}
+	}
+
+	function showDeleteCodingTermDialog(item) {
+		var params = new DefaultDialogParams();
+		params.bBoxId = 'alertBox';
+		params.selector = '#alertBox';
+		params.bBoxTitle = "<fmt:message bundle="${words}" key="warning_message"/>";
+		params.message = "<fmt:message bundle="${words}" key="check_item_you_want_to_delete"/><br><br>" +
+						"<input name='answer' type='radio' value='Code'><fmt:message bundle="${words}" key="code"/>" +
+						"<input name='answer' type='radio' value='Alias'><fmt:message bundle="${words}" key="alias"/>" +
+						"<input name='answer' type='radio' value='Both'><fmt:message bundle="${words}" key="both"/>";
+		params.width = 500;
+		params.height = 160;
+		params.okButtonClass = "medium_submit";
+		params.cancelButtonClass = "medium_cancel";
+		params.okButtonValue = '<fmt:message bundle="${words}" key="submit"/>';
+		params.cancelButtonValue = '<fmt:message bundle="${words}" key="cancel"/>';
+		params.buttons = {
+			'<fmt:message bundle="${words}" key="submit"/>': function () {
+				var answer = $('input[name=answer]:checked').val();
+				if (answer == 'Code') {
+					uncodeCodeItem(item);
+				} else if (answer == 'Alias') {
+					deleteTerm(item);
+				} else if (answer == 'Both') {
+					uncodeCodeItem(item);
+					deleteTerm(item);
+				}
+				$("#alertBox").remove();
+			},
+			'<fmt:message bundle="${words}" key="cancel"/>': function () {
+				$("#alertBox").remove();
+			}
+		};
+		createDialog(params);
+	}
+
+	function showConfirmDeleteCodingTermDialog(item) {
+		var params = new DefaultDialogParams();
+		params.bBoxId = 'alertBox';
+		params.selector = '#alertBox';
+		params.bBoxTitle = "<fmt:message bundle="${words}" key="warning_message"/>";
+		params.message = "<fmt:message bundle="${words}" key="are_you_sure_you_want_to_delete_this_code"/>";
+		params.width = 400;
+		params.okButtonClass = "medium_submit";
+		params.cancelButtonClass = "medium_cancel";
+		params.okButtonValue = '<fmt:message bundle="${words}" key="submit"/>';
+		params.cancelButtonValue = '<fmt:message bundle="${words}" key="cancel"/>';
+		params.buttons = {
+			'<fmt:message bundle="${words}" key="submit"/>': function() {
+				uncodeCodeItem(item); $("#alertBox").remove();
+			},
+			'<fmt:message bundle="${words}" key="cancel"/>': function() {
+				$("#alertBox").remove();
+			}
+		};
+		createDialog(params);
+	}
+
 	function showSessionExpireDialog() {
 		var params = new DefaultDialogParams();
 		params.okButtonValue = '<fmt:message bundle="${words}" key="resume_data_entry"/>';
@@ -101,6 +181,8 @@
 		this.checkbox = undefined;
 		this.cancelButtonValue = '<fmt:message bundle="${words}" key="no" />';
 		this.okButtonValue = '<fmt:message bundle="${words}" key="yes" />';
+		this.okButtonClass;
+		this.cancelButtonClass;
 		var instance = this;
 		this.getButtons = function () {
 			return {
@@ -125,6 +207,8 @@
 				dialogDiv: instance.selector,
 				cancelButtonValue: instance.cancelButtonValue,
 				okButtonValue: instance.okButtonValue,
+				okButtonClass: instance.okButtonClass,
+				cancelButtonClass: instance.cancelButtonClass,
 				imagesFolderPath: determineImagesPath()
 			});
 

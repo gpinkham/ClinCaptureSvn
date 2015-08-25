@@ -10,7 +10,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
-
+<jsp:include page="/includes/js/dialogs.js.jsp" />
 <jsp:include page="include/sideAlert.jsp"/>
 
 <script type="text/javascript">
