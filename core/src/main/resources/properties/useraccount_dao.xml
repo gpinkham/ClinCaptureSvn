@@ -295,10 +295,12 @@
     <query>
         <name>usersAssignedMetric</name>
         <sql>
-            select count(distinct sur.oid)
-			from study_user_role sur, study s
+            select count(distinct sur.user_name)
+			from study_user_role sur, study s, user_account ua
 			where sur.study_id = s.study_id
+			and sur.user_name = ua.user_name
 			and (s.study_id = ? or s.parent_study_id = ?)
+			and ua.institutional_affiliation not like '%Clinovo%'
         </sql>
     </query>
 </queries>
