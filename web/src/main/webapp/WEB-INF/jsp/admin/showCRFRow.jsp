@@ -215,10 +215,17 @@
             </td>
           </c:if>
 			<td>
-				<a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&annotated=1"
-					onclick="setAccessedObjectWithRowspans(this)">
-					<img name="bt_Annotate" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="annotate_crf" bundle="${resword}"/>" align="left" hspace="6">
-				</a>
+				<c:choose>
+					<c:when test="${study.studyParameterConfig.crfAnnotation == 'no'}">
+						<img src="images/bt_Transparent.gif" border="0" align="left" hspace="6">
+                    </c:when>
+	            	<c:otherwise>	
+						<a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&annotated=1"
+							onclick="setAccessedObjectWithRowspans(this)">
+							<img name="bt_Annotate" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="annotate_crf" bundle="${resword}"/>" align="left" hspace="6">
+						</a>
+					</c:otherwise>
+				</c:choose>			
 			</td>
         </tr>
       </table>
