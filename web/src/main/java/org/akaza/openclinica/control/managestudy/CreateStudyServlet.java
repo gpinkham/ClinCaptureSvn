@@ -20,15 +20,10 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.StudyValidator;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -49,9 +44,11 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Processes request to create a new study.
@@ -160,21 +157,7 @@ public class CreateStudyServlet extends Controller {
 		addValidatorIfParamPresented(request, "startDateTimeLabel", v, Validator.NO_BLANKS);
 		addValidatorIfParamPresented(request, "endDateTimeLabel", v, Validator.NO_BLANKS);
 		errors.putAll(v.validate());
-		// check to see if name and uniqueProId are unique, tbh
-		StudyDAO studyDAO = new StudyDAO(getDataSource());
-		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
-		for (StudyBean thisBean : allStudies) {
-			if (fp.getString("name").trim().equals(thisBean.getName())) {
-				MessageFormat mf = new MessageFormat("");
-				mf.applyPattern(respage.getString("brief_title_existed"));
-				Object[] arguments = {fp.getString("name").trim()};
-
-				Validator.addError(errors, "name", mf.format(arguments));
-			}
-			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())) {
-				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
-			}
-		}
+		StudyValidator.checkIfStudyFieldsAreUnique(fp,  errors, getStudyDAO(), respage, resexception);
 		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
 			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
 		}

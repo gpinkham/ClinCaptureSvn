@@ -20,18 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.exception.CodeException;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.model.DiscrepancyDescriptionType;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.StudyValidator;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -53,11 +48,15 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.exception.CodeException;
-import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.model.DiscrepancyDescriptionType;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 /**
  * Processes request to update study.
@@ -236,6 +235,8 @@ public class UpdateStudyServletNew extends Controller {
 		v.addValidation("endDateTimeLabel", Validator.NO_BLANKS);
 
 		errors.putAll(v.validate());
+
+		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), respage, resexception, study);
 
 		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
 			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
