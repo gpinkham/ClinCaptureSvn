@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 /**
  * StudyBean validator.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyValidator {
 
 	public static boolean checkIfStudyFieldsAreUnique(FormProcessor fp, HashMap errors, StudyDAO studyDAO,
