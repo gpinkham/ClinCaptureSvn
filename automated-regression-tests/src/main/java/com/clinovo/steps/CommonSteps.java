@@ -547,14 +547,15 @@ public class CommonSteps extends ScenarioSteps {
 		case "Event":
 			dnPage.fillInAndSaveDNForEvent(dn, newWindowId);
 			break;
+		case "Study Subject":
+			dnPage.fillInAndSaveDN(dn, newWindowId);
+			break;
 		default:
 			dnPage.fillInAndSaveDN(dn, newWindowId);
 		}
 		
 		switch_to_another_window(oldWindowId);
 	}
-	
-	
 	
 	@Step
 	public void save_crf() {
@@ -629,6 +630,16 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_element_on_page(String page, String element) {
 		switch (page) {
+		case ViewSubjectRecordPage.PAGE_NAME:
+			switch (element) {
+			case "'Study Subject Record' link":
+				viewSubjectRecordPage.clickStudySubjectRecordLink();
+				break;
+			case "'Date of Enrollment for Study' flag":
+				viewSubjectRecordPage.clickEnrollmentDateFlag();
+				break;
+			}
+			break;
 		case AddSubjectPage.PAGE_NAME:
 			switch (element) {
 			case "'Add Next Subject' button":
@@ -719,15 +730,15 @@ public class CommonSteps extends ScenarioSteps {
 	}
 
 	public void click_start_date_flag_in_popup() {
-		subjectMatrixPage.clickStartDateFlag();
+		subjectMatrixPage.clickStartDateFlagInPopup();
 	}
 	
 	public void click_end_date_flag_in_popup() {
-		subjectMatrixPage.clickEndDateFlag();
+		subjectMatrixPage.clickEndDateFlagInPopup();
 	}
 	
 	public void click_location_flag_in_popup() {
-		subjectMatrixPage.clickLocationFlag();
+		subjectMatrixPage.clickLocationFlagInPopup();
 	}
 
 	@Step
@@ -767,6 +778,11 @@ public class CommonSteps extends ScenarioSteps {
 
 	@Step
 	public void check_row_is_present_on_SM() {
-		subjectMatrixPage.check_first_row_is_present_on_SM();
+		subjectMatrixPage.checkFirstRowIsPresent();
+	}
+	
+	@Step
+	public void click_view_icon_for_study_subject_on_SM(String studySubjectID) {
+		subjectMatrixPage.clickViewIconForStudySubject(studySubjectID);
 	}
 }

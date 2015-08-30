@@ -585,4 +585,15 @@ Examples:
 |optional                |no                  |no                 |                          |                        |                 |
 
 
+Scenario: 20.11 "Study Admin" creates DNs for Study Subject
 
+Given User logs in as "Study Admin"
+And User goes to SM page
+And User clicks 'View' icon for StSubj_5 on SM page
+And User is on View Subject Record page
+And User clicks 'Study Subject Record' link on View Subject Record page
+When User creates DNs for Study Subject:
+|Type |Description |Detailed Note    |Entity Name    |
+|Query|st_subj_dn_1|Scenario 20.11...|Enrollment Date|
+
+Then DNs are created

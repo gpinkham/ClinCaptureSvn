@@ -20,6 +20,7 @@ import com.clinovo.pages.ManageEventDefinitionsPage;
 import com.clinovo.pages.NotesAndDiscrepanciesPage;
 import com.clinovo.pages.PreviewCRFPage;
 import com.clinovo.pages.SubjectMatrixPage;
+import com.clinovo.pages.ViewSubjectRecordPage;
 import com.clinovo.steps.CommonSteps;
 import com.clinovo.pages.beans.CRF;
 import com.clinovo.pages.beans.DNote;
@@ -770,6 +771,30 @@ public class ClinovoJBehave extends BaseJBehave {
     	}
     	
     	Thucydides.getCurrentSession().remove(StudySubject.STUDY_SUBJECTS_TO_CHECK_EXIST);
+    }
+    
+    @When(value = "User clicks 'View' icon for $studySubjectID on SM page", priority=1)
+    @Given(value = "User clicks 'View' icon for $studySubjectID on SM page", priority=1)
+	public void userClicksViewIconForStSubjectOnSMPage(String studySubjectID) {
+    	commonSteps.click_view_icon_for_study_subject_on_SM(studySubjectID);
+    }
+    
+    @Given("User creates DNs for Study Subject: $activityTable")
+    @When("User creates DNs for Study Subject: $activityTable")
+   	public void userCreatesDNsForStudySubject(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<DNote> dns = new ArrayList<DNote>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		DNote dn = DNote.fillDNoteFromTableRow(rowParams.values());
+        	dn.setEntityType("Study Subject");
+    		commonSteps.click_element_on_page(ViewSubjectRecordPage.PAGE_NAME, "'Date of Enrollment for Study' flag");
+        	commonSteps.create_DN(dn);
+        	dns.add(dn);
+    	}
+    	
+    	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
     }
     
 	private void userChecksSignEventStatus(Map<String, String> values) {

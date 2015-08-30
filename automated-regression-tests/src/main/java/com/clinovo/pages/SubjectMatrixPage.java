@@ -163,22 +163,27 @@ public class SubjectMatrixPage extends BasePage {
 		return tFindSubjects.findBy(By.xpath(".//td[text()='" + studySubjectID + "']/..//div[@event_name='" + eventName + "']/../a/img"));
 	}
 
-	public void check_first_row_is_present_on_SM() {
+	public void checkFirstRowIsPresent() {
 		Assert.assertTrue(trFirstRow.isCurrentlyVisible());
 	}
 	
-	public void clickStartDateFlag() {
+	public void clickStartDateFlagInPopup() {
 		lStartDateFlag.waitUntilVisible();
 		lStartDateFlag.click();
 	}
 
-	public void clickEndDateFlag() {
+	public void clickEndDateFlagInPopup() {
 		lEndDateFlag.waitUntilVisible();
 		lEndDateFlag.click();
 	}
 
-	public void clickLocationFlag() {
+	public void clickLocationFlagInPopup() {
 		lLocationFlag.waitUntilVisible();
 		lLocationFlag.click();
+	}
+
+	public void clickViewIconForStudySubject(String studySubjectID) {
+		tFindSubjects.withTimeoutOf(60, TimeUnit.SECONDS).
+			findElement(By.xpath(".//td[text()='" + studySubjectID + "']/..//a[contains(@href, 'ViewStudySubject')]")).click();
 	}
 }
