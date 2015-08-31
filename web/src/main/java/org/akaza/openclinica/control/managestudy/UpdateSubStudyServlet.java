@@ -190,7 +190,7 @@ public class UpdateSubStudyServlet extends Controller {
 		StudyBean oldStudy = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
 		for (StudyBean thisBean : allStudies) {
 			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())
-					&& !thisBean.getIdentifier().equals(oldStudy.getIdentifier())) {
+					&& thisBean.getId() != oldStudy.getId()) {
 				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
 			}
 		}
