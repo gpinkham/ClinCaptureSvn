@@ -1163,12 +1163,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
-    <servlet>
-        <servlet-name>printAllEventCRFServlet</servlet-name>
-        <display-name>PrintAllEventCRFServlet</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>lockCRFVersionServlet</servlet-name>
         <url-pattern>/LockCRFVersion</url-pattern>
@@ -1936,10 +1930,6 @@
     <servlet-mapping>
         <servlet-name>printEventCRFServlet</servlet-name>
         <url-pattern>/PrintEventCRF</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>printAllEventCRFServlet</servlet-name>
-        <url-pattern>/PrintAllEventCRF</url-pattern>
     </servlet-mapping>
 
     <servlet>

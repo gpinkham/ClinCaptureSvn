@@ -85,14 +85,6 @@
 						<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="last page" title="last page"></a>
 					</c:if>
 				</td>
-				<td>
-				<a href="javascript:openDocWindow('PrintAllEventCRF')"
-   					onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-   					onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-   					name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" 
-   					title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="right" hspace="6"></a>
-	
-				</td>
 			</tr>
 		</table>
 		</td>
