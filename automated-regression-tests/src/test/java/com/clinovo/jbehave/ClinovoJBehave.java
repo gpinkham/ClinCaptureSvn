@@ -20,6 +20,7 @@ import com.clinovo.pages.ManageEventDefinitionsPage;
 import com.clinovo.pages.NotesAndDiscrepanciesPage;
 import com.clinovo.pages.PreviewCRFPage;
 import com.clinovo.pages.SubjectMatrixPage;
+import com.clinovo.pages.UpdateSubjectDetailsPage;
 import com.clinovo.pages.ViewSubjectRecordPage;
 import com.clinovo.steps.CommonSteps;
 import com.clinovo.pages.beans.CRF;
@@ -772,11 +773,17 @@ public class ClinovoJBehave extends BaseJBehave {
     	
     	Thucydides.getCurrentSession().remove(StudySubject.STUDY_SUBJECTS_TO_CHECK_EXIST);
     }
-    
-    @When(value = "User clicks 'View' icon for $studySubjectID on SM page", priority=1)
+        
     @Given(value = "User clicks 'View' icon for $studySubjectID on SM page", priority=1)
+    @When(value = "User clicks 'View' icon for $studySubjectID on SM page", priority=1)
 	public void userClicksViewIconForStSubjectOnSMPage(String studySubjectID) {
     	commonSteps.click_view_icon_for_study_subject_on_SM(studySubjectID);
+    }
+    
+    @Given(value = "User clicks 'Edit' icon for $studyIDStSubjectID on Administer Subjects page", priority=1)
+    @When(value = "User clicks 'Edit' icon for $studyIDStSubjectID on Administer Subjects page", priority=1)
+	public void userClicksEditIconForSubjectOnAdministerSubjectsPage(String studyIDStSubjectID) {
+    	commonSteps.click_edit_icon_for_subject_on_Administer_Subjects_page(studyIDStSubjectID);
     }
     
     @Given("User creates DNs for Study Subject: $activityTable")
@@ -792,6 +799,62 @@ public class ClinovoJBehave extends BaseJBehave {
     		commonSteps.click_element_on_page(ViewSubjectRecordPage.PAGE_NAME, "'Date of Enrollment for Study' flag");
         	commonSteps.create_DN(dn);
         	dns.add(dn);
+    	}
+    	
+    	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
+    }
+    
+    @Given("User creates DNs for Subject: $activityTable")
+    @When("User creates DNs for Subject: $activityTable")
+   	public void userCreatesDNsForSubject(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<DNote> dns = new ArrayList<DNote>();
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		DNote dn = DNote.fillDNoteFromTableRow(rowParams.values());
+        	dn.setEntityType("Subject");
+        	switch (dn.getEntityName()) {
+    		case "Unique Identifier": //Person ID
+    			commonSteps.click_element_on_page(UpdateSubjectDetailsPage.PAGE_NAME, "'Person ID' flag");
+    			break;
+    		case "Sex": //Gender
+    			commonSteps.click_element_on_page(UpdateSubjectDetailsPage.PAGE_NAME, "'Gender' flag");
+    			break;
+    		case "Date of Birth": //Date of Birth
+    			commonSteps.click_element_on_page(UpdateSubjectDetailsPage.PAGE_NAME, "'Date of Birth' flag");
+    			break;
+    		}
+        	commonSteps.create_DN(dn);
+        	dns.add(dn);
+    	}
+    	
+    	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
+    }
+    
+    @Given("User works with DNs on N&Ds page: $activityTable")
+    @When("User works with DNs on N&Ds page: $activityTable")
+   	public void userWorksWithDNs(String action, ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<DNote> dns = new ArrayList<DNote>();
+    	DNote dn;
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		dn = DNote.fillDNoteFromTableRow(rowParams.values());
+    		commonSteps.filter_NDs_page(dn);
+    		switch (rowParams.values().get("Action")) {
+    		case "View": 
+    			break;
+    		case "Update":
+    			break;
+    		case "Close":
+    			commonSteps.click_element_on_page(UpdateSubjectDetailsPage.PAGE_NAME, "'Date of Birth' flag");
+    			break;
+    		}
+    		commonSteps.update_or_close_DN(dn);
+    		userClicksSaveButton();
+    		dns.add(dn);
     	}
     	
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);

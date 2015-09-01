@@ -17,6 +17,9 @@ public class BasePage extends AbstractPage {
 	@FindBy(jquery = "a[href='ViewNotes?module=submit']")
     private WebElementFacade lNDs;
 	
+	@FindBy(jquery = "a[href$='ListSubject']")
+    private WebElementFacade lSubjects;
+	
 	@FindBy(jquery = "a[href$='system']")
     private WebElementFacade lSystem;
 	
@@ -179,5 +182,10 @@ public class BasePage extends AbstractPage {
 
 	public void message_is_shown(String message) {
 		Assert.assertTrue(tSideBar.find(By.xpath(".//div[contains(text(),'"+message+"')]")).isVisible());
+	}
+
+	public void goToAdministerSubjectsPage() {
+		lTasksMenu.click();
+		lSubjects.click();
 	}
 }

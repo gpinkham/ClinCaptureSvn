@@ -585,7 +585,7 @@ Examples:
 |optional                |no                  |no                 |                          |                        |                 |
 
 
-Scenario: 20.11 "Study Admin" creates DNs for Study Subject
+Scenario: 20.11 "Study Admin" creates DNs for Study Subject 
 
 Given User logs in as "Study Admin"
 And User goes to SM page
@@ -597,3 +597,20 @@ When User creates DNs for Study Subject:
 |Query|st_subj_dn_1|Scenario 20.11...|Enrollment Date|
 
 Then DNs are created
+
+
+Scenario: 20.12 "Study Admin" creates DNs for Subject
+
+Given User logs in as "Study Admin"
+And User goes to Administer Subjects page
+And User clicks 'Edit' icon for TS1-StSubj_3 on Administer Subjects page
+And User is on Update Subject Details page
+When User creates DNs for Subject:
+|Type      |Description |Detailed Note    |Entity Name      |
+|Query     |subj_dn_1   |Scenario 20.12...|Unique Identifier|
+|Annotation|subj_dn_2   |Scenario 20.12...|Sex              |
+|Query     |subj_dn_3   |Scenario 20.12...|Date of Birth    |
+
+Then DNs are created
+
+

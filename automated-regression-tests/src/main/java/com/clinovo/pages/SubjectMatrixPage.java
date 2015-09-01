@@ -56,11 +56,11 @@ public class SubjectMatrixPage extends BasePage {
     @FindBy(className = "crfListTable")
     private WebElementFacade tCRFList;
     
-    @FindBy(css = "div.dynFilter")
+    @FindBy(xpath = ".//div[contains(@onclick,'studySubject.label')][@class='dynFilter']")
     private WebElementFacade divFindSubjects;
     
     @FindBy(id = "dynFilterInput")
-    private WebElementFacade iFindSubjects;
+    private WebElementFacade iFilterField;
 
     @FindBy(xpath = ".//tr[@class='filter']//a[contains(@href,\"onInvokeAction('findSubjects','filter')\")]")
     private WebElementFacade lApplyFilter;
@@ -84,7 +84,7 @@ public class SubjectMatrixPage extends BasePage {
     public void enterStudySubjectIDToFilterField(String sSubjectID) {
     	divFindSubjects.waitUntilVisible();
     	divFindSubjects.click();
-        iFindSubjects.type(sSubjectID);
+    	iFilterField.type(sSubjectID);
     }
 
     public void clickApplyFilterLink() {
@@ -184,6 +184,6 @@ public class SubjectMatrixPage extends BasePage {
 
 	public void clickViewIconForStudySubject(String studySubjectID) {
 		tFindSubjects.withTimeoutOf(60, TimeUnit.SECONDS).
-			findElement(By.xpath(".//td[text()='" + studySubjectID + "']/..//a[contains(@href, 'ViewStudySubject')]")).click();
+			findElement(By.xpath(".//td[text()='" + studySubjectID + "']/..//a[contains(@href, 'ViewStudySubject')]")).click();;
 	}
 }

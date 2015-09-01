@@ -66,7 +66,9 @@ public class CommonSteps extends ScenarioSteps {
 	protected ManageRulesPage manageRulesPage = getPages().get(ManageRulesPage.class);
 	protected ImportRuleDataPage importRuleDataPage = getPages().get(ImportRuleDataPage.class);
 	protected AdministerCRFsPage administerCRFsPage = getPages().get(AdministerCRFsPage.class);
-	
+	protected AdministerSubjectsPage administerSubjectsPage = getPages().get(AdministerSubjectsPage.class);
+	protected UpdateSubjectDetailsPage updateSubjectDetailsPage = getPages().get(UpdateSubjectDetailsPage.class);
+
 	
     private LoginPage loginPage = getPages().get(LoginPage.class);
     private HomePage homePage = getPages().get(HomePage.class);
@@ -212,6 +214,10 @@ public class CommonSteps extends ScenarioSteps {
 			return importRuleDataPage;
 		case AdministerCRFsPage.PAGE_NAME:
 			return administerCRFsPage;
+		case AdministerSubjectsPage.PAGE_NAME:
+			return administerSubjectsPage;	
+		case UpdateSubjectDetailsPage.PAGE_NAME:
+			return updateSubjectDetailsPage;	
 			
 		default:
 			;
@@ -320,10 +326,17 @@ public class CommonSteps extends ScenarioSteps {
 		case ManageEventDefinitionsPage.PAGE_NAME:
 			go_to_manage_event_definitions_page();
 			break;
-		
+		case AdministerSubjectsPage.PAGE_NAME:
+			go_to_administer_subjects_page();
+			break;
+			
 		default:
 			;
 		}
+	}
+
+	private void go_to_administer_subjects_page() {
+		basePage.goToAdministerSubjectsPage();
 	}
 
 	private void go_to_manage_event_definitions_page() {
@@ -550,6 +563,9 @@ public class CommonSteps extends ScenarioSteps {
 		case "Study Subject":
 			dnPage.fillInAndSaveDN(dn, newWindowId);
 			break;
+		case "Subject":
+			dnPage.fillInAndSaveDN(dn, newWindowId);
+			break;
 		default:
 			dnPage.fillInAndSaveDN(dn, newWindowId);
 		}
@@ -630,6 +646,19 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_element_on_page(String page, String element) {
 		switch (page) {
+		case UpdateSubjectDetailsPage.PAGE_NAME:
+			switch (element) {
+			case "'Person ID' flag":
+				updateSubjectDetailsPage.clickPersonIDFlag();
+				break;
+			case "'Gender' flag":
+				updateSubjectDetailsPage.clickGenderFlag();
+				break;
+			case "'Date of Birth' flag":
+				updateSubjectDetailsPage.clickDOBFlag();
+				break;
+			}
+			break;
 		case ViewSubjectRecordPage.PAGE_NAME:
 			switch (element) {
 			case "'Study Subject Record' link":
@@ -784,5 +813,14 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void click_view_icon_for_study_subject_on_SM(String studySubjectID) {
 		subjectMatrixPage.clickViewIconForStudySubject(studySubjectID);
+	}
+	
+	@Step
+	public void click_edit_icon_for_subject_on_Administer_Subjects_page(
+			String studyIDStSubjectID) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("Protocol-Study Subject IDs", studyIDStSubjectID);
+		administerSubjectsPage.filterAdministerSubjectsPage(map);
+		administerSubjectsPage.clickEditIconForSubject(studyIDStSubjectID);
 	}
 }
