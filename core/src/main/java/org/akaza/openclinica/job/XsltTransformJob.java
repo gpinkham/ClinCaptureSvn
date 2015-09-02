@@ -1205,8 +1205,10 @@ public class XsltTransformJob extends QuartzJobBean {
 			StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
 			emailText += words.getString("job_error_mail.studyName");
 			if (studyBean.isSite()) {
-				emailText += " " + studyBean.getParentStudyName() + listItemClosing;
+				StudyBean parent = (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId());
+				emailText += " " + parent.getName() + listItemClosing;
 				emailText += words.getString("job_error_mail.siteName");
+				emailText += " " + studyBean.getName() + listItemClosing;
 			} else {
 				emailText += " " + studyBean.getName() + listItemClosing;
 			}
