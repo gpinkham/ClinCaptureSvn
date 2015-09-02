@@ -55,9 +55,19 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 			// Randomization Result
 			String randomizationResult = returnData.getString("RandomizationResult");
 
+			// Randomization ID - NOTE that this may or may not be present in the response!
+			String randomizationID = null;
+			
+			try {
+				randomizationID = returnData.getString("RandomizationID");
+			} catch (JSONException jException) {
+				log.info("JSON Exception thrown because Rando ID not present - continuing with processing response");
+			}
+			
 			result.setTreatment(treament);
 			result.setPatientId(patientId);
 			result.setRandomizationResult(randomizationResult);
+			result.setRandomizationID(randomizationID);
 
 		} else if (httpStatus == HttpStatus.SC_SERVICE_UNAVAILABLE) {
 

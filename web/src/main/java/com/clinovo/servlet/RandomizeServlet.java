@@ -169,6 +169,7 @@ public class RandomizeServlet extends Controller {
 
 		randomizationResult.put("date", dateFormat.format(date));
 		randomizationResult.put("result", result.getRandomizationResult());
+		randomizationResult.put("id", result.getRandomizationID());
 
 		writer.write(randomizationResult.toString());
 		writer.flush();

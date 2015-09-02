@@ -2423,7 +2423,12 @@ function fixFileInputsForFireFox() {
 $(function() {
     var dateInput = $("#Rand_Date").find(":input");
     var resultInput = $("#Rand_Result").find(":input");
-
+    
+    if ($("#Rand_ID").length) {
+    	var resultId = $("#Rand_ID").find(":input");
+    	$(resultId).attr("readonly", "readonly");
+	}
+    
     $(dateInput).attr("readonly", "readonly");
     $(resultInput).attr("readonly", "readonly");
 
@@ -2453,6 +2458,11 @@ function randomizeSubject() {
 	var eventCrfId = $("input:hidden[name='eventCRFId']").val();
 	var dateInputId = $("#Rand_Date").find(":input").attr("id").replace('input','');
 	var resultInputId = $("#Rand_Result").find(":input").attr("id").replace('input','');
+	if ($("#Rand_ID").length) {
+		var resultId = $("#Rand_ID").find(":input").attr("id").replace('input','');
+	} else {
+		var resultId = "";
+	}
 	var eligibility = null;
 	// Check if the data entry step is IDE
 	if($("form[id=mainForm]").attr("action") !== "InitialDataEntry") {
@@ -2517,6 +2527,7 @@ function randomizeSubject() {
             eventCrfId: eventCrfId,
             dateInputId: dateInputId,
             resultInputId: resultInputId,
+            resultId: resultId,
             subject: subject,
 	        subjectId: subjectId,
             trialId: trialId,
@@ -2553,12 +2564,23 @@ function randomizeSubject() {
                 var result = JSON.parse(data);
                 var dateInput = $("#Rand_Date").find(":input");
                 var resultInput = $("#Rand_Result").find(":input");
+                
+                if ($("#Rand_ID").length) {
+                	var resultID = $("#Rand_ID").find(":input");
+                	$(resultID).attr("readonly", "");
+                	$(resultID).val(result.id).change();
+                	$(resultID).attr("readonly", "readonly");
+                }
+                
                 $(dateInput).attr("readonly", "");
                 $(resultInput).attr("readonly", "");
+                
                 $(dateInput).val(result.date).change();
                 $(resultInput).val(result.result).change();
+                
                 $(dateInput).attr("readonly", "readonly");
                 $(resultInput).attr("readonly", "readonly");
+                
                 $("input[type='submit']").removeAttr("disabled");
                 var errorMessage = $("input[name=randomizationMessage]").val();
                 alertDialog({ message: errorMessage, height: 150, width: 500 });
@@ -2575,7 +2597,9 @@ function checkRandomizationCRF() {
 
 	var dateSize = parseInt($("div[id=Rand_Date] input").size(),10);
 	var resultSize = parseInt($("div[id=Rand_Result] input").size(),10);
-
+	
+	// not checking ID here since it may or may not appear
+	
 	if (dateSize > 0 && resultSize > 0) {
 
 		var randResult = $("div#Rand_Result input").val();

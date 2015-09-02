@@ -2,7 +2,6 @@ package com.clinovo.rule.ext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import javax.xml.ws.WebServiceException;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -127,5 +126,17 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		assertEquals("Should have a correct Randomization result specified", "some-result",
 				result.getRandomizationResult());
+	}
+	
+	/**
+	 * Adding a test here to profile the type of rando response which does not have a rando ID
+	 * @throws Exception
+	 */
+	@Test
+	public void testThatCallReturnsNoRandomizationIDWithACorrectSiteId() throws Exception {
+
+		RandomizationResult result = protocol.call();
+
+		assertEquals("Does not necessarily have to have a Randomization ID", "", result.getRandomizationID());
 	}
 }

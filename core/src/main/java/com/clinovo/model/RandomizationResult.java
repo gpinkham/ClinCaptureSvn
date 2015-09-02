@@ -24,6 +24,19 @@ public class RandomizationResult {
 	private String patientId;
 	private String treatmentID;
 	private String randomizationResult;
+	private String randomizationID;
+
+	/**
+	 * this may or may not be null, so we have to account for that.
+	 * @return
+	 */
+	public String getRandomizationID() {
+		return randomizationID == null ? "" : randomizationID;
+	}
+
+	public void setRandomizationID(String randomizationID) {
+		this.randomizationID = randomizationID;
+	}
 
 	public String getTreatment() {
 		return treatmentID;

@@ -110,4 +110,12 @@ public class JSONSubmissionContextTest extends BaseTest {
 
 		assertEquals("Should return correct randomization result", "radiotherapy", result.getRandomizationResult());
 	}
+	
+	@Test
+	public void testThatProcessResponseReturnsresultWithCorrectRandomizationID() throws Exception {
+
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
+
+		assertEquals("Should return correct randomization ID", "01-013", result.getRandomizationID());
+	}
 }

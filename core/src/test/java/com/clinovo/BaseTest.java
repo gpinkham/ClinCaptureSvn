@@ -55,6 +55,7 @@ public class BaseTest {
 		randomizationResult.put("PatientID", "abc123");
 		randomizationResult.put("RandomizationResult", "radiotherapy");
 		randomizationResult.put("TreatmentID", "3");
+		randomizationResult.put("RandomizationID", "01-013");
 		
 	}
 	
