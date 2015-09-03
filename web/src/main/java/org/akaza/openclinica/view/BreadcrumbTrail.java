@@ -267,14 +267,9 @@ public class BreadcrumbTrail {
 							"MarkEventCRFComplete", Status.UNAVAILABLE));
 				}
 				closeRestOfTrail(ordinal);
-			} else if (jspPage.equals(Page.INITIAL_DATA_ENTRY_NW)) {
+			} else if (jspPage.equals(Page.DATA_ENTRY)) {
 				int ordinal = trail.size() - 2;
 				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("data_entry"), "InitialDataEntry"
-						+ this.generateURLString(request), Status.PENDING), ordinal);
-				closeRestOfTrail(ordinal);
-			} else if (jspPage.equals(Page.DOUBLE_DATA_ENTRY)) {
-				int ordinal = trail.size() - 2;
-				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("data_entry"), "DoubleDataEntry"
 						+ this.generateURLString(request), Status.PENDING), ordinal);
 				closeRestOfTrail(ordinal);
 			} else if (jspPage.equals(Page.CREATE_STUDY1)) {
