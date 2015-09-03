@@ -1,5 +1,6 @@
 package com.clinovo.tag;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,12 +28,15 @@ public class CalendarIconTag extends TagSupport {
 
 	private String alt = "";
 	private String title = "";
-	private String dateFormat = "";
-	private String linkName = "";
 	private String linkId = "";
-	private String onClickSelector;
 	private String imageId = "";
+	private String linkName = "";
+	private String dateFormat = "";
+	private String onClickSelector;
 	private boolean checkIfShowYear = false;
+
+	public static final int INT_10 = 10;
+	public static final int INT_100 = 100;
 
 	private void reset() {
 		alt = "";
@@ -49,9 +53,8 @@ public class CalendarIconTag extends TagSupport {
 	public int doStartTag() throws JspException {
 
 		if (onClickSelector != null) {
-			WebApplicationContext webApplicationContext = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
-							.getServletContext());
+			WebApplicationContext webApplicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(
+					((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT)).getServletContext());
 			StudyBean currentStudy = (StudyBean) pageContext.getSession().getAttribute("study");
 			MessageSource messageSource = (MessageSource) webApplicationContext.getBean("messageSource");
 			Locale locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest());
@@ -71,12 +74,14 @@ public class CalendarIconTag extends TagSupport {
 					|| currentStudy.getStudyParameterConfig().getShowYearsInCalendar().equalsIgnoreCase("yes");
 
 			if (showYears) {
-				html = html.concat(", changeYear: true,changeMonth : true,\n").concat(
-						"onChangeMonthYear: function (year, month, inst) {\n" + "\t var date = $(this).val();\n"
+				int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+				html = html.concat(", changeYear: true,changeMonth : true,\n")
+						.concat("onChangeMonthYear: function (year, month, inst) {\n" + "\t var date = $(this).val();\n"
 								+ "\t if ($.trim(date) != '') {\n"
 								+ "\t\t var newDate = month + '/' + inst.currentDay + '/' + year;\n"
 								+ "\t\t $(this).val($.datepicker.formatDate('" + dateFormat
-								+ "', new Date(newDate)));\n" + "\t}\n},\n yearRange: 'c-20:c+10'");
+								+ "', new Date(newDate)));\n" + "\t}\n},\n yearRange: '" + (currentYear - INT_100) + ":"
+								+ (currentYear + INT_10) + "'");
 			}
 			html = html.concat("}).datepicker('show');\" ");
 			if (!linkId.isEmpty()) {
@@ -85,8 +90,8 @@ public class CalendarIconTag extends TagSupport {
 			if (!linkName.isEmpty()) {
 				html = html.concat("name='" + linkName + "'");
 			}
-			html = html.concat(">\n \t<img src='images/bt_Calendar.gif' alt='" + alt + "' ").concat(
-					"title='" + title + "' border='0'");
+			html = html.concat(">\n \t<img src='images/bt_Calendar.gif' alt='" + alt + "' ")
+					.concat("title='" + title + "' border='0'");
 			if (!imageId.isEmpty()) {
 				html = html.concat("id='" + imageId + "'");
 			}
