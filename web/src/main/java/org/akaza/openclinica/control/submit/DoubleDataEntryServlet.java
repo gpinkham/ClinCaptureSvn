@@ -138,11 +138,6 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected void putDataEntryStageFlagToRequest(HttpServletRequest request) {
-		request.setAttribute(DATA_ENTRY_STAGE, DataEntryStage.DOUBLE_DATA_ENTRY);
-	}
-
-	@Override
 	protected boolean validateInputOnFirstRound() {
 		return true;
 	}
@@ -385,7 +380,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 	 */
 	@Override
 	protected Page getJSPPage() {
-		return Page.DATA_ENTRY;
+		return Page.DOUBLE_DATA_ENTRY;
 	}
 
 	/*

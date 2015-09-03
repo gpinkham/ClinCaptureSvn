@@ -311,11 +311,6 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
 	}
 
-	@Override
-	protected void putDataEntryStageFlagToRequest(HttpServletRequest request) {
-
-	}
-
 	// Get a Section's title by its key number in the sectionsMap; i.e., what is
 	// the title
 	// of the first section in the CRF?

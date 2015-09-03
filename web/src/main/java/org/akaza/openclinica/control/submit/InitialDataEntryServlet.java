@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -231,7 +230,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
 	@Override
 	protected Page getJSPPage() {
-		return Page.DATA_ENTRY;
+		return Page.INITIAL_DATA_ENTRY_NW;
+
 	}
 
 	@Override
@@ -264,10 +264,5 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 	@Override
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
 		return false;
-	}
-
-	@Override
-	protected void putDataEntryStageFlagToRequest(HttpServletRequest request) {
-		request.setAttribute(DATA_ENTRY_STAGE, DataEntryStage.INITIAL_DATA_ENTRY);
 	}
 }

@@ -482,11 +482,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected void putDataEntryStageFlagToRequest(HttpServletRequest request) {
-
-	}
-
-	@Override
 	protected Status getBlankItemStatus() {
 		return Status.AVAILABLE;
 	}
