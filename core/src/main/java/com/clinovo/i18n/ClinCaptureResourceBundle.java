@@ -69,6 +69,14 @@ public class ClinCaptureResourceBundle extends ResourceBundle {
 		return found;
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param baseName
+	 *            String
+	 * @param locale
+	 *            Locale
+	 */
 	public ClinCaptureResourceBundle(String baseName, Locale locale) {
 		keys = new HashSet<String>();
 		properties = new Properties();

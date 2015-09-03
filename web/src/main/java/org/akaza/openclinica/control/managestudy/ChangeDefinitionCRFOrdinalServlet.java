@@ -20,7 +20,9 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes request to change CRF ordinals in a study event definition.
  */
-@SuppressWarnings({ "serial", "unchecked" })
+@SuppressWarnings({"serial", "unchecked"})
 @Component
 public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 
@@ -51,8 +53,8 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 		int eventCRFDefId = fp.getInt(PARAM_EVENT_DEF_CRF_ID);
 		String action = fp.getString(PARAM_ACTION);
 
-		EventDefinitionCRFBean eventDefCRFToMove =
-				(EventDefinitionCRFBean) getEventDefinitionCRFDAO().findByPK(eventCRFDefId);
+		EventDefinitionCRFBean eventDefCRFToMove = (EventDefinitionCRFBean) getEventDefinitionCRFDAO()
+				.findByPK(eventCRFDefId);
 		request.getSession().getServletContext().setAttribute(EVENT_DEF_CRF_BEAN_TO_MOVE, eventDefCRFToMove);
 
 		if (!isEventDefCRFValid(request)
@@ -72,9 +74,9 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 
 	private boolean isEventDefCRFValid(HttpServletRequest request) {
 
-		EventDefinitionCRFBean eventDefCRFToMove =
-				(EventDefinitionCRFBean) request.getSession().getServletContext().getAttribute(EVENT_DEF_CRF_BEAN_TO_MOVE);
-		StudyBean currentStudy  = getCurrentStudy(request);
+		EventDefinitionCRFBean eventDefCRFToMove = (EventDefinitionCRFBean) request.getSession().getServletContext()
+				.getAttribute(EVENT_DEF_CRF_BEAN_TO_MOVE);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		return (eventDefCRFToMove.getId() > 0) && (eventDefCRFToMove.getStudyId() == currentStudy.getId());
 	}
@@ -86,53 +88,39 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean currentUser = getUserAccountBean(request);
 
-		EventDefinitionCRFBean eventDefCRFToMove =
-				(EventDefinitionCRFBean) request.getSession().getServletContext().getAttribute(EVENT_DEF_CRF_BEAN_TO_MOVE);
+		EventDefinitionCRFBean eventDefCRFToMove = (EventDefinitionCRFBean) request.getSession().getServletContext()
+				.getAttribute(EVENT_DEF_CRF_BEAN_TO_MOVE);
 
-		List<EventDefinitionCRFBean> eventDefCRFBeansList =
-				(List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO().findAllByDefinition(currentStudy,
-						eventDefCRFToMove.getStudyEventDefinitionId());
+		List<EventDefinitionCRFBean> eventDefCRFBeansList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+				.findAllByDefinition(currentStudy, eventDefCRFToMove.getStudyEventDefinitionId());
 
-		int maxOrdinal = eventDefCRFBeansList.size();
+		List<Integer> edcIds = new ArrayList<Integer>();
+		for (EventDefinitionCRFBean edcBean : eventDefCRFBeansList) {
+			edcIds.add(edcBean.getId());
+		}
+		int posFrom = edcIds.indexOf(eventDefCRFToMove.getId());
+		int posTo = action.equalsIgnoreCase(ACTION_MOVE_UP) ? posFrom - 1 : posFrom + 1;
+		if (posTo >= 0 && posTo <= edcIds.size() - 1) {
+			EventDefinitionCRFBean edcBeanFrom = eventDefCRFBeansList.get(posFrom);
+			EventDefinitionCRFBean edcBeanTo = eventDefCRFBeansList.get(posTo);
+			eventDefCRFBeansList.set(posFrom, edcBeanTo);
+			eventDefCRFBeansList.set(posTo, edcBeanFrom);
+			edcIds.clear();
 
-		if ((action.equalsIgnoreCase(ACTION_MOVE_UP) && eventDefCRFToMove.getOrdinal() != 1)
-				|| (action.equalsIgnoreCase(ACTION_MOVE_DOWN) && eventDefCRFToMove.getOrdinal() != maxOrdinal)) {
-
-			EventDefinitionCRFBean eventDefCRFNeighbourToMove = new EventDefinitionCRFBean();
-			int neighbourOrdinal = action.equalsIgnoreCase(ACTION_MOVE_UP)
-					? eventDefCRFToMove.getOrdinal() - 1 : eventDefCRFToMove.getOrdinal() + 1;
-
+			int ordinal = 1;
 			for (EventDefinitionCRFBean eventDefCRFBean : eventDefCRFBeansList) {
-
-				if (eventDefCRFBean.getOrdinal() == neighbourOrdinal) {
-					eventDefCRFNeighbourToMove = eventDefCRFBean;
-					break;
-				}
+				edcIds.add(eventDefCRFBean.getId());
+				eventDefCRFBean.setOrdinal(ordinal++);
+				eventDefCRFBean.setUpdater(currentUser);
+				getEventDefinitionCRFDAO().update(eventDefCRFBean);
 			}
 
-			List<EventDefinitionCRFBean> siteLevelEventDefinitionCRFsList =
-					getEventDefinitionCRFDAO().findAllChildrenByDefinition(eventDefCRFToMove.getStudyEventDefinitionId());
-			int newOrdinalForNeighbour = eventDefCRFToMove.getOrdinal();
-
-			updateOrdinal(eventDefCRFToMove, siteLevelEventDefinitionCRFsList, neighbourOrdinal, currentUser);
-			updateOrdinal(eventDefCRFNeighbourToMove, siteLevelEventDefinitionCRFsList, newOrdinalForNeighbour, currentUser);
-		}
-	}
-
-	private void updateOrdinal(EventDefinitionCRFBean studyLevelEventDefCRFToUpdate,
-			List<EventDefinitionCRFBean> siteLevelEventDefinitionCRFsList, int newOrdinal, UserAccountBean updater) {
-
-		studyLevelEventDefCRFToUpdate.setOrdinal(newOrdinal);
-		studyLevelEventDefCRFToUpdate.setUpdater(updater);
-		getEventDefinitionCRFDAO().update(studyLevelEventDefCRFToUpdate);
-
-		for (EventDefinitionCRFBean siteLevelEventDefinitionCRF : siteLevelEventDefinitionCRFsList) {
-
-			if (siteLevelEventDefinitionCRF.getParentId() == studyLevelEventDefCRFToUpdate.getId()) {
-
-				siteLevelEventDefinitionCRF.setOrdinal(newOrdinal);
-				siteLevelEventDefinitionCRF.setUpdater(updater);
-				getEventDefinitionCRFDAO().update(siteLevelEventDefinitionCRF);
+			List<EventDefinitionCRFBean> siteLevelEventDefinitionCRFsList = getEventDefinitionCRFDAO()
+					.findAllChildrenByDefinition(eventDefCRFToMove.getStudyEventDefinitionId());
+			for (EventDefinitionCRFBean siteEventDefCRFBean : siteLevelEventDefinitionCRFsList) {
+				siteEventDefCRFBean.setOrdinal(edcIds.indexOf(siteEventDefCRFBean.getParentId()) + 1);
+				siteEventDefCRFBean.setUpdater(currentUser);
+				getEventDefinitionCRFDAO().update(siteEventDefCRFBean);
 			}
 		}
 	}
