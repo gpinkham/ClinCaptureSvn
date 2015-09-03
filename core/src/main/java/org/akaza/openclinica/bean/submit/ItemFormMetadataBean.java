@@ -20,11 +20,12 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import com.clinovo.util.DRUtil;
+import java.util.List;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.core.form.StringUtil;
 
-import java.util.List;
+import com.clinovo.util.DRUtil;
 
 /**
  * ItemFormMetadataBean.
@@ -341,6 +342,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		ResponseSetBean rsb = new ResponseSetBean();
 		rsb.setId(getResponseSet().getId());
 		rsb.setLabel(getResponseSet().getLabel());
+		rsb.setResponseType(getResponseSet().getResponseType());
 		rsb.setResponseTypeId(getResponseSet().getResponseTypeId());
 		for (ResponseOptionBean ro : (List<ResponseOptionBean>) getResponseSet().getOptions()) {
 			rsb.setOptions(ro.getText(), ro.getValue());

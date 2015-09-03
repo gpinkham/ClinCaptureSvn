@@ -29,13 +29,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -58,23 +56,26 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.lib.crf.builder.CrfBuilder;
 
 /**
  * Create a new CRF version by uploading excel file.
  *
  * @author jxu, ywang
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked", "serial", "unused"})
 @Component
 public class CreateCRFVersionServlet extends Controller {
 
@@ -94,10 +95,10 @@ public class CreateCRFVersionServlet extends Controller {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+				"1");
 	}
 
 	/**
@@ -149,12 +150,6 @@ public class CreateCRFVersionServlet extends Controller {
 	private void confirmSql(HttpServletRequest request, HttpServletResponse response, CRFVersionBean version) {
 		UserAccountBean ub = getUserAccountBean(request);
 		CRFDAO cdao = getCRFDAO();
-		NewCRFBean nib = (NewCRFBean) request.getSession().getAttribute("nib");
-		if (nib != null && nib.getItemQueries() != null) {
-			request.setAttribute("openQueries", nib.getItemQueries());
-		} else {
-			request.setAttribute("openQueries", new HashMap());
-		}
 		Boolean deletePreviousVersion = (Boolean) request.getSession().getAttribute("deletePreviousVersion");
 		Integer previousVersionId = (Integer) request.getSession().getAttribute("previousVersionId");
 		if (deletePreviousVersion != null && deletePreviousVersion.equals(Boolean.TRUE) && previousVersionId != null
@@ -176,37 +171,16 @@ public class CreateCRFVersionServlet extends Controller {
 				forwardPage(Page.CREATE_CRF_VERSION_NODELETE, request, response);
 				return;
 			}
-			try {
-				CRFVersionDAO cvdao = getCRFVersionDAO();
-				ArrayList nonSharedItems = cvdao.findNotSharedItemsByVersion(previousVersionId);
-				if (nib != null) {
-					nib.deleteFromDB();
-				}
-				NewCRFBean nib1 = (NewCRFBean) request.getSession().getAttribute("nib");
-				if (!nonSharedItems.isEmpty()) {
-					logger.info("items are not shared, need to insert");
-					request.setAttribute("openQueries", nib1.getBackupItemQueries());
-					nib1.setItemQueries(nib1.getBackupItemQueries());
-				} else {
-					nib1.setItemQueries(new HashMap());
-				}
-				request.getSession().setAttribute("nib", nib1);
-			} catch (OpenClinicaException pe) {
-				request.getSession().setAttribute("excelErrors", nib.getDeleteErrors());
-				logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_ERROR.");
-				forwardPage(Page.CREATE_CRF_VERSION_ERROR, request, response);
-				return;
-			}
+			getDeleteCrfService().deleteCrfVersion(previousVersionId);
 		}
 		logger.info("commit sql");
-		NewCRFBean nib1 = (NewCRFBean) request.getSession().getAttribute("nib");
-		if (nib1 != null) {
+		CrfBuilder crfBuilder = (CrfBuilder) request.getSession().getAttribute("crfBuilder");
+		if (crfBuilder != null) {
 			try {
 				CRFVersionDAO cvdao = getCRFVersionDAO();
-				List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) cvdao.findAllActiveByCRF(version
-						.getCrfId());
-				nib1.insertToDB();
-				request.setAttribute("queries", nib1.getQueries());
+				List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) cvdao
+						.findAllActiveByCRF(version.getCrfId());
+				crfBuilder.save();
 
 				ArrayList crfvbeans;
 				logger.info("CRF-ID [" + version.getCrfId() + "]");
@@ -224,7 +198,8 @@ public class CreateCRFVersionServlet extends Controller {
 				}
 				Integer cfvID = crfVersionId;
 				if (cfvID == 0) {
-					cfvID = cvdao.findCRFVersionId(nib1.getCrfId(), nib1.getVersionName());
+					cfvID = cvdao.findCRFVersionId(crfBuilder.getCrfBean().getId(),
+							crfBuilder.getCrfVersionBean().getName());
 				}
 				CRFVersionBean finalVersion = (CRFVersionBean) cvdao.findByPK(cfvID);
 				if (crfVersionList != null && crfVersionList.size() > 0) {
@@ -233,7 +208,7 @@ public class CreateCRFVersionServlet extends Controller {
 				}
 				getEventDefinitionCrfService().updateChildEventDefinitionCrfsForNewCrfVersion(finalVersion, ub);
 
-				version.setCrfId(nib1.getCrfId());
+				version.setCrfId(crfBuilder.getCrfBean().getId());
 				version.setOid(finalVersion.getOid());
 
 				CRFBean crfBean = (CRFBean) cdao.findByPK(version.getCrfId());
@@ -277,7 +252,7 @@ public class CreateCRFVersionServlet extends Controller {
 				forwardPage(Page.CREATE_CRF_VERSION_DONE, request, response);
 			} catch (OpenClinicaException pe) {
 				logger.info("--------------");
-				request.getSession().setAttribute("excelErrors", nib1.getErrors());
+				request.getSession().setAttribute("excelErrors", crfBuilder.getErrorsList());
 				forwardPage(Page.CREATE_CRF_VERSION_ERROR, request, response);
 			}
 		} else {
@@ -327,22 +302,15 @@ public class CreateCRFVersionServlet extends Controller {
 		// At this point, if there are errors, they point to no file
 		// provided and/or not xls format
 		if (errors.isEmpty()) {
-			NewCRFBean newCRFBean = (NewCRFBean) request.getSession().getAttribute("nib");
-			if (newCRFBean == null) {
+			CrfBuilder crfBuilder = (CrfBuilder) request.getSession().getAttribute("crfBuilder");
+			if (crfBuilder == null) {
 				forwardPage(Page.CREATE_CRF_VERSION, request, response);
 				return false;
 			}
-			String versionName = newCRFBean.getVersionName();
-			if (versionName.length() > versionNameLength) {
-				Validator.addError(errors, "excel_file", resword.getString("the_version_CRF_version_more_than_255"));
-			} else if (versionName.length() <= 0) {
-				Validator.addError(errors, "excel_file", resword.getString("the_VERSION_column_was_blank"));
-			}
-			version.setName(versionName);
+			version.setName(crfBuilder.getCrfVersionBean().getName());
 			if (version.getCrfId() == 0) {
 				version.setCrfId(fp.getInt("crfId"));
 			}
-			request.getSession().setAttribute("version", version);
 		}
 		if (!errors.isEmpty()) {
 			logger.info("has validation errors ");
@@ -394,6 +362,7 @@ public class CreateCRFVersionServlet extends Controller {
 				return false;
 			}
 		}
+		forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW, request, response);
 		return true;
 	}
 
@@ -418,8 +387,9 @@ public class CreateCRFVersionServlet extends Controller {
 		HashMap errors = getErrorsHolder(request);
 		errors.remove("excel_file");
 		String tempFile = null;
+		CrfBuilder crfBuilder = null;
 		for (File f : theFiles) {
-			if (f == null || f.getName() == null) {
+			if (f == null) {
 				logger.info("file is empty.");
 				Validator.addError(errors, "excel_file", resword.getString("you_have_to_provide_spreadsheet"));
 				request.getSession().setAttribute("version", version);
@@ -430,143 +400,84 @@ public class CreateCRFVersionServlet extends Controller {
 						respage.getString("file_you_uploaded_not_seem_excel_spreadsheet"));
 				request.getSession().setAttribute("version", version);
 				return tempFile;
-
 			} else {
 				logger.info("file name:" + f.getName());
 				tempFile = f.getName();
+				FileInputStream inputStream = null;
 				isXlsx = f.getName().toLowerCase().endsWith(".xlsx");
-				FileInputStream inStream = null;
-				FileInputStream inStreamClassic = null;
-				SpreadSheetTableRepeating htab;
-				SpreadSheetTableClassic sstc = null;
-				// create newCRFBean here
-				NewCRFBean nib = null;
 				try {
-					inStream = new FileInputStream(theDir + tempFile);
-
-					htab = new SpreadSheetTableRepeating(inStream, ub, version.getName(),
-							LocaleResolver.getLocale(request), currentStudy.getId(), isXlsx);
-					htab.setMeasurementUnitDao(getMeasurementUnitDao());
-					if (!htab.isRepeating()) {
-						inStreamClassic = new FileInputStream(theDir + tempFile);
-						sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(),
-								LocaleResolver.getLocale(request), currentStudy.getId(), isXlsx);
-						sstc.setMeasurementUnitDao(getMeasurementUnitDao());
-					}
-					if (htab.isRepeating()) {
-						htab.setCrfId(version.getCrfId());
-						// not the best place for this but for now...
-						request.getSession().setAttribute("new_table", "y");
-					} else {
-						sstc.setCrfId(version.getCrfId());
-					}
-					if (htab.isRepeating()) {
-						nib = htab.toNewCRF(getDataSource(), respage);
-					} else {
-						nib = sstc.toNewCRF(getDataSource(), respage);
-					}
-					// This object is created to pull preview information out of
-					// the spreadsheet
-					Workbook workbook;
-					FileInputStream inputStream = null;
-					try {
-						inputStream = new FileInputStream(theDir + tempFile);
-						workbook = isXlsx ? new XSSFWorkbook(inputStream) : new HSSFWorkbook(inputStream);
-						// Store the Sections, Items, Groups, and CRF name and
-						// version information
-						// so they can be displayed in a preview. The Map
-						// consists of the
-						// names "sections," "items," "groups," and "crf_info"
-						// as keys, each of which point
-						// to a Map containing data on those CRF sections.
-
-						// Check if it's the old template
-						Preview preview;
-						if (htab.isRepeating()) {
-
-							// the preview uses date formatting with default
-							// values in date fields: yyyy-MM-dd
-							preview = new SpreadsheetPreviewNw();
-
-						} else {
-							preview = new SpreadsheetPreview();
-
-						}
-						request.getSession().setAttribute("preview_crf", preview.createCrfMetaObject(workbook));
-					} catch (Exception exc) { // opening the stream could
-						// throw FileNotFoundException
-						exc.printStackTrace();
-						String message = resword.getString("the_application_encountered_a_problem_uploading_CRF");
-						logger.info(message + ": " + exc.getMessage());
-						this.addPageMessage(message, request);
-					} finally {
-						if (inputStream != null) {
-							try {
-								inputStream.close();
-							} catch (IOException io) {
-								logger.warn("ignore this close()-related exception");
-							}
-						}
-					}
-					List<ItemBean> ibs = isItemSame(nib.getItems(), version);
-
-					if (!ibs.isEmpty()) {
-						List<String> warnings = new ArrayList<String>();
-						boolean isOwner = ibs.get(0).getOwner().getId() == ub.getId();
-						warnings.add(resexception.getString("you_may_not_modify_items"));
-						for (ItemBean ib : ibs) {
-							if (isOwner) {
-								warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-										+ resexception.getString("in_your_spreadsheet_already_exists")
-										+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
-										+ ib.getUnits() + ").");
-							} else {
-								warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-										+ resexception.getString("in_your_spreadsheet_already_exists")
-										+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
-										+ ib.getUnits() + ").");
-							}
-
-						}
-						if (isOwner) {
-							warnings.add("UNITS " + resword.getString("and") + " DATA_TYPE(PDATE to DATE) "
-									+ resexception.getString("will_not_be_changed_if") + " "
-									+ resexception.getString("if_you_think_you_made_mistake"));
-						} else {
-							warnings.add(resexception.getString("these_field_cannot_be_modified_because_not_owner"));
-						}
-						request.setAttribute("warnings", warnings);
-					}
-					ItemBean ib = isResponseValid(nib.getItems(), version);
-					if (ib != null) {
-
-						nib.getErrors().add(
-								resword.getString("the_item") + ": " + ib.getName() + " "
-										+ resexception.getString("in_your_spreadsheet_already_exits_in_DB"));
-					}
-				} catch (IOException io) {
-					logger.warn("Opening up the Excel file caused an error. the error message is: " + io.getMessage());
+					inputStream = new FileInputStream(theDir + tempFile);
+					Workbook workbook = !isXlsx
+							? new HSSFWorkbook(new POIFSFileSystem(inputStream))
+							: new XSSFWorkbook(inputStream);
+					crfBuilder = getCrfBuilderFactory().getCrfBuilder(workbook, currentStudy, ub,
+							LocaleResolver.getLocale(), ResourceBundleProvider.getPageMessagesBundle());
+					crfBuilder.getCrfBean().setId(version.getCrfId());
+					crfBuilder.build();
+					request.getSession().setAttribute("crfBuilder", crfBuilder);
+					request.getSession().setAttribute("htmlTable", crfBuilder.getHtmlTable());
+					request.getSession().setAttribute("excelErrors", crfBuilder.getErrorsList());
+					request.getSession().setAttribute("preview_crf", crfBuilder.createCrfMetaObject());
+				} catch (IOException ex) {
+					// opening the stream could throw FileNotFoundException
+					ex.printStackTrace();
+					String message = resword.getString("the_application_encountered_a_problem_uploading_CRF");
+					logger.info(message + ": " + ex.getMessage());
+					this.addPageMessage(message, request);
 				} finally {
-					if (inStream != null) {
+					if (inputStream != null) {
 						try {
-							inStream.close();
-						} catch (IOException ioe) {
-							logger.warn("inStream.close()-related exception");
-						}
-					}
-					if (inStreamClassic != null) {
-						try {
-							inStreamClassic.close();
-						} catch (IOException ioe) {
-							logger.warn("inStreamClassic.close()-related exception");
+							inputStream.close();
+						} catch (IOException io) {
+							logger.warn("ignore this close()-related exception");
 						}
 					}
 				}
-				request.getSession().setAttribute("excelErrors", nib.getErrors());
-				request.getSession().setAttribute("htmlTable", nib.getHtmlTable());
-				request.getSession().setAttribute("nib", nib);
 			}
 		}
+
+		if (crfBuilder != null) {
+			// TODO move warnings to validator
+			List<ItemBean> ibs = isItemSame(crfBuilder.getItems(), version);
+
+			if (!ibs.isEmpty()) {
+				List<String> warnings = new ArrayList<String>();
+				boolean isOwner = ibs.get(0).getOwner().getId() == ub.getId();
+				warnings.add(resexception.getString("you_may_not_modify_items"));
+				for (ItemBean ib : ibs) {
+					if (isOwner) {
+						warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
+								+ resexception.getString("in_your_spreadsheet_already_exists")
+								+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
+								+ ib.getUnits() + ").");
+					} else {
+						warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
+								+ resexception.getString("in_your_spreadsheet_already_exists")
+								+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
+								+ ib.getUnits() + ").");
+					}
+
+				}
+				if (isOwner) {
+					warnings.add("UNITS " + resword.getString("and") + " DATA_TYPE(PDATE to DATE) "
+							+ resexception.getString("will_not_be_changed_if") + " "
+							+ resexception.getString("if_you_think_you_made_mistake"));
+				} else {
+					warnings.add(resexception.getString("these_field_cannot_be_modified_because_not_owner"));
+				}
+				request.setAttribute("warnings", warnings);
+			}
+
+			// TODO move it to validator
+			ItemBean ib = isResponseValid(crfBuilder.getItems(), version);
+			if (ib != null) {
+
+				crfBuilder.getErrorsList().add(resword.getString("the_item") + ": " + ib.getName() + " "
+						+ resexception.getString("in_your_spreadsheet_already_exits_in_DB"));
+			}
+
+		}
+
 		return tempFile;
 	}
 
@@ -605,12 +516,6 @@ public class CreateCRFVersionServlet extends Controller {
 				return false;
 			}
 		}
-
-		// user is the owner and item not have data,
-		// delete previous version with non-shared items
-		NewCRFBean nib = (NewCRFBean) request.getSession().getAttribute("nib");
-		nib.setDeleteQueries(cdao.generateDeleteQueries(previousVersionId, items));
-		request.getSession().setAttribute("nib", nib);
 		return true;
 
 	}
@@ -625,13 +530,11 @@ public class CreateCRFVersionServlet extends Controller {
 	 *            crf version bean
 	 * @return the items found
 	 */
-	public List<ItemBean> isItemSame(HashMap<String, ItemBean> items, CRFVersionBean version) {
+	public List<ItemBean> isItemSame(List<ItemBean> items, CRFVersionBean version) {
 		ItemDAO idao = getItemDAO();
 		List<ItemBean> diffItems = new ArrayList<ItemBean>();
-		Set<String> names = items.keySet();
-		for (String name : names) {
-			ItemBean newItem = (ItemBean) idao.findByNameAndCRFId(name, version.getCrfId());
-			ItemBean item = items.get(name);
+		for (ItemBean item : items) {
+			ItemBean newItem = (ItemBean) idao.findByNameAndCRFId(item.getName(), version.getCrfId());
 			if (newItem.getId() > 0) {
 				if (!item.getUnits().equalsIgnoreCase(newItem.getUnits())
 						|| item.getDataType().getId() != newItem.getDataType().getId()) {
@@ -643,14 +546,11 @@ public class CreateCRFVersionServlet extends Controller {
 		return diffItems;
 	}
 
-	private ItemBean isResponseValid(HashMap items, CRFVersionBean version) {
+	private ItemBean isResponseValid(List<ItemBean> items, CRFVersionBean version) {
 		ItemDAO idao = getItemDAO();
 		ItemFormMetadataDAO metadao = getItemFormMetadataDAO();
-		Set names = items.keySet();
-		for (Object name1 : names) {
-			String name = (String) name1;
-			ItemBean oldItem = (ItemBean) idao.findByNameAndCRFId(name, version.getCrfId());
-			ItemBean item = (ItemBean) items.get(name);
+		for (ItemBean item : items) {
+			ItemBean oldItem = (ItemBean) idao.findByNameAndCRFId(item.getName(), version.getCrfId());
 			if (oldItem.getId() > 0) { // found same item in DB
 				ArrayList metas = metadao.findAllByItemId(oldItem.getId());
 				for (Object meta : metas) {
@@ -693,7 +593,6 @@ public class CreateCRFVersionServlet extends Controller {
 	 *            ResponseSetBean
 	 * @return The original option
 	 */
-	@SuppressWarnings("unused")
 	public ResponseOptionBean hasDifferentOption(ResponseSetBean oldRes, ResponseSetBean newRes) {
 		ArrayList oldOptions = oldRes.getOptions();
 		ArrayList newOptions = newRes.getOptions();

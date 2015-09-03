@@ -108,7 +108,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 		}
 		request.setAttribute("eventlist", events);
 		request.setAttribute("crfCount", crfdao.getCountofActiveCRFs());
-		request.setAttribute("itemCount", itemdao.getCountofActiveItems());
+		request.setAttribute("itemCount", itemdao.getCountOfActiveItems());
 		request.setAttribute("ruleSetCount", getRuleSetService().getRuleSetDao().count(currentStudy));
 
 	}

@@ -498,7 +498,7 @@ public class ImportCRFDataService {
 					// Refine Item Group Data
 					importDataRefiner.refineImportItemGroupData(itemGroupDataBeans,
 							itemDAO.findAllItemsByVersionId(crfVersion.getId()),
-							itemGroupDAO.findGroupByCRFVersionID(crfVersion.getId()),
+							itemGroupDAO.findGroupByCrfVersionId(crfVersion.getId()),
 							itemGroupMetadataDAO.findByCrfVersion(crfVersion.getId()));
 					if (permittedEventCRFIds.contains(eventCRFBean.getId())) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {

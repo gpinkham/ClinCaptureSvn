@@ -233,33 +233,61 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	}
 
+	/**
+	 * Select method.
+	 *
+	 * @param query
+	 *            String
+	 * @param variables
+	 *            HashMap
+	 * @return ArrayList
+	 */
 	public ArrayList<V> select(String query, HashMap variables) {
+		return select(query, variables, null);
+	}
+
+	/**
+	 * Select method.
+	 *
+	 * @param query
+	 *            String
+	 * @param variables
+	 *            HashMap
+	 * @param con
+	 *            Connection
+	 * @return ArrayList
+	 */
+	public ArrayList<V> select(String query, HashMap variables, Connection con) {
 		clearSignals();
 
 		ArrayList results = new ArrayList();
 
 		ResultSet rs = null;
-		con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
 		PreparedStatement ps = null;
 
+		boolean isTrasactional = false;
+		if (con != null) {
+			isTrasactional = true;
+		}
+
 		try {
-			con = ds.getConnection();
+			if (!isTrasactional) {
+				con = ds.getConnection();
+			}
 			if (con.isClosed()) {
-				if (logger.isWarnEnabled())
+				if (logger.isWarnEnabled()) {
 					logger.warn("Connection is closed: GenericDAO.select!");
+				}
 				throw new SQLException();
 			}
 
 			ps = con.prepareStatement(query);
 
-			ps = psf.generate(ps);// enter variables here!
+			ps = psf.generate(ps); // enter variables here!
 
-			{
-				rs = ps.executeQuery();
-				results = this.processResultRows(rs);
-
-			}
+			rs = ps.executeQuery();
+			results = this.processResultRows(rs);
 
 			if (logger.isInfoEnabled()) {
 				logger.trace("Executing dynamic query, EntityDAO.select:query " + query);
@@ -274,10 +302,13 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				sqle.printStackTrace();
 			}
 		} finally {
-			this.closeIfNecessary(con, rs, ps);
+			if (!isTrasactional) {
+				closeIfNecessary(con, rs, ps);
+			} else {
+				closeIfNecessary(rs, ps);
+			}
 		}
 		return results;
-
 	}
 
 	/**

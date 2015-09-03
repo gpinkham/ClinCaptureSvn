@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.DeleteCrfService;
 import com.clinovo.util.PageMessagesUtil;
 
 /**
@@ -60,6 +61,9 @@ public class CompleteCRFDeleteController {
 
 	@Autowired
 	private RuleSetDao ruleSetDao;
+
+	@Autowired
+	private DeleteCrfService deleteCrfService;
 
 	public static final String ACTION_PAGE = "admin/completeCRFDelete";
 	public static final String ERROR_PAGE = "redirect:/MainMenu?message=system_no_permission";
@@ -108,8 +112,8 @@ public class CompleteCRFDeleteController {
 			model.addAttribute("eventDefinitionListFull", eventDefinitionListFull);
 			model.addAttribute("eventCRFBeanList", eventCrfBeanList);
 
-			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0
-					|| eventDefinitionListAvailable.size() > 0 || ruleSetBeanList.size() > 0) {
+			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
+					|| ruleSetBeanList.size() > 0) {
 				PageMessagesUtil.addPageMessage(request,
 						messageSource.getMessage("this_crf_has_associated_data", null, LocaleResolver.getLocale()));
 			} else {
@@ -138,8 +142,6 @@ public class CompleteCRFDeleteController {
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
 	public String confirm(HttpServletRequest request, @RequestParam("crfId") int crfId) throws Exception {
-
-		CRFDAO crfDao = new CRFDAO(dataSource);
 		EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
 		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
@@ -155,7 +157,7 @@ public class CompleteCRFDeleteController {
 			request.getSession().setAttribute("controllerMessage",
 					messageSource.getMessage("this_crf_has_associated_data", null, LocaleResolver.getLocale()));
 		} else {
-			crfDao.deleteCrfById(crfId);
+			deleteCrfService.deleteCrf(crfId);
 			request.getSession().setAttribute("controllerMessage",
 					messageSource.getMessage("the_crf_has_been_removed", null, LocaleResolver.getLocale()));
 		}

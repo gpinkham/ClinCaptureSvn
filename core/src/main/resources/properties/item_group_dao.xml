@@ -21,10 +21,7 @@
   </query>
   <query>
     <name>create</name>
-    <sql>
-      INSERT INTO ITEM_GROUP (ITEM_GROUP_ID,name,crf_id,status_id,
-      date_created ,owner_id) VALUES (?,?,?,?,now(),?)
-    </sql>
+    <sql>INSERT INTO ITEM_GROUP (name,crf_id,status_id,date_created,owner_id,oc_oid) VALUES (?,?,?,now(),?,?)</sql>
   </query>
   <query>
     <name>update</name>
@@ -147,5 +144,11 @@
   <query>
   	<name>findByItemAndCRFVersion</name>
   	<sql>select ig.* from item_group_metadata igm, item_group ig where igm.item_id = ? and igm.crf_version_id = ? and ig.item_group_id = igm.item_group_id</sql>
+  </query>
+  <query>
+    <name>findAllActiveByCrf</name>
+    <sql>
+      select ig.* from item_group ig where ig.crf_id=? order by ig.item_group_id
+    </sql>
   </query>
 </queries>

@@ -61,7 +61,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.SpreadsheetPreviewUtil;
+import com.clinovo.lib.crf.util.SpreadsheetPreviewUtil;
 
 /**
  * Preview a CRF version section data entry. This class is based almost entirely on ViewSectionDataEntryServlet except

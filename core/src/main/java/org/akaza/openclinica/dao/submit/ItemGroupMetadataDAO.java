@@ -13,15 +13,6 @@
 
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.exception.OpenClinicaException;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,8 +23,28 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.dao.core.EntityDAO;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.exception.OpenClinicaException;
+
+/**
+ * ItemGroupMetadataDAO.
+ */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemGroupMetadataDAO extends EntityDAO {
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 */
 	public ItemGroupMetadataDAO(DataSource ds) {
 		super(ds);
 		this.getNextPKName = "getNextPK";
@@ -44,25 +55,36 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		digesterName = SQLFactory.getInstance().DAO_ITEM_GROUP_METADATA;
 	}
 
+	/**
+	 * Sets expected types.
+	 */
 	public void setTypesExpected() {
+		int index = 1;
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.STRING);
-		this.setTypeExpected(4, TypeNames.STRING);
-		this.setTypeExpected(5, TypeNames.STRING);
-		this.setTypeExpected(6, TypeNames.INT);
-		this.setTypeExpected(7, TypeNames.INT);
-		this.setTypeExpected(8, TypeNames.STRING);
-		this.setTypeExpected(9, TypeNames.INT);
-		this.setTypeExpected(10, TypeNames.INT);
-		this.setTypeExpected(11, TypeNames.INT);
-		this.setTypeExpected(12, TypeNames.INT);
-		this.setTypeExpected(13, TypeNames.INT);
-		this.setTypeExpected(14, TypeNames.BOOL);
-		this.setTypeExpected(15, TypeNames.BOOL);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.BOOL);
+		this.setTypeExpected(index, TypeNames.BOOL);
 	}
 
+	/**
+	 * Transforms map to object.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @return Object
+	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		ItemGroupMetadataBean meta = new ItemGroupMetadataBean();
 		meta.setId((Integer) hm.get("item_group_metadata_id"));
@@ -83,15 +105,44 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		return meta;
 	}
 
+	/**
+	 * Fidn all.
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
 			throws OpenClinicaException {
 		return new ArrayList();
 	}
 
+	/**
+	 * Find all.
+	 * 
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAll() throws OpenClinicaException {
 		return new ArrayList();
 	}
 
+	/**
+	 * Find by pk.
+	 * 
+	 * @param id
+	 *            int
+	 * @return EntityBean
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public EntityBean findByPK(int id) throws OpenClinicaException {
 		ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
 		this.setTypesExpected();
@@ -110,6 +161,15 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		// File Templates.;
 	}
 
+	/**
+	 * Find by item and crf version.
+	 * 
+	 * @param itemId
+	 *            Integer
+	 * @param crfVersionId
+	 *            Integer
+	 * @return EntityBean
+	 */
 	public EntityBean findByItemAndCrfVersion(Integer itemId, Integer crfVersionId) {
 		ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
 		this.setTypesExpected();
@@ -126,39 +186,68 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		return eb;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public EntityBean create(EntityBean eb) throws OpenClinicaException {
+		return create(eb, null);
+	}
+
+	/**
+	 * Creates new ItemGroupMetadataBean.
+	 *
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
+	 * @return EntityBean
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
+	public EntityBean create(EntityBean eb, Connection con) throws OpenClinicaException {
+		int index = 1;
 		ItemGroupMetadataBean igMetaBean = (ItemGroupMetadataBean) eb;
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		int id = getNextPK();
-		variables.put(1, id);
-		variables.put(2, igMetaBean.getItemGroupId());
-		variables.put(3, igMetaBean.getHeader());
-		variables.put(4, igMetaBean.getSubheader());
-		variables.put(5, igMetaBean.getLayout());
-		variables.put(6, igMetaBean.getRepeatNum());
-		variables.put(7, igMetaBean.getRepeatMax());
-		variables.put(8, igMetaBean.getRepeatArray());
-		variables.put(9, igMetaBean.getRowStartNumber());
-		variables.put(10, igMetaBean.getCrfVersionId());
-		variables.put(11, igMetaBean.getItemId());
-		variables.put(12, igMetaBean.getOrdinal());
-		variables.put(13, igMetaBean.getBorders());
-		variables.put(14, igMetaBean.isShowGroup());
-
-		this.execute(digester.getQuery("create"), variables);
+		variables.put(index++, igMetaBean.getItemGroupId());
+		variables.put(index++, igMetaBean.getHeader());
+		variables.put(index++, igMetaBean.getSubheader());
+		variables.put(index++, igMetaBean.getLayout());
+		variables.put(index++, igMetaBean.getRepeatNum());
+		variables.put(index++, igMetaBean.getRepeatMax());
+		variables.put(index++, igMetaBean.getRepeatArray());
+		variables.put(index++, igMetaBean.getRowStartNumber());
+		variables.put(index++, igMetaBean.getCrfVersionId());
+		variables.put(index++, igMetaBean.getItemId());
+		variables.put(index++, igMetaBean.getOrdinal());
+		variables.put(index++, igMetaBean.getBorders());
+		variables.put(index++, igMetaBean.isShowGroup());
+		variables.put(index, igMetaBean.isRepeatingGroup());
+		executeWithPK(digester.getQuery("create"), variables, null, con);
 		if (isQuerySuccessful()) {
-			eb.setId(id);
+			eb.setId(getLatestPK());
 		}
 		return eb;
 
 	}
 
+	/**
+	 * Find meta by group and section.
+	 * 
+	 * @param itemGroupId
+	 *            int
+	 * @param crfVersionId
+	 *            int
+	 * @param sectionId
+	 *            int
+	 * @return List
+	 */
 	public List<ItemGroupMetadataBean> findMetaByGroupAndSection(int itemGroupId, int crfVersionId, int sectionId) {
+		int index = 1;
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, itemGroupId);
-		variables.put(2, crfVersionId);
-		variables.put(3, sectionId);
+		variables.put(index++, itemGroupId);
+		variables.put(index++, crfVersionId);
+		variables.put(index, sectionId);
 		List listofMaps = this.select(digester.getQuery("findMetaByGroupAndSection"), variables);
 
 		List<ItemGroupMetadataBean> beanList = new ArrayList<ItemGroupMetadataBean>();
@@ -170,13 +259,25 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Find meta by group and section for print.
+	 * 
+	 * @param itemGroupId
+	 *            int
+	 * @param crfVersionId
+	 *            int
+	 * @param sectionId
+	 *            int
+	 * @return List
+	 */
 	public List<ItemGroupMetadataBean> findMetaByGroupAndSectionForPrint(int itemGroupId, int crfVersionId,
 			int sectionId) {
+		int index = 1;
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, itemGroupId);
-		variables.put(2, crfVersionId);
-		variables.put(3, sectionId);
+		variables.put(index++, itemGroupId);
+		variables.put(index++, crfVersionId);
+		variables.put(index, sectionId);
 		List listofMaps = this.select(digester.getQuery("findMetaByGroupAndSectionForPrint"), variables);
 
 		List<ItemGroupMetadataBean> beanList = new ArrayList<ItemGroupMetadataBean>();
@@ -188,27 +289,65 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Update method.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public EntityBean update(EntityBean eb) throws OpenClinicaException {
 		return new ItemGroupMetadataBean(); // To change body of implemented
 		// methods use File | Settings |
 		// File Templates.
 	}
 
+	/**
+	 * Find all by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
 		return new ArrayList(); // To change body of implemented methods use
 		// File | Settings | File Templates.
 	}
 
+	/**
+	 * Find all by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
 		return new ArrayList(); // To change body of implemented methods use
 		// File | Settings | File Templates.
 	}
 
 	/**
+	 * Returns true if version is included.
 	 * 
 	 * @param crfVersionId
-	 *            int
+	 *            int int
 	 * @return boolean
 	 */
 	public boolean versionIncluded(int crfVersionId) {
@@ -244,16 +383,18 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		try {
 			con = ds.getConnection();
 			if (con.isClosed()) {
-				if (logger.isWarnEnabled())
+				if (logger.isWarnEnabled()) {
 					logger.warn("Connection is closed: GenericDAO.select!");
+				}
 				throw new SQLException();
 			}
 
 			ps = con.prepareStatement(query);
 
-			ps = psf.generate(ps);// enter variables here!
+			ps = psf.generate(ps); // enter variables here!
 			key = ps.toString();
-			if ((results = (ArrayList) cache.get(key)) == null) {
+			results = (ArrayList) cache.get(key);
+			if (results == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {
@@ -261,9 +402,8 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 				}
 			}
 
-			// if (logger.isInfoEnabled()) {
 			logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
-			// }
+
 			signalSuccess();
 
 		} catch (SQLException sqle) {
@@ -280,62 +420,8 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 
 	}
 
-	// @Override
-	// public ArrayList<V> select(String query, Map variables) {
-	// clearSignals();
-	//
-	// ArrayList results = new ArrayList();
-	// V value;
-	// K key;
-	// ResultSet rs = null;
-	// Connection con = null;
-	// PreparedStatementFactory psf = new PreparedStatementFactory(variables);
-	// PreparedStatement ps = null;
-	//
-	// try {
-	// con = ds.getConnection();
-	// if (con.isClosed()) {
-	// if (logger.isWarnEnabled())
-	// logger.warn("Connection is closed: GenericDAO.select!");
-	// throw new SQLException();
-	// }
-	//
-	// ps = con.prepareStatement(query);
-	//
-	//
-	// ps = psf.generate(ps);// enter variables here!
-	// key = (K) ps.toString();
-	// if((results=(V) cache.get(key))==null)
-	// {
-	// rs = ps.executeQuery();
-	// results = this.processResultRows(rs);
-	// if(results!=null){
-	// cache.put(key,results);
-	// }
-	// }
-	//
-	// if (logger.isInfoEnabled()) {
-	// logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
-	// }
-	// signalSuccess();
-	//
-	//
-	// } catch (SQLException sqle) {
-	// signalFailure(sqle);
-	// if (logger.isWarnEnabled()) {
-	// logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " +
-	// sqle.getMessage());
-	// sqle.printStackTrace();
-	// }
-	// } finally {
-	// this.closeIfNecessary(con, rs, ps);
-	// }
-	// return results;
-	//
-	// }
-
 	/**
-	 * findByCrfVersion, added by clinovo for #121, 12/2012
+	 * findByCrfVersion, added by clinovo for #121, 12/2012.
 	 * 
 	 * @param crfVersionId
 	 *            Integer

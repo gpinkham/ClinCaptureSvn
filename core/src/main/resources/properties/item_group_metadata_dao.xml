@@ -3,10 +3,10 @@
 	<query>
     <name>create</name>
     <sql>
-    INSERT INTO item_group_metadata (item_group_metadata_id,item_group_id,
+    INSERT INTO item_group_metadata (item_group_id,
   header, subheader,layout,repeat_number,repeat_max,
   repeat_array, row_start_number,crf_version_id,
-  item_id, ordinal,borders, show_group)
+  item_id, ordinal,borders, show_group, repeating_group)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
       </sql>
   </query>

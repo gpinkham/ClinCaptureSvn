@@ -144,8 +144,7 @@
                 <name>create</name>
                 <sql>
                     INSERT INTO
-                    item_form_metadata (item_form_metadata_id,
-                    item_id,
+                    item_form_metadata (item_id,
                     crf_version_id,
                     "header",
                     subheader,
@@ -169,7 +168,7 @@
                     show_item,
                     code_ref,
                     sdv_required)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>
         <query>

@@ -22,6 +22,8 @@ import javax.sql.DataSource;
 public class CrfVersionOidGenerator extends OidGenerator {
 
 	public static final String SEQ_NAME = "crf_version_oid_id_seq";
+	public static final int INT_10 = 10;
+	public static final int INT_25 = 25;
 
 	private final int argumentLength = 2;
 
@@ -56,7 +58,8 @@ public class CrfVersionOidGenerator extends OidGenerator {
 		String crfOid = keys[0];
 		String crfVersion = keys[1];
 
-		crfVersion = truncateToXChars(capitalize(stripNonAlphaNumeric(crfVersion)), 10);
+		crfVersion = truncateToXChars(capitalize(stripNonAlphaNumeric(crfVersion)), INT_10);
+		crfOid = "F_" + truncateToXChars(capitalize(stripNonAlphaNumeric(crfOid)), INT_25);
 
 		logger.info(crfOid);
 		logger.info(crfVersion);

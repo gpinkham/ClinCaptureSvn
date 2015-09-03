@@ -35,8 +35,8 @@
 		<name>create</name>
 		<sql>INSERT INTO CRF_VERSION (CRF_ID, STATUS_ID, NAME,
 		DESCRIPTION, OWNER_ID,
-		DATE_CREATED, REVISION_NOTES) 
-		VALUES (?,?,?,?,?,NOW(),?)</sql>
+		DATE_CREATED, OC_OID, REVISION_NOTES)
+		VALUES (?,?,?,?,?,NOW(),?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
@@ -99,6 +99,10 @@
 	<query>
 		<name>deleteItemMapByVersion</name>
 		<sql>delete from versioning_map where crf_version_id=</sql>
+	</query>
+	<query>
+		<name>deleteResponseSetsByVersion</name>
+		<sql>delete from response_set where version_id=</sql>
 	</query>
 	<query>
 		<name>deleteSectionsByVersion</name>

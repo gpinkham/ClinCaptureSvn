@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -35,7 +34,6 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -47,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DeleteCrfService;
 import com.clinovo.util.PageMessagesUtil;
 
 /**
@@ -54,7 +53,7 @@ import com.clinovo.util.PageMessagesUtil;
  */
 @Controller
 @RequestMapping("/deleteCRFVersion")
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class DeleteCRFVersionController {
 
 	@Autowired
@@ -68,6 +67,9 @@ public class DeleteCRFVersionController {
 
 	@Autowired
 	private RuleSetDao ruleSetDao;
+
+	@Autowired
+	private DeleteCrfService deleteCrfService;
 
 	public static final String ACTION_PAGE = "admin/deleteCRFVersion";
 	public static final String ERROR_PAGE = "redirect:/MainMenu?message=system_no_permission";
@@ -123,23 +125,17 @@ public class DeleteCRFVersionController {
 			model.addAttribute("eventDefinitionListFull", eventDefinitionListFull);
 			model.addAttribute("eventCRFBeanList", eventCrfBeanList);
 
-			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0
-					|| eventDefinitionListAvailable.size() > 0 || ruleSetBeanList.size() > 0) {
-				PageMessagesUtil.addPageMessage(
-						request,
-						messageSource.getMessage("this_crf_version_has_associated_data", null,
-								LocaleResolver.getLocale()));
+			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
+					|| ruleSetBeanList.size() > 0) {
+				PageMessagesUtil.addPageMessage(request, messageSource
+						.getMessage("this_crf_version_has_associated_data", null, LocaleResolver.getLocale()));
 				if (crfVersionsQuantity == 1) {
-					PageMessagesUtil.addPageMessage(
-							request,
-							messageSource.getMessage("you_are_trying_to_delete_last_version", null,
-									LocaleResolver.getLocale()));
+					PageMessagesUtil.addPageMessage(request, messageSource
+							.getMessage("you_are_trying_to_delete_last_version", null, LocaleResolver.getLocale()));
 				}
 			} else {
-				PageMessagesUtil.addPageMessage(
-						request,
-						messageSource.getMessage("this_crf_version_has_no_conflict_data", null,
-								LocaleResolver.getLocale()));
+				PageMessagesUtil.addPageMessage(request, messageSource
+						.getMessage("this_crf_version_has_no_conflict_data", null, LocaleResolver.getLocale()));
 			}
 		} else {
 			return ERROR_PAGE;
@@ -185,12 +181,7 @@ public class DeleteCRFVersionController {
 			request.getSession().setAttribute("controllerMessage",
 					messageSource.getMessage("this_crf_version_has_associated_data", null, LocaleResolver.getLocale()));
 		} else {
-			ArrayList items = crfVersionDao.findNotSharedItemsByVersion(crfVersionBean.getId());
-			NewCRFBean nib = new NewCRFBean(dataSource, crfVersionBean.getCrfId());
-			EventDefinitionCRFUtil.setDefaultCRFVersionInsteadOfDeleted(dataSource, crfVersionBean.getId());
-			ruleSetDao.deleteRuleStudioMetadataByCRFVersionOID(crfVersionBean.getOid());
-			nib.setDeleteQueries(crfVersionDao.generateDeleteQueries(crfVersionBean.getId(), items));
-			nib.deleteFromDB();
+			deleteCrfService.deleteCrfVersion(crfVersionBean.getId());
 
 			// Purge coded items
 			codedItemService.deleteByCRFVersion(crfVersionBean.getId());

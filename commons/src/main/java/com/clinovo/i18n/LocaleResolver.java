@@ -113,8 +113,9 @@ public class LocaleResolver implements org.springframework.web.servlet.LocaleRes
 	 *
 	 */
 	public static void resolveRestApiLocale() {
-		((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().setAttribute(
-				LocaleResolver.REST_API_LOCALE, CoreResources.getSystemLocale());
+		((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+				.setAttribute(LocaleResolver.REST_API_LOCALE, CoreResources.getSystemLocale());
+		resolveLocale();
 	}
 
 	/**

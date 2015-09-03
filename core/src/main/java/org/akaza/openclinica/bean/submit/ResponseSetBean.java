@@ -20,13 +20,19 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.ResponseType;
+
+/**
+ * ResponseSetBean.
+ */
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class ResponseSetBean extends EntityBean {
+
 	private org.akaza.openclinica.bean.core.ResponseType responseType;
 
 	/**
@@ -45,6 +51,9 @@ public class ResponseSetBean extends EntityBean {
 	 */
 	private String value;
 
+	/**
+	 * Constructor.
+	 */
 	public ResponseSetBean() {
 		super();
 		setResponseType(org.akaza.openclinica.bean.core.ResponseType.TEXT);
@@ -104,46 +113,47 @@ public class ResponseSetBean extends EntityBean {
 		responseType = org.akaza.openclinica.bean.core.ResponseType.get(responseTypeId);
 	}
 
+	/**
+	 * Set options.
+	 * 
+	 * @param optionsText
+	 *            String
+	 * @param optionsValues
+	 *            String
+	 */
 	public void setOptions(String optionsText, String optionsValues) {
-		String text1 = optionsText.replaceAll("\\\\,", "##");
-
-		String value1 = optionsValues.replaceAll("\\\\,", "##");
-
-		String[] texts = text1.split(",", -1);
-		String[] values = value1.split(",", -1);
-
-		if (values == null) {
-			return;
-		}
-
-		if (texts == null) {
-			texts = new String[0];
-		}
-
-		for (int i = 0; i < values.length; i++) {
+		if (responseType.getId() == ResponseType.CALCULATION.getId()
+				|| responseType.getId() == ResponseType.GROUP_CALCULATION.getId()
+				|| responseType.getId() == ResponseType.INSTANT_CALCULATION.getId()) {
 			ResponseOptionBean ro = new ResponseOptionBean();
-
-			if (values[i] == null) {
-				continue;
-			}
-
-			String value = values[i].trim();
-			value = value.replaceAll("##", ",");
-			ro.setValue(value);
-
-			if (texts.length <= i || texts[i] == null) {
-				ro.setText(value);
-			} else {
-				String t = texts[i].trim();
-				String t1 = t.replaceAll("##", ",");
-				ro.setText(t1);
-			}
-
+			ro.setValue(optionsValues.replace("\\,", ","));
+			ro.setText(optionsText);
 			options.add(ro);
-			optionIndexesByValue.put(value, Integer.valueOf(options.size() - 1));
+			optionIndexesByValue.put(optionsValues, options.size() - 1);
+		} else {
+			String text1 = optionsText.replaceAll("\\\\,", "##");
+			String value1 = optionsValues.replaceAll("\\\\,", "##");
+			String[] texts = text1.split(",", -1);
+			String[] values = value1.split(",", -1);
+			for (int i = 0; i < values.length; i++) {
+				ResponseOptionBean ro = new ResponseOptionBean();
+				if (values[i] == null) {
+					continue;
+				}
+				String value = values[i].trim();
+				value = value.replaceAll("##", ",");
+				ro.setValue(value);
+				if (texts.length <= i || texts[i] == null) {
+					ro.setText(value);
+				} else {
+					String t = texts[i].trim();
+					String t1 = t.replaceAll("##", ",");
+					ro.setText(t1);
+				}
+				options.add(ro);
+				optionIndexesByValue.put(value, options.size() - 1);
+			}
 		}
-
-		return;
 	}
 
 	/**
@@ -154,7 +164,7 @@ public class ResponseSetBean extends EntityBean {
 	 */
 	public void addOption(ResponseOptionBean ro) {
 		options.add(ro);
-		optionIndexesByValue.put(ro.getValue(), Integer.valueOf(options.size() - 1));
+		optionIndexesByValue.put(ro.getValue(), options.size() - 1);
 	}
 
 	/**
@@ -182,10 +192,11 @@ public class ResponseSetBean extends EntityBean {
 	 */
 	public void setSelected(String value, boolean selected) {
 		if (optionIndexesByValue.containsKey(value)) {
-			int ind = ((Integer) optionIndexesByValue.get(value)).intValue();
+			int ind = (Integer) optionIndexesByValue.get(value);
 
 			if (ind >= 0 && ind < options.size()) {
-				if (responseType.getId() == 5 || responseType.getId() == 6) {
+				if (responseType.getId() == ResponseType.RADIO.getId()
+						|| responseType.getId() == ResponseType.SELECT.getId()) {
 					// only for radio and single-select menu
 					options = removeSelection();
 				}
@@ -196,10 +207,14 @@ public class ResponseSetBean extends EntityBean {
 		}
 	}
 
+	/**
+	 * Removes selection.
+	 * 
+	 * @return ArrayList
+	 */
 	public ArrayList removeSelection() {
 		ArrayList list = new ArrayList();
-		for (int i = 0; i < options.size(); i++) {
-			ResponseOptionBean rob = (ResponseOptionBean) options.get(i);
+		for (ResponseOptionBean rob : (List<ResponseOptionBean>) options) {
 			if (rob.isSelected()) {
 				rob.setSelected(false);
 			}

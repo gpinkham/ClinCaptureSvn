@@ -1176,7 +1176,7 @@ public class ExpressionService {
 		logger.debug("Expression : {} , Item OID : {}", expression, itemKey);
 		ItemBean item = itemOidMap.get(itemKey);
 		if (item == null) {
-			item = getItemDao().findItemByGroupIdandItemOid(itemGroup.getId(), itemKey);
+			item = getItemDao().findItemByGroupIdAndItemOid(itemGroup.getId(), itemKey);
 			cache(itemOidMap, itemKey, item);
 		}
 		return item;

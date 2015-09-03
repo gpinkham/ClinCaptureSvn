@@ -1039,7 +1039,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			case TWO :
 				itemGroup = getItemGroupDAO().findByOid(theOid[igPos].trim());
 				if (itemGroup != null) {
-					ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(),
+					ItemBean item = getItemDAO().findItemByGroupIdAndItemOid(itemGroup.getId(),
 							theOid[igPos + 1].trim());
 					if (item != null) {
 						return new ItemOrItemGroupHolder(item, itemGroup);

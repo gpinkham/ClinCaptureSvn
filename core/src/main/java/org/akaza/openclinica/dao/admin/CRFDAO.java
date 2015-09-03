@@ -20,6 +20,15 @@
  */
 package org.akaza.openclinica.dao.admin;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -31,20 +40,13 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * The data access object for instruments in the database.
  * 
  * @author thickerson
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class CRFDAO extends AuditableEntityDAO {
 
 	private static String dbType = CoreResources.getDBType();
@@ -134,28 +136,39 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that creates EntityBean in the DB.
-	 * 
-	 * @param eb
-	 *            EntityBean
-	 * @return EntityBean
+	 * {@inheritDoc}
 	 */
 	public EntityBean create(EntityBean eb) {
+		return create(eb, null);
+	}
+
+	/**
+	 * Creates new CRFBean.
+	 *
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
+	 * @return EntityBean
+	 */
+	public EntityBean create(EntityBean eb, Connection con) {
 		int index = 1;
 		CRFBean cb = (CRFBean) eb;
+		cb.setOid(getValidOid(cb, cb.getName()));
 		HashMap variables = new HashMap();
 		variables.put(index++, cb.getStatus().getId());
 		variables.put(index++, cb.getName());
 		variables.put(index++, cb.getDescription());
 		variables.put(index++, cb.getOwner().getId());
-		variables.put(index++, getValidOid(cb, cb.getName()));
+		variables.put(index++, cb.getOid());
+		variables.put(index++, cb.getStudyId());
 		// set auto_layout property
 		if (getDBType().equals("oracle")) {
 			variables.put(index, 1);
 		} else {
 			variables.put(index, Boolean.TRUE);
 		}
-		executeWithPK(digester.getQuery("create"), variables, null);
+		executeWithPK(digester.getQuery("create"), variables, null, con);
 		if (isQuerySuccessful()) {
 			cb.setId(getLatestPK());
 		}
@@ -648,6 +661,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		variables.put(index++, crfId);
 		variables.put(index++, crfId);
 		variables.put(index++, crfId);
+		variables.put(index++, crfId);
 		variables.put(index, crfId);
 		this.execute(sql, variables);
 	}
@@ -674,9 +688,12 @@ public class CRFDAO extends AuditableEntityDAO {
 
 	/**
 	 * Method returns all unmasked available CRFs.
-	 * @param sed StudyEventDefinitionBean
-	 * @param ub  UserAccountBean
-	 * @return    List<CRFBean>
+	 * 
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @param ub
+	 *            UserAccountBean
+	 * @return List<CRFBean>
 	 */
 	public List<CRFBean> findAllActiveUnmaskedByDefinition(StudyEventDefinitionBean sed, UserAccountBean ub) {
 		this.setTypesExpected();

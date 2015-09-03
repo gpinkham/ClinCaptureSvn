@@ -16,7 +16,7 @@ package org.akaza.openclinica.control.admin;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -46,7 +46,7 @@ public class CreateCRFVersionServletTest {
 	private Logger logger;
 	private ItemBean existingItem1;
 	private ItemBean existingItem2;
-	private HashMap<String, ItemBean> items;
+	private List<ItemBean> items;
 
 	@Before
 	public void setUp() throws Exception {
@@ -67,18 +67,18 @@ public class CreateCRFVersionServletTest {
 	}
 
 	private void populateItemsMap() {
-		items = new HashMap<String, ItemBean>();
+		items = new ArrayList<ItemBean>();
 		ItemBean item = new ItemBean();
 		item.setName("Item1");
 		item.setUnits("mg");
 		item.setDataType(ItemDataType.INTEGER);
-		items.put("Item1", item);
+		items.add(item);
 
 		item = new ItemBean();
 		item.setName("Item2");
 		item.setUnits("");
 		item.setDataType(ItemDataType.ST);
-		items.put("Item2", item);
+		items.add(item);
 	}
 
 	@Test

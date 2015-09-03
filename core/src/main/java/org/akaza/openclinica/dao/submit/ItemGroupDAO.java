@@ -13,18 +13,6 @@
 
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.exception.OpenClinicaException;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,22 +25,61 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.exception.OpenClinicaException;
+
+/**
+ * ItemGroupDAO.
+ */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemGroupDAO extends AuditableEntityDAO {
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 */
 	public ItemGroupDAO(DataSource ds) {
 		super(ds);
 		this.getCurrentPKName = "findCurrentPKValue";
 		this.getNextPKName = "getNextPK";
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 */
 	public ItemGroupDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
 	}
 
-	// This constructor sets up the Locale for JUnit tests; see the locale
-	// member variable in EntityDAO, and its initializeI18nStrings() method
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 * @param locale
+	 *            Locale
+	 */
 	public ItemGroupDAO(DataSource ds, DAODigester digester, Locale locale) {
 
 		this(ds, digester);
@@ -68,61 +95,147 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 
 	@Override
 	public void setTypesExpected() {
+		int index = 1;
 		this.unsetTypeExpected();
 		/*
 		 * item_group_id serial NOT NULL, name varchar(255), crf_id numeric NOT NULL, status_id numeric, date_created
 		 * date, date_updated date, owner_id numeric, update_id numeric,
 		 */
-		this.setTypeExpected(1, TypeNames.INT); // item_group_id
-		this.setTypeExpected(2, TypeNames.STRING); // name
-		this.setTypeExpected(3, TypeNames.INT);// crf_id
-		this.setTypeExpected(4, TypeNames.INT); // status_id
-		this.setTypeExpected(5, TypeNames.TIMESTAMP); // date_created
-		this.setTypeExpected(6, TypeNames.TIMESTAMP); // date_updated
-		this.setTypeExpected(7, TypeNames.INT); // owner_id
-		this.setTypeExpected(8, TypeNames.INT); // update_id
-		this.setTypeExpected(9, TypeNames.STRING); // oc_oid
+		this.setTypeExpected(index++, TypeNames.INT); // item_group_id
+		this.setTypeExpected(index++, TypeNames.STRING); // name
+		this.setTypeExpected(index++, TypeNames.INT); // crf_id
+		this.setTypeExpected(index++, TypeNames.INT); // status_id
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_created
+		this.setTypeExpected(index++, TypeNames.TIMESTAMP); // date_updated
+		this.setTypeExpected(index++, TypeNames.INT); // owner_id
+		this.setTypeExpected(index++, TypeNames.INT); // update_id
+		this.setTypeExpected(index, TypeNames.STRING); // oc_oid
 
 	}
 
+	/**
+	 * Update method.
+	 * 
+	 * @param eb
+	 *            EntityBean
+	 * @return EntityBean
+	 */
 	public EntityBean update(EntityBean eb) {
+		int index = 1;
 		ItemGroupBean formGroupBean = (ItemGroupBean) eb;
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		/*
 		 * item_group_id serial NOT NULL, name varchar(255), crf_id numeric NOT NULL, status_id numeric, date_created
 		 * date, date_updated date, owner_id numeric, update_id numeric,
 		 */
-		variables.put(1, formGroupBean.getName());
-		variables.put(2, formGroupBean.getCrfId());
-		variables.put(3, formGroupBean.getStatus().getId());
-		variables.put(4, formGroupBean.getUpdater().getId());
-		variables.put(5, formGroupBean.getId());
+		variables.put(index++, formGroupBean.getName());
+		variables.put(index++, formGroupBean.getCrfId());
+		variables.put(index++, formGroupBean.getStatus().getId());
+		variables.put(index++, formGroupBean.getUpdater().getId());
+		variables.put(index, formGroupBean.getId());
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
 	}
 
+	/**
+	 * Find all active by crf.
+	 *
+	 * @param crf
+	 *            CRFBean
+	 * @return ArrayList
+	 */
+	public ArrayList findAllActiveByCrf(CRFBean crf) {
+		HashMap variables = new HashMap();
+		this.setTypesExpected();
+		variables.put(1, crf.getId());
+		String sql = digester.getQuery("findAllActiveByCrf");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			ItemGroupBean eb = (ItemGroupBean) this.getEntityFromHashMap(hm);
+			al.add(eb);
+		}
+		return al;
+
+	}
+
+	/**
+	 * Find all by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
 		return new ArrayList();
 	}
 
+	/**
+	 * Find all by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @return Collection
+	 * @throws OpenClinicaException
+	 *             the OpenClinicaException
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
 		return new ArrayList();
 	}
 
+	/**
+	 * Returns oid.
+	 * 
+	 * @param itemGroupBean
+	 *            ItemGroupBean
+	 * @param crfName
+	 *            String
+	 * @param itemGroupLabel
+	 *            String
+	 * @return String
+	 */
 	private String getOid(ItemGroupBean itemGroupBean, String crfName, String itemGroupLabel) {
 
 		String oid;
 		try {
-			oid = itemGroupBean.getOid() != null ? itemGroupBean.getOid() : itemGroupBean.getOidGenerator(ds)
-					.generateOid(crfName, itemGroupLabel);
+			oid = itemGroupBean.getOid() != null
+					? itemGroupBean.getOid()
+					: itemGroupBean.getOidGenerator(ds).generateOid(crfName, itemGroupLabel);
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
 		}
 	}
 
-	public String getValidOid(ItemGroupBean itemGroup, String crfName, String itemGroupLabel, ArrayList<String> oidList) {
+	/**
+	 * Returns valid oid.
+	 * 
+	 * @param itemGroup
+	 *            ItemGroupBean
+	 * @param crfName
+	 *            String
+	 * @param itemGroupLabel
+	 *            String
+	 * @param oidList
+	 *            ArrayList
+	 * @return String
+	 */
+	public String getValidOid(ItemGroupBean itemGroup, String crfName, String itemGroupLabel,
+			ArrayList<String> oidList) {
 
 		String oid = getOid(itemGroup, crfName, itemGroupLabel);
 		logger.info(oid);
@@ -133,28 +246,43 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return oid;
 	}
 
-	/*
-	 * name varchar(255), crf_id numeric NOT NULL, status_id numeric, date_created date, date_updated date, owner_id
-	 * numeric, update_id numeric,
+	/**
+	 * {@inheritDoc}
 	 */
 	public EntityBean create(EntityBean eb) {
+		return create(eb, null);
+	}
+
+	/**
+	 * Creates new ItemGroupBean.
+	 *
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
+	 * @return EntityBean
+	 */
+	public EntityBean create(EntityBean eb, Connection con) {
+		int index = 1;
 		ItemGroupBean formGroupBean = (ItemGroupBean) eb;
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		int id = getNextPK();
-		variables.put(1, id);
-		variables.put(2, formGroupBean.getName());
-		variables.put(3, formGroupBean.getCrfId());
-		variables.put(4, formGroupBean.getStatus().getId());
-		variables.put(5, formGroupBean.getOwner().getId());
-
-		this.execute(digester.getQuery("create"), variables);
+		variables.put(index++, formGroupBean.getName());
+		variables.put(index++, formGroupBean.getCrfId());
+		variables.put(index++, formGroupBean.getStatus().getId());
+		variables.put(index++, formGroupBean.getOwner().getId());
+		variables.put(index, formGroupBean.getOid());
+		executeWithPK(digester.getQuery("create"), variables, null, con);
 		if (isQuerySuccessful()) {
-			eb.setId(id);
-			eb.setActive(true);
+			eb.setId(getLatestPK());
 		}
 		return eb;
 	}
 
+	/**
+	 * Find all.
+	 * 
+	 * @return Collection
+	 */
 	public Collection findAll() {
 		this.setTypesExpected();
 		List listofMaps = this.select(digester.getQuery("findAll"));
@@ -167,10 +295,17 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
-	public Collection findGroupsByItemID(int ID) {
+	/**
+	 * Find groups by item id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return Collection
+	 */
+	public Collection findGroupsByItemId(int id) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, ID);
+		variables.put(1, id);
 		List listofMap = this.select(digester.getQuery("findGroupsByItemID"), variables);
 
 		List<ItemGroupBean> formGroupBs = new ArrayList<ItemGroupBean>();
@@ -182,12 +317,19 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 
 	}
 
-	public EntityBean findByPK(int ID) {
+	/**
+	 * Find by id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return EntityBean
+	 */
+	public EntityBean findByPK(int id) {
 		ItemGroupBean formGroupB = new ItemGroupBean();
 		this.setTypesExpected();
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, ID);
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList listofMap = this.select(sql, variables);
@@ -198,6 +340,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return formGroupB;
 	}
 
+	/**
+	 * Find by name.
+	 * 
+	 * @param name
+	 *            String
+	 * @return EntityBean
+	 */
 	public EntityBean findByName(String name) {
 		ItemGroupBean formGroupBean = new ItemGroupBean();
 		this.setTypesExpected();
@@ -214,6 +363,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return formGroupBean;
 	}
 
+	/**
+	 * Find all by oid.
+	 * 
+	 * @param oid
+	 *            String
+	 * @return List
+	 */
 	public List<ItemGroupBean> findAllByOid(String oid) {
 
 		this.unsetTypeExpected();
@@ -234,6 +390,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Find by oid.
+	 * 
+	 * @param oid
+	 *            String
+	 * @return ItemGroupBean
+	 */
 	public ItemGroupBean findByOid(String oid) {
 		ItemGroupBean itemGroup;
 		this.unsetTypeExpected();
@@ -254,13 +417,23 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * Find by oid and crf.
+	 * 
+	 * @param oid
+	 *            String
+	 * @param crfId
+	 *            int
+	 * @return ItemGroupBean
+	 */
 	public ItemGroupBean findByOidAndCrf(String oid, int crfId) {
+		int index = 1;
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, oid);
-		variables.put(2, crfId);
+		variables.put(index++, oid);
+		variables.put(index, crfId);
 		String sql = digester.getQuery("findGroupByOidAndCrfId");
 
 		ArrayList rows = this.select(sql, variables);
@@ -273,10 +446,17 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		}
 	}
 
-	public List<ItemGroupBean> findGroupByCRFVersionID(int Id) {
+	/**
+	 * Find group by crf version id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return List
+	 */
+	public List<ItemGroupBean> findGroupByCrfVersionId(int id) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, Id);
+		variables.put(1, id);
 		List listofMaps = this.select(digester.getQuery("findGroupByCRFVersionID"), variables);
 
 		List<ItemGroupBean> beanList = new ArrayList<ItemGroupBean>();
@@ -288,17 +468,36 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Find by item and crf version.
+	 * 
+	 * @param item
+	 *            ItemBean
+	 * @param crfVersion
+	 *            CRFVersionBean
+	 * @return ItemGroupBean
+	 */
 	public ItemGroupBean findByItemAndCRFVersion(ItemBean item, CRFVersionBean crfVersion) {
 		return this.findByItemIdAndCRFVersionId(item.getId(), crfVersion.getId());
 	}
-	
+
+	/**
+	 * Find by item id and crf version id.
+	 * 
+	 * @param itemId
+	 *            int
+	 * @param crfVersionId
+	 *            int
+	 * @return ItemGroupBean
+	 */
 	public ItemGroupBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
+		int index = 1;
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, itemId);
-		variables.put(2, crfVersionId);
+		variables.put(index++, itemId);
+		variables.put(index, crfVersionId);
 		String sql = digester.getQuery("findByItemAndCRFVersion");
 
 		ArrayList rows = this.select(sql, variables);
@@ -311,10 +510,17 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		}
 	}
 
-	public List<ItemGroupBean> findOnlyGroupsByCRFVersionID(int Id) {
+	/**
+	 * Find only groups by crf version id.
+	 * 
+	 * @param id
+	 *            int
+	 * @return List
+	 */
+	public List<ItemGroupBean> findOnlyGroupsByCRFVersionId(int id) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, Id);
+		variables.put(1, id);
 		List listofMaps = this.select(digester.getQuery("findOnlyGroupsByCRFVersionID"), variables);
 
 		List<ItemGroupBean> beanList = new ArrayList<ItemGroupBean>();
@@ -326,6 +532,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Find group by section id.
+	 * 
+	 * @param sectionId
+	 *            int
+	 * @return List
+	 */
 	public List<ItemGroupBean> findGroupBySectionId(int sectionId) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -341,6 +554,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Finds legit groups by section id.
+	 * 
+	 * @param sectionId
+	 *            int
+	 * @return List
+	 */
 	public List<ItemGroupBean> findLegitGroupBySectionId(int sectionId) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -356,6 +576,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Finds legit groups all by section id.
+	 * 
+	 * @param sectionId
+	 *            int
+	 * @return List
+	 */
 	public List<ItemGroupBean> findLegitGroupAllBySectionId(int sectionId) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -371,6 +598,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return beanList;
 	}
 
+	/**
+	 * Transforms map to object.
+	 * 
+	 * @param hm
+	 *            HashMap
+	 * @return Object
+	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		ItemGroupBean formGroupBean = new ItemGroupBean();
 		super.setEntityAuditInformation(formGroupBean, hm);
@@ -382,16 +616,40 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return formGroupBean;
 	}
 
+	/**
+	 * Find all.
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Deletes test group.
+	 * 
+	 * @param name
+	 *            String
+	 */
 	public void deleteTestGroup(String name) {
 		HashMap variables = new HashMap();
 		variables.put(1, name);
 		this.execute(digester.getQuery("deleteTestGroup"), variables);
 	}
 
+	/**
+	 * Returns true if item group is repeating based on all crf versions.
+	 * 
+	 * @param groupOid
+	 *            String
+	 * @return Boolean
+	 */
 	public Boolean isItemGroupRepeatingBasedOnAllCrfVersions(String groupOid) {
 		Boolean result = false;
 		setTypesExpected();
@@ -410,6 +668,15 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return result;
 	}
 
+	/**
+	 * Returns true if item group is repeating based on crf version.
+	 * 
+	 * @param groupOid
+	 *            String
+	 * @param crfVersion
+	 *            Integer
+	 * @return Boolean
+	 */
 	public Boolean isItemGroupRepeatingBasedOnCrfVersion(String groupOid, Integer crfVersion) {
 		Boolean result = false;
 		setTypesExpected();
@@ -429,6 +696,13 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		return result;
 	}
 
+	/**
+	 * Find top one group by section id.
+	 * 
+	 * @param sectionId
+	 *            int
+	 * @return ItemGroupBean
+	 */
 	public ItemGroupBean findTopOneGroupBySectionId(int sectionId) {
 		ItemGroupBean formGroupBean = new ItemGroupBean();
 		this.setTypesExpected();
@@ -459,16 +733,18 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		try {
 			con = ds.getConnection();
 			if (con.isClosed()) {
-				if (logger.isWarnEnabled())
+				if (logger.isWarnEnabled()) {
 					logger.warn("Connection is closed: GenericDAO.select!");
+				}
 				throw new SQLException();
 			}
 
 			ps = con.prepareStatement(query);
 
-			ps = psf.generate(ps);// enter variables here!
+			ps = psf.generate(ps); // enter variables here!
 			key = ps.toString();
-			if ((results = (ArrayList) cache.get(key)) == null) {
+			results = (ArrayList) cache.get(key);
+			if (results == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {

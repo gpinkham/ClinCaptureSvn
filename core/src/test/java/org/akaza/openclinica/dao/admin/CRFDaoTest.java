@@ -345,6 +345,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testThatCreateWorksFine() throws OpenClinicaException {
 		CRFBean crfBean = new CRFBean();
+		crfBean.setStudyId(1);
 		crfBean.setStatus(Status.AVAILABLE);
 		crfBean.setName(testCRFBean.getName());
 		crfBean.setDescription(testCRFBean.getDescription());

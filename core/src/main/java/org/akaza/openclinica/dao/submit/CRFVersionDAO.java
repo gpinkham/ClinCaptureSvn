@@ -21,6 +21,8 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -116,7 +118,35 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	 * {@inheritDoc}
 	 */
 	public EntityBean create(EntityBean eb) {
-		return eb;
+		return create(eb, null);
+	}
+
+	/**
+	 * Creates new CRFVersionBean.
+	 *
+	 * @param eb
+	 *            EntityBean
+	 * @param con
+	 *            Connection
+	 * @return EntityBean
+	 */
+	public EntityBean create(EntityBean eb, Connection con) {
+		int index = 1;
+		CRFVersionBean cb = (CRFVersionBean) eb;
+		cb.setOid(getValidOid(cb, cb.getDescription(), cb.getName()));
+		HashMap variables = new HashMap();
+		variables.put(index++, cb.getCrfId());
+		variables.put(index++, cb.getStatus().getId());
+		variables.put(index++, cb.getName());
+		variables.put(index++, cb.getDescription());
+		variables.put(index++, cb.getOwner().getId());
+		variables.put(index++, cb.getOid());
+		variables.put(index, cb.getRevisionNotes());
+		executeWithPK(digester.getQuery("create"), variables, null, con);
+		if (isQuerySuccessful()) {
+			cb.setId(getLatestPK());
+		}
+		return cb;
 	}
 
 	@Override
@@ -393,8 +423,6 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	@Deprecated
 	public void delete(int id) {
 		HashMap variables = new HashMap();
-		// variables.put(new Integer(1), new Integer(id));
-
 		String sql = digester.getQuery("delete") + id;
 		this.execute(sql, variables);
 	}
@@ -417,6 +445,8 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		sql = digester.getQuery("deleteSectionsByVersion") + versionId;
 		sqls.add(sql);
 		sql = digester.getQuery("deleteItemMapByVersion") + versionId;
+		sqls.add(sql);
+		sql = digester.getQuery("deleteResponseSetsByVersion") + versionId;
 		sqls.add(sql);
 
 		sql = digester.getQuery("deleteItemGroupMetaByVersion") + versionId;
@@ -444,6 +474,47 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		sqls.add(sql);
 		return sqls;
 
+	}
+
+	/**
+	 * Deletes crf version. Use the DeleteCrfService.deleteCrfVersion()!
+	 * 
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param items
+	 *            ArrayList
+	 */
+	public void deleteCrfVersion(CRFVersionBean crfVersionBean, ArrayList items) {
+		Statement statement = null;
+		Connection connection = null;
+		try {
+			connection = ds.getConnection();
+			connection.setAutoCommit(false);
+			List<String> queryList = (List<String>) generateDeleteQueries(crfVersionBean.getId(), items);
+			for (String query : queryList) {
+				statement = connection.createStatement();
+				statement.executeUpdate(query);
+				statement.close();
+			}
+			connection.commit();
+		} catch (Exception ex) {
+			logger.error("Error has occurred.", ex);
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception ex) {
+				logger.error("Error has occurred.", ex);
+			}
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+			} catch (Exception ex) {
+				logger.error("Error has occurred.", ex);
+			}
+		}
 	}
 
 	private String getOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {

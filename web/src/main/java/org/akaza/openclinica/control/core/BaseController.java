@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import com.clinovo.lib.crf.factory.CrfBuilderFactory;
+import com.clinovo.service.DeleteCrfService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -263,6 +265,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private DatasetService datasetService;
 	@Autowired
 	private EventDefinitionService eventDefinitionService;
+	@Autowired
+	private CrfBuilderFactory crfBuilderFactory;
+	@Autowired
+	private DeleteCrfService deleteCrfService;
 
 	/**
 	 * Allow access to this for other users.
@@ -776,5 +782,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		getStoredSessionAttributes().remove(userName);
 	}
 
+	public CrfBuilderFactory getCrfBuilderFactory() {
+		return crfBuilderFactory;
+	}
 
+	public DeleteCrfService getDeleteCrfService() {
+		return deleteCrfService;
+	}
 }

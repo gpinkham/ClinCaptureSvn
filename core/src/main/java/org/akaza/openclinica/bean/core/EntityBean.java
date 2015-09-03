@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @SuppressWarnings("serial")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EntityBean implements java.io.Serializable {
+public class EntityBean extends ExcelRowAware implements java.io.Serializable {
 
 	public static final int INT_1231 = 1231;
 

@@ -20,18 +20,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.domain.crfdata.InstantOnChangePairContainer;
-import org.akaza.openclinica.exception.OpenClinicaException;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +32,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.EntityDAO;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.domain.crfdata.InstantOnChangePairContainer;
+import org.akaza.openclinica.exception.OpenClinicaException;
 
 /**
  * ItemFormMetadataDAO.
@@ -645,22 +646,28 @@ public class ItemFormMetadataDAO extends EntityDAO {
 	}
 
 	/**
-	 * Method creates / saves the ItemFormMetadataBean.
-	 * 
+	 * {@inheritDoc}
+	 */
+	public EntityBean create(EntityBean eb) throws OpenClinicaException {
+		return create(eb, null);
+	}
+
+	/**
+	 * Creates new ItemFormMetadataBean.
+	 *
 	 * @param eb
 	 *            EntityBean
+	 * @param con
+	 *            Connection
 	 * @return EntityBean
 	 * @throws OpenClinicaException
 	 *             the OpenClinicaException
 	 */
-	public EntityBean create(EntityBean eb) throws OpenClinicaException {
+	public EntityBean create(EntityBean eb, Connection con) throws OpenClinicaException {
 		ItemFormMetadataBean ifmb = (ItemFormMetadataBean) eb;
 		HashMap nullVars = new HashMap();
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-
 		int ind = 1;
-		int id = getNextPK();
-		variables.put(ind++, id);
 		variables.put(ind++, ifmb.getItemId());
 		variables.put(ind++, ifmb.getCrfVersionId());
 		variables.put(ind++, ifmb.getHeader());
@@ -691,10 +698,10 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		variables.put(ind++, ifmb.getCodeRef());
 		variables.put(ind, ifmb.isSdvRequired());
 
-		execute(digester.getQuery("create"), variables, nullVars);
+		executeWithPK(digester.getQuery("create"), variables, nullVars, con);
 
 		if (isQuerySuccessful()) {
-			ifmb.setId(id);
+			ifmb.setId(getLatestPK());
 		}
 
 		return ifmb;
@@ -1148,7 +1155,9 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
 	/**
 	 * Returns list of Metadatabeans for crf version id.
-	 * @param crfVersionId the crf version id for search.
+	 * 
+	 * @param crfVersionId
+	 *            the crf version id for search.
 	 * @return the list of Metadatabeans.
 	 */
 	public ArrayList<ItemFormMetadataBean> findAllCrfVersionItemMetadata(int crfVersionId) {
