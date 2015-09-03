@@ -435,7 +435,7 @@ $(document).ready(function() {
 		<c:if test="${(enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData')}">
 		<div align="right">
 			<input type="button" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onclick="javascript:setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');this.form.submit();">
-			<input type="button" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled'); sendFormDataViaAjax(${parentId});">
+			<input type="button" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium medium_submit" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled'); sendFormDataViaAjax(${parentId});">
 		</div>
 		</c:if>
 		<c:if test="${parentId==0}">
