@@ -95,8 +95,9 @@ public class CalendarLogic {
 			int subjectDynGroupId = ssb.getDynamicGroupClassId();
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(ds);
 			StudyGroupClassBean sgcb = new StudyGroupClassBean();
+			StudyGroupClassBean defaultGroup = sgcdao.findDefaultByStudyId(studyBean.getId());
 			if (subjectDynGroupId == 0) {
-				sgcb = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(studyBean.getId());
+				sgcb = defaultGroup;
 			} else {
 				sgcb.setId(subjectDynGroupId);
 			}
@@ -106,12 +107,15 @@ public class CalendarLogic {
 			if (sgcb.getId() == 0) {
 				sedForSch = seddao.findAllByStudy(studyBean);
 			} else {
+				// find all events from subject dynamic group
 				sedForSch = seddao.findAllActiveOrderedByStudyGroupClassId(sgcb.getId());
+				// find all events from default group (if events aren't already added)
+				if (sgcb.getId() != defaultGroup.getId()) {
+					sedForSch.addAll(seddao.findAllActiveOrderedByStudyGroupClassId(defaultGroup.getId()));
+				}
+				// find all non-grouped events
+				sedForSch.addAll(seddao.findAllActiveNotClassGroupedByStudyId(studyBean.getId()));
 			}
-			// find all non-grouped events
-			List<StudyEventDefinitionBean> nonGroupedEvents = seddao.findAllActiveNotClassGroupedByStudyId(studyBean
-					.getId());
-			sedForSch.addAll(nonGroupedEvents);
 			LOGGER.debug("found list " + sedForSch.size());
 			for (StudyEventDefinitionBean sedTmp : sedForSch) {
 				LOGGER.debug("found name " + sedTmp.getName());
