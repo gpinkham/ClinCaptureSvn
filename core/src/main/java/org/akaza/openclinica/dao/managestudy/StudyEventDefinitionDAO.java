@@ -898,4 +898,13 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 
 		return al;
 	}
+
+	public boolean isAnyCalendaredEventExist(int parentStudyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, parentStudyId);
+		ArrayList alist = this.select(digester.getQuery("findAllActiveCalendaredEventsByStudyId"), variables);
+		
+		return alist.size() > 0;
+	}
 }

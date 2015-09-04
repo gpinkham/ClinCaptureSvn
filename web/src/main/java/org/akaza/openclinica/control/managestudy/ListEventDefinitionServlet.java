@@ -107,7 +107,7 @@ public class ListEventDefinitionServlet extends Controller {
 		CRFDAO crfDao = getCRFDAO();
 		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
 		ArrayList seds = edao.findAllByStudy(currentStudy);
-
+		
 		StudyEventDAO sedao = getStudyEventDAO();
 		for (Object sed1 : seds) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
@@ -161,6 +161,7 @@ public class ListEventDefinitionServlet extends Controller {
 		table.setPaginated(false);
 		table.computeDisplay();
 
+		request.setAttribute("isAnyCalendaredEventExist", edao.isAnyCalendaredEventExist(currentStudy.getId()));
 		request.setAttribute("table", table);
 		request.setAttribute("defSize", seds.size());
 

@@ -258,4 +258,13 @@
 			AND edc.crf_id = ?
 		</sql>
 	</query>
+	<query>
+		<name>findAllActiveCalendaredEventsByStudyId</name>
+		<sql>
+			SELECT sed.*
+			FROM study_event_definition sed
+			WHERE sed.status_id = 1 AND sed.study_id = ?
+			AND sed.type = 'calendared_visit'
+		</sql>
+	</query>
 </queries>

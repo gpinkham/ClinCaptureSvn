@@ -86,9 +86,11 @@
 	<td>
 		<input type="button" name="<fmt:message key="create_event" bundle="${resword}"/>" value="<fmt:message key="create_event" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='DefineStudyEvent?actionName=init'"/>
 	</td>
-	<td>
-		<input type="button" name="<fmt:message key="calendared_events" bundle="${resword}"/>" value="<fmt:message key="calendared_events" bundle="${resword}"/>" class="button_medium" onclick="javascript:openDocWindow('ShowCalendarFunc?id=<c:out value="${study.id}"/>')"/>
-	</td>
+	<c:if test="${isAnyCalendaredEventExist}">
+		<td>
+			<input type="button" name="<fmt:message key="calendared_events" bundle="${resword}"/>" value="<fmt:message key="calendared_events" bundle="${resword}"/>" class="button_medium" onclick="javascript:openDocWindow('ShowCalendarFunc?id=<c:out value="${study.id}"/>')"/>
+		</td>	
+	</c:if>
 </table>
 <input id="accessAttributeName" type="hidden" value="data-cc-eventDefinitionId">
 <jsp:include page="../include/footer.jsp"/>

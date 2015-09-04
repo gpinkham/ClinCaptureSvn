@@ -83,31 +83,25 @@
 					<div class="formfieldXL_BG">
 						<select name="type" onchange="javascript:changeIcon();" class="formfieldXL">
 							<c:choose>
-								<c:when test="${definition.type == 'common'}">
-									<option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-									<option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-									<option value="common" selected><fmt:message key="common" bundle="${resword}"/>
-									<option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-								</c:when>
-								<c:when test="${definition.type == 'unscheduled'}">
-									<option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-									<option value="unscheduled" selected><fmt:message key="unscheduled" bundle="${resword}"/>
-									<option value="common"><fmt:message key="common" bundle="${resword}"/>
-									<option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-								</c:when>
-								<c:when test="${definition.type == 'calendared_visit'}">
-									<option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-									<option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-									<option value="common"><fmt:message key="common" bundle="${resword}"/>
-									<option value="calendared_visit" selected><fmt:message key="calendared_visit" bundle="${resword}"/>
-								</c:when>
-								<c:otherwise>
-									<option value="scheduled" selected><fmt:message key="scheduled" bundle="${resword}"/>
-									<option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-									<option value="common"><fmt:message key="common" bundle="${resword}"/>
-									<option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-								</c:otherwise>
+							<c:when test="${definition.type == 'common'}">
+								<c:set var="common_selected" value="selected"/>
+							</c:when>
+							<c:when test="${definition.type == 'unscheduled'}">
+								<c:set var="unscheduled_selected" value="selected"/>
+							</c:when>
+							<c:when test="${definition.type == 'calendared_visit'}">
+								<c:set var="calendared_selected" value="selected"/>
+							</c:when>
+							<c:when test="${definition.type == 'scheduled'}">
+								<c:set var="scheduled_selected" value="selected"/>
+							</c:when>
 							</c:choose>
+							<option value="scheduled" ${scheduled_selected}><fmt:message key="scheduled" bundle="${resword}"/>
+							<option value="unscheduled" ${unscheduled_selected}><fmt:message key="unscheduled" bundle="${resword}"/>
+							<option value="common" ${common_selected}><fmt:message key="common" bundle="${resword}"/>
+							<c:if test="${study.studyParameterConfig.calendaredVisits != 'no' || definition.type == 'calendared_visit'}">
+								<option value="calendared_visit" ${calendared_selected}><fmt:message key="calendared_visit" bundle="${resword}"/>
+							</c:if>
 						</select>
 					</div>
 				</td>

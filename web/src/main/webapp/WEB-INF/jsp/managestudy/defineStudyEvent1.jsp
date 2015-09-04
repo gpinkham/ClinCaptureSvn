@@ -78,41 +78,28 @@
 		<select name="type" onchange="javascript:changeIcon();" class="formfieldXL">
 			<c:choose>
 				<c:when test="${definition.type == 'common'}">
-			   		<option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-				 	<option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-				 	<option value="common" selected><fmt:message key="common" bundle="${resword}"/>
-				 	<option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-				 	<option value=''>
+			   		<c:set var="common_selected" value="selected"/>
 				</c:when>
 				<c:when test="${definition.type == 'unscheduled'}">
-					 <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-					 <option value="unscheduled" selected><fmt:message key="unscheduled" bundle="${resword}"/>
-					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
-					 <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-					 <option value=''>
+					<c:set var="unscheduled_selected" value="selected"/>
 				</c:when>
 				<c:when test="${definition.type == 'calendared_visit'}">
-					 <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-					 <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
-					 <option value="calendared_visit" selected><fmt:message key="calendared_visit" bundle="${resword}"/>
-					 <option value=''>
+					<c:set var="calendared_selected" value="selected"/>
 				</c:when>
 				<c:when test="${definition.type == 'scheduled'}">
-					 <option value="scheduled" selected><fmt:message key="scheduled" bundle="${resword}"/>
-					 <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
-					 <option value="calendared_visit" ><fmt:message key="calendared_visit" bundle="${resword}"/>
-					 <option value=''>
+					<c:set var="scheduled_selected" value="selected"/>
 				</c:when>
 				<c:otherwise>
-					 <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
-					 <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
-					 <option value="common"><fmt:message key="common" bundle="${resword}"/>
-					 <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
-					 <option value='' selected>
+					<c:set var="empty_selected" value="selected"/>
 				</c:otherwise>
-		   </c:choose>
+			</c:choose>
+			<option value="scheduled" ${scheduled_selected}><fmt:message key="scheduled" bundle="${resword}"/>
+			<option value="unscheduled" ${unscheduled_selected}><fmt:message key="unscheduled" bundle="${resword}"/>
+			<option value="common" ${common_selected}><fmt:message key="common" bundle="${resword}"/>
+			<c:if test="${study.studyParameterConfig.calendaredVisits != 'no'}">
+				<option value="calendared_visit" ${calendared_selected}><fmt:message key="calendared_visit" bundle="${resword}"/>
+            </c:if>
+			<option value='' ${empty_selected}>
     	</select>
 	</div>
    </td><td class="formlabel alert">*</td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="type"/></jsp:include></td></tr></table></td></tr>
