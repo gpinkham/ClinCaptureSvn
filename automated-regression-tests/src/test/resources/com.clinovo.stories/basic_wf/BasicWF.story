@@ -614,3 +614,15 @@ When User creates DNs for Subject:
 Then DNs are created
 
 
+Scenario: 20.13 "Study Admin" opens, updates and closes DN on N&Ds page
+
+Given User logs in as "Study Admin"
+And User goes to N&Ds page
+When User works with DNs on NDs page: 
+|Action|Study Subject ID|Event Name|CRF Name            |Entity Name  |Parent Description           |Parent Detailed Note|Description                  |Detailed Note    |Resolution Status|Assign to User|Email Assigned User|
+|View  |StSubj_3        |          |                    |Date of Birth|                             |                    |subj_dn_3                    |peace of text... |                 |              |                   |
+|Update|StSubj_1        |Event E   |CRF_w_basic_fields_2|             |Information was not available|peace of text...    |Need additional clarification|time to update...|Updated          |demo_crc      |                   |
+|Close |StSubj_2        |Event B   |CRF_w_basic_fields_1|             |test DN 3                    |peace of text...    |Other                        |time to close... |Closed           |demo_pi       |                   |
+
+Then DNs are processed
+

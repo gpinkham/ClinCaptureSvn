@@ -551,6 +551,7 @@ public class ClinovoJBehave extends BaseJBehave {
     	for (DNote dn: dns) {
     		commonSteps.filter_NDs_page(dn);
     		commonSteps.check_DN_row_is_present(dn);
+    		commonSteps.clear_filter_NDs_page(dn);
     	}
     
     	Thucydides.getCurrentSession().remove(DNote.DNS_TO_CHECK_EXIST);
@@ -595,7 +596,7 @@ public class ClinovoJBehave extends BaseJBehave {
     		dn = DNote.fillDNoteFromTableRow(rowParams.values());
     		commonSteps.update_or_close_DN(dn);
     		userClicksSaveButton();
-    		dns.add(dn);
+    		dns.add(dn.getParentDN());
     	}
     	
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
@@ -832,9 +833,9 @@ public class ClinovoJBehave extends BaseJBehave {
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
     }
     
-    @Given("User works with DNs on N&Ds page: $activityTable")
-    @When("User works with DNs on N&Ds page: $activityTable")
-   	public void userWorksWithDNs(String action, ExamplesTable table) {
+    @Given("User works with DNs on NDs page: $activityTable")
+    @When("User works with DNs on NDs page: $activityTable")
+   	public void userWorksWithDNs(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams;
     	List<DNote> dns = new ArrayList<DNote>();
@@ -842,19 +843,22 @@ public class ClinovoJBehave extends BaseJBehave {
     	for (int i = 0; i < table.getRowCount(); i++) {
     		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
     		dn = DNote.fillDNoteFromTableRow(rowParams.values());
-    		commonSteps.filter_NDs_page(dn);
+    		
     		switch (rowParams.values().get("Action")) {
     		case "View": 
+    			commonSteps.filter_NDs_page(dn);
+    			commonSteps.view_DN_on_NDs_page(dn);
+    			commonSteps.exit_from_DN();
+    			dns.add(dn);
     			break;
-    		case "Update":
-    			break;
-    		case "Close":
-    			commonSteps.click_element_on_page(UpdateSubjectDetailsPage.PAGE_NAME, "'Date of Birth' flag");
+    		default:
+    			commonSteps.filter_NDs_page(dn.getParentDN());
+    			commonSteps.view_DN_on_NDs_page(dn);
+    			commonSteps.update_or_close_DN(dn);
+    			dns.add(dn.getParentDN());
     			break;
     		}
-    		commonSteps.update_or_close_DN(dn);
-    		userClicksSaveButton();
-    		dns.add(dn);
+    		commonSteps.clear_filter_NDs_page(dn);
     	}
     	
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);

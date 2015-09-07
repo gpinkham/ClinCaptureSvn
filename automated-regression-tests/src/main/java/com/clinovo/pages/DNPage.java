@@ -55,6 +55,9 @@ public class DNPage extends BasePage {
 	@FindBy(xpath = ".//*[@name='SubmitExit0']")
     private WebElementFacade bSubmitClose0;
 	
+	@FindBy(xpath = ".//*[@id='CloseWindow']")
+    private WebElementFacade bCloseWindow;
+	
 	@FindBy(xpath = ".//a[@id='a0']")
     private WebElementFacade beginNewThread;
 	
@@ -171,31 +174,36 @@ public class DNPage extends BasePage {
 	}
 
 	public void findAndFillInAndClickSubmit(DNote dn) {		
-		if (dn.getParentID().isEmpty() && !dn.getParentDescription().isEmpty()) {
-			for (WebElement div: bodyWithData.findElements(By.xpath(".//b[text()='"+dn.getParentDescription()+"']/../../../../..//td[contains(text(),'ID:')]"))) {
-				dn.setParentID(div.getText());
+		if (dn.getParentDN().getId().isEmpty() && !dn.getParentDN().getDescription().isEmpty()) {
+			for (WebElement div: bodyWithData.findElements(By.xpath(".//b[text()='"+dn.getParentDN().getDescription()+"']/../../../../..//td[contains(text(),'ID:')]"))) {
+				dn.getParentDN().setId(div.getText().replace("ID: ", ""));
 				// take first matching div
 				break;
 			}
 		}
-			
+		
 		if (dn.getResolutionStatus().equals("Updated")) {
-			bodyWithData.findElement(By.xpath(".//input[@id='resStatus2"+dn.getParentID()+"']")).click();				
+			bodyWithData.findElement(By.xpath(".//input[@id='resStatus2"+dn.getParentDN().getId()+"']")).click();				
 		} else {
-			bodyWithData.findElement(By.xpath(".//input[@id='resStatus4"+dn.getParentID()+"']")).click();
+			bodyWithData.findElement(By.xpath(".//input[@id='resStatus4"+dn.getParentDN().getId()+"']")).click();
 		}
-			
-		WebElementFacade sDescription1 = dn.getResolutionStatus().equals("Updated")? bodyWithData.find(By.xpath(".//select[@id='selectUpdateDescription"+dn.getParentID()+"']")) :
-				bodyWithData.find(By.xpath(".//select[@id='selectCloseDescription"+dn.getParentID()+"']"));
-		WebElementFacade tDetailedNote1 = bodyWithData.find(By.xpath(".//textarea[@name='detailedDes"+dn.getParentID()+"']"));
-		WebElementFacade sAssignToUser1 = bodyWithData.find(By.xpath(".//select[@id='userAccountId"+dn.getParentID()+"']"));
-		WebElementFacade cEmailAssignedUser1 = bodyWithData.find(By.xpath(".//input[@name='sendEmail"+dn.getParentID()+"']"));
-				
+		
+		WebElementFacade sDescription1 = dn.getResolutionStatus().equals("Updated")? bodyWithData.
+				find(By.xpath(".//select[@id='selectUpdateDescription"+dn.getParentDN().getId()+"']")) :
+				bodyWithData.find(By.xpath(".//select[@id='selectCloseDescription"+dn.getParentDN().getId()+"']"));
+		WebElementFacade tDetailedNote1 = bodyWithData.find(By.xpath(".//textarea[@name='detailedDes"+dn.getParentDN().getId()+"']"));
+		WebElementFacade sAssignToUser1 = bodyWithData.find(By.xpath(".//select[@id='userAccountId"+dn.getParentDN().getId()+"']"));
+		WebElementFacade cEmailAssignedUser1 = bodyWithData.find(By.xpath(".//input[@name='sendEmail"+dn.getParentDN().getId()+"']"));
+		
 		sDescription1.selectByValue(dn.getDescription());
 		tDetailedNote1.type(dn.getDetailedNote());
-		sAssignToUser1.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), dn.getParentID()));
+		sAssignToUser1.selectByVisibleText(findOptionByUserName(dn.getAssignToUser(), dn.getParentDN().getId()));
 		ItemsUtil.fillCheckbox(new Checkbox(cEmailAssignedUser1), dn.getEmailAssignedUser());
 		
-		bodyWithData.findElement(By.xpath(".//input[@name='SubmitExit"+dn.getParentID()+"']")).click();	
+		bodyWithData.findElement(By.xpath(".//input[@name='SubmitExit"+dn.getParentDN().getId()+"']")).click();	
+	}
+
+	public void clickCloseWindowButton() {
+		bCloseWindow.click();	
 	}
 }

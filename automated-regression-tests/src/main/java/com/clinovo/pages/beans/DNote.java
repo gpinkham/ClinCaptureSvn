@@ -30,16 +30,12 @@ public class DNote {
     private String entityName = "";
     
     //for updating/closing
-    
-    private String parentID = "";
-    
-    private String parentDescription = "";
-    
-    private String parentDetailedNote = "";
 	
 	private String resolutionStatus = "";
 	
 	private String entityType = "";
+	
+	private DNote parentDN;
 
     public static DNote fillDNoteFromTableRow(
 			Map<String, String> row) {
@@ -88,16 +84,28 @@ public class DNote {
     	
     	//for updating/closing
     	
+    	if (row.get("Study Subject ID") != null) {
+			dn.getParentDN().setStudySubjectID(row.get("Study Subject ID"));
+    	}
+    	
+    	if (row.get("Event Name") != null) {
+    		dn.getParentDN().setEventName(row.get("Event Name"));
+    	}
+    	
+    	if (row.get("CRF Name") != null) {
+    		dn.getParentDN().setCRFName(row.get("CRF Name"));
+    	}
+    	
     	if (row.get("Parent ID") != null) {
-			dn.setParentID(row.get("Parent ID"));
+			dn.getParentDN().setId(row.get("Parent ID"));
     	}
     	
     	if (row.get("Parent Description") != null) {
-    		dn.setParentDescription(row.get("Parent Description"));
+    		dn.getParentDN().setDescription(row.get("Parent Description"));
     	}
     	
     	if (row.get("Parent Detailed Note") != null) {
-    		dn.setParentDetailedNote(row.get("Parent Detailed Note"));
+    		dn.getParentDN().setDetailedNote(row.get("Parent Detailed Note"));
     	}
     	
     	if (row.get("Resolution Status") != null) {
@@ -168,8 +176,8 @@ public class DNote {
 			map.put("Assign To User", dn.getAssignToUser());
 		}
 		
-		if (!dn.getParentDescription().isEmpty()) {
-			map.put("Parent Description", dn.getParentDescription());
+		if (!dn.getParentDN().getDescription().isEmpty()) {
+			map.put("Parent Description", dn.getParentDN().getDescription());
 		}
     	
 		if (!dn.getResolutionStatus().isEmpty()) {
@@ -259,30 +267,6 @@ public class DNote {
 		return this.getType().trim().equals("Query");
 	}
 
-	public String getParentID() {
-		return parentID;
-	}
-
-	public void setParentID(String parentID) {
-		this.parentID = parentID;
-	}
-
-	public String getParentDescription() {
-		return parentDescription;
-	}
-
-	public void setParentDescription(String parentDescription) {
-		this.parentDescription = parentDescription;
-	}
-
-	public String getParentDetailedNote() {
-		return parentDetailedNote;
-	}
-
-	public void setParentDetailedNote(String parentDetailedNote) {
-		this.parentDetailedNote = parentDetailedNote;
-	}
-
 	public String getResolutionStatus() {
 		return resolutionStatus;
 	}
@@ -313,6 +297,22 @@ public class DNote {
 
 	public void setEntityType(String entityType) {
 		this.entityType = entityType;
+	}
+
+	public DNote getParentDN() {
+		if (this.parentDN == null) {
+			 this.parentDN = new DNote();
+		} 
+		return this.parentDN;
+	}
+
+	public void setParentDN(DNote parentDN) {
+		this.parentDN = parentDN;
+	}
+	
+	public boolean hasParentDN(DNote parentDN) {
+		return getParentDN().getDescription().isEmpty() && getParentDN().getId().isEmpty() && 
+				getParentDN().getDetailedNote().isEmpty() && getParentDN().getResolutionStatus().isEmpty();
 	}
 }
 

@@ -816,11 +816,26 @@ public class CommonSteps extends ScenarioSteps {
 	}
 	
 	@Step
-	public void click_edit_icon_for_subject_on_Administer_Subjects_page(
-			String studyIDStSubjectID) {
+	public void click_edit_icon_for_subject_on_Administer_Subjects_page(String studyIDStSubjectID) {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("Protocol-Study Subject IDs", studyIDStSubjectID);
 		administerSubjectsPage.filterAdministerSubjectsPage(map);
 		administerSubjectsPage.clickEditIconForSubject(studyIDStSubjectID);
+	}
+
+	@Step
+	public void view_DN_on_NDs_page(DNote dn) {
+		notesAndDiscrepanciesPage.clickViewDNIcon();
+	}
+
+	@Step
+	public void exit_from_DN() {
+		String oldWindowId = switch_to_another_window("").get("from");
+		dnPage.clickCloseWindowButton();
+		switch_to_another_window(oldWindowId);
+	}
+
+	public void clear_filter_NDs_page(DNote dn) {
+		notesAndDiscrepanciesPage.clickClearFilterLink();
 	}
 }

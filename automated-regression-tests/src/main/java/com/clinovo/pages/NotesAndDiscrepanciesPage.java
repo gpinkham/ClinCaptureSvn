@@ -79,7 +79,6 @@ public class NotesAndDiscrepanciesPage extends BasePage {
    	}
        
     public void fillFiltersFromMapOnNDPage(Map<String, String> map) {
-		
     	if (map.containsKey("Study Subject ID")) {
 			divFilterBySSubjectId.click();
 			iFilterField.type(map.get("Study Subject ID"));
@@ -100,14 +99,9 @@ public class NotesAndDiscrepanciesPage extends BasePage {
 			iFilterField.type(map.get("Entity Value"));
 		}
 		
-		if (map.containsKey("Description") && !map.containsKey("Parent Description")) {
+		if (map.containsKey("Description")) {
 			divFilterByDescription.click();
 			iFilterField.type(map.get("Description"));
-		}
-		
-		if (map.containsKey("Parent Description")) {
-			divFilterByDescription.click();
-			iFilterField.type(map.get("Parent Description"));
 		}
 		
 		if (map.containsKey("Type")) {
@@ -151,6 +145,10 @@ public class NotesAndDiscrepanciesPage extends BasePage {
     }
 
 	public void checkDNPresent(DNote dn) {
-		firstRow.findBy(By.xpath("//td[1]"));
+		firstRow.findBy(By.xpath(".//td[1]"));
+	}
+
+	public void clickViewDNIcon() {
+		firstRow.findBy(By.xpath(".//a/img[@name='bt_View1']")).click();
 	}
 }
