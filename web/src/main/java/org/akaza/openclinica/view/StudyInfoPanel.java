@@ -343,9 +343,9 @@ public class StudyInfoPanel {
 				this.setCreateDataset(false);
 				this.setIconInfoShown(false);
 
-			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.INITIAL_DATA_ENTRY_NW)
-					|| page.equals(Page.INITIAL_DATA_ENTRY_SERVLET) || page.equals(Page.DOUBLE_DATA_ENTRY)
-					|| page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET) || page.equals(Page.ADMIN_EDIT)
+			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.DATA_ENTRY)
+					|| page.equals(Page.INITIAL_DATA_ENTRY_SERVLET)
+					|| page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET)
 					|| page.equals(Page.ADMIN_EDIT_SERVLET)) {
 				/*
 				 * pages designed to also follow the above format; check to see if they are in the session already, and

@@ -128,7 +128,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
 	@Override
 	protected Page getJSPPage() {
-		return Page.ADMIN_EDIT;
+		return Page.DATA_ENTRY;
 	}
 
 	@Override
@@ -187,6 +187,11 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 					respage.getString("you_may_not_perform_administrative_editing"), "1");
 		}
 		return;
+	}
+
+	@Override
+	protected void putDataEntryStageFlagToRequest(HttpServletRequest request) {
+		request.setAttribute(DATA_ENTRY_STAGE, DataEntryStage.ADMINISTRATIVE_EDITING);
 	}
 
 	@Override

@@ -268,6 +268,8 @@ public abstract class DataEntryServlet extends Controller {
 
 	public static final String DN_ADDITIONAL_CR_PARAMS = "dnAdditionalCreatingParameters";
 
+	public static final String DATA_ENTRY_STAGE = "dataEntryStage";
+
 	public static final int INT_3800 = 3800;
 	public static final int INT_255 = 255;
 	public static final int INT_3 = 3;
@@ -333,6 +335,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 
+		putDataEntryStageFlagToRequest(request);
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
 		ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
@@ -1910,6 +1913,8 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 	}
+
+	protected abstract void putDataEntryStageFlagToRequest(HttpServletRequest request);
 
 	private void goToNextCRF(HttpServletRequest request, HttpServletResponse response, EventCRFBean ecb,
 			StudyUserRoleBean currentRole, UserAccountBean ub, EventDefinitionCRFBean edcb,

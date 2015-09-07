@@ -583,15 +583,12 @@ public final class Page {
 			"Enter Data for a Study Event");
 	public static final Page INTERVIEWER = new Page(PATH + "submit/interviewer.jsp",
 			"Event CRF Interview Info Submission");
-	
-	public static final Page INITIAL_DATA_ENTRY_NW = new Page(PATH + "submit/initialDataEntryNw.jsp",
-			"Initial Data Entry");
+
+	public static final Page DATA_ENTRY = new Page(PATH + "submit/dataEntry.jsp", "Data Entry");
 	public static final Page INITIAL_DATA_ENTRY_SERVLET = new Page("/InitialDataEntry", "Initial Data Entry");
 
-	public static final Page DOUBLE_DATA_ENTRY = new Page(PATH + "submit/doubleDataEntry.jsp", "Double Data Entry");
 	public static final Page DOUBLE_DATA_ENTRY_SERVLET = new Page("/DoubleDataEntry", "Double Data Entry");
 
-	public static final Page ADMIN_EDIT = new Page(PATH + "submit/administrativeEditing.jsp", "Administrative Editing");
 	public static final Page ADMIN_EDIT_SERVLET = new Page("/AdministrativeEditing", "Administrative Editing Servlet");
 
 	public static final Page LIST_USER_IN_STUDY = new Page(PATH + "managestudy/listUserInStudy.jsp",
