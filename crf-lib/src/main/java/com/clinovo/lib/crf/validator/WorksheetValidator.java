@@ -56,11 +56,11 @@ public final class WorksheetValidator {
 			}
 		}
 		if (validSheetNum != INT_4) {
-			crfBuilder.getErrorsList().add(crfBuilder.getPageMessagesResourceBundle().getString("workbook.isNotValid"));
+			crfBuilder.getErrorsList().add(crfBuilder.getMessage("workbook.isNotValid"));
 		}
 		Sheet sheet = crfBuilder.getWorkbook().getSheetAt(0);
 		if (sheet == null || sheet.getRow(1) == null || sheet.getRow(1).getCell(0) == null) {
-			throw new CRFReadingException(crfBuilder.getPageMessagesResourceBundle().getString("workbook.blankFound"));
+			throw new CRFReadingException(crfBuilder.getMessage("workbook.blankFound"));
 		}
 	}
 

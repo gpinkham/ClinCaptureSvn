@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.bean.ItemBeanExt;
 import com.clinovo.lib.crf.builder.impl.ExcelCrfBuilder;
@@ -56,6 +57,9 @@ public class ExcelErrorMessageProducerTest {
 	@Mock
 	private ImportCrfService importCrfService;
 
+	@Mock
+	private MessageSource messageSource;
+
 	@Before
 	public void before() {
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
@@ -63,9 +67,10 @@ public class ExcelErrorMessageProducerTest {
 		Mockito.when(row.getCell(Mockito.anyInt())).thenReturn(cell);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
-		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle(), importCrfService);
+		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH, messageSource,
+				importCrfService);
 		excelErrorMessageProducer = new ExcelErrorMessageProducer(excelCrfBuilder);
+		excelCrfBuilder.setCurrentMessage(new StringBuffer());
 		excelCrfBuilder.setCurrentItemGroup(new ItemGroupBean());
 		excelCrfBuilder.setCurrentSection(new SectionBean());
 		excelCrfBuilder.setCurrentItem(new ItemBeanExt());
@@ -79,10 +84,9 @@ public class ExcelErrorMessageProducerTest {
 				new ItemGroupMetadataBean());
 	}
 
-	@Test
+	@Test(expected = CRFReadingException.class)
 	public void testThatCrfVersionIsBlankMethodGeneratesErrorMessage() throws Exception {
 		excelErrorMessageProducer.crfVersionIsBlank();
-		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
 	}
 
 	@Test
@@ -113,7 +117,6 @@ public class ExcelErrorMessageProducerTest {
 	@Test(expected = CRFReadingException.class)
 	public void testThatCrfNameIsBlankMethodGeneratesErrorMessage() throws Exception {
 		excelErrorMessageProducer.crfNameIsBlank();
-		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
 	}
 
 	@Test
@@ -122,16 +125,19 @@ public class ExcelErrorMessageProducerTest {
 		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
 	}
 
-	@Test
+	@Test(expected = CRFReadingException.class)
 	public void testThatCrfNameHasAlreadyBeenUsedMethodGeneratesErrorMessage() throws Exception {
 		excelErrorMessageProducer.crfNameHasAlreadyBeenUsed();
-		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
+	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatCrfVersionHasAlreadyBeenUsedMethodGeneratesErrorMessage() throws Exception {
+		excelErrorMessageProducer.crfVersionHasAlreadyBeenUsed();
 	}
 
 	@Test(expected = CRFReadingException.class)
 	public void testThatDidNotMatchCrfNameMethodGeneratesErrorMessage() throws Exception {
 		excelErrorMessageProducer.didNotMatchCrfName("Test Name");
-		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
 	}
 
 	@Test
@@ -369,13 +375,6 @@ public class ExcelErrorMessageProducerTest {
 	}
 
 	@Test
-	public void testThatResponseLabelShouldBeFileMethodGeneratesErrorMessages() throws Exception {
-		excelErrorMessageProducer.responseLabelShouldBeFile();
-		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
-		assertEquals(excelCrfBuilder.getErrorsMap().size(), 1);
-	}
-
-	@Test
 	public void testThatResponseOptionsTextIsBlankMethodGeneratesErrorMessages() throws Exception {
 		excelErrorMessageProducer.responseOptionsTextIsBlank();
 		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
@@ -418,8 +417,8 @@ public class ExcelErrorMessageProducerTest {
 	}
 
 	@Test
-	public void testThatExpressionStartsWithFuncMethodGeneratesErrorMessages() throws Exception {
-		excelErrorMessageProducer.expressionStartsWithFunc();
+	public void testThatExpressionDoesNotStartWithFuncMethodGeneratesErrorMessages() throws Exception {
+		excelErrorMessageProducer.expressionDoesNotStartWithFunc();
 		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
 		assertEquals(excelCrfBuilder.getErrorsMap().size(), 1);
 	}

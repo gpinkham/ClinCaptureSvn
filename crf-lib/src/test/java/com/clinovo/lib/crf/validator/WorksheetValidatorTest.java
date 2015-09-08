@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.builder.impl.ExcelCrfBuilder;
 import com.clinovo.lib.crf.service.ImportCrfService;
@@ -47,6 +48,9 @@ public class WorksheetValidatorTest {
 	@Mock
 	private ImportCrfService importCrfService;
 
+	@Mock
+	private MessageSource messageSource;
+
 	@Before
 	public void before() {
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
@@ -54,8 +58,8 @@ public class WorksheetValidatorTest {
 		Mockito.when(row.getCell(Mockito.anyInt())).thenReturn(cell);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
-		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle(), importCrfService);
+		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH, messageSource,
+				importCrfService);
 	}
 
 	@Test(expected = CRFReadingException.class)

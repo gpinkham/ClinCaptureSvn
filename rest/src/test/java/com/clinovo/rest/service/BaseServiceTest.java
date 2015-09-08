@@ -68,6 +68,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final Locale LOCALE = new Locale("en");
 
 	// Managed services
+	public static final String API_CRF_JSON_IMPORT_CRF = "/crf/json/importCrf";
+	public static final String API_CRF_JSON_IMPORT_CRF_VERSION = "/crf/json/importCrfVersion";
 	public static final String API_EVENT = "/event";
 	public static final String API_EVENT_REMOVE_CRF = "/event/removeCrf";
 	public static final String API_EVENT_RESTORE_CRF = "/event/restoreCrf";

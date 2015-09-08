@@ -16,11 +16,11 @@
 package com.clinovo.lib.crf.factory;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.builder.CrfBuilder;
 
@@ -40,14 +40,14 @@ public interface CrfBuilderFactory {
 	 *            UserAccountBean
 	 * @param locale
 	 *            Locale
-	 * @param pageMessagesResourceBundle
-	 *            ResourceBundle
+	 * @param messageSource
+	 *            MessageSource
 	 * @return CrfBuilder
 	 * @throws Exception
 	 *             an Exception
 	 */
 	CrfBuilder getCrfBuilder(Workbook workbook, StudyBean studyBean, UserAccountBean owner, Locale locale,
-			ResourceBundle pageMessagesResourceBundle) throws Exception;
+			MessageSource messageSource) throws Exception;
 
 	/**
 	 * Returns CrfBuilder instance.
@@ -60,12 +60,12 @@ public interface CrfBuilderFactory {
 	 *            UserAccountBean
 	 * @param locale
 	 *            Locale
-	 * @param pageMessagesResourceBundle
-	 *            ResourceBundle
+	 * @param messageSource
+	 *            MessageSource
 	 * @return CrfBuilder
 	 * @throws Exception
 	 *             an Exception
 	 */
 	CrfBuilder getCrfBuilder(String jsonData, StudyBean studyBean, UserAccountBean owner, Locale locale,
-			ResourceBundle pageMessagesResourceBundle) throws Exception;
+			MessageSource messageSource) throws Exception;
 }

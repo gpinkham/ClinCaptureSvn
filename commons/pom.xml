@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>commons</artifactId>
     <packaging>jar</packaging>
-    <name>ClinCapture Validation</name>
+    <name>ClinCapture Commons</name>
 
     <dependencies>
         <dependency>

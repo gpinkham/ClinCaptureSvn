@@ -56,7 +56,6 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -411,9 +410,8 @@ public class CreateCRFVersionServlet extends Controller {
 							? new HSSFWorkbook(new POIFSFileSystem(inputStream))
 							: new XSSFWorkbook(inputStream);
 					crfBuilder = getCrfBuilderFactory().getCrfBuilder(workbook, currentStudy, ub,
-							LocaleResolver.getLocale(), ResourceBundleProvider.getPageMessagesBundle());
-					crfBuilder.getCrfBean().setId(version.getCrfId());
-					crfBuilder.build();
+							LocaleResolver.getLocale(), getMessageSource());
+					crfBuilder.build(version.getCrfId());
 					request.getSession().setAttribute("crfBuilder", crfBuilder);
 					request.getSession().setAttribute("htmlTable", crfBuilder.getHtmlTable());
 					request.getSession().setAttribute("excelErrors", crfBuilder.getErrorsList());

@@ -24,6 +24,8 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 
+import com.clinovo.lib.crf.enums.OperationType;
+
 /**
  * CrfBuilder.
  */
@@ -87,12 +89,29 @@ public interface CrfBuilder {
 	Map<String, Map> createCrfMetaObject();
 
 	/**
-	 * Builds crf.
+	 * Returns type of operation.
+	 * 
+	 * @return OperationType
+	 */
+	OperationType getOperationType();
+
+	/**
+	 * Builds new crf.
 	 * 
 	 * @throws Exception
 	 *             an Exception
 	 */
 	void build() throws Exception;
+
+	/**
+	 * Builds new crf version.
+	 *
+	 * @param crfId
+	 *            int
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void build(int crfId) throws Exception;
 
 	/**
 	 * Saves crf.

@@ -1018,7 +1018,7 @@ public class ItemDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING); // (crf)name
 		this.setTypeExpected(index++, TypeNames.STRING); // (crf)name
 		this.setTypeExpected(index++, TypeNames.STRING); // (crf)name
-		this.setTypeExpected(index++, TypeNames.INT); // (crf)name
+		this.setTypeExpected(index, TypeNames.INT); // (crf)name
 
 		HashMap variables = new HashMap();
 		variables.put(1, crfName);

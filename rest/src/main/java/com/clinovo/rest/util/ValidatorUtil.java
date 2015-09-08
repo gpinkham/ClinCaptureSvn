@@ -45,4 +45,18 @@ public final class ValidatorUtil {
 			throw new RestException(key.concat(DELIMITER).concat(((List<String>) errors.get(key)).get(0)));
 		}
 	}
+
+	/**
+	 * Method that throws new REST Exception.
+	 *
+	 * @param errors
+	 *            List
+	 * @throws Exception
+	 *             an Exception
+	 */
+	public static void checkForErrors(List<String> errors) throws Exception {
+		if (!errors.isEmpty()) {
+			throw new RestException(errors.get(0));
+		}
+	}
 }

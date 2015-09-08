@@ -40,7 +40,7 @@ import com.clinovo.lib.crf.enums.CellName;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.enums.RealValueKey;
 import com.clinovo.lib.crf.enums.SheetName;
-import com.clinovo.lib.crf.validator.CrfValidator;
+import com.clinovo.lib.crf.validator.CommonValidator;
 import com.clinovo.lib.crf.validator.WorksheetValidator;
 import com.clinovo.util.CodingFieldsUtil;
 
@@ -261,11 +261,11 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 			responseLabel = responseType.getCode();
 			responseValues = responseType.getCode();
 			responseOptions = responseType.getCode();
-			crfBuilder.getRow().createCell(CellName.ITEM_RESPONSE_LABEL.getColumnNumber())
+			crfBuilder.getRow().createCell(crfBuilder.getColumnNumber(CellName.ITEM_RESPONSE_LABEL))
 					.setCellValue(responseType.getCode().toLowerCase() + AUTO_CHANGED_CELL);
-			crfBuilder.getRow().createCell(CellName.ITEM_RESPONSE_OPTIONS_TEXT.getColumnNumber())
+			crfBuilder.getRow().createCell(crfBuilder.getColumnNumber(CellName.ITEM_RESPONSE_OPTIONS_TEXT))
 					.setCellValue(responseType.getCode().toLowerCase() + AUTO_CHANGED_CELL);
-			crfBuilder.getRow().createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber())
+			crfBuilder.getRow().createCell(crfBuilder.getColumnNumber(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS))
 					.setCellValue(responseType.getCode().toLowerCase() + AUTO_CHANGED_CELL);
 		}
 
@@ -277,9 +277,9 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 				|| responseType.getId() == ResponseType.GROUP_CALCULATION.getId()) {
 			responseLabel = responseType.getCode();
 			responseOptions = responseType.getCode();
-			crfBuilder.getRow().createCell(CellName.ITEM_RESPONSE_LABEL.getColumnNumber())
+			crfBuilder.getRow().createCell(crfBuilder.getColumnNumber(CellName.ITEM_RESPONSE_LABEL))
 					.setCellValue(responseType.getCode().toLowerCase() + AUTO_CHANGED_CELL);
-			crfBuilder.getRow().createCell(CellName.ITEM_RESPONSE_OPTIONS_TEXT.getColumnNumber())
+			crfBuilder.getRow().createCell(crfBuilder.getColumnNumber(CellName.ITEM_RESPONSE_OPTIONS_TEXT))
 					.setCellValue(responseType.getCode().toLowerCase() + AUTO_CHANGED_CELL);
 		}
 
@@ -466,6 +466,14 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 				: OperationType.IMPORT_NEW_CRF);
 		WorksheetValidator.validate((ExcelCrfBuilder) crfBuilder);
 		processWorkbook((ExcelCrfBuilder) crfBuilder);
-		CrfValidator.validate(crfBuilder);
+		CommonValidator.validate(crfBuilder);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void importNewCrfVersion(BaseCrfBuilder crfBuilder, int crfId) throws Exception {
+		crfBuilder.getCrfBean().setId(crfId);
+		importNewCrf(crfBuilder);
 	}
 }

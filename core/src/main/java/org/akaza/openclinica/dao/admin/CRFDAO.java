@@ -643,7 +643,8 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that deletes crf by crfId.
+	 * Method that deletes crf by crfId. Note: it will be better to use the DeleteCrfService.deleteCrf(int crfId)
+	 * instead of this method, cuz service may have additional logic.
 	 * 
 	 * @param crfId
 	 *            int

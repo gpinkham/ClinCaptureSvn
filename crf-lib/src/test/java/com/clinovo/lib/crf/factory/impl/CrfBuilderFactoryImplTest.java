@@ -4,12 +4,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.builder.CrfBuilder;
 import com.clinovo.lib.crf.builder.impl.ExcelCrfBuilder;
@@ -52,10 +53,11 @@ public class CrfBuilderFactoryImplTest {
 	private CrfBuilderFactory crfBuilderFactory;
 
 	@Mock
-	private ResourceBundle pageMessagesResourceBundle;
+	private MessageSource messageSource;
 
 	@Before
 	public void before() {
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		crfBuilderFactory = new CrfBuilderFactoryImpl();
 		Mockito.when(workbook.getSheetAt(Mockito.anyInt())).thenReturn(sheet);
 		Mockito.when(row.getCell(Mockito.anyInt())).thenReturn(cell);
@@ -65,15 +67,14 @@ public class CrfBuilderFactoryImplTest {
 	@Test
 	public void testThatCrfBuilderFactoryCreatesExcelCrfBuilderCorrectly() throws Exception {
 		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				pageMessagesResourceBundle);
+				messageSource);
 		assertNotNull(crfBuilder);
 		assertTrue(crfBuilder instanceof ExcelCrfBuilder);
 	}
 
 	@Test
 	public void testThatCrfBuilderFactoryCreatesJsonCrfBuilderCorrectly() throws Exception {
-		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder("{}", studyBean, owner, Locale.ENGLISH,
-				pageMessagesResourceBundle);
+		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder("{}", studyBean, owner, Locale.ENGLISH, messageSource);
 		assertNotNull(crfBuilder);
 		assertTrue(crfBuilder instanceof JsonCrfBuilder);
 	}

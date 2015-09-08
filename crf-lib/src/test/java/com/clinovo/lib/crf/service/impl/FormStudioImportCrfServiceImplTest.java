@@ -29,8 +29,14 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	@Autowired
 	private CrfBuilderFactory crfBuilderFactory;
 
+	@Override
+	protected void restoreDb() throws Exception {
+		// do not restore db
+	}
+
 	@Before
 	public void before() {
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		studyBean = (StudyBean) studyDAO.findByPK(1);
 		owner = (UserAccountBean) userAccountDAO.findByPK(1);
 	}
@@ -46,8 +52,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectQuantityOfSections() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
-		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle());
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		assertEquals(crfBuilder.getSections().size(), 2);
 	}
@@ -56,8 +61,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectQuantityOfItemGroups() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
-		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle());
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		assertEquals(crfBuilder.getItemGroups().size(), 2);
 	}
@@ -66,18 +70,16 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectQuantityOfItems() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
-		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle());
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
-		assertEquals(crfBuilder.getItems().size(), 18);
+		assertEquals(crfBuilder.getItems().size(), 22);
 	}
 
 	@Test
 	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectCrfName() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
-		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle());
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		assertEquals(crfBuilder.getCrfBean().getName(), "testCRF");
 	}
@@ -86,8 +88,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectCrfVersion() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
-		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle());
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		assertEquals(crfBuilder.getCrfVersionBean().getName(), "v1.0");
 	}
@@ -96,8 +97,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	public void testThatCrfBuilderSavesDataFromTheTestCrfCorrectly() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
-		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle());
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		crfBuilder.save();
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(crfBuilder.getCrfBean().getId());

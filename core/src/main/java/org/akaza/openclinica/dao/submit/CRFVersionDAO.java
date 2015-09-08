@@ -415,19 +415,6 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	}
 
 	/**
-	 * Deletes a CRF version.
-	 * 
-	 * @param id
-	 *            Id of CRFVersion to delete
-	 */
-	@Deprecated
-	public void delete(int id) {
-		HashMap variables = new HashMap();
-		String sql = digester.getQuery("delete") + id;
-		this.execute(sql, variables);
-	}
-
-	/**
 	 * Generates all the delete queries for deleting a version.
 	 * 
 	 * @param versionId
@@ -436,7 +423,7 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	 *            ArrayList
 	 * @return List of deleted queries
 	 */
-	public ArrayList generateDeleteQueries(int versionId, ArrayList items) {
+	private ArrayList generateDeleteQueries(int versionId, ArrayList items) {
 		ArrayList sqls = new ArrayList();
 		String sql = digester.getQuery("deleteScdItemMetadataByVersion") + versionId + ")";
 		sqls.add(sql);
@@ -477,7 +464,8 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	}
 
 	/**
-	 * Deletes crf version. Use the DeleteCrfService.deleteCrfVersion()!
+	 * Deletes crf version. Note: it will be better to use the DeleteCrfService.deleteCrfVersion(int crfVersionId)
+	 * instead of this method, cuz service has additional logic.
 	 * 
 	 * @param crfVersionBean
 	 *            CRFVersionBean

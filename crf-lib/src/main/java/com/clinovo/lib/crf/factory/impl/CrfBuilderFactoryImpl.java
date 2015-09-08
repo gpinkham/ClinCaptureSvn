@@ -16,7 +16,6 @@
 package com.clinovo.lib.crf.factory.impl;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
@@ -25,6 +24,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.lib.crf.builder.CrfBuilder;
@@ -53,17 +53,16 @@ public class CrfBuilderFactoryImpl implements CrfBuilderFactory {
 	 * {@inheritDoc}
 	 */
 	public CrfBuilder getCrfBuilder(Workbook workbook, StudyBean studyBean, UserAccountBean owner, Locale locale,
-			ResourceBundle pageMessagesResourceBundle) throws Exception {
-		return new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, locale, pageMessagesResourceBundle,
-				spreadSheetService);
+			MessageSource messageSource) throws Exception {
+		return new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, locale, messageSource, spreadSheetService);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public CrfBuilder getCrfBuilder(String jsonData, StudyBean studyBean, UserAccountBean owner, Locale locale,
-			ResourceBundle pageMessagesResourceBundle) throws Exception {
-		return new JsonCrfBuilder(new JSONObject(jsonData), owner, studyBean, dataSource, locale,
-				pageMessagesResourceBundle, formStudioService);
+			MessageSource messageSource) throws Exception {
+		return new JsonCrfBuilder(new JSONObject(jsonData), owner, studyBean, dataSource, locale, messageSource,
+				formStudioService);
 	}
 }

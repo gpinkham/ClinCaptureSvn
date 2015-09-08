@@ -24,8 +24,11 @@ public interface ErrorMessageProducer {
 
 	/**
 	 * Generate error message if crf version is blank.
+	 *
+	 * @throws CRFReadingException
+	 *             the CRFReadingException
 	 */
-	void crfVersionIsBlank();
+	void crfVersionIsBlank() throws CRFReadingException;
 
 	/**
 	 * Generate error message if crf version length is exceeded.
@@ -72,8 +75,19 @@ public interface ErrorMessageProducer {
 
 	/**
 	 * Generate error message if crf name has already been used.
+	 * 
+	 * @throws CRFReadingException
+	 *             the CRFReadingException
 	 */
-	void crfNameHasAlreadyBeenUsed();
+	void crfNameHasAlreadyBeenUsed() throws CRFReadingException;
+
+	/**
+	 * Generate error message if crf version has already been used.
+	 *
+	 * @throws CRFReadingException
+	 *             the CRFReadingException
+	 */
+	void crfVersionHasAlreadyBeenUsed() throws CRFReadingException;
 
 	/**
 	 * Generate error message if section label is blank.
@@ -251,11 +265,6 @@ public interface ErrorMessageProducer {
 	void responseLabelIsBlank();
 
 	/**
-	 * Generate error message if response label should be file.
-	 */
-	void responseLabelShouldBeFile();
-
-	/**
 	 * Generate error message if response options text is blank.
 	 */
 	void responseOptionsTextIsBlank();
@@ -286,9 +295,9 @@ public interface ErrorMessageProducer {
 	void itemHasDifferentValuesForOptionsValues();
 
 	/**
-	 * Generate error message if expression starts with func.
+	 * Generate error message if expression does not start with func.
 	 */
-	void expressionStartsWithFunc();
+	void expressionDoesNotStartWithFunc();
 
 	/**
 	 * Generate error message if expression is not valid.
@@ -434,4 +443,14 @@ public interface ErrorMessageProducer {
 	 * Generate error message if response label has been used for another ResponseType.
 	 */
 	void responseLabelHasBeenUsedForAnotherResponseType();
+
+	/**
+	 * Generate error message if an item of one group belongs to more than one section.
+	 */
+	void itemOfOneGroupBelongsToMoreThanOneSection();
+
+	/**
+	 * Generate error message if there is a not unique item placement in groups.
+	 */
+	void notUniqueItemPlacementInGroups();
 }

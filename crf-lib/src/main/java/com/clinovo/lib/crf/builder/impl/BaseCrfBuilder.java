@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,9 +37,9 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.admin.SpreadSheetItemUtil;
 import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidator;
 import org.akaza.openclinica.control.form.spreadsheet.SheetValidationContainer;
+import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -48,9 +47,10 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.apache.poi.ss.usermodel.Cell;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.bean.ItemBeanExt;
 import com.clinovo.lib.crf.builder.CrfBuilder;
@@ -66,7 +66,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(BaseCrfBuilder.class);
 
-	public static final int INT_5 = 5;
 	public static final int INT_1000 = 1000;
 
 	public static final String UNGROUPED = "Ungrouped";
@@ -95,7 +94,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	private List<ItemGroupBean> itemGroups = new ArrayList<ItemGroupBean>();
 
 	// current beans
-	private String currentVariable;
 	private ItemBeanExt currentItem;
 	private String currentHeader = "";
 	private SectionBean currentSection;
@@ -116,11 +114,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	private Map<String, ItemFormMetadataBean> itemNameToMetaMap = new HashMap<String, ItemFormMetadataBean>();
 	private Map<String, ItemGroupMetadataBean> itemGroupLabelToMetaMap = new HashMap<String, ItemGroupMetadataBean>();
 
-	// resource bundles
-	private ResourceBundle pageMessagesResourceBundle;
+	// message source
+	private MessageSource messageSource;
 
 	// validation assistants
-	private List refItemNames = new ArrayList();
 	private SheetValidationContainer sheetContainer;
 	private OnChangeSheetValidator instantValidator;
 	private List<String> resPairs = new ArrayList<String>();
@@ -130,11 +127,12 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	private List<String> sectionNames = new ArrayList<String>();
 	private Map<String, String> labelWithType = new HashMap<String, String>();
 	private Map<String, String> optionsTextMap = new HashMap<String, String>();
+	private Map<String, String> groupSectionMap = new HashMap<String, String>();
 	private Map<String, String> optionsValuesMap = new HashMap<String, String>();
 	private Map<String, String[]> controlValues = new HashMap<String, String[]>();
 	private Map<String, String[]> labelWithOptionsText = new HashMap<String, String[]>();
 	private Map<String, String[]> labelWithOptionsValues = new HashMap<String, String[]>();
-	private List<SpreadSheetItemUtil> spreadSheetItems = new ArrayList<SpreadSheetItemUtil>();
+	private List<ItemGroupCrvVersionUtil> itemGroupCrfRecords = new ArrayList<ItemGroupCrvVersionUtil>();
 
 	// error
 	private Map<String, String> errorsMap = new HashMap<String, String>();
@@ -151,22 +149,22 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	 *            DataSource
 	 * @param locale
 	 *            Locale
-	 * @param pageMessagesResourceBundle
-	 *            ResourceBundle
+	 * @param messageSource
+	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
 	 */
 	public BaseCrfBuilder(UserAccountBean owner, StudyBean studyBean, DataSource dataSource, Locale locale,
-			ResourceBundle pageMessagesResourceBundle, ImportCrfService importCrfService) {
+			MessageSource messageSource, ImportCrfService importCrfService) {
 		this.owner = owner;
 		this.locale = locale;
 		groupNames.add(UNGROUPED);
 		this.studyBean = studyBean;
 		this.dataSource = dataSource;
+		this.messageSource = messageSource;
 		this.importCrfService = importCrfService;
 		sheetContainer = new SheetValidationContainer();
-		this.pageMessagesResourceBundle = pageMessagesResourceBundle;
-		instantValidator = new OnChangeSheetValidator(sheetContainer, pageMessagesResourceBundle);
+		instantValidator = new OnChangeSheetValidator(sheetContainer, ResourceBundleProvider.getPageMessagesBundle());
 	}
 
 	/**
@@ -270,14 +268,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public void setCurrentSection(SectionBean section) {
 		this.currentSection = section;
-	}
-
-	public String getCurrentVariable() {
-		return currentVariable;
-	}
-
-	public void setCurrentVariable(String currentVariable) {
-		this.currentVariable = currentVariable;
 	}
 
 	public ItemBeanExt getCurrentItem() {
@@ -394,20 +384,44 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		return itemNames;
 	}
 
-	public ResourceBundle getPageMessagesResourceBundle() {
-		return pageMessagesResourceBundle;
+	public MessageSource getMessageSource() {
+		return messageSource;
 	}
 
-	public OperationType getOperationType() {
-		return operationType;
+	/**
+	 * Returns message.
+	 * 
+	 * @param code
+	 *            String
+	 * @return String
+	 */
+	public String getMessage(String code) {
+		return getMessage(code, null);
+	}
+
+	/**
+	 * Returns message.
+	 * 
+	 * @param code
+	 *            String
+	 * @param args
+	 *            Object[]
+	 * @return String
+	 */
+	public String getMessage(String code, Object[] args) {
+		return messageSource.getMessage(code, args, locale);
 	}
 
 	public void setOperationType(OperationType operationType) {
 		this.operationType = operationType;
 	}
 
-	public List getRefItemNames() {
-		return refItemNames;
+	public Map<String, String> getGroupSectionMap() {
+		return groupSectionMap;
+	}
+
+	public List<ItemGroupCrvVersionUtil> getItemGroupCrfRecords() {
+		return itemGroupCrfRecords;
 	}
 
 	public Map<String, String[]> getLabelWithOptionsValues() {
@@ -426,25 +440,12 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		return controlValues;
 	}
 
-	public List<SpreadSheetItemUtil> getSpreadSheetItems() {
-		return spreadSheetItems;
-	}
-
 	public Map<String, String> getOptionsTextMap() {
 		return optionsTextMap;
 	}
 
 	public Map<String, String> getOptionsValuesMap() {
 		return optionsValuesMap;
-	}
-
-	/**
-	 * Returns last SpreadSheetItemUtil.
-	 * 
-	 * @return SpreadSheetItemUtil
-	 */
-	public SpreadSheetItemUtil getLastSpreadSheetItem() {
-		return spreadSheetItems.get(spreadSheetItems.size() - 1);
 	}
 
 	public List<String> getResPairs() {
@@ -469,50 +470,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public void setCurrentScoreValidatorErrorsBuffer(StringBuffer currentScoreValidatorErrorsBuffer) {
 		this.currentScoreValidatorErrorsBuffer = currentScoreValidatorErrorsBuffer;
-	}
-
-	/**
-	 * Returns cell value.
-	 * 
-	 * @param cell
-	 *            Cell
-	 * @return String
-	 */
-	public String getValue(Cell cell) {
-		String val;
-		int cellType;
-		if (cell == null) {
-			cellType = Cell.CELL_TYPE_BLANK;
-		} else {
-			cellType = cell.getCellType();
-		}
-
-		switch (cellType) {
-			case Cell.CELL_TYPE_BLANK :
-				val = "";
-				break;
-			case Cell.CELL_TYPE_NUMERIC :
-				val = cell.getNumericCellValue() + "";
-				double dphi = cell.getNumericCellValue();
-				if ((dphi - (int) dphi) * INT_1000 == 0) {
-					val = (int) dphi + "";
-				}
-				break;
-			case Cell.CELL_TYPE_STRING :
-				val = cell.getStringCellValue();
-				break;
-			case Cell.CELL_TYPE_BOOLEAN :
-				boolean val2 = cell.getBooleanCellValue();
-				if (val2) {
-					val = "true";
-				} else {
-					val = "false";
-				}
-				break;
-			default :
-				val = "";
-		}
-		return val.trim();
 	}
 
 	/**
@@ -550,10 +507,33 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	public abstract ErrorMessageProducer getErrorMessageProducer();
 
 	/**
+	 * Prepares itemGroupCrfRecords collection.
+	 */
+	public void prepareItemGroupCrfRecords() {
+		// all items with group / version info from db
+		itemGroupCrfRecords = new ItemDAO(dataSource)
+				.findAllWithItemGroupCRFVersionMetadataByCRFId(getCrfBean().getName());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public OperationType getOperationType() {
+		return operationType;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void build() throws Exception {
 		importCrfService.importNewCrf(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void build(int crfId) throws Exception {
+		importCrfService.importNewCrfVersion(this, crfId);
 	}
 
 	private Map<String, ItemGroupBean> existingGroupsMap(ItemGroupDAO itemGroupDao) {

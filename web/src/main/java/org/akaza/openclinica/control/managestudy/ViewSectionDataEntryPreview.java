@@ -57,11 +57,10 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.util.SpreadsheetPreviewUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import com.clinovo.lib.crf.util.SpreadsheetPreviewUtil;
 
 /**
  * Preview a CRF version section data entry. This class is based almost entirely on ViewSectionDataEntryServlet except
@@ -97,9 +96,8 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+				+ respage.getString("change_active_study_or_contact"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
 	}
@@ -443,11 +441,13 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
 			dib = validateDisplayItemBeanText(v, dib, inputName, request);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+		} else
+			if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
+					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
 			dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+		} else
+				if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
+						|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 			dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
 		}
 
@@ -455,9 +455,9 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 	}
 
 	@Override
-	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v,
-			DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups,
-			HttpServletRequest request, HttpServletResponse response) {
+	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb,
+			List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		return formGroups;
 

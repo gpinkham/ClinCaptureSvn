@@ -18,12 +18,11 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.akaza.openclinica.util.SpreadsheetPreviewUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-
-import com.clinovo.lib.crf.util.SpreadsheetPreviewUtil;
 
 /**
  * SpreadsheetPreview.
@@ -78,8 +77,8 @@ public final class SpreadsheetPreview implements Preview {
 		if (workbook == null || workbook.getNumberOfSheets() == 0) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
-		if (itemsOrSection == null || !itemsOrSection.equalsIgnoreCase(ITEMS)
-				&& !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
+		if (itemsOrSection == null
+				|| !itemsOrSection.equalsIgnoreCase(ITEMS) && !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
 		Sheet sheet;
@@ -202,7 +201,7 @@ public final class SpreadsheetPreview implements Preview {
 	}
 
 	/*
-
+	
 	 */
 
 	/**

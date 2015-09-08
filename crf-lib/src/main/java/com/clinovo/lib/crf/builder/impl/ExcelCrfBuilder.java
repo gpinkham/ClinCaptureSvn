@@ -17,7 +17,6 @@ package com.clinovo.lib.crf.builder.impl;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
@@ -26,11 +25,14 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.admin.Preview;
 import org.akaza.openclinica.control.admin.SpreadsheetPreview;
 import org.akaza.openclinica.control.admin.SpreadsheetPreviewNw;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.enums.CellName;
+import com.clinovo.lib.crf.enums.SheetName;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.producer.impl.ExcelErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
@@ -47,7 +49,6 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	private int index;
 	private int numRows;
 	private Workbook workbook;
-	private int blankRowCount;
 	private Sheet currentSheet;
 	private int currentSheetNumber;
 	private String currentSheetName;
@@ -71,21 +72,19 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 *            DataSource
 	 * @param locale
 	 *            Locale
-	 * @param pageMessagesResourceBundle
-	 *            ResourceBundle
+	 * @param messageSource
+	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
 	 */
 	public ExcelCrfBuilder(Workbook workbook, UserAccountBean owner, StudyBean studyBean, DataSource dataSource,
-			Locale locale, ResourceBundle pageMessagesResourceBundle, ImportCrfService importCrfService) {
-		super(owner, studyBean, dataSource, locale, pageMessagesResourceBundle, importCrfService);
+			Locale locale, MessageSource messageSource, ImportCrfService importCrfService) {
+		super(owner, studyBean, dataSource, locale, messageSource, importCrfService);
 		this.workbook = workbook;
-		hasWidthDecimalColumn = getValue(
-				workbook.getSheetAt(3).getRow(0).getCell(CellName.ITEM_WIDTH_DECIMAL.getColumnNumber()))
-						.equalsIgnoreCase(WIDTH_DECIMAL);
-		hasGroupLayoutColumn = getValue(
-				workbook.getSheetAt(2).getRow(0).getCell(CellName.GROUP_LAYOUT.getColumnNumber()))
-						.equalsIgnoreCase(GROUP_LAYOUT);
+		hasWidthDecimalColumn = getValue(workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(0)
+				.getCell(CellName.ITEM_WIDTH_DECIMAL.getColumnNumber())).equalsIgnoreCase(WIDTH_DECIMAL);
+		hasGroupLayoutColumn = getValue(workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(0)
+				.getCell(CellName.GROUP_LAYOUT.getColumnNumber())).equalsIgnoreCase(GROUP_LAYOUT);
 
 	}
 
@@ -128,6 +127,50 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	}
 
 	/**
+	 * Returns cell value.
+	 *
+	 * @param cell
+	 *            Cell
+	 * @return String
+	 */
+	public String getValue(Cell cell) {
+		String val;
+		int cellType;
+		if (cell == null) {
+			cellType = Cell.CELL_TYPE_BLANK;
+		} else {
+			cellType = cell.getCellType();
+		}
+
+		switch (cellType) {
+			case Cell.CELL_TYPE_BLANK :
+				val = "";
+				break;
+			case Cell.CELL_TYPE_NUMERIC :
+				val = cell.getNumericCellValue() + "";
+				double dphi = cell.getNumericCellValue();
+				if ((dphi - (int) dphi) * INT_1000 == 0) {
+					val = (int) dphi + "";
+				}
+				break;
+			case Cell.CELL_TYPE_STRING :
+				val = cell.getStringCellValue();
+				break;
+			case Cell.CELL_TYPE_BOOLEAN :
+				boolean val2 = cell.getBooleanCellValue();
+				if (val2) {
+					val = "true";
+				} else {
+					val = "false";
+				}
+				break;
+			default :
+				val = "";
+		}
+		return val.trim();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public Map<String, Map> createCrfMetaObject() {
@@ -149,14 +192,48 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 		boolean result = false;
 		if (i < numRows) {
 			row = currentSheet.getRow(i++);
-			if (row == null || getValue(row.getCell(0)).isEmpty()) {
-				blankRowCount++;
-				if (blankRowCount < INT_5) {
-					result = hasNextRow();
-				}
+			if (isEmptyRow(row)) {
+				result = false;
 			} else {
 				index++;
 				result = true;
+			}
+		}
+		return result;
+	}
+
+	private boolean isEmptyRow(Row row) {
+		boolean result = row == null;
+		if (!result) {
+			result = true;
+			if (currentSheetNumber == SheetName.CRF.getSheetNumber()) {
+				for (int i = 0; i <= CellName.CRF_REVISION_NOTES.getColumnNumber() - 1; i++) {
+					if (!getValue(row.getCell(i)).isEmpty()) {
+						result = false;
+						break;
+					}
+				}
+			} else if (currentSheetNumber == SheetName.SECTIONS.getSheetNumber()) {
+				for (int i = 0; i <= CellName.SECTION_BORDERS.getColumnNumber() - 1; i++) {
+					if (!getValue(row.getCell(i)).isEmpty()) {
+						result = false;
+						break;
+					}
+				}
+			} else if (currentSheetNumber == SheetName.GROUPS.getSheetNumber()) {
+				for (int i = 0; i <= CellName.GROUP_DISPLAY_STATUS.getColumnNumber() - 1; i++) {
+					if (!getValue(row.getCell(i)).isEmpty()) {
+						result = false;
+						break;
+					}
+				}
+			} else if (currentSheetNumber == SheetName.ITEMS.getSheetNumber()) {
+				for (int i = 0; i <= CellName.ITEM_CODE_REF.getColumnNumber() - 1; i++) {
+					if (!getValue(row.getCell(i)).isEmpty()) {
+						result = false;
+						break;
+					}
+				}
 			}
 		}
 		return result;
@@ -183,24 +260,12 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 * @return String
 	 */
 	public String getCellValue(CellName cellKey, boolean replaceSpecialSymbols) {
-		int offset = 0;
-		if (currentSheetNumber == 2) {
-			offset = hasGroupLayoutColumn
-					? 0
-					: (cellKey.getColumnNumber() >= CellName.GROUP_LAYOUT.getColumnNumber()
-							&& cellKey != CellName.GROUP_LAYOUT ? -1 : 0);
-		} else if (currentSheetNumber == 3) {
-			offset = hasWidthDecimalColumn
-					? 0
-					: (cellKey.getColumnNumber() >= CellName.ITEM_WIDTH_DECIMAL.getColumnNumber()
-							&& cellKey != CellName.ITEM_WIDTH_DECIMAL ? -1 : 0);
-		}
-		String value = getValue(row.getCell(cellKey.getColumnNumber() + offset));
+		String value = getValue(row.getCell(getColumnNumber(cellKey)));
 		return replaceSpecialSymbols ? value.replaceAll("<[^>]*>", "") : value;
 	}
 
 	/**
-	 * Returns column number.
+	 * Returns the correct column number of cell.
 	 *
 	 * @param cellKey
 	 *            CellKey
@@ -208,12 +273,12 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 */
 	public int getColumnNumber(CellName cellKey) {
 		int offset = 0;
-		if (currentSheetNumber == 2) {
+		if (CellName.GROUPS_SHEET_CELL_NAMES.contains(cellKey)) {
 			offset = hasGroupLayoutColumn
 					? 0
 					: (cellKey.getColumnNumber() >= CellName.GROUP_LAYOUT.getColumnNumber()
 							&& cellKey != CellName.GROUP_LAYOUT ? -1 : 0);
-		} else if (currentSheetNumber == 3) {
+		} else if (CellName.ITEMS_SHEET_CELL_NAMES.contains(cellKey)) {
 			offset = hasWidthDecimalColumn
 					? 0
 					: (cellKey.getColumnNumber() >= CellName.ITEM_WIDTH_DECIMAL.getColumnNumber()
@@ -224,6 +289,10 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 
 	public Row getRow() {
 		return row;
+	}
+
+	public int getIndex() {
+		return index - 1;
 	}
 
 	public int getNumRows() {
@@ -248,9 +317,5 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 
 	public String getCurrentSheetName() {
 		return currentSheetName;
-	}
-
-	public int getIndex() {
-		return index - 1;
 	}
 }

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
@@ -23,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.service.ImportCrfService;
 
@@ -49,7 +49,7 @@ public class ExcelCrfBuilderTest {
 	@Mock
 	private ImportCrfService importCrfService;
 	@Mock
-	private ResourceBundle pageMessagesResourceBundle;
+	private MessageSource messageSource;
 
 	@Before
 	public void before() {
@@ -57,8 +57,8 @@ public class ExcelCrfBuilderTest {
 		Mockito.when(workbook.getSheetAt(Mockito.anyInt())).thenReturn(sheet);
 		Mockito.when(row.getCell(Mockito.anyInt())).thenReturn(cell);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
-		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH,
-				ResourceBundleProvider.getPageMessagesBundle(), importCrfService);
+		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH, messageSource,
+				importCrfService);
 	}
 
 	@Test

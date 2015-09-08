@@ -20,14 +20,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.akaza.openclinica.bean.core.ApplicationConstants;
+import org.akaza.openclinica.util.SpreadsheetPreviewUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.clinovo.lib.crf.util.SpreadsheetPreviewUtil;
 
 /**
  * SpreadsheetPreviewNw.
@@ -101,8 +100,8 @@ public final class SpreadsheetPreviewNw implements Preview {
 		if (workbook == null || workbook.getNumberOfSheets() == 0) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
-		if (itemsOrSection == null || !itemsOrSection.equalsIgnoreCase(ITEMS)
-				&& !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
+		if (itemsOrSection == null
+				|| !itemsOrSection.equalsIgnoreCase(ITEMS) && !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
 		Sheet sheet;
@@ -156,7 +155,8 @@ public final class SpreadsheetPreviewNw implements Preview {
 								continue;
 							} catch (Exception e) {
 								String cellVal = getCellValue(cell);
-								logger.info("An invalid date format was encountered when reading a default value in the spreadsheet.");
+								logger.info(
+										"An invalid date format was encountered when reading a default value in the spreadsheet.");
 								rowCells.put(headers[k], cellVal);
 								continue;
 							}

@@ -16,13 +16,13 @@
 package com.clinovo.lib.crf.builder.impl;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.json.JSONObject;
+import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.producer.impl.JsonErrorMessageProducer;
@@ -52,14 +52,14 @@ public class JsonCrfBuilder extends BaseCrfBuilder {
 	 *            DataSource
 	 * @param locale
 	 *            Locale
-	 * @param pageMessagesResourceBundle
-	 *            ResourceBundle
+	 * @param messageSource
+	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
 	 */
 	public JsonCrfBuilder(JSONObject jsonObject, UserAccountBean owner, StudyBean studyBean, DataSource dataSource,
-			Locale locale, ResourceBundle pageMessagesResourceBundle, ImportCrfService importCrfService) {
-		super(owner, studyBean, dataSource, locale, pageMessagesResourceBundle, importCrfService);
+			Locale locale, MessageSource messageSource, ImportCrfService importCrfService) {
+		super(owner, studyBean, dataSource, locale, messageSource, importCrfService);
 		this.jsonObject = jsonObject;
 	}
 

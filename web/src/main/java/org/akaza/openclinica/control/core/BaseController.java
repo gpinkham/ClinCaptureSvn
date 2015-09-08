@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-import com.clinovo.lib.crf.factory.CrfBuilderFactory;
-import com.clinovo.service.DeleteCrfService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -71,16 +69,19 @@ import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.quartz.impl.StdScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DatasetService;
 import com.clinovo.service.DcfService;
+import com.clinovo.service.DeleteCrfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.EventCRFService;
@@ -269,10 +270,14 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private CrfBuilderFactory crfBuilderFactory;
 	@Autowired
 	private DeleteCrfService deleteCrfService;
+	@Autowired
+	private MessageSource messageSource;
 
 	/**
 	 * Allow access to this for other users.
-	 * @param userId int
+	 * 
+	 * @param userId
+	 *            int
 	 */
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(UNAVAILABLE_CRF_LIST);
@@ -286,8 +291,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Prevent the case when other users can open same CRF for data entry.
-	 * @param ecb EventCRFBean ID
-	 * @param ub UserAccountBean ID
+	 * 
+	 * @param ecb
+	 *            EventCRFBean ID
+	 * @param ub
+	 *            UserAccountBean ID
 	 */
 	public static synchronized void lockThisEventCRF(int ecb, int ub) {
 		UNAVAILABLE_CRF_LIST.put(ecb, ub);
@@ -295,7 +303,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Unlock EventCRF.
-	 * @param ecb EventCRFBean ID
+	 * 
+	 * @param ecb
+	 *            EventCRFBean ID
 	 */
 	public static synchronized void justRemoveLockedCRF(int ecb) {
 		UNAVAILABLE_CRF_LIST.remove(ecb);
@@ -343,7 +353,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get SessionManager from request.
-	 * @param request HttpServletRequest request
+	 * 
+	 * @param request
+	 *            HttpServletRequest request
 	 * @return SessionManager
 	 */
 	public SessionManager getSessionManager(HttpServletRequest request) {
@@ -352,7 +364,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get errors holder.
-	 * @param request HttpServletRequest
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 * @return HashMap
 	 */
 	public HashMap getErrorsHolder(HttpServletRequest request) {
@@ -366,7 +380,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get studyInfoPanel.
-	 * @param request HttpServletRequest
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 * @return StudyInfoPanel
 	 */
 	public StudyInfoPanel getStudyInfoPanel(HttpServletRequest request) {
@@ -381,7 +397,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get current study.
-	 * @param request HttpServletRequest
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 * @return StudyBean
 	 */
 	public StudyBean getCurrentStudy(HttpServletRequest request) {
@@ -390,6 +408,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get current study from RequestUtil.
+	 * 
 	 * @return StudyBean
 	 */
 	public StudyBean getCurrentStudy() {
@@ -398,7 +417,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get parent study.
-	 * @param request HttpServletRequest
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 * @return StudyBean
 	 */
 	public StudyBean getParentStudy(HttpServletRequest request) {
@@ -411,7 +432,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get UserAccountBean.
-	 * @param request HttpServletRequest
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 * @return UserAccountBean
 	 */
 	public UserAccountBean getUserAccountBean(HttpServletRequest request) {
@@ -424,7 +447,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get current role.
-	 * @param request HttpServletRequest
+	 * 
+	 * @param request
+	 *            HttpServletRequest
 	 * @return StudyUserRoleBean
 	 */
 	public StudyUserRoleBean getCurrentRole(HttpServletRequest request) {
@@ -685,19 +710,27 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Get CRF shortcuts analyzer.
-	 * @param request HttpServletRequest
-	 * @param itemSDVService ItemSDVService
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param itemSDVService
+	 *            ItemSDVService
 	 * @return CrfShortcutsAnalyzer
 	 */
-	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request, ItemSDVService itemSDVService) {
+	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request,
+			ItemSDVService itemSDVService) {
 		return getCrfShortcutsAnalyzer(request, itemSDVService, false);
 	}
 
 	/**
 	 * Get CRF shortcuts analyzer with recreate flag.
-	 * @param request HttpServletRequest
-	 * @param itemSDVService ItemSDVService
-	 * @param recreate boolean
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param itemSDVService
+	 *            ItemSDVService
+	 * @param recreate
+	 *            boolean
 	 * @return CrfShortcutsAnalyzer
 	 */
 	public static CrfShortcutsAnalyzer getCrfShortcutsAnalyzer(HttpServletRequest request,
@@ -718,8 +751,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 					: fp.getString(CrfShortcutsAnalyzer.SERVLET_PATH));
 
 			crfShortcutsAnalyzer = new CrfShortcutsAnalyzer(request.getScheme(), request.getMethod(),
-					request.getRequestURI(), request.getServletPath(), (String) request.getSession().getAttribute(
-							DOMAIN_NAME), attributes, itemSDVService);
+					request.getRequestURI(), request.getServletPath(),
+					(String) request.getSession().getAttribute(DOMAIN_NAME), attributes, itemSDVService);
 
 			crfShortcutsAnalyzer.getInterviewerDisplayItemBean().setField(CrfShortcutsAnalyzer.INTERVIEWER_NAME);
 			crfShortcutsAnalyzer.getInterviewDateDisplayItemBean().setField(CrfShortcutsAnalyzer.DATE_INTERVIEWED);
@@ -747,7 +780,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Set attributes that should be restored for this user after session.destroy.
-	 * @param session HttpSession
+	 * 
+	 * @param session
+	 *            HttpSession
 	 */
 	public static void setStoredSessionAttributes(HttpSession session) {
 		UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
@@ -767,13 +802,16 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	/**
 	 * Restore session attributes for the current user.
-	 * @param session HttpSession
-	 * @param userName String
+	 * 
+	 * @param session
+	 *            HttpSession
+	 * @param userName
+	 *            String
 	 */
 	public static void restoreSavedSessionAttributes(HttpSession session, String userName) {
 		HashMap<String, Object> storedAttributes = getStoredSessionAttributes().get(userName);
 
-		if  (storedAttributes == null || storedAttributes.size() == 0) {
+		if (storedAttributes == null || storedAttributes.size() == 0) {
 			return;
 		}
 		for (String key : storedAttributes.keySet()) {
@@ -788,5 +826,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public DeleteCrfService getDeleteCrfService() {
 		return deleteCrfService;
+	}
+
+	public MessageSource getMessageSource() {
+		return messageSource;
 	}
 }

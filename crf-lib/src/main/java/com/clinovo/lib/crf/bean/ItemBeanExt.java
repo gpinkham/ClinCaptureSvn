@@ -55,6 +55,13 @@ public class ItemBeanExt extends ItemBean {
 	}
 
 	/**
+	 * Default constructor.
+	 */
+	public ItemBeanExt(ItemBean itemBean) {
+		itemBean.cloneTo(this);
+	}
+
+	/**
 	 * Constructor.
 	 *
 	 * @param crfBuilder

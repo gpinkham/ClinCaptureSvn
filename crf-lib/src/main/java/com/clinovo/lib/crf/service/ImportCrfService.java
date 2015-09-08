@@ -59,12 +59,14 @@ public interface ImportCrfService {
 	String SUB_TITLE = "subTitle";
 	String LEFT_TEXT = "leftText";
 	String ITEM_NAME = "itemName";
+	String RAND_DATE = "Rand_Date";
 	String QUESTIONS = "questions";
 	String NUMBERING = "numbering";
 	String UNGROUPED = "Ungrouped";
 	String RESIZABLE = "resizable";
 	String RIGHT_TEXT = "rightText";
 	String NUMBER_TYPE = "numberType";
+	String RAND_RESULT = "Rand_Result";
 	String CALCULATION = "calculation";
 	String DESCRIPTION = "description";
 	String PARTIAL_DATE = "partialDate";
@@ -74,19 +76,25 @@ public interface ImportCrfService {
 	String DEFAULT_VALUE = "defaultValue";
 	String COLUMN_NUMBER = "columnNumber";
 	String DISPLAY_STATE = "displayState";
+	String RANDOMIZATION = "Randomization";
 	String WIDTH_DECIMAL = "width_decimal";
 	String RESPONSE_LABEL = "responseLabel";
 	String REPEATING_GROUP = "repeatingGroup";
+	String STRATA_VARIABLE = "Strata Variable";
 	String FIELD_VALIDATION = "fieldValidation";
 	String CALCULATION_TYPE = "calculationType";
+	String RAND_STRATA_DATA = "Rand_StrataData";
 	String GROUP_CALCULATION = "groupCalculation";
 	String VALIDATION_MESSAGE = "validationMessage";
+	String STRATIFICATION_DATA = "Stratification Data";
+	String RANDOMIZATION_RESULT = "Randomization Result";
 	String REPEATING_GROUP_HEADER = "repeatingGroupHeader";
+	String DATE_OF_RANDOMIZATION = "Date of Randomization";
 	String REPEATING_ITEM_GROUP_HEADER = "repeatingItemGroupHeader";
 	String AUTO_CHANGED_CELL = "<br/><span style='color: silver;'>(auto-change)</span>";
 
 	/**
-	 * Imports crf.
+	 * Imports new crf.
 	 * 
 	 * @param crfBuilder
 	 *            BaseCrfBuilder
@@ -94,4 +102,16 @@ public interface ImportCrfService {
 	 *             an Exception
 	 */
 	void importNewCrf(BaseCrfBuilder crfBuilder) throws Exception;
+
+	/**
+	 * Imports new crf version.
+	 *
+	 * @param crfBuilder
+	 *            BaseCrfBuilder
+	 * @param crfId
+	 *            int
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void importNewCrfVersion(BaseCrfBuilder crfBuilder, int crfId) throws Exception;
 }
