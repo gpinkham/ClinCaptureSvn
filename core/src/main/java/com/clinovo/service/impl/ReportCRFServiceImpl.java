@@ -188,7 +188,7 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
 		// Get the section beans from dataEntryService
 		sectionBeans = dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study,
-				Page.VIEW_SECTION_DATA_ENTRY_SERVLET, dynamicsMetadataService);
+				Page.VIEW_SECTION_DATA_ENTRY_SERVLET);
 		String titleText = cb.getName() + " " + crfVerBean.getName();
 		String reportFilePath = dataPath + (titleText + " " + ssubj.getLabel()).replaceAll("( |/|\\\\)", "_");
         Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer = getSectionRepeatingGroupItemData(crfVerBean, ecb, dynamicsMetadataService);

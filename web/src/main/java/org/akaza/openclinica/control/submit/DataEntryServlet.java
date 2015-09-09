@@ -297,7 +297,7 @@ public abstract class DataEntryServlet extends Controller {
 			boolean isSubmitted, List<DiscrepancyNoteBean> allNotes) {
 		try {
 			if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
-				request.setAttribute("section", getDisplayBean(hasGroup, false, request, isSubmitted).getSection());
+				request.setAttribute("section", getDisplayBean(hasGroup, request, isSubmitted).getSection());
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				if (fdn != null) {
@@ -529,7 +529,7 @@ public abstract class DataEntryServlet extends Controller {
 			phase2 = Phase.ADMIN_EDITING;
 		}
 
-		DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
+		DisplaySectionBean section = getDisplayBean(hasGroup, request, isSubmitted);
 		if (section.getSection().hasSCDItem()) {
 			SimpleConditionalDisplayService cds0 = (SimpleConditionalDisplayService) SpringServletAccess
 					.getApplicationContext(getServletContext()).getBean("simpleConditionalDisplayService");
@@ -3331,15 +3331,9 @@ public abstract class DataEntryServlet extends Controller {
 	 * @param isSubmitted
 	 *            TODO
 	 */
-	protected DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems,
-			HttpServletRequest request, boolean isSubmitted) throws Exception {
-		FormProcessor fp = new FormProcessor(request);
-		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
-
-		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
-				getServletPage(request), study, ecb, sb, getDynamicsMetadataService());
+	protected DisplaySectionBean getDisplayBean(boolean hasGroup, HttpServletRequest request, boolean isSubmitted) throws Exception {
+		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, isSubmitted,
+				getServletPage(request), request);
 	}
 
 	/**
@@ -3355,7 +3349,7 @@ public abstract class DataEntryServlet extends Controller {
 		ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>) request.getAttribute(ALL_SECTION_BEANS);
 
 		return getDataEntryService(getServletContext()).getAllDisplayBeans(allSectionBeans, ecb, study,
-				getServletPage(request), getDynamicsMetadataService());
+				getServletPage(request));
 	}
 
 	/**

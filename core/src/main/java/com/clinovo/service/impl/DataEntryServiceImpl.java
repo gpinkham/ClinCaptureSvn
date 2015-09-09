@@ -17,9 +17,9 @@ package com.clinovo.service.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -52,18 +52,20 @@ import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.service.DataEntryService;
 
+/**
+ * Data Entry service.
+ */
 @Service("dataEntryService")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DataEntryServiceImpl implements DataEntryService {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	public static final String INPUT_EVENT_CRF = "event";
+	public static final String SECTION_BEAN = "section_bean";
 
 	@Autowired
 	private DataSource dataSource;
@@ -72,95 +74,52 @@ public class DataEntryServiceImpl implements DataEntryService {
 	@Autowired
 	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 
-	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, boolean isSubmitted,
-			Page servletPage, StudyBean study, EventCRFBean ecb, SectionBean sb,
-			DynamicsMetadataService dynamicsMetadataService) throws Exception {
+	private DynamicsMetadataService dynamicsMetadataService;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted,
+			Page servletPage, HttpServletRequest request) throws Exception {
+
 		DisplaySectionBean section = new DisplaySectionBean();
-
-		// Find out whether there are ungrouped items in this section
-		boolean hasUngroupedItems = false;
-
-		StudyDAO studydao = new StudyDAO(dataSource);
-		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
-		EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId((StudyBean) studydao
-				.findByPK(((StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId())).getStudyId()), ecb
-				.getStudyEventId(), ecb.getCRFVersionId());
-		int eventDefinitionCRFId = edcb.getId();
-
-		logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
-		// Use this class to find out whether there are ungrouped items in this
-		// section
-
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
+		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
+		EventDefinitionCRFBean edcb = getEventDefinitionCRFFromSubjectsSite(ecb);
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
+
 		if (hasGroup) {
-			DisplaySectionBean newDisplayBean = new DisplaySectionBean();
-			if (includeUngroupedItems) {
-				// Null values: this method adds null values to the
-				// displayitembeans
-				newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(),
-						dataSource, eventDefinitionCRFId, ecb, dynamicsMetadataService);
-			} else {
-				newDisplayBean = formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb,
-						ecb.getStudyEventId(), dataSource, eventDefinitionCRFId, dynamicsMetadataService);
-			}
+			DisplaySectionBean newDisplayBean;
+			newDisplayBean = formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb,
+					ecb.getStudyEventId(), dataSource, edcb.getId(), getDynamicsMetadataService());
 			itemGroups = newDisplayBean.getDisplayFormGroups();
-			logger.trace("found item group size: " + itemGroups.size() + " and to string: " + itemGroups.toString());
 			section.setDisplayFormGroups(itemGroups);
-
 		}
-
-		// Find out whether any display items are *not* grouped; see issue 1689
-		hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(dataSource, sb.getId(), itemGroups);
-
+		boolean hasUnGroupedItems = formBeanUtil.sectionHasUngroupedItems(dataSource, sb.getId(), itemGroups);
 		SectionDAO sdao = new SectionDAO(dataSource);
-		sb.setHasSCDItem(hasUngroupedItems ? sdao.hasSCDItem(sb.getId()) : false);
-
+		sb.setHasSCDItem(hasUnGroupedItems && sdao.hasSCDItem(sb.getId()));
 		section.setEventCRF(ecb);
 
 		if (sb.getParentId() > 0) {
 			SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
 			sb.setParent(parent);
 		}
-
 		section.setSection(sb);
-
-		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
-		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
+		CRFVersionBean cvb = getCRFVersionFromEventCRF(ecb);
 		section.setCrfVersion(cvb);
-
-		CRFDAO cdao = new CRFDAO(dataSource);
-		CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
+		CRFBean cb = getCrfFromCrfVersion(cvb);
 		section.setCrf(cb);
-
 		section.setEventDefinitionCRF(edcb);
-
-		// setup DAO's here to avoid creating too many objects
-		ItemDAO idao = new ItemDAO(dataSource);
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(dataSource);
-		ItemDataDAO iddao = new ItemDataDAO(dataSource);
-
-		// Use itemGroups to determine if there are any ungrouped items
-
-		// get all the parent display item beans not in group
-		logger.debug("Entering getParentDisplayItems::: Thread is? " + Thread.currentThread());
-		ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, ecb, hasUngroupedItems,
-				Page.isDDEServletPage(servletPage), dynamicsMetadataService);
-		logger.debug("Entering getParentDisplayItems::: Done and Thread is? " + Thread.currentThread());
-
-		logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
-		// now sort them by ordinal
+		ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, ecb, hasUnGroupedItems,
+				Page.isDDEServletPage(servletPage));
 		Collections.sort(displayItems);
 
-		// now get the child DisplayItemBeans
 		for (int i = 0; i < displayItems.size(); i++) {
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-			dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage, dynamicsMetadataService));
+			dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage));
 
-			// TODO use the setData command here to make sure we get a value?
-			// On Submition of the Admin Editing form the loadDBValue does not required
-			//
 			if (ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
 					|| ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
 				if (shouldLoadDBValues(dib, servletPage) && !isSubmitted) {
@@ -168,27 +127,20 @@ public class DataEntryServiceImpl implements DataEntryService {
 				}
 			} else {
 				if (shouldLoadDBValues(dib, servletPage)) {
-					logger.trace("should load db values is true, set value");
 					dib.loadDBValue();
-					logger.trace("just got data loaded: " + dib.getData().getValue());
 				}
 			}
-
 			displayItems.set(i, dib);
 		}
-
 		section.setItems(displayItems);
-
 		return section;
 	}
 
 	/**
 	 * Method that checks that DB data should be displayed.
 	 * 
-	 * @param dib
-	 *            DisplayItemBean
-	 * @param servletPage
-	 *            Page
+	 * @param dib DisplayItemBean
+	 * @param servletPage Page
 	 * @return boolean
 	 */
 	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage) {
@@ -203,121 +155,73 @@ public class DataEntryServiceImpl implements DataEntryService {
 		return true;
 	}
 
-	/**
-	 * For each single item in this section which is a parent, get a DisplayItemBean corresponding to that item. Note
-	 * that an item is a parent iff its parentId == 0.
-	 * 
-	 * @param sb
-	 *            The section whose items we are retrieving.
-	 * @param hasUngroupedItems
-	 *
-	 * 
-	 * @return An array of DisplayItemBean objects, one per parent item in the section. Note that there is no guarantee
-	 *         on the ordering of the objects.
-	 * @throws Exception
-	 */
 	private ArrayList getParentDisplayItems(boolean hasGroup, SectionBean sb, EventDefinitionCRFBean edcb,
-			ItemDAO idao, ItemFormMetadataDAO ifmdao, ItemDataDAO iddao, EventCRFBean ecb, boolean hasUngroupedItems,
-			boolean isDDEPage, DynamicsMetadataService dynamicsMetadataService) throws Exception {
+			EventCRFBean ecb, boolean hasUngroupedItems, boolean isDDEPage) throws Exception {
+
+		ItemDAO idao = new ItemDAO(dataSource);
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(dataSource);
+		ItemDataDAO iddao = new ItemDataDAO(dataSource);
 		ArrayList answer = new ArrayList();
-
-		// DisplayItemBean objects are composed of an ItemBean, ItemDataBean and
-		// ItemFormDataBean.
-		// However the DAOs only provide methods to retrieve one type of bean at
-		// a
-		// time (per section)
-		// the displayItems hashmap allows us to compose these beans into
-		// DisplayItemBean objects,
-		// while hitting the database only three times
 		HashMap displayItems = new HashMap();
-
-		ArrayList items = new ArrayList();
+		ArrayList items;
 		ArrayList itemsUngrped = new ArrayList();
 		if (hasGroup) {
 			if (hasUngroupedItems) {
 				itemsUngrped = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
 			}
 		}
-
-		logger.trace("no item groups");
 		items = idao.findAllNonRepeatingParentsBySectionId(sb.getId());
 		items.addAll(itemsUngrped);
-		// }
-		logger.debug("items size" + items.size());
-		for (int i = 0; i < items.size(); i++) {
+
+		for (Object item : items) {
 			DisplayItemBean dib = new DisplayItemBean();
 			dib.setEventDefinitionCRF(edcb);
-			ItemBean ib = (ItemBean) items.get(i);
+			ItemBean ib = (ItemBean) item;
 			dib.setItem(ib);
-			displayItems.put(new Integer(dib.getItem().getId()), dib);
+			displayItems.put(dib.getItem().getId(), dib);
 		}
-
 		ArrayList data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
-		for (int i = 0; i < data.size(); i++) {
-			ItemDataBean idb = (ItemDataBean) data.get(i);
+
+		for (Object aData : data) {
+			ItemDataBean idb = (ItemDataBean) aData;
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(idb.getItemId()));
 			if (dib != null) {
 				dib.setData(idb);
-				displayItems.put(new Integer(idb.getItemId()), dib);
+				displayItems.put(idb.getItemId(), dib);
 			}
 		}
-
 		ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
-		for (int i = 0; i < metadata.size(); i++) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
+
+		for (Object aMetadata : metadata) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) aMetadata;
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
 			if (dib != null) {
-				logger.debug("Entering thread before getting ItemMetadataService:::" + Thread.currentThread());
-				boolean showItem = dynamicsMetadataService.isShown(ifmb.getItemId(), ecb, dib.getData());
+				boolean showItem = getDynamicsMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
 				if (isDDEPage) {
-					showItem = dynamicsMetadataService.hasPassedDDE(ifmb, ecb, dib.getData());
+					showItem = getDynamicsMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
 				}
-				// is the above needed for children items too?
-				boolean passedDDE = dynamicsMetadataService.hasPassedDDE(ifmb, ecb, dib.getData());
-				if (showItem) { // we are only showing, not hiding
-					logger.debug("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item "
-							+ showItem + " passed dde " + passedDDE);
+				if (showItem) {
 					ifmb.setShowItem(true);
-				} else {
-					logger.debug("DID NOT set show item " + ifmb.getItemId() + " idb " + dib.getData().getId()
-							+ " show item " + showItem + " passed dde " + passedDDE + " value "
-							+ dib.getData().getValue());
 				}
-				DynamicsItemFormMetadataBean dynamicsMetadataBean = dynamicsMetadataService
+				DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsMetadataService()
 						.getDynamicsItemFormMetadataBean(ifmb.getItemId(), ecb, dib.getData());
 				if (dynamicsMetadataBean != null) {
 					ifmb.setShowItem(dynamicsMetadataBean.isShowItem());
 				}
 				dib.setMetadata(ifmb);
-				displayItems.put(new Integer(ifmb.getItemId()), dib);
+				displayItems.put(ifmb.getItemId(), dib);
 			}
 		}
-
-		Iterator hmIt = displayItems.keySet().iterator();
-		while (hmIt.hasNext()) {
-			Integer key = (Integer) hmIt.next();
+		for (Object o : displayItems.keySet()) {
+			Integer key = (Integer) o;
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(key);
 			answer.add(dib);
-			logger.debug("*** getting with key: " + key + " display item bean with value: " + dib.getData().getValue());
 		}
-		logger.debug("*** test of the display items: " + displayItems.toString());
-
 		return answer;
 	}
 
-	/**
-	 * Get the DisplayItemBean objects corresponding to the items which are children of the specified parent.
-	 * 
-	 * @param parent
-	 *            The item whose children are to be retrieved.
-	 * @param isDDEPage
-	 * @param shouldLoadDBValues
-	 * 
-	 * @return An array of DisplayItemBean objects corresponding to the items which are children of parent, and are
-	 *         sorted by column number (ascending), then ordinal (ascending).
-	 */
 	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb, EventCRFBean ecb,
-			Page servletPage, DynamicsMetadataService dynamicsMetadataService) {
+			Page servletPage) {
 		boolean isDDEPage = Page.isDDEServletPage(servletPage);
 		ArrayList answer = new ArrayList();
 		int parentId = parent.getItem().getId();
@@ -325,119 +229,106 @@ public class DataEntryServiceImpl implements DataEntryService {
 		ArrayList childItemBeans = idao.findAllByParentIdAndCRFVersionId(parentId, ecb.getCRFVersionId());
 		ItemDataDAO iddao = new ItemDataDAO(dataSource);
 		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(dataSource);
-		for (int i = 0; i < childItemBeans.size(); i++) {
-			ItemBean child = (ItemBean) childItemBeans.get(i);
+
+		for (Object childItemBean : childItemBeans) {
+			ItemBean child = (ItemBean) childItemBean;
 			ItemDataBean data = iddao.findByItemIdAndEventCRFId(child.getId(), ecb.getId());
 			ItemFormMetadataBean metadata = ifmdao.findByItemIdAndCRFVersionId(child.getId(), ecb.getCRFVersionId());
 
 			DisplayItemBean dib = new DisplayItemBean();
 			dib.setEventDefinitionCRF(edcb);
 			dib.setItem(child);
-			// tbh
+
 			if (!isDDEPage) {
 				dib.setData(data);
 			}
 			dib.setDbData(data);
-			boolean showItem = dynamicsMetadataService.isShown(metadata.getItemId(), ecb, data);
-			if (isDDEPage) {
-				showItem = dynamicsMetadataService.hasPassedDDE(metadata, ecb, data);
-			}
+			boolean showItem = getDynamicsMetadataService().isShown(metadata.getItemId(), ecb, data);
 
+			if (isDDEPage) {
+				showItem = getDynamicsMetadataService().hasPassedDDE(metadata, ecb, data);
+			}
 			if (showItem) {
-				logger.debug("set show item: " + metadata.getItemId() + " data " + data.getId());
 				metadata.setShowItem(true);
 			}
-
 			dib.setMetadata(metadata);
 
 			if (shouldLoadDBValues(dib, servletPage)) {
-				logger.trace("should load db values is true, set value");
 				dib.loadDBValue();
-				logger.trace("just loaded the child value: " + dib.getData().getValue());
 			}
-
 			answer.add(dib);
 		}
-
-		// this is a pretty slow and memory intensive way to sort... see if we
-		// can
-		// have the db do this instead
 		Collections.sort(answer);
-
 		return answer;
 	}
 
 	/**
-	 * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used
-	 * to controll processRequest.
-	 * 
-	 * @param request
-	 *            TODO
+	 * {@inheritDoc}
 	 */
 	public ArrayList getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb, StudyBean study,
-			Page servletPage, DynamicsMetadataService dynamicsMetadataService) throws Exception {
+			Page servletPage) throws Exception {
 		ArrayList<DisplaySectionBean> sections = new ArrayList<DisplaySectionBean>();
 		SectionDAO sdao = new SectionDAO(dataSource);
-		ItemDataDAO iddao = new ItemDataDAO(dataSource);
 
-		for (int j = 0; j < allSectionBeans.size(); j++) {
-
-			SectionBean sb = allSectionBeans.get(j);
-
+		for (SectionBean sb : allSectionBeans) {
 			DisplaySectionBean section = new DisplaySectionBean();
 			section.setEventCRF(ecb);
 
 			if (sb.getParentId() > 0) {
-				SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
-				sb.setParent(parent);
+				sb.setParent((SectionBean) sdao.findByPK(sb.getParentId()));
 			}
-
 			section.setSection(sb);
-
-			CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
-			CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
+			CRFVersionBean cvb = getCRFVersionFromEventCRF(ecb);
 			section.setCrfVersion(cvb);
-
-			CRFDAO cdao = new CRFDAO(dataSource);
-			CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
+			CRFBean cb = getCrfFromCrfVersion(cvb);
 			section.setCrf(cb);
 
 			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
 			EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
 					cvb.getId());
-
 			section.setEventDefinitionCRF(edcb);
 
-			// setup DAO's here to avoid creating too many objects
-			ItemDAO idao = new ItemDAO(dataSource);
-			ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(dataSource);
-			iddao = new ItemDataDAO(dataSource);
-
-			// get all the display item beans
-			ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, ecb, false,
-					Page.isDDEServletPage(servletPage), dynamicsMetadataService);
-
-			logger.debug("222 just ran get parent display, has group " + " FALSE has ungrouped FALSE");
-			// now sort them by ordinal
+			ArrayList displayItems = getParentDisplayItems(false, sb, edcb, ecb, false,
+					Page.isDDEServletPage(servletPage));
 			Collections.sort(displayItems);
 
-			// now get the child DisplayItemBeans
 			for (int i = 0; i < displayItems.size(); i++) {
 				DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-				dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage, dynamicsMetadataService));
-
+				dib.setChildren(getChildrenDisplayItems(dib, edcb, ecb, servletPage));
 				if (shouldLoadDBValues(dib, servletPage)) {
-					logger.trace("should load db values is true, set value");
 					dib.loadDBValue();
 				}
-
 				displayItems.set(i, dib);
 			}
-
 			section.setItems(displayItems);
 			sections.add(section);
 		}
-
 		return sections;
+	}
+
+	private DynamicsMetadataService getDynamicsMetadataService() {
+		if (dynamicsMetadataService == null) {
+			dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao, dynamicsItemGroupMetadataDao, dataSource);
+		}
+		return dynamicsMetadataService;
+	}
+
+	private EventDefinitionCRFBean getEventDefinitionCRFFromSubjectsSite(EventCRFBean eventCRFBean) {
+		StudyDAO studydao = new StudyDAO(dataSource);
+		StudySubjectDAO subjectDAO = new StudySubjectDAO(dataSource);
+		EventDefinitionCRFDAO definitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		StudySubjectBean subject = (StudySubjectBean) subjectDAO.findByPK(eventCRFBean.getStudySubjectId());
+		StudyBean subjectStudy = (StudyBean) studydao.findByPK((subject).getStudyId());
+		return definitionCRFDAO.findByStudyEventIdAndCRFVersionId(subjectStudy, eventCRFBean.getStudyEventId(), eventCRFBean.getCRFVersionId());
+	}
+
+	private CRFVersionBean getCRFVersionFromEventCRF(EventCRFBean eventCRFBean) {
+		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
+		return  (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
+	}
+
+	private CRFBean getCrfFromCrfVersion(CRFVersionBean crfVersionBean) {
+		CRFDAO crfdao = new CRFDAO(dataSource);
+		return  (CRFBean) crfdao.findByPK(crfVersionBean.getCrfId());
 	}
 }

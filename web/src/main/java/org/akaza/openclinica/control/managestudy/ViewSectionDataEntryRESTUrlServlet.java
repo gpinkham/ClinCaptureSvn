@@ -346,7 +346,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(SECTION_BEAN, sb);
-		dsb = super.getDisplayBean(hasItemGroup, false, request, false);
+		dsb = super.getDisplayBean(hasItemGroup, request, false);
 
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);

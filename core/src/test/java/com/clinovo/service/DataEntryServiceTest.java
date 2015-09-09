@@ -28,16 +28,21 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.mock.web.MockHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @SuppressWarnings("unchecked")
 public class DataEntryServiceTest extends DefaultAppContextTest {
 
 	private DynamicsMetadataService dynamicsMetadataService;
+	private MockHttpServletRequest request;
 
 	@Before
 	public void setUp() throws Exception {
+		request = new MockHttpServletRequest();
 		dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,
 				dynamicsItemGroupMetadataDao, dataSource);
 	}
@@ -48,8 +53,7 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		ArrayList<SectionBean> allSectionBeans = sdao.findAllByCRFVersionId(1);
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
-		assertNotNull(dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET,
-				dynamicsMetadataService));
+		assertNotNull(dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET));
 	}
 
 	@Test
@@ -58,7 +62,7 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		assertEquals(3, (dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study,
-				Page.INITIAL_DATA_ENTRY_SERVLET, dynamicsMetadataService).size()));
+				Page.INITIAL_DATA_ENTRY_SERVLET).size()));
 	}
 
 	@Test
@@ -102,7 +106,6 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testGetDisplayBeanReturnsNotNull() throws Exception {
 		boolean hasGroup = false;
-		boolean includeUngroupedItems = true;
 		boolean isSubmitted = false;
 		Page servletPage = Page.INITIAL_DATA_ENTRY_SERVLET;
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
@@ -113,8 +116,11 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		ib.setId(1);
 		items.add(ib);
 		sb.setItems(items);
-		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, includeUngroupedItems, isSubmitted,
-				servletPage, study, ecb, sb, dynamicsMetadataService);
+		request.getSession().setAttribute("study", study);
+		request.setAttribute("event", ecb);
+		request.setAttribute("section_bean", sb);
+		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, isSubmitted,
+				servletPage, request);
 		assertNotNull(dsb);
 	}
 }
