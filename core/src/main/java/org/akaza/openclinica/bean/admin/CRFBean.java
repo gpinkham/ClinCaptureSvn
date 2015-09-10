@@ -34,6 +34,7 @@ import java.util.ArrayList;
 public class CRFBean extends AuditableEntityBean {
 	private int statusId = 1;
 	private String description = "";
+	private String source = "";
 	private ArrayList versions; // not in DB
 	private boolean selected = false; // not in DB
 
@@ -175,5 +176,19 @@ public class CRFBean extends AuditableEntityBean {
 
 	public void setSdvOptions(ArrayList<SourceDataVerification> sdvOptions) {
 		this.sdvOptions = sdvOptions;
+	}
+
+	/**
+	 * @return Source of the CRF - excel or form studio
+	 */
+	public String getSource() {
+		return source;
+	}
+
+	/**
+	 * @param source - excel or form studio
+	 */
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

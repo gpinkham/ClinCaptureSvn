@@ -69,13 +69,13 @@
 		<name>create</name>
 		<sql>INSERT INTO CRF (STATUS_ID,NAME,
 		DESCRIPTION, OWNER_ID,
-		DATE_CREATED,OC_OID, SOURCE_STUDY_ID, AUTO_LAYOUT)
-		VALUES (?,?,?,?,NOW(),?,?,?)</sql>
+		DATE_CREATED,OC_OID, SOURCE_STUDY_ID, AUTO_LAYOUT, SOURCE)
+		VALUES (?,?,?,?,NOW(),?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>UPDATE CRF SET STATUS_ID=?,NAME=?,
-		DESCRIPTION=?,DATE_UPDATED=NOW(),UPDATE_ID=? WHERE
+		DESCRIPTION=?,DATE_UPDATED=NOW(),UPDATE_ID=?, SOURCE=? WHERE
 		CRF_ID=?</sql>
 	</query>
 	<query>

@@ -19,6 +19,7 @@ import java.net.URLDecoder;
 
 import javax.sql.DataSource;
 
+import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -106,13 +107,17 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private String getString(JSONObject jsonObject, String key) throws Exception {
+		return getString(jsonObject, key, false);
+	}
+
+	private String getString(JSONObject jsonObject, String key, boolean checkMetadataTags) {
 		String result = "";
 		try {
 			result = URLDecoder.decode(jsonObject.getString(key), UTF_8);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
-		return result;
+		return checkMetadataTags ? CrfMetadataUtil.removeAllMetadataTags(result) : result;
 	}
 
 	private int getInt(JSONObject jsonObject, String key) throws Exception {
@@ -140,10 +145,11 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		JSONArray pages = getJSONArray(crfBuilder.getJsonObject(), PAGES);
 		for (int i = 0; i < pages.length(); i++) {
 			JSONObject jsonObj = pages.getJSONObject(i);
+			crfBuilder.checkCRFSource(getString(jsonObj, SUB_TITLE));
 
 			crfBuilder.setCurrentSection(new SectionBean());
 			crfBuilder.getCurrentSection().setInstructions(getString(jsonObj, INSTRUCTIONS));
-			crfBuilder.getCurrentSection().setSubtitle(getString(jsonObj, SUB_TITLE));
+			crfBuilder.getCurrentSection().setSubtitle(getString(jsonObj, SUB_TITLE, true));
 			crfBuilder.getCurrentSection().setLabel(getString(jsonObj, NAME));
 			crfBuilder.getCurrentSection().setTitle(getString(jsonObj, TITLE));
 			if (crfBuilder.getCurrentSection().getTitle().trim().isEmpty()) {

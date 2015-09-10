@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.admin.Preview;
@@ -260,8 +261,29 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 * @return String
 	 */
 	public String getCellValue(CellName cellKey, boolean replaceSpecialSymbols) {
+		return getCellValue(cellKey, replaceSpecialSymbols, false);
+	}
+
+	/**
+	 * Returns cell value.
+	 *
+	 * @param cellKey
+	 *            CellKey
+	 * @param replaceSpecialSymbols
+	 *            boolean
+	 * @param removeMetadataTags boolean
+	 * @return String
+	 */
+	public String getCellValue(CellName cellKey, boolean replaceSpecialSymbols, boolean removeMetadataTags) {
 		String value = getValue(row.getCell(getColumnNumber(cellKey)));
-		return replaceSpecialSymbols ? value.replaceAll("<[^>]*>", "") : value;
+
+		if (replaceSpecialSymbols) {
+			value = value.replaceAll("<[^>]*>", "");
+		}
+		if (removeMetadataTags) {
+			value = CrfMetadataUtil.removeAllMetadataTags(value);
+		}
+		return value;
 	}
 
 	/**

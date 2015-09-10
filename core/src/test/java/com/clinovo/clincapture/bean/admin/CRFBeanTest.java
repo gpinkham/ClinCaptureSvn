@@ -33,6 +33,7 @@ public class CRFBeanTest {
 	public void testAllDefaultValues() {
 		assertEquals(1, crf.getStatusId());
 		assertEquals("", crf.getDescription());
+		assertEquals("", crf.getSource());
 		assertEquals(false, crf.isSelected());
 
 		assertNotNull(crf.getVersions());

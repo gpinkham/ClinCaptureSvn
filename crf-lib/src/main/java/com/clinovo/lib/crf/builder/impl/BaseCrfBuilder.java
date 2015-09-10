@@ -23,9 +23,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import com.clinovo.lib.crf.enums.CRFSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -71,6 +74,8 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	public static final String UNGROUPED = "Ungrouped";
 	public static final String GROUP_LAYOUT = "GROUP_LAYOUT";
 	public static final String WIDTH_DECIMAL = "width_decimal";
+	public static final String CRF_SOURCE_MARKER_OPEN = "<crfSource>";
+	public static final String CRF_SOURCE_MARKER_CLOSE = "</crfSource>";
 
 	// import service
 	private ImportCrfService importCrfService;
@@ -712,5 +717,23 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 			}
 		}
 		return crfVersionBean;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void checkCRFSource(String sectionSubTitle) {
+		Pattern pattern = Pattern.compile(CRF_SOURCE_MARKER_OPEN + "(.*?)" + CRF_SOURCE_MARKER_CLOSE);
+		Matcher matcher = pattern.matcher(sectionSubTitle);
+		String crfSource = CRFSource.SOURCE_DEFAULT.getSourceName();
+		while (matcher.find()) {
+			if (matcher.group(1).equals(CRFSource.SOURCE_FORM_STUDIO.getSourceName())) {
+				crfSource = CRFSource.SOURCE_FORM_STUDIO.getSourceName();
+			}
+		}
+
+		if (!crfSource.equals(CRFSource.SOURCE_DEFAULT.getSourceName()) || getCrfBean().getSource().isEmpty()) {
+			getCrfBean().setSource(crfSource);
+		}
 	}
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-09-08-TICKET2553">
+		<comment>Add new column to "crf" table to store source of the CRF.</comment>
+		<addColumn tableName="crf">
+			<column name="source" value="excel" type="varchar(50)"/>
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>

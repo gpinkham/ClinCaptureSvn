@@ -109,10 +109,11 @@ public class CRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		// set type for auto_layout property
 		if (getDBType().equals("oracle")) {
-			this.setTypeExpected(index, TypeNames.INT);
+			this.setTypeExpected(index++, TypeNames.INT);
 		} else {
-			this.setTypeExpected(index, TypeNames.BOOL);
+			this.setTypeExpected(index++, TypeNames.BOOL);
 		}
+		this.setTypeExpected(index, TypeNames.STRING);
 	}
 
 	/**
@@ -130,6 +131,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		variables.put(index++, cb.getName());
 		variables.put(index++, cb.getDescription());
 		variables.put(index++, cb.getUpdater().getId());
+		variables.put(index++, cb.getSource());
 		variables.put(index, cb.getId());
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
@@ -164,10 +166,11 @@ public class CRFDAO extends AuditableEntityDAO {
 		variables.put(index++, cb.getStudyId());
 		// set auto_layout property
 		if (getDBType().equals("oracle")) {
-			variables.put(index, 1);
+			variables.put(index++, 1);
 		} else {
-			variables.put(index, Boolean.TRUE);
+			variables.put(index++, Boolean.TRUE);
 		}
+		variables.put(index, cb.getSource());
 		executeWithPK(digester.getQuery("create"), variables, null, con);
 		if (isQuerySuccessful()) {
 			cb.setId(getLatestPK());
@@ -188,6 +191,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		eb.setId((Integer) hm.get("crf_id"));
 		eb.setName((String) hm.get("name"));
 		eb.setDescription((String) hm.get("description"));
+		eb.setSource((String) hm.get("source"));
 		eb.setOid((String) hm.get("oc_oid"));
 		eb.setStudyId((Integer) hm.get("source_study_id"));
 		// get auto_layout property

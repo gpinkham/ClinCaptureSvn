@@ -3,11 +3,13 @@ package com.clinovo.lib.crf.service.impl;
 import java.io.InputStream;
 import java.util.Locale;
 
+import com.clinovo.lib.crf.enums.CRFSource;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -110,6 +112,14 @@ public class SpreadSheetImportCrfServiceImplTest extends DefaultAppContextTest {
 				messageSource);
 		crfBuilder.build();
 		assertEquals(crfBuilder.getCrfVersionBean().getName(), "v1.0");
+	}
+
+	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectCrfSource() throws Exception {
+		crfBuilder = crfBuilderFactory.getCrfBuilder(getWorkbook("testCrf.xls"), studyBean, owner, Locale.ENGLISH,
+				messageSource);
+		crfBuilder.build();
+		assertEquals(CRFSource.SOURCE_DEFAULT.getSourceName(), crfBuilder.getCrfBean().getSource());
 	}
 
 	@Test

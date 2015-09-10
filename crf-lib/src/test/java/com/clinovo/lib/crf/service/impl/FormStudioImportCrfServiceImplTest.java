@@ -2,6 +2,7 @@ package com.clinovo.lib.crf.service.impl;
 
 import java.util.Locale;
 
+import com.clinovo.lib.crf.enums.CRFSource;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -58,6 +59,15 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	}
 
 	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectSectionSubtitle() throws Exception {
+		String jsonData = IOUtils
+				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getSections().get(0).getSubtitle(), "stt");
+	}
+
+	@Test
 	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectQuantityOfItemGroups() throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
@@ -91,6 +101,15 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		assertEquals(crfBuilder.getCrfVersionBean().getName(), "v1.0");
+	}
+
+	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfWithCorrectCrfSource() throws Exception {
+		String jsonData = IOUtils
+				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getCrfBean().getSource(), CRFSource.SOURCE_FORM_STUDIO.getSourceName());
 	}
 
 	@Test
