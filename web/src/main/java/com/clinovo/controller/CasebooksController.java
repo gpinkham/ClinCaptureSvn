@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,6 +59,8 @@ public class CasebooksController extends Redirection {
 
 	@Autowired
 	private EmailService emailService;
+
+	private ArrayList<String> subjectOIDs;
 
     public static final String CASEBOOKS_PAGE = "casebooks/studyCasebooks";
     public static final String DOWNLOADCASEBOOKS_PAGE = "casebooks/downloadCasebooks";
@@ -116,17 +119,18 @@ public class CasebooksController extends Redirection {
 
         request.setAttribute("crfEvaluationTable", casebooksTableFactory.createTable(request, response).render());
         request.setAttribute("studyName", parentStudy.getName());
+		request.setAttribute("generatingOIDs", getSubjectOIDs());
         return CASEBOOKS_PAGE;
     }
 
 	/**
-	 * Generate Site casebooks
+	 * Generate Site casebooks.
 	 * @param request HttpServletRequest
 	 * @throws Exception in case of error
 	 */
     @RequestMapping("/generateSiteCasebooks")
     public void generateSiteCasebooks(HttpServletRequest request) throws Exception {
-        String siteId = (String) request.getParameter("siteId");
+        String siteId = request.getParameter("siteId");
         if (siteId != null) {
             StudyDAO studyDAO = new StudyDAO(dataSource);
             StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -142,7 +146,7 @@ public class CasebooksController extends Redirection {
     }
 
 	/**
-	 * Generate one casebook
+	 * Generate one casebook.
 	 * @param request HttpServletRequest
 	 * @param response HttpServletResponse
 	 * @throws Exception in case of error
@@ -181,13 +185,21 @@ public class CasebooksController extends Redirection {
         StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
         StudyDAO studyDAO = new StudyDAO(dataSource);
         List<String> studySubjectOidList = new ArrayList<String>(Arrays.asList(studySubjectOidString.split("\\,")));
+		setSubjectOIDs(studySubjectOidList);
         StudyBean parentStudyBean = studyBean.isSite() ? (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId()) : studyBean;
         for (String ssOid : studySubjectOidList) {
             String reportXml = getSubjectCasebookXml(request, true, true, ssOid);
             OutputStream os = new FileOutputStream(getFile(ssOid, DIR_NAME + File.separator + parentStudyBean.getOid()));
             HtmlToPdfUtil.buildPdf(reportXml, os);
         }
+		cleanupOIDs(studySubjectOidList);
 		sendCompletionEmail(request, studySubjectOidString);
+		HashMap<String, Object> storedAttributes = new HashMap<String, Object>();
+		ArrayList<String> messages = new ArrayList<String>();
+		String message = messageSource.getMessage("casebooks_generated", null, LocaleResolver.getLocale()).replace("{0}", request.getContextPath() + "/pages");
+		messages.add(message);
+		storedAttributes.put("pageMessages", messages);
+		request.getSession().setAttribute("RememberLastPage_storedAttributes", storedAttributes);
         return CASEBOOKS_PAGE;
     }
 
@@ -207,7 +219,7 @@ public class CasebooksController extends Redirection {
 
         webClient.getCookieManager().addCookie(new Cookie(request.getServerName(), JSESSIONID, sessionId));
         HtmlPage page = webClient.getPage(getCasebookUrl(request, includeAudit, includeNotes, ssOid, parentStudyBean.getOid()));
-        while (page.asXml().indexOf("page-header") < 0) {
+        while (!page.asXml().contains("page-header")) {
             if (page.asText().isEmpty()) {
                 break;
             }
@@ -261,7 +273,7 @@ public class CasebooksController extends Redirection {
         if (studyOid != null && !studyOid.isEmpty() && studySubjectOid != null && !studySubjectOid.isEmpty()) {
             String casebookPath = getCasebookFilePath(studyOid, studySubjectOid);
             File file = new File(casebookPath);
-            if (file != null && file.isFile()) {
+            if (file.isFile()) {
                 uploadFileToResponse(file, response);
 
             }
@@ -287,7 +299,7 @@ public class CasebooksController extends Redirection {
         if (studyOid != null && !studyOid.isEmpty() && studySubjectOid != null && !studySubjectOid.isEmpty()) {
             String casebookPath = getCasebookFilePath(studyOid, studySubjectOid);
             File file = new File(casebookPath);
-            if (file != null && file.isFile()) {
+            if (file.isFile()) {
                 file.delete();
             }
         }
@@ -351,11 +363,13 @@ public class CasebooksController extends Redirection {
         List<String> studySubjectOid = new ArrayList<String>();
         if (folder.isDirectory()) {
             File[] listOfFiles = folder.listFiles();
-            for (File file : listOfFiles) {
-                if (file.isFile()) {
-                    studySubjectOid.add(FilenameUtils.removeExtension(file.getName()));
-                }
-            }
+			if (listOfFiles != null) {
+				for (File file : listOfFiles) {
+					if (file.isFile()) {
+						studySubjectOid.add(FilenameUtils.removeExtension(file.getName()));
+					}
+				}
+			}
         }
         return studySubjectOid;
     }
@@ -397,6 +411,26 @@ public class CasebooksController extends Redirection {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private ArrayList<String> getSubjectOIDs() {
+		if (subjectOIDs == null) {
+			subjectOIDs = new ArrayList<String>();
+		}
+		return subjectOIDs;
+	}
+
+	private void setSubjectOIDs(List<String> list) {
+		for (String oid : list) {
+			if (getSubjectOIDs().contains(oid)) {
+				continue;
+			}
+			getSubjectOIDs().add(oid);
+		}
+	}
+
+	private void cleanupOIDs(List<String> list) {
+		getSubjectOIDs().removeAll(list);
 	}
 
     @Override

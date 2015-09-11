@@ -19,43 +19,7 @@
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jmesa.js?r=${revisionNumber}'/>"></script>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.jmesa.js?r=${revisionNumber}'/>"></script>
 
-<script type="text/javascript">
-
-  function selectAll(isSelect) {
-    $("input[name='oids']").each(function() {
-      this.checked = isSelect;
-    });
-  }
-
-  function onInvokeAction(id) {
-    createHiddenInputFieldsForLimitAndSubmit(id);
-  }
-
-  function sendSubjectOids() {
-    var list = $("input[name=oids]:checked").map(function () {return $(this).attr("ssoid");}).get().join(",")
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
-    if($("#sidebar_Alerts_open").css("display") == 'none') {
-      leftnavExpand('sidebar_Alerts_open');
-      leftnavExpand('sidebar_Alerts_closed');
-    }
-    $("#sidebar_Alerts_open .sidebar_tab_content").html('')
-            .append("<div class='alert'><fmt:message key="selected_casebooks_in_progress" bundle="${resword}"/></div>");
-    $.ajax({
-      type: "POST",
-      url: url + "/generateCasebooks",
-      data: {
-        oids: list
-      },
-      success: function(data) {
-        $("#sidebar_Alerts_open .sidebar_tab_content").html('');
-      },
-      error: function(e) {
-        console.log("Error:" + e);
-      }
-    });
-  }
-
-</script>
+<jsp:include page="/includes/js/pages/casebooks.js.jsp"/>
 
 <tr id="sidebar_Instructions_open">
   <td class="sidebar_tab">
@@ -103,8 +67,5 @@
   <input type="button" value="<fmt:message key="download_casebooks" bundle="${resword}"/>"
          class="button_long" onClick="javascript:window.open('${pageContext.request.contextPath}/pages/downloadCasebooks','','location=0,status=0,scrollbars=1,width=650,height=600');"/>
 </div>
-
-
-
 
 <jsp:include page="../include/footer.jsp" />
