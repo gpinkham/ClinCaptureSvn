@@ -100,8 +100,7 @@ public class ScoreUtil {
 				}
 				String funcname = getFunctionName(tokenname);
 				System.out.println("found func name: " + funcname);
-				if (funcname != null && !funcname.equalsIgnoreCase("getexternalvalue")
-						&& !funcname.equalsIgnoreCase(FUNCTION_PACKAGE + "getexternalvalue")) {
+				if (funcname != null) {
 					try {
 						token.setName(sign
 								+ evalFunc(expression, info, (Function) Class.forName(funcname).newInstance()));

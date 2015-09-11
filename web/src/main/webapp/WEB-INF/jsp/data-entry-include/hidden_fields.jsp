@@ -21,6 +21,7 @@
 <c:if test="${dataEntryStage.isInitialDE()}">
 <input type="hidden" name="isFirstTimeOnSection" value="${section.section.id}" />
 </c:if>
+<input type="hidden" id="currentUser" value="${userBean.name}">
 <!-- For randomization -->
 <input type="hidden" name="studySubjectId" value="${studySubject.id}">
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />

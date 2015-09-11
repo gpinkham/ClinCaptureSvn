@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @SuppressWarnings({"serial"})
 public class InitialDataEntryServlet extends DataEntryServlet {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -63,12 +63,9 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 		HttpSession session = request.getSession();
-
 		session.setAttribute("mayProcessUploading", "true");
 
 		getInputBeans(request);
-
-		return;
 	}
 
 	@Override
@@ -81,29 +78,20 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 			RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation,
 			ArrayList<String> messages, HttpServletRequest request) {
 
-		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
 		// note that this step sets us up both for
 		// displaying the data on the form again, in the event of an error
 		// and sending the data to the database, in the event of no error
-		if (StringUtil.isBlank(inputName)) {// not an item from group, doesn't
+		if (StringUtil.isBlank(inputName)) {
+			// not an item from group, doesn't
 			// need to get data from form again
 			dib = loadFormValue(dib, request);
 		}
 
-		// types TEL and ED are not supported yet
-		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
-			// dib = validateDisplayItemBeanText(v, dib, inputName);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
-			// dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-		}
 		if (groupOrdinalPLusItemOid.containsKey(dib.getItem().getOid()) || fireRuleValidation) {
 			messages = messages == null ? groupOrdinalPLusItemOid.get(dib.getItem().getOid()) : messages;
 			dib = validateDisplayItemBeanSingleCV(rv, dib, inputName, messages);
 		}
-		// I_AGEN_DOSEDATE64
+
 		return dib;
 	}
 
@@ -114,28 +102,18 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 			HttpServletResponse response) {
 
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-
 		formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-		String inputName = "";
-		for (int i = 0; i < formGroups.size(); i++) {
-			DisplayItemGroupBean displayGroup = formGroups.get(i);
 
+		for (DisplayItemGroupBean displayGroup : formGroups) {
 			List<DisplayItemBean> items = displayGroup.getItems();
 			int order = displayGroup.getOrdinal();
 
 			for (DisplayItemBean displayItem : items) {
-				if (displayGroup.isAuto()) {
-
-					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-				} else {
-
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-				}
+				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
 
 				if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
 						|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)
-								+ displayItem.getItem().getOid())) {
+						+ displayItem.getItem().getOid())) {
 					logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
 					validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true,
 							groupOrdinalPLusItemOid.get(String.valueOf(order + 1) + displayItem.getItem().getOid()),
@@ -159,7 +137,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 		// note that this step sets us up both for
 		// displaying the data on the form again, in the event of an error
 		// and sending the data to the database, in the event of no error
-		if (StringUtil.isBlank(inputName)) {// not an item from group, doesn't
+		if (StringUtil.isBlank(inputName)) {
+			// not an item from group, doesn't
 			// need to get data from form again
 			dib = loadFormValue(dib, request);
 		}
@@ -187,23 +166,14 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 			HttpServletRequest request, HttpServletResponse response) {
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
 		formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-		String inputName = "";
-		for (int i = 0; i < formGroups.size(); i++) {
-			DisplayItemGroupBean displayGroup = formGroups.get(i);
-
+		for (DisplayItemGroupBean displayGroup : formGroups) {
 			List<DisplayItemBean> items = displayGroup.getItems();
 			for (DisplayItemBean displayItem : items) {
-				if (displayGroup.isAuto()) {
-					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-				}
+				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
 				validateDisplayItemBean(v, displayItem, inputName, request);
 			}
 		}
 		return formGroups;
-
 	}
 
 	@Override

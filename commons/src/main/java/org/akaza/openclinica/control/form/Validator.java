@@ -1940,7 +1940,6 @@ public class Validator {
 
 		String fname;
 		ArrayList args;
-		int externalValue = THREE;
 
 		HashMap numArgsByFunction = new HashMap();
 		numArgsByFunction.put("range", 2);
@@ -1950,7 +1949,6 @@ public class Validator {
 		numArgsByFunction.put("lte", 1);
 		numArgsByFunction.put("ne", 1);
 		numArgsByFunction.put("eq", 1);
-		numArgsByFunction.put("getExternalValue", externalValue);
 
 		HashMap valTypeByFunction = new HashMap();
 		valTypeByFunction.put("range", Validator.IS_IN_RANGE);
@@ -1990,7 +1988,7 @@ public class Validator {
 
 			// if i > = 3, then we are dealing with arg2 or above
 			// this means we need to get rid of the preceding ,
-			if (i >= externalValue) {
+			if (i >= THREE) {
 				arg = arg.substring(1);
 			}
 			arg = arg.trim();
@@ -1999,7 +1997,7 @@ public class Validator {
 
 		if (!fname.equalsIgnoreCase("range") && !fname.equalsIgnoreCase("gt") && !fname.equalsIgnoreCase("lt")
 				&& !fname.equalsIgnoreCase("gte") && !fname.equalsIgnoreCase("lte") && !fname.equalsIgnoreCase("eq")
-				&& !fname.equalsIgnoreCase("ne") && !fname.equalsIgnoreCase("getexternalvalue")) {
+				&& !fname.equalsIgnoreCase("ne")) {
 			throw new Exception(resexception.getString("validation_column_invalid_function"));
 		}
 		// test that the right number of arguments have been provided; complain

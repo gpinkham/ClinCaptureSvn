@@ -80,15 +80,6 @@ public class ScoreValidator {
 		if (exp.startsWith("func:")) {
 			exp = exp.substring(5).trim();
 		}
-		// adding get external here, tbh, 05/2009
-		if (exp.contains("getexternalvalue") || exp.contains("getExternalValue")) {
-			// System.out.println("^^^ got to first error block ^^^");
-			errors = processExternalValues(exp);
-			if (errors != null && errors.length() > 1)
-				return false;
-
-			return true;
-		}
 		exp = exp.replace(" ", "");
 		exp = exp.replaceAll("##", ",");
 
@@ -197,43 +188,6 @@ public class ScoreValidator {
 			return false;
 
 		return true;
-	}
-
-	/**
-	 * process the HTML and whether or not all four values are valid, tbh 05/2009
-	 */
-	private StringBuffer processExternalValues(String expression) {
-		System.out.println("expression: " + expression);
-		expression = expression.replace(" ", "");
-		StringBuffer errors = new StringBuffer();
-		String[] values = expression.split("##");
-		String leftright = values[1];
-		// System.out.println("found values: " + values);
-		if (!leftright.equalsIgnoreCase("left") && !leftright.equalsIgnoreCase("right")) {
-			errors.append("Your expression in getExternalValues is incorrect: the second value should be 'right' or 'left', not '"
-					+ leftright + "'; ");
-		}
-		String height = values[2];
-
-		System.out.println("found height: " + height);
-		String width = values[3];
-		try {
-			new Integer(height);
-		} catch (NumberFormatException npe) {
-			errors.append("Your expression in getExternalValues is incorrect: the third value should be a number, not '"
-					+ height + "'; ");
-		}
-		width = width.replace(")", "");
-		System.out.println("found width: " + width);
-		try {
-			new Integer(width);
-		} catch (NumberFormatException npe) {
-			errors.append("Your expression in getExternalValues is incorrect: the fourth value should be a number, not '"
-					+ width + "'; ");
-		}
-		System.out.println(errors);
-		// checking three values: left/right, and two ints
-		return errors;
 	}
 
 	public boolean isValidFunction(char[] contents, ScoreUtil.Info info, String func, StringBuffer errors,
@@ -352,7 +306,7 @@ public class ScoreValidator {
 			char nextnext = info.pos < contents.length - 2 ? contents[info.pos + 2] : ' ';
 			boolean isNextSign = isValidSign(next, nextnext, func);
 			if (!isNextSign) {
-				if (!isValidOrder(c, next, func)) {
+				if (!isValidOrder(c, next)) {
 					errors.append(resexception.getString("the_character") + " " + c + " "
 							+ resexception.getString("should_not_followed_by_character") + " " + next + "; ");
 				}
@@ -384,15 +338,6 @@ public class ScoreValidator {
 			return false;
 
 		return true;
-	}
-
-	/**
-	 * checks to make sure we have a valid URL for the external-value function. tbh, 05/2009
-	 */
-	public boolean isValidUrl(char[] contents, String token, String func) {
-		if (func.equalsIgnoreCase("getexternalvalue"))// (contents.toString().startsWith("http://"))
-			return true;
-		return false;
 	}
 
 	public boolean isValidArgument(String term, StringBuffer errors, ArrayList<String> allVariables) {
@@ -456,12 +401,6 @@ public class ScoreValidator {
 				return true;
 			}
 		}
-		if (ch == '/') {
-			if ((next == '/') && (function.equalsIgnoreCase("getexternalvalue"))) {
-				System.out.println("got this far!");
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -479,20 +418,11 @@ public class ScoreValidator {
 	 * No space between two characters<br>
 	 * </p>
 	 * 
-	 * @param curr
-	 * @param next
+	 * @param curr char
+	 * @param next char
 	 * @return
 	 */
 	public static boolean isValidOrder(char curr, char next) {
-
-		return isValidOrder(curr, next, "");
-	}
-
-	public static boolean isValidOrder(char curr, char next, String func) {
-		if (curr == '/' && next == '/' && func.equalsIgnoreCase("getexternalvalue")) {
-			System.out.println("is valid order");
-			return true;
-		}
 		if (curr == '(') {
 			if (next == ')' || ScoreUtil.isOperator(next) || next == ',')
 				return false;
@@ -518,8 +448,7 @@ public class ScoreValidator {
 	public static boolean isSupportedFunc(String token) {
 		return token.equalsIgnoreCase("sum") || token.equalsIgnoreCase("avg") || token.equalsIgnoreCase("min")
 				|| token.equalsIgnoreCase("max") || token.equalsIgnoreCase("median") || token.equalsIgnoreCase("pow")
-				|| token.equalsIgnoreCase("stdev") || token.equalsIgnoreCase("decode")
-				|| token.equalsIgnoreCase("getexternalvalue");
+				|| token.equalsIgnoreCase("stdev") || token.equalsIgnoreCase("decode");
 	}
 
 	/**

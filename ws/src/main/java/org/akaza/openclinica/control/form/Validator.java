@@ -1683,7 +1683,6 @@ public class Validator {
 		numArgsByFunction.put("lte", new Integer(1));
 		numArgsByFunction.put("ne", new Integer(1));
 		numArgsByFunction.put("eq", new Integer(1));
-		numArgsByFunction.put("getExternalValue", new Integer(3));
 
 		HashMap valTypeByFunction = new HashMap();
 		valTypeByFunction.put("range", new Integer(Validator.IS_IN_RANGE));
@@ -1729,7 +1728,7 @@ public class Validator {
 
 		if (!fname.equalsIgnoreCase("range") && !fname.equalsIgnoreCase("gt") && !fname.equalsIgnoreCase("lt")
 				&& !fname.equalsIgnoreCase("gte") && !fname.equalsIgnoreCase("lte") && !fname.equalsIgnoreCase("eq")
-				&& !fname.equalsIgnoreCase("ne") && !fname.equalsIgnoreCase("getexternalvalue")) {
+				&& !fname.equalsIgnoreCase("ne")) {
 			throw new Exception(resexception.getString("validation_column_invalid_function"));
 		}
 		// test that the right number of arguments have been provdided; complain

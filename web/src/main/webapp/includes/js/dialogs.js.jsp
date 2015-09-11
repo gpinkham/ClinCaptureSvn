@@ -95,7 +95,7 @@
 				showLoginPopUp();
 			},
 			'<fmt:message bundle="${words}" key="delete_data_and_exit"/>': function () {
-				location.href("${pageContext.request.contextPath}/MainMenu");
+				location.href = "${pageContext.request.contextPath}/MainMenu";
 			}
 		};
 		params.message = "<fmt:message bundle="${words}" key="session_timed_out"/>";

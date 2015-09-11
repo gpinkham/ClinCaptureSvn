@@ -384,7 +384,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 						List<DisplayItemBean> items = displayGroup.getItems();
 						LOGGER.info("item size: " + items.size());
 						for (DisplayItemBean displayItem : items) {
-							String inputName = getGroupItemInputName(displayGroup, j, displayItem);
+							String inputName = getGroupItemInputName(displayGroup, j, displayItem, false);
 							LOGGER.info("inputName:" + inputName);
 							LOGGER.info("item data id:" + displayItem.getData().getId());
 							dnService.saveFieldNotes(inputName, discNotes, displayItem.getData().getId(), "itemData",

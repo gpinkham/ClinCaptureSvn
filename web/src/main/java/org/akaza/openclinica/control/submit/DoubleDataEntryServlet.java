@@ -133,8 +133,6 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		doubleDataProgress.setSectionVisited(eventCRFId, tabNumber, true);
 		mySession.setAttribute("doubleDataProgress", doubleDataProgress);
 		session.setAttribute("mayProcessUploading", "true");
-
-		return;
 	}
 
 	@Override
@@ -156,7 +154,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
 		boolean isSingleItem = false;
-		if (StringUtil.isBlank(inputName)) {// for single items
+		if (StringUtil.isBlank(inputName)) {
+			// for single items
 			inputName = getInputName(dib);
 			isSingleItem = true;
 		}
@@ -195,7 +194,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
 					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
 				dib = validateDisplayItemBeanText(v, dib, inputName, request);
-				if (validationCount == null || validationCount.intValue() == 0) {
+				if (validationCount == null || validationCount == 0) {
 					v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
 					v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
 							+ respage.getString("from_initial_data_entry"));
@@ -205,14 +204,14 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
 				dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
 
-				if (validationCount == null || validationCount.intValue() == 0) {
+				if (validationCount == null || validationCount == 0) {
 					v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
 					String errorValue = valueToCompare.getValue();
 
 					java.util.ArrayList options = dib.getMetadata().getResponseSet().getOptions();
 
-					for (int u = 0; u < options.size(); u++) {
-						ResponseOptionBean rob = (ResponseOptionBean) options.get(u);
+					for (Object option : options) {
+						ResponseOptionBean rob = (ResponseOptionBean) option;
 						if (rob.getValue().equals(errorValue)) {
 							errorValue = rob.getText();
 						}
@@ -224,7 +223,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 				dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
 
-				if (validationCount == null || validationCount.intValue() == 0) {
+				if (validationCount == null || validationCount == 0) {
 					v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true);
 					String errorValue = valueToCompare.getValue();
 					String errorTexts = "";
@@ -273,16 +272,11 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
 			List<DisplayItemBean> items = displayGroup.getItems();
 			for (DisplayItemBean displayItem : items) {
-				if (displayGroup.isAuto()) {
-					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-				}
+				inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
 				validateDisplayItemBean(v, displayItem, inputName, request);
 			}
 
-			if (validationCount == null || validationCount.intValue() == 0) {
+			if (validationCount == null || validationCount == 0) {
 				if (i == 0 && formGroups.size() != digbs.size()) {
 					v.addValidation(inputName + "group", Validator.DIFFERENT_NUMBER_OF_GROUPS_IN_DDE);
 					// TODO internationalize this string, tbh
@@ -304,7 +298,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 		ItemDataDAO iddao = getItemDataDAO();
 		boolean isSingleItem = false;
-		if (StringUtil.isBlank(inputName)) {// for single items
+		if (StringUtil.isBlank(inputName)) {
+			// for single items
 			inputName = getInputName(dib);
 			isSingleItem = true;
 		}
@@ -335,7 +330,6 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 						+ respage.getString("from_initial_data_entry"));
 			}
 		}
-
 		return dib;
 	}
 
@@ -421,7 +415,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 			ArrayList<String> messages, HttpServletRequest request) {
 
 		boolean isSingleItem = false;
-		if (StringUtil.isBlank(inputName)) {// for single items
+		if (StringUtil.isBlank(inputName)) {
+			// for single items
 			inputName = getInputName(dib);
 			isSingleItem = true;
 		}
@@ -449,27 +444,20 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		logger.info("found formgroups size for " + digb.getGroupMetaBean().getName() + ": " + formGroups.size()
 				+ " compare to db groups size: " + digbs.size());
 
-		String inputName = "";
-		for (int i = 0; i < formGroups.size(); i++) {
-			DisplayItemGroupBean displayGroup = formGroups.get(i);
-
+		for (DisplayItemGroupBean displayGroup : formGroups) {
 			List<DisplayItemBean> items = displayGroup.getItems();
 			int order = displayGroup.getOrdinal();
 
 			for (DisplayItemBean displayItem : items) {
-				if (displayGroup.isAuto()) {
-					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-				}
+				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
+
 				if (displayItem.getMetadata().isShowItem()
 						|| getDynamicsMetadataService().isShown(displayItem.getItem().getId(), ecb,
-								displayItem.getData())) {
+						displayItem.getData())) {
 					// add the validation
 					if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
 							|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)
-									+ displayItem.getItem().getOid())) {
+							+ displayItem.getItem().getOid())) {
 						System.out.println("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
 						validateDisplayItemBean(
 								v,
@@ -527,6 +515,5 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		result.setStatus(src.getStatus());
 
 		return result;
-
 	}
 }

@@ -342,25 +342,23 @@ public final class CommonValidator {
 					crfBuilder.getCurrentScoreValidatorErrorsBuffer(), variables)) {
 				crfBuilder.getErrorMessageProducer().expressionIsNotValid();
 			}
-			if (!(exp.startsWith("getexternalvalue") || exp.startsWith("getExternalValue"))) {
-				String groupLabel = crfBuilder.getCurrentItem().getItemMeta().getGroupLabel();
-				for (String variable : variables) {
-					crfBuilder.setCurrentMessage(new StringBuffer(variable));
-					if (!crfBuilder.getSheetContainer().getAllItems().containsKey(variable)) {
-						crfBuilder.getErrorMessageProducer().itemMustBeListedBeforeAnotherItem();
-					} else {
+			String groupLabel = crfBuilder.getCurrentItem().getItemMeta().getGroupLabel();
+			for (String variable : variables) {
+				crfBuilder.setCurrentMessage(new StringBuffer(variable));
+				if (!crfBuilder.getSheetContainer().getAllItems().containsKey(variable)) {
+					crfBuilder.getErrorMessageProducer().itemMustBeListedBeforeAnotherItem();
+				} else {
+					if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
+							.getResponseTypeId() == ResponseType.CALCULATION.getId()
+							&& !crfBuilder.getSheetContainer().getAllItems().get(variable)
+									.equalsIgnoreCase(groupLabel)) {
+						crfBuilder.getErrorMessageProducer().itemsMustHaveTheSameGroup();
+					} else
 						if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-								.getResponseTypeId() == ResponseType.CALCULATION.getId()
-								&& !crfBuilder.getSheetContainer().getAllItems().get(variable)
-										.equalsIgnoreCase(groupLabel)) {
-							crfBuilder.getErrorMessageProducer().itemsMustHaveTheSameGroup();
-						} else
-							if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-									.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()) {
-							String g = crfBuilder.getSheetContainer().getAllItems().get(variable);
-							if (!g.equalsIgnoreCase(UNGROUPED) && g.equalsIgnoreCase(groupLabel)) {
-								crfBuilder.getErrorMessageProducer().itemsShouldNotHaveTheSameGroup();
-							}
+								.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()) {
+						String g = crfBuilder.getSheetContainer().getAllItems().get(variable);
+						if (!g.equalsIgnoreCase(UNGROUPED) && g.equalsIgnoreCase(groupLabel)) {
+							crfBuilder.getErrorMessageProducer().itemsShouldNotHaveTheSameGroup();
 						}
 					}
 				}

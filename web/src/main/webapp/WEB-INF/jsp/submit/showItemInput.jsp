@@ -863,63 +863,18 @@ include the default value first in the select list --%>
 
  
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
-        <%-- need to test for coding function here, tbh  --%>
-        <c:set var="isAnExternalValue" value="0"/>
-        <c:forTokens items="${functionType}" delims="\"" begin="0" end="0" var="functionName">
-                <c:if test="${functionName eq 'func: getExternalValue(' || functionName eq 'func: getexternalvalue('}">
-                        <c:set var="isAnExternalValue" value="1"/>
-                </c:if>
-        </c:forTokens>
-        <c:choose>
-                <c:when test="${isAnExternalValue == '1'}">
-                        <label for="input<c:out value="${itemId}"/>"></label>
-                        <%--<c:out value="${inputTxtValue}"/>--%>
-                        <%-- above for test, adding javascript below to support FF3 tbh 03/2007 --%>
-                        <script>
-                                if (window.attachEvent)
-                                {
-                                        window.attachEvent("onmessage", receiver<c:out value="${itemId}"/>); // for IE
-                                }
-                                else
-                                {
-                                        window.addEventListener("message", receiver<c:out value="${itemId}"/>, false); // for FF
-                                }
-                                function receiver<c:out value="${itemId}"/>(e) {
-                                        if (e.data.substring(0,e.data.indexOf(":")) != 'mainForm.input<c:out value="${itemId}"/>')
-                                        {
-                                                return;
-                                        }
-                                        document.crfForm.input<c:out value="${itemId}"/>.value = e.data.substring(e.data.indexOf(":") + 1);
-                                        // document.crfForm.input<c:out value="${itemId}"/>.value = e.data;
-                                }
-                        </script>
-                        
-                    <c:choose>
-                        <c:when test="${isInError && !hasShown}">
-                            <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" readonly="readonly" onChange=
-                          "this.className='changedField'; changeImage('input${itemId}');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
-                        </c:when> 
-                        <c:otherwise>
-                            <input class="aka_input_readonly" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" readonly="readonly" onChange=
-                              "this.className='changedField'; changeImage('input${itemId}');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
-                        </c:otherwise>
-                    </c:choose>
-                </c:when>
-                <c:otherwise>
-                    <label for="input<c:out value="${itemId}"/>"></label>
-                    <input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-                    <c:choose>
-                        <c:when test="${isInError && !hasShown}">
-                            <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
-                          "this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-                        </c:when>
-                        <c:otherwise>
-                            <input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
-                              "this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-                        </c:otherwise>
-                    </c:choose>
-        </c:otherwise>
-        </c:choose>
+	<label for="input<c:out value="${itemId}"/>"></label>
+	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+	<c:choose>
+		<c:when test="${isInError && !hasShown}">
+			<span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
+				"this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+		</c:when>
+		<c:otherwise>
+			<input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
+					"this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+		</c:otherwise>
+	</c:choose>
 </c:if>
 
 

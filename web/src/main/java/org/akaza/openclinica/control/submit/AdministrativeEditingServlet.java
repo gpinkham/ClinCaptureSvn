@@ -178,15 +178,12 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 				throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 						resexception.getString("no_permission_administrative_editing"), "1");
 			}
-		}
-
-		else {
+		} else {
 			session.setAttribute("mayProcessUploading", "false");
 			addPageMessage(respage.getString("you_may_not_perform_administrative_editing"), request);
 			throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 					respage.getString("you_may_not_perform_administrative_editing"), "1");
 		}
-		return;
 	}
 
 	@Override
@@ -210,7 +207,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 		// note that this step sets us up both for
 		// displaying the data on the form again, in the event of an error
 		// and sending the data to the database, in the event of no error
-		if (StringUtil.isBlank(inputName)) {// not an item from group, doesn't
+		if (StringUtil.isBlank(inputName)) {
+			// not an item from group, doesn't
 			// need to get data from form again
 			dib = loadFormValue(dib, request);
 		}
@@ -237,18 +235,11 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 			HttpServletRequest request, HttpServletResponse response) {
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
 		formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-		String inputName = "";
-		for (int i = 0; i < formGroups.size(); i++) {
-			DisplayItemGroupBean displayGroup = formGroups.get(i);
 
+		for (DisplayItemGroupBean displayGroup : formGroups) {
 			List<DisplayItemBean> items = displayGroup.getItems();
 			for (DisplayItemBean displayItem : items) {
-				if (displayGroup.isAuto()) {
-					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-				}
+				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
 				validateDisplayItemBean(v, displayItem, inputName, request);
 			}
 		}
@@ -260,7 +251,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
 			RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation,
 			ArrayList<String> messages, HttpServletRequest request) {
-		if (StringUtil.isBlank(inputName)) {// we pass a blank inputName,which
+		if (StringUtil.isBlank(inputName)) {
+			// we pass a blank inputName,which
 			// means if not an item from group,
 			// doesn't
 			// need to get data from form again
@@ -280,32 +272,17 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 			HttpServletResponse response) {
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
 		formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-		String inputName = "";
-		for (int i = 0; i < formGroups.size(); i++) {
-			DisplayItemGroupBean displayGroup = formGroups.get(i);
 
+		for (DisplayItemGroupBean displayGroup : formGroups) {
 			List<DisplayItemBean> items = displayGroup.getItems();
 			int order = displayGroup.getOrdinal();
-			/*
-			 * if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) { order =
-			 * displayGroup.getFormInputOrdinal(); }
-			 */
+
 			for (DisplayItemBean displayItem : items) {
-				// int manualcount = 0;
-				// tbh trying to set this correctly 01/2010
-				if (displayGroup.isAuto()) {
-					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-					// manualcount++;
-				}
-				logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : "
-						+ inputName);
+				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
 
 				if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
 						|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)
-								+ displayItem.getItem().getOid())) {
+						+ displayItem.getItem().getOid())) {
 					logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
 					validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true,
 							groupOrdinalPLusItemOid.get(String.valueOf(order + 1) + displayItem.getItem().getOid()),
@@ -363,19 +340,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
 	@Override
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
-		// StudyParameterValueDAO spvdao = new
-		// StudyParameterValueDAO();
-		// ArrayList studyParameters =
-		// spvdao.findParamConfigByStudy(currentStudy);
-
-		// currentStudy.setStudyParameters(studyParameters);
-		// refresh study params here, tbh 06/2009
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		if (currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		return currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true");
 	}
 
 }
