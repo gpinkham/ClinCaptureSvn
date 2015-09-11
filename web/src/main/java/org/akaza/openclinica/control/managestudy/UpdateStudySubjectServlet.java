@@ -265,9 +265,7 @@ public class UpdateStudySubjectServlet extends Controller {
 				logger.error("Date parsing error.", fe);
 			}
 			subjectToUpdate.setEnrollmentDate(enrollDate);
-		} else {
-			subjectToUpdate.setEnrollmentDate(null);
-		}
+		} 
 		request.getSession().setAttribute("studySub", subjectToUpdate);
 
 		if (!classes.isEmpty()) {
