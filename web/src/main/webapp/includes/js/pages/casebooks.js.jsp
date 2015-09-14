@@ -13,7 +13,6 @@
 		if (oidsList.length == 0) {
 			return;
 		}
-		console.log("list: " + oidsList);
 		var splitedList = oidsList.replace("[","").replace("]","").split(",");
 		splitedList.forEach(function(item) {
 			var $input = $("input[name=oids][ssoid=" + item + "]");
@@ -37,15 +36,24 @@
 		var $sidebarContent = $sidebar.find(".sidebar_tab_content");
 		var $subjectsList = $("input[name=oids]:checked");
 		var list = $subjectsList.map(function () { return $(this).attr("ssoid");}).get().join(",");
-		$subjectsList.each(function(){
-			$(this).css("display", "none");
-			$(this).parent().append($loader);
-		});
-		var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
 		if ($sidebar.css("display") == 'none') {
 			leftnavExpand('sidebar_Alerts_open');
 			leftnavExpand('sidebar_Alerts_closed');
 		}
+		if (list == "") {
+			$sidebarContent.html('<div class="alert"><fmt:message key="please_select_subjects_to_generate_casebooks" bundle="${resword}"/></div>');
+			return;
+		}
+		$subjectsList.each(function(){
+			var $checkBox = $(this);
+			if ($checkBox.css("display") != "none") {
+				$checkBox[0].checked = false;
+				$checkBox.css("display", "none");
+				$checkBox.parent().append($loader);
+			}
+		});
+		var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
+
 		$sidebarContent.html("<div class='alert'><fmt:message key="selected_casebooks_in_progress" bundle="${resword}"/></div>");
 		$.ajax({
 			type: "POST",
