@@ -1469,7 +1469,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			return " SELECT   "
 					+ " DISTINCT study_subject.study_subject_id, study_subject.study_id, study_subject.label,  study_subject.subject_id, "
 					+ "  subject.date_of_birth, subject.gender, subject.unique_identifier, subject.dob_collected,  "
-					+ "  subject.status_id, study_subject.secondary_label, study_event.start_time_flag, study_event.end_time_flag  "
+					+ "  subject.status_id, study_subject.secondary_label  "
 					+ "  FROM  "
 					+ "   study_subject "
 					+ "  JOIN subject ON (study_subject.subject_id = subject.subject_id::numeric)  "
