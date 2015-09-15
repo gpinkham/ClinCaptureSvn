@@ -117,12 +117,7 @@
 	</a><br/><br/>
 </span>
 
-<script type="text/JavaScript" language="JavaScript">
-  //check which home page should be displayed
-  $(document).ready(function () {
-    chooseHomePageVersion();
-  });
-</script>
+
 <!--Old home page layout-->
 <c:if test="${displayPageVersion=='old'}">
 	<span class="old_home_page">

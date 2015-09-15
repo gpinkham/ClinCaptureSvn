@@ -3868,14 +3868,6 @@ function upateEventDefinitionAddCRF(){
 	$("#updateEventDefinition").submit();
 }
 
-function chooseHomePageVersion(){
-	if($.browser.msie && parseFloat($.browser.version) < 8){
-		$(".new_home_page").remove();
-	} else {
-		$(".old_home_page").remove();
-	}
-}
-
 /* =======================================================================================
 * Adding an ability to uncheck radiobuttons on all pages
 * To make radiobutton uncheckable, you should add class "uncheckable_radio" to it

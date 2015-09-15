@@ -468,6 +468,11 @@ public class MainMenuServlet extends Controller {
 
 	private boolean browserSupportNewLayout(HttpServletRequest request) {
 
+		// Checking if the dashboard feature is turned off
+		if (!getCurrentStudy().getStudyParameterConfig().getInteractiveDashboards().equalsIgnoreCase("yes")) {
+			return false;
+		}
+
 		String userAgent = request.getHeader("User-Agent");
 		boolean displayNewLayout = true;
 		if (userAgent.contains("MSIE")) { // Checking if Internet Explorer
