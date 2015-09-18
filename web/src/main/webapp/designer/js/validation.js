@@ -95,6 +95,9 @@ $(function() {
 		cleanUp();
 		$(this).click();
 	});
+	$("#save_and_exit").click(function() {
+		saveRule(rule, true)
+	})
 });
 
 /* =================================================================
@@ -104,7 +107,7 @@ $(function() {
  * => data - the xml data to post to CC via the rule import servlet
  *
  * ============================================================= */
-function saveRule(rule) {
+function saveRule(rule, exitOnSuccess) {
 
 	$("body").append(createLoader());
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
@@ -121,6 +124,11 @@ function saveRule(rule) {
 		data: body,
 		url: c + "/ImportRule?action=confirm&rs=true&edit=" + rule.editing + "&id=" + rule.ruleSet + "&study=" + rule.study + "&copy=" + rule.copied,
 		success: function(response) {
+			if (exitOnSuccess) {
+				cleanUp();
+				location.href = c + "/ViewRuleAssignment";
+				return;
+			}
 			try {
 				// Context
 				var ctx = Object.create(null);

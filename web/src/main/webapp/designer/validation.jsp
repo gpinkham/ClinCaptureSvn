@@ -67,6 +67,11 @@
 		              <fmt:message bundle="${resword}" key="save"/>
 	              </a>
               </li>
+				<li>
+					<a id="save_and_exit" class="btn btn-primary navbar-btn">
+						<fmt:message bundle="${resword}" key="save_and_exit"/>
+					</a>
+				</li>
               <li>
 	              <a id="exit" href="" class="btn btn-warning navbar-btn">
 		              <fmt:message bundle="${resword}" key="exit"/>
