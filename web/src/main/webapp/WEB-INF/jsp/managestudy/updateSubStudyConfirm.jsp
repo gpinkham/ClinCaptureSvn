@@ -336,10 +336,10 @@
 		   <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td class="table_cell">
 		   <c:choose>
 		   <c:when test="${config.value.value== 'yes'}">
-		   <fmt:message key="yes" bundle="${resword}"/>
+		   <fmt:message key="required" bundle="${resword}"/>
 		   </c:when>
            <c:when test="${config.value.value== 'no'}">
-           <fmt:message key="no" bundle="${resword}"/>
+           <fmt:message key="optional" bundle="${resword}"/>
            </c:when>
            <c:otherwise>
 		   <fmt:message key="not_used" bundle="${resword}"/>
@@ -379,10 +379,10 @@
 		  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td><td class="table_cell">
 		   <c:choose>
 		   <c:when test="${config.value.value== 'yes'}">
-		    <fmt:message key="yes" bundle="${resword}"/>		    
+		    <fmt:message key="required" bundle="${resword}"/>		    
 		   </c:when>
            <c:when test="${config.value.value== 'no'}">
-            <fmt:message key="no" bundle="${resword}"/>
+            <fmt:message key="optional" bundle="${resword}"/>
            </c:when>
            <c:otherwise>
 		    <fmt:message key="not_used" bundle="${resword}"/>

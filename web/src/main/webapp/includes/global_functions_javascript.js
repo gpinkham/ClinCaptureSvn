@@ -4296,9 +4296,16 @@ function hideUnhideStudyParamRow(element) {
 	var rowClass = $(element).attr('data-row-class');
 	if ($(element).attr('data-cc-action') == 'show') {
 		$("tr." + rowClass).show();
+		// hide / unhide recursively the rows
+		hideUnhideStudyParamRow($("tr." + rowClass + " :input[data-cc-action][checked]"));
 	} else {
 		$("tr." + rowClass).hide();
 	}
+	
+}
+
+function changeParameterForStudy(name, value) {
+	$("input[name='" + name + "'][value='" + value + "']").attr('checked', 'checked');
 }
 
 function setAccessedObjected(element) {

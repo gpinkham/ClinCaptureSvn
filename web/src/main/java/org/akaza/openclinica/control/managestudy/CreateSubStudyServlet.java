@@ -121,6 +121,8 @@ public class CreateSubStudyServlet extends Controller {
 
 				newStudy.setStudyParameterConfig(currentStudy.getStudyParameterConfig());
 
+				HashMap<String, String> paramsMap = new HashMap<String, String>();
+				
 				for (StudyParamsConfig scg : parentConfigs) {
 
 					if (scg != null) {
@@ -161,6 +163,8 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("autoTabbing"));
 							}
 							configs.add(scg);
+							paramsMap.put(scg.getParameter().getHandle(), scg
+									.getValue().getValue());
 						}
 					}
 				}
@@ -168,6 +172,7 @@ public class CreateSubStudyServlet extends Controller {
 				addPresetValues(fp);
 				setPresetValues(fp.getPresetValues(), request);
 
+				request.getSession().setAttribute("paramsMap", paramsMap);
 				request.getSession().setAttribute("newStudy", newStudy);
 				request.getSession().setAttribute("definitions", this.initDefinitions(newStudy));
 				request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
@@ -357,6 +362,7 @@ public class CreateSubStudyServlet extends Controller {
 		study.setStatus(Status.get(fp.getInt("statusId")));
 
 		ArrayList parameters = study.getStudyParameters();
+		HashMap<String, String> paramsMap = new HashMap<String, String>();
 
 		for (Object parameter : parameters) {
 			StudyParamsConfig scg = (StudyParamsConfig) parameter;
@@ -443,8 +449,12 @@ public class CreateSubStudyServlet extends Controller {
 					scg.getValue().setValue(fp.getString("autoTabbing"));
 					study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 				}
+				paramsMap.put(scg.getParameter().getHandle(), scg.getValue()
+						.getValue());
 			}
 		}
+		
+		request.setAttribute("paramsMap", paramsMap);
 
 		return study;
 	}
@@ -503,6 +513,7 @@ public class CreateSubStudyServlet extends Controller {
 
 		this.submitSiteEventDefinitions(request, study);
 		request.getSession().removeAttribute("newStudy");
+		request.getSession().removeAttribute("paramsMap");
 		request.getSession().setAttribute("new_site_created", "true");
 		forwardPage(Page.SITE_LIST_SERVLET, request, response);
 	}

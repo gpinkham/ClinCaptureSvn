@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -104,6 +105,8 @@ public class InitUpdateSubStudyServlet extends Controller {
 				// at this time, this feature is only available for site
 				createEventDefinitions(request, parent);
 			}
+			
+			HashMap<String, String> paramsMap = new HashMap<String, String>();
 
 			if (currentStudy.getId() != study.getId()) {
 				ArrayList parentConfigs = currentStudy.getStudyParameters();
@@ -121,12 +124,15 @@ public class InitUpdateSubStudyServlet extends Controller {
 								scg.setValue(spvb);
 							}
 							configs.add(scg);
+							paramsMap.put(scg.getParameter().getHandle(), scg
+									.getValue().getValue());
 						}
 					}
 				}
 
 				study.setStudyParameters(configs);
 			}
+			request.setAttribute("paramsMap", paramsMap);
 			request.setAttribute("parentStudy", parent);
 			request.getSession().setAttribute("parentName", parentStudyName);
 			request.getSession().setAttribute("newStudy", study);

@@ -2006,11 +2006,11 @@
 		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer"
 		${studyToView.studyParameterConfig.interviewerNameRequired == 'yes' ? "checked" : ""}
 		       name="interviewerNameRequired" value="yes">
-		<fmt:message key="yes" bundle="${resword}"/>
+		<fmt:message key="required" bundle="${resword}"/>
 		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer"
 		${studyToView.studyParameterConfig.interviewerNameRequired == 'no' ? "checked" : ""}
 		       name="interviewerNameRequired" value="no">
-		<fmt:message key="no" bundle="${resword}"/>
+		<fmt:message key="optional" bundle="${resword}"/>
 		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer"
 		${studyToView.studyParameterConfig.interviewerNameRequired == 'not_used' ? "checked" : ""}
 		       name="interviewerNameRequired" value="not_used">
@@ -2025,18 +2025,18 @@
 	<td>
 		<c:choose>
 			<c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
-				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="blank" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewerNameEditable', 'true');" data-cc-action="hide" data-row-class="interviewerEditable"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()"  name="interviewerNameDefault" value="pre-populated" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewerEditable"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
 			</c:when>
 			<c:otherwise>
-				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewerNameDefault" value="re-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" name="interviewerNameDefault" value="blank" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewerNameEditable', 'true');" data-cc-action="hide" data-row-class="interviewerEditable"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()"  checked name="interviewerNameDefault" value="re-populated" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewerEditable"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
 			</c:otherwise>
 		</c:choose>
 	</td>
 </tr>
 
-<tr valign="top" class="interviewer">
+<tr valign="top" class="interviewer interviewerEditable">
 	<td class="formlabel">
 		<fmt:message key="interviewer_name_editable" bundle="${resword}"/>
 	</td>
@@ -2059,14 +2059,14 @@
 		<fmt:message key="interviewer_date_required" bundle="${resword}"/>
 	</td>
 	<td>
-		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate"
+		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate" 
 		${studyToView.studyParameterConfig.interviewDateRequired == 'yes' ? "checked" : ""}
 		       name="interviewDateRequired" value="yes">
-		<fmt:message key="yes" bundle="${resword}"/>
+		<fmt:message key="required" bundle="${resword}"/>
 		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate"
 		${studyToView.studyParameterConfig.interviewDateRequired == 'no' ? "checked" : ""}
 		       name="interviewDateRequired" value="no">
-		<fmt:message key="no" bundle="${resword}"/>
+		<fmt:message key="optional" bundle="${resword}"/>
 		<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate"
 		${studyToView.studyParameterConfig.interviewDateRequired == 'not_used' ? "checked" : ""}
 		       name="interviewDateRequired" value="not_used">
@@ -2081,19 +2081,18 @@
 	<td>
 		<c:choose>
 			<c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
-				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" name="interviewDateDefault" value="pre-populated">
-				<fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewDateEditable', 'true');" checked name="interviewDateDefault" value="blank" data-cc-action="hide" data-row-class="interviewDateEditable"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" name="interviewDateDefault" value="pre-populated" data-cc-action="show" data-row-class="interviewDateEditable"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
 			</c:when>
 			<c:otherwise>
-				<input type="radio" onchange="javascript:changeIcon()" name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" checked name="interviewDateDefault" value="re-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewDateEditable', 'true');" name="interviewDateDefault" value="blank" data-cc-action="hide" data-row-class="interviewDateEditable"><fmt:message key="blank" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" checked name="interviewDateDefault" value="re-populated" data-cc-action="show" data-row-class="interviewDateEditable"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
 			</c:otherwise>
 		</c:choose>
 	</td>
 </tr>
 
-<tr valign="top" class="interviewDate">
+<tr valign="top" class="interviewDate interviewDateEditable">
 	<td class="formlabel">
 		<fmt:message key="interviewer_date_editable" bundle="${resword}"/>
 	</td>

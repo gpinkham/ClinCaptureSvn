@@ -38,6 +38,10 @@
 	</c:if>	
 </c:forEach>
 
+<script language="JavaScript">
+	<c:import url="../../../includes/js/pages/update_study.js?r=${revisionNumber}" />
+</script>
+
 <script type="text/JavaScript" language="JavaScript">
 function updateVersionSelection(vsIds, index, count) {
 	var s = "vs"+count;
@@ -256,17 +260,15 @@ function updateThis(multiSelEle, count) {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td></tr>
 
 
-  <c:forEach var="config" items="${newStudy.studyParameters}">
-   <c:choose>
-   <c:when test="${config.parameter.handle=='collectDob'}">
+   <c:if test="${paramsMap['collectDob'] != null}">
      <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
        <c:choose>
-         <c:when test="${config.value.value == '1'}">
+         <c:when test="${paramsMap['collectDob'] == '1'}">
            <input type="radio" checked name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
            <input type="radio" name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
            <input type="radio" name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
          </c:when>
-         <c:when test="${config.value.value == '2'}">
+         <c:when test="${paramsMap['collectDob'] == '2'}">
             <input type="radio" name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
             <input type="radio" checked name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
             <input type="radio" name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
@@ -278,13 +280,12 @@ function updateThis(multiSelEle, count) {
          </c:otherwise>
       </c:choose>
       </td></tr>
+   </c:if>
 
-   </c:when>
-
-   <c:when test="${config.parameter.handle=='discrepancyManagement'}">
+   <c:if test="${paramsMap['discrepancyManagement'] != null}">
 		  <tr valign="top"><td class="formlabel"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/>:</td><td>
 		   <c:choose>
-		   <c:when test="${config.value.value == 'false'}">
+		   <c:when test="${paramsMap['discrepancyManagement'] == 'false'}">
 		    <input type="radio" name="discrepancyManagement" value="true"><fmt:message key="yes" bundle="${resword}"/>
 		    <input type="radio" checked name="discrepancyManagement" value="false"><fmt:message key="no" bundle="${resword}"/>
 		   </c:when>
@@ -295,12 +296,12 @@ function updateThis(multiSelEle, count) {
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>
+	</c:if>
 
-	<c:when test="${config.parameter.handle=='genderRequired'}">
+	<c:if test="${paramsMap['genderRequired'] != null}">
 		  <tr valign="top"><td class="formlabel"><fmt:message key="gender_required" bundle="${resword}"/>:</td><td>
 		   <c:choose>
-		   <c:when test="${config.value.value == 'false'}">
+		   <c:when test="${paramsMap['genderRequired'] == 'false'}">
 		    <input type="radio" name="genderRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
 		    <input type="radio" checked name="genderRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
 		   </c:when>
@@ -311,8 +312,8 @@ function updateThis(multiSelEle, count) {
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>
-    <c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">
+	</c:if>
+    <c:if test="${paramsMap['subjectPersonIdRequired'] != null}">
 		  <tr valign="top"><td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
 			<td colspan="2">
 				<c:set var="subjectPersonIdRequired" value=""/>
@@ -321,13 +322,13 @@ function updateThis(multiSelEle, count) {
 				<c:set var="subjectPersonIdNotUsed" value=""/>
 
 				<c:choose>
-					<c:when test="${config.value.value == 'required'}">
+					<c:when test="${paramsMap['subjectPersonIdRequired'] == 'required'}">
 						<c:set var="subjectPersonIdRequired" value="checked"/>
 					</c:when>
-					<c:when test="${config.value.value == 'optional'}">
+					<c:when test="${paramsMap['subjectPersonIdRequired'] == 'optional'}">
 						<c:set var="subjectPersonIdOptional" value="checked"/>
 					</c:when>
-					<c:when test="${config.value.value == 'copyFromSSID'}">
+					<c:when test="${paramsMap['subjectPersonIdRequired'] == 'copyFromSSID'}">
 						<c:set var="subjectPersonIdCopy" value="checked"/>
 					</c:when>
 					<c:otherwise>
@@ -341,16 +342,16 @@ function updateThis(multiSelEle, count) {
 				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdNotUsed} name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
 			</td>
 		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='subjectIdGeneration'}">
+	</c:if>
+	<c:if test="${paramsMap['subjectIdGeneration'] != null}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="how_to_generate_the_subject" bundle="${resword}"/>:</td><td>
 		   <c:choose>
-		   <c:when test="${config.value.value == 'manual'}">
+		   <c:when test="${paramsMap['subjectIdGeneration'] == 'manual'}">
 		    <input type="radio" checked name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
 		    <input type="radio" name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
 		    <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
 		   </c:when>
-		    <c:when test="${config.value.value == 'auto editable'}">
+		    <c:when test="${paramsMap['subjectIdGeneration'] == 'auto editable'}">
 		    <input type="radio" name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
 		    <input type="radio" checked name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
 		    <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
@@ -363,11 +364,11 @@ function updateThis(multiSelEle, count) {
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='subjectIdPrefixSuffix'}">
+	</c:if>
+	<c:if test="${paramsMap['subjectIdPrefixSuffix'] != null}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/>:</td><td>
 		   <c:choose>
-		   <c:when test="${config.value.value == 'true'}">
+		   <c:when test="${paramsMap['subjectIdPrefixSuffix'] == 'true'}">
 		    <input type="radio" checked name="subjectIdPrefixSuffix" value="true"><fmt:message key="yes" bundle="${resword}"/>
 		    <input type="radio" name="subjectIdPrefixSuffix" value="false"><fmt:message key="no" bundle="${resword}"/>
 
@@ -380,103 +381,144 @@ function updateThis(multiSelEle, count) {
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>
-    <c:when test="${config.parameter.handle=='markImportedCRFAsCompleted'}">
+	</c:if>
+    <c:if test="${paramsMap['markImportedCRFAsCompleted'] != null}">
         <tr valign="top">
             <td class="formlabel"><fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/></td>
             <td>
-                <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="markImportedCRFAsCompleted" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="markImportedCRFAsCompleted" value="no"><fmt:message key="no" bundle="${resword}"/>
+                <input type="radio" <c:if test="${paramsMap['markImportedCRFAsCompleted'] == 'yes'}">checked</c:if> name="markImportedCRFAsCompleted" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" <c:if test="${paramsMap['markImportedCRFAsCompleted'] == 'no'}">checked</c:if> name="markImportedCRFAsCompleted" value="no"><fmt:message key="no" bundle="${resword}"/>
             </td>
         </tr>
-    </c:when>
-    <c:when test="${config.parameter.handle=='autoScheduleEventDuringImport'}">
+    </c:if>
+    <c:if test="${paramsMap['autoScheduleEventDuringImport'] != null}">
       <tr valign="top">
         <td class="formlabel"><fmt:message key="autoScheduleEventDuringImport" bundle="${resword}"/></td>
         <td>
-          <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="autoScheduleEventDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-          <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="autoScheduleEventDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+          <input type="radio" <c:if test="${paramsMap['autoScheduleEventDuringImport'] == 'yes'}">checked</c:if> name="autoScheduleEventDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" <c:if test="${paramsMap['autoScheduleEventDuringImport'] == 'no'}">checked</c:if> name="autoScheduleEventDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
         </td>
       </tr>
-    </c:when>
-    <c:when test="${config.parameter.handle=='autoCreateSubjectDuringImport'}">
+    </c:if>
+    <c:if test="${paramsMap['autoCreateSubjectDuringImport'] != null}">
       <tr valign="top">
         <td class="formlabel"><fmt:message key="autoCreateSubjectDuringImport" bundle="${resword}"/></td>
         <td>
-          <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="autoCreateSubjectDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-          <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="autoCreateSubjectDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+          <input type="radio" <c:if test="${paramsMap['autoCreateSubjectDuringImport'] == 'yes'}">checked</c:if> name="autoCreateSubjectDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" <c:if test="${paramsMap['autoCreateSubjectDuringImport'] == 'no'}">checked</c:if> name="autoCreateSubjectDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
         </td>
       </tr>
-    </c:when>
-    <c:when test="${config.parameter.handle=='allowSdvWithOpenQueries'}">
+    </c:if>
+   <c:if test="${paramsMap['allowSdvWithOpenQueries'] != null}">
         <tr valign="top">
             <td class="formlabel"><fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/></td>
             <td>
-                <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
+                <input type="radio" <c:if test="${paramsMap['allowSdvWithOpenQueries'] == 'yes'}">checked</c:if> name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" <c:if test="${paramsMap['allowSdvWithOpenQueries'] == 'no'}">checked</c:if> name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
             </td>
         </tr>
-    </c:when>
-    <c:when test="${config.parameter.handle=='autoTabbing'}">
+    </c:if>
+    <c:if test="${paramsMap['useAutoTabbing'] != null}">
         <tr valign="top">
             <td class="formlabel"><fmt:message key="useAutoTabbing" bundle="${resword}"/></td>
             <td>
-                <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
+                <input type="radio" <c:if test="${paramsMap['useAutoTabbing'] == 'yes'}">checked</c:if> name="autoTabbing" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" <c:if test="${paramsMap['useAutoTabbing'] == 'no'}">checked</c:if> name="autoTabbing" value="no"><fmt:message key="no" bundle="${resword}"/>
             </td>
         </tr>
-    </c:when>
-   <c:when test="${config.parameter.handle=='replaceExisitingDataDuringImport'}">
+    </c:if>
+   <c:if test="${not empty paramsMap['replaceExisitingDataDuringImport']}">
        <tr valign="top">
            <td class="formlabel"><fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/></td>
            <td>
-               <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="replaceExisitingDataDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="replaceExisitingDataDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+               <input type="radio" <c:if test="${paramsMap['replaceExisitingDataDuringImport'] == 'yes'}">checked</c:if> name="replaceExisitingDataDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${paramsMap['replaceExisitingDataDuringImport'] == 'no'}">checked</c:if> name="replaceExisitingDataDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
            </td>
        </tr>
-   </c:when>
-	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
-		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
-		   <c:choose>
-               <c:when test="${config.value.value== 'yes'}">
-                   <input type="radio" checked name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                   <input type="radio" name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-                   <input type="radio" name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-               </c:when>
-               <c:when test="${config.value.value== 'no'}">
-                   <input type="radio" name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                   <input type="radio" checked name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-                   <input type="radio" name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-               </c:when>
-		       <c:otherwise>
-                   <input type="radio" name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                   <input type="radio" name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-                   <input type="radio" checked name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-		       </c:otherwise>
-		  </c:choose>
+   </c:if>
+	<c:if test="${paramsMap['interviewDateRequired'] != null}">
+		  <tr valign="top">
+		  	<td class="formlabel">
+		  		<fmt:message key="interviewer_date_required" bundle="${resword}"/>
+		  	</td>
+		   <td>
+				<input type="radio" ${paramsMap['interviewDateRequired'] == 'yes' ? 'checked' : ''} onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate" name="interviewDateRequired" value="yes">
+				<fmt:message key="required" bundle="${resword}"/>
+				<input type="radio" ${paramsMap['interviewDateRequired'] == 'no' ? 'checked' : ''} onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate" name="interviewDateRequired" value="no">
+				<fmt:message key="optional" bundle="${resword}"/>
+				<input type="radio" ${paramsMap['interviewDateRequired'] == 'not_used' ? 'checked' : ''} onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate" name="interviewDateRequired" value="not_used">
+				<fmt:message key="not_used" bundle="${resword}"/>
+					
+			</td>
 		  </td>
 		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='interviewerNameDefault'}">
-		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td>
+    </c:if>
+	<c:if test="${paramsMap['interviewDateDefault'] != null}">
+		  <tr valign="top" class="interviewDate">
+		  	<td class="formlabel">
+		  		<fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/>
+		  	</td>
+		  	<td>
+		     <c:choose>
+				<c:when test="${paramsMap['interviewDateDefault'] == 'blank'}">
+					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewDateEditable', 'true');" checked name="interviewDateDefault" value="blank" data-cc-action="hide" data-row-class="interviewDateEditable"><fmt:message key="blank" bundle="${resword}"/>
+					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" name="interviewDateDefault" value="pre-populated" data-cc-action="show" data-row-class="interviewDateEditable"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewDateEditable', 'true');" name="interviewDateDefault" value="blank" data-cc-action="hide" data-row-class="interviewDateEditable"><fmt:message key="blank" bundle="${resword}"/>
+					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" checked name="interviewDateDefault" value="re-populated" data-cc-action="show" data-row-class="interviewDateEditable"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		  </td>
+		  </tr>
+	 </c:if>
+	 <c:if test="${paramsMap['interviewDateEditable'] != null}">
+		  <tr valign="top" class="interviewDate interviewDateEditable"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
 		   <c:choose>
-		   <c:when test="${config.value.value== 'blank'}">
-		    <input type="radio" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-		    <input type="radio" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
-
+		   <c:when test="${paramsMap['interviewDateEditable'] == 'true'}">
+		    <input type="radio" checked name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
+		    <input type="radio" name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
+	
 		   </c:when>
 		   <c:otherwise>
-		    <input type="radio" name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewerNameDefault" value="re-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+		    <input type="radio" name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
+		    <input type="radio" checked name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
 		   </c:otherwise>
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='interviewerNameEditable'}">
-		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td>
+	 </c:if>
+	 <c:if test="${paramsMap['interviewerNameRequired'] != null}">
+		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
+		   <td>
+			  	<input type="radio" ${paramsMap['interviewerNameRequired'] == 'yes' ? 'checked' : ''} onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer" name="interviewerNameRequired" value="yes">
+				<fmt:message key="required" bundle="${resword}"/>
+				<input type="radio" ${paramsMap['interviewerNameRequired'] == 'no' ? 'checked' : ''} onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer" name="interviewerNameRequired" value="no">
+				<fmt:message key="optional" bundle="${resword}"/>
+				<input type="radio" ${paramsMap['interviewerNameRequired'] == 'not_used' ? 'checked' : ''} onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer" name="interviewerNameRequired" value="not_used">
+				<fmt:message key="not_used" bundle="${resword}"/>
+		  </td>
+		  </tr>
+	</c:if>
+	<c:if test="${paramsMap['interviewerNameDefault'] != null}">
+		  <tr valign="top" class="interviewer"><td class="formlabel"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td>
+			   <c:choose>
+				   <c:when test="${paramsMap['interviewerNameDefault'] == 'blank'}">
+					    <input type="radio" checked name="interviewerNameDefault" value="blank" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewerNameEditable', 'true');" data-cc-action="hide" data-row-class="interviewerEditable"><fmt:message key="blank" bundle="${resword}"/>
+					    <input type="radio" name="interviewerNameDefault" value="pre-populated" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewerEditable"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+				   </c:when>
+				   <c:otherwise>
+					    <input type="radio" name="interviewerNameDefault" value="blank" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewerNameEditable', 'true');" data-cc-action="hide" data-row-class="interviewerEditable"><fmt:message key="blank" bundle="${resword}"/>
+					    <input type="radio" checked name="interviewerNameDefault" value="re-populated" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewerEditable"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+				   </c:otherwise>
+			  </c:choose>
+		  </td>
+		  </tr>
+	</c:if>
+	<c:if test="${paramsMap['interviewerNameEditable'] != null}">
+		  <tr valign="top" class="interviewer interviewerEditable"><td class="formlabel"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td>
 		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
+		   <c:when test="${paramsMap['interviewerNameEditable'] == 'true'}">
 		    <input type="radio" checked name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
 		    <input type="radio" name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
 		   </c:when>
@@ -487,59 +529,21 @@ function updateThis(multiSelEle, count) {
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='interviewDateRequired'}">
-		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td><td>
-		   <c:choose>
-               <c:when test="${config.value.value== 'yes'}">
-                   <input type="radio" checked name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                   <input type="radio" name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-                   <input type="radio" name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-               </c:when>
-               <c:when test="${config.value.value== 'no'}">
-                   <input type="radio" name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                   <input type="radio" checked name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-                   <input type="radio" name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-               </c:when>
-		       <c:otherwise>
-                   <input type="radio" name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-                   <input type="radio" name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-                   <input type="radio" checked name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
-		       </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-    </c:when>
-	<c:when test="${config.parameter.handle=='interviewDateDefault'}">
-		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'blank'}">
-		    <input type="radio" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-		    <input type="radio" name="interviewDateDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+	</c:if>
 
-		   </c:when>
-		   <c:otherwise>
-		    <input type="radio" name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewDateDefault" value="re-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	 </c:when>
-
-   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+   <c:if test="${paramsMap['allowCodingVerification'] != null}">
        <tr valign="top">
            <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
            <td>
-               <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
+               <input type="radio" <c:if test="${paramsMap['allowCodingVerification'] == 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${paramsMap['allowCodingVerification'] == 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
            </td>
        </tr>
        <tr>
           <td>&nbsp;</td>
       </tr>
-   </c:when>
-   <c:when test="${config.parameter.handle == 'defaultBioontologyURL'}">
+   </c:if>
+   <c:if test="${paramsMap['defaultBioontologyURL'] != null}">
        <tr valign="top">
            <td class="formlabel">
                <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>:
@@ -548,9 +552,9 @@ function updateThis(multiSelEle, count) {
                <input id="bioontologyURL" name="defaultBioontologyURL" value="${bioontologyURL}"/>
            </td>
        </tr>
-   </c:when>
+   </c:if>
 
-  <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
+  <c:if test="${paramsMap['autoCodeDictionaryName'] != null}">
     <tr valign="top">
       <td class="formlabel">
         <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
@@ -563,26 +567,7 @@ function updateThis(multiSelEle, count) {
         </jsp:include>
       </td>
     </tr>
-   </c:when>
-
-	 <c:otherwise>
-		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <input type="radio" checked name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-
-		   </c:when>
-		   <c:otherwise>
-		    <input type="radio" name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-     </c:otherwise>
-   </c:choose>
-  </c:forEach>
+   </c:if>
 
 </table>
 </div>

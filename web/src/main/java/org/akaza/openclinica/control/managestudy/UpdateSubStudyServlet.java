@@ -301,6 +301,7 @@ public class UpdateSubStudyServlet extends Controller {
 		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 
 		ArrayList parameters = study.getStudyParameters();
+		HashMap<String, String> paramsMap = new HashMap<String, String>();
 
 		for (Object parameter : parameters) {
 			StudyParamsConfig scg = (StudyParamsConfig) parameter;
@@ -309,7 +310,10 @@ public class UpdateSubStudyServlet extends Controller {
 			scg.getValue().setStudyId(study.getId());
 			scg.getValue().setParameter(scg.getParameter().getHandle());
 			scg.getValue().setValue(value);
+			paramsMap.put(scg.getParameter().getHandle(), scg.getValue().getValue());
 		}
+		
+		request.setAttribute("paramsMap", paramsMap);
 
 		return study;
 
