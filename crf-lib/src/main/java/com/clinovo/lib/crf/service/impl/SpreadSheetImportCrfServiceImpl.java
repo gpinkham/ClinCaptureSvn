@@ -191,8 +191,6 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 
 		itemGroupBean.getMeta().setBorders(0);
 		itemGroupBean.getMeta().setHeader("");
-		itemGroupBean.getMeta().setRepeatMax(1);
-		itemGroupBean.getMeta().setRepeatNum(1);
 		itemGroupBean.getMeta().setSubheader("");
 		itemGroupBean.getMeta().setShowGroup(true);
 		itemGroupBean.getMeta().setRowStartNumber(0);

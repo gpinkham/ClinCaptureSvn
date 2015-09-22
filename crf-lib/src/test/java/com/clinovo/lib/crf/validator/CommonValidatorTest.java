@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 
@@ -23,6 +24,7 @@ import com.clinovo.lib.crf.builder.impl.JsonCrfBuilder;
 import com.clinovo.lib.crf.enums.CellName;
 import com.clinovo.lib.crf.enums.SheetName;
 import com.clinovo.lib.crf.factory.CrfBuilderFactory;
+import com.clinovo.lib.crf.producer.impl.ExcelErrorMessageProducer;
 
 public class CommonValidatorTest extends DefaultAppContextTest {
 
@@ -95,6 +97,15 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		return result;
 	}
 
+	private ExcelCrfBuilder getMockedExcelCrfBuilder(Workbook workbook) throws Exception {
+		excelCrfBuilder = Mockito.spy((ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner,
+				Locale.ENGLISH, messageSource));
+		ExcelErrorMessageProducer mockedExcelErrorMessageProducer = Mockito
+				.spy(new ExcelErrorMessageProducer(excelCrfBuilder));
+		Mockito.when(excelCrfBuilder.getErrorMessageProducer()).thenReturn(mockedExcelErrorMessageProducer);
+		return excelCrfBuilder;
+	}
+
 	@Test
 	public void testThatJsonCrfBuilderDoesNotGenerateAnyErrorsForCorrectData() throws Exception {
 		jsonCrfBuilder = (JsonCrfBuilder) crfBuilderFactory.getCrfBuilder(getJsonData("testCrf.json"), studyBean, owner,
@@ -128,10 +139,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.CRF.getSheetNumber()).getRow(1).createCell(CellName.CRF_VERSION.getColumnNumber())
 				.setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfVersionLengthIsExceeded();
 	}
 
 	@Test
@@ -139,10 +150,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.CRF.getSheetNumber()).getRow(1)
 				.createCell(CellName.CRF_VERSION_DESCRIPTION.getColumnNumber()).setCellValue(generateString(4001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfVersionDescriptionLengthIsExceeded();
 	}
 
 	@Test
@@ -150,11 +161,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.CRF.getSheetNumber()).getRow(1)
 				.createCell(CellName.CRF_REVISION_NOTES.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfRevisionNotesIsBlank();
 	}
 
 	@Test
@@ -162,10 +173,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.CRF.getSheetNumber()).getRow(1)
 				.createCell(CellName.CRF_REVISION_NOTES.getColumnNumber()).setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfRevisionNotesLengthIsExceeded();
 	}
 
 	@Test(expected = CRFReadingException.class)
@@ -173,9 +184,9 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.CRF.getSheetNumber()).getRow(1).createCell(CellName.CRF_NAME.getColumnNumber())
 				.setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfNameIsBlank();
 	}
 
 	@Test
@@ -183,10 +194,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.CRF.getSheetNumber()).getRow(1).createCell(CellName.CRF_NAME.getColumnNumber())
 				.setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfNameLengthIsExceeded();
 	}
 
 	@Test
@@ -194,11 +205,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(1)
 				.createCell(CellName.SECTION_LABEL.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionLabelIsBlank();
 	}
 
 	@Test
@@ -206,10 +217,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(1)
 				.createCell(CellName.SECTION_LABEL.getColumnNumber()).setCellValue(generateString(2001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionLabelLengthIsExceeded();
 	}
 
 	@Test
@@ -219,11 +230,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.SECTION_LABEL.getColumnNumber()).setCellValue("section1");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).createRow(2)
 				.createCell(CellName.SECTION_LABEL.getColumnNumber()).setCellValue("section1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionLabelIsDuplicated();
 	}
 
 	@Test
@@ -231,11 +242,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(1)
 				.createCell(CellName.SECTION_TITLE.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionTitleIsBlank();
 	}
 
 	@Test
@@ -243,10 +254,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(1)
 				.createCell(CellName.SECTION_TITLE.getColumnNumber()).setCellValue(generateString(2001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionTitleLengthIsExceeded();
 	}
 
 	@Test
@@ -254,10 +265,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(1)
 				.createCell(CellName.SECTION_INSTRUCTIONS.getColumnNumber()).setCellValue(generateString(10001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionInstructionsLengthIsExceeded();
 	}
 
 	@Test
@@ -265,10 +276,23 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(1)
 				.createCell(CellName.SECTION_PAGE_NUMBER.getColumnNumber()).setCellValue(generateString(6));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).sectionPageNumberLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatExcelCrfBuilderGeneratesErrorsIfGroupLabelIsBlank() throws Exception {
+		Workbook workbook = getWorkbook("testCrf.xls");
+		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(1)
+				.createCell(CellName.GROUP_LABEL.getColumnNumber()).setCellValue("");
+		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(1)
+				.createCell(CellName.GROUP_HEADER.getColumnNumber()).setCellValue("GROUP HEADER");
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
+		excelCrfBuilder.build();
+		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).groupLabelIsBlank();
 	}
 
 	@Test
@@ -276,10 +300,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(1)
 				.createCell(CellName.GROUP_LABEL.getColumnNumber()).setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).groupLabelLengthIsExceeded();
 	}
 
 	@Test
@@ -287,10 +311,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(1)
 				.createCell(CellName.GROUP_HEADER.getColumnNumber() - 1).setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).groupHeaderLengthIsExceeded();
 	}
 
 	@Test
@@ -300,11 +324,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.GROUP_LABEL.getColumnNumber()).setCellValue("group1");
 		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(2)
 				.createCell(CellName.GROUP_LABEL.getColumnNumber()).setCellValue("group1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).groupLabelIsDuplicated();
 	}
 
 	@Test
@@ -312,11 +336,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1).createCell(CellName.ITEM_NAME.getColumnNumber())
 				.setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemNameIsBlank();
 	}
 
 	@Test
@@ -324,10 +348,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1).createCell(CellName.ITEM_NAME.getColumnNumber())
 				.setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemNameLengthIsExceeded();
 	}
 
 	@Test
@@ -337,10 +361,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.setCellValue("item1");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2).createCell(CellName.ITEM_NAME.getColumnNumber())
 				.setCellValue("item1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemNameIsDuplicated();
 	}
 
 	@Test
@@ -348,11 +372,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DESCRIPTION_LABEL.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemDescriptionIsBlank();
 	}
 
 	@Test
@@ -360,10 +384,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DESCRIPTION_LABEL.getColumnNumber()).setCellValue(generateString(4001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemDescriptionLengthIsExceeded();
 	}
 
 	@Test
@@ -371,11 +395,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(1)
 				.createCell(CellName.GROUP_REPEAT_NUMBER.getColumnNumber() - 1).setCellValue("-1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).repeatNumIsWrong();
 	}
 
 	@Test
@@ -383,11 +407,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.GROUPS.getSheetNumber()).getRow(1)
 				.createCell(CellName.GROUP_REPEAT_MAX.getColumnNumber() - 1).setCellValue("-1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).repeatMaxIsWrong();
 	}
 
 	@Test
@@ -395,11 +419,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1).createCell(CellName.ITEM_NAME.getColumnNumber())
 				.setCellValue("$$###");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemNameIsNotMatchingRegexp();
 	}
 
 	@Test
@@ -407,10 +431,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_LEFT_ITEM_TEXT.getColumnNumber()).setCellValue(generateString(4001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemLeftTextLengthIsExceeded();
 	}
 
 	@Test
@@ -418,10 +442,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RIGHT_ITEM_TEXT.getColumnNumber()).setCellValue(generateString(2001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemRightTextLengthIsExceeded();
 	}
 
 	@Test
@@ -429,10 +453,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_HEADER.getColumnNumber()).setCellValue(generateString(2001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemHeaderLengthIsExceeded();
 	}
 
 	@Test
@@ -440,11 +464,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_SUBHEADER.getColumnNumber()).setCellValue(generateString(241));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemSubHeaderLengthIsExceeded();
 	}
 
 	@Test
@@ -452,23 +476,23 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("WRONG GROUP");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemGroupLabelIsNotValid();
 	}
 
 	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfItemSectionLabelLengthIsExceeded() throws Exception {
+	public void testThatExcelCrfBuilderGeneratesErrorsIfItemSectionLabelIsNotValid() throws Exception {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_SECTION_LABEL.getColumnNumber()).setCellValue("WRONG SECTION");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemSectionLabelIsNotValid();
 	}
 
 	@Test
@@ -476,11 +500,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemGroupLabelLengthIsExceeded();
 	}
 
 	@Test
@@ -488,11 +512,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_SECTION_LABEL.getColumnNumber()).setCellValue(generateString(2001));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemSectionLabelIsNotValid();
 	}
 
 	@Test
@@ -500,11 +524,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_UNITS.getColumnNumber()).setCellValue(generateString(65));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemUnitsLengthIsExceeded();
 	}
 
 	@Test
@@ -512,11 +536,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_PARENT_ITEM.getColumnNumber()).setCellValue("WRONG ITEM");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemParentItemIsNotValid();
 	}
 
 	@Test
@@ -524,11 +548,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_TYPE.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseTypeIsBlank();
 	}
 
 	@Test
@@ -536,11 +560,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_TYPE.getColumnNumber()).setCellValue("WRONG TYPE");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseTypeIsNotValid();
 	}
 
 	@Test
@@ -550,11 +574,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_PARENT_ITEM.getColumnNumber()).setCellValue("CM001_TXT_INT1");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(3)
 				.createCell(CellName.ITEM_PARENT_ITEM.getColumnNumber()).setCellValue("CM001_TXT_INT2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).hasNestedParentItem();
 	}
 
 	@Test
@@ -564,11 +588,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_PARENT_ITEM.getColumnNumber()).setCellValue("CM001_TXT_INT1");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).repeatingGroupHasParentItem();
 	}
 
 	@Test
@@ -578,11 +602,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_RESPONSE_TYPE.getColumnNumber()).setCellValue("radio");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_DEFAULT_VALUE.getColumnNumber()).setCellValue("1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).hasRadioWithDefault();
 	}
 
 	@Test
@@ -590,11 +614,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_LABEL.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseLabelIsBlank();
 	}
 
 	@Test
@@ -602,11 +626,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_OPTIONS_TEXT.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseOptionsTextIsBlank();
 	}
 
 	@Test
@@ -614,11 +638,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseOptionsValuesIsBlank();
 	}
 
 	@Test
@@ -629,11 +653,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber())
 				.setCellValue("0,1,2,3,4,5");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemHasIncompleteOptionValuePair();
 	}
 
 	@Test
@@ -649,11 +673,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber())
 				.setCellValue("0,1,2,3,4,5");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemHasDifferentNumberOfOptionsValues();
 	}
 
 	@Test
@@ -668,11 +692,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_RESPONSE_OPTIONS_TEXT.getColumnNumber()).setCellValue("a,b,c,d,e");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue("0,1,7,3,4");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemHasDifferentValuesForOptionsValues();
 	}
 
 	@Test
@@ -687,11 +711,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_RESPONSE_OPTIONS_TEXT.getColumnNumber()).setCellValue("a,b,c,d,e,z");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue("0,1,2,3,4");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemHasDifferentNumberOfOptionsText();
 	}
 
 	@Test
@@ -701,11 +725,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_RESPONSE_TYPE.getColumnNumber()).setCellValue("calculation");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue(": 2+2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).expressionDoesNotStartWithFunc();
 	}
 
 	@Test
@@ -716,11 +740,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber())
 				.setCellValue("func: $#2*/d;2+2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).expressionIsNotValid();
 	}
 
 	@Test
@@ -731,11 +755,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber())
 				.setCellValue("CM001_TXT_INT3 + CM001_TXT_INT2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemMustBeListedBeforeAnotherItem();
 	}
 
 	@Test
@@ -748,11 +772,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.setCellValue("CM001_TXT_INT1 + CM001_TXT_INT2");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemsMustHaveTheSameGroup();
 	}
 
 	@Test
@@ -767,11 +791,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemsShouldNotHaveTheSameGroup();
 	}
 
 	@Test
@@ -779,11 +803,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemDataTypeIsBlank();
 	}
 
 	@Test
@@ -791,11 +815,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("WRONG DATA TYPE");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemDataTypeIsNotValid();
 	}
 
 	@Test
@@ -805,39 +829,39 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_RESPONSE_TYPE.getColumnNumber()).setCellValue("file");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("ST");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemDataTypeShouldBeFile();
 	}
 
 	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfItemDataTypeShouldBeInteger() throws Exception {
+	public void testThatExcelCrfBuilderGeneratesErrorsIfResponseOptionsValuesShouldBeInteger() throws Exception {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("INT");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue("a,1,2,3,4");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseOptionsValuesShouldBeInteger();
 	}
 
 	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfItemDataTypeShouldBeReal() throws Exception {
+	public void testThatExcelCrfBuilderGeneratesErrorsIfResponseOptionsValuesShouldBeReal() throws Exception {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("REAL");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue("a,1,2,3,4");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseOptionsValuesShouldBeReal();
 	}
 
 	@Test
@@ -845,11 +869,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_WIDTH_DECIMAL.getColumnNumber()).setCellValue("10");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).widthDecimalIsNotAvailable();
 	}
 
 	@Test
@@ -857,11 +881,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_WIDTH_DECIMAL.getColumnNumber()).setCellValue("x10");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).widthDecimalHasErrors();
 	}
 
 	@Test
@@ -871,38 +895,38 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_VALIDATION.getColumnNumber()).setCellValue(":#$afasdg32x10");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION_ERROR_MESSAGE.getColumnNumber()).setCellValue("BLA");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).validationColumnIsNotValid();
 	}
 
 	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfValidationMessageColumnIsBlank() throws Exception {
+	public void testThatExcelCrfBuilderGeneratesErrorsIfRegexpErrorMsgIsBlank() throws Exception {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION.getColumnNumber()).setCellValue("regexp: /2.*/");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION_ERROR_MESSAGE.getColumnNumber()).setCellValue("");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).regexpErrorMsgIsBlank();
 	}
 
 	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfValidationMessageLengthIsExceeded() throws Exception {
+	public void testThatExcelCrfBuilderGeneratesErrorsIfRegexpErrorMsgLengthIsExceeded() throws Exception {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION.getColumnNumber()).setCellValue("regexp: /2.*/");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION_ERROR_MESSAGE.getColumnNumber()).setCellValue(generateString(256));
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).regexpErrorMsgLengthIsExceeded();
 	}
 
 	@Test
@@ -912,11 +936,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_VALIDATION.getColumnNumber()).setCellValue("func: #$afasdg32x10");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION_ERROR_MESSAGE.getColumnNumber()).setCellValue("BLA");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).regexpIsNotValid();
 	}
 
 	@Test
@@ -926,11 +950,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_VALIDATION.getColumnNumber()).setCellValue("regexp: #$afasdg32x10");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION_ERROR_MESSAGE.getColumnNumber()).setCellValue("BLA");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).regexpIsInvalidRegularExpression();
 	}
 
 	@Test
@@ -940,11 +964,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_VALIDATION.getColumnNumber()).setCellValue("regexp: \\\\#$afasdg32x10");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_VALIDATION_ERROR_MESSAGE.getColumnNumber()).setCellValue("BLA");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).validationColumnHasInvalidRegularExpression();
 	}
 
 	@Test
@@ -952,11 +976,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1).createCell(CellName.ITEM_PHI.getColumnNumber())
 				.setCellValue("WRONG VALUE");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).phiIsNotValid();
 	}
 
 	@Test
@@ -964,11 +988,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_REQUIRED.getColumnNumber()).setCellValue("WRONG VALUE");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).requiredIsNotValid();
 	}
 
 	@Test
@@ -979,11 +1003,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY.getColumnNumber())
 				.setCellValue("CM001_TXT_INT1,1,MESSAGE!");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemDisplayStatusIsNotValid();
 	}
 
 	@Test
@@ -994,11 +1018,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY.getColumnNumber())
 				.setCellValue("CM001_TXT_INT1,345,MESSAGE!");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).controlResponseValueIsNotValid();
 	}
 
 	@Test
@@ -1009,11 +1033,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY.getColumnNumber())
 				.setCellValue("CM001_TXT_INT345,1,MESSAGE!");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).controlItemNameIsNotValid();
 	}
 
 	@Test
@@ -1024,11 +1048,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY.getColumnNumber())
 				.setCellValue("CM001_TXT_INT1,1");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).simpleConditionalDisplayIsNotValid();
 	}
 
 	@Test
@@ -1038,11 +1062,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("CODE");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_CODE_REF.getColumnNumber()).setCellValue("WRONG VALUE");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).ontologyNameIsNotValid();
 	}
 
 	@Test
@@ -1052,11 +1076,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_DATA_TYPE.getColumnNumber()).setCellValue("INT");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_CODE_REF.getColumnNumber()).setCellValue("MEDDRA");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).needToUpdateMedicalCodingReferenceItemType();
 	}
 
 	@Test
@@ -1071,11 +1095,11 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_RESPONSE_OPTIONS_TEXT.getColumnNumber()).setCellValue("a,b,c,d,e");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_RESPONSE_VALUES_OR_CALCULATIONS.getColumnNumber()).setCellValue("0,1,2,3,4");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).responseLabelHasBeenUsedForAnotherResponseType();
 	}
 
 	@Test
@@ -1091,30 +1115,10 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
 				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
+		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
-	}
-
-	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfThereIsNotUniqueItemPlacementInGroups() throws Exception {
-		Workbook workbook = getWorkbook("testCrf.xls");
-		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).createRow(2)
-				.createCell(CellName.SECTION_LABEL.getColumnNumber()).setCellValue("section2");
-		workbook.getSheetAt(SheetName.SECTIONS.getSheetNumber()).getRow(2)
-				.createCell(CellName.SECTION_TITLE.getColumnNumber()).setCellValue("section2");
-		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
-				.createCell(CellName.ITEM_SECTION_LABEL.getColumnNumber()).setCellValue("section2");
-		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
-				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
-		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(2)
-				.createCell(CellName.ITEM_GROUP_LABEL.getColumnNumber()).setCellValue("group2");
-		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
-				messageSource);
-		excelCrfBuilder.build();
-		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
-		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemOfOneGroupBelongsToMoreThanOneSection();
 	}
 }

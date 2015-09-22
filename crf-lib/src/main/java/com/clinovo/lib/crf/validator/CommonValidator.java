@@ -686,8 +686,9 @@ public final class CommonValidator {
 
 	private static void validatePhiAndRequired(BaseCrfBuilder crfBuilder) throws Exception {
 		if (crfBuilder.isExcelCrfBuilder()) {
-			if (!ZERO.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))
-					&& !ONE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))) {
+			if (!(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI).isEmpty()
+					|| ZERO.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))
+					|| ONE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI)))) {
 				crfBuilder.getErrorMessageProducer().phiIsNotValid();
 			}
 			if (!ZERO.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.REQUIRED))
@@ -695,8 +696,9 @@ public final class CommonValidator {
 				crfBuilder.getErrorMessageProducer().requiredIsNotValid();
 			}
 		} else if (crfBuilder.isJsonCrfBuilder()) {
-			if (!TRUE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))
-					&& !FALSE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))) {
+			if (!(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI).isEmpty()
+					|| TRUE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))
+					|| FALSE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI)))) {
 				crfBuilder.getErrorMessageProducer().phiIsNotValid();
 			}
 			if (!YES.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.REQUIRED))

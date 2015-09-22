@@ -13,17 +13,6 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyType;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,10 +28,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyType;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+
 /**
  * StudyDAO.java, the data access object that users will access the database for study objects.
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	public StudyDAO(DataSource ds) {
@@ -132,7 +133,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 * <b>update </b>, the method that returns an updated study bean after it updates the database. Note that we can use
 	 * the three stages from our creation use case.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return sb an updated study bean.
 	 */
 	public EntityBean update(EntityBean eb) {
@@ -200,7 +202,6 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(index++, sb.getFacilityContactEmail());
 		variables.put(index++, sb.getStatus().getId()); // status
 		variables.put(index++, sb.getUpdaterId()); // owner
-		variables.put(index++, new Timestamp(sb.getUpdatedDate().getTime())); // date updated
 		variables.put(index++, sb.getOldStatus().getId()); // study id
 		variables.put(index, sb.getId()); // study id
 		this.execute(digester.getQuery("updateStepOne"), variables, nullVars);
@@ -214,7 +215,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 * function here which calls all four functions at once, but the seperate functions may be required in the control
 	 * servlets.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return eb the created entity bean.
 	 */
 	public EntityBean create(EntityBean eb) {
@@ -306,7 +308,6 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(index++, sb.getFacilityContactPhone());
 		variables.put(index++, sb.getFacilityContactEmail());
 		variables.put(index++, sb.getStatus().getId());
-		variables.put(index++, new Timestamp(new Date().getTime()));
 		variables.put(index++, sb.getOwnerId());
 		variables.put(index, getValidOid(sb));
 		// replace this with the owner id
@@ -341,7 +342,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param oid String
+	 * @param oid
+	 *            String
 	 * @return StudyBean
 	 */
 	public StudyBean findByOid(String oid) {
@@ -365,7 +367,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param oid String
+	 * @param oid
+	 *            String
 	 * @return StudyBean
 	 */
 	public StudyBean findByUniqueIdentifier(String oid) {
@@ -387,8 +390,10 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	}
 
 	/**
-	 * @param parentUniqueIdentifier String
-	 * @param siteUniqueIdentifier   String
+	 * @param parentUniqueIdentifier
+	 *            String
+	 * @param siteUniqueIdentifier
+	 *            String
 	 * @return StudyBean
 	 */
 	public StudyBean findSiteByUniqueIdentifier(String parentUniqueIdentifier, String siteUniqueIdentifier) {
@@ -412,7 +417,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return StudyBean
 	 */
 	public StudyBean createStepTwo(StudyBean sb) {
@@ -454,7 +460,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return StudyBean
 	 */
 	public StudyBean createStepThree(StudyBean sb) {
@@ -474,7 +481,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return StudyBean
 	 */
 	public StudyBean createStepFour(StudyBean sb) {
@@ -491,7 +499,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	/**
 	 * getEntityFromHashMap, the method that gets the object from the database query.
 	 *
-	 * @param hm HashMap
+	 * @param hm
+	 *            HashMap
 	 * @return Object
 	 */
 	@SuppressWarnings("deprecation")
@@ -582,7 +591,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param username String
+	 * @param username
+	 *            String
 	 * @return Collection
 	 */
 	public Collection findAllByUser(String username) {
@@ -601,7 +611,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param crfId int
+	 * @param crfId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList<Integer> getStudyIdsByCRF(int crfId) {
@@ -620,7 +631,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param username String
+	 * @param username
+	 *            String
 	 * @return Collection
 	 */
 	public Collection findAllByUserNotRemoved(String username) {
@@ -639,7 +651,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param username String
+	 * @param username
+	 *            String
 	 * @return List
 	 */
 	public List<StudyBean> findAllActiveStudiesWhereUserHasRole(String username) {
@@ -659,7 +672,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param username String
+	 * @param username
+	 *            String
 	 * @return List
 	 */
 	public List<StudyBean> findAllActiveWhereUserHasRole(String username) {
@@ -678,7 +692,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param username String
+	 * @param username
+	 *            String
 	 * @return List
 	 */
 	public List<StudyBean> findAllActiveWhereUserHasActiveRole(String username) {
@@ -697,7 +712,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param status String
+	 * @param status
+	 *            String
 	 * @return ArrayList
 	 */
 	public ArrayList findAllByStatus(Status status) {
@@ -721,7 +737,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param isLimited boolean
+	 * @param isLimited
+	 *            boolean
 	 * @return Collection
 	 */
 	public Collection findAllByLimit(boolean isLimited) {
@@ -780,7 +797,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param parentStudyId int
+	 * @param parentStudyId
+	 *            int
 	 * @return Collection
 	 */
 	public Collection findAllByParent(int parentStudyId) {
@@ -789,8 +807,10 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param parentStudyId int
-	 * @param isLimited boolean
+	 * @param parentStudyId
+	 *            int
+	 * @param isLimited
+	 *            boolean
 	 * @return Collection
 	 */
 	public Collection findAllByParentAndLimit(int parentStudyId, boolean isLimited) {
@@ -813,7 +833,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param parentStudyId int
+	 * @param parentStudyId
+	 *            int
 	 * @return List
 	 */
 	public List<StudyBean> findAllByParentAndActive(int parentStudyId) {
@@ -831,7 +852,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param studyId int
+	 * @param studyId
+	 *            int
 	 * @return Collection
 	 */
 	public Collection findAll(int studyId) {
@@ -872,7 +894,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param name String
+	 * @param name
+	 *            String
 	 * @return EntityBean
 	 */
 	public EntityBean findByName(String name) {
@@ -894,7 +917,9 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 * Find Study by name.
-	 * @param name String
+	 * 
+	 * @param name
+	 *            String
 	 * @return EntityBean
 	 */
 	public EntityBean findStudyByName(String name) {
@@ -917,7 +942,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	/**
 	 * deleteTestOnly, used only to clean up after unit testing.
 	 *
-	 * @param name String
+	 * @param name
+	 *            String
 	 */
 	public void deleteTestOnly(String name) {
 		HashMap variables = new HashMap();
@@ -937,9 +963,12 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	/**
 	 * Only for use by getChildrenByParentIds.
 	 * 
-	 * @param answer HashMap
-	 * @param parentId int
-	 * @param child StudyBean
+	 * @param answer
+	 *            HashMap
+	 * @param parentId
+	 *            int
+	 * @param child
+	 *            StudyBean
 	 * @return HashMap
 	 */
 	private HashMap addChildToParent(HashMap answer, int parentId, StudyBean child) {
@@ -954,12 +983,13 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	}
 
 	/**
-	 * @param allStudies The result of findAll().
+	 * @param allStudies
+	 *            The result of findAll().
 	 * @return A HashMap where the keys are Integers whose intValue are studyIds and the values are ArrayLists; each
-	 * element of the ArrayList is a StudyBean representing a child of the study whose id is the key
-	 * <p/>
-	 * e.g., if A has children B and C, then this will return a HashMap h where h.get(A.getId()) returns an
-	 * ArrayList whose elements are B and C
+	 *         element of the ArrayList is a StudyBean representing a child of the study whose id is the key
+	 *         <p/>
+	 *         e.g., if A has children B and C, then this will return a HashMap h where h.get(A.getId()) returns an
+	 *         ArrayList whose elements are B and C
 	 */
 	public HashMap getChildrenByParentIds(ArrayList allStudies) {
 		HashMap answer = new HashMap();
@@ -979,7 +1009,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return Collection
 	 */
 	public Collection<Integer> findAllSiteIdsByStudy(StudyBean study) {
@@ -999,7 +1030,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return Collection
 	 */
 	public Collection<Integer> findOlnySiteIdsByStudy(StudyBean study) {
@@ -1018,7 +1050,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return StudyBean
 	 */
 	public StudyBean updateSitesStatus(StudyBean sb) {
@@ -1034,7 +1067,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param studyId int
+	 * @param studyId
+	 *            int
 	 * @return int
 	 */
 	public int countLockedEvents(int studyId) {
@@ -1055,7 +1089,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param studyId int
+	 * @param studyId
+	 *            int
 	 * @return int
 	 */
 	public int countEvents(int studyId) {
@@ -1076,7 +1111,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param studies List
+	 * @param studies
+	 *            List
 	 * @return Map
 	 */
 	public Map<Integer, Map<String, Integer>> analyzeEvents(List<StudyBean> studies) {
@@ -1123,8 +1159,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 			} catch (SQLException sqle) {
 				signalFailure(sqle);
 				if (logger.isWarnEnabled()) {
-					logger.warn("Exception while executing dynamic query, StudyDAO.analyzeEvents: " + sql
-							+ ":message: " + sqle.getMessage());
+					logger.warn("Exception while executing dynamic query, StudyDAO.analyzeEvents: " + sql + ":message: "
+							+ sqle.getMessage());
 					sqle.printStackTrace();
 				}
 			} finally {
@@ -1137,7 +1173,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param sb StudyBean
+	 * @param sb
+	 *            StudyBean
 	 * @return StudyBean
 	 */
 	public StudyBean updateStudyStatus(StudyBean sb) {
@@ -1153,7 +1190,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param studySubjectId int
+	 * @param studySubjectId
+	 *            int
 	 * @return StudyBean
 	 */
 	public StudyBean findByStudySubjectId(int studySubjectId) {
@@ -1171,7 +1209,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param parentStudyId int
+	 * @param parentStudyId
+	 *            int
 	 * @return Collection
 	 */
 	public Collection findAllByParentStudyIdOrderedByIdAsc(int parentStudyId) {

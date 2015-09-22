@@ -14,6 +14,7 @@
 
     <xs:complexType name="restData">
         <xs:sequence>
+            <xs:element ref="CrfVersion" minOccurs="0"/>
             <xs:element ref="EventDefinitionCrf" minOccurs="0"/>
             <xs:element ref="StudyEventDefinition" minOccurs="0"/>
             <xs:element ref="UserAccount" minOccurs="0"/>
@@ -151,6 +152,21 @@
             <xs:element ref="StudyId" minOccurs="0"/>
             <xs:element ref="EmailWhen" minOccurs="0"/>
             <xs:element ref="Email" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="CrfVersion" type="crfVersionBean"/>
+
+    <xs:element name="CrfId" type="xs:int"/>
+    <xs:element name="Version" type="xs:string"/>
+
+    <xs:complexType name="crfVersionBean">
+        <xs:sequence>
+            <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
+            <xs:element ref="CrfId" minOccurs="0"/>
+            <xs:element ref="CrfName" minOccurs="0"/>
+            <xs:element ref="Version" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

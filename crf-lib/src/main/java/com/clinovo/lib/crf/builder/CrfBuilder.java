@@ -119,11 +119,4 @@ public interface CrfBuilder {
 	 * @return CRFVersionBean
 	 */
 	CRFVersionBean save();
-
-	/**
-	 * Check if tag with source of the CRF included into section sub title.
-	 *
-	 * @param sectionSubTitle String.
-	 */
-	void checkCRFSource(String sectionSubTitle);
 }

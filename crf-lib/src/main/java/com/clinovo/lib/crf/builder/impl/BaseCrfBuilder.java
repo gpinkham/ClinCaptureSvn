@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import com.clinovo.lib.crf.enums.CRFSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -57,6 +56,7 @@ import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.bean.ItemBeanExt;
 import com.clinovo.lib.crf.builder.CrfBuilder;
+import com.clinovo.lib.crf.enums.CRFSource;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
@@ -220,8 +220,18 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		return defaultItemGroupBean;
 	}
 
+	/**
+	 * Sets default item group. And sets min & max rows.
+	 *
+	 * @param defaultItemGroupBean
+	 *            ItemGroupBean
+	 */
 	public void setDefaultItemGroupBean(ItemGroupBean defaultItemGroupBean) {
 		this.defaultItemGroupBean = defaultItemGroupBean;
+		this.defaultItemGroupBean.setMeta(new ItemGroupMetadataBean());
+		this.defaultItemGroupBean.getMeta().setRepeatingGroup(false);
+		this.defaultItemGroupBean.getMeta().setRepeatMax(1);
+		this.defaultItemGroupBean.getMeta().setRepeatNum(1);
 	}
 
 	/**
@@ -720,7 +730,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Check if tag with source of the CRF included into section sub title.
+	 *
+	 * @param sectionSubTitle
+	 *            String.
 	 */
 	public void checkCRFSource(String sectionSubTitle) {
 		Pattern pattern = Pattern.compile(CRF_SOURCE_MARKER_OPEN + "(.*?)" + CRF_SOURCE_MARKER_CLOSE);

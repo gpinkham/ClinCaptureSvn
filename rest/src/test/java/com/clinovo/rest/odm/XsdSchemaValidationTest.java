@@ -20,9 +20,8 @@ public class XsdSchemaValidationTest {
 
 	@Before
 	public void before() throws Exception {
-		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-				new FileSystemResourceLoader().getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd")
-						.getURL());
+		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new FileSystemResourceLoader()
+				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getURL());
 	}
 
 	@Test
@@ -30,8 +29,8 @@ public class XsdSchemaValidationTest {
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		jaxbUnmarshaller.setSchema(schema);
-		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
-				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/eventdefinitioncrf.xml").getFile());
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/eventdefinitioncrf.xml").getFile());
 		assertNotNull(restOdmContainer.getRestData().getEventDefinitionCRFBean());
 		assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEventName(), "TEST EDC");
 	}
@@ -41,9 +40,8 @@ public class XsdSchemaValidationTest {
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		jaxbUnmarshaller.setSchema(schema);
-		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
-				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition1.xml")
-						.getFile());
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition1.xml").getFile());
 		assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
 		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test visit");
 	}
@@ -54,9 +52,8 @@ public class XsdSchemaValidationTest {
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		jaxbUnmarshaller.setSchema(schema);
-		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
-				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition2.xml")
-						.getFile());
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller.unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition2.xml").getFile());
 		assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
 		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test visit");
 		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getEventDefinitionCrfs().size(), 2);
@@ -93,5 +90,16 @@ public class XsdSchemaValidationTest {
 				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/error.xml").getFile());
 		assertNotNull(restOdmContainer.getRestData().getError());
 		assertEquals(restOdmContainer.getRestData().getError().getCode(), 401);
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheCrfVersionBean() throws Exception {
+		JAXBContext jaxbContext = JAXBContext.newInstance(ODM.class, RestOdmContainer.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		jaxbUnmarshaller.setSchema(schema);
+		RestOdmContainer restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
+				.unmarshal(new FileSystemResourceLoader().getResource("classpath:xml/crfversion.xml").getFile());
+		assertNotNull(restOdmContainer.getRestData().getCrfVersionBean());
+		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getCrfName(), "Test CRF");
 	}
 }

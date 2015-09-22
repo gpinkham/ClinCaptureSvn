@@ -19,7 +19,6 @@ import java.net.URLDecoder;
 
 import javax.sql.DataSource;
 
-import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -42,6 +41,7 @@ import com.clinovo.lib.crf.builder.impl.JsonCrfBuilder;
 import com.clinovo.lib.crf.enums.FormStudioElement;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.enums.RealValueKey;
+import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import com.clinovo.lib.crf.validator.CommonValidator;
 
 /**
@@ -113,7 +113,8 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	private String getString(JSONObject jsonObject, String key, boolean checkMetadataTags) {
 		String result = "";
 		try {
-			result = URLDecoder.decode(jsonObject.getString(key), UTF_8);
+			result = URLDecoder.decode(jsonObject.getString(key), UTF_8).replaceAll("&lt;script&gt;", OPEN_CLOSE_TAG)
+					.replaceAll("&lt;/script&gt;", CLOSE_SCRIPT_TAG);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
@@ -135,6 +136,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		itemGroupBean.setStatus(Status.AVAILABLE);
 		itemGroupBean.setOwner(crfBuilder.getOwner());
 		itemGroupBean.setName(groupName);
+		itemGroupBean.setMeta(null);
 		crfBuilder.getItemGroups().add(itemGroupBean);
 		crfBuilder.getItemGroupLabelMap().put(itemGroupBean.getName(), itemGroupBean);
 		return itemGroupBean;
@@ -226,19 +228,20 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		ItemGroupBean itemGroupBean = (ItemGroupBean) getObject(jsonObj, REPEATING_GROUP);
 		crfBuilder.getCurrentItem()
 				.setItemGroupBean(itemGroupBean != null ? itemGroupBean : crfBuilder.getDefaultItemGroupBean());
-		crfBuilder.getCurrentItem().getItemGroupBean().setMeta(new ItemGroupMetadataBean());
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setBorders(0);
-		int maxRows = getInt(jsonObj, MAX_ROWS);
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatMax(
-				crfBuilder.getCurrentItem().getItemGroupBean() == crfBuilder.getDefaultItemGroupBean() ? 1 : maxRows);
-		int minRows = getInt(jsonObj, MIN_ROWS);
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatNum(
-				crfBuilder.getCurrentItem().getItemGroupBean() == crfBuilder.getDefaultItemGroupBean() ? 1 : minRows);
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRowStartNumber(0);
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setShowGroup(true);
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatingGroup(itemGroupBean != null);
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setHeader(getString(jsonObj, REPEATING_GROUP_HEADER));
-		crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setSubheader("");
+		if (crfBuilder.getCurrentItem().getItemGroupBean().getMeta() == null) {
+			crfBuilder.getCurrentItem().getItemGroupBean().setMeta(new ItemGroupMetadataBean());
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setBorders(0);
+			int maxRows = getInt(jsonObj, MAX_ROWS);
+			int minRows = getInt(jsonObj, MIN_ROWS);
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatMax(maxRows);
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatNum(minRows);
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRowStartNumber(0);
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setShowGroup(true);
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatingGroup(itemGroupBean != null);
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta()
+					.setHeader(getString(jsonObj, REPEATING_GROUP_HEADER));
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setSubheader("");
+		}
 	}
 
 	private void createResponseSet(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
@@ -470,12 +473,15 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			for (int r = 0; r < rows; r++) {
 				JSONArray columnsArray = rowsArray.getJSONArray(r);
 				for (int c = 0; c < columns; c++) {
-					childrenQuestions.put(columnsArray.getJSONObject(c));
+					Object jsonObj = columnsArray.get(c);
+					if (jsonObj instanceof JSONObject) {
+						childrenQuestions.put(jsonObj);
+					}
 				}
 			}
 		} else if (type == FormStudioElement.TABLE) {
-			int maxRows = getInt(jsonObject, MAX_ROWS);
-			int minRows = getInt(jsonObject, MIN_ROWS);
+			int maxRows = getString(jsonObject, MAX_ROWS).isEmpty() ? INT_40 : getInt(jsonObject, MAX_ROWS);
+			int minRows = getString(jsonObject, MIN_ROWS).isEmpty() ? 1 : getInt(jsonObject, MIN_ROWS);
 			String groupHeader = getString(jsonObject, HEADER);
 			if (isYes(jsonObject, NUMBERING)) {
 				groupHeader = getString(jsonObject, POS).concat(". ").concat(groupHeader);

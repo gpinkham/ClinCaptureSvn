@@ -23,6 +23,7 @@ import com.clinovo.lib.crf.builder.impl.BaseCrfBuilder;
 public interface ImportCrfService {
 
 	int INT_3 = 3;
+	int INT_40 = 40;
 
 	String SL = "SL";
 	String ONE = "1";
@@ -66,6 +67,7 @@ public interface ImportCrfService {
 	String RESIZABLE = "resizable";
 	String RIGHT_TEXT = "rightText";
 	String NUMBER_TYPE = "numberType";
+	String OPEN_CLOSE_TAG = "<script>";
 	String RAND_RESULT = "Rand_Result";
 	String CALCULATION = "calculation";
 	String DESCRIPTION = "description";
@@ -73,6 +75,7 @@ public interface ImportCrfService {
 	String MULTI_SELECT = "multiSelect";
 	String INSTRUCTIONS = "instructions";
 	String GROUP_LAYOUT = "GROUP_LAYOUT";
+	String CLOSE_SCRIPT_TAG = "</script>";
 	String DEFAULT_VALUE = "defaultValue";
 	String COLUMN_NUMBER = "columnNumber";
 	String DISPLAY_STATE = "displayState";

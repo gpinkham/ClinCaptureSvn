@@ -90,12 +90,12 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 				try {
 					RestOdmContainer restOdmContainer = new RestOdmContainer();
 					restOdmContainer.setRestData(new RestData());
-					Method method = RestData.class.getMethod("set".concat(o.getClass().getSimpleName()), o.getClass());
+					Method method = getSetterMethod(RestData.class.getMethods(), o);
 					method.invoke(restOdmContainer.getRestData(), o);
 					restOdmContainer.collectOdmRoot();
-					Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-							new FileSystemResourceLoader().getResource(
-									"classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getURL());
+					Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+							.newSchema(new FileSystemResourceLoader()
+									.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getURL());
 					StringWriter writer = new StringWriter();
 					JAXBContext context = JAXBContext.newInstance(RestOdmContainer.class);
 					javax.xml.bind.Marshaller jaxbMarshaller = context.createMarshaller();
@@ -114,5 +114,14 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 			((StreamResult) result).setWriter(new StringWriter());
 			((StreamResult) result).getOutputStream().write(xmlOutput.toString().getBytes("UTF-8"));
 		}
+	}
+
+	private Method getSetterMethod(Method[] methods, Object o) {
+		for (Method method : methods) {
+			if (method.getName().equalsIgnoreCase("set".concat(o.getClass().getSimpleName()))) {
+				return method;
+			}
+		}
+		return null;
 	}
 }

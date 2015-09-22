@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 
 /**
  * RestData.
@@ -45,6 +46,9 @@ public class RestData {
 
 	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private EventDefinitionCRFBean eventDefinitionCRFBean;
+
+	@XmlElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private CRFVersionBean crfVersionBean;
 
 	public Error getError() {
 		return error;
@@ -86,4 +90,11 @@ public class RestData {
 		this.eventDefinitionCRFBean = eventDefinitionCRFBean;
 	}
 
+	public CRFVersionBean getCrfVersionBean() {
+		return crfVersionBean;
+	}
+
+	public void setCrfVersionBean(CRFVersionBean crfVersionBean) {
+		this.crfVersionBean = crfVersionBean;
+	}
 }

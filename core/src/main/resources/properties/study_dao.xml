@@ -150,7 +150,7 @@
 		FACILITY_RECRUITMENT_STATUS=?, FACILITY_CONTACT_NAME=?,
 		FACILITY_CONTACT_DEGREE=?, FACILITY_CONTACT_PHONE=?,
 		FACILITY_CONTACT_EMAIL=?, STATUS_ID=?,
-		UPDATE_ID=?, DATE_UPDATED=?, OLD_STATUS_ID=? WHERE STUDY_ID=?</sql>
+		UPDATE_ID=?, DATE_UPDATED=NOW(), OLD_STATUS_ID=? WHERE STUDY_ID=?</sql>
 	</query>
 	<query>
 		<name>findNextKey</name>
@@ -166,7 +166,7 @@
 		FACILITY_CONTACT_NAME, FACILITY_CONTACT_DEGREE, FACILITY_CONTACT_PHONE,
 		FACILITY_CONTACT_EMAIL, STATUS_ID, DATE_CREATED, OWNER_ID, OC_OID)
 		VALUES (?,
-		?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</sql>
+		?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?,?)</sql>
 	</query>
 	<query>
 	   <name>createStepTwo</name>

@@ -13,12 +13,22 @@
 
 package org.akaza.openclinica.bean.submit;
 
+import java.util.Date;
+
+import javax.sql.DataSource;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 
-import javax.sql.DataSource;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * The object to carry CRF versions in the application.
@@ -26,31 +36,65 @@ import java.util.Date;
  * @author thickerson
  * 
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"id", "crfid", "crfname", "version", "status"})
 @SuppressWarnings("serial")
 public class CRFVersionBean extends AuditableEntityBean {
 
+	@JsonIgnore
+	@XmlTransient
 	private String description = "";
+
+	@JsonProperty("crfid")
+	@XmlElement(name = "CrfId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int crfId = 0;
+
+	@JsonProperty("crfname")
+	@XmlElement(name = "CrfName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String crfName = "";
+
+	@JsonProperty("version")
+	@XmlElement(name = "Version", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String version = "";
+
+	@JsonIgnore
+	@XmlTransient
 	private int statusId = 1;
+
+	@JsonIgnore
+	@XmlTransient
 	private String revisionNotes = "";
-	private Date date_created;
 
-	// not in DB, tells whether the spreadsheet is downloadable
-	private boolean downloadable = false;
+	@JsonIgnore
+	@XmlTransient
+	private Date dateCreated;
 
+	@JsonIgnore
+	@XmlTransient
+	private boolean downloadable = false; // not in DB, tells whether the spreadsheet is downloadable
+
+	@JsonIgnore
+	@XmlTransient
 	private String oid;
+
+	@JsonIgnore
+	@XmlTransient
 	private OidGenerator oidGenerator;
 
+	/**
+	 * Default constructor.
+	 */
 	public CRFVersionBean() {
 		this.oidGenerator = new CrfVersionOidGenerator();
-		date_created = new Date();
+		dateCreated = new Date();
 	}
 
 	/**
 	 * @return date_created Date
 	 */
 	public Date getDateCreated() {
-		return date_created;
+		return dateCreated;
 	}
 
 	/**
@@ -138,6 +182,19 @@ public class CRFVersionBean extends AuditableEntityBean {
 		this.oid = oid;
 	}
 
+	@Override
+	public void setName(String name) {
+		this.name = name;
+		this.version = name;
+	}
+
+	/**
+	 * Returns oid generator.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @return OidGenerator
+	 */
 	public OidGenerator getOidGenerator(DataSource ds) {
 		if (oidGenerator != null) {
 			oidGenerator.setDataSource(ds);
@@ -172,5 +229,17 @@ public class CRFVersionBean extends AuditableEntityBean {
 		} else if (!oid.equals(other.oid))
 			return false;
 		return true;
+	}
+
+	public String getCrfName() {
+		return crfName;
+	}
+
+	public void setCrfName(String crfName) {
+		this.crfName = crfName;
+	}
+
+	public String getVersion() {
+		return version;
 	}
 }

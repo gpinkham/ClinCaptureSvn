@@ -91,7 +91,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
 		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
-		assertEquals(crfBuilder.getCrfBean().getName(), "testCRF");
+		assertEquals(crfBuilder.getCrfBean().getName(), "FS Test CRF");
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 		crfBuilder.build();
 		crfBuilder.save();
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(crfBuilder.getCrfBean().getId());
-		assertEquals(crfBean.getName(), "testCRF");
+		assertEquals(crfBean.getName(), "FS Test CRF");
 		assertTrue(crfBean.getId() > 0);
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfBuilder.getCrfBean().getId());
 		assertEquals(crfVersionBean.getName(), "v1.0");

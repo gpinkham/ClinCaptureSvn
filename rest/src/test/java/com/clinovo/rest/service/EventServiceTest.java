@@ -477,7 +477,7 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void xtestThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
+	public void testThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
 			throws Exception {
 		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
@@ -1042,7 +1042,7 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void xtestThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
+	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
 			throws Exception {
 		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
