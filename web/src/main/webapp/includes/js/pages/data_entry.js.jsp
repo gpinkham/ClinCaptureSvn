@@ -112,7 +112,7 @@
 		$(".sectionsContainer td").remove();
 		while (TabID <= TabsNumber) {
 			sectionId = TabSectionId[TabID - 1];
-			url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> +"&sectionId=" + sectionId + "&tabId=" + TabID + "${justCloseWindow ? '&cw=1' : ''}";
+			url = "${formAction}?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> +"&sectionId=" + sectionId + "&tabId=" + TabID + "${justCloseWindow ? '&cw=1' : ''}";
 			currTabID = <c:out value="${tabId}"/>;
 			var sectionContent = '<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">';
 			if (TabID != currTabID) {
