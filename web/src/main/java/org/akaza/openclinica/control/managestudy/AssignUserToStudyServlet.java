@@ -130,7 +130,7 @@ public class AssignUserToStudyServlet extends Controller {
 			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
 					"allowCodingVerification");
 			StudyParameterValueBean allowEvaluation = dao.findByHandleAndStudy(currentStudy.getId(),
-					"allowCrfEvaluation");
+					"studyEvaluator");
 
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
@@ -153,8 +153,8 @@ public class AssignUserToStudyServlet extends Controller {
 
 			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
 					.getId();
-			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
-					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId, "studyEvaluator")
+					.getValue().equalsIgnoreCase("yes");
 			if (!isEvaluationEnabled) {
 				roles.remove(Role.STUDY_EVALUATOR);
 			}

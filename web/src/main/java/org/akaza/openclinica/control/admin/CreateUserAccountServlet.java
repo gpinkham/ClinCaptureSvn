@@ -238,8 +238,8 @@ public class CreateUserAccountServlet extends Controller {
 		int parentStudyId = selectedStudyBean.getParentStudyId() > 0
 				? selectedStudyBean.getParentStudyId()
 				: selectedStudyBean.getId();
-		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation", parentStudyId,
-				getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+		boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(parentStudyId, "studyEvaluator")
+				.getValue().equalsIgnoreCase("yes");
 		if (!isEvaluationEnabled) {
 			roleMap.remove(Role.STUDY_EVALUATOR.getId());
 		}

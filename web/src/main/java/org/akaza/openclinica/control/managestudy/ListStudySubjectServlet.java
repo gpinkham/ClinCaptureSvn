@@ -352,8 +352,8 @@ public abstract class ListStudySubjectServlet extends Controller {
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "medicalCodingContextNeeded");
 		currentStudy.getStudyParameterConfig().setMedicalCodingContextNeeded(parentSPV.getValue());
 
-		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowCrfEvaluation");
-		currentStudy.getStudyParameterConfig().setAllowCrfEvaluation(parentSPV.getValue());
+		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "studyEvaluator");
+		currentStudy.getStudyParameterConfig().setStudyEvaluator(parentSPV.getValue());
 
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "evaluateWithContext");
 		currentStudy.getStudyParameterConfig().setEvaluateWithContext(parentSPV.getValue());

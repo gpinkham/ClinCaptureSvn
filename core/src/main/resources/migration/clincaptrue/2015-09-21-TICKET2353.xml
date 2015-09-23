@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-09-21-TICKET2353-0">
+		<comment>Migrate value from old parameter to the new one.</comment>
+		<sql splitStatements="false">
+			UPDATE study_parameter_value spv
+			SET value = (SELECT value FROM study_parameter_value spv_2
+				WHERE parameter = 'allowCrfEvaluation' AND spv.study_id = spv_2.study_id)
+			WHERE parameter = 'studyEvaluator';
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-09-21-TICKET2353-1">
+		<comment>Delete "Allow CRF evaluation?" from study parameter values.</comment>
+		<delete tableName="study_parameter_value">
+			<where>parameter = 'allowCrfEvaluation'</where>
+		</delete>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-09-21-TICKET2353-2">
+		<comment>Delete "Allow CRF evaluation?" from study parameters.</comment>
+		<delete tableName="study_parameter">
+			<where>handle = 'allowCrfEvaluation'</where>
+		</delete>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-09-21-TICKET2353-3">
+		<comment>Delete Evaluator from system.</comment>
+		<delete tableName="system">
+			<where>name = 'allowCrfEvaluation'</where>
+		</delete>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-09-21-TICKET2353-4">
+		<comment>Delete Evaluate with Context from system.</comment>
+		<delete tableName="system">
+			<where>name = 'evaluateWithContext'</where>
+		</delete>
+	</changeSet>
+</databaseChangeLog>

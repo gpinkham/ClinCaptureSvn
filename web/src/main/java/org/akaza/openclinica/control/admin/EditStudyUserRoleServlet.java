@@ -157,8 +157,8 @@ public class EditStudyUserRoleServlet extends Controller {
 		StudyBean selectedStudyBean = (StudyBean) getStudyDAO().findByPK(studyId);
 		int currentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId()
 				: selectedStudyBean.getId();
-		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
-				currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+		boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId, "studyEvaluator")
+				.getValue().equalsIgnoreCase("yes");
 		if (!isEvaluationEnabled) {
 			roleMap.remove(Role.STUDY_EVALUATOR.getId());
 		}

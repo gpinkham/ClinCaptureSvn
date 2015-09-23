@@ -785,11 +785,19 @@
                     </c:when>
                 </c:choose>
 
-                <input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE} disabled/>
-                <fmt:message key="double_data_entry" bundle="${resword}"/>
+				<c:choose>
+					<c:when test="${study.studyParameterConfig.studyEvaluator == 'yes' || edc.evaluatedCRF == true}">
+						<input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE} disabled/>
+						<fmt:message key="double_data_entry" bundle="${resword}"/>
 
-                <input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="evaluation" class="email_field_trigger uncheckable_radio" ${deQualityEvaluatedCRF} disabled/>
-                <fmt:message key="crf_data_evaluation" bundle="${resword}"/>
+						<input type="radio" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="evaluation" class="email_field_trigger uncheckable_radio" ${deQualityEvaluatedCRF} disabled/>
+						<fmt:message key="crf_data_evaluation" bundle="${resword}"/>
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" name="deQuality${num}" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="dde" class="email_field_trigger uncheckable_radio" ${deQualityDE} disabled/>
+						<fmt:message key="double_data_entry" bundle="${resword}"/>
+					</c:otherwise>
+				</c:choose>
             </td>
         </tr>
 

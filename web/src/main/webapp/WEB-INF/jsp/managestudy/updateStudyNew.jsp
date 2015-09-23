@@ -1479,12 +1479,12 @@
 	    <td>
 			<c:choose>
 				<c:when test="${studyToView.studyParameterConfig.studyEvaluator == 'yes'}">
-					<input type="radio" checked name="studyEvaluator" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" ${mode} name="studyEvaluator" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+					<input type="radio" checked name="studyEvaluator" value="yes" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="evaluation"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="studyEvaluator" value="no" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="evaluation"><fmt:message key="no" bundle="${resword}"/>
 				</c:when>
 				<c:otherwise>
-					<input type="radio" ${mode} name="studyEvaluator" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" checked name="studyEvaluator" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+					<input type="radio" ${mode} name="studyEvaluator" value="yes" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="evaluation"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="studyEvaluator" value="no" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="evaluation"><fmt:message key="no" bundle="${resword}"/>
 				</c:otherwise>
 			</c:choose>
 		</td>
@@ -2135,25 +2135,8 @@
 		&nbsp;
 	</td>
 </tr>
-<tr valign="top">
-	<td class="formlabel">
-		<fmt:message key="systemProperty.allowCrfEvaluation.label" bundle="${resword}"/>?
-	</td>
-	<td>
-		<c:choose>
-			<c:when test="${studyToView.studyParameterConfig.allowCrfEvaluation == 'yes'}">
-				<input type="radio" checked name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-			</c:when>
-			<c:otherwise>
-				<input type="radio" name="allowCrfEvaluation" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" checked name="allowCrfEvaluation" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-			</c:otherwise>
-		</c:choose>
-	</td>
-</tr>
 
-<tr valign="top">
+<tr valign="top" class="evaluation">
 	<td class="formlabel">
 		<fmt:message key="systemProperty.evaluateWithContext.label" bundle="${resword}"/>?
 	</td>

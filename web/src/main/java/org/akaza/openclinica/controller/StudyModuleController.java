@@ -200,8 +200,8 @@ public class StudyModuleController {
 			request.getSession().removeAttribute("pageMessages");
 		}
 		StudyParameterValueDAO studyParameterValueDao = new StudyParameterValueDAO(dataSource);
-		boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
-				currentStudy.getId(), systemDao, studyParameterValueDao, studyDao);
+		boolean isEvaluationEnabled = studyParameterValueDao.findByHandleAndStudy(currentStudy.getId(), "studyEvaluator")
+				.getValue().equalsIgnoreCase("yes");
 		request.getSession().setAttribute("evaluationEnabled", isEvaluationEnabled);
 		return map;
 	}

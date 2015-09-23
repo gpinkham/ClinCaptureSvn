@@ -85,7 +85,6 @@ public class DataEntryLinkTag extends TagSupport {
 			WebApplicationContext webApplicationContext = WebApplicationContextUtils
 					.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
 							.getServletContext());
-			SystemDAO systemDAO = (SystemDAO) webApplicationContext.getBean("systemDAO");
 			DataSource dataSource = (DataSource) webApplicationContext.getBean("dataSource");
 			MessageSource messageSource = (MessageSource) webApplicationContext.getBean("messageSource");
 			CRFMaskingService maskingService = (CRFMaskingService) webApplicationContext.getBean("crfMaskingService");
@@ -94,8 +93,9 @@ public class DataEntryLinkTag extends TagSupport {
 			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
 					.getId();
 			EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
-			boolean allowCrfEvaluation = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
-					currentStudyId, systemDAO, new StudyParameterValueDAO(dataSource), new StudyDAO(dataSource));
+			StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(dataSource);
+			boolean allowCrfEvaluation = studyParameterValueDAO.findByHandleAndStudy(currentStudyId, "studyEvaluator")
+					.getValue().equalsIgnoreCase("yes");
 			String link = "<img src=\"".concat(imgSrcPrefix)
 					.concat("bt_Transparent.gif\" class=\"crfBlankCellImg\" border=\"")
 					.concat(Integer.toString(border)).concat("\" align=\"").concat(imgAlign).concat("\" hspace=\"")

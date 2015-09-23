@@ -120,7 +120,6 @@ public class StudyParameterConfig {
 	private String randomizationEnviroment = "";
 
 	// Evaluation
-	private String allowCrfEvaluation = "no";
 	private String evaluateWithContext = "no";
 
 	private String allowRulesAutoScheduling = "yes";
@@ -675,14 +674,6 @@ public class StudyParameterConfig {
 	 */
 	public void setRandomizationTrialId(String randomizationTrialId) {
 		this.randomizationTrialId = randomizationTrialId;
-	}
-
-	public String getAllowCrfEvaluation() {
-		return allowCrfEvaluation;
-	}
-
-	public void setAllowCrfEvaluation(String allowCrfEvaluation) {
-		this.allowCrfEvaluation = allowCrfEvaluation;
 	}
 
 	public String getEvaluateWithContext() {

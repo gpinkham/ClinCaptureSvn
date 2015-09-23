@@ -1188,7 +1188,7 @@ public class WidgetsLayoutController {
 		filter.addFilter("crfCompletedYear", previousYear);
 		boolean evalProgNextYearExists = currentYear > displayedYear;
 		boolean evalProgPreviousYearExists = eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, sb) != 0;
-		boolean evaluationProgressActivateLegend = sb.getStudyParameterConfig().getAllowCrfEvaluation().equals("yes");
+		boolean evaluationProgressActivateLegend = sb.getStudyParameterConfig().getStudyEvaluator().equals("yes");
 		model.addAttribute("evalProgNextYearExists", evalProgNextYearExists);
 		model.addAttribute("evalProgPreviousYearExists", evalProgPreviousYearExists);
 		model.addAttribute("evaluationProgressYear", displayedYear);

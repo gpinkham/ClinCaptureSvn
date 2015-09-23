@@ -500,10 +500,6 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingContextNeeded());
 		spvdao.create(spv);
 
-		spv.setParameter("allowCrfEvaluation");
-		spv.setValue(newStudy.getStudyParameterConfig().getAllowCrfEvaluation());
-		spvdao.create(spv);
-
 		spv.setParameter("evaluateWithContext");
 		spv.setValue(newStudy.getStudyParameterConfig().getEvaluateWithContext());
 		spvdao.create(spv);

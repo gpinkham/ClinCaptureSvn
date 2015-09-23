@@ -534,7 +534,6 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setRandomizationEnviroment(fp.getString("randomizationEnviroment"));
 
 		// Evaluation
-		study.getStudyParameterConfig().setAllowCrfEvaluation(fp.getString("allowCrfEvaluation"));
 		study.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
 
 		study.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
@@ -937,10 +936,6 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
 		updateParameter(spvdao, spv);
 
-		spv.setParameter("allowCrfEvaluation");
-		spv.setValue(study1.getStudyParameterConfig().getAllowCrfEvaluation());
-		updateParameter(spvdao, spv);
-
 		spv.setParameter("evaluateWithContext");
 		spv.setValue(study1.getStudyParameterConfig().getEvaluateWithContext());
 		updateParameter(spvdao, spv);
@@ -1202,10 +1197,6 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("randomizationTrialId");
 			childspv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowCrfEvaluation");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowCrfEvaluation());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("evaluateWithContext");

@@ -549,8 +549,8 @@ public abstract class Controller extends BaseController {
 			int currentStudyId = currentStudy.getParentStudyId() > 0
 					? currentStudy.getParentStudyId()
 					: currentStudy.getId();
-			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled("allowCrfEvaluation",
-					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
+			boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId, "studyEvaluator")
+					.getValue().equalsIgnoreCase("yes");
 			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
 
 			if (this instanceof ListStudySubjectsServlet && currentStudy.getStatus() != Status.AVAILABLE) {
