@@ -49,7 +49,6 @@ import org.springframework.stereotype.Component;
 
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.EmailUtil;
-import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.validator.UserValidator;
 
 /**

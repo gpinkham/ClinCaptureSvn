@@ -50,8 +50,6 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.StudyParameterPriorityUtil;
-
 /**
  * Processes request to assign a user to a study.
  */

@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.StudyParameterPriorityUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;

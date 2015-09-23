@@ -27,7 +27,6 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +34,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.clinovo.dao.SystemDAO;
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.StudyParameterPriorityUtil;
 
 /**
  * Custom tag for building the data entry link.

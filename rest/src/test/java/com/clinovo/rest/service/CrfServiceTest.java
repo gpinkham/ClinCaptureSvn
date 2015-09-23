@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+@SuppressWarnings({"unused", "unchecked"})
 public class CrfServiceTest extends BaseServiceTest {
 
 	// these fields should be the same as in the data/json/testCrf.json & data/excel/testCrf.xls

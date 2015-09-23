@@ -23,7 +23,6 @@ import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 /**
  * JsonErrorMessageProducer.
  */
-@SuppressWarnings("unused")
 public class JsonErrorMessageProducer implements ErrorMessageProducer {
 
 	private JsonCrfBuilder crfBuilder;

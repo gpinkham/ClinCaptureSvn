@@ -19,7 +19,6 @@ import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 
 import javax.servlet.http.HttpServletRequest;

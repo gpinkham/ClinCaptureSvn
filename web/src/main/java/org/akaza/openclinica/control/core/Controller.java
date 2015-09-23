@@ -132,7 +132,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.StudyParameterPriorityUtil;
 
 /**
  * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the

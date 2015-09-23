@@ -3,6 +3,7 @@ package org.akaza.openclinica.exception;
 /**
  * CRFReadingException.
  */
+@SuppressWarnings("serial")
 public class CRFReadingException extends Exception {
 
 	private String message;

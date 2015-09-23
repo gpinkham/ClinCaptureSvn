@@ -9,7 +9,6 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;

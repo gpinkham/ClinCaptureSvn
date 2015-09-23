@@ -21,7 +21,6 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.service.CRFMaskingService;
-import com.clinovo.util.StudyParameterPriorityUtil;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.TermType;

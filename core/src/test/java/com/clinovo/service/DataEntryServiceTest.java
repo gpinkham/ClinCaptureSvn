@@ -24,27 +24,21 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @SuppressWarnings("unchecked")
 public class DataEntryServiceTest extends DefaultAppContextTest {
 
-	private DynamicsMetadataService dynamicsMetadataService;
 	private MockHttpServletRequest request;
 
 	@Before
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
-		dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,
-				dynamicsItemGroupMetadataDao, dataSource);
 	}
 
 	@Test
