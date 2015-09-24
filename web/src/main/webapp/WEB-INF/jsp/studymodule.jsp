@@ -182,7 +182,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.study == 3}">
                         <a href='javascript:void(0)' onclick="prompt('study')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="study" name="study" value=""/>
+                        <input type="hidden" id="study" name="study" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" id="study" name="study" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
@@ -231,7 +231,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 3}">
                         <a href='javascript:void(0)' onclick="prompt('crf')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="crf" name="crf" value=""/>
+                        <input type="hidden" id="crf" name="crf" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" name="crf" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
@@ -286,7 +286,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 3}">
                         <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="eventDefinition" name="eventDefinition" value=""/>
+                        <input type="hidden" id="eventDefinition" name="eventDefinition" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" name="eventDefinition" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
@@ -343,7 +343,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 3}">
                         <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="subjectGroup" name="subjectGroup" value=""/>
+                        <input type="hidden" id="subjectGroup" name="subjectGroup" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" name="subjectGroup" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
@@ -396,7 +396,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 3}">
                         <a href='javascript:void(0)' onclick="prompt('rule')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="rule" name="rule" value=""/>
+                        <input type="hidden" id="rule" name="rule" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" name="rule" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
@@ -470,7 +470,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 3}">
                         <a href='javascript:void(0)' onclick="prompt('site')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="site" name="site" value=""/>
+                        <input type="hidden" id="site" name="site" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" name="site" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
@@ -544,7 +544,7 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 3}">
                         <a href='javascript:void(0)' onclick="prompt('users')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
-                        <input type="hidden" id="users" name="users" value=""/>
+                        <input type="hidden" id="users" name="users" value="3"/>
                     </c:when>
                     <c:otherwise>
                         <input type="checkbox" name="users" value="3" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"/>
