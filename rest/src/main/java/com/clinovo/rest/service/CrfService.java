@@ -15,6 +15,8 @@
 
 package com.clinovo.rest.service;
 
+import java.net.URLDecoder;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
@@ -23,6 +25,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -49,6 +52,9 @@ import com.clinovo.rest.util.ValidatorUtil;
 @Controller("restCrfService")
 @RequestMapping("/crf")
 public class CrfService {
+
+	public static final String NAME = "name";
+	public static final String UTF_8 = "UTF-8";
 
 	@Autowired
 	private DataSource dataSource;
@@ -86,8 +92,6 @@ public class CrfService {
 	 *
 	 * @param jsonData
 	 *            String
-	 * @param crfName
-	 *            String
 	 * @return CRFVersionBean
 	 * @throws Exception
 	 *             an Exception
@@ -96,17 +100,21 @@ public class CrfService {
 	@ResponseBody
 	@RestScope(Scope.STUDY)
 	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
-	public CRFVersionBean importCrfVersion(@RequestParam("jsondata") String jsonData,
-			@RequestParam("crfname") String crfName) throws Exception {
+	public CRFVersionBean importCrfVersion(@RequestParam("jsondata") String jsonData) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 		UserAccountBean owner = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, currentStudy, owner,
 				LocaleResolver.getLocale(), messageSource);
-		crfBuilder.build(getCrfBean(crfName).getId());
+		crfBuilder.build(getCrfBean(jsonData).getId());
 		return save(crfBuilder);
 	}
 
-	private CRFBean getCrfBean(String crfName) throws Exception {
+	private CRFBean getCrfBean(String jsonData) throws Exception {
+		JSONObject jsonObject = new JSONObject(jsonData);
+		String crfName = URLDecoder.decode(jsonObject.getString(NAME), UTF_8).trim();
+		if (crfName.isEmpty()) {
+			throw new RestException(messageSource, "rest.crf.crfNameIsEmpty");
+		}
 		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
 		if (crfBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.crf.crfNameDoesNotExist", new Object[]{crfName},

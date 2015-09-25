@@ -819,6 +819,9 @@ public final class CommonValidator {
 			validateGroup(crfBuilder);
 		}
 		crfBuilder.prepareItemGroupCrfRecords();
+		if (crfBuilder.getItems().size() == 0) {
+			crfBuilder.getErrorMessageProducer().crfShouldHaveAtLeastOneItem();
+		}
 		for (ItemBean itemBean : crfBuilder.getItems()) {
 			crfBuilder.setCurrentItem((ItemBeanExt) itemBean);
 			validateItem(crfBuilder);

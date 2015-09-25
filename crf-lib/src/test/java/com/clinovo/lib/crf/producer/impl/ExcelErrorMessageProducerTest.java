@@ -624,4 +624,9 @@ public class ExcelErrorMessageProducerTest {
 		assertEquals(excelCrfBuilder.getErrorsList().size(), 1);
 		assertEquals(excelCrfBuilder.getErrorsMap().size(), 1);
 	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatCrfShouldHaveAtLeastOneItemMethodGeneratesErrorMessage() throws Exception {
+		excelErrorMessageProducer.crfShouldHaveAtLeastOneItem();
+	}
 }

@@ -392,10 +392,10 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
 		crfBuilder.getErrorsList()
-				.add(crfBuilder.getMessage("Error_found_at_row") + " \"" + row + "\""
-						+ crfBuilder.getMessage("items_worksheet_with_dot") + crfBuilder.getMessage("GROUP_LABEL")
-						+ "\"" + crfBuilder.getCurrentItem().getItemMeta().getGroupLabel() + "\" "
-						+ crfBuilder.getMessage("does_not_exist_in_group_spreadsheet"));
+				.add(crfBuilder.getMessage("Error_found_at_row") + " \"" + row + "\"" + crfBuilder
+						.getMessage("items_worksheet_with_dot") + crfBuilder.getMessage("GROUP_LABEL") + "\""
+						+ crfBuilder.getCurrentItem().getItemMeta().getGroupLabel() + "\" " + crfBuilder
+						.getMessage("does_not_exist_in_group_spreadsheet"));
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",6", crfBuilder.getMessage("GROUP_DOES_NOT_EXIST"));
 	}
 
@@ -531,8 +531,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 	public void itemHasDifferentNumberOfOptionsText() {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage(("resp_label_with_different_resp_options")) + " " + row
-				+ ", " + crfBuilder.getMessage("items_worksheet_with_dot"));
+		crfBuilder.getErrorsList().add(
+				crfBuilder.getMessage(("resp_label_with_different_resp_options")) + " " + row + ", " + crfBuilder
+						.getMessage("items_worksheet_with_dot"));
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",15",
 				crfBuilder.getMessage("resp_label_with_different_resp_options_html_error"));
 	}
@@ -557,8 +558,8 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
 		crfBuilder.getErrorsList()
 				.add(crfBuilder.getMessage("the") + " " + crfBuilder.getMessage("RESPONSE_VALUES_column") + " "
-						+ crfBuilder.getMessage("was_blank_at_row") + " " + row + ", "
-						+ crfBuilder.getMessage("items_worksheet_with_dot"));
+						+ crfBuilder.getMessage("was_blank_at_row") + " " + row + ", " + crfBuilder
+						.getMessage("items_worksheet_with_dot"));
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",16", crfBuilder.getMessage("required_field"));
 	}
 
@@ -568,8 +569,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 	public void itemHasDifferentNumberOfOptionsValues() {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage("resp_label_with_different_resp_values") + " " + row + ", "
-				+ crfBuilder.getMessage("items_worksheet") + ".");
+		crfBuilder.getErrorsList().add(
+				crfBuilder.getMessage("resp_label_with_different_resp_values") + " " + row + ", " + crfBuilder
+						.getMessage("items_worksheet") + ".");
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",16",
 				crfBuilder.getMessage("resp_label_with_different_resp_values_html_error"));
 	}
@@ -618,8 +620,7 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 				+ crfBuilder.getMessage("RESPONSE_OPTIONS_column") + " " + crfBuilder.getMessage("and") + " "
 				+ crfBuilder.getMessage("RESPONSE_VALUES_column") + " " + crfBuilder.getMessage("at_row") + row + " "
 				+ crfBuilder.getMessage("items_worksheet") + "; " + crfBuilder.getMessage("perhaps_missing_comma"));
-		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",15",
-				crfBuilder.getMessage("number_option_not_match"));
+		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",15", crfBuilder.getMessage("number_option_not_match"));
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",16", crfBuilder.getMessage("number_value_not_match"));
 	}
 
@@ -758,8 +759,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 	public void widthDecimalHasErrors() {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage("error_message_for_width_decimal_at") + " " + row + ", "
-				+ crfBuilder.getMessage("items_worksheet") + ":" + " " + crfBuilder.getCurrentMessage());
+		crfBuilder.getErrorsList().add(
+				crfBuilder.getMessage("error_message_for_width_decimal_at") + " " + row + ", " + crfBuilder
+						.getMessage("items_worksheet") + ":" + " " + crfBuilder.getCurrentMessage());
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",20", crfBuilder.getMessage("INVALID_FIELD"));
 	}
 
@@ -783,9 +785,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
 		crfBuilder.getErrorsList()
-				.add(crfBuilder.getMessage("the") + " " + crfBuilder.getMessage("VALIDATION_column") + " "
-						+ crfBuilder.getMessage("was_invalid_at_row") + " " + row + ", "
-						+ crfBuilder.getMessage("items_worksheet_with_dot"));
+				.add(crfBuilder.getMessage("the") + " " + crfBuilder.getMessage("VALIDATION_column") + " " + crfBuilder
+						.getMessage("was_invalid_at_row") + " " + row + ", " + crfBuilder
+						.getMessage("items_worksheet_with_dot"));
 		crfBuilder.getErrorsMap().put(
 				sheetNumber + "," + row + "," + crfBuilder.getColumnNumber(CellName.ITEM_VALIDATION),
 				crfBuilder.getMessage("INVALID_FIELD"));
@@ -907,9 +909,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 						+ crfBuilder.getMessage("control_response_value_invalid") + " "
 						+ crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getOptionValue());
 		crfBuilder.getErrorsMap()
-				.put(sheetNumber + "," + row + ","
-						+ crfBuilder.getColumnNumber(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY),
-				crfBuilder.getMessage("INVALID_VALUE"));
+				.put(sheetNumber + "," + row + "," + crfBuilder
+								.getColumnNumber(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY),
+						crfBuilder.getMessage("INVALID_VALUE"));
 	}
 
 	/**
@@ -989,9 +991,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
 		crfBuilder.getErrorsList()
-				.add("Error found at row \"" + row + "\" in items worksheet. ResponseLabel \""
-						+ crfBuilder.getCurrentItem().getResponseSet().getLabel() + "\" for ResponseType \""
-						+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE)
+				.add("Error found at row \"" + row + "\" in items worksheet. ResponseLabel \"" + crfBuilder
+						.getCurrentItem().getResponseSet().getLabel() + "\" for ResponseType \"" + crfBuilder
+						.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE)
 						+ "\" has been used for another ResponseType.  ");
 		crfBuilder.getErrorsMap().put(sheetNumber + "," + row + ",14", "INVALID FIELD");
 	}
@@ -1002,8 +1004,9 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 	public void itemOfOneGroupBelongsToMoreThanOneSection() {
 		int row = crfBuilder.getCurrentItem().getRowNumber();
 		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage("group_in_several_sections")
-				+ crfBuilder.getCurrentItem().getItemMeta().getGroupLabel() + "'.");
+		crfBuilder.getErrorsList().add(
+				crfBuilder.getMessage("group_in_several_sections") + crfBuilder.getCurrentItem().getItemMeta()
+						.getGroupLabel() + "'.");
 		crfBuilder.getErrorsMap().put(
 				sheetNumber + "," + row + "," + crfBuilder.getColumnNumber(CellName.ITEM_GROUP_LABEL),
 				crfBuilder.getMessage("INVALID_VALUE"));
@@ -1024,4 +1027,10 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 				crfBuilder.getMessage("INVALID_FIELD"));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void crfShouldHaveAtLeastOneItem() throws CRFReadingException {
+		throw new CRFReadingException(crfBuilder.getMessage("crfShouldHaveAtLeastOneItem"));
+	}
 }

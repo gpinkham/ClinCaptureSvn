@@ -552,4 +552,9 @@ public class JsonErrorMessageProducerTest extends DefaultAppContextTest {
 		jsonErrorMessageProducer.responseLabelHasBeenUsedForAnotherResponseType();
 		assertEquals(jsonCrfBuilder.getErrorsList().size(), 1);
 	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatCrfShouldHaveAtLeastOneItemMethodGeneratesErrorMessage() throws Exception {
+		jsonErrorMessageProducer.crfShouldHaveAtLeastOneItem();
+	}
 }

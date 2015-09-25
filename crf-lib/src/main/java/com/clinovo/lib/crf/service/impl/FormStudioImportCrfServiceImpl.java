@@ -113,8 +113,8 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	private String getString(JSONObject jsonObject, String key, boolean checkMetadataTags) {
 		String result = "";
 		try {
-			result = URLDecoder.decode(jsonObject.getString(key), UTF_8).replaceAll("&lt;script&gt;", OPEN_CLOSE_TAG)
-					.replaceAll("&lt;/script&gt;", CLOSE_SCRIPT_TAG);
+			result = URLDecoder.decode(jsonObject.getString(key), UTF_8).replaceAll(LT, OPEN_TAG)
+					.replaceAll(GT, CLOSE_TAG).replaceAll(AMP, AMP_REPLACEMENT);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}

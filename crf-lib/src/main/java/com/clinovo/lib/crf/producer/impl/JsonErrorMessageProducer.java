@@ -186,9 +186,9 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	 */
 	public void groupLabelIsDuplicated() {
 		crfBuilder.getErrorsList()
-				.add(crfBuilder.getMessage("rest.crfservice.groupLabelIsDuplicated")
-						+ crfBuilder.getMessage("rest.crfservice.checkItem",
-								new Object[]{crfBuilder.getCurrentItem().getItemMeta().getGroupLabel()}));
+				.add(crfBuilder.getMessage("rest.crfservice.groupLabelIsDuplicated") + crfBuilder
+						.getMessage("rest.crfservice.checkItem",
+								new Object[] { crfBuilder.getCurrentItem().getItemMeta().getGroupLabel() }));
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	 */
 	public void groupHeaderLengthIsExceeded() {
 		crfBuilder.getErrorsList().add(crfBuilder.getMessage("group_header_length_error") + crfBuilder
-				.getMessage("rest.crfservice.checkItem", new Object[]{crfBuilder.getCurrentItem().getName()}));
+				.getMessage("rest.crfservice.checkItem", new Object[] { crfBuilder.getCurrentItem().getName() }));
 	}
 
 	/**
@@ -534,8 +534,8 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	public void doesNotMatchDataTypeOfItemWithSameResponseLabel() {
 		crfBuilder.getErrorsList()
 				.add(crfBuilder.getMessage("rest.crfservice.doesNotMatchDataTypeOfItemWithSameResponseLabel",
-						new Object[]{crfBuilder.getCurrentItem().getName(),
-								crfBuilder.getCurrentItem().getResponseSet().getLabel()}));
+						new Object[] { crfBuilder.getCurrentItem().getName(),
+								crfBuilder.getCurrentItem().getResponseSet().getLabel() }));
 	}
 
 	/**
@@ -543,7 +543,7 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	 */
 	public void widthDecimalIsNotAvailable() {
 		crfBuilder.getErrorsList().add(crfBuilder.getMessage("rest.crfservice.widthDecimalIsNotAvailableFor",
-				new Object[]{crfBuilder.getCurrentItem().getName()}));
+				new Object[] { crfBuilder.getCurrentItem().getName() }));
 	}
 
 	/**
@@ -600,15 +600,15 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	public void validationColumnHasInvalidRegularExpression() {
 		crfBuilder.getErrorsList()
 				.add(crfBuilder.getMessage("rest.crfservice.validationColumnHasInvalidRegularExpression",
-						new Object[]{crfBuilder.getCurrentItem().getName()}));
+						new Object[] { crfBuilder.getCurrentItem().getName() }));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void phiIsNotValid() {
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage("rest.crfservice.phiIsNotValid",
-				new Object[]{crfBuilder.getCurrentItem().getName()}));
+		crfBuilder.getErrorsList().add(crfBuilder
+				.getMessage("rest.crfservice.phiIsNotValid", new Object[] { crfBuilder.getCurrentItem().getName() }));
 	}
 
 	/**
@@ -673,7 +673,7 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	public void needToUpdateMedicalCodingReferenceItemType() {
 		crfBuilder.getErrorsList()
 				.add(crfBuilder.getMessage("rest.crfservice.needToUpdateMedicalCodingReferenceItemType",
-						new Object[]{crfBuilder.getCurrentItem().getName()}));
+						new Object[] { crfBuilder.getCurrentItem().getName() }));
 	}
 
 	/**
@@ -699,6 +699,13 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	 */
 	public void notUniqueItemPlacementInGroups() {
 		crfBuilder.getErrorsList().add(crfBuilder.getMessage("rest.crfservice.notUniqueItemPlacementInGroups",
-				new Object[]{crfBuilder.getCurrentItem().getName()}));
+				new Object[] { crfBuilder.getCurrentItem().getName() }));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void crfShouldHaveAtLeastOneItem() throws CRFReadingException {
+		throw new CRFReadingException(crfBuilder.getMessage("crfShouldHaveAtLeastOneItem"));
 	}
 }

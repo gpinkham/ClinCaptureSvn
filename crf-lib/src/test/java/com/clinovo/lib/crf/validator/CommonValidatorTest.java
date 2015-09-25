@@ -1121,4 +1121,15 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
 		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemOfOneGroupBelongsToMoreThanOneSection();
 	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatExcelCrfBuilderGeneratesErrorsIfCrfDoesNotHaveItems() throws Exception {
+		Workbook workbook = getWorkbook("testCrf.xls");
+		for (int i = 0; i <= 11; i++) {
+			workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).createRow(i);
+		}
+		excelCrfBuilder = (ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner, Locale.ENGLISH,
+				messageSource);
+		excelCrfBuilder.build();
+	}
 }

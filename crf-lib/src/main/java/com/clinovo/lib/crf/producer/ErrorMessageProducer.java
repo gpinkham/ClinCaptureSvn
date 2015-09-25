@@ -453,4 +453,12 @@ public interface ErrorMessageProducer {
 	 * Generate error message if there is a not unique item placement in groups.
 	 */
 	void notUniqueItemPlacementInGroups();
+
+	/**
+	 * Generate error message if crf does not have items.
+	 * 
+	 * @throws CRFReadingException
+	 *             the CRFReadingException
+	 */
+	void crfShouldHaveAtLeastOneItem() throws CRFReadingException;
 }

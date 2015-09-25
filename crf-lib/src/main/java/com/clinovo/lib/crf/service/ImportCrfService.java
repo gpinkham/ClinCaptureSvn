@@ -31,6 +31,8 @@ public interface ImportCrfService {
 	String CRF = "CRF";
 	String POS = "pos";
 	String YES = "yes";
+	String LT = "&lt;";
+	String GT = "&gt;";
 	String FORTY = "40";
 	String ROWS = "rows";
 	String HIDE = "hide";
@@ -39,6 +41,9 @@ public interface ImportCrfService {
 	String TEXT = "text";
 	String NAME = "name";
 	String FILE = "file";
+	String AMP = "&amp;";
+	String OPEN_TAG = "<";
+	String CLOSE_TAG = ">";
 	String VALUE = "value";
 	String UTF_8 = "UTF-8";
 	String PAGES = "pages";
@@ -54,6 +59,7 @@ public interface ImportCrfService {
 	String MAX_ROWS = "maxRows";
 	String MIN_ROWS = "minRows";
 	String PHI_DATA = "phiData";
+	String AMP_REPLACEMENT = "&";
 	String CHILDREN = "children";
 	String REQUIRED = "required";
 	String TEXTAREA = "textarea";
@@ -67,7 +73,6 @@ public interface ImportCrfService {
 	String RESIZABLE = "resizable";
 	String RIGHT_TEXT = "rightText";
 	String NUMBER_TYPE = "numberType";
-	String OPEN_CLOSE_TAG = "<script>";
 	String RAND_RESULT = "Rand_Result";
 	String CALCULATION = "calculation";
 	String DESCRIPTION = "description";
@@ -75,7 +80,6 @@ public interface ImportCrfService {
 	String MULTI_SELECT = "multiSelect";
 	String INSTRUCTIONS = "instructions";
 	String GROUP_LAYOUT = "GROUP_LAYOUT";
-	String CLOSE_SCRIPT_TAG = "</script>";
 	String DEFAULT_VALUE = "defaultValue";
 	String COLUMN_NUMBER = "columnNumber";
 	String DISPLAY_STATE = "displayState";
