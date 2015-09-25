@@ -14,7 +14,12 @@
  *******************************************************************************/
 package com.clinovo.service;
 
+import com.clinovo.enums.CurrentDataEntryStage;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -51,6 +56,15 @@ public interface DataEntryService {
 	boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage);
 
 	/**
+	 * Method that checks that values should be loaded from DB.
+	 *
+	 * @param dib DisplayItemBean
+	 * @param dataEntryStage DataEntryStage
+	 * @return boolean
+	 */
+	boolean shouldLoadDBValues(DisplayItemBean dib, CurrentDataEntryStage dataEntryStage);
+
+	/**
 	 * Method returns list of DisplaySectionBean.
 	 *
 	 * @param allSectionBeans ArrayList<SectionBean>
@@ -62,4 +76,5 @@ public interface DataEntryService {
 	 */
 	ArrayList<DisplaySectionBean> getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb,
 			StudyBean study, Page servletPage) throws Exception;
+
 }

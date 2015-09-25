@@ -29,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.enums.CurrentDataEntryStage;
+import com.clinovo.util.DataEntryUtil;
+import com.clinovo.validation.DisplayItemBeanValidator;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -104,6 +107,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		FormProcessor fp = new FormProcessor(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
@@ -112,6 +116,8 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		int crfid = fp.getInt("crfId");
 		int tabNum = fp.getInt("tabId");
 		HttpSession session = request.getSession();
+
+		request.setAttribute("currentDataEntryStage", getCurrentDataEntryStage());
 		request.setAttribute("crfId", crfid);
 		String crfName = "";
 		String verNumber = "";
@@ -426,44 +432,6 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 	}
 
 	@Override
-	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
-			HttpServletRequest request) {
-		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
-		// note that this step sets us up both for
-		// displaying the data on the form again, in the event of an error
-		// and sending the data to the database, in the event of no error
-		dib = loadFormValue(dib, request);
-
-		// types TEL and ED are not supported yet
-		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
-			dib = validateDisplayItemBeanText(v, dib, inputName, request);
-		} else
-			if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
-					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
-			dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-		} else
-				if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
-						|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
-			dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
-		}
-
-		return dib;
-	}
-
-	@Override
-	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb,
-			List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups, HttpServletRequest request,
-			HttpServletResponse response) {
-
-		return formGroups;
-
-	}
-
-	@Override
 	protected boolean shouldRunRules() {
 		return false;
 	}
@@ -474,5 +442,10 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
 		return false;
+	}
+
+	@Override
+	protected CurrentDataEntryStage getCurrentDataEntryStage() {
+		return CurrentDataEntryStage.VIEW_DATA_ENTRY;
 	}
 }

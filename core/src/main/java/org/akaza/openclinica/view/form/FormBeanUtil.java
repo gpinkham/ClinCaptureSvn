@@ -63,8 +63,6 @@ public class FormBeanUtil {
 	public static ItemFormMetadataBean runDynamicsCheck(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean,
 			ItemDataBean itemDataBean, DynamicsMetadataService dynamicsMetadataService) {
 		if (!metadataBean.isShowItem()) {
-
-			// if the base case is not already shown, let's check it
 			boolean showItem = dynamicsMetadataService.isShown(metadataBean.getItemId(), eventCrfBean, itemDataBean);
 			metadataBean.setShowItem(showItem);
 			// setting true or false here, tbh

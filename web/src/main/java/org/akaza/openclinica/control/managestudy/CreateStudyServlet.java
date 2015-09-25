@@ -109,7 +109,7 @@ public class CreateStudyServlet extends Controller {
 			request.getSession().setAttribute("newStudy", new StudyBean());
 
 			UserAccountDAO udao = new UserAccountDAO(getDataSource());
-			Collection users = udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(), Role.STUDY_DIRECTOR.getName());
+			Collection users = udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getCode(), Role.STUDY_DIRECTOR.getCode());
 			request.setAttribute("users", users);
 
 			forwardPage(Page.CREATE_STUDY1, request, response);

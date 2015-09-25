@@ -38,6 +38,9 @@ public class EmailServiceImpl implements EmailService {
 	private Locale locale;
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, HttpServletRequest request)
 			throws Exception {
 		locale = LocaleResolver.getLocale(request);
@@ -46,6 +49,9 @@ public class EmailServiceImpl implements EmailService {
 				true, request);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, Boolean sendMessage,
 			HttpServletRequest request) throws Exception {
 		locale = LocaleResolver.getLocale(request);
@@ -55,6 +61,9 @@ public class EmailServiceImpl implements EmailService {
 				sendMessage, request);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, HttpServletRequest request)
 			throws Exception {
@@ -62,6 +71,9 @@ public class EmailServiceImpl implements EmailService {
 				new String[0], request);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Boolean sendEmailWithAttach(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, String[] files, HttpServletRequest request)
 			throws Exception {

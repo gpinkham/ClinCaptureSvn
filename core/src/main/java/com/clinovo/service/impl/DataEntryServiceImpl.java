@@ -22,6 +22,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.clinovo.enums.CurrentDataEntryStage;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -145,6 +146,18 @@ public class DataEntryServiceImpl implements DataEntryService {
 	 */
 	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage) {
 		if (Page.DOUBLE_DATA_ENTRY_SERVLET.equals(servletPage)) {
+			if (dib.getEventDefinitionCRF().isEvaluatedCRF()) {
+				return true;
+			}
+			if (dib.getData().getStatus() != null && dib.getData().getStatus().equals(Status.PENDING)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean shouldLoadDBValues(DisplayItemBean dib, CurrentDataEntryStage dataEntryStage) {
+		if (dataEntryStage == CurrentDataEntryStage.DOUBLE_DATA_ENTRY) {
 			if (dib.getEventDefinitionCRF().isEvaluatedCRF()) {
 				return true;
 			}

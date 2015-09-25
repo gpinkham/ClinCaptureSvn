@@ -20,27 +20,19 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.enums.CurrentDataEntryStage;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
@@ -48,10 +40,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 /**
- * Performs 'administrative editing' action for study director/study coordinator
- * 
- * @author jxu
- * 
+ * Performs 'administrative editing' action for study director/study coordinator.
  */
 @SuppressWarnings({ "serial" })
 @Component
@@ -153,7 +142,6 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
 			checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-			//checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 		}
 		request.setAttribute("fromResolvingNotes", fromResolvingNotes);
 		DataEntryStage stage = ecb.getStage();
@@ -199,128 +187,15 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
-			HttpServletRequest request) {
-
-		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
-		// note that this step sets us up both for
-		// displaying the data on the form again, in the event of an error
-		// and sending the data to the database, in the event of no error
-		if (StringUtil.isBlank(inputName)) {
-			// not an item from group, doesn't
-			// need to get data from form again
-			dib = loadFormValue(dib, request);
-		}
-
-		// types TEL and ED are not supported yet
-		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
-			dib = validateDisplayItemBeanText(v, dib, inputName, request);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
-			dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
-			dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
-		}
-
-		return dib;
-	}
-
-	@Override
-	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v,
-			DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups,
-			HttpServletRequest request, HttpServletResponse response) {
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-
-		for (DisplayItemGroupBean displayGroup : formGroups) {
-			List<DisplayItemBean> items = displayGroup.getItems();
-			for (DisplayItemBean displayItem : items) {
-				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
-				validateDisplayItemBean(v, displayItem, inputName, request);
-			}
-		}
-		return formGroups;
-
-	}
-
-	@Override
-	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
-			RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation,
-			ArrayList<String> messages, HttpServletRequest request) {
-		if (StringUtil.isBlank(inputName)) {
-			// we pass a blank inputName,which
-			// means if not an item from group,
-			// doesn't
-			// need to get data from form again
-			dib = loadFormValue(dib, request);
-		}
-		if (groupOrdinalPLusItemOid.containsKey(dib.getItem().getOid()) || fireRuleValidation) {
-			messages = messages == null ? groupOrdinalPLusItemOid.get(dib.getItem().getOid()) : messages;
-			dib = validateDisplayItemBeanSingleCV(rv, dib, inputName, messages);
-		}
-		return dib;
-	}
-
-	@Override
-	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v,
-			DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups,
-			RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, HttpServletRequest request,
-			HttpServletResponse response) {
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-
-		for (DisplayItemGroupBean displayGroup : formGroups) {
-			List<DisplayItemBean> items = displayGroup.getItems();
-			int order = displayGroup.getOrdinal();
-
-			for (DisplayItemBean displayItem : items) {
-				String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
-
-				if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
-						|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)
-						+ displayItem.getItem().getOid())) {
-					logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
-					validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true,
-							groupOrdinalPLusItemOid.get(String.valueOf(order + 1) + displayItem.getItem().getOid()),
-							request);
-				} else {
-					validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null,
-							request);
-				}
-			}
-		}
-		return formGroups;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#getBlankItemStatus ()
-	 */
-	@Override
 	protected Status getBlankItemStatus() {
 		return Status.UNAVAILABLE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#getNonBlankItemStatus ()
-	 */
 	@Override
 	protected Status getNonBlankItemStatus(HttpServletRequest request) {
 		return Status.UNAVAILABLE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#getEventCRFAnnotations ()
-	 */
 	@Override
 	protected String getEventCRFAnnotations(HttpServletRequest request) {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -344,4 +219,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 		return currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true");
 	}
 
+	@Override
+	protected CurrentDataEntryStage getCurrentDataEntryStage() {
+		return CurrentDataEntryStage.ADMINISTRATIVE_DATA_ENTRY;
+	}
 }

@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.enums.CurrentDataEntryStage;
+import com.clinovo.util.DataEntryUtil;
 import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -129,6 +131,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		FormProcessor fp = new FormProcessor(request);
 		request.setAttribute("expandCrfInfo", false);
+		request.setAttribute("currentDataEntryStage", getCurrentDataEntryStage());
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		SectionBean sb;
@@ -392,7 +395,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 		}
 
-		List<DisplayItemWithGroupBean> displayItemWithGroups = super.createItemWithGroups(dsb, hasItemGroup,
+		List<DisplayItemWithGroupBean> displayItemWithGroups = getDisplayItemService(getServletContext()).createItemWithGroups(dsb, hasItemGroup,
 				eventDefinitionCRFId, request);
 		dsb.setDisplayItemGroups(displayItemWithGroups);
 
@@ -414,7 +417,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 						List<DisplayItemBean> items = displayGroup.getItems();
 						logger.info("item size: " + items.size());
 						for (DisplayItemBean displayItem : items) {
-							String inputName = getGroupItemInputName(displayGroup, j, displayItem, false);
+							String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, false);
 							logger.info("inputName:" + inputName);
 							logger.info("item data id:" + displayItem.getData().getId());
 							dnService.saveFieldNotes(inputName, discNotes, displayItem.getData().getId(), "itemData",
@@ -426,13 +429,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					DisplayItemBean dib = diwb.getSingleItem();
 					// TODO work on this line
 
-					String inputName = getInputName(dib);
+					String inputName = DataEntryUtil.getInputName(dib);
 					dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(), "ItemData", currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
-						inputName = getInputName(child);
+						inputName = DataEntryUtil.getInputName(child);
 						dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(), "ItemData", currentStudy);
 					}
 				}
@@ -527,46 +530,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	}
 
 	/**
-	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
-	 *      (org.akaza.openclinica.core.form.Validator, org.akaza.openclinica.bean.submit.DisplayItemBean)
-	 */
-	@Override
-	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
-			HttpServletRequest request) {
-		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
-		// note that this step sets us up both for
-		// displaying the data on the form again, in the event of an error
-		// and sending the data to the database, in the event of no error
-		dib = loadFormValue(dib, request);
-
-		// types TEL and ED are not supported yet
-		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
-			dib = validateDisplayItemBeanText(v, dib, inputName, request);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
-			dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
-			dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
-		}
-
-		return dib;
-	}
-
-	@Override
-	protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v,
-			DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs, List<DisplayItemGroupBean> formGroups,
-			HttpServletRequest request, HttpServletResponse response) {
-
-		return formGroups;
-
-	}
-
-	/**
 	 * Current User may access a requested event CRF in the current user's studies.
 	 * 
 	 * @param eventCrfNotes
@@ -603,6 +566,11 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	@Override
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
 		return false;
+	}
+
+	@Override
+	protected CurrentDataEntryStage getCurrentDataEntryStage() {
+		return CurrentDataEntryStage.VIEW_DATA_ENTRY;
 	}
 
 	private HashMap<String, String> getSasItemNamesMap(HttpServletRequest request) {

@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DataEntryUtil;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -355,7 +356,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 		}
 
-		List<DisplayItemWithGroupBean> displayItemWithGroups = super.createItemWithGroups(dsb, hasItemGroup,
+		List<DisplayItemWithGroupBean> displayItemWithGroups = getDisplayItemService(getServletContext()).createItemWithGroups(dsb, hasItemGroup,
 				eventDefinitionCRFId, request);
 		dsb.setDisplayItemGroups(displayItemWithGroups);
 
@@ -384,7 +385,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 						List<DisplayItemBean> items = displayGroup.getItems();
 						LOGGER.info("item size: " + items.size());
 						for (DisplayItemBean displayItem : items) {
-							String inputName = getGroupItemInputName(displayGroup, j, displayItem, false);
+							String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, false);
 							LOGGER.info("inputName:" + inputName);
 							LOGGER.info("item data id:" + displayItem.getData().getId());
 							dnService.saveFieldNotes(inputName, discNotes, displayItem.getData().getId(), "itemData",
@@ -397,14 +398,14 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 					DisplayItemBean dib = diwb.getSingleItem();
 					// TODO work on this line
 
-					String inputName = getInputName(dib);
+					String inputName = DataEntryUtil.getInputName(dib);
 					dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA,
 							currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
-						inputName = getInputName(child);
+						inputName = DataEntryUtil.getInputName(child);
 						dnService.saveFieldNotes(inputName, discNotes, dib.getData().getId(),
 								DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 					}

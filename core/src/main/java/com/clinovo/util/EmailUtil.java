@@ -1,5 +1,6 @@
 package com.clinovo.util;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -95,5 +96,24 @@ public final class EmailUtil {
 			LOGGER.error("Error has occurred.", ex);
 		}
 		return result;
+	}
+
+	/**
+	 * Get CRF report email body.
+	 * @param studyName String
+	 * @param locale Locale
+	 * @return String
+	 */
+	public static String getCRFReportMessageBody(String studyName, Locale locale) {
+		ResourceBundleProvider.updateLocale(locale);
+		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
+		return  (getEmailBodyStart()
+				+ MessageFormat.format(respage.getString("crf_report_email_body"), "completed"))
+				+ respage.getString("email_body_simple_separator")
+				+ respage.getString("email_body_simple_separator")
+				+ MessageFormat.format(respage.getString("thank_you_message"), studyName)
+				+ respage.getString("email_body_simple_separator")
+				+ getEmailBodyEnd()
+				+ getEmailFooter(locale);
 	}
 }
