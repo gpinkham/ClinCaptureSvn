@@ -145,11 +145,17 @@ public class DownloadRuleSetXmlServlet extends Controller {
 		String dir = SQLInitServlet.getField("filePath") + "rules" + File.separator;
 		Long time = System.currentTimeMillis();
 		File f = new File(dir + "rules" + currentStudy.getOid() + "-" + time + ".xml");
-		OutputStreamWriter charOutput = new OutputStreamWriter(
-				new FileOutputStream(f),
-				Charset.forName("UTF-8").newEncoder()
-		);
-		handleLoadCastor(charOutput, prepareRulesPostImportRuleSetRuleContainer(ruleSetRuleIds));
+		try {
+			OutputStreamWriter charOutput = new OutputStreamWriter(
+					new FileOutputStream(f),
+					Charset.forName("UTF-8").newEncoder()
+			);
+			handleLoadCastor(charOutput, prepareRulesPostImportRuleSetRuleContainer(ruleSetRuleIds));
+		} catch (FileNotFoundException e) {
+			addPageMessage(resword.getString("file_path_is_invalid"), request);
+			forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
+			return;
+		}
 
 		response.setHeader("Content-disposition", "attachment; filename=\"" + "rules" + currentStudy.getOid() + "-"
 				+ time + ".xml" + "\";");
