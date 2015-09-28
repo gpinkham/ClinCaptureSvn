@@ -153,8 +153,8 @@
 	        <fmt:message key="randomization_cap" bundle="${resword}"/>?
 	    </td>
 	    <td>
-			<input type="radio" name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-			<input type="radio" checked name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+			<input type="radio" checked name="randomization" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+			<input type="radio" name="randomization" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
 		</td>
 	</tr>
 	<tr valign="top">
