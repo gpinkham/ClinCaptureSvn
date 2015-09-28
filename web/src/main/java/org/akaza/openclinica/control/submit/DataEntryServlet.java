@@ -141,7 +141,9 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.EventCRFSectionBean;
 import com.clinovo.service.DataEntryService;
+import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
@@ -179,6 +181,9 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String INTERVIEWER_DATE_NOTE = "InterviewerDateNote";
 	public static final String INPUT_TAB = "tabId";
 	public static final String INPUT_MARK_COMPLETE = "markComplete";
+	
+	public static final String INPUT_MARK_PARTIAL_SAVED = "markPartialSaved";
+
 	public static final String VALUE_YES = "Yes";
 	public static final String INPUT_EVENT_DEFINITION_CRF_ID = "eventDefinitionCRFId";
 	public static final String INPUT_CRF_VERSION_ID = "crfVersionId";
@@ -282,7 +287,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		logMe("Enterting DataEntry Servlet" + System.currentTimeMillis());
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-
+		
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		String age = "";
@@ -295,7 +300,6 @@ public abstract class DataEntryServlet extends Controller {
 		boolean headerRequiredField = currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")
 				|| currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes");
 		request.setAttribute("expandCrfInfo", headerRequiredField);
-
 		if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("")
 				&& fp.getString("sectionId").equals("")) {
 			if (getUnavailableCRFList().containsKey(ecb.getId())) {
@@ -482,6 +486,9 @@ public abstract class DataEntryServlet extends Controller {
 		SectionBean nextSec = DataEntryUtil.getNextSection(toc, sIndex);
 		section.setFirstSection(!previousSec.isActive());
 		section.setLastSection(!nextSec.isActive());
+
+		setPartialSaveParameters(request, ecb.getId(), section);
+		
 		SubjectDAO subjectDao = new SubjectDAO(getDataSource());
 		SubjectBean subject = (SubjectBean) subjectDao.findByPK(ssb.getSubjectId());
 
@@ -1159,6 +1166,7 @@ public abstract class DataEntryServlet extends Controller {
 				setPresetValues(fp.getPresetValues(), request);
 
 				request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
+				request.setAttribute("markPartialSaved", fp.getString(INPUT_MARK_PARTIAL_SAVED));
 				request.setAttribute(BEAN_DISPLAY, section);
 				request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 				setInputMessages(errors, request);
@@ -1267,6 +1275,8 @@ public abstract class DataEntryServlet extends Controller {
 									noteDescription, detailedDescription);
 					fdn.addAutoRFCs(dbns);
 				}
+
+				savePartialSavedStatus(fp, ecb, sb.getId(), ssb.getId());
 
 				dndao = new DiscrepancyNoteDAO(getDataSource());
 				dnService.saveFieldNotes(INPUT_INTERVIEWER, fdn, ecb.getId(), "EventCRF", currentStudy);
@@ -1525,7 +1535,9 @@ public abstract class DataEntryServlet extends Controller {
 					success = updateFailedItems.size() > 0 ? false : true;
 
 					boolean markComplete = fp.getString(INPUT_MARK_COMPLETE).equals(VALUE_YES);
-					boolean markSuccessfully = false;
+					
+					boolean markSuccessfully = false; // if the CRF was marked
+
 
 					if (markComplete && section.isLastSection()) {
 						logger.debug("need to mark CRF as complete");
@@ -1711,6 +1723,36 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
+	private void savePartialSavedStatus(FormProcessor fp, EventCRFBean eventCRFBean, int sectionBeanId, int sSubjectId) {
+		boolean markPartialSaved = fp.getString("markPartialSaved").equals(VALUE_YES);
+		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
+				getServletContext()).getBean("eventCRFSectionService");
+		
+		EventCRFSectionBean ecsb = eventCRFSectionService.findByEventCRFIdAndSectionId(eventCRFBean.getId(), sectionBeanId);
+		ecsb.setEventCRFId(eventCRFBean.getId());
+		ecsb.setSectionId(sectionBeanId);
+		ecsb.setStudySubjectId(sSubjectId);
+		if ((ecsb.isPartialSaved() != markPartialSaved)) {
+			ecsb.setPartialSaved(markPartialSaved);
+			eventCRFSectionService.saveEventCRFSectionBean(ecsb);
+		}
+	}
+
+	private void setPartialSaveParameters(HttpServletRequest request, int eventCRFId, DisplaySectionBean dsb) {
+		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
+				getServletContext()).getBean("eventCRFSectionService");
+		EventCRFSectionBean ecsb = eventCRFSectionService.findByEventCRFIdAndSectionId(eventCRFId, dsb.getSection().getId());
+		List<EventCRFSectionBean> psSectionsList = eventCRFSectionService.findAllByEventCRFId(eventCRFId);
+		Map<Integer, EventCRFSectionBean> sectionIdToEvCRFSection = eventCRFSectionService.getSectionIdToEvCRFSectionMap(eventCRFId);
+		request.setAttribute("disableMarkCRFComplete", dsb.isLastSection() && (psSectionsList.size() > 1 
+				|| (psSectionsList.size() == 1 	&& !sectionIdToEvCRFSection.containsKey(dsb.getSection().getId()))));
+		request.setAttribute("psSectionsList", psSectionsList);
+		request.setAttribute("sectionIdToEvCRFSection", sectionIdToEvCRFSection);
+		request.setAttribute("markPartialSaved", ecsb.isPartialSaved()? "Yes" : "No");
+	}
+
+	
+	
 	protected abstract void putDataEntryStageFlagToRequest(HttpServletRequest request);
 
 	private void goToNextCRF(HttpServletRequest request, HttpServletResponse response, EventCRFBean ecb,

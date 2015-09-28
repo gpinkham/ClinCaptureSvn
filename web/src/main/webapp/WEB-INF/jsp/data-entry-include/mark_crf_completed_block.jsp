@@ -7,18 +7,22 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
+<c:if test="${disableMarkCRFComplete}">
+	<c:set var="disabled" scope="request" value="disabled"/>
+</c:if>
+
 <c:choose>
 	<c:when test="${!dataEntryStage.isAdmin_Editing() && section.lastSection}">
 		<c:choose>
 			<c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
 				<td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-				<c:if test="${markComplete=='Yes'}"> checked </c:if> onchange="changeImage('markComplete');" onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this });">
+				<c:if test="${markComplete=='Yes'}"> checked </c:if> ${disabled} onchange="changeImage('markComplete');" onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this });">
 				</td>
 				<td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
 			</c:when>
 			<c:otherwise>
 				<td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-				<c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="${markCRFMethodName}" onchange="changeImage('markComplete');">
+				<c:if test="${markComplete=='Yes'}"> checked </c:if> ${disabled} onclick="${markCRFMethodName}" onchange="changeImage('markComplete');">
 				</td>
 				<td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
 			</c:otherwise>

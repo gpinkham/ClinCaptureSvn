@@ -81,16 +81,6 @@
 	var TabFullName = new Array(TabsNumber);
 	var TabSectionId = new Array(TabsNumber);
 
-	<c:set var="eventDefinitionCRFDoubleEntryMode" value="${toc.eventDefinitionCRF.doubleEntry}"/>
-	<c:choose>
-	<c:when test="${eventDefinitionCRFDoubleEntryMode}">
-	<c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, true)"/>
-	</c:when>
-	<c:otherwise>
-	<c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
-	</c:otherwise>
-	</c:choose>
-
 	<c:set value="0" var="count"/>
 	<c:forEach var="section" items="${toc.sections}">
 	<c:set var="completedItems" value="${section.numItemsCompleted}"/>

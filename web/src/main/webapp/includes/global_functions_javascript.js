@@ -940,7 +940,6 @@ function unCheckSiblings(radioObject,
             }
         }
     }
-
 }
 
 function unCheckObject(radioObject) {
@@ -964,6 +963,23 @@ function isCheckedRadioOrCheckbox(inputObject){
     return false;
 }
 
+function checkCheckboxes(checkboxObjectName, isChecked){
+    var checkboxObjects = document.getElementsByName(checkboxObjectName);
+    if(checkboxObjects[0]){
+        checkboxObjects[0].checked=isChecked;
+    }
+    if(checkboxObjects[1]){
+        checkboxObjects[1].checked=isChecked;
+    }
+}
+
+function checkPartialSaveCheckboxes(psCheckboxesName, psIsChecked, mCRFcCheckboxesName){
+	if (psIsChecked) {
+		checkCheckboxes(mCRFcCheckboxesName, false);
+	}
+	checkCheckboxes(psCheckboxesName, psIsChecked);
+}
+
 var setCookie = function(c_name, value, exdays) {
     var exdate = new Date();
     exdate.setDate(exdate.getDate() + exdays);
@@ -983,26 +999,15 @@ var getCookie = function(c_name) {
     }
 };
 
-var markCRFCompleteOk = function(checkboxObjectName) {
+var markCRFCompleteOk = function(checkboxObjectName, psCheckboxesName) {
     $("#confirmation").dialog("close");
-    var checkboxObjects = document.getElementsByName(checkboxObjectName);
-    if(checkboxObjects[0]){
-        checkboxObjects[0].checked=true;
-    }
-    if(checkboxObjects[1]){
-        checkboxObjects[1].checked=true;
-    }
+    checkCheckboxes(checkboxObjectName, true);
+	checkCheckboxes(psCheckboxesName, false);
 };
 
 var markCRFCompleteCancel = function(checkboxObjectName) {
     $("#confirmation").dialog("close");
-    var checkboxObjects = document.getElementsByName(checkboxObjectName);
-    if(checkboxObjects[0]){
-        checkboxObjects[0].checked=false;
-    }
-    if(checkboxObjects[1]){
-        checkboxObjects[1].checked=false;
-    }
+    checkCheckboxes(checkboxObjectName, false);
 };
 
 var shouldShowDialog = function() {
@@ -1017,7 +1022,7 @@ var shouldShowDialog = function() {
 /* Only display the confirm dialogue box if the checkbox was checked
  when the user clicked it; then uncheck the checkbox if the user chooses "cancel"
  in the confirm dialogue. */
-function displayMessageFromCheckbox(checkboxObject, dde){
+function displayMessageFromCheckbox(checkboxObject, psCheckboxesName, dde){
     if(checkboxObject != null && checkboxObject.checked){
 
         if ($("#confirmation").length == 0) {
@@ -1027,7 +1032,7 @@ function displayMessageFromCheckbox(checkboxObject, dde){
                                       : "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will prepare it for Double Data Entry, where another user will enter data and then be able to finally complete this CRF.</div>") +
                     "<div style=\"clear: both; padding: 6px;\"><input type=\"checkbox\" id=\"ignoreMarkCRFCompleteMSG\"/> Do not show this message anymore.</div>" +
                     "<div style=\"clear: both;\">" +
-                        "<input type=\"button\" value=\"Yes\" class=\"button_medium\" onclick=\"markCRFCompleteOk('" + checkboxObject.name + "');\" style=\"float: left;\">" +
+                        "<input type=\"button\" value=\"Yes\" class=\"button_medium\" onclick=\"markCRFCompleteOk('" + checkboxObject.name + "," + psCheckboxesName + "');\" style=\"float: left;\">" +
                         "<input type=\"button\" value=\"No\" class=\"button_medium\" onclick=\"markCRFCompleteCancel('" + checkboxObject.name + "');\" style=\"float: left; margin-left: 6px;\">" +
                     "</div>" +
                 "</div>");
@@ -1050,19 +1055,13 @@ function displayMessageFromCheckbox(checkboxObject, dde){
             $("#confirmation #ignoreMarkCRFCompleteMSG").attr('checked', false);
             $("#confirmation").dialog("open");
         } else {
-            markCRFCompleteOk(checkboxObject.name);
+            markCRFCompleteOk(checkboxObject.name, psCheckboxesName);
         }
-
-    } else
-    if(checkboxObject != null && !checkboxObject.checked){
-    	var checkboxObjects = document.getElementsByName(checkboxObject.name);
-        if(checkboxObjects[0]){
-            checkboxObjects[0].checked=false;
-        }
-        if(checkboxObjects[1]){
-            checkboxObjects[1].checked=false;
-        }
-    }
+    } else {
+		if(checkboxObject != null && !checkboxObject.checked){
+			checkCheckboxes(checkboxObject.name, false);
+		}
+	}
 
     if (theme.name != 'blue') {
 		$('input.button_medium').not('.medium_back, .medium_cancel, .medium_continue, .medium_submit').css('background-image', 'url(images/' + theme.name + '/button_medium_BG.gif)');

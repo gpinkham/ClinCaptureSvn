@@ -11,6 +11,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<jsp:include page="../data-entry-include/mark_crf_completed_block.jsp"/>
+		<jsp:include page="../data-entry-include/partial_save_block.jsp"/>
 		<td>
 			<c:if test="${dataEntryStage.isAdmin_Editing() and !(param.isUpper eq 'true')}">
 				<input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>

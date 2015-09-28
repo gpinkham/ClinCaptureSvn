@@ -45,7 +45,14 @@
 	<script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
 </c:if>
 
-<c:set var="markCRFMethodName" scope="request" value="displayMessageFromCheckbox(this, undefined)"/>
+<c:choose>
+	<c:when test="${toc.eventDefinitionCRF.doubleEntry}">
+		<c:set var="markCRFMethodName" scope="request" value="displayMessageFromCheckbox(this, 'markPartialSaved', true)"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="markCRFMethodName" scope="request" value="displayMessageFromCheckbox(this, 'markPartialSaved', undefined)"/>
+	</c:otherwise>
+</c:choose>
 <c:choose>
 	<c:when test="${section.checkInputs}">
 		<c:set var="buttonAction" scope="request"><fmt:message key="save" bundle="${resword}"/></c:set>
