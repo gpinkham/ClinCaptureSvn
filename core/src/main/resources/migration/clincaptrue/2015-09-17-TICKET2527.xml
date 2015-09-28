@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="igor" id="2015-09-17-TICKET2527">
+		<comment>Create event_crf_section table to implement Partial Save</comment>
+		<createTable tableName="event_crf_section">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="version" type="int"/>
+			<column name="section_id" type="int"/>
+			<column name="study_subject_id" type="int"/>
+			<column name="event_crf_id" type="int"/>
+			<column name="partial_saved" type="bool"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="igor" id="2015-09-17-TICKET2527-2">
+		<comment>Add foreign keys for event_crf_section</comment>
+		<addForeignKeyConstraint constraintName="event_crf_section_fk_section_id"
+								 baseColumnNames="section_id"
+								 baseTableName="event_crf_section"
+								 onDelete="CASCADE"
+								 referencedColumnNames="section_id"
+								 referencedTableName="section"/>
+		<addForeignKeyConstraint constraintName="event_crf_section_fk_study_subject_id"
+								 baseColumnNames="study_subject_id"
+								 baseTableName="event_crf_section"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_subject_id"
+								 referencedTableName="study_subject"/>
+		<addForeignKeyConstraint constraintName="event_crf_section_fk_event_crf_id"
+								 baseColumnNames="event_crf_id"
+								 baseTableName="event_crf_section"
+								 onDelete="CASCADE"
+								 referencedColumnNames="event_crf_id"
+								 referencedTableName="event_crf"/>
+	</changeSet>
+</databaseChangeLog>
