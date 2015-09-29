@@ -744,6 +744,10 @@ Parser.prototype.isValid = function(expression) {
             valid = false;
             message = messageSource.messages.specifyDiscrepancyText;
             $(".discrepancy-properties").find("textarea").focus();
+        } else if ($(".discrepancy-properties").find("textarea").val().length > 2000) {
+        	valid = false;
+        	message = messageSource.messages.invalidDiscrepancyText;
+            $(".discrepancy-properties").find("textarea").focus();
         }
     }
 
@@ -752,6 +756,10 @@ Parser.prototype.isValid = function(expression) {
             valid = false;
             message = messageSource.messages.specifyEmailMessage;
             $(".email-properties").find("textarea").focus();
+        } else if ($(".email-properties").find("textarea").val().length > 2000) {
+        	valid = false;
+        	message = messageSource.messages.invalidEmailText;
+        	$(".email-properties").find("textarea").focus();
         }
     }
 

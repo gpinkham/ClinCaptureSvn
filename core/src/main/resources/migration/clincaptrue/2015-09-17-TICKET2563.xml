@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="thickerson" id="2015-09-17-TICKET2563">
+        <comment>Expand the ability to store a longer message in the DB for Rules</comment>
+        <modifyColumn tableName="rule_action">
+            <column name="message" type="VARCHAR(2000)"/>
+        </modifyColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -80,6 +80,8 @@
 		messageSource.messages.specifyTarget = '<fmt:message bundle="${resword}" key="rs.message.specifyTarget"/>';
 		messageSource.messages.specifyDescription = '<fmt:message bundle="${resword}" key="rs.message.specifyDescription"/>';
 		messageSource.messages.specifyDiscrepancyText = '<fmt:message bundle="${resword}" key="rs.message.specifyDiscrepancyText"/>';
+		messageSource.messages.invalidDiscrepancyText = '<fmt:message bundle="${resword}" key="rs.message.invalidDiscrepancyText"/>';
+		messageSource.messages.invalidEmailText = '<fmt:message bundle="${resword}" key="rs.message.invalidEmailText"/>';
 		messageSource.messages.specifyEmailMessage = '<fmt:message bundle="${resword}" key="rs.message.specifyEmailMessage"/>';
 		messageSource.messages.invalidEmail = '<fmt:message bundle="${resword}" key="rs.message.invalidEmail"/>';
 		messageSource.messages.selectItemsToInsert = '<fmt:message bundle="${resword}" key="rs.message.selectItemsToInsert"/>';

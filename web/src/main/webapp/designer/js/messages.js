@@ -85,6 +85,8 @@ function MessageSourceGetter() {
 		clearExpression: "",
 		showHideEvaluation: "",
 		itemDoesNotExistInTheStudy: "",
+		invalidDiscrepancyText: "",
+		invalidEmailText: "",
 		serverIsNotAvailable: "",
 		enterNumber: "",
 		expressionWillBeLost: "",

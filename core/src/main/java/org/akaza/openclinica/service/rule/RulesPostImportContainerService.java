@@ -34,6 +34,8 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
@@ -330,6 +332,22 @@ public final class RulesPostImportContainerService {
 			if (errors.hasErrors()) {
 				ruleSetBeanWrapper.error("InsertAction is not valid: "
 						+ errors.getAllErrors().get(0).getDefaultMessage());
+			}
+		}
+		if (ruleActionBean instanceof EmailActionBean) {
+			EmailActionBean emailActionBean = (EmailActionBean) ruleActionBean;
+			if (emailActionBean.getMessage() != null) {
+				if (emailActionBean.getMessage().length() > 2000) {
+					ruleSetBeanWrapper.error("Your message cannot be more than 2000 characters.");
+				}
+			}
+		}
+		if (ruleActionBean instanceof DiscrepancyNoteActionBean) {
+			DiscrepancyNoteActionBean discrepancyNoteActionBean = (DiscrepancyNoteActionBean) ruleActionBean;
+			if (discrepancyNoteActionBean.getMessage() != null) {
+				if (discrepancyNoteActionBean.getMessage().length() > 2000) {
+					ruleSetBeanWrapper.error("Your message cannot be more than 2000 characters.");
+				}
 			}
 		}
 	}
