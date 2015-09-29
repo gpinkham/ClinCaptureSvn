@@ -2,7 +2,6 @@ package com.clinovo.lib.crf.service.impl;
 
 import java.util.Locale;
 
-import com.clinovo.lib.crf.enums.CRFSource;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -17,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 
 import com.clinovo.lib.crf.builder.CrfBuilder;
+import com.clinovo.lib.crf.enums.CRFSource;
+import com.clinovo.lib.crf.enums.Dictionary;
 import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 
 public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
@@ -82,7 +83,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
 		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
-		assertEquals(crfBuilder.getItems().size(), 22);
+		assertEquals(crfBuilder.getItems().size(), 29);
 	}
 
 	@Test
@@ -125,5 +126,80 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfBuilder.getCrfBean().getId());
 		assertEquals(crfVersionBean.getName(), "v1.0");
 		assertTrue(crfVersionBean.getId() > 0);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryCTCAE() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 8);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryICD9CM() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		jsonData = jsonData.replaceAll("\"dictionary\":\"ctcae\"",
+				"\"dictionary\":\"".concat(Dictionary.ICD_9CM.getName()).concat("\""));
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 7);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryICD10() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		jsonData = jsonData.replaceAll("\"dictionary\":\"ctcae\"",
+				"\"dictionary\":\"".concat(Dictionary.ICD_10.getName()).concat("\""));
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 7);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryMEDDRA171() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		jsonData = jsonData.replaceAll("\"dictionary\":\"ctcae\"",
+				"\"dictionary\":\"".concat(Dictionary.MEDDRA_171.getName()).concat("\""));
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 11);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryMEDDRA180() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		jsonData = jsonData.replaceAll("\"dictionary\":\"ctcae\"",
+				"\"dictionary\":\"".concat(Dictionary.MEDDRA_180.getName()).concat("\""));
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 11);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryWHODRUGSEP14() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		jsonData = jsonData.replaceAll("\"dictionary\":\"ctcae\"",
+				"\"dictionary\":\"".concat(Dictionary.WHODRUG_SEP_14.getName()).concat("\""));
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 19);
+	}
+
+	@Test
+	public void testThatCrfBuilderCreatesCorrectQuantityOfCodingItemsForDictionaryWHODRUGMAR15() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCodingCrf.json").getInputStream(), "UTF-8");
+		jsonData = jsonData.replaceAll("\"dictionary\":\"ctcae\"",
+				"\"dictionary\":\"".concat(Dictionary.WHODRUG_MAR_15.getName()).concat("\""));
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(crfBuilder.getItems().size(), 19);
 	}
 }

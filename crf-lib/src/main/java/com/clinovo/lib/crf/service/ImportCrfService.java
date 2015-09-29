@@ -27,7 +27,10 @@ public interface ImportCrfService {
 
 	String SL = "SL";
 	String ONE = "1";
+	String DOT = ".";
 	String ZERO = "0";
+	String EMPTY = "";
+	String COMMA = ",";
 	String CRF = "CRF";
 	String POS = "pos";
 	String YES = "yes";
@@ -36,6 +39,7 @@ public interface ImportCrfService {
 	String FORTY = "40";
 	String ROWS = "rows";
 	String HIDE = "hide";
+	String SHOW = "show";
 	String TRUE = "true";
 	String TYPE = "type";
 	String TEXT = "text";
@@ -48,6 +52,7 @@ public interface ImportCrfService {
 	String UTF_8 = "UTF-8";
 	String PAGES = "pages";
 	String TITLE = "title";
+	String UNDERLINE = "_";
 	String LAYOUT = "layout";
 	String HEADER = "header";
 	String INTEGER = "integer";
@@ -59,6 +64,7 @@ public interface ImportCrfService {
 	String MAX_ROWS = "maxRows";
 	String MIN_ROWS = "minRows";
 	String PHI_DATA = "phiData";
+	String CODE_REF = "codeRef";
 	String AMP_REPLACEMENT = "&";
 	String CHILDREN = "children";
 	String REQUIRED = "required";
@@ -72,6 +78,7 @@ public interface ImportCrfService {
 	String UNGROUPED = "Ungrouped";
 	String RESIZABLE = "resizable";
 	String RIGHT_TEXT = "rightText";
+	String DICTIONARY = "dictionary";
 	String NUMBER_TYPE = "numberType";
 	String RAND_RESULT = "Rand_Result";
 	String CALCULATION = "calculation";

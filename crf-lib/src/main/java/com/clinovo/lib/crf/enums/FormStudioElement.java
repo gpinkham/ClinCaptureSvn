@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public enum FormStudioElement {
 
-	TEXT, NUMBER, LIST, DIVIDER, RADIO, CHECKBOX, CALCULATION, FILE, TIME, DATE, GRID, TABLE, CODING, RANDOMIZATION;
+	TEXT, NUMBER, LIST, DIVIDER, RADIO, CHECKBOX, CALCULATION, FILE, TIME, DATE, GRID, TABLE, CODING, CODING_SYSTEM, CODING_RADIO, RANDOMIZATION;
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(FormStudioElement.class);
 

@@ -38,17 +38,21 @@ import org.springframework.stereotype.Service;
 import com.clinovo.lib.crf.bean.ItemBeanExt;
 import com.clinovo.lib.crf.builder.impl.BaseCrfBuilder;
 import com.clinovo.lib.crf.builder.impl.JsonCrfBuilder;
+import com.clinovo.lib.crf.enums.Coding;
+import com.clinovo.lib.crf.enums.Dictionary;
 import com.clinovo.lib.crf.enums.FormStudioElement;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.enums.RealValueKey;
+import com.clinovo.lib.crf.service.ImportCrfService;
 import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import com.clinovo.lib.crf.validator.CommonValidator;
+import com.clinovo.util.CodingFieldsUtil;
 
 /**
  * FormStudioServiceImpl.
  */
 @Service
-@SuppressWarnings("unused")
+@SuppressWarnings({"unchecked", "unused"})
 public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(FormStudioImportCrfServiceImpl.class);
@@ -87,7 +91,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private String getString(JSONArray jsonArray, int index) throws Exception {
-		String result = "";
+		String result = EMPTY;
 		try {
 			result = URLDecoder.decode(jsonArray.getString(index), UTF_8);
 		} catch (Exception ex) {
@@ -111,7 +115,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private String getString(JSONObject jsonObject, String key, boolean checkMetadataTags) {
-		String result = "";
+		String result = EMPTY;
 		try {
 			result = URLDecoder.decode(jsonObject.getString(key), UTF_8).replaceAll(LT, OPEN_TAG)
 					.replaceAll(GT, CLOSE_TAG).replaceAll(AMP, AMP_REPLACEMENT);
@@ -158,7 +162,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 				crfBuilder.getCurrentSection().setTitle(crfBuilder.getCurrentSection().getName());
 			}
 			crfBuilder.getCurrentSection().setStatus(Status.AVAILABLE);
-			crfBuilder.getCurrentSection().setPageNumberLabel("");
+			crfBuilder.getCurrentSection().setPageNumberLabel(EMPTY);
 			crfBuilder.getCurrentSection().setOrdinal(crfBuilder.getNextSectionOrdinal());
 			crfBuilder.getCurrentSection().setOwner(crfBuilder.getOwner());
 			crfBuilder.getSections().add(crfBuilder.getCurrentSection());
@@ -176,8 +180,8 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			hiddenDataStringBuilder.append("<input eleId=\"").append(crfBuilder.getCurrentItem().getName())
 					.append("\" type=\"hidden\" ");
 			String[] attrValues = crfBuilder.split(crfBuilder.getCurrentItem().getResponseSet().getOptionsValues(),
-					",");
-			for (String attr : crfBuilder.split(crfBuilder.getCurrentItem().getResponseSet().getOptionsText(), ",")) {
+					COMMA);
+			for (String attr : crfBuilder.split(crfBuilder.getCurrentItem().getResponseSet().getOptionsText(), COMMA)) {
 				hiddenDataStringBuilder.append(" ").append(attr).append("=\"").append(attrValues[c]).append("\" ");
 				c++;
 			}
@@ -193,18 +197,19 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private void createItemFormMetadata(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
-		crfBuilder.getCurrentItem().getItemMeta().setWidthDecimal("");
+		FormStudioElement type = FormStudioElement.getByName(getString(jsonObj, TYPE).toUpperCase());
+		crfBuilder.getCurrentItem().getItemMeta().setWidthDecimal(EMPTY);
 		String repeatingItemGroupHeader = getString(jsonObj, REPEATING_ITEM_GROUP_HEADER);
 		crfBuilder.getCurrentItem().getItemMeta().setHeader(
 				!repeatingItemGroupHeader.isEmpty() ? repeatingItemGroupHeader : crfBuilder.getCurrentHeader());
 		crfBuilder.getCurrentItem().getItemMeta().setColumnNumber(getInt(jsonObj, COLUMN_NUMBER));
 		if (crfBuilder.getCurrentItem().getName().equalsIgnoreCase(RAND_DATE)) {
-			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel("");
+			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(EMPTY);
 		} else if (isYes(jsonObj, NUMBERING)) {
-			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(getString(jsonObj, POS).concat("."));
+			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(getString(jsonObj, POS).concat(DOT));
 		}
 
-		crfBuilder.getCurrentItem().getItemMeta().setPageNumberLabel("");
+		crfBuilder.getCurrentItem().getItemMeta().setPageNumberLabel(EMPTY);
 		crfBuilder.getCurrentItem().getItemMeta().setLeftItemText(getString(jsonObj, LEFT_TEXT));
 		crfBuilder.getCurrentItem().getItemMeta().setRightItemText(getString(jsonObj, RIGHT_TEXT));
 		crfBuilder.getCurrentItem().getItemMeta().setRegexp(getString(jsonObj, FIELD_VALIDATION));
@@ -214,7 +219,19 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().getItemMeta().setResponseLayout(getString(jsonObj, LAYOUT));
 		crfBuilder.getCurrentItem().getItemMeta()
 				.setShowItem(!getString(jsonObj, DISPLAY_STATE).equalsIgnoreCase(HIDE));
-		crfBuilder.getCurrentItem().getItemMeta().setCodeRef("");
+		if (type == FormStudioElement.CODING) {
+			crfBuilder.getCurrentItem().getItemMeta()
+					.setCodeRef(Dictionary.findDictionary(getString(jsonObj, DICTIONARY)).getSysName());
+		} else if (type == FormStudioElement.CODING_SYSTEM || type == FormStudioElement.CODING_RADIO) {
+			crfBuilder.getCurrentItem().getItemMeta()
+					.setCodeRef(crfBuilder.getCurrentItem().getParentItemBean().getName());
+			crfBuilder.getCurrentItem().setParentItemBean(null);
+		} else {
+			crfBuilder.getCurrentItem().getItemMeta().setCodeRef(EMPTY);
+		}
+		if (CodingFieldsUtil.getEnumAsList(crfBuilder.getCurrentItem().getItemMeta().getCodeRef()) != null) {
+			crfBuilder.getCodingRefItemNames().add(crfBuilder.getCurrentItem().getName());
+		}
 		crfBuilder.getCurrentItem().getItemMeta().setSdvRequired(false);
 		crfBuilder.getItemNameToMetaMap().put(crfBuilder.getCurrentItem().getName(),
 				crfBuilder.getCurrentItem().getItemMeta());
@@ -240,7 +257,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setRepeatingGroup(itemGroupBean != null);
 			crfBuilder.getCurrentItem().getItemGroupBean().getMeta()
 					.setHeader(getString(jsonObj, REPEATING_GROUP_HEADER));
-			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setSubheader("");
+			crfBuilder.getCurrentItem().getItemGroupBean().getMeta().setSubheader(EMPTY);
 		}
 	}
 
@@ -249,7 +266,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		String optionsText;
 		JSONArray jsonArray;
 		String optionsValues;
-		String defaultValue = "";
+		String defaultValue = EMPTY;
 		ResponseType responseType;
 		boolean resizable = getBoolean(jsonObj, RESIZABLE);
 		crfBuilder.getCurrentItem().setResponseSet(new ResponseSet());
@@ -261,6 +278,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			case DATE :
 			case TIME :
 			case NUMBER :
+			case CODING :
 			case RANDOMIZATION :
 				label = resizable ? TEXTAREA : TEXT;
 				optionsText = resizable ? TEXTAREA : TEXT;
@@ -282,52 +300,53 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 				responseType = ResponseType.FILE;
 				break;
 			case LIST :
-				optionsText = "";
-				optionsValues = "";
+				optionsText = EMPTY;
+				optionsValues = EMPTY;
 				label = getString(jsonObj, RESPONSE_LABEL);
 				jsonArray = getJSONArray(jsonObj, OPTIONS);
 				responseType = getBoolean(jsonObj, MULTI_SELECT) ? ResponseType.SELECTMULTI : ResponseType.SELECT;
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
-					String optionValue = getString(jsonObjectOption, VALUE);
-					optionsText = optionsText.concat(optionsText.isEmpty() ? "" : ",")
+					String optionValue = getString(jsonObjectOption, ImportCrfService.VALUE);
+					optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA)
 							.concat(getString(jsonObjectOption, NAME));
-					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? "" : ",").concat(optionValue);
+					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA).concat(optionValue);
 					if (getBoolean(jsonObjectOption, DEFAULT)) {
 						defaultValue = optionValue;
 					}
 				}
 				if (getString(jsonObj, DEFAULT_VALUE).isEmpty()) {
-					optionsText = ",".concat(optionsText);
-					optionsValues = ",".concat(optionsValues);
+					optionsText = COMMA.concat(optionsText);
+					optionsValues = COMMA.concat(optionsValues);
 				}
 				break;
 			case RADIO :
-				optionsText = "";
-				optionsValues = "";
+			case CODING_RADIO :
+				optionsText = EMPTY;
+				optionsValues = EMPTY;
 				responseType = ResponseType.RADIO;
 				label = getString(jsonObj, RESPONSE_LABEL);
 				jsonArray = getJSONArray(jsonObj, OPTIONS);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
-					optionsText = optionsText.concat(optionsText.isEmpty() ? "" : ",")
+					optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA)
 							.concat(getString(jsonObjectOption, NAME));
-					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? "" : ",")
-							.concat(getString(jsonObjectOption, VALUE));
+					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA)
+							.concat(getString(jsonObjectOption, ImportCrfService.VALUE));
 				}
 				break;
 			case CHECKBOX :
-				optionsText = "";
-				optionsValues = "";
+				optionsText = EMPTY;
+				optionsValues = EMPTY;
 				responseType = ResponseType.CHECKBOX;
 				label = getString(jsonObj, RESPONSE_LABEL);
 				jsonArray = getJSONArray(jsonObj, OPTIONS);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
-					String optionValue = getString(jsonObjectOption, VALUE);
-					optionsText = optionsText.concat(optionsText.isEmpty() ? "" : ",")
+					String optionValue = getString(jsonObjectOption, ImportCrfService.VALUE);
+					optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA)
 							.concat(getString(jsonObjectOption, NAME));
-					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? "" : ",").concat(optionValue);
+					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA).concat(optionValue);
 					if (getBoolean(jsonObjectOption, DEFAULT)) {
 						defaultValue = optionValue;
 					}
@@ -341,12 +360,12 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		}
 
 		if (responseType.getId() == ResponseType.INSTANT_CALCULATION.getId()) {
-			crfBuilder.getCurrentItem().setUnits("");
+			crfBuilder.getCurrentItem().setUnits(EMPTY);
 		}
 
 		crfBuilder.getCurrentItem().getItemMeta()
 				.setDefaultValue(type == FormStudioElement.CALCULATION
-						? ""
+						? EMPTY
 						: (type == FormStudioElement.LIST || type == FormStudioElement.CHECKBOX
 								? defaultValue
 								: getString(jsonObj, DEFAULT_VALUE)));
@@ -364,7 +383,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 
 	private void createSimpleConditionalDisplay(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
 		JSONArray jsonArray = getJSONArray(jsonObj, SL);
-		crfBuilder.getCurrentItem().setRealValue(RealValueKey.SCD_DATA, "");
+		crfBuilder.getCurrentItem().setRealValue(RealValueKey.SCD_DATA, EMPTY);
 		if (jsonArray.length() > 0) {
 			String controlItemName = getString(jsonArray, 0).trim();
 			String optionValue = getString(jsonArray, 1).trim();
@@ -375,7 +394,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().setOptionValue(optionValue);
 			crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().setMessage(message);
 			crfBuilder.getCurrentItem().setRealValue(RealValueKey.SCD_DATA,
-					controlItemName.concat(",").concat(optionValue).concat(",").concat(message));
+					controlItemName.concat(COMMA).concat(optionValue).concat(COMMA).concat(message));
 		}
 	}
 
@@ -400,6 +419,12 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 					? ItemDataType.INTEGER
 					: (calculationType.equalsIgnoreCase(DECIMAL) ? ItemDataType.REAL : itemDataType);
 			itemDataTypeValue = itemDataType.getCode();
+		} else if (type == FormStudioElement.CODING_RADIO) {
+			itemDataType = ItemDataType.INTEGER;
+			itemDataTypeValue = itemDataType.getCode();
+		} else if (type == FormStudioElement.CODING_SYSTEM) {
+			itemDataType = ItemDataType.CODE;
+			itemDataTypeValue = itemDataType.getCode();
 		}
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.ITEM_DATA_TYPE,
 				FormStudioElement.findByName(itemDataTypeValue)
@@ -417,19 +442,22 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			crfBuilder.getCurrentItem().getItemMeta()
 					.setLeftItemText(" <span id=\"rando\"><table><tr><td align=left style=\"width:120px\">"
 							.concat(crfBuilder.getMessage("randomizationResult")).concat("</td></tr></table></span>"));
-			crfBuilder.getCurrentItem().getItemMeta().setRightItemText("");
-			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel("");
+			crfBuilder.getCurrentItem().getItemMeta().setRightItemText(EMPTY);
 			crfBuilder.getCurrentItem().getItemMeta()
-					.setSubHeader(crfBuilder.getCurrentItem().getItemMeta().getSubHeader().concat(
-							" <table width=500px ><tr><td class=\"aka_ques_block\"> </td><td><span id=\"Button\"><input eleId=\"randomize\" type=\"button\"value=\"Randomize Subject\" width=\"40\" onclick=\"randomizeSubject()\"></span></td></tr></table>"));
+					.setSubHeader(crfBuilder.getCurrentItem().getItemMeta().getSubHeader()
+							.concat(" <table width=500px ><tr><td class=\"aka_ques_block\">")
+							.concat(crfBuilder.getCurrentItem().getItemMeta()
+									.getQuestionNumberLabel())
+					.concat("</td><td><span id=\"Button\"><input eleId=\"randomize\" type=\"button\"value=\"Randomize Subject\" width=\"40\" onclick=\"randomizeSubject()\"></span></td></tr></table>"));
+			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(EMPTY);
 			jsonObj.put(ITEM_NAME, RAND_DATE);
 			jsonObj.put(TYPE, TEXT);
 			jsonObj.put(LEFT_TEXT, "<table><tr><td align=\"left\" style=\"width:120px;\">"
 					.concat(crfBuilder.getMessage("dateOfRandomization")).concat("</td></tr></table>"));
-			jsonObj.put(RIGHT_TEXT, "");
-			jsonObj.put(HEADER, "");
+			jsonObj.put(RIGHT_TEXT, EMPTY);
+			jsonObj.put(HEADER, EMPTY);
 			jsonObj.put(DESCRIPTION, DATE_OF_RANDOMIZATION);
-			jsonObj.put(POS, "");
+			jsonObj.put(POS, EMPTY);
 			ItemBeanExt currentItem = new ItemBeanExt(crfBuilder.getCurrentItem());
 			crfBuilder.setCurrentItem(currentItem);
 			crfBuilder.getItems().add(crfBuilder.getCurrentItem());
@@ -438,7 +466,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private void createItemBean(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
-		crfBuilder.getCurrentItem().setUnits("");
+		crfBuilder.getCurrentItem().setUnits(EMPTY);
 		crfBuilder.getCurrentItem().setName(getString(jsonObj, ITEM_NAME));
 		crfBuilder.getCurrentItem().setDescription(getString(jsonObj, DESCRIPTION));
 		crfBuilder.getCurrentItem().setPhiStatus(getBoolean(jsonObj, PHI_DATA));
@@ -497,7 +525,41 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 				elementObject.put(REPEATING_ITEM_GROUP_HEADER, getString(elementObject, HEADER));
 				childrenQuestions.put(elementObject);
 			}
-		} else {
+		} else if (type == FormStudioElement.CODING) {
+			Dictionary dictionary = Dictionary.findDictionary(getString(jsonObject, DICTIONARY));
+			if (dictionary != null) {
+				for (Coding coding : dictionary.getCodingList()) {
+					ItemGroupBean repeatingGroup = (ItemGroupBean) getObject(jsonObject, REPEATING_GROUP);
+					JSONObject jsonObj = new JSONObject(jsonObject.toString());
+					jsonObj.put(ITEM_NAME,
+							crfBuilder.getCurrentItem().getName().concat(UNDERLINE).concat(coding.getPostfix()));
+					jsonObj.put(DISPLAY_STATE, coding.isVisible() ? SHOW : HIDE);
+					jsonObj.put(LAYOUT, coding.getLayout());
+					jsonObj.put(TYPE, coding.getType());
+					jsonObj.put(HEADER, EMPTY);
+					jsonObj.put(LEFT_TEXT, EMPTY);
+					jsonObj.put(RIGHT_TEXT, EMPTY);
+					jsonObj.put(DESCRIPTION, EMPTY);
+					jsonObj.put(POS, EMPTY);
+					jsonObj.put(NUMBERING, EMPTY);
+					if (repeatingGroup != null) {
+						jsonObj.put(REPEATING_GROUP, repeatingGroup);
+					}
+					JSONArray options = new JSONArray();
+					for (String value : coding.getOptionsValues()) {
+						JSONObject jsonObjectOption = new JSONObject();
+						jsonObjectOption.put(NAME,
+								crfBuilder.getMessage(CODE_REF.concat(DOT).concat(dictionary.name()).concat(DOT)
+										.concat(coding.getPostfix()).concat(DOT).concat(VALUE).concat(DOT)
+										.concat(value)));
+						jsonObjectOption.put(ImportCrfService.VALUE, value);
+						options.put(jsonObjectOption);
+					}
+					jsonObj.put(OPTIONS, options);
+					childrenQuestions.put(jsonObj);
+				}
+			}
+		} else if (type != FormStudioElement.CODING_SYSTEM && type != FormStudioElement.CODING_RADIO) {
 			childrenQuestions = getJSONArray(jsonObject, CHILDREN);
 		}
 		return childrenQuestions;
@@ -530,7 +592,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			processQuestions(getChildrenQuestions(jsonObj, crfBuilder), currentItem, crfBuilder);
 
 			if (resetHeader) {
-				crfBuilder.setCurrentHeader("");
+				crfBuilder.setCurrentHeader(EMPTY);
 			}
 		}
 	}

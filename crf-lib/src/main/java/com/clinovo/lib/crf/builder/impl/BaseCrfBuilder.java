@@ -609,6 +609,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 				crfDao.create(crfBean, connection);
 			}
 			crfVersionBean.setCrfId(crfBean.getId());
+			crfVersionBean.setCrfName(crfBean.getName());
 			crfVersionDao.create(crfVersionBean, connection);
 
 			// create sections
