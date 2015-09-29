@@ -20,6 +20,7 @@ import java.util.LinkedList;
 /**
  * Data Entry Util.
  */
+@SuppressWarnings({"unused", "rawtypes", "unchecked"})
 public final class DataEntryUtil {
 
 	private DataEntryUtil() {

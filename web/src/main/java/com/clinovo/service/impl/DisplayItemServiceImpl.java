@@ -45,6 +45,7 @@ import java.util.Map;
  * DisplayItemService Implementation.
  */
 @Service("displayItemService")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DisplayItemServiceImpl implements DisplayItemService {
 
 	@Autowired

@@ -3,6 +3,7 @@ package com.clinovo.validation;
 import com.clinovo.enums.CurrentDataEntryStage;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DataEntryUtil;
+
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,7 @@ import java.util.Locale;
  * Display Item Bean Validator.
  */
 @Component("displayItemValidator")
+@SuppressWarnings("rawtypes")
 public final class DisplayItemBeanValidator {
 
 	@Autowired

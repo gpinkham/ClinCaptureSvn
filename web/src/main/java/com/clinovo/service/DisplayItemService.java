@@ -6,7 +6,6 @@ import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.view.Page;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
