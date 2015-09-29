@@ -102,6 +102,8 @@ import com.clinovo.util.RuleSetServiceUtil;
 @SuppressWarnings({"rawtypes", "serial"})
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
+	public static final String REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN = "redirectBackToControllerAfterLogin";
+
 	public static final String REFERER = "referer";
 
 	public static final String ACTION_START_INITIAL_DATA_ENTRY = "ide_s";

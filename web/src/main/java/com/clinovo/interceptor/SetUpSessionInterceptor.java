@@ -48,7 +48,7 @@ import com.clinovo.i18n.LocaleResolver;
 public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
-	public DataSource ds;
+	private DataSource dataSource;
 
 	public static final String PREV_URL = "_PrevUrl";
 	public static final String FIRST_URL_PARAMETER = "?";
@@ -58,7 +58,8 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 	private static Set<String> methodList = new HashSet<String>(Arrays.asList("getPrintCRFController"));
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		boolean ok = true;
 		setupDefaultParameters(request, handler);
 		LocaleResolver.resolveLocale();
@@ -68,17 +69,20 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 			request.setAttribute(FORM_WITH_STATE_FLAG, request.getParameter(FORM_WITH_STATE_FLAG));
 			StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession()
 					.getAttribute(BaseController.USER_ROLE);
-			UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute(
-					BaseController.USER_BEAN_NAME);
+			UserAccountBean userBean = (UserAccountBean) request.getSession()
+					.getAttribute(BaseController.USER_BEAN_NAME);
 			StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
 			ok = userBean != null && userRole != null && currentStudy != null;
 			request.setAttribute(BaseController.USER_ROLE, userRole);
 			request.setAttribute(BaseController.STUDY, currentStudy);
 			request.setAttribute(BaseController.USER_BEAN_NAME, userBean);
 			request.getSession().setAttribute(BaseController.STUDY_INFO_PANEL, new StudyInfoPanel());
-			//request.setAttribute(INCLUDE_REPORTING, !SQLInitServlet.getField("pentaho.url").trim().equals(""));
+			// request.setAttribute(INCLUDE_REPORTING, !SQLInitServlet.getField("pentaho.url").trim().equals(""));
 			request.setAttribute(INCLUDE_REPORTING, false);
 			if (!ok) {
+				String queryString = request.getQueryString();
+				request.getSession().setAttribute(BaseController.REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN,
+						request.getRequestURI().concat(queryString != null ? "?".concat(queryString) : ""));
 				response.sendRedirect(request.getContextPath() + "/MainMenu");
 			} else {
 				ok = checkForRedirection(request, response, handler);
@@ -145,7 +149,7 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 	 * @return the DataSource object.
 	 */
 	public DataSource getDataSource() {
-		return ds;
+		return dataSource;
 	}
 
 	private boolean checkForRedirection(HttpServletRequest request, HttpServletResponse response, Object handler)

@@ -487,7 +487,8 @@ public abstract class Controller extends BaseController {
 			request.setAttribute(SESSION_MANAGER, sm);
 
 			String restoreSessionFlag = getRestoreSessionFlag();
-			if (ub == null && sm.getUserBean() != null && restoreSessionFlag != null && restoreSessionFlag.equals("true")) {
+			if (ub == null && sm.getUserBean() != null && restoreSessionFlag != null
+					&& restoreSessionFlag.equals("true")) {
 				restoreSavedSessionAttributes(session, userName);
 			}
 
@@ -548,8 +549,8 @@ public abstract class Controller extends BaseController {
 			int currentStudyId = currentStudy.getParentStudyId() > 0
 					? currentStudy.getParentStudyId()
 					: currentStudy.getId();
-			boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId, "studyEvaluator")
-					.getValue().equalsIgnoreCase("yes");
+			boolean isEvaluationEnabled = getStudyParameterValueDAO()
+					.findByHandleAndStudy(currentStudyId, "studyEvaluator").getValue().equalsIgnoreCase("yes");
 			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
 
 			if (this instanceof ListStudySubjectsServlet && currentStudy.getStatus() != Status.AVAILABLE) {
@@ -603,23 +604,31 @@ public abstract class Controller extends BaseController {
 			if (!request.getRequestURI().endsWith("ResetPassword")) {
 				passwdTimeOut(request, response);
 			}
-			mayProceed(request, response);
-			pingJobServer(request);
 
-			long startTime = System.currentTimeMillis();
+			String controllerUrl = (String) request.getSession().getAttribute(REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN);
+			if (controllerUrl != null) {
+				request.getSession().removeAttribute(REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN);
+				response.sendRedirect(controllerUrl);
+			} else {
+				mayProceed(request, response);
+				pingJobServer(request);
 
-			processRequest(request, response);
+				long startTime = System.currentTimeMillis();
 
-			final int millisecondsInSec = 1000;
-			long endTime = System.currentTimeMillis();
-			long reportTime = (endTime - startTime) / millisecondsInSec;
-			logger.info("Time taken [" + reportTime + " seconds]");
-			// If the time taken is over 5 seconds, write it to the stats table
-			final int maxReportTime = 5;
-			if (reportTime > maxReportTime) {
-				getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(), Long.toString(reportTime));
+				processRequest(request, response);
+
+				final int millisecondsInSec = 1000;
+				long endTime = System.currentTimeMillis();
+				long reportTime = (endTime - startTime) / millisecondsInSec;
+				logger.info("Time taken [" + reportTime + " seconds]");
+				// If the time taken is over 5 seconds, write it to the stats table
+				final int maxReportTime = 5;
+				if (reportTime > maxReportTime) {
+					getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(),
+							Long.toString(reportTime));
+				}
+				// Call the usagestats dao here and record a time in the db
 			}
-			// Call the usagestats dao here and record a time in the db
 		} catch (InconsistentStateException ise) {
 			ise.printStackTrace();
 			logger.warn("InconsistentStateException: org.akaza.openclinica.control.Controller: " + ise.getMessage());
