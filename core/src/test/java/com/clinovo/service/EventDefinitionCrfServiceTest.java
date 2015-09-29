@@ -116,4 +116,32 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		assertTrue(eventDefinitionCrfBean.getStatus() == Status.AVAILABLE);
 	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testThatUpdateDefaultVersionMethodWorksCorrectlyForRemovedCRFs() {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		crfVersionBean.setUpdater(userBean);
+		crfVersionBean.setStatus(Status.AUTO_DELETED);
+		crfVersionDao.update(crfVersionBean);
+		List<CRFVersionBean> crfVersions = crfVersionDao.findAllByCRFId(crfVersionBean.getCrfId());
+		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(eventDefinitionCrfBean, crfVersions, userBean);
+		assertTrue(crfVersionBean.getId() != eventDefinitionCrfBean.getDefaultVersionId());
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testThatUpdateDefaultVersionMethodWorksCorrectlyForLockedCRFs() {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		crfVersionBean.setUpdater(userBean);
+		crfVersionBean.setStatus(Status.LOCKED);
+		crfVersionDao.update(crfVersionBean);
+		List<CRFVersionBean> crfVersions = crfVersionDao.findAllByCRFId(crfVersionBean.getCrfId());
+		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(eventDefinitionCrfBean, crfVersions, userBean);
+		assertTrue(crfVersionBean.getId() != eventDefinitionCrfBean.getDefaultVersionId());
+	}
 }

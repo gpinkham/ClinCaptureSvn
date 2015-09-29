@@ -84,10 +84,7 @@ public class RemoveCRFVersionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return true;
-		}
-		return false;
+		return ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -100,7 +97,6 @@ public class RemoveCRFVersionServlet extends Controller {
 		int versionId = fp.getInt(CRF_VERSION_ID_PARAMETER, true);
 		String action = fp.getString(ACTION_PARAMETER);
 		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
-
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
 		List<EventCRFBean> eventCRFs;
@@ -108,7 +104,6 @@ public class RemoveCRFVersionServlet extends Controller {
 		SectionDAO secdao;
 
 		if (version.getId() != 0 && !StringUtil.isBlank(action)) {
-
 			evdao = getEventCRFDAO();
 			// find all event crfs by version id
 			eventCRFs = evdao.findAllByCRFVersion(versionId);
@@ -121,14 +116,12 @@ public class RemoveCRFVersionServlet extends Controller {
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
-
 				request.setAttribute("versionToRemove", version);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.REMOVE_CRF_VERSION, request, response);
 				return;
 			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
 					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
-
 				logger.info("submit to remove the crf version");
 				// version
 				version.setStatus(Status.DELETED);
@@ -146,26 +139,23 @@ public class RemoveCRFVersionServlet extends Controller {
 						secdao.update(section);
 					}
 				}
-
 				getEventCRFService().setEventCRFsToAutoRemovedState(eventCRFs, currentUser);
-
 				ArrayList versionList = (ArrayList) cvdao.findAllByCRF(version.getCrfId());
 				if (versionList.size() > 0) {
 					EventDefinitionCRFDAO edCRFDao = getEventDefinitionCRFDAO();
 					List<EventDefinitionCRFBean> edcList = (ArrayList) edCRFDao.findAllByCRF(version.getCrfId());
 					for (EventDefinitionCRFBean edcBean : edcList) {
-						updateEventDef(edcBean, edCRFDao, versionList);
+						if (edcBean.getDefaultVersionId() == versionId) {
+							getEventDefinitionCrfService().updateDefaultVersionOfEventDefinitionCRF(edcBean, versionList,
+									currentUser);
+						}
 					}
 				}
-
 				// Remove coded items
 				getCodedItemService().removeByCRFVersion(versionId);
 
-				addPageMessage(
-						new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
-								.append(" ").append(respage.getString("has_been_removed_succesfully")).toString(),
-						request);
-
+				addPageMessage(respage.getString("the_CRF_version") + version.getName() + " "
+								+ respage.getString("has_been_removed_succesfully"), request);
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);
 			}
@@ -191,88 +181,6 @@ public class RemoveCRFVersionServlet extends Controller {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
-		}
-	}
-
-	/**
-	 * 
-	 * @param edcBean
-	 *            EventDefinitionCRFBean
-	 * @param edcDao
-	 *            EventDefinitionCRFDAO
-	 * @param versionList
-	 *            List<CRFVersionBean>
-	 */
-	public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao,
-			List<CRFVersionBean> versionList) {
-		ArrayList<Integer> idList = new ArrayList<Integer>();
-		CRFVersionBean temp = versionList.get(0);
-		if (StringUtil.isBlank(edcBean.getSelectedVersionIds())) {
-			edcBean.setDefaultVersionId(temp.getId());
-			edcDao.update(edcBean);
-		} else {
-			String sversionIds = edcBean.getSelectedVersionIds();
-			String[] ids = sversionIds.split("\\,");
-			for (String id : ids) {
-				idList.add(Integer.valueOf(id));
-			}
-			for (CRFVersionBean versionBean : versionList) {
-				if (idList.contains(versionBean.getId())) {
-					edcBean.setDefaultVersionId(versionBean.getId());
-					edcDao.update(edcBean);
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param edcBean
-	 *            EventDefinitionCRFBean
-	 * @param edcDao
-	 *            EventDefinitionCRFDAO
-	 * @param versionList
-	 *            List<CRFVersionBean>
-	 * @param crfVIdToLock
-	 *            int
-	 */
-	public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao,
-			List<CRFVersionBean> versionList, int crfVIdToLock) {
-		ArrayList<Integer> idList = new ArrayList<Integer>();
-		CRFVersionBean temp = null;
-		if ((null != versionList) && (versionList.size() > 0)) {
-			temp = versionList.get(0);
-		}
-		// Check the first version in list if it is getting locked
-		// here. If not, make that as default version. Otherwise get the next
-		// element in list and make that as the default version.
-
-		if (StringUtil.isBlank(edcBean.getSelectedVersionIds())) {
-			if ((null != temp) && (temp.getId() == crfVIdToLock) && (versionList.size() > 1)) {
-				CRFVersionBean temp2 = versionList.get(1);
-				edcBean.setDefaultVersionId(temp2.getId());
-			} else {
-				if (temp != null) {
-					edcBean.setDefaultVersionId(temp.getId());
-				}
-			}
-			edcDao.update(edcBean);
-		} else {
-			String sversionIds = edcBean.getSelectedVersionIds();
-			String[] ids = sversionIds.split("\\,");
-			for (String id : ids) {
-				idList.add(Integer.valueOf(id));
-			}
-			if (versionList != null) {
-				for (CRFVersionBean versionBean : versionList) {
-					if (idList.contains(versionBean.getId())) {
-						edcBean.setDefaultVersionId(versionBean.getId());
-						edcDao.update(edcBean);
-						break;
-					}
-				}
-			}
 		}
 	}
 }

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 
@@ -241,5 +242,11 @@ public class CRFVersionBean extends AuditableEntityBean {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public boolean isAvailable() {
+		return this.getStatus() != Status.DELETED
+				&& this.getStatus() != Status.LOCKED
+				&& this.getStatus() != Status.AUTO_DELETED;
 	}
 }

@@ -87,4 +87,12 @@ public interface EventDefinitionCrfService {
 	void restoreEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater)
 			throws Exception;
 
+	/**
+	 * This method will check if current default version is available and set another one if not.
+	 * @param edcBean EventDefinitionCRFBean
+	 * @param versionList List<CRFVersionBean>
+	 * @param updater UserAccountBean
+	 */
+	void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean, List<CRFVersionBean> versionList,
+												  UserAccountBean updater);
 }

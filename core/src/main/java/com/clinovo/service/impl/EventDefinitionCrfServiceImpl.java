@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -199,6 +200,34 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
 				new DAOWrapper(dataSource), null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean,
+														 List<CRFVersionBean> versionList, UserAccountBean updater) {
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+
+		if (!StringUtil.isBlank(edcBean.getSelectedVersionIds())) {
+			String sversionIds = edcBean.getSelectedVersionIds();
+			String[] ids = sversionIds.split("\\,");
+			for (String id : ids) {
+				idList.add(Integer.valueOf(id));
+			}
+		}
+		if ((null != versionList) && (versionList.size() > 0)) {
+			EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+			for (CRFVersionBean versionBean : versionList) {
+				if ((idList.size() == 0 || idList.contains(versionBean.getId()))
+						&& versionBean.isAvailable()) {
+					edcBean.setDefaultVersionId(versionBean.getId());
+					edcBean.setUpdater(updater);
+					eventDefinitionCRFDAO.update(edcBean);
+					break;
+				}
+			}
+		}
 	}
 
 	private HashMap processNullValues(EventDefinitionCRFBean edc) {

@@ -33,7 +33,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.admin.RemoveCRFVersionServlet;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -73,10 +72,7 @@ public class LockCRFVersionServlet extends Controller {
 	private boolean userCanLockCRFVersion(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return true;
-		}
-		return false;
+		return ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -127,16 +123,15 @@ public class LockCRFVersionServlet extends Controller {
 			ArrayList versionList = (ArrayList) cvdao.findAllByCRF(version.getCrfId());
 
 			if (versionList.size() > 0) {
-
 				EventDefinitionCRFDAO edCRFDao = getEventDefinitionCRFDAO();
 				List<EventDefinitionCRFBean> edcList = (ArrayList<EventDefinitionCRFBean>) edCRFDao
 						.findAllByCRF(version.getCrfId());
 				for (EventDefinitionCRFBean edcBean : edcList) {
-
-					RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao, versionList, crfVersionId);
+					if (edcBean.getDefaultVersionId() == crfVersionId) {
+						getEventDefinitionCrfService().updateDefaultVersionOfEventDefinitionCRF(edcBean, versionList, ub);
+					}
 				}
 			}
-
 			addPageMessage(respage.getString("crf_version_locked_successfully"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
