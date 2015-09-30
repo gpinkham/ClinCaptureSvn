@@ -534,90 +534,48 @@ function changeImage(name) {
   </c:if>
 </c:if>
 
-
-
 <c:if test='${inputType == "single-select"}'>
-
-  <label for="<c:out value="${inputName}"/>"></label>
-  <c:choose>
-
-    <c:when test="${isInError}">
-      <span class="aka_exclaim_error">! </span>
-      <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-              onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" name="<c:out value="${inputName}"/>" class="formfield">
-          <%-- taken from showItemInput.jsp, somebody kind of forgot to put the options in there but added the </select>--%>
-        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-          <c:choose>
-            <c:when test="${count==selectedOption}">
-              <c:set var="checked" value="selected" />
-            </c:when>
-            <c:otherwise>
-              <c:set var="checked" value="" />
-            </c:otherwise>
-          </c:choose>
-          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
-                    <c:if test="${option.selected}">
-      	                selected="selected"
-                    </c:if>
-                  >
-            <c:out value="${option.text}" />
-          </option>
-
-          <c:set var="count" value="${count+1}"/>
-        </c:forEach>
-      </select>
-    </c:when>
-
-    <c:otherwise>
-      <c:choose>
-        <c:when test="${displayItem.metadata.defaultValue != '' &&
-                displayItem.metadata.defaultValue != null}">
-          <c:set var="printDefault" value="true"/>
-        </c:when>
-        <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
-      </c:choose>
-      <c:set var="selectedOption" value="-1"/>
-      <c:set var="count" value="0"/>
-      <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-        <c:if test="${option.selected}"><c:set var="selectedOption" value="${count}" /></c:if>
-        <c:if test="${printDefault=='true'}">
-          <c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
-            <c:set var="printDefault" value="false"/>
-            <c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
-          </c:if>
-        </c:if>
-        <c:set var="count" value="${count+1}"/>
-      </c:forEach>
-      <select id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-              onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" name="<c:out value="${inputName}"/>" class="formfield">
-        <c:choose>
-          <c:when test="${printDefault == 'true'}">
-            <c:set var="count" value="0"/>
-            <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
-            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-              <c:choose>
-                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
-                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
-              </c:choose>
-              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
-              <c:set var="count" value="${count+1}"/>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-            <c:set var="count" value="0"/>
-            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-              <c:choose>
-                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
-                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
-              </c:choose>
-              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
-              <c:set var="count" value="${count+1}"/>
-            </c:forEach>
-          </c:otherwise>
-        </c:choose>
-      </select>
-    </c:otherwise>
-  </c:choose>
+	<label for="<c:out value="${inputName}"/>"></label>
+	<c:if test="${isInError}">
+		<span class="aka_exclaim_error">! </span>
+	</c:if>
+	<c:choose>
+		<c:when test="${displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">
+			<c:set var="printDefault" value="true"/>
+		</c:when>
+		<c:otherwise>
+			<c:set var="printDefault" value="false"/>
+		</c:otherwise>
+	</c:choose>
+	<c:set var="selectedOption" value="-1"/>
+	<c:set var="count" value="0"/>
+	<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+		<c:if test="${option.selected}">
+			<c:set var="selectedOption" value="${count}"/>
+		</c:if>
+		<c:if test="${printDefault=='true'}">
+			<c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
+				<c:set var="printDefault" value="false"/>
+				<c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
+			</c:if>
+		</c:if>
+		<c:set var="count" value="${count+1}"/>
+	</c:forEach>
+	<select id="${inputName}" tabindex="${tabNum}" name="${inputName}"
+			class="${isInError ? 'aka_input_error' : 'formfield'}"
+			onChange="this.className='changedField'; sameRepGrpInstant('${inputName}', '${itemId}',
+					'${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}',
+					'${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}');
+					changeImage('${inputName}');">
+		<c:if test="${printDefault == 'true'}">
+			<option value="">${displayItem.metadata.defaultValue}</option>
+		</c:if>
+		<c:set var="count" value="0"/>
+		<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+			<option value="${option.value}" ${count==selectedOption ? 'selected' : ''}>${option.text}</option>
+			<c:set var="count" value="${count+1}"/>
+		</c:forEach>
+	</select>
 </c:if>
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
