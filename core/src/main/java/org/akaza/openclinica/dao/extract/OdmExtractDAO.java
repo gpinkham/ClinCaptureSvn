@@ -2639,6 +2639,9 @@ public class OdmExtractDAO extends DatasetDAO {
         if (status.equals(Status.LOCKED)) {
             stage = DataEntryStage.LOCKED;
         }
+        if (status.equals(Status.PARTIAL_DATA_ENTRY)) {
+            stage = DataEntryStage.INITIAL_DATA_ENTRY;
+        }
 
         try {
             if (seSubjectEventStatus.equals(SubjectEventStatus.LOCKED.getName())
@@ -2662,8 +2665,10 @@ public class OdmExtractDAO extends DatasetDAO {
         } else if (stage == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && seSubjectEventStatus != null
                 && seSubjectEventStatus.equals(SubjectEventStatus.SIGNED.getName())) {
             result = SubjectEventStatus.SIGNED.getName();
+        } else if (status == Status.PARTIAL_DATA_ENTRY) {
+        	result = Status.PARTIAL_DATA_ENTRY.getName();
         } else {
-            result = stage.getName();
+        	result = stage.getName();
         }
 
         return result;

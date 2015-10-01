@@ -1735,6 +1735,13 @@ public abstract class DataEntryServlet extends Controller {
 		if ((ecsb.isPartialSaved() != markPartialSaved)) {
 			ecsb.setPartialSaved(markPartialSaved);
 			eventCRFSectionService.saveEventCRFSectionBean(ecsb);
+			
+			boolean doesPSSectionExist = eventCRFSectionService.findAllByEventCRFId(eventCRFBean.getId()).size() > 0;
+			if (!eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) && doesPSSectionExist) {
+				eventCRFBean.setStatus(Status.PARTIAL_DATA_ENTRY);
+			} else if (eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) && !doesPSSectionExist) {
+				eventCRFBean.setStatus(Status.AVAILABLE);
+			}
 		}
 	}
 

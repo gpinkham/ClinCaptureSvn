@@ -27,7 +27,7 @@ public enum Status implements CodedEnum {
 
 	INVALID(0, "invalid"), AVAILABLE(1, "available"), UNAVAILABLE(2, "unavailable"), PRIVATE(3, "private"), PENDING(4,
 			"pending"), DELETED(5, "removed"), LOCKED(6, "locked"), AUTO_DELETED(7, "auto-removed"), SIGNED(8, "signed"), FROZEN(
-			9, "frozen"), SOURCE_DATA_VERIFICATION(10, "source_data_verification");
+			9, "frozen"), SOURCE_DATA_VERIFICATION(10, "source_data_verification"), PARTIAL_DATA_ENTRY (17, "partial_data_entry");
 
 	private int code;
 	private String description;
