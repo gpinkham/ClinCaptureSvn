@@ -31,9 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.clinovo.enums.CurrentDataEntryStage;
-import com.clinovo.util.DataEntryUtil;
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
@@ -80,9 +77,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.enums.CurrentDataEntryStage;
+import com.clinovo.util.DataEntryUtil;
+import com.clinovo.util.DateUtil;
+
 /**
  * View a CRF version section data entry.
- * 
+ *
  * @author jxu
  */
 @SuppressWarnings({"unchecked", "rawtypes", "serial"})
@@ -95,7 +96,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	/**
 	 * Checks whether the user has the correct privilege.
-	 * 
+	 *
 	 * @param request
 	 *            HttpServletRequest
 	 * @param response
@@ -221,6 +222,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			if (ecb != null && ecb.getId() > 0) {
 				request.setAttribute("eventCRF", ecb);
 				StudyEventBean event = (StudyEventBean) studyEventDao.findByPK(ecb.getStudyEventId());
+				request.setAttribute("studyEvent", event);
 				if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
 					request.setAttribute("isLocked", "yes");
 				} else {
@@ -288,6 +290,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		} else if (crfVersionId > 0) {
 			// for viewing blank CRF
 			DisplayTableOfContentsBean displayBean = getDisplayBeanByCrfVersionId(crfVersionId);
+			if (displayBean.getEventDefinitionCRF().getId() == 0 && edcb.getId() > 0) {
+				displayBean.setEventDefinitionCRF(edcb);
+			}
 			request.setAttribute("toc", displayBean);
 			ArrayList sections = displayBean.getSections();
 
@@ -310,6 +315,10 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		sb = (SectionBean) sdao.findByPK(sectionId);
 		if (eventCRFId == 0) {
+			int studyEventId = fp.getInt("eventId");
+			if (studyEventId > 0) {
+				request.setAttribute("studyEvent", studyEventDao.findByPK(studyEventId));
+			}
 			ecb = new EventCRFBean();
 			ecb.setCRFVersionId(sb.getCRFVersionId());
 			if (currentStudy.getParentStudyId() > 0) {
@@ -341,7 +350,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
 						.getStudyEventDefinitionId());
 				se.setStudyEventDefinition(sed);
-				request.setAttribute("studyEvent", se);
 
 				// Enrollment-date is used for computing age
 				age = Utils.getInstance().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
