@@ -107,7 +107,7 @@ public class StudyParameterConfig {
 	private String allowDiscrepancyCorrectionForms;
 
 	// Medical coding parameters
-	private String allowCodingVerification = "no";
+	// private String allowCodingVerification = "no";
 	private String defaultBioontologyURL = "";
 	private String medicalCodingApiKey = "";
 	private String autoCodeDictionaryName = "";
@@ -580,14 +580,6 @@ public class StudyParameterConfig {
 
 	public void setReplaceExisitingDataDuringImport(String replaceExisitingDataDuringImport) {
 		this.replaceExisitingDataDuringImport = replaceExisitingDataDuringImport;
-	}
-
-	public String getAllowCodingVerification() {
-		return allowCodingVerification;
-	}
-
-	public void setAllowCodingVerification(String allowCodingVerification) {
-		this.allowCodingVerification = allowCodingVerification;
 	}
 
 	public String getDefaultBioontologyURL() {

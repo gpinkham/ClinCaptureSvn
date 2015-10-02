@@ -225,22 +225,22 @@ public class CreateUserAccountServlet extends Controller {
 
 	private Map customiseUserRoleMap(StudyDAO sdao, StudyBean currentStudy, int selectedStudy) {
 		Map<Object, Object> roleMap = new LinkedHashMap<Object, Object>(Role.ROLE_MAP_WITH_DESCRIPTION);
-		StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
-				"allowCodingVerification");
-
-		if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
-			roleMap.remove(Role.STUDY_CODER.getId());
-		}
-
+		
 		StudyBean selectedStudyBean = (StudyBean) sdao.findByPK(selectedStudy);
 		int parentStudyId = selectedStudyBean.getParentStudyId() > 0
 				? selectedStudyBean.getParentStudyId()
 				: selectedStudyBean.getId();
+		
 		boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(parentStudyId, "studyEvaluator")
 				.getValue().equalsIgnoreCase("yes");
 		if (!isEvaluationEnabled) {
 			roleMap.remove(Role.STUDY_EVALUATOR.getId());
+		}
+		StudyParameterValueBean allowCodingVerification = getStudyParameterValueDAO().findByHandleAndStudy(parentStudyId,
+				"medicalCoding");
+
+		if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+			roleMap.remove(Role.STUDY_CODER.getId());
 		}
 		return roleMap;
 	}

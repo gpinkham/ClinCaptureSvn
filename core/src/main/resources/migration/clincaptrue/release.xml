@@ -182,4 +182,6 @@
 	<include file="migration/clincaptrue/2015-09-21-TICKET2353.xml" />
 	<include file="migration/clincaptrue/2015-09-17-TICKET2527.xml" />
 	<include file="migration/clincaptrue/2015-09-17-TICKET2563.xml" />
+	<include file="migration/clincaptrue/postgres/2015-09-29-TICKET2354.xml" />
+	<include file="migration/clincaptrue/2015-09-29-TICKET2354.xml" />
 </databaseChangeLog>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	
+	<changeSet author="thickerson" id="2015-09-29-TICKET2354-1">
+		<comment>Delete "Allow Medical Coding?" from study parameter values.</comment>
+		<delete tableName="study_parameter_value">
+			<where>parameter = 'allowCodingVerification'</where>
+		</delete>
+	</changeSet>
+
+	<changeSet author="thickerson" id="2015-09-29-TICKET2354-2">
+		<comment>Delete "Allow Medical Coding?" from study parameters.</comment>
+		<delete tableName="study_parameter">
+			<where>handle = 'allowCodingVerification'</where>
+		</delete>
+	</changeSet>
+
+</databaseChangeLog>

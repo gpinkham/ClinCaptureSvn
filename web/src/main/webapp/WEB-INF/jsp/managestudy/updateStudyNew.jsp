@@ -1513,12 +1513,12 @@
 	    <td>
 			<c:choose>
 				<c:when test="${studyToView.studyParameterConfig.medicalCoding == 'yes'}">
-					<input type="radio" checked name="medicalCoding" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" ${mode} name="medicalCoding" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+					<input type="radio" checked name="medicalCoding" value="yes" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="medicalCoding"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" ${mode} name="medicalCoding" value="no" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="medicalCoding"><fmt:message key="no" bundle="${resword}"/>
 				</c:when>
 				<c:otherwise>
-					<input type="radio" ${mode} name="medicalCoding" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-					<input type="radio" checked name="medicalCoding" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+					<input type="radio" ${mode} name="medicalCoding" value="yes" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="medicalCoding"><fmt:message key="yes" bundle="${resword}"/>
+					<input type="radio" checked name="medicalCoding" value="no" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="medicalCoding"><fmt:message key="no" bundle="${resword}"/>
 				</c:otherwise>
 			</c:choose>
 		</td>
@@ -2310,10 +2310,10 @@
 <!-- /Import Parameters section -->
 
 <!-- Coding Parameters section -->
-<tr>
+<tr class="medicalCoding">
 	<td>&nbsp;</td>
 </tr>
-<tr valign="top" style="border: 1px solid black;width: 100%;">
+<tr valign="top" style="border: 1px solid black;width: 100%;" class="medicalCoding">
 	<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
 		<fmt:message key="medical_coding" bundle="${resword}"/>:
 	</td>
@@ -2322,19 +2322,6 @@
 	</td>
 </tr>
 
-<tr valign="top">
-	<td class="formlabel">
-		<fmt:message key="allowCodingVerification" bundle="${resword}"/>
-	</td>
-	<td>
-		<input type="radio" name="allowCodingVerification" ${studyToView.studyParameterConfig.allowCodingVerification == 'yes' ? "checked" : ""} value="yes" onchange="javascript:changeIcon()"
-		       onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="medicalCoding">
-		<fmt:message key="yes" bundle="${resword}"/>
-		<input type="radio" name="allowCodingVerification" ${studyToView.studyParameterConfig.allowCodingVerification == 'no' ? "checked" : ""} value="no" onchange="javascript:changeIcon()"
-		       onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="medicalCoding">
-		<fmt:message key="no" bundle="${resword}"/>
-	</td>
-</tr>
 <tr valign="top" class="medicalCoding">
 	<td class="formlabel">
 		<fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>

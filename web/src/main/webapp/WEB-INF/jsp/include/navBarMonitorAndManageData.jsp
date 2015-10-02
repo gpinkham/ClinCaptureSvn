@@ -44,7 +44,7 @@
     </c:when>
     <c:when test="${userRole.studyCoder}">
         <c:choose>
-            <c:when test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
+            <c:when test="${study.studyParameterConfig.medicalCoding eq 'yes'}">
                 <div class="taskLeftColumn">
                     <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
                 </div>
@@ -105,7 +105,7 @@
     </c:when>
     <c:otherwise>
         <c:set var="showCrfEvaluation" value="${true}"/>
-        <c:set var="countOfElementsOnTheRightSide" value="${(includeReporting ? 1 : 0) + (study.parentStudyId > 0 ? 0 : (study.studyParameterConfig.allowCodingVerification eq 'yes' ? 2 : 1))}"/>
+        <c:set var="countOfElementsOnTheRightSide" value="${(includeReporting ? 1 : 0) + (study.parentStudyId > 0 ? 0 : (study.studyParameterConfig.medicalCoding eq 'yes' ? 2 : 1))}"/>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
@@ -132,7 +132,7 @@
                     <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                 </c:if>
             </c:if>
-            <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
+            <c:if test="${study.studyParameterConfig.medicalCoding eq 'yes'}">
                 <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
             </c:if>
             <c:if test="${includeReporting}">

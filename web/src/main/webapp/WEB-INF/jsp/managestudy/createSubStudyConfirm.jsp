@@ -559,49 +559,7 @@
 					</td>
 				</tr>
 			</c:when>
-
-			<c:when test="${config.parameter.handle=='allowCodingVerification'}">
-				<tr valign="top">
-					<td class="table_header_column">
-						<fmt:message key="allowCodingVerification" bundle="${resword}" />
-					</td>
-					<td class="table_cell">
-						<c:choose>
-							<c:when test="${config.value.value== 'yes'}">
-								<fmt:message key="yes" bundle="${resword}" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="no" bundle="${resword}" />
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</c:when>
-
-			<c:when test="${config.parameter.handle=='defaultBioontologyURL'}">
-				<tr valign="top">
-					<td class="formlabel">
-						<fmt:message key="defaultBioontologyURL" bundle="${resword}" />
-					</td>
-					<td>
-						<input name="defaultBioontologyURL" value=<c:out value="${bioontologyURL}" />/></td>
-				</tr>
-			</c:when>
-
-			<c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
-				<tr valign="top">
-					<td class="formlabel">
-						<fmt:message key="autoCodeDictionaryName" bundle="${resword}" />
-					</td>
-					<td>
-						<input type="text" name="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35">
-						<c:set var="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}" />
-						<jsp:include page="../showMessage.jsp">
-							<jsp:param name="key" value="autoCodeDictionaryName" /></jsp:include>
-					</td>
-				</tr>
-			</c:when>
-
+			
 			<c:otherwise>
 				<tr valign="top">
 					<td class="table_header_column">

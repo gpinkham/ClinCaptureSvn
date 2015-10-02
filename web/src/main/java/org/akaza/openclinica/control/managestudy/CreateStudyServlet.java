@@ -472,10 +472,6 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
 		spvdao.create(spv);
 
-		spv.setParameter("allowCodingVerification");
-		spv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
-		spvdao.create(spv);
-
 		spv.setParameter("defaultBioontologyURL");
 		spv.setValue(newStudy.getStudyParameterConfig().getDefaultBioontologyURL());
 		spvdao.create(spv);

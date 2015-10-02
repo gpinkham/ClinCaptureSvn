@@ -72,7 +72,6 @@ public class StudyParameterConfigTest {
 
 		assertEquals("no", config.getMedicalCodingApprovalNeeded());
 		assertEquals("no", config.getMedicalCodingContextNeeded());
-		assertEquals("no", config.getAllowCodingVerification());
 		assertEquals("yes", config.getAllowRulesAutoScheduling());
 
 		assertEquals("no", config.getAnnotatedCrfSasItemNames());

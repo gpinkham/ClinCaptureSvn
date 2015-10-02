@@ -434,21 +434,6 @@
 		</tr>
 	</c:when>
 
-  <c:when test="${config.parameter.handle=='allowCodingVerification'}">
-   <tr valign="top">
-       <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
-       <td class="table_cell">
-           <c:choose>
-               <c:when test="${config.value.value == 'yes'}">
-                   <fmt:message key="yes" bundle="${resword}"/>
-               </c:when>
-               <c:otherwise>
-                   <fmt:message key="no" bundle="${resword}"/>
-               </c:otherwise>
-           </c:choose>
-       </td>
-   </tr>
-  </c:when>
 	<c:when test="${config.parameter.handle=='interviewDateDefault'}">
 		  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
 		   <c:choose>
@@ -465,24 +450,6 @@
 		  </tr>
 	 </c:when>
 
-   <c:when test="${config.parameter.handle == 'defaultBioontologyURL'}">
-      <tr valign="top">
-        <td class="table_header_column"><fmt:message key="defaultBioontologyURL" bundle="${resword}"/></td>
-        <td class="table_cell">
-            ${config.value.value}
-        </td>
-      </tr>
-   </c:when>
-   <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
-    <tr valign="top">
-      <td class="table_header_column">
-        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-        <c:out value="${config.value.value}"/>&nbsp;
-      </td>
-    </tr>
-   </c:when>
 	<c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">
 		<tr valign="top">
 			<td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
@@ -516,7 +483,7 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-</div>
+
 <br>
 <c:if test = "${not empty definitions}">
 	<div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>

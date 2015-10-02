@@ -296,7 +296,6 @@ public class UpdateSubStudyServlet extends Controller {
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
-		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 

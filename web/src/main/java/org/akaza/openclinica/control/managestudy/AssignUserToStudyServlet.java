@@ -126,7 +126,7 @@ public class AssignUserToStudyServlet extends Controller {
 
 			StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
 			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
-					"allowCodingVerification");
+					"medicalCoding");
 			StudyParameterValueBean allowEvaluation = dao.findByHandleAndStudy(currentStudy.getId(),
 					"studyEvaluator");
 
@@ -147,14 +147,6 @@ public class AssignUserToStudyServlet extends Controller {
 				roles.remove(Role.INVESTIGATOR);
 				roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
 				roles.remove(Role.SITE_MONITOR);
-			}
-
-			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-					.getId();
-			boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId, "studyEvaluator")
-					.getValue().equalsIgnoreCase("yes");
-			if (!isEvaluationEnabled) {
-				roles.remove(Role.STUDY_EVALUATOR);
 			}
 
 			roles.remove(Role.STUDY_DIRECTOR);

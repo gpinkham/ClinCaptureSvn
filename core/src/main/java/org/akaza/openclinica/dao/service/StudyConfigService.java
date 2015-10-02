@@ -163,8 +163,6 @@ public class StudyConfigService {
 				spc.setAllowDynamicGroupsManagement(spv.getValue());
 			} else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 				spc.setReplaceExisitingDataDuringImport(spv.getValue());
-			} else if (handle.equalsIgnoreCase("allowCodingVerification")) {
-				spc.setAllowCodingVerification(spv.getValue());
 			} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
 				spc.setAutoCodeDictionaryName(spv.getValue());
 			} else if (handle.equalsIgnoreCase("medicalCodingApprovalNeeded")) {

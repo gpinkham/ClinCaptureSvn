@@ -184,7 +184,7 @@
 
                                                 <c:when test="${userRole.studyCoder}">
                                                     <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                    <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
+                                                    <c:if test="${study.studyParameterConfig.medicalCoding eq 'yes'}">
                                                         <li><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                     </c:if>
                                                     <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>

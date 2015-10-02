@@ -528,44 +528,6 @@
 		  </td>
 		  </tr>
 	</c:if>
-
-   <c:if test="${paramsMap['allowCodingVerification'] != null}">
-       <tr valign="top">
-           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
-           <td>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification == 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification == 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
-           </td>
-       </tr>
-       <tr>
-          <td>&nbsp;</td>
-      </tr>
-   </c:if>
-   <c:if test="${paramsMap['defaultBioontologyURL'] != null}">
-       <tr valign="top">
-           <td class="formlabel">
-               <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>:
-           </td>
-           <td>
-               <input id="bioontologyURL" name="defaultBioontologyURL" value="${bioontologyURL}"/>
-           </td>
-       </tr>
-   </c:if>
-
-  <c:if test="${paramsMap['autoCodeDictionaryName'] != null}">
-    <tr valign="top">
-      <td class="formlabel">
-        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
-      </td>
-      <td>
-        <input type="text" name="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35">
-        <c:set var="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}"/>
-        <jsp:include page="../showMessage.jsp">
-          <jsp:param name="key" value="autoCodeDictionaryName"/>
-        </jsp:include>
-      </td>
-    </tr>
-   </c:if>
    
 </table>
 </div>

@@ -25,6 +25,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -144,6 +145,12 @@ public class SetUserRoleServlet extends Controller {
 				}
 				int currentStudyId = selectedStudyBean.getParentStudyId() > 0 ? selectedStudyBean.getParentStudyId()
 						: selectedStudyBean.getId();
+				StudyParameterValueBean allowCodingVerification = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId,
+						"medicalCoding");
+
+				if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+					roleMap.remove(Role.STUDY_CODER.getId());
+				}
 				boolean isEvaluationEnabled = getStudyParameterValueDAO().findByHandleAndStudy(currentStudyId, "studyEvaluator")
 						.getValue().equalsIgnoreCase("yes");
 				if (!isEvaluationEnabled) {
