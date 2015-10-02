@@ -72,6 +72,7 @@ public abstract class RememberLastPage extends Controller {
 		if (!result) {
 			restoreAttributes(request);
 		}
+		saveAdditionalURLAttributes(request, response);
 		return result;
 	}
 
@@ -81,6 +82,9 @@ public abstract class RememberLastPage extends Controller {
 
 	protected void saveUrl(String key, String value, HttpServletRequest request) {
 		request.getSession().setAttribute(key, request.getContextPath().concat(request.getServletPath()).concat(value));
+	}
+
+	protected void saveAdditionalURLAttributes(HttpServletRequest request, HttpServletResponse response) {
 	}
 
 	protected String getSavedUrl(String key, HttpServletRequest request) {

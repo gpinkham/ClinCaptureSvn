@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.CookiesUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -156,7 +157,8 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		if (!newDefId.trim().isEmpty()) {
 			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
 		}
-		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE);
+		StudyBean study = getCurrentStudy();
+		String pageSize = CookiesUtil.getCookie(request, study.getOid() + ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE);
 		pageSize = pageSize == null ? "15" : pageSize;
 		return "?module=" + fp.getString("module") + "&defId=" + newDefId + "&maxRows=" + pageSize + "&showMoreLink="
 				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="
@@ -168,12 +170,19 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		super.saveUrl(key, value, request);
 		FormProcessor fp = new FormProcessor(request);
 		String pageSize = fp.getString("listEventsForSubject_mr_");
-		request.getSession().setAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
 		String savedUrl = getSavedUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL, request);
 		if (savedUrl != null) {
 			saveUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL,
 					savedUrl.replaceAll("findSubjects_mr_=\\d*", "findSubjects_mr_=".concat(pageSize)));
 		}
+	}
+
+	@Override
+	protected void saveAdditionalURLAttributes(HttpServletRequest request, HttpServletResponse response) {
+		FormProcessor fp = new FormProcessor(request);
+		String pageSize = fp.getString("listEventsForSubject_mr_");
+		StudyBean study = getCurrentStudy();
+		CookiesUtil.addCookie(response, study + ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
 	}
 
 	@Override

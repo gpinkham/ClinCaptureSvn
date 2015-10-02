@@ -25,6 +25,7 @@ import java.util.Stack;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.CookiesUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -164,7 +165,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		FormProcessor fp = new FormProcessor(request);
 		boolean showMoreLink = fp.getString("showMoreLink").equals("")
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
-		String pageSize = (String) request.getSession().getAttribute(SUBJECT_MATRIX_PAGE_SIZE);
+		StudyBean study = getCurrentStudy(request);
+		String pageSize = CookiesUtil.getCookie(request, study.getOid() + SUBJECT_MATRIX_PAGE_SIZE);
 		pageSize = pageSize == null ? "15" : pageSize;
 		return "?module=" + fp.getString("module") + "&maxRows=" + pageSize + "&showMoreLink=" + showMoreLink
 				+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=" + pageSize
@@ -179,12 +181,19 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		super.saveUrl(key, value, request);
 		FormProcessor fp = new FormProcessor(request);
 		String pageSize = fp.getString("findSubjects_mr_");
-		request.getSession().setAttribute(ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE, pageSize);
 		String savedUrl = getSavedUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL, request);
 		if (savedUrl != null) {
 			saveUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL,
 					savedUrl.replaceAll("listEventsForSubject_mr_=\\d*", "listEventsForSubject_mr_=".concat(pageSize)));
 		}
+	}
+
+	@Override
+	protected void saveAdditionalURLAttributes(HttpServletRequest request, HttpServletResponse response) {
+		FormProcessor fp = new FormProcessor(request);
+		String pageSize = fp.getString("findSubjects_mr_");
+		StudyBean study = getCurrentStudy(request);
+		CookiesUtil.addCookie(response, study.getOid() + SUBJECT_MATRIX_PAGE_SIZE, pageSize);
 	}
 
 	@Override
