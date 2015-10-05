@@ -76,6 +76,9 @@
 											 value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
 								</c:import>
 							</td>
+							<td>
+								<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+							</td>
 							<c:if test='${childItem.item.units != ""}'>
 								<td valign="top"><c:out value="(${childItem.item.units})" escapeXml="false"/></td>
 							</c:if>

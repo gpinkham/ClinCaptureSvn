@@ -129,6 +129,9 @@
       </c:import>
         <%--    <c:import url="../showMessage.jsp"><c:param name="key" value="input${displayItem.item.id}" /></c:import> --%>
     </td>
+	<td>
+		<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+	</td>
     <c:if test='${displayItem.item.units != ""}'>
       <td valign="top">
         <c:out value="(${displayItem.item.units})" escapeXml="false"/>
@@ -197,6 +200,9 @@
                 <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
             </c:import>
           </td>
+			<td>
+				<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+			</td>
           <c:if test='${childItem.item.units != ""}'>
             <td valign="top"> <c:out value="(${childItem.item.units})" escapeXml="false"/> </td>
           </c:if>

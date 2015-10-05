@@ -44,6 +44,7 @@ import javax.servlet.http.HttpSession;
 
 import com.clinovo.enums.CurrentDataEntryStage;
 import com.clinovo.service.DisplayItemService;
+import com.clinovo.util.DataEntryRenderUtil;
 import com.clinovo.util.DataEntryUtil;
 import com.clinovo.validation.DisplayItemBeanValidator;
 import com.clinovo.validator.CodedTermValidator;
@@ -170,8 +171,6 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String INPUT_ANNOTATIONS = "annotations";
 	public static final String BEAN_ANNOTATIONS = "annotations";
 	public static final String RESUME_LATER = "submittedResume";
-	public static final String GO_PREVIOUS = "submittedPrev";
-	public static final String GO_NEXT = "submittedNext";
 	public static final String SAVE_NEXT = "saveAndNext";
 	public static final String BEAN_DISPLAY = "section";
 	public static final String TOC_DISPLAY = "toc";
@@ -536,7 +535,7 @@ public abstract class DataEntryServlet extends Controller {
 			// data entry, if this is second round
 			logMe("Entering Checks !submitted entered  " + System.currentTimeMillis());
 			long t = System.currentTimeMillis();
-			request.setAttribute(BEAN_DISPLAY, section);
+			request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 			request.setAttribute(BEAN_ANNOTATIONS, getEventCRFAnnotations(request));
 			session.setAttribute("shouldRunValidation", null);
 			session.setAttribute("rulesErrors", null);
@@ -625,14 +624,12 @@ public abstract class DataEntryServlet extends Controller {
 				} else {
 					DisplayItemBean dib = diwg.getSingleItem();
 					if (validate) {
-
 						String itemName = DataEntryUtil.getInputName(dib);
 						dib = getDisplayItemBeanValidator().validateDisplayItemBean(v, dib, "", request);
 					} else {
 						String itemName = DataEntryUtil.getInputName(dib);
 						dib = DataEntryUtil.loadFormValue(dib, request);
 					}
-
 					ArrayList children = dib.getChildren();
 
 					for (int j = 0; j < children.size(); j++) {
@@ -715,7 +712,7 @@ public abstract class DataEntryServlet extends Controller {
 						if (getCurrentDataEntryStage() != CurrentDataEntryStage.VIEW_DATA_ENTRY) {
 							formGroups = displayItemService.loadFormValueForItemGroup(dgb, dbGroups, formGroups, request);
 							formGroups = getDisplayItemBeanValidator().validateDisplayItemGroupBean(dbGroups,
-									formGroups, ruleValidator,groupOrdinalPLusItemOid, request);
+									formGroups, ruleValidator, groupOrdinalPLusItemOid, request);
 							logger.debug("*** form group size after validation " + formGroups.size());
 						}
 					}
@@ -1167,7 +1164,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
 				request.setAttribute("markPartialSaved", fp.getString(INPUT_MARK_PARTIAL_SAVED));
-				request.setAttribute(BEAN_DISPLAY, section);
+				request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 				request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 				setInputMessages(errors, request);
 				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
@@ -1462,10 +1459,6 @@ public abstract class DataEntryServlet extends Controller {
 								ItemBean itemBean = displayItemBean.getItem();
 								if (newFieldName.equals(itemBean.getOid())) {
 									if (!displayItemBean.getMetadata().isShowItem()) {
-										logger.debug("found item " + DataEntryUtil.getInputName(displayItemBean) + " vs. "
-												+ fieldName + " and is show item: "
-												+ displayItemBean.getMetadata().isShowItem());
-
 										displayItemBean.getMetadata().setShowItem(true);
 										if (prevShownDynItemDataIds == null
 												|| !prevShownDynItemDataIds.contains(displayItemBean.getData().getId())) {
@@ -1516,7 +1509,7 @@ public abstract class DataEntryServlet extends Controller {
 						String[] textFields = {INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE};
 						fp.setCurrentStringValuesAsPreset(textFields);
 						setPresetValues(fp.getPresetValues(), request);
-						request.setAttribute(BEAN_DISPLAY, section);
+						request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 						request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 						setInputMessages(errorsPostDryRun, request);
 						addPageMessage(respage.getString("your_answers_activated_hidden_items"), request);
@@ -1544,7 +1537,7 @@ public abstract class DataEntryServlet extends Controller {
 						markSuccessfully = markCRFComplete(request);
 						logger.debug("...marked CRF as complete: " + markSuccessfully);
 						if (!markSuccessfully) {
-							request.setAttribute(BEAN_DISPLAY, section);
+							request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 							request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 							setUpPanel(request, section);
 							forwardPage(getJSPPage(), request, response);
@@ -1600,7 +1593,7 @@ public abstract class DataEntryServlet extends Controller {
 
 							addPageMessage(resexception.getString("database_error"), request);
 						}
-						request.setAttribute(BEAN_DISPLAY, section);
+						request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 						session.removeAttribute(GROUP_HAS_DATA);
 						session.removeAttribute(HAS_DATA_FLAG);
 						session.removeAttribute(DDE_PROGESS);
@@ -1615,42 +1608,62 @@ public abstract class DataEntryServlet extends Controller {
 							forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 						}
 					} else {
-						boolean forwardingSucceeded = false;
+						if (markSuccessfully) {
+							addPageMessage(respage.getString("data_saved_CRF_marked_complete"), request);
+							session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+							session.removeAttribute(GROUP_HAS_DATA);
+							session.removeAttribute(HAS_DATA_FLAG);
+							session.removeAttribute(DDE_PROGESS);
+							session.removeAttribute("to_create_crf");
 
-						if (!fp.getString(GO_PREVIOUS).equals("")) {
-							if (previousSec.isActive()) {
-								forwardingSucceeded = true;
-								request.setAttribute(INPUT_EVENT_CRF, ecb);
-								request.setAttribute(INPUT_SECTION, previousSec);
-								request.setAttribute(INPUT_SECTION_ID, Integer.toString(previousSec.getId()));
+							request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
+
+							storePageMessages(request);
+							if (autoCloseDataEntryPage) {
+								forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
+							} else {
+								if (!fp.getString(SAVE_NEXT).equals("")) {
+									goToNextCRF(request, response, ecb, currentRole, ub, edcb, studyEventBean);
+								} else {
+									response.sendRedirect(Navigation.getSavedUrl(request));
+								}
+							}
+						} else {
+							// user clicked 'save'
+							addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
+							request.setAttribute(INPUT_EVENT_CRF, ecb);
+							request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
+							// forward to the next section if the previous one
+							// is not the last section
+							if (!section.isLastSection()) {
+								request.setAttribute(INPUT_SECTION, nextSec);
+								request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
 								request.setAttribute(
 										"tabId",
 										Integer.toString(CrfShortcutsAnalyzer.getTabNum(allSections,
-												previousSec.getId())));
-								forwardPage(getServletPage(request), request, response);
-							}
-						} else if (!fp.getString(GO_NEXT).equals("")) {
-							if (nextSec.isActive()) {
-								forwardingSucceeded = true;
-								request.setAttribute(INPUT_EVENT_CRF, ecb);
-								request.setAttribute(INPUT_SECTION, nextSec);
-								request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
-								request.setAttribute("tabId",
-										Integer.toString(CrfShortcutsAnalyzer.getTabNum(allSections, nextSec.getId())));
-								forwardPage(getServletPage(request), request, response);
-							}
-						}
-
-						if (!forwardingSucceeded) {
-							if (markSuccessfully) {
-								addPageMessage(respage.getString("data_saved_CRF_marked_complete"), request);
-								session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+												nextSec.getId())));
+								session.removeAttribute("mayProcessUploading");
+							} else if (section.isLastSection()) {
+								// already the last section, should go back to
+								// view event page
 								session.removeAttribute(GROUP_HAS_DATA);
 								session.removeAttribute(HAS_DATA_FLAG);
 								session.removeAttribute(DDE_PROGESS);
 								session.removeAttribute("to_create_crf");
+								session.removeAttribute("mayProcessUploading");
 
 								request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
+
+								// Clinovo Ticket #173 start
+								StdScheduler scheduler = getScheduler(request);
+								CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
+								if (!isAdministrativeEditing()) {
+									String message = calLogic.maxMinDaysValidator(seb);
+									if (!"empty".equalsIgnoreCase(message)) {
+										addPageMessage(message, request);
+									}
+								}
+								// end
 
 								storePageMessages(request);
 								if (autoCloseDataEntryPage) {
@@ -1662,58 +1675,10 @@ public abstract class DataEntryServlet extends Controller {
 										response.sendRedirect(Navigation.getSavedUrl(request));
 									}
 								}
-							} else {
-								// user clicked 'save'
-								addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
-								request.setAttribute(INPUT_EVENT_CRF, ecb);
-								request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
-								// forward to the next section if the previous one
-								// is not the last section
-								if (!section.isLastSection()) {
-									request.setAttribute(INPUT_SECTION, nextSec);
-									request.setAttribute(INPUT_SECTION_ID, Integer.toString(nextSec.getId()));
-									request.setAttribute(
-											"tabId",
-											Integer.toString(CrfShortcutsAnalyzer.getTabNum(allSections,
-													nextSec.getId())));
-									session.removeAttribute("mayProcessUploading");
-								} else if (section.isLastSection()) {
-									// already the last section, should go back to
-									// view event page
-									session.removeAttribute(GROUP_HAS_DATA);
-									session.removeAttribute(HAS_DATA_FLAG);
-									session.removeAttribute(DDE_PROGESS);
-									session.removeAttribute("to_create_crf");
-									session.removeAttribute("mayProcessUploading");
-
-									request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-
-									// Clinovo Ticket #173 start
-									StdScheduler scheduler = getScheduler(request);
-									CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
-									if (!isAdministrativeEditing()) {
-										String message = calLogic.maxMinDaysValidator(seb);
-										if (!"empty".equalsIgnoreCase(message)) {
-											addPageMessage(message, request);
-										}
-									}
-									// end
-
-									storePageMessages(request);
-									if (autoCloseDataEntryPage) {
-										forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
-									} else {
-										if (!fp.getString(SAVE_NEXT).equals("")) {
-											goToNextCRF(request, response, ecb, currentRole, ub, edcb, studyEventBean);
-										} else {
-											response.sendRedirect(Navigation.getSavedUrl(request));
-										}
-									}
-									return;
-								}
-
-								forwardPage(getServletPage(request), request, response);
+								return;
 							}
+
+							forwardPage(getServletPage(request), request, response);
 						}
 					}
 				}
@@ -2749,7 +2714,6 @@ public abstract class DataEntryServlet extends Controller {
 					int childItemDataId = child.getData().getId();
 					int childItemId = child.getItem().getId();
 					String childInputFieldName = "input" + childItemId;
-					logger.debug("*** setting " + childInputFieldName);
 
 					List<DiscrepancyNoteBean> toolTipChildDNotes = toolTipItemDataDNCache.get(childItemDataId);
 					toolTipChildDNotes = toolTipChildDNotes == null ? new ArrayList() : new ArrayList(
@@ -3418,9 +3382,6 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			// Items in repeating groups
 			for (DisplayItemGroupBean itemGroupBean : displayItemWithGroupBean.getItemGroups()) {
-				logger.debug("Item Group Name : {} , Item Group OID : {} , Ordinal : {} ", new Object[]{
-						itemGroupBean.getItemGroupBean().getName(), itemGroupBean.getItemGroupBean().getOid(),
-						itemGroupBean.getIndex()});
 				for (DisplayItemBean displayItemBean : itemGroupBean.getItems()) {
 					String key1 = itemGroupBean.getItemGroupBean().getOid() + "[" + (itemGroupBean.getIndex() + 1)
 							+ "]." + displayItemBean.getItem().getOid();
@@ -3763,7 +3724,7 @@ public abstract class DataEntryServlet extends Controller {
 		return transformedDNs == null ? new ArrayList<DiscrepancyNoteBean>() : transformedDNs;
 	}
 
-	private Set<Integer> getTransformedSavedDNIds (List<DiscrepancyNoteBean> transformedDNs) {
+	private Set<Integer> getTransformedSavedDNIds(List<DiscrepancyNoteBean> transformedDNs) {
 		Set<Integer> transformedSavedDNIds = new HashSet<Integer>();
 		for (DiscrepancyNoteBean dn : transformedDNs) {
 			if (dn.getId() > 0) {
@@ -3773,7 +3734,7 @@ public abstract class DataEntryServlet extends Controller {
 		return transformedSavedDNIds;
 	}
 
-	private Set<String> getTransformedUnSavedDNIds (List<DiscrepancyNoteBean> transformedDNs) {
+	private Set<String> getTransformedUnSavedDNIds(List<DiscrepancyNoteBean> transformedDNs) {
 		Set<String> transformedUnSavedDNFieldNames = new HashSet<String>();
 		for (DiscrepancyNoteBean dn : transformedDNs) {
 			if (dn.getId() <= 0) {
@@ -3791,5 +3752,13 @@ public abstract class DataEntryServlet extends Controller {
 			break;
 		}
 		return sectionId;
+	}
+
+	private DisplaySectionBean getDisplaySectionBeanDependingOnStage(DisplaySectionBean sectionBean) {
+		if (getCurrentDataEntryStage() == CurrentDataEntryStage.VIEW_DATA_ENTRY) {
+			return sectionBean;
+		} else {
+			return DataEntryRenderUtil.convertSingleItemsToDisplayItemRowsDependingOnSource(sectionBean);
+		}
 	}
 }

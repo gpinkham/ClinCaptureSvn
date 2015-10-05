@@ -27,6 +27,8 @@ import java.util.List;
 public class DisplayItemWithGroupBean implements Comparable {
 	private DisplayItemBean singleItem;
 
+	private DisplayItemRowBean itemsRow;
+
 	private DisplayItemGroupBean itemGroup;
 
 	// this is an array of same item groups, which reflects multiple item group
@@ -46,6 +48,7 @@ public class DisplayItemWithGroupBean implements Comparable {
 		this.singleItem = new DisplayItemBean();
 		this.itemGroup = new DisplayItemGroupBean();
 		this.pageNumberLabel = "";
+		itemsRow = new DisplayItemRowBean();
 	}
 
 	@Override
@@ -208,6 +211,14 @@ public class DisplayItemWithGroupBean implements Comparable {
 		this.singleItem = singleItem;
 	}
 
+	public DisplayItemRowBean getItemsRow() {
+		return itemsRow;
+	}
+
+	public void setItemsRow(DisplayItemRowBean itemsRow) {
+		this.itemsRow = itemsRow;
+	}
+
 	public int compareTo(Object o) {
 		if (!o.getClass().equals(this.getClass())) {
 			return 0;
@@ -217,4 +228,33 @@ public class DisplayItemWithGroupBean implements Comparable {
 		return getOrdinal() - arg.getOrdinal();
 	}
 
+	/**
+	 * This method was added in order to support new entity DisplayItemsRowBean.
+	 * @param source String, CRF source
+	 * @return Array list of items
+	 */
+	public ArrayList<DisplayItemBean> getListOfSingleItems(String source) {
+		ArrayList<DisplayItemBean> list = new ArrayList<DisplayItemBean>();
+		if (source.equalsIgnoreCase("formstudio")) {
+			list = itemsRow.getItems();
+		} else {
+			list.add(singleItem);
+		}
+		return list;
+	}
+
+	/**
+	 * This method should be used in case if there is no ability to check CRF source.
+	 * @return ArrayList of items
+	 */
+	public ArrayList<DisplayItemBean> getListOfSingleItems() {
+		if (singleItem == new DisplayItemBean() && itemsRow.getItems().size() != 0) {
+			return itemsRow.getItems();
+		} else {
+			ArrayList<DisplayItemBean> newList = new ArrayList<DisplayItemBean>();
+			newList.add(singleItem);
+			return newList;
+		}
+
+	}
 }

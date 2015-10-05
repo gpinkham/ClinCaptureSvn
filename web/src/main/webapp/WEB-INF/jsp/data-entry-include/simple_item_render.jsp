@@ -108,12 +108,15 @@
 			<c:param name="defaultValue" value="${displayItemWithGroup.singleItem.metadata.defaultValue}"/>
 			<c:param name="respLayout" value="${displayItemWithGroup.singleItem.metadata.responseLayout}"/>
 			<c:param name="originJSP" value="${originJSP}"/>
-			<c:param name="isForcedRFC" value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
-		</c:import>
-	</td>
-	<c:if test='${displayItemWithGroup.singleItem.item.units != ""}'>
-		<td valign="top">
-			<c:out value="(${displayItemWithGroup.singleItem.item.units})" escapeXml="false"/>
+		<c:param name="isForcedRFC" value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
+	</c:import>
+</td>
+<td>
+	<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+</td>
+<c:if test='${displayItemWithGroup.singleItem.item.units != ""}'>
+	<td valign="top">
+		<c:out value="(${displayItemWithGroup.singleItem.item.units})" escapeXml="false"/>
 		</td>
 	</c:if>
 	<td valign="top">

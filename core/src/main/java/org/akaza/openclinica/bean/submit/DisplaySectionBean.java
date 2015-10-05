@@ -44,10 +44,10 @@ public class DisplaySectionBean {
 	// collect item_id of simple conditional display items to be shown in this section
 	private Set<Integer> showSCDItemIds;
 	// The Item groups associated with this section.
-	private List<DisplayItemGroupBean> displayFormGroups;// for items in
+	private List<DisplayItemGroupBean> displayFormGroups; // for items in
 	// groups
 
-	private List<DisplayItemWithGroupBean> displayItemGroups;// for all items
+	private List<DisplayItemWithGroupBean> displayItemGroups; // for all items
 
 	// including
 	// single ones
@@ -247,5 +247,25 @@ public class DisplaySectionBean {
 
 	public void setShowSCDItemIds(Set<Integer> showSCDItemIds) {
 		this.showSCDItemIds = showSCDItemIds;
+	}
+
+	/**
+	 * Get clone of the object.
+	 * @return DisplaySectionBean
+	 */
+	public DisplaySectionBean cloneWithoutDisplayItemGroups() {
+		DisplaySectionBean newSection = new DisplaySectionBean();
+		newSection.setCrf(crf);
+		newSection.setCrfVersion(crfVersion);
+		newSection.setEventCRF(eventCRF);
+		newSection.setEventDefinitionCRF(eventDefinitionCRF);
+		newSection.setSection(section);
+		newSection.setItems(items);
+		newSection.setFirstSection(firstSection);
+		newSection.setLastSection(lastSection);
+		newSection.setRuleEditCheck(ruleEditCheck);
+		newSection.setShowSCDItemIds(showSCDItemIds);
+		newSection.setDisplayFormGroups(displayFormGroups);
+		return newSection;
 	}
 }

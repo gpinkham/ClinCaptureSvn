@@ -80,6 +80,7 @@
 
 <c:set var="save_and_next_button_caption" scope="request"><fmt:message key='save_and_next' bundle='${resword}'/></c:set>
 <c:set var="submitClassType" value="submit" scope="request"/>
+<c:set var="isFSCRF" value="${toc.crf.source == 'formstudio'}" scope="request"/>
 
 <div id="centralContainer">
 	<table width="75%">
@@ -193,9 +194,21 @@
 												<c:set var="currPage" value="${displayItemWithGroup.singleItem.metadata.pageNumberLabel}" scope="request"/>
 												<c:set var="cdisplay" value="${displayItemWithGroup.singleItem.scdData.scdItemMetadataBean.id}" scope="request"/>
 												<c:if test="${displayItemWithGroup.singleItem.metadata.showItem || cdisplay>0}">
-													<c:if test="${displayItemWithGroup.singleItem.metadata.parentId == 0}">
-														<jsp:include page="../data-entry-include/simple_item_render.jsp"/>
-													</c:if>
+
+													<c:choose>
+														<c:when test="${isFSCRF}">
+															<tr>
+																<td>
+																	<jsp:include page="../data-entry-include/fs_item_render.jsp"/>
+																</td>
+															</tr>
+														</c:when>
+														<c:otherwise>
+															<c:if test="${displayItemWithGroup.singleItem.metadata.parentId == 0}">
+																<jsp:include page="../data-entry-include/simple_item_render.jsp"/>
+															</c:if>
+														</c:otherwise>
+													</c:choose>
 												</c:if>
 											</c:otherwise>
 										</c:choose>
