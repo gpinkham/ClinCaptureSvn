@@ -3080,37 +3080,10 @@ public abstract class DataEntryServlet extends Controller {
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-		ItemDAO idao = new ItemDAO(getDataSource());
 		for (int i = 0; i < sections.size(); i++) {
 			SectionBean sb = (SectionBean) sections.get(i);
 			if (!isCreateItemReqd(sb, request)) {
-				ArrayList items = idao.findAllBySectionId(sb.getId());
-				for (int j = 0; j < items.size(); j++) {
-					ItemBean item = (ItemBean) items.get(j);
-					ArrayList<ItemDataBean> itemBean = iddao.findAllByEventCRFIdAndItemIdNoStatus(ecb.getId(),
-							item.getId());
-					ItemDataBean idb = new ItemDataBean();
-					idb.setItemId(item.getId());
-					idb.setEventCRFId(ecb.getId());
-					idb.setCreatedDate(new Date());
-					idb.setOrdinal(1);
-					idb.setOwner(ub);
-					if (completeStatus != null) {
-						// to avoid null exception
-						idb.setStatus(completeStatus);
-					} else {
-						idb.setStatus(Status.UNAVAILABLE);
-					}
-					idb.setValue("");
-					boolean save = true;
-					if (itemBean.size() > 0) {
-						save = false;
-					}
-					if (save) {
-						iddao.create(idb);
-					}
-				}
+				getDataEntryService(getServletContext()).saveItemsWithoutItemData(sb.getId(), completeStatus, ub, ecb);
 			}
 		}
 		return true;

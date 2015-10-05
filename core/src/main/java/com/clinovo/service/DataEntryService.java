@@ -15,6 +15,8 @@
 package com.clinovo.service;
 
 import com.clinovo.enums.CurrentDataEntryStage;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
@@ -73,4 +75,13 @@ public interface DataEntryService {
 	ArrayList<DisplaySectionBean> getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb,
 			StudyBean study, Page servletPage) throws Exception;
 
+	/**
+	 * Create empty Item Data for all items for which data was not saved yet.
+	 * This method is needed to create data for items in the sections that were not saved before.
+	 * @param sectionId int
+	 * @param status Status
+	 * @param user UserAccountBean
+	 * @param eventCrf EventCRFBean
+	 */
+	void saveItemsWithoutItemData(int sectionId, Status status, UserAccountBean user, EventCRFBean eventCrf);
 }

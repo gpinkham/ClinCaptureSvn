@@ -16,6 +16,7 @@ package com.clinovo.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import com.clinovo.enums.CurrentDataEntryStage;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -37,6 +39,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
@@ -48,6 +51,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -156,6 +160,9 @@ public class DataEntryServiceImpl implements DataEntryService {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean shouldLoadDBValues(DisplayItemBean dib, CurrentDataEntryStage dataEntryStage) {
 		if (dataEntryStage == CurrentDataEntryStage.DOUBLE_DATA_ENTRY) {
 			if (dib.getEventDefinitionCRF().isEvaluatedCRF()) {
@@ -317,6 +324,48 @@ public class DataEntryServiceImpl implements DataEntryService {
 			sections.add(section);
 		}
 		return sections;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void saveItemsWithoutItemData(int sectionId, Status status, UserAccountBean ub, EventCRFBean eventCrf) {
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+		ItemDAO itemDAO = new ItemDAO(dataSource);
+		ArrayList<ItemBean> items = itemDAO.findAllBySectionId(sectionId);
+		ItemGroupMetadataDAO metadataDAO = new ItemGroupMetadataDAO(dataSource);
+		for (ItemBean item : items) {
+			ArrayList<ItemDataBean> itemData = itemDataDAO.findAllByEventCRFIdAndItemIdNoStatus(eventCrf.getId(),
+					item.getId());
+			if (itemData.size() == 0) {
+				ItemGroupMetadataBean metadata = (ItemGroupMetadataBean) metadataDAO
+						.findByItemAndCrfVersion(item.getId(), eventCrf.getCRFVersionId());
+				if (metadata.isRepeatingGroup() && metadata.getRepeatNum() > 1) {
+					for (int i = 1; i <= metadata.getRepeatNum(); i++) {
+						createItemData(i, status, item.getId(), eventCrf.getId(), ub);
+					}
+				} else  {
+					createItemData(1, status, item.getId(), eventCrf.getId(), ub);
+				}
+			}
+		}
+	}
+
+	private void createItemData(int ordinal, Status status, int itemId, int eventCRFId, UserAccountBean owner) {
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+		ItemDataBean idb = new ItemDataBean();
+		idb.setItemId(itemId);
+		idb.setEventCRFId(eventCRFId);
+		idb.setCreatedDate(new Date());
+		idb.setOrdinal(ordinal);
+		idb.setOwner(owner);
+		if (status != null) {
+			idb.setStatus(status);
+		} else {
+			idb.setStatus(Status.UNAVAILABLE);
+		}
+		idb.setValue("");
+		itemDataDAO.create(idb);
 	}
 
 	private DynamicsMetadataService getDynamicsMetadataService() {
