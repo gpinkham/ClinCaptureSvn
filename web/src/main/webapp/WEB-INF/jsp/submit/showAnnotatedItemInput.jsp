@@ -34,6 +34,24 @@
 	</c:otherwise>
 </c:choose>
 
+<c:if test="${displayItem.item.dataType.id == 13}">
+	<c:set var="inputType" value="divider"/>
+	<label for="${inputName}"></label>
+	<%-- we don't support dividers inside repeating groups --%>
+</c:if>
+
+<c:if test="${displayItem.item.dataType.id == 14}">
+	<c:set var="inputType" value="label"/>
+	<label for="${inputName}"></label>
+	<div class="tableLabelHolder">
+		<select class="tableLabelSelect hidden">
+			<c:forEach items="${displayItem.tableLabels}" var="tableLabel">
+				<option>${tableLabel}</option>
+			</c:forEach>
+		</select>
+	</div>
+</c:if>
+
 <c:if test='${inputType=="file"}'>
 	<label for="input${itemId}"></label>
 	<input type="text" id="ft${itemId}" name="fileText${itemId}" value="">

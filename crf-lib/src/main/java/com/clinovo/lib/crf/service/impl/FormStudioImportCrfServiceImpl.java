@@ -16,6 +16,7 @@
 package com.clinovo.lib.crf.service.impl;
 
 import java.net.URLDecoder;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -90,6 +91,17 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		return result;
 	}
 
+	private void copyObject(JSONObject fromJsonObject, JSONObject toJsonObject, String key) throws Exception {
+		try {
+			Object object = fromJsonObject.get(key);
+			if (object != null) {
+				toJsonObject.put(key, object);
+			}
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+	}
+
 	private String getString(JSONArray jsonArray, int index) throws Exception {
 		String result = EMPTY;
 		try {
@@ -151,7 +163,6 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		JSONArray pages = getJSONArray(crfBuilder.getJsonObject(), PAGES);
 		for (int i = 0; i < pages.length(); i++) {
 			JSONObject jsonObj = pages.getJSONObject(i);
-			crfBuilder.checkCRFSource(getString(jsonObj, SUB_TITLE));
 
 			crfBuilder.setCurrentSection(new SectionBean());
 			crfBuilder.getCurrentSection().setInstructions(getString(jsonObj, INSTRUCTIONS));
@@ -189,7 +200,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 					.append(crfBuilder.getMessage("pleaseSpecifyStratificationData")).append("\">");
 
 			crfBuilder.getCurrentItem().getResponseSet().setResponseType(newResponseType(ResponseType.SELECT));
-			crfBuilder.getCurrentItem().setDescription(STRATIFICATION_DATA);
+			crfBuilder.getCurrentItem().setDescription(crfBuilder.getMessage("stratificationData"));
 			crfBuilder.getCurrentItem().getItemMeta().setHeader(crfBuilder.getMessage("strataVariable"));
 			crfBuilder.getCurrentItem().getItemMeta().setRightItemText(crfBuilder.getCurrentItem().getItemMeta()
 					.getRightItemText().concat(" ").concat(hiddenDataStringBuilder.toString()));
@@ -200,15 +211,16 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		FormStudioElement type = FormStudioElement.getByName(getString(jsonObj, TYPE).toUpperCase());
 		crfBuilder.getCurrentItem().getItemMeta().setWidthDecimal(EMPTY);
 		String repeatingItemGroupHeader = getString(jsonObj, REPEATING_ITEM_GROUP_HEADER);
-		crfBuilder.getCurrentItem().getItemMeta().setHeader(
-				!repeatingItemGroupHeader.isEmpty() ? repeatingItemGroupHeader : crfBuilder.getCurrentHeader());
+		crfBuilder.getCurrentItem().getItemMeta()
+				.setHeader(!repeatingItemGroupHeader.isEmpty() ? repeatingItemGroupHeader : getString(jsonObj, HEADER));
+		crfBuilder.getCurrentItem().getItemMeta().setSubHeader(getString(jsonObj, SUBHEADER));
 		crfBuilder.getCurrentItem().getItemMeta().setColumnNumber(getInt(jsonObj, COLUMN_NUMBER));
 		if (crfBuilder.getCurrentItem().getName().equalsIgnoreCase(RAND_DATE)) {
 			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(EMPTY);
-		} else if (isYes(jsonObj, NUMBERING)) {
-			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(getString(jsonObj, POS).concat(DOT));
+		} else if (isYes(jsonObj, NUMBERING) || type == FormStudioElement.LABEL) {
+			String pos = getString(jsonObj, POS);
+			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(pos.isEmpty() ? EMPTY : pos.concat(DOT));
 		}
-
 		crfBuilder.getCurrentItem().getItemMeta().setPageNumberLabel(EMPTY);
 		crfBuilder.getCurrentItem().getItemMeta().setLeftItemText(getString(jsonObj, LEFT_TEXT));
 		crfBuilder.getCurrentItem().getItemMeta().setRightItemText(getString(jsonObj, RIGHT_TEXT));
@@ -219,7 +231,11 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().getItemMeta().setResponseLayout(getString(jsonObj, LAYOUT));
 		crfBuilder.getCurrentItem().getItemMeta()
 				.setShowItem(!getString(jsonObj, DISPLAY_STATE).equalsIgnoreCase(HIDE));
-		if (type == FormStudioElement.CODING) {
+		if (type == FormStudioElement.DIVIDER) {
+			crfBuilder.getCurrentItem().getItemMeta()
+					.setHeader(crfBuilder.getCurrentItem().getItemMeta().getLeftItemText());
+			crfBuilder.getCurrentItem().getItemMeta().setLeftItemText(EMPTY);
+		} else if (type == FormStudioElement.CODING) {
 			crfBuilder.getCurrentItem().getItemMeta()
 					.setCodeRef(Dictionary.findDictionary(getString(jsonObj, DICTIONARY)).getSysName());
 		} else if (type == FormStudioElement.CODING_SYSTEM || type == FormStudioElement.CODING_RADIO) {
@@ -425,6 +441,12 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		} else if (type == FormStudioElement.CODING_SYSTEM) {
 			itemDataType = ItemDataType.CODE;
 			itemDataTypeValue = itemDataType.getCode();
+		} else if (type == FormStudioElement.DIVIDER) {
+			itemDataType = ItemDataType.DIVIDER;
+			itemDataTypeValue = itemDataType.getCode();
+		} else if (type == FormStudioElement.LABEL) {
+			itemDataType = ItemDataType.LABEL;
+			itemDataTypeValue = itemDataType.getCode();
 		}
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.ITEM_DATA_TYPE,
 				FormStudioElement.findByName(itemDataTypeValue)
@@ -437,31 +459,61 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		FormStudioElement type = FormStudioElement.getByName(getString(jsonObj, TYPE).toUpperCase());
 		if (type == FormStudioElement.RANDOMIZATION) {
 			crfBuilder.getCurrentItem().setName(RAND_RESULT);
-			crfBuilder.getCurrentItem().setDescription(RANDOMIZATION_RESULT);
+			crfBuilder.getCurrentItem().setDescription(crfBuilder.getMessage("randomizationResult"));
 			crfBuilder.getCurrentItem().getItemMeta().setHeader(crfBuilder.getMessage("randomization"));
 			crfBuilder.getCurrentItem().getItemMeta()
-					.setLeftItemText(" <span id=\"rando\"><table><tr><td align=left style=\"width:120px\">"
-							.concat(crfBuilder.getMessage("randomizationResult")).concat("</td></tr></table></span>"));
+					.setLeftItemText(" <span id=\"rando\"><table><tr><td class=\"randTd\">"
+							.concat(crfBuilder.getMessage("randomizationResult")).concat(":</td></tr></table></span>"));
 			crfBuilder.getCurrentItem().getItemMeta().setRightItemText(EMPTY);
 			crfBuilder.getCurrentItem().getItemMeta()
 					.setSubHeader(crfBuilder.getCurrentItem().getItemMeta().getSubHeader()
-							.concat(" <table width=500px ><tr><td class=\"aka_ques_block\">")
+							.concat(" <table class=\"randTable\"><tr><td class=\"aka_ques_block\">")
 							.concat(crfBuilder.getCurrentItem().getItemMeta()
 									.getQuestionNumberLabel())
-					.concat("</td><td><span id=\"Button\"><input eleId=\"randomize\" type=\"button\"value=\"Randomize Subject\" width=\"40\" onclick=\"randomizeSubject()\"></span></td></tr></table>"));
+					.concat("</td><td><span id=\"Button\"><input eleId=\"randomize\" type=\"button\"value=\"Randomize Subject\" class=\"randButton\" onclick=\"randomizeSubject()\"></span></td></tr></table>"));
 			crfBuilder.getCurrentItem().getItemMeta().setQuestionNumberLabel(EMPTY);
 			jsonObj.put(ITEM_NAME, RAND_DATE);
 			jsonObj.put(TYPE, TEXT);
-			jsonObj.put(LEFT_TEXT, "<table><tr><td align=\"left\" style=\"width:120px;\">"
-					.concat(crfBuilder.getMessage("dateOfRandomization")).concat("</td></tr></table>"));
+			jsonObj.put(LEFT_TEXT, "<table><tr><td class=\"randTd\">"
+					.concat(crfBuilder.getMessage("dateOfRandomization")).concat(":</td></tr></table>"));
 			jsonObj.put(RIGHT_TEXT, EMPTY);
 			jsonObj.put(HEADER, EMPTY);
-			jsonObj.put(DESCRIPTION, DATE_OF_RANDOMIZATION);
+			jsonObj.put(DESCRIPTION, crfBuilder.getMessage("dateOfRandomization"));
 			jsonObj.put(POS, EMPTY);
 			ItemBeanExt currentItem = new ItemBeanExt(crfBuilder.getCurrentItem());
 			crfBuilder.setCurrentItem(currentItem);
 			crfBuilder.getItems().add(crfBuilder.getCurrentItem());
 			createItemBean(jsonObj, crfBuilder);
+		}
+	}
+
+	private void checkItemName(BaseCrfBuilder crfBuilder) throws Exception {
+		boolean b = false;
+		String itemName = crfBuilder.getCurrentItem().getName().toLowerCase().trim();
+		if (itemName.startsWith(SYSDVR.concat(UNDERLINE)) || itemName.startsWith(SYSLBL.concat(UNDERLINE))) {
+			throw new Exception(crfBuilder.getMessage("crfItemNamesShouldNotStartWith"));
+		}
+	}
+
+	private String generateName(String prefix, List<String> names) {
+		String name;
+		int index = names.size();
+		do {
+			name = prefix.concat(UNDERLINE).concat(Integer.toString(++index));
+		} while ((names.contains(name)));
+		names.add(name);
+		return name;
+	}
+
+	private void generateLabelName(BaseCrfBuilder crfBuilder) {
+		if (crfBuilder.getCurrentItem().getItemDataTypeId() == ItemDataType.LABEL.getId()) {
+			crfBuilder.getCurrentItem().setName(generateName(SYSLBL, crfBuilder.getSysItemNames()));
+		}
+	}
+
+	private void generateDividerName(BaseCrfBuilder crfBuilder) {
+		if (crfBuilder.getCurrentItem().getItemDataTypeId() == ItemDataType.DIVIDER.getId()) {
+			crfBuilder.getCurrentItem().setName(generateName(SYSDVR, crfBuilder.getSysItemNames()));
 		}
 	}
 
@@ -478,6 +530,12 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().setItemMeta(new ItemFormMetadataBean());
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.REQUIRED, getString(jsonObj, REQUIRED));
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.PHI, getString(jsonObj, PHI_DATA));
+
+		checkItemName(crfBuilder);
+
+		generateLabelName(crfBuilder);
+
+		generateDividerName(crfBuilder);
 
 		createResponseSet(jsonObj, crfBuilder);
 
@@ -516,35 +574,59 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			}
 			ItemGroupBean itemGroupBean = createItemGroup(itemName, crfBuilder);
 			JSONArray elementsArray = getJSONArray(jsonObject, CHILDREN);
+			JSONObject tableLabelObject = null;
 			for (int e = 0; e < elementsArray.length(); e++) {
 				JSONObject elementObject = elementsArray.getJSONObject(e);
-				elementObject.put(MAX_ROWS, maxRows);
-				elementObject.put(MIN_ROWS, minRows);
-				elementObject.put(REPEATING_GROUP, itemGroupBean);
-				elementObject.put(REPEATING_GROUP_HEADER, groupHeader);
-				elementObject.put(REPEATING_ITEM_GROUP_HEADER, getString(elementObject, HEADER));
-				childrenQuestions.put(elementObject);
+				FormStudioElement elementObjectType = FormStudioElement
+						.getByName(getString(elementObject, TYPE).toUpperCase());
+				if (elementObjectType == FormStudioElement.LABEL) {
+					if (tableLabelObject == null) {
+						tableLabelObject = new JSONObject();
+						tableLabelObject.put(TYPE, LABEL);
+						tableLabelObject.put(MAX_ROWS, maxRows);
+						tableLabelObject.put(MIN_ROWS, minRows);
+						tableLabelObject.put(REPEATING_GROUP, itemGroupBean);
+						tableLabelObject.put(REPEATING_GROUP_HEADER, groupHeader);
+						tableLabelObject.put(LEFT_TEXT, getString(elementObject, LABEL));
+						tableLabelObject.put(REPEATING_ITEM_GROUP_HEADER, getString(elementObject, HEADER));
+						childrenQuestions.put(tableLabelObject);
+					} else {
+						String tableLabel = getString(tableLabelObject, LEFT_TEXT);
+						tableLabelObject.put(LEFT_TEXT,
+								tableLabel.concat(tableLabel.isEmpty() ? EMPTY : ItemDataType.LABEL_SPLITTER)
+										.concat(getString(elementObject, LABEL)));
+					}
+				} else {
+					elementObject.put(MAX_ROWS, maxRows);
+					elementObject.put(MIN_ROWS, minRows);
+					elementObject.put(REPEATING_GROUP, itemGroupBean);
+					elementObject.put(REPEATING_GROUP_HEADER, groupHeader);
+					elementObject.put(REPEATING_ITEM_GROUP_HEADER, getString(elementObject, HEADER));
+					String elementObjectPos = getString(elementObject, POS);
+					String tableLabelPos = getString(tableLabelObject, POS);
+					if (tableLabelObject != null && tableLabelPos.isEmpty() && !elementObjectPos.isEmpty()) {
+						tableLabelObject.put(POS, elementObjectPos.replace(DOT.concat(B), DOT.concat(A)));
+					}
+					childrenQuestions.put(elementObject);
+				}
 			}
 		} else if (type == FormStudioElement.CODING) {
 			Dictionary dictionary = Dictionary.findDictionary(getString(jsonObject, DICTIONARY));
 			if (dictionary != null) {
 				for (Coding coding : dictionary.getCodingList()) {
-					ItemGroupBean repeatingGroup = (ItemGroupBean) getObject(jsonObject, REPEATING_GROUP);
-					JSONObject jsonObj = new JSONObject(jsonObject.toString());
-					jsonObj.put(ITEM_NAME,
+					JSONObject newJsonObject = new JSONObject(jsonObject.toString());
+					newJsonObject.put(ITEM_NAME,
 							crfBuilder.getCurrentItem().getName().concat(UNDERLINE).concat(coding.getPostfix()));
-					jsonObj.put(DISPLAY_STATE, coding.isVisible() ? SHOW : HIDE);
-					jsonObj.put(LAYOUT, coding.getLayout());
-					jsonObj.put(TYPE, coding.getType());
-					jsonObj.put(HEADER, EMPTY);
-					jsonObj.put(LEFT_TEXT, EMPTY);
-					jsonObj.put(RIGHT_TEXT, EMPTY);
-					jsonObj.put(DESCRIPTION, EMPTY);
-					jsonObj.put(POS, EMPTY);
-					jsonObj.put(NUMBERING, EMPTY);
-					if (repeatingGroup != null) {
-						jsonObj.put(REPEATING_GROUP, repeatingGroup);
-					}
+					newJsonObject.put(DISPLAY_STATE, coding.isVisible() ? SHOW : HIDE);
+					newJsonObject.put(LAYOUT, coding.getLayout());
+					newJsonObject.put(TYPE, coding.getType());
+					newJsonObject.put(HEADER, EMPTY);
+					newJsonObject.put(LEFT_TEXT, EMPTY);
+					newJsonObject.put(RIGHT_TEXT, EMPTY);
+					newJsonObject.put(DESCRIPTION, EMPTY);
+					newJsonObject.put(POS, EMPTY);
+					newJsonObject.put(NUMBERING, EMPTY);
+					copyObject(jsonObject, newJsonObject, REPEATING_GROUP);
 					JSONArray options = new JSONArray();
 					for (String value : coding.getOptionsValues()) {
 						JSONObject jsonObjectOption = new JSONObject();
@@ -555,8 +637,8 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 						jsonObjectOption.put(ImportCrfService.VALUE, value);
 						options.put(jsonObjectOption);
 					}
-					jsonObj.put(OPTIONS, options);
-					childrenQuestions.put(jsonObj);
+					newJsonObject.put(OPTIONS, options);
+					childrenQuestions.put(newJsonObject);
 				}
 			}
 		} else if (type != FormStudioElement.CODING_SYSTEM && type != FormStudioElement.CODING_RADIO) {
@@ -572,28 +654,20 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	private void processQuestions(JSONArray questions, ItemBeanExt parentItemBean, JsonCrfBuilder crfBuilder)
 			throws Exception {
 		for (int i = 0; i < questions.length(); i++) {
-			boolean resetHeader = false;
-
 			ItemBeanExt currentItem = new ItemBeanExt();
 			currentItem.setParentItemBean(parentItemBean);
 
 			JSONObject jsonObj = questions.getJSONObject(i);
 			FormStudioElement type = FormStudioElement.getByName(getString(jsonObj, TYPE).toUpperCase());
 
-			if (type == FormStudioElement.DIVIDER) {
-				crfBuilder.setCurrentHeader(getString(jsonObj, LEFT_TEXT));
-			} else if (type != FormStudioElement.GRID && type != FormStudioElement.TABLE) {
-				resetHeader = true;
+			if (type != FormStudioElement.GRID && type != FormStudioElement.TABLE) {
 				crfBuilder.setCurrentItem(currentItem);
 				crfBuilder.getItems().add(crfBuilder.getCurrentItem());
 				createItemBean(jsonObj, crfBuilder);
 			}
 
-			processQuestions(getChildrenQuestions(jsonObj, crfBuilder), currentItem, crfBuilder);
-
-			if (resetHeader) {
-				crfBuilder.setCurrentHeader(EMPTY);
-			}
+			processQuestions(getChildrenQuestions(jsonObj, crfBuilder),
+					type == FormStudioElement.DIVIDER ? null : currentItem, crfBuilder);
 		}
 	}
 
@@ -615,7 +689,6 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 
 		processPages(crfBuilder);
 	}
-
 	/**
 	 * {@inheritDoc}
 	 */

@@ -21,8 +21,10 @@ package org.akaza.openclinica.bean.submit;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -50,6 +52,8 @@ public class DisplayItemBean implements Comparable {
 	private boolean autoAdded; // used for data import
 	private String maxLength;
 	// adding totals here for display purposes
+
+	private List<String> tableLabels = new ArrayList<String>();
 
 	private int totNew;
 	private int totUpdated;
@@ -180,11 +184,23 @@ public class DisplayItemBean implements Comparable {
 		this.item = item;
 	}
 
+	public List<String> getTableLabels() {
+		return tableLabels;
+	}
+
 	/**
 	 * @return Returns the metadata.
 	 */
 	public ItemFormMetadataBean getMetadata() {
 		return metadata;
+	}
+
+	private void prepareTableLabels() {
+		if (item != null && item.getDataType() != null && metadata != null && metadata.getLeftItemText() != null
+				&& item.getItemDataTypeId() == ItemDataType.LABEL.getId()) {
+			tableLabels = Arrays.asList(metadata.getLeftItemText()
+					.split(ItemDataType.LABEL_SPLITTER.replace("]", "\\]").replace("[", "\\[")));
+		}
 	}
 
 	/**
@@ -193,6 +209,8 @@ public class DisplayItemBean implements Comparable {
 	 */
 	public void setMetadata(ItemFormMetadataBean metadata) {
 		this.metadata = metadata;
+
+		prepareTableLabels();
 
 		ResponseSetBean rsb = metadata.getResponseSet();
 
@@ -349,12 +367,13 @@ public class DisplayItemBean implements Comparable {
 					rsb.setSelected(element.trim(), true);
 				}
 			}
-		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) // ||
-																					// rt.equals(org.akaza.openclinica.bean.core.ResponseType.CODING)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)
-				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.INSTANT_CALCULATION)) {
+		} else
+			if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
+					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) // ||
+																						// rt.equals(org.akaza.openclinica.bean.core.ResponseType.CODING)
+					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
+					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)
+					|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.INSTANT_CALCULATION)) {
 			rsb.setValue(dbValue);
 		} else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
 			// Here assume dbValue from database should be a valid file pathname
@@ -767,6 +786,11 @@ public class DisplayItemBean implements Comparable {
 		return 0;
 	}
 
+	/**
+	 * Returns max length.
+	 * 
+	 * @return String
+	 */
 	public String getMaxLength() {
 		maxLength = "";
 		try {

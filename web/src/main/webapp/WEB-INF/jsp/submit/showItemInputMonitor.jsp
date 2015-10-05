@@ -130,6 +130,14 @@ form element in red --%>
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
  </c:if>
 
+<c:if test="${displayItem.item.dataType.id == 13}">
+    <c:set var="inputType" value="divider"/>
+</c:if>
+
+<c:if test="${displayItem.item.dataType.id == 14}">
+    <c:set var="inputType" value="label"/>
+</c:if>
+
 <%-- A way to deal with the lack of 'break' out of forEach loop--%>
 <c:if test='${inputType=="file"}'>
 	<label for="input<c:out value="${itemId}"/>"></label>
@@ -429,6 +437,7 @@ form element in red --%>
   <td valign="top">
 
       <c:choose>
+          <c:when test="${displayItem.item.dataType.id eq 13 or displayItem.item.dataType.id eq 14}"></c:when>
           <c:when test="${displayItem.numDiscrepancyNotes > 0}">
               <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip()"
                  onClick="openDNoteWindow('<c:out value="${contextPath}" />/ViewDiscrepancyNote?stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;">

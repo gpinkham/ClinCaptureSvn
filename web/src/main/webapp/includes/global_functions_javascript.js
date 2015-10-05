@@ -370,6 +370,16 @@ function myCancel(objButtonText) {
 
 }
 
+function displayTableLabels() {
+    $("table.repeatingGroupTable").each(function() {
+        $(this).find("select.tableLabelSelect").each(function (index) {
+            if ($(this).find("option").get(index) != undefined) {
+                $(this).parent("div.tableLabelHolder").text($(this).find("option").get(index).text);
+            }
+        });
+    });
+}
+
 /*
  This method is called as part of a window.onload handler. It places the focus
  on the first element in a CRF's data-entry form. SEE THE REPETITION-MODEL.JS FILE,
@@ -378,7 +388,7 @@ function myCancel(objButtonText) {
  so the actual JSP page's body.onload handler cannot be called.
  */
 function giveFirstElementFocus(){
-
+    displayTableLabels();
     var element = document.getElementById("hasPopUp");
     if (element != null) {
         var hasPopUp = element.value;

@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.lib.crf.builder.CrfBuilder;
-import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.annotation.RestScope;
@@ -79,12 +78,7 @@ public class CrfService {
 	@RestScope(Scope.STUDY)
 	@RequestMapping(value = "/json/importCrf", method = RequestMethod.POST)
 	public CRFVersionBean importCrf(@RequestParam("jsondata") String jsonData) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-		UserAccountBean owner = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, currentStudy, owner,
-				LocaleResolver.getLocale(), messageSource);
-		crfBuilder.build();
-		return save(crfBuilder);
+		return processRequest(jsonData, false);
 	}
 
 	/**
@@ -101,12 +95,20 @@ public class CrfService {
 	@RestScope(Scope.STUDY)
 	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
 	public CRFVersionBean importCrfVersion(@RequestParam("jsondata") String jsonData) throws Exception {
+		return processRequest(jsonData, true);
+	}
+
+	private CRFVersionBean processRequest(String jsonData, boolean importCrfVersion) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 		UserAccountBean owner = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, currentStudy, owner,
 				LocaleResolver.getLocale(), messageSource);
-		crfBuilder.build(getCrfBean(jsonData).getId());
-		return save(crfBuilder);
+		if (importCrfVersion) {
+			crfBuilder.build(getCrfBean(jsonData).getId());
+		} else {
+			crfBuilder.build();
+		}
+		return save(crfBuilder, importCrfVersion);
 	}
 
 	private CRFBean getCrfBean(String jsonData) throws Exception {
@@ -123,13 +125,12 @@ public class CrfService {
 		return crfBean;
 	}
 
-	private CRFVersionBean save(CrfBuilder crfBuilder) throws Exception {
+	private CRFVersionBean save(CrfBuilder crfBuilder, boolean importCrfVersion) throws Exception {
 		ValidatorUtil.checkForErrors(crfBuilder.getErrorsList());
 		CRFVersionBean crfVersionBean = crfBuilder.save();
 		if (crfVersionBean.getId() == 0) {
-			throw new RestException(messageSource, crfBuilder.getOperationType() == OperationType.IMPORT_NEW_CRF
-					? "rest.importCrf.operationFailed"
-					: "rest.importCrfVersion.operationFailed");
+			throw new RestException(messageSource,
+					importCrfVersion ? "rest.importCrfVersion.operationFailed" : "rest.importCrf.operationFailed");
 		}
 		return crfVersionBean;
 	}

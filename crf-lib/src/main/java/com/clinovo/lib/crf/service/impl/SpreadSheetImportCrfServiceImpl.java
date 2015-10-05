@@ -159,7 +159,6 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.goToSheet(SheetName.SECTIONS.getSheetNumber());
 		while (crfBuilder.hasNextRow()) {
 			String label = crfBuilder.getCellValue(CellName.SECTION_LABEL, true);
-			crfBuilder.checkCRFSource(crfBuilder.getCellValue(CellName.SECTION_SUBTITLE));
 			crfBuilder.setCurrentSection(newSectionBean(crfBuilder));
 			crfBuilder.getCurrentSection().setInstructions(crfBuilder.getCellValue(CellName.SECTION_INSTRUCTIONS));
 			crfBuilder.getCurrentSection().setSubtitle(crfBuilder.getCellValue(CellName.SECTION_SUBTITLE, false, true));

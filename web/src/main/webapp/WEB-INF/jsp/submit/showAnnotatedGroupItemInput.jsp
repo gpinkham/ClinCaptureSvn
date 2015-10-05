@@ -56,9 +56,32 @@
 		</td>
 	</tr>
 
+	<c:if test="${displayItem.item.dataType.id == 13}">
+		<c:set var="inputType" value="divider"/>
+		<%-- we don't support dividers inside repeating groups --%>
+	</c:if>
+
+	<c:if test="${displayItem.item.dataType.id == 14}">
+		<c:set var="inputType" value="label"/>
+	</c:if>
 
 	<tr>
 		<td class="hidden_cell">
+			<c:if test='${inputType=="divider"}'>
+				<label for="${inputName}"></label>
+			</c:if>
+
+			<c:if test='${inputType=="label"}'>
+				<label for="${inputName}"></label>
+				<div class="tableLabelHolder">
+					<select class="tableLabelSelect hidden">
+						<c:forEach items="${displayItem.tableLabels}" var="tableLabel">
+							<option>${tableLabel}</option>
+						</c:forEach>
+					</select>
+				</div>
+			</c:if>
+
 			<c:if test='${inputType=="file"}'>				<label for="${inputName}"></label>
 				<input type="text" id="ft${itemId}" name="fileText${itemId}" value="">
 				<input type="button" id="up${inputName}" name="uploadFile${inputName}" value="<fmt:message key="click_to_upload" bundle="${resword}"/>">

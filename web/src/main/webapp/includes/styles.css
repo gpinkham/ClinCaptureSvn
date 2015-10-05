@@ -2976,3 +2976,20 @@ table.footerInnerTable {
 .pl10 {
 	padding-left: 10px;
 }
+
+td.randTd {
+    width: 120px;
+    text-align: left;
+}
+
+table.randTable {
+    width: 500px;
+}
+
+input.randButton {
+    text-align: left;
+}
+
+span.autoChange {
+    color: silver;
+}

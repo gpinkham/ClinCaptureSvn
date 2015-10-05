@@ -23,8 +23,11 @@ import com.clinovo.lib.crf.builder.impl.BaseCrfBuilder;
 public interface ImportCrfService {
 
 	int INT_3 = 3;
+	int INT_10 = 10;
 	int INT_40 = 40;
 
+	String A = "a";
+	String B = "b";
 	String SL = "SL";
 	String ONE = "1";
 	String DOT = ".";
@@ -47,12 +50,16 @@ public interface ImportCrfService {
 	String FILE = "file";
 	String AMP = "&amp;";
 	String OPEN_TAG = "<";
+	String LABEL = "label";
 	String CLOSE_TAG = ">";
 	String VALUE = "value";
 	String UTF_8 = "UTF-8";
 	String PAGES = "pages";
 	String TITLE = "title";
 	String UNDERLINE = "_";
+	String SYSLBL = "syslbl";
+	String SYSDVR = "sysdvr";
+	String SYSITM = "sysitm";
 	String LAYOUT = "layout";
 	String HEADER = "header";
 	String INTEGER = "integer";
@@ -72,6 +79,7 @@ public interface ImportCrfService {
 	String SUB_TITLE = "subTitle";
 	String LEFT_TEXT = "leftText";
 	String ITEM_NAME = "itemName";
+	String SUBHEADER = "subheader";
 	String RAND_DATE = "Rand_Date";
 	String QUESTIONS = "questions";
 	String NUMBERING = "numbering";
@@ -100,12 +108,9 @@ public interface ImportCrfService {
 	String RAND_STRATA_DATA = "Rand_StrataData";
 	String GROUP_CALCULATION = "groupCalculation";
 	String VALIDATION_MESSAGE = "validationMessage";
-	String STRATIFICATION_DATA = "Stratification Data";
-	String RANDOMIZATION_RESULT = "Randomization Result";
 	String REPEATING_GROUP_HEADER = "repeatingGroupHeader";
-	String DATE_OF_RANDOMIZATION = "Date of Randomization";
 	String REPEATING_ITEM_GROUP_HEADER = "repeatingItemGroupHeader";
-	String AUTO_CHANGED_CELL = "<br/><span style='color: silver;'>(auto-change)</span>";
+	String AUTO_CHANGED_CELL = "<br/><span class=\"autoChange\">(auto-change)</span>";
 
 	/**
 	 * Imports new crf.

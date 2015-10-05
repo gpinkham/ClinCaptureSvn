@@ -695,7 +695,10 @@ public final class CommonValidator {
 					&& !ONE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.REQUIRED))) {
 				crfBuilder.getErrorMessageProducer().requiredIsNotValid();
 			}
-		} else if (crfBuilder.isJsonCrfBuilder()) {
+		} else
+			if (crfBuilder.isJsonCrfBuilder()
+					&& crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.LABEL.getId()
+					&& crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.DIVIDER.getId()) {
 			if (!(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI).isEmpty()
 					|| TRUE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))
 					|| FALSE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI)))) {

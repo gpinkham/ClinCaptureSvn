@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.json.JSONObject;
 import org.springframework.context.MessageSource;
 
+import com.clinovo.lib.crf.enums.CRFSource;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.producer.impl.JsonErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
@@ -61,6 +62,11 @@ public class JsonCrfBuilder extends BaseCrfBuilder {
 			Locale locale, MessageSource messageSource, ImportCrfService importCrfService) {
 		super(owner, studyBean, dataSource, locale, messageSource, importCrfService);
 		this.jsonObject = jsonObject;
+	}
+
+	@Override
+	protected void setCrfSource() {
+		getCrfBean().setSource(CRFSource.SOURCE_FORM_STUDIO.getSourceName());
 	}
 
 	/**

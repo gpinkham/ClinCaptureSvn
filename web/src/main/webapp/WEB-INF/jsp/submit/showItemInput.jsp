@@ -488,6 +488,14 @@ function changeImage(name) {
 	</c:otherwise>
 </c:choose>
 
+<c:if test="${displayItem.item.dataType.id == 13}">
+	<c:set var="inputType" value="divider"/>
+</c:if>
+
+<c:if test="${displayItem.item.dataType.id == 14}">
+	<c:set var="inputType" value="label"/>
+</c:if>
+
 <%-- adding here, tbh clinovo 10/18/2012 --%>
 <div id="<c:out value='${itemName }'/>">
 <%-- end addition --%>
@@ -927,6 +935,7 @@ include the default value first in the select list --%>
 	<td valign="top">
 
         <c:choose>
+			<c:when test="${displayItem.item.dataType.id eq 13 or displayItem.item.dataType.id eq 14}"></c:when>
             <c:when test="${displayItem.numDiscrepancyNotes > 0}">
                 <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip()"
                    onClick="openDNWindow('ViewDiscrepancyNote?stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}" />&column=value&enterData=1&originJSP=<c:out value="${param.originJSP}"/>&writeToDB=1&','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;">

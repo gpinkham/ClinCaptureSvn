@@ -331,6 +331,21 @@ function changeImage(name) {
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
  </c:if>
 
+<c:if test="${displayItem.item.dataType.id == 13}">
+	<c:set var="inputType" value="divider"/>
+	<%-- we don't support dividers inside repeating groups --%>
+</c:if>
+
+<c:if test="${displayItem.item.dataType.id == 14}">
+	<c:set var="inputType" value="label"/>
+	<div class="tableLabelHolder">
+		<select class="tableLabelSelect hidden">
+			<c:forEach items="${displayItem.tableLabels}" var="tableLabel">
+				<option>${tableLabel}</option>
+			</c:forEach>
+		</select>
+	</div>
+</c:if>
 
 <c:if test='${inputType=="file"}'>
 	<label for="<c:out value="${inputName}"/>"></label>
@@ -662,6 +677,7 @@ function changeImage(name) {
     </c:import>
 
 	<c:choose>
+		<c:when test="${displayItem.item.dataType.id eq 13 or displayItem.item.dataType.id eq 14}"></c:when>
 		<c:when test="${displayItem.numDiscrepancyNotes > 0}">
 			<a class="dnLink"
 						tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"

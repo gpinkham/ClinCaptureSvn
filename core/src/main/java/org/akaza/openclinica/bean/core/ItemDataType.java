@@ -26,19 +26,19 @@ import java.util.List;
 /**
  * BL - Boolean
  * 
- * BN � BooleanNonNull
+ * BN - BooleanNonNull
  * 
- * ED � Encapsulated Data (Files w/ specified MIME type e.g. ED-pdf, ED-jpg defined in a separate ED Types table in
- * the future)
+ * ED - Encapsulated Data (Files w/ specified MIME type e.g. ED-pdf, ED-jpg defined in a separate ED Types table in the
+ * future)
  * 
  * TEL - A telecommunication address (TEL), such as a URL for HTTP or FTP, which will resolve to precisely the same
  * binary data that could as well have been provided as inline data.
  * 
- * ST � Character String
+ * ST - Character String
  * 
- * INTEGER � Integer
+ * INTEGER - Integer
  * 
- * REAL � Floating
+ * REAL - Floating
  * 
  * SET - a value that contains other distinct values in no particular order.
  * 
@@ -46,9 +46,11 @@ import java.util.List;
  * 
  * @author ssachs
  */
-@SuppressWarnings({ "rawtypes", "serial" })
-public class ItemDataType extends Term {
-	
+@SuppressWarnings({"rawtypes", "serial"})
+public final class ItemDataType extends Term {
+
+	public static final String LABEL_SPLITTER = "<![CDATA[LABEL]]>";
+
 	public static final ItemDataType INVALID = new ItemDataType(0, "invalid", "Invalid_Type");
 	public static final ItemDataType BL = new ItemDataType(1, "bl", "Boolean");
 
@@ -70,9 +72,13 @@ public class ItemDataType extends Term {
 	public static final ItemDataType FILE = new ItemDataType(11, "file", "file");
 	public static final ItemDataType CODE = new ItemDataType(12, "code", "code");
 
-	private static final ItemDataType[] members = { BL, BN, ED, TEL, ST, INTEGER, REAL, SET, DATE, PDATE, FILE, CODE };
+	public static final ItemDataType DIVIDER = new ItemDataType(13, "divider", "divider"); // supported in FS only
+	public static final ItemDataType LABEL = new ItemDataType(14, "label", "label"); // supported in FS only
 
-	public static final List list = Arrays.asList(members);
+	private static final ItemDataType[] MEMBERS = {BL, BN, ED, TEL, ST, INTEGER, REAL, SET, DATE, PDATE, FILE, CODE,
+			DIVIDER, LABEL};
+
+	public static final List LIST = Arrays.asList(MEMBERS);
 
 	private ItemDataType(int id, String name, String description) {
 		super(id, name, description);
@@ -81,18 +87,39 @@ public class ItemDataType extends Term {
 	private ItemDataType() {
 	}
 
+	/**
+	 * Checks the presence of ItemDataType by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return boolean
+	 */
 	public static boolean contains(int id) {
-		return Term.contains(id, list);
+		return Term.contains(id, LIST);
 	}
 
+	/**
+	 * Finds the ItemDataType by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return ItemDataType
+	 */
 	public static ItemDataType get(int id) {
-		Term term = Term.get(id, list);
+		Term term = Term.get(id, LIST);
 		return term instanceof ItemDataType ? (ItemDataType) term : null;
 	}
 
+	/**
+	 * Finds the ItemDataType by name.
+	 *
+	 * @param name
+	 *            String
+	 * @return ItemDataType
+	 */
 	public static ItemDataType getByName(String name) {
-		for (int i = 0; i < list.size(); i++) {
-			ItemDataType temp = (ItemDataType) list.get(i);
+		for (Object aList : LIST) {
+			ItemDataType temp = (ItemDataType) aList;
 			if (temp.getName().equalsIgnoreCase(name)) {
 				return temp;
 			}
@@ -100,9 +127,16 @@ public class ItemDataType extends Term {
 		return ItemDataType.INVALID;
 	}
 
+	/**
+	 * Checks the existence of ItemDataType by name.
+	 * 
+	 * @param name
+	 *            String
+	 * @return boolean
+	 */
 	public static boolean findByName(String name) {
-		for (int i = 0; i < list.size(); i++) {
-			ItemDataType temp = (ItemDataType) list.get(i);
+		for (Object aList : LIST) {
+			ItemDataType temp = (ItemDataType) aList;
 			if (temp.getName().equals(name)) {
 				return true;
 			}

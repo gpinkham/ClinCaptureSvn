@@ -1034,7 +1034,7 @@
 								escapeXml="false" /></td>
 					</tr>
 				</c:if>
-				<tr>
+				<tr class="${displayItem.singleItem.item.dataType.id eq 13 or displayItem.singleItem.item.dataType.id eq 14 ? 'hidden' : ''}">
 					<td class="table_cell_left">
 						<table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
               <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>

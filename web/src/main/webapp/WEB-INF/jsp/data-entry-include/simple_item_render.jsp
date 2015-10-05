@@ -7,7 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:if test="${displayItemWithGroup.singleItem.metadata.columnNumber <=1}">
+<c:if test="${displayItemWithGroup.singleItem.metadata.columnNumber <= 1}">
 
 	<c:if test="${(not empty lastItemWasSingle) && lastItemWasSingle}">
 		</tr></table></td></tr>
@@ -38,10 +38,12 @@
 			<tr id="tr${numOfTr}" style="display:none">
 		</c:otherwise>
 	</c:choose>
-	<td class="table_cell_left">
-	<table border="0" class="itemHolderClass" id="itemHolderId_input${displayItemWithGroup.singleItem.item.id}">
-	<c:set var="prevItemHolderId" value="${displayItemWithGroup.singleItem.item.id}" scope="request"/>
-	<tr>
+	<c:if test="${displayItemWithGroup.singleItem.item.dataType.id ne 13 and displayItemWithGroup.singleItem.item.dataType.id ne 14}">
+		<td class="table_cell_left">
+		<table border="0" class="itemHolderClass" id="itemHolderId_input${displayItemWithGroup.singleItem.item.id}">
+		<c:set var="prevItemHolderId" value="${displayItemWithGroup.singleItem.item.id}" scope="request"/>
+		<tr>
+	</c:if>
 </c:if>
 
 <c:choose>
@@ -85,46 +87,48 @@
 	</c:otherwise>
 </c:choose>
 
-<td valign="top" class="aka_ques_block">
-	<c:out value="${displayItemWithGroup.singleItem.metadata.questionNumberLabel}" escapeXml="false"/>
-</td>
-<td valign="top" class="aka_text_block">
-	<c:import url="../submit/generateLeftItemTxt.jsp">
-		<c:param name="itemId" value="${displayItemWithGroup.singleItem.item.id}"/>
-		<c:param name="inputType" value="${displayItemWithGroup.singleItem.metadata.responseSet.responseType.name}"/>
-		<c:param name="function" value="${displayItemWithGroup.singleItem.metadata.responseSet.options[0].value}"/>
-		<c:param name="linkText" value="${displayItemWithGroup.singleItem.metadata.leftItemText}"/>
-		<c:param name="side" value="left"/>
-	</c:import>
-</td>
-<td valign="top" nowrap="nowrap">
-	<c:set var="displayItem" scope="request" value="${displayItemWithGroup.singleItem}" />
-	<c:import url="../submit/showItemInput.jsp">
-		<c:param name="key" value="${numOfDate}" />
-		<c:param name="tabNum" value="${itemNum}"/>
-		<c:param name="defaultValue" value="${displayItemWithGroup.singleItem.metadata.defaultValue}"/>
-		<c:param name="respLayout" value="${displayItemWithGroup.singleItem.metadata.responseLayout}"/>
-		<c:param name="originJSP" value="${originJSP}"/>
-		<c:param name="isForcedRFC" value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
-	</c:import>
-</td>
-<c:if test='${displayItemWithGroup.singleItem.item.units != ""}'>
+<c:if test="${displayItemWithGroup.singleItem.item.dataType.id ne 13 and displayItemWithGroup.singleItem.item.dataType.id ne 14}">
+	<td valign="top" class="aka_ques_block">
+		<c:out value="${displayItemWithGroup.singleItem.metadata.questionNumberLabel}" escapeXml="false"/>
+	</td>
+	<td valign="top" class="aka_text_block">
+		<c:import url="../submit/generateLeftItemTxt.jsp">
+			<c:param name="itemId" value="${displayItemWithGroup.singleItem.item.id}"/>
+			<c:param name="inputType" value="${displayItemWithGroup.singleItem.metadata.responseSet.responseType.name}"/>
+			<c:param name="function" value="${displayItemWithGroup.singleItem.metadata.responseSet.options[0].value}"/>
+			<c:param name="linkText" value="${displayItemWithGroup.singleItem.metadata.leftItemText}"/>
+			<c:param name="side" value="left"/>
+		</c:import>
+	</td>
+	<td valign="top" nowrap="nowrap">
+		<c:set var="displayItem" scope="request" value="${displayItemWithGroup.singleItem}" />
+		<c:import url="../submit/showItemInput.jsp">
+			<c:param name="key" value="${numOfDate}" />
+			<c:param name="tabNum" value="${itemNum}"/>
+			<c:param name="defaultValue" value="${displayItemWithGroup.singleItem.metadata.defaultValue}"/>
+			<c:param name="respLayout" value="${displayItemWithGroup.singleItem.metadata.responseLayout}"/>
+			<c:param name="originJSP" value="${originJSP}"/>
+			<c:param name="isForcedRFC" value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
+		</c:import>
+	</td>
+	<c:if test='${displayItemWithGroup.singleItem.item.units != ""}'>
+		<td valign="top">
+			<c:out value="(${displayItemWithGroup.singleItem.item.units})" escapeXml="false"/>
+		</td>
+	</c:if>
 	<td valign="top">
-		<c:out value="(${displayItemWithGroup.singleItem.item.units})" escapeXml="false"/>
+		<c:import url="../submit/generateLeftItemTxt.jsp">
+			<c:param name="itemId" value="${displayItemWithGroup.singleItem.item.id}"/>
+			<c:param name="inputType" value="${displayItemWithGroup.singleItem.metadata.responseSet.responseType.name}"/>
+			<c:param name="function" value="${displayItemWithGroup.singleItem.metadata.responseSet.options[0].value}"/>
+			<c:param name="linkText" value="${displayItemWithGroup.singleItem.metadata.rightItemText}"/>
+			<c:param name="side" value="right"/>
+		</c:import>
+	</td>
+	</tr>
+	</table>
 	</td>
 </c:if>
-<td valign="top">
-	<c:import url="../submit/generateLeftItemTxt.jsp">
-		<c:param name="itemId" value="${displayItemWithGroup.singleItem.item.id}"/>
-		<c:param name="inputType" value="${displayItemWithGroup.singleItem.metadata.responseSet.responseType.name}"/>
-		<c:param name="function" value="${displayItemWithGroup.singleItem.metadata.responseSet.options[0].value}"/>
-		<c:param name="linkText" value="${displayItemWithGroup.singleItem.metadata.rightItemText}"/>
-		<c:param name="side" value="right"/>
-	</c:import>
-</td>
-</tr>
-</table>
-</td>
 
 <c:if test="${displayItemWithGroup.singleItem.numChildren > 0}">
 	<jsp:include page="../data-entry-include/child_item_render.jsp"/>

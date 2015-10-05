@@ -20,7 +20,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.admin.Preview;
@@ -32,11 +31,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.context.MessageSource;
 
+import com.clinovo.lib.crf.enums.CRFSource;
 import com.clinovo.lib.crf.enums.CellName;
 import com.clinovo.lib.crf.enums.SheetName;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.producer.impl.ExcelErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
+import com.clinovo.lib.crf.util.CrfMetadataUtil;
 
 /**
  * ExcelCrfBuilder.
@@ -271,7 +272,8 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 *            CellKey
 	 * @param replaceSpecialSymbols
 	 *            boolean
-	 * @param removeMetadataTags boolean
+	 * @param removeMetadataTags
+	 *            boolean
 	 * @return String
 	 */
 	public String getCellValue(CellName cellKey, boolean replaceSpecialSymbols, boolean removeMetadataTags) {
@@ -307,6 +309,11 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 							&& cellKey != CellName.ITEM_WIDTH_DECIMAL ? -1 : 0);
 		}
 		return cellKey.getColumnNumber() + offset;
+	}
+
+	@Override
+	protected void setCrfSource() {
+		getCrfBean().setSource(CRFSource.SOURCE_FORM_EXCEL.getSourceName());
 	}
 
 	public Row getRow() {

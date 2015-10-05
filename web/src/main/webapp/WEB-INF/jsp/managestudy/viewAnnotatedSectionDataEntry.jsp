@@ -284,7 +284,7 @@
 												</strong>
 											</div>
 										</c:if>
-										<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table" width="100%">
+										<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table repeatingGroupTable" width="100%">
 										<thead>
 											<tr>
 												<%-- if there are horizontal checkboxes or radios anywhere in the group...--%>

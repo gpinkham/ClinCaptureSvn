@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="skirpichenok" id="2015-09-30-TICKET2579-01">
+		<comment>Add the divider data type to the database</comment>
+		<insert tableName="item_data_type">
+			<column name="item_data_type_id" valueNumeric="13" />
+			<column name="code" value="DIVIDER" />
+			<column name="name" value="Divider" />
+			<column name="definition" value="Type to be divider" />
+		</insert>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2015-09-30-TICKET2579-02">
+		<comment>Add the label data type to the database</comment>
+		<insert tableName="item_data_type">
+			<column name="item_data_type_id" valueNumeric="14" />
+			<column name="code" value="LABEL" />
+			<column name="name" value="Label" />
+			<column name="definition" value="Type to be label" />
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>

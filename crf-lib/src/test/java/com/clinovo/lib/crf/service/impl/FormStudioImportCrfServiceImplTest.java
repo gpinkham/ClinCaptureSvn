@@ -83,7 +83,7 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
 		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
-		assertEquals(crfBuilder.getItems().size(), 29);
+		assertEquals(crfBuilder.getItems().size(), 33);
 	}
 
 	@Test

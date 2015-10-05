@@ -23,8 +23,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -56,7 +54,6 @@ import org.springframework.context.MessageSource;
 
 import com.clinovo.lib.crf.bean.ItemBeanExt;
 import com.clinovo.lib.crf.builder.CrfBuilder;
-import com.clinovo.lib.crf.enums.CRFSource;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
@@ -74,8 +71,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	public static final String UNGROUPED = "Ungrouped";
 	public static final String GROUP_LAYOUT = "GROUP_LAYOUT";
 	public static final String WIDTH_DECIMAL = "width_decimal";
-	public static final String CRF_SOURCE_MARKER_OPEN = "<crfSource>";
-	public static final String CRF_SOURCE_MARKER_CLOSE = "</crfSource>";
 
 	// import service
 	private ImportCrfService importCrfService;
@@ -100,7 +95,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	// current beans
 	private ItemBeanExt currentItem;
-	private String currentHeader = "";
 	private SectionBean currentSection;
 	private StringBuffer currentMessage;
 	private ItemGroupBean currentItemGroup;
@@ -113,6 +107,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	private boolean hasWidthDecimalColumn;
 	private List codingRefItemNames = new ArrayList();
 	private Set<String> existingUnits = new TreeSet<String>();
+	private List<String> sysItemNames = new ArrayList<String>();
 	private Map<String, SectionBean> sectionLabelMap = new HashMap<String, SectionBean>();
 	private Map<String, ItemBeanExt> itemNameToItemMap = new HashMap<String, ItemBeanExt>();
 	private Map<String, ItemGroupBean> itemGroupLabelMap = new HashMap<String, ItemGroupBean>();
@@ -202,14 +197,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public StudyBean getStudyBean() {
 		return studyBean;
-	}
-
-	public String getCurrentHeader() {
-		return currentHeader;
-	}
-
-	public void setCurrentHeader(String currentHeader) {
-		this.currentHeader = currentHeader;
 	}
 
 	public UserAccountBean getOwner() {
@@ -323,6 +310,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public Map<String, ItemFormMetadataBean> getItemNameToMetaMap() {
 		return itemNameToMetaMap;
+	}
+
+	public List<String> getSysItemNames() {
+		return sysItemNames;
 	}
 
 	public Map<String, SectionBean> getSectionLabelMap() {
@@ -531,7 +522,9 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns type of operation.
+	 *
+	 * @return OperationType
 	 */
 	public OperationType getOperationType() {
 		return operationType;
@@ -542,6 +535,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	 */
 	public void build() throws Exception {
 		importCrfService.importNewCrf(this);
+		setCrfSource();
 	}
 
 	/**
@@ -549,6 +543,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	 */
 	public void build(int crfId) throws Exception {
 		importCrfService.importNewCrfVersion(this, crfId);
+		setCrfSource();
 	}
 
 	private Map<String, ItemGroupBean> existingGroupsMap(ItemGroupDAO itemGroupDao) {
@@ -635,7 +630,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 			for (ItemBean item : items) {
 				ItemBeanExt itemBean = (ItemBeanExt) item;
 				// create or update item
-
 				if (!existingItemsMap.keySet().contains(itemBean.getName())) {
 					itemBean.setOid(itemDao.getValidOid(itemBean, crfBean.getName(), itemBean.getName(),
 							(ArrayList) itemOidList));
@@ -731,23 +725,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	}
 
 	/**
-	 * Check if tag with source of the CRF included into section sub title.
-	 *
-	 * @param sectionSubTitle
-	 *            String.
+	 * Sets crf source.
 	 */
-	public void checkCRFSource(String sectionSubTitle) {
-		Pattern pattern = Pattern.compile(CRF_SOURCE_MARKER_OPEN + "(.*?)" + CRF_SOURCE_MARKER_CLOSE);
-		Matcher matcher = pattern.matcher(sectionSubTitle);
-		String crfSource = CRFSource.SOURCE_DEFAULT.getSourceName();
-		while (matcher.find()) {
-			if (matcher.group(1).equals(CRFSource.SOURCE_FORM_STUDIO.getSourceName())) {
-				crfSource = CRFSource.SOURCE_FORM_STUDIO.getSourceName();
-			}
-		}
-
-		if (!crfSource.equals(CRFSource.SOURCE_DEFAULT.getSourceName()) || getCrfBean().getSource().isEmpty()) {
-			getCrfBean().setSource(crfSource);
-		}
-	}
+	protected abstract void setCrfSource();
 }
