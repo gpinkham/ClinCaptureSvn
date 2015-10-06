@@ -565,13 +565,20 @@ function changeImage(name) {
 	<c:set var="selectedOption" value="-1"/>
 	<c:set var="count" value="0"/>
 	<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-		<c:if test="${option.selected}">
+		<c:if test="${option.selected && !isTemplateRow}">
 			<c:set var="selectedOption" value="${count}"/>
 		</c:if>
 		<c:if test="${printDefault=='true'}">
 			<c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
 				<c:set var="printDefault" value="false"/>
-				<c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
+				<c:choose>
+					<c:when test="${isTemplateRow}">
+						<c:set var="selectedOption" value="${count}"/>
+					</c:when>
+					<c:otherwise>
+						<c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
+					</c:otherwise>
+				</c:choose>
 			</c:if>
 		</c:if>
 		<c:set var="count" value="${count+1}"/>

@@ -704,12 +704,10 @@ function clearInputElementValues(trElement) {
     var tdElements = trElement.getElementsByTagName('td');
 
 
-    //variables representing all inputs, selects, textareas, and options
+    //variables representing all inputs, textareas
     //in the new row
     var inputs;
-    var selects;
     var textareas;
-    var options;
     var myDiv;
     var myId="";
     if(tdElements){
@@ -803,30 +801,6 @@ function clearInputElementValues(trElement) {
 	                	myDiv[0].removeChild(myDivEls[0]);
                 	}
             	}
-                /* select element behavior removed for 2791: */
-
-                if(selects) {
-                    for(var h = 0; h < selects.length; h++){
-                        if(selects[h]){
-                            options = selects[h].getElementsByTagName("option");
-                            if(options){
-                                if(! detectIEWindows(navigator.userAgent)){
-                                    for(var k = 0; k < options.length; k++){
-                                        if(options[k]) {
-                                            options[k].selected=false;
-                                        }
-
-                                    }
-                                }
-                                
-                                if(detectIEWindows(navigator.userAgent)){
-                                    selects[h].selectedIndex=0;
-                                }
-                            }
-                        }
-                    }
-
-                }
 
                 if(textareas) {
                     for(var m = 0; m < textareas.length; m++){
