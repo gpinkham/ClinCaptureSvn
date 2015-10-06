@@ -580,7 +580,7 @@ public abstract class DataEntryServlet extends Controller {
 			return;
 		} else {
 			logMe("Entering Checks !submitted not entered  " + System.currentTimeMillis());
-			boolean validate = fp.getBoolean(INPUT_CHECK_INPUTS) && validateInputOnFirstRound();
+			boolean validate = (!fp.getString("markPartialSaved").equals(VALUE_YES)) && validateInputOnFirstRound();
 			HashMap errors = new HashMap();
 
 			FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
@@ -596,59 +596,8 @@ public abstract class DataEntryServlet extends Controller {
 			DiscrepancyValidator v = new DiscrepancyValidator(validatorHelper, discNotes);
 			RuleValidator ruleValidator = new RuleValidator(validatorHelper);
 
-			for (int i = 0; i < allItems.size(); i++) {
-				logger.trace("===itering through items: " + i);
-				DisplayItemWithGroupBean diwg = allItems.get(i);
-				if (diwg.isInGroup()) {
-					// for the items in groups
-					DisplayItemGroupBean dgb = diwg.getItemGroup();
-					List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
-					List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
-
-					if (validate) {
-						if (getCurrentDataEntryStage() != CurrentDataEntryStage.VIEW_DATA_ENTRY) {
-							logger.debug("SINGLE ITEM");
-							formGroups = displayItemService.loadFormValueForItemGroup(dgb, dbGroups, formGroups, request);
-							formGroups = getDisplayItemBeanValidator().validateDisplayItemGroupBean(v, dbGroups, formGroups, request);
-						}
-					} else {
-						logger.debug("NOT A SINGLE ITEM");
-						formGroups = displayItemService.loadFormValueForItemGroup(dgb, dbGroups, formGroups, request);
-					}
-
-					diwg.setItemGroup(dgb);
-					diwg.setItemGroups(formGroups);
-
-					allItems.set(i, diwg);
-
-				} else {
-					DisplayItemBean dib = diwg.getSingleItem();
-					if (validate) {
-						String itemName = DataEntryUtil.getInputName(dib);
-						dib = getDisplayItemBeanValidator().validateDisplayItemBean(v, dib, "", request);
-					} else {
-						String itemName = DataEntryUtil.getInputName(dib);
-						dib = DataEntryUtil.loadFormValue(dib, request);
-					}
-					ArrayList children = dib.getChildren();
-
-					for (int j = 0; j < children.size(); j++) {
-						DisplayItemBean child = (DisplayItemBean) children.get(j);
-						String itemName = DataEntryUtil.getInputName(child);
-						child.loadFormValue(fp.getString(itemName));
-						if (validate) {
-							child = getDisplayItemBeanValidator().validateDisplayItemBean(v, child, itemName, request);
-						} else {
-							child = DataEntryUtil.loadFormValue(child, request);
-						}
-						children.set(j, child);
-					}
-					dib.setChildren(children);
-					diwg.setSingleItem(DataEntryUtil.runDynamicsItemCheck(getDynamicsMetadataService(), dib, ecb));
-					allItems.set(i, diwg);
-				}
-			}
-
+			runHardEditChecks(allItems, validate, displayItemService, fp, v, ecb);
+			
 			List<ItemBean> itemBeansWithSCDShown = new ArrayList<ItemBean>();
 			if (validate && section.getSection().hasSCDItem()) {
 				for (int i = 0; i < allItems.size(); ++i) {
@@ -696,56 +645,13 @@ public abstract class DataEntryServlet extends Controller {
 			RuleSetService ruleSetService = getRuleSetService();
 			List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean,
 					studyEventBean, ecb, true, request, response, itemBeansWithSCDShown);
-			boolean shouldRunRules = ruleSetService.shouldRunRulesForRuleSets(ruleSets, phase2);
+			boolean shouldRunRules = ruleSetService.shouldRunRulesForRuleSets(ruleSets, phase2) && validate;
 			HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = null;
 			groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,
 					ecb, request);
-
-			for (int i = 0; i < allItems.size(); i++) {
-				DisplayItemWithGroupBean diwg = allItems.get(i);
-				if (diwg.isInGroup()) {
-					// for the items in groups
-					DisplayItemGroupBean dgb = diwg.getItemGroup();
-					List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
-					List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
-					if (validate) {
-						if (getCurrentDataEntryStage() != CurrentDataEntryStage.VIEW_DATA_ENTRY) {
-							formGroups = displayItemService.loadFormValueForItemGroup(dgb, dbGroups, formGroups, request);
-							formGroups = getDisplayItemBeanValidator().validateDisplayItemGroupBean(dbGroups,
-									formGroups, ruleValidator, groupOrdinalPLusItemOid, request);
-							logger.debug("*** form group size after validation " + formGroups.size());
-						}
-					}
-					diwg.setItemGroup(dgb);
-					diwg.setItemGroups(formGroups);
-
-					allItems.set(i, diwg);
-
-				} else {
-					DisplayItemBean dib = diwg.getSingleItem();
-					if (validate) {
-						dib = getDisplayItemBeanValidator().validateDisplayItemBean(dib, "", ruleValidator, groupOrdinalPLusItemOid, false, null,
-								request);
-					}
-					ArrayList children = dib.getChildren();
-					for (int j = 0; j < children.size(); j++) {
-
-						DisplayItemBean child = (DisplayItemBean) children.get(j);
-						String itemName = DataEntryUtil.getInputName(child);
-						child.loadFormValue(fp.getString(itemName));
-						if (validate) {
-							child = getDisplayItemBeanValidator().validateDisplayItemBean(child, "", ruleValidator, groupOrdinalPLusItemOid,
-									false, null, request);
-						}
-						children.set(j, child);
-					}
-
-					dib.setChildren(children);
-					diwg.setSingleItem(DataEntryUtil.runDynamicsItemCheck(getDynamicsMetadataService(), dib, ecb));
-					allItems.set(i, diwg);
-				}
-			}
-
+			
+			runSoftEditChecks(allItems, validate, displayItemService, fp, ruleValidator, groupOrdinalPLusItemOid, ecb);
+			
 			// A map from item name to item bean object.
 			HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
 			HashMap<String, String> scoreItemdata = new HashMap<String, String>();
@@ -1688,6 +1594,82 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
+	private void runHardEditChecks(List<DisplayItemWithGroupBean> allItems, boolean validate, DisplayItemService displayItemService, 
+			FormProcessor fp, DiscrepancyValidator v, EventCRFBean ecb) {
+		runValidations(allItems, validate, displayItemService, fp, null, v, null, ecb);
+	}
+
+	private void runSoftEditChecks(List<DisplayItemWithGroupBean> allItems, boolean validate, DisplayItemService displayItemService, 
+			FormProcessor fp, RuleValidator ruleValidator, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, EventCRFBean ecb) {
+		runValidations(allItems, validate, displayItemService, fp, ruleValidator, null, groupOrdinalPLusItemOid, ecb);
+	}
+	
+	private void runValidations(List<DisplayItemWithGroupBean> allItems, boolean validate, DisplayItemService displayItemService, 
+			FormProcessor fp, RuleValidator ruleValidator, DiscrepancyValidator v, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, EventCRFBean ecb) {
+		for (int i = 0; i < allItems.size(); i++) {
+			DisplayItemWithGroupBean diwg = allItems.get(i);
+			if (diwg.isInGroup()) {
+				// for the items in groups
+				DisplayItemGroupBean dgb = diwg.getItemGroup();
+				List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
+				List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
+				if (validate) {
+					if (getCurrentDataEntryStage() != CurrentDataEntryStage.VIEW_DATA_ENTRY) {
+						formGroups = displayItemService.loadFormValueForItemGroup(dgb, dbGroups, formGroups, fp.getRequest());
+						if (ruleValidator != null) { 
+							formGroups = getDisplayItemBeanValidator().validateDisplayItemGroupBean(dbGroups,
+									formGroups, ruleValidator,groupOrdinalPLusItemOid, fp.getRequest());
+						} else if (v != null) {
+							formGroups = getDisplayItemBeanValidator().validateDisplayItemGroupBean(v, dbGroups, formGroups, fp.getRequest());
+						}
+						logger.debug("*** form group size after validation " + formGroups.size());
+					}
+				} else {
+					formGroups = displayItemService.loadFormValueForItemGroup(dgb, dbGroups, formGroups, fp.getRequest());
+				}
+				diwg.setItemGroup(dgb);
+				diwg.setItemGroups(formGroups);
+
+				allItems.set(i, diwg);
+
+			} else {
+				DisplayItemBean dib = diwg.getSingleItem();
+				if (validate) {
+					if (ruleValidator != null) {
+						dib = getDisplayItemBeanValidator().validateDisplayItemBean(dib, "", ruleValidator, groupOrdinalPLusItemOid, false, null,
+								fp.getRequest());
+					} else if (v != null) {
+						dib = getDisplayItemBeanValidator().validateDisplayItemBean(v, dib, "", fp.getRequest());
+					}
+				} else if ( v != null) {
+					dib = DataEntryUtil.loadFormValue(dib, fp.getRequest());
+				}
+				
+				ArrayList children = dib.getChildren();
+				for (int j = 0; j < children.size(); j++) {
+					DisplayItemBean child = (DisplayItemBean) children.get(j);
+					String itemName = DataEntryUtil.getInputName(child);
+					child.loadFormValue(fp.getString(itemName));
+					if (validate) { 
+						if (ruleValidator != null) {
+							child = getDisplayItemBeanValidator().validateDisplayItemBean(child, "", ruleValidator, groupOrdinalPLusItemOid,
+									false, null, fp.getRequest());
+						} else if (v != null) {
+							child = getDisplayItemBeanValidator().validateDisplayItemBean(v, child, itemName, fp.getRequest());
+						}
+					} else if (v != null) {
+						child = DataEntryUtil.loadFormValue(child, fp.getRequest());
+					}
+					children.set(j, child);
+				}
+
+				dib.setChildren(children);
+				diwg.setSingleItem(DataEntryUtil.runDynamicsItemCheck(getDynamicsMetadataService(), dib, ecb));
+				allItems.set(i, diwg);
+			}
+		}
+	}
+	
 	private void savePartialSavedStatus(FormProcessor fp, EventCRFBean eventCRFBean, int sectionBeanId, int sSubjectId) {
 		boolean markPartialSaved = fp.getString("markPartialSaved").equals(VALUE_YES);
 		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(

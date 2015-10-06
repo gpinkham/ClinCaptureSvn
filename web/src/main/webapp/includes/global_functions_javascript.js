@@ -975,7 +975,7 @@ function isCheckedRadioOrCheckbox(inputObject){
 
 function checkCheckboxes(checkboxObjectName, isChecked){
     var checkboxObjects = document.getElementsByName(checkboxObjectName);
-    if(checkboxObjects[0]){
+	if(checkboxObjects[0]){
         checkboxObjects[0].checked=isChecked;
     }
     if(checkboxObjects[1]){
@@ -1042,7 +1042,7 @@ function displayMessageFromCheckbox(checkboxObject, psCheckboxesName, dde){
                                       : "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will prepare it for Double Data Entry, where another user will enter data and then be able to finally complete this CRF.</div>") +
                     "<div style=\"clear: both; padding: 6px;\"><input type=\"checkbox\" id=\"ignoreMarkCRFCompleteMSG\"/> Do not show this message anymore.</div>" +
                     "<div style=\"clear: both;\">" +
-                        "<input type=\"button\" value=\"Yes\" class=\"button_medium\" onclick=\"markCRFCompleteOk('" + checkboxObject.name + "," + psCheckboxesName + "');\" style=\"float: left;\">" +
+                        "<input type=\"button\" value=\"Yes\" class=\"button_medium\" onclick=\"markCRFCompleteOk('" + checkboxObject.name + "', '" + psCheckboxesName + "');\" style=\"float: left;\">" +
                         "<input type=\"button\" value=\"No\" class=\"button_medium\" onclick=\"markCRFCompleteCancel('" + checkboxObject.name + "');\" style=\"float: left; margin-left: 6px;\">" +
                     "</div>" +
                 "</div>");
