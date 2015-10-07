@@ -1,9 +1,17 @@
 .DS_Store
 rest/bin/
+.metadata/
 ws/target/
 ws/.project
 ws/.settings/
 ws/.classpath
+commons/.classpath
+commons/.project
+commons/.settings/
+crf-lib/.classpath
+crf-lib/.project
+crf-lib/.settings/
+crf-lib/target/
 rest/target/
 rest/.project
 rest/.classpath
@@ -19,6 +27,7 @@ web/.classpath
 commons/target/
 build.properties
 medical-coding/target
+RemoteSystemsTempFiles/
 medical-coding/.project
 medical-coding/test.log
 web/openclinica-test.log
