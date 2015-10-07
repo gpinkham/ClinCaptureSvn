@@ -36,7 +36,6 @@ import com.clinovo.dao.SystemDAO;
 import com.clinovo.model.PropertyType;
 import com.clinovo.model.System;
 import com.clinovo.model.SystemGroup;
-import com.clinovo.service.DictionaryService;
 import com.clinovo.service.SystemService;
 import com.clinovo.util.FileUtil;
 
@@ -57,9 +56,6 @@ public class SystemServiceImpl implements SystemService {
 
 	@Autowired
 	private DataSource datasource;
-
-	@Autowired
-	private DictionaryService dictionaryService;
 
 	public List<System> findAll() {
 		return systemDAO.findAll();

@@ -40,7 +40,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.service.EventCRFService;
@@ -60,9 +59,6 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 
 	@Autowired
 	private DataSource dataSource;
-
-	@Autowired
-	private MessageSource messageSource;
 
 	@Autowired
 	private ItemSDVService itemSDVService;

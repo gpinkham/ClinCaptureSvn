@@ -37,7 +37,6 @@ import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -236,8 +235,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private JavaMailSenderImpl mailSender;
 	@Autowired
 	private CodedItemService codedItemService;
-	@Autowired
-	private SCDItemMetadataDao scdItemMetadataDao;
 	@Autowired
 	private DictionaryService dictionaryService;
 	@Autowired

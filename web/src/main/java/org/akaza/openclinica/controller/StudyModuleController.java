@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.dao.SystemDAO;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -66,9 +65,6 @@ public class StudyModuleController {
 
 	@Autowired
 	private BasicDataSource dataSource;
-
-	@Autowired
-	private SystemDAO systemDao;
 
 	public static final int IN_PROGRESS_ID = 3;
 
