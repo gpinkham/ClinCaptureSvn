@@ -83,14 +83,22 @@
 
 	<c:set value="0" var="count"/>
 	<c:forEach var="section" items="${toc.sections}">
-	<c:set var="completedItems" value="${section.numItemsCompleted}"/>
-	<c:if test="${toc.eventDefinitionCRF.doubleEntry}">
-	<c:set var="completedItems" value="${section.numItemsNeedingValidation}"/>
-	</c:if>
-	TabFullName[${count}] = "<c:out value="${section.label}"/> (<c:out value="${section.numItemsCompleted}"/>/<c:out value="${section.numItems}" />)";
-	TabSectionId[<c:out value="${count}"/>] = <c:out value="${section.id}"/>;
-	TabLabel[<c:out value="${count}"/>] = "<c:out value="${section.label}"/>" + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>  (<c:out value="${completedItems}"/>/<c:out value="${section.numItems}" />)</span>";
-	<c:set value="${count+1}" var="count"/>
+		<c:set var="completedItems" value="${section.numItemsCompleted}"/>
+		<c:if test="${toc.eventDefinitionCRF.doubleEntry}">
+			<c:set var="completedItems" value="${section.numItemsNeedingValidation}"/>
+		</c:if>
+		<c:choose>
+			<c:when test="${sectionIdToEvCRFSection[section.id] ne null && sectionIdToEvCRFSection[section.id].partialSaved}">
+				<c:set var="section_icon" value="<img title='partial data entry' style='position: relative; margin-bottom: -3px' alt='partial data entry' src='images/icon_PartialDE.gif'/>"/>
+			</c:when>
+			<c:otherwise>
+			   	<c:set var="section_icon" value=""/>
+			</c:otherwise>
+		</c:choose>
+		TabFullName[${count}] = "<c:out value="${section.label}"/> (<c:out value="${section.numItemsCompleted}"/>/<c:out value="${section.numItems}" />)";
+		TabSectionId[<c:out value="${count}"/>] = <c:out value="${section.id}"/>;
+		TabLabel[<c:out value="${count}"/>] = "<c:out value="${section.label}"/>" + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>  (<c:out value="${completedItems}"/>/<c:out value="${section.numItems}" />) ${section_icon}</span>";
+		<c:set value="${count+1}" var="count"/>
 	</c:forEach>
 
 	$(window).load(function() {
