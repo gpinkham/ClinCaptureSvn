@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+	<c:import url="/includes/js/dn_flag_tooltip.js.jsp" />
     <ui:theme/>
 </head>
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />

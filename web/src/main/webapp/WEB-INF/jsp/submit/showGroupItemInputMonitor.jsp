@@ -12,92 +12,6 @@
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <!-- *JSP* submit/showGroupItemInputMonitor.jsp -->
-<script language="javascript">
-    function genToolTips(itemId){
-        var resStatus = new Array();
-        var detailedNotes= new Array();
-        var discrepancyType = new Array();
-        var updatedDates = new Array();
-        var i=0;
-        var discNotes = new Array();
-        var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
-        var parentDnIds = new Array();
-        var totNotes = 0;
-        var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
-        var auditLog = '';
-        <c:set var="discrepancyNotes" value="1"/>
-            <c:forEach var="itemsSection" items="${section.items}">
-
-                       if("${itemsSection.item.id}"== itemId)
-                       {
-                    <c:set var="notesSize" value="${itemsSection.totNew}"/>
-                       title = "<c:out value="${itemsSection.item.name}"/>";
-                           <c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
-                        <c:forEach var="discrepancyNotes" items="${discrepancyNotes}">
-                         resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
-                              detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
-                              discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
-                              updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
-                            parentDnIds[i] = "<c:out value="${discrepancyNotes.parentDnId}"/>";
-                           i++;
-
-                            </c:forEach>
-                        totNotes = 	 ${notesSize};
-
-
-                           if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
-                           <%--if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;--%>
-                           if("${itemsSection.data.auditLog}" == "true"){
-                               auditLog = '<fmt:message key="audit_exist" bundle="${resword}" />';
-                           }
-                       }
-            </c:forEach>
-        //including tool tips for grouped items
-            <c:forEach var="group" items="${section.displayFormGroups}">
-                <c:forEach var="itemsSection" items="${group.items}">
-
-                       if("${itemsSection.item.id}"== itemId)
-                       {
-
-                    <c:set var="notesSize" value="${itemsSection.totNew}"/>
-                       title = "<c:out value="${itemsSection.item.name}"/>";
-                           <c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
-                        <c:forEach var="discrepancyNotes" items="${discrepancyNotes}">
-                         resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
-                              detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
-                              discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
-                              updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
-                            parentDnIds[i] = "<c:out value="${discrepancyNotes.parentDnId}"/>";
-                           i++;
-
-                            </c:forEach>
-                        totNotes = 	 ${notesSize};
-                              if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
-                           if("${itemsSection.data.auditLog}" == "true"){
-                               auditLog = '<fmt:message key="audit_exist" bundle="${resword}" />';
-                           }
-                       }
-
-                </c:forEach>
-            </c:forEach>
-
-
-              var htmlgen =
-                  '<div class=\"tooltip\">'+
-                  '<table  width="95%">'+
-                  ' <tr><td  align=\"center\" class=\"header1\">' +title+
-                  ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="95%" >'+
-                  drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnIds)+
-                  '</table><table width="95%"  class="tableborder" align="left">'+
-                  '</table><table><tr></tr></table>'+
-                  '<table width="95%"><tbody><td height="30" colspan="3"><span class=\"note\">'+footNote +'</span>'+
-                  '</td></tr>' +
-                  '<tr><td align=\"center\">'+ auditLog +'</td></tr>' +
-                  '</tbody></table></table></div>';
-              return htmlgen;
-        }
-
-</script>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
@@ -536,35 +450,7 @@
   </c:import>
 
 </c:if>
-<%-- we won't need this if we're not embedding error messages
-<br><c:import url="../showMessage.jsp"><c:param name="key" value=
-              "${inputName}" /></c:import>    --%>
-<%--
-adding units...
- if(responseName.equalsIgnoreCase("text") ||
-      responseName.equalsIgnoreCase("textarea") ||
-      responseName.equalsIgnoreCase("single-select") ||
-      responseName.equalsIgnoreCase("multi-select")){
 
-       td = this.addUnits(td,displayBean);
-       //td = this.addRightItemText(td,displayBean);
-    }
-    if(responseName.equalsIgnoreCase("radio") ||
-      responseName.equalsIgnoreCase("checkbox") ){
-      String grLabel = displayBean.getMetadata().getGroupLabel();
-      boolean grouped = (grLabel != null && (! "".equalsIgnoreCase(grLabel)) &&
-      (! grLabel.equalsIgnoreCase("ungrouped")));
-
-      if(! grouped) {
-         td = this.addUnits(td,displayBean);
-      }  else {
-        //the radio or checkbox does appear in a group table
-        //Do not add units if the layout is horizontal
-        if(! displayBean.getMetadata().getResponseLayout().
-          equalsIgnoreCase("Horizontal")){
-           td = this.addUnits(td,displayBean);
-        }
---%>
 <c:if test='${inputType == "text"|| inputType == "textarea" ||
 inputType == "multi-select" || inputType == "single-select" ||
 inputType == "calculation" }'>

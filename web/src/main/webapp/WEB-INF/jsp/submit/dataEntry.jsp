@@ -37,6 +37,7 @@
 	<ui:theme/>
 
 	<c:import url="/includes/js/pages/data_entry.js.jsp" />
+	<c:import url="/includes/js/dn_flag_tooltip.js.jsp" />
 	<c:import url="/includes/js/dialogs.js.jsp" />
 </head>
 <body class="aka_bodywidth" onunload="javascript:clsWin();" >

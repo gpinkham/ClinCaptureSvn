@@ -33,7 +33,7 @@
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/effects.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
     <!-- Added for the new Calender -->
-
+	<c:import url="/includes/js/dialogs.js.jsp" />
     <ui:calendar/>
     <!-- End -->
     <ui:theme/>
