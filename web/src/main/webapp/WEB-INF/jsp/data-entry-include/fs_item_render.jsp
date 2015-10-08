@@ -8,7 +8,26 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<c:if test="${displayItemWithGroup.singleItem.item.dataType.id ne 13 and displayItemWithGroup.singleItem.item.dataType.id ne 14}">
+<c:if test="${displayItemWithGroup.itemsRow.haveHeaders}">
+	<div style="width: 100%; background-color: #ececec">
+		<c:forEach items="${displayItemWithGroup.itemsRow.headers}" var="itemHeader">
+			<div style="padding: 5px; width: 555px; display: table-cell;">
+					<b>${itemHeader}</b>
+			</div>
+		</c:forEach>
+	</div>
+</c:if>
+
+<c:if test="${displayItemWithGroup.itemsRow.haveSubHeaders}">
+	<div style="width: 100%; background-color: #ececec;">
+		<c:forEach items="${displayItemWithGroup.itemsRow.subHeaders}" var="subHeader">
+			<div style="padding: 5px; width: 555px; display: table-cell;">
+					${subHeader}
+			</div>
+		</c:forEach>
+	</div>
+</c:if>
+
 <div style="border-bottom: 1px solid #eeeeee; width: 100%;">
 	<div style="padding: 5px;">
 		<c:forEach items="${displayItemWithGroup.itemsRow.items}" var="displayItem" varStatus="rowStatus">
@@ -56,4 +75,3 @@
 		</c:forEach>
 	</div>
 </div>
-</c:if>

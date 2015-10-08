@@ -9,9 +9,13 @@ import java.util.ArrayList;
 public class DisplayItemRowBean {
 
 	private ArrayList<DisplayItemBean> items;
+	private ArrayList<String> headers;
+	private ArrayList<String> subHeaders;
 	private int totalItemsInRow;
 	private int maxColumn;
 	private boolean containsItemsWithCustomWidth;
+	private boolean haveSubHeaders;
+	private boolean haveHeaders;
 
 	/**
 	 * Default constructor.
@@ -21,6 +25,8 @@ public class DisplayItemRowBean {
 		maxColumn = 0;
 		containsItemsWithCustomWidth = false;
 		items = new ArrayList<DisplayItemBean>();
+		headers = new ArrayList<String>();
+		subHeaders = new ArrayList<String>();
 	}
 
 	public boolean isContainsItemsWithCustomWidth() {
@@ -64,6 +70,20 @@ public class DisplayItemRowBean {
 		containsItemsWithCustomWidth = false;
 		totalItemsInRow++;
 		items.add(item);
+
+		if (item.getMetadata().getHeader() != null && !item.getMetadata().getHeader().isEmpty()) {
+			haveHeaders = true;
+			headers.add(item.getMetadata().getHeader());
+		} else {
+			headers.add("");
+		}
+
+		if (item.getMetadata().getSubHeader() != null && !item.getMetadata().getSubHeader().isEmpty()) {
+			haveSubHeaders = true;
+			subHeaders.add(item.getMetadata().getSubHeader());
+		} else {
+			subHeaders.add("");
+		}
 	}
 
 	/**
@@ -73,5 +93,37 @@ public class DisplayItemRowBean {
 	 */
 	public boolean shouldItemBeAddedToThisRow(DisplayItemBean item) {
 		return maxColumn < item.getMetadata().getColumnNumber();
+	}
+
+	public ArrayList<String> getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(ArrayList<String> headers) {
+		this.headers = headers;
+	}
+
+	public ArrayList<String> getSubHeaders() {
+		return subHeaders;
+	}
+
+	public void setSubHeaders(ArrayList<String> subHeaders) {
+		this.subHeaders = subHeaders;
+	}
+
+	public boolean isHaveHeaders() {
+		return haveHeaders;
+	}
+
+	public void setHaveHeaders(boolean haveHeaders) {
+		this.haveHeaders = haveHeaders;
+	}
+
+	public boolean isHaveSubHeaders() {
+		return haveSubHeaders;
+	}
+
+	public void setHaveSubHeaders(boolean haveSubHeaders) {
+		this.haveSubHeaders = haveSubHeaders;
 	}
 }
