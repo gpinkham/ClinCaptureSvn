@@ -42,12 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.clinovo.enums.CurrentDataEntryStage;
-import com.clinovo.service.DisplayItemService;
-import com.clinovo.util.DataEntryRenderUtil;
-import com.clinovo.util.DataEntryUtil;
-import com.clinovo.validation.DisplayItemBeanValidator;
-import com.clinovo.validator.CodedTermValidator;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -141,17 +135,23 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 
+import com.clinovo.enums.CurrentDataEntryStage;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.EventCRFSectionBean;
 import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DisplayItemService;
 import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DataEntryRenderUtil;
+import com.clinovo.util.DataEntryUtil;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.SubjectEventStatusUtil;
 import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validation.DisplayItemBeanValidator;
+import com.clinovo.validator.CodedTermValidator;
 
 /**
  * Data Entry Servlet.
@@ -1692,6 +1692,18 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
+	private void setPartialSavedSectionNames(HttpServletRequest request,
+			Map<Integer, EventCRFSectionBean> sectionIdToEvCRFSection, DisplaySectionBean dsb) {
+		List<String> partialSavedSectionNames = new ArrayList<String>();
+		List<SectionBean> sectionBeanList = getSectionDAO().findAllByCRFVersionId(dsb.getCrfVersion().getId());
+		for (SectionBean sectionBean : sectionBeanList) {
+			if (sectionIdToEvCRFSection.get(sectionBean.getId()) != null) {
+				partialSavedSectionNames.add(sectionBean.getName());
+			}
+		}
+		request.setAttribute("partialSavedSectionNames", partialSavedSectionNames);
+	}
+	
 	private void setPartialSaveParameters(HttpServletRequest request, int eventCRFId, DisplaySectionBean dsb) {
 		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("eventCRFSectionService");
@@ -1703,6 +1715,7 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("psSectionsList", psSectionsList);
 		request.setAttribute("sectionIdToEvCRFSection", sectionIdToEvCRFSection);
 		request.setAttribute("markPartialSaved", ecsb.isPartialSaved()? "Yes" : "No");
+		setPartialSavedSectionNames(request, sectionIdToEvCRFSection, dsb);
 	}
 
 	

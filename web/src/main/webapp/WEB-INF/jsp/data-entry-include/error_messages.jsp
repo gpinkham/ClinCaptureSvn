@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -45,4 +46,13 @@
 			</c:forEach>
 		</ul>
 	</div>
+</c:if>
+<c:if test="${partialSavedSectionNames ne null and fn:length(partialSavedSectionNames) gt 0}">
+	<div class="alert">
+		<fmt:message key="dataEntry.thisCrfContainsPDForTheFollowingPages" bundle="${resword}"/>:<br/>
+		<c:forEach items="${partialSavedSectionNames}" var="partialSavedSectionName" varStatus="partialSavedSectionNameStatus">
+			- ${partialSavedSectionName}<br/>
+		</c:forEach>
+	</div>
+	<br/>
 </c:if>
