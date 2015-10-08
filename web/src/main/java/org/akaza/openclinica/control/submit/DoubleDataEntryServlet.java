@@ -171,9 +171,9 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		String tabId = fp.getString("tab", true);
 		String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
 		String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
-		String hideSaveAndNextButton = fp.getString("hsnb", true);
-		if (hideSaveAndNextButton.equals("1")) {
-			request.setAttribute("hideSaveAndNextButton", true);
+		String hideSaveAndNextButton = fp.getString("hideSaveAndNextButton", true);
+		if (hideSaveAndNextButton.equals("true")) {
+			request.setAttribute("hideSaveAndNextButton", "true");
 		}
 		request.setAttribute("system_lang", CoreResources.getSystemLocale().toString());
 		if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {

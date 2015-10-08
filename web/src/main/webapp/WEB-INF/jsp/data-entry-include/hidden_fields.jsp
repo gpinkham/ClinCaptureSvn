@@ -8,16 +8,17 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <c:if test="${justCloseWindow}"><input type="hidden" name="cw" value="1" /></c:if>
-<input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
-<input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
-<input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
-<input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
-<input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
+<input type="hidden" name="eventCRFId" value="${section.eventCRF.id}" />
+<input type="hidden" name="hideSaveAndNextButton" value="${hideSaveAndNextButton}" />
+<input type="hidden" name="sectionId" value="${section.section.id}" />
+<input type="hidden" name="checkInputs" value="${checkInputsValue}" />
+<input type="hidden" name="tabId" value="${tabId}" />
+<input type="hidden" name="occurenceNumber" value="${studyEvent.sampleOrdinal}" />
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
-<input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
+<input type="hidden" name="currentUserRole" value="${userRole.role.name}" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
-<input type="hidden" name="crfVersionId" value="<c:out value="${section.eventCRF.CRFVersionId}"/>" />
+<input type="hidden" name="crfVersionId" value="${section.eventCRF.CRFVersionId}" />
 <c:if test="${dataEntryStage.isInitialDE()}">
 <input type="hidden" name="isFirstTimeOnSection" value="${section.section.id}" />
 </c:if>
