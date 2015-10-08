@@ -6,6 +6,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.exceptions" var="resexception"/>
 
 <c:set var="sectionNum" value="0"/>
 <c:forEach var="section" items="${toc.sections}">
@@ -13,6 +14,37 @@
 </c:forEach>
 <script type="text/javascript" language="JavaScript">
 	var checkboxObject;
+
+	var areCheckboxesValid = function() {
+		var partialSave = false;
+		var markComplete = false;
+		$("input[name=markPartialSaved]").each(function() {
+			partialSave = !partialSave ? this.checked : partialSave;
+		});
+		$("input[name=markComplete]").each(function() {
+			markComplete = !markComplete ? this.checked : markComplete;
+		});
+		return !(partialSave && markComplete);
+	}
+
+	var submitCrfForm = function(button) {
+		disableSubmit(true);
+		var formIsValid = true;
+		if (!areCheckboxesValid()) {
+			formIsValid	= false;
+			alertDialog({ message: "<fmt:message key="crfForm.checkboxesErrorMsg" bundle="${resexception}"/>", height: 150, width: 400 });
+		}
+		if (formIsValid) {
+			$("form[name=crfForm]").append('<input type="hidden" name="' + $(button).attr("name") + '" value="' + $(button).val() + '">');
+			$("form[name=crfForm]").submit();
+		} else {
+			disableSubmit(false);
+		}
+	}
+
+	function disableSubmit(value) {
+		$("input[type=button],input[type=submit]").attr("disabled", value);
+	}
 
 	$(document).ready(function(){
 		$("#CRF_infobox_closed").css("display","block");
@@ -46,21 +78,6 @@
 	function getFocused(f){
 		var v = document.getElementById(f);
 		v.focus();
-	}
-
-	function disableSubmit() {
-		var srh = document.getElementById('srh');
-		var srl = document.getElementById('srl');
-		var seh = document.getElementById('seh');
-		var sel = document.getElementById('sel');
-		if (srh != undefined)
-			srh.disabled = true;
-		if (srl != undefined)
-			srl.disabled = true;
-		if (seh != undefined)
-			seh.disabled = true;
-		if (sel != undefined)
-			sel.disabled = true;
 	}
 
 	function setParameterForDN(field, parameterName, value) {

@@ -16,12 +16,12 @@
 			<c:if test="${dataEntryStage.isAdmin_Editing() and !(param.isUpper eq 'true')}">
 				<input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
 			</c:if>
-			<input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
-				"button_medium medium_submit" onclick="disableSubmit(); this.form.submit();"/></td>
+			<input type="button" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
+				"button_medium medium_submit" onclick="submitCrfForm(this);"/></td>
 		<c:if test="${!dataEntryStage.isAdmin_Editing() and section.lastSection and hideSaveAndNextButton eq null }">
 			<td>
-				<input type="submit" id="snl" name="saveAndNext" value="${save_and_next_button_caption}"
-					   class="${view:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="disableSubmit(); this.form.submit();"/>
+				<input type="button" id="snl" name="saveAndNext" value="${save_and_next_button_caption}"
+					   class="${view:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="submitCrfForm(this);"/>
 			</td>
 		</c:if>
 		<td><input type="submit" id="sel" name="submittedExit"
