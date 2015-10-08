@@ -404,9 +404,8 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 			crfBuilder.getCurrentItem().getItemMeta()
 					.setWidthDecimal(crfBuilder.getCellValue(CellName.ITEM_WIDTH_DECIMAL));
 			crfBuilder.getCurrentItem().setRealValue(RealValueKey.ITEM_DATA_TYPE, dataTypeValue);
-			crfBuilder.getItemNameToItemMap().put(crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem());
 			crfBuilder.getCurrentItem().setRealValue(RealValueKey.PHI, phi);
-
+			crfBuilder.getItemNameToItemMap().put(crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem());
 		}
 	}
 

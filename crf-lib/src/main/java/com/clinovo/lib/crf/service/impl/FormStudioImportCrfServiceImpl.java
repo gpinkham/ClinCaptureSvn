@@ -236,8 +236,10 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 					.setHeader(crfBuilder.getCurrentItem().getItemMeta().getLeftItemText());
 			crfBuilder.getCurrentItem().getItemMeta().setLeftItemText(EMPTY);
 		} else if (type == FormStudioElement.CODING) {
+			String dictionaryValue = getString(jsonObj, DICTIONARY);
+			Dictionary dictionary = Dictionary.findDictionary(dictionaryValue);
 			crfBuilder.getCurrentItem().getItemMeta()
-					.setCodeRef(Dictionary.findDictionary(getString(jsonObj, DICTIONARY)).getSysName());
+					.setCodeRef(dictionary != null ? dictionary.getSysName() : dictionaryValue);
 		} else if (type == FormStudioElement.CODING_SYSTEM || type == FormStudioElement.CODING_RADIO) {
 			crfBuilder.getCurrentItem().getItemMeta()
 					.setCodeRef(crfBuilder.getCurrentItem().getParentItemBean().getName());
@@ -530,6 +532,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().setItemMeta(new ItemFormMetadataBean());
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.REQUIRED, getString(jsonObj, REQUIRED));
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.PHI, getString(jsonObj, PHI_DATA));
+		crfBuilder.getItemNameToItemMap().put(crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem());
 
 		checkItemName(crfBuilder);
 

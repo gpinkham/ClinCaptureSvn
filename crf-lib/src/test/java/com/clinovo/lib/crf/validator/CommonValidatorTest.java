@@ -13,6 +13,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -25,6 +27,7 @@ import com.clinovo.lib.crf.enums.CellName;
 import com.clinovo.lib.crf.enums.SheetName;
 import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.lib.crf.producer.impl.ExcelErrorMessageProducer;
+import com.clinovo.lib.crf.producer.impl.JsonErrorMessageProducer;
 
 public class CommonValidatorTest extends DefaultAppContextTest {
 
@@ -97,6 +100,15 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		return result;
 	}
 
+	private JsonCrfBuilder getMockedJsonCrfBuilder(String jsonData) throws Exception {
+		jsonCrfBuilder = Mockito.spy((JsonCrfBuilder) crfBuilderFactory.getCrfBuilder(jsonData.toString(), studyBean,
+				owner, Locale.ENGLISH, messageSource));
+		JsonErrorMessageProducer mockedJsonErrorMessageProducer = Mockito
+				.spy(new JsonErrorMessageProducer(jsonCrfBuilder));
+		Mockito.when(jsonCrfBuilder.getErrorMessageProducer()).thenReturn(mockedJsonErrorMessageProducer);
+		return jsonCrfBuilder;
+	}
+
 	private ExcelCrfBuilder getMockedExcelCrfBuilder(Workbook workbook) throws Exception {
 		excelCrfBuilder = Mockito.spy((ExcelCrfBuilder) crfBuilderFactory.getCrfBuilder(workbook, studyBean, owner,
 				Locale.ENGLISH, messageSource));
@@ -113,6 +125,531 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		jsonCrfBuilder.build();
 		assertTrue(jsonCrfBuilder.getErrorsList().isEmpty());
 		assertTrue(jsonCrfBuilder.getErrorsMap().isEmpty());
+	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatJsonCrfBuilderGeneratesErrorsIfCrfVersionIsBlank() throws Exception {
+		JSONObject jsonData = new JSONObject(getJsonData("testCrf.json"));
+		jsonData.put("version", "");
+		jsonCrfBuilder = (JsonCrfBuilder) crfBuilderFactory.getCrfBuilder(jsonData.toString(), studyBean, owner,
+				Locale.ENGLISH, messageSource);
+		jsonCrfBuilder.build();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfCrfVersionLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.put("version", generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).crfVersionLengthIsExceeded();
+	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatJsonCrfBuilderGeneratesErrorsIfCrfNameIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.put("name", "");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfCrfNameLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.put("name", generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).crfNameLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfSectionLabelIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("name", "");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).sectionLabelIsBlank();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfSectionLabelLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("name", generateString(2001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).sectionLabelLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfSectionLabelIsDuplicated() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("name", "section1");
+		jsonObject.getJSONArray("pages").getJSONObject(1).put("name", "section1");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).sectionLabelIsDuplicated();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfSectionTitleLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("title", generateString(2001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).sectionTitleLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfSectionInstructionsLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("instructions", generateString(10001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).sectionInstructionsLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfGroupLabelIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(1).put("itemName", "");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).groupLabelIsBlank();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfGroupLabelLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(1).put("itemName", generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).groupLabelLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfGroupHeaderLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(1).put("header", generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).groupHeaderLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfGroupLabelIsDuplicated() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		JSONObject jsonObjectTable = jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions")
+				.getJSONObject(3).getJSONArray("children").getJSONObject(1);
+		jsonObjectTable.put("itemName", "table1");
+		jsonObjectTable.put("header", "_dup_header1");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").put(2, jsonObjectTable);
+		jsonObjectTable = jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(2);
+		jsonObjectTable.put("itemName", "table2");
+		jsonObjectTable.put("header", "_dup_header1");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).groupLabelIsDuplicated();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemNameIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("itemName",
+				"");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemNameIsBlank();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemNameLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("itemName",
+				generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemNameLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemNameIsDuplicated() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("itemName",
+				"_dup_item1");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(1)
+				.getJSONArray("children").getJSONObject(0).put("itemName", "_dup_item1");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemNameIsDuplicated();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemDescriptionLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("description",
+				generateString(4001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemDescriptionLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemNameIsWrong() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("itemName",
+				"$$###");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemNameIsNotMatchingRegexp();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRepeatNumIsWrong() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(1).put("minRows", "-1");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).repeatNumIsWrong();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRepeatMaxIsWrong() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(1).put("maxRows", "-1");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).repeatMaxIsWrong();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfLeftItemTextLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("leftText",
+				generateString(4001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemLeftTextLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRightItemTextLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("rightText",
+				generateString(2001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemRightTextLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemHeaderLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("header",
+				generateString(2001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemHeaderLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemSubHeaderLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("subheader",
+				generateString(241));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemSubHeaderLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemGroupLabelLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(3)
+				.getJSONArray("children").getJSONObject(1).put("itemName", generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer(), Mockito.times(4)).itemGroupLabelLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemSectionLabelLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("name", generateString(2001));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer(), Mockito.times(32)).itemSectionLabelLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfResponseTypeIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("type", "");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).responseTypeIsBlank();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfResponseTypeIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("type",
+				"WRONG TYPE");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).responseTypeIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRadioHasItemWithDefaultValue() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).put("defaultValue", "1");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).hasRadioWithDefault();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfResponseOptionsTextIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).put("options", new JSONArray());
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).responseOptionsTextIsBlank();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfResponseOptionsValuesIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).put("options", new JSONArray());
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).responseOptionsValuesIsBlank();
+	}
+
+	@Test(expected = CRFReadingException.class)
+	public void testThatJsonCrfBuilderGeneratesErrorsIfCrfDoesNotHaveItems() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).put("questions", new JSONArray());
+		jsonObject.getJSONArray("pages").getJSONObject(1).put("questions", new JSONArray());
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfOntologyNameIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(4).put("dictionary", "WRONG VALUE");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).ontologyNameIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfExpressionDoesNotStartWithFunc() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("defaultValue", ": 2+2");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).expressionDoesNotStartWithFunc();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfExpressionIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("defaultValue", "func: $#2*/d;2+2");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).expressionIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfValidationColumnIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("fieldValidation", ":#$afasdg32x10");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).validationColumnIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRegexpErrorMsgIsBlank() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("fieldValidation", "regexp: /2.*/");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("validationMessage", "");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).regexpErrorMsgIsBlank();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRegexpErrorMsgLengthIsExceeded() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("fieldValidation", "regexp: /2.*/");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("validationMessage", generateString(256));
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).regexpErrorMsgLengthIsExceeded();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRegexpIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("fieldValidation", "func: #$afasdg32x10");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("validationMessage", "BLA");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).regexpIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRegexpIsInvalidRegularExpression() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("fieldValidation", "regexp: #$afasdg32x10");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("validationMessage", "BLA");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).regexpIsInvalidRegularExpression();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfValidationColumnHasInvalidRegularExpression() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("fieldValidation", "regexp: \\\\#$afasdg32x10");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(4)
+				.getJSONArray("children").getJSONObject(3).put("validationMessage", "BLA");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).validationColumnHasInvalidRegularExpression();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfPhiIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("phiData",
+				"WRONG TYPE");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).phiIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfRequiredIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(0).put("required",
+				"WRONG TYPE");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).requiredIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfItemDisplayStatusIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).put("displayState", "show");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).itemDisplayStatusIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfControlResponseValueIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).getJSONArray("SL").put(1, "XF12");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).controlResponseValueIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfControlItemNameIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).getJSONArray("SL").put(0, "wrong item");
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).controlItemNameIsNotValid();
+	}
+
+	@Test
+	public void testThatJsonCrfBuilderGeneratesErrorsIfSCDIsNotValid() throws Exception {
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		JSONArray jsonArray = new JSONArray();
+		jsonArray.put(0, "item2");
+		jsonArray.put(1, "t");
+		jsonObject.getJSONArray("pages").getJSONObject(0).getJSONArray("questions").getJSONObject(2)
+				.getJSONArray("children").getJSONObject(0).put("SL", jsonArray);
+		jsonCrfBuilder = getMockedJsonCrfBuilder(jsonObject.toString());
+		jsonCrfBuilder.build();
+		assertTrue(jsonCrfBuilder.getErrorsList().size() > 0);
+		Mockito.verify(jsonCrfBuilder.getErrorMessageProducer()).simpleConditionalDisplayIsNotValid();
 	}
 
 	@Test
@@ -186,7 +723,6 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 				.setCellValue("");
 		excelCrfBuilder = getMockedExcelCrfBuilder(workbook);
 		excelCrfBuilder.build();
-		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).crfNameIsBlank();
 	}
 
 	@Test
@@ -508,7 +1044,7 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatExcelCrfBuilderGeneratesErrorsIfItemSectionLabelIsWrong() throws Exception {
+	public void testThatExcelCrfBuilderGeneratesErrorsIfItemSectionLabelLengthIsExceeded() throws Exception {
 		Workbook workbook = getWorkbook("testCrf.xls");
 		workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(1)
 				.createCell(CellName.ITEM_SECTION_LABEL.getColumnNumber()).setCellValue(generateString(2001));
@@ -516,7 +1052,7 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 		excelCrfBuilder.build();
 		assertTrue(excelCrfBuilder.getErrorsList().size() > 0);
 		assertTrue(excelCrfBuilder.getErrorsMap().size() > 0);
-		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemSectionLabelIsNotValid();
+		Mockito.verify(excelCrfBuilder.getErrorMessageProducer()).itemSectionLabelLengthIsExceeded();
 	}
 
 	@Test
