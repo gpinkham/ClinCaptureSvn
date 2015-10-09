@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-09-21-TICKET2353-pg" dbms="postgresql">
+		<comment>Create studyEvaluator study parameter value if it's not exists.</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE FUNCTION add_study_evaluator_parameter() RETURNS integer AS '
+				DECLARE stids RECORD;
+				BEGIN
+					FOR stids IN (SELECT * FROM study) LOOP
+						IF (SELECT count(*) FROM study_parameter_value WHERE study_id = stids.study_id AND parameter = ''studyEvaluator'') = 0 THEN
+							INSERT INTO study_parameter_value
+								(study_parameter_value_id, study_id, value, parameter)
+							VALUES
+								((SELECT nextval(''study_parameter_value_study_parameter_value_id_seq'')),
+								stids.study_id ,
+								''yes'',
+								''studyEvaluator'' );
+						END IF;
+					END LOOP;
+
+					RETURN 1;
+				END;
+			' LANGUAGE plpgsql;
+
+			SELECT add_study_evaluator_parameter();
+			DROP FUNCTION add_study_evaluator_parameter();
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
