@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.submit.DisplayItemRowBean;
 import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,6 +47,7 @@ public final class DataEntryRenderUtil {
 			if (newRow.shouldItemBeAddedToThisRow(itemBean)) {
 				newRow.addNewItem(itemBean);
 			} else {
+				processRowWhenAllItemsAreAdded(newRow);
 				if (previousContainer != null) {
 					previousContainer.setItemsRow(newRow);
 					newSection.getDisplayItemGroups().add(previousContainer);
@@ -56,13 +58,28 @@ public final class DataEntryRenderUtil {
 				newRow = new DisplayItemRowBean();
 				newRow.addNewItem(itemBean);
 			}
-
 			if (counter++ == itemContainers.size()) {
+				processRowWhenAllItemsAreAdded(newRow);
 				itemContainer.setItemsRow(newRow);
 				newSection.getDisplayItemGroups().add(itemContainer);
 			}
 			previousContainer = itemContainer;
 		}
 		return newSection;
+	}
+
+	private static void processRowWhenAllItemsAreAdded(DisplayItemRowBean newRow) {
+		processSCDLogic(newRow);
+	}
+
+	private static void processSCDLogic(DisplayItemRowBean row) {
+		boolean allItemsAreHidden = true;
+		ArrayList<DisplayItemBean> items = row.getItems();
+		for (DisplayItemBean item : items) {
+			if (item.getScdData().getScdDisplayInfo().getScdShowStatus() != 2) {
+				allItemsAreHidden = false;
+			}
+		}
+		row.setShown(!allItemsAreHidden);
 	}
 }

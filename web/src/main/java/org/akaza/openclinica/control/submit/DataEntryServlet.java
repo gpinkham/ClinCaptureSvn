@@ -535,7 +535,6 @@ public abstract class DataEntryServlet extends Controller {
 			// data entry, if this is second round
 			logMe("Entering Checks !submitted entered  " + System.currentTimeMillis());
 			long t = System.currentTimeMillis();
-			request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 			request.setAttribute(BEAN_ANNOTATIONS, getEventCRFAnnotations(request));
 			session.setAttribute("shouldRunValidation", null);
 			session.setAttribute("rulesErrors", null);
@@ -560,8 +559,9 @@ public abstract class DataEntryServlet extends Controller {
 
 			int keyId = ecb.getId();
 			session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
-
 			setUpPanel(request, section);
+			request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
+
 			if (newUploadedFiles.size() > 0) {
 				if (!this.unloadFiles(newUploadedFiles)) {
 					String missed = "";

@@ -10,6 +10,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <jsp:useBean id="dataEntryStage" scope="request" type="org.akaza.openclinica.bean.core.DataEntryStage"/>
+<c:set var="isFSCRF" value="${toc.crf.source == 'formstudio'}" scope="request"/>
 
 <!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -36,6 +37,7 @@
 	<ui:calendar/>
 	<ui:theme/>
 
+	<c:import url="/includes/js/conditional_show_hide.js.jsp" />
 	<c:import url="/includes/js/pages/data_entry.js.jsp" />
 	<c:import url="/includes/js/dn_flag_tooltip.js.jsp" />
 	<c:import url="/includes/js/dialogs.js.jsp" />
@@ -81,7 +83,6 @@
 
 <c:set var="save_and_next_button_caption" scope="request"><fmt:message key='save_and_next' bundle='${resword}'/></c:set>
 <c:set var="submitClassType" value="submit" scope="request"/>
-<c:set var="isFSCRF" value="${toc.crf.source == 'formstudio'}" scope="request"/>
 
 <div id="centralContainer">
 	<table width="75%">

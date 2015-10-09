@@ -16,6 +16,7 @@ public class DisplayItemRowBean {
 	private boolean containsItemsWithCustomWidth;
 	private boolean haveSubHeaders;
 	private boolean haveHeaders;
+	private boolean isShown;
 
 	/**
 	 * Default constructor.
@@ -27,6 +28,7 @@ public class DisplayItemRowBean {
 		items = new ArrayList<DisplayItemBean>();
 		headers = new ArrayList<String>();
 		subHeaders = new ArrayList<String>();
+		isShown = true;
 	}
 
 	public boolean isContainsItemsWithCustomWidth() {
@@ -125,5 +127,13 @@ public class DisplayItemRowBean {
 
 	public void setHaveSubHeaders(boolean haveSubHeaders) {
 		this.haveSubHeaders = haveSubHeaders;
+	}
+
+	public boolean isShown() {
+		return isShown;
+	}
+
+	public void setShown(boolean isShown) {
+		this.isShown = isShown;
 	}
 }
