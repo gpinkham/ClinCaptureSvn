@@ -8,6 +8,15 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
+<c:if test="${!(displayItemWithGroup.itemGroup.groupMetaBean.header eq '')}">
+	<tr>
+		<th colspan="${displayItemWithGroup.columnsShown}" class="aka_headerBackground aka_padding_large aka_cellBorders">
+			<c:out value="${displayItemWithGroup.itemGroup.groupMetaBean.header}" escapeXml="false"/>
+		</th>
+	</tr>
+</c:if>
+
+
 <tr>
 	<%-- if there are horizontal checkboxes or radios anywhere in the group...--%>
 	<c:set var="isHorizontal" scope="request" value="${false}"/>

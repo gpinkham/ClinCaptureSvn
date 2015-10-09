@@ -30,11 +30,6 @@
 		<c:set var="totalColsPlusSubcols" value="0" scope="request"/>
 		<c:set var="questionNumber" value="" scope="request"/>
 		<c:if test="${! (repeatParentId eq 'Ungrouped')}">
-			<c:if test="${! (displayItemWithGroup.itemGroup.groupMetaBean.header eq '')}">
-				<div class="aka_group_header">
-					<strong><c:out value="${displayItemWithGroup.itemGroup.groupMetaBean.header}" escapeXml="false"/></strong>
-				</div>
-			</c:if>
 			<c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
 			<table border="0" cellspacing="0" cellpadding="0" class="aka_form_table repeatingGroupTable" width="100%">
 				<thead>

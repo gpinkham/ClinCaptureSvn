@@ -25,6 +25,7 @@ public final class DataEntryRenderUtil {
 	 */
 	public static DisplaySectionBean convertSingleItemsToDisplayItemRowsDependingOnSource(DisplaySectionBean displaySection) {
 		if (!displaySection.getCrf().getSource().equalsIgnoreCase("formstudio")) {
+			postProcessRepeatingGroups(displaySection);
 			return displaySection;
 		}
 		DisplaySectionBean newSection = displaySection.cloneWithoutDisplayItemGroups();
@@ -39,6 +40,7 @@ public final class DataEntryRenderUtil {
 					previousContainer.setItemsRow(newRow);
 					newSection.getDisplayItemGroups().add(previousContainer);
 				}
+				processRepeatingGroup(itemContainer);
 				newSection.getDisplayItemGroups().add(itemContainer);
 				continue;
 			}
@@ -68,6 +70,15 @@ public final class DataEntryRenderUtil {
 		return newSection;
 	}
 
+	private static void postProcessRepeatingGroups(DisplaySectionBean section) {
+		List<DisplayItemWithGroupBean> displayItemsWithGroup = section.getDisplayItemGroups();
+		for (DisplayItemWithGroupBean displayItemWithGroup : displayItemsWithGroup) {
+			if (displayItemWithGroup.isInGroup()) {
+				processRepeatingGroup(displayItemWithGroup);
+			}
+		}
+	}
+
 	private static void processRowWhenAllItemsAreAdded(DisplayItemRowBean newRow) {
 		processSCDLogic(newRow);
 	}
@@ -81,5 +92,16 @@ public final class DataEntryRenderUtil {
 			}
 		}
 		row.setShown(!allItemsAreHidden);
+	}
+
+	private static void processRepeatingGroup(DisplayItemWithGroupBean displayItemWithGroup) {
+		List<DisplayItemBean> items = displayItemWithGroup.getItemGroup().getItems();
+		int columnsShown = 1;
+		for (DisplayItemBean item : items) {
+			if (item.getMetadata().isShowItem()) {
+				columnsShown++;
+			}
+		}
+		displayItemWithGroup.setColumnsShown(columnsShown);
 	}
 }

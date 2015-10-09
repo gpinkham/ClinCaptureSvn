@@ -39,6 +39,7 @@ public class DisplayItemWithGroupBean implements Comparable {
 	private List<DisplayItemGroupBean> dbItemGroups = new ArrayList<DisplayItemGroupBean>();
 
 	private int ordinal;
+	private int columnsShown;
 
 	private boolean inGroup;
 
@@ -219,6 +220,14 @@ public class DisplayItemWithGroupBean implements Comparable {
 		this.itemsRow = itemsRow;
 	}
 
+	public int getColumnsShown() {
+		return columnsShown;
+	}
+
+	public void setColumnsShown(int columnsShown) {
+		this.columnsShown = columnsShown;
+	}
+
 	public int compareTo(Object o) {
 		if (!o.getClass().equals(this.getClass())) {
 			return 0;
@@ -255,6 +264,7 @@ public class DisplayItemWithGroupBean implements Comparable {
 			newList.add(singleItem);
 			return newList;
 		}
-
 	}
+
+
 }
