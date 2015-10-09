@@ -20,9 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -47,19 +51,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
 /**
  * @author jxu
  * 
  *         Removes a study event and all its related event CRFs, items
  */
-
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class RemoveStudyEventServlet extends Controller {
 
@@ -135,13 +132,7 @@ public class RemoveStudyEventServlet extends Controller {
 				logger.info("submit to remove the event from study");
 				// remove event from study
 
-				event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-				event.setStatus(Status.DELETED);
-				event.setUpdater(currentUser);
-				event.setUpdatedDate(new Date());
-				sedao.update(event);
-
-				getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
+				getStudyEventService().removeStudyEvent(event, currentUser);
 
 				String emailBody = new StringBuilder("")
 						.append(respage.getString("the_event"))
@@ -215,8 +206,8 @@ public class RemoveStudyEventServlet extends Controller {
 			int studyEventId = ecb.getStudyEventId();
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
 
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(
-					studyEventDefinitionId));
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(
+					new Integer(studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);

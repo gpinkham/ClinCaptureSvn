@@ -20,9 +20,14 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -47,19 +52,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * @author jxu
  * 
  *         Restores a removed study event and all its data
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 @Component
 public class RestoreStudyEventServlet extends Controller {
 
@@ -157,27 +155,7 @@ public class RestoreStudyEventServlet extends Controller {
 			} else if ("submit".equalsIgnoreCase(action)) {
 				logger.info("submit to restore the event to study");
 
-				// restore event to study
-				event.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-				event.setStatus(Status.AVAILABLE);
-				event.setUpdater(currentUser);
-				event.setUpdatedDate(new Date());
-				sedao.update(event);
-
-				EventCRFDAO ecdao = getEventCRFDAO();
-				List<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) ecdao.findAllByStudyEvent(event);
-				boolean hasStarted = false;
-
-				getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
-
-				for (EventCRFBean eventCRF : eventCRFs) {
-					hasStarted = !hasStarted ? !eventCRF.isNotStarted() : hasStarted;
-				}
-
-				if (!hasStarted) {
-					event.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
-					sedao.update(event);
-				}
+				getStudyEventService().restoreStudyEvent(event, currentUser);
 
 				String emailBody = new StringBuilder("").append(respage.getString("the_event"))
 						.append(event.getStudyEventDefinition().getName()).append(" ")
@@ -243,8 +221,8 @@ public class RestoreStudyEventServlet extends Controller {
 			int studyEventId = ecb.getStudyEventId();
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
 
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(
-					studyEventDefinitionId));
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(
+					new Integer(studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);

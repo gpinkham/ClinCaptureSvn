@@ -2018,7 +2018,7 @@ function getSchedulePage(params, targetElement) {
         jQuery('#eventScheduleWrapper_' + params.statusBoxId).css("height", "18px");
         
         jQuery.ajax({
-            url: element.attr("rel"),
+            url: "PageToCreateNewStudyEvent" + element.attr("rel"),
             type: "GET",
             data: {page: params.page},
             cache: false,
@@ -2070,18 +2070,19 @@ function adjustCrfListTable(studyEventId, statusBoxId) {
 }
 
 function getCRFList(params, targetElement) {
-    jQuery('#crfListWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
-    jQuery('#crfListWrapper_' + params.statusBoxId).css("height", "18px");
-    jQuery.ajax({
-        url: "CRFListForStudyEvent",
+    var crfListWrapper = $('#crfListWrapper_' + params.statusBoxId);
+    crfListWrapper.html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
+    crfListWrapper.css("height", "18px");
+    $.ajax({
+        url: "CRFListForStudyEvent" + (params.studyEventId == "" ? crfListWrapper.attr("rel") : ""),
         type: "GET",
         data: {studyEventId: params.studyEventId, eventCRFId: params.eventCRFId,
         	eventDefintionCRFId: params.eventDefintionCRFId, page: params.page},
         cache: false,
         success: function (data) {
-            jQuery('#crfListWrapper_' + params.statusBoxId).css("height", "auto");
-            jQuery('#crfListWrapper_' + params.statusBoxId).html(data);
-            jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
+            crfListWrapper.css("height", "auto");
+            crfListWrapper.html(data);
+            $("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
             adjustCrfListTable(params.studyEventId, params.statusBoxId);
             setAccessedObjected(targetElement);
         }
@@ -2187,8 +2188,9 @@ function hideAllTooltips(params, top, left, targetElement) {
                 }	
                 if (document.getElementById('Menu_off_' + params.statusBoxId) != undefined) {
                 	document.getElementById('Menu_off_' + params.statusBoxId).style.display = "none";
-                }	
-                if (params.studyEventId != '') {
+                }
+
+                if (params.studyEventId != '' || $('#eventScheduleWrapper_' + params.statusBoxId).length == 0) {
                     getCRFList(params, targetElement);
                 } else {
                     getSchedulePage(params, targetElement);

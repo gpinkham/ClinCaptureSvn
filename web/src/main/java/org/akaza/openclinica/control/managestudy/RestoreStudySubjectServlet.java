@@ -20,33 +20,28 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Restores a removed subject to a study.
@@ -54,7 +49,7 @@ import java.util.Date;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"serial"})
 @Component
 public class RestoreStudySubjectServlet extends Controller {
 
@@ -112,9 +107,9 @@ public class RestoreStudySubjectServlet extends Controller {
 					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
 
 			// find study events
-			StudyEventDAO sedao = getStudyEventDAO();
 			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
 					getDataSource(), currentUser, currentRole, false);
+
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (studySub.getStatus().equals(Status.AVAILABLE)) {
@@ -133,32 +128,8 @@ public class RestoreStudySubjectServlet extends Controller {
 				forwardPage(Page.RESTORE_STUDY_SUBJECT, request, response);
 			} else {
 				logger.info("submit to restore the subject from study");
-				// restore subject from study
-				studySub.setStatus(Status.AVAILABLE);
-				studySub.setUpdater(currentUser);
-				studySub.setUpdatedDate(new Date());
-				subdao.update(studySub);
 
-				EventCRFDAO ecdao = getEventCRFDAO();
-
-				// restore all study events
-				for (DisplayStudyEventBean dispEvent : displayEvents) {
-
-					StudyEventBean event = dispEvent.getStudyEvent();
-					if (event.getStatus().equals(Status.AUTO_DELETED)) {
-						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(currentUser);
-						event.setUpdatedDate(new Date());
-						sedao.update(event);
-
-						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
-
-						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(
-								getDataSource()));
-					}
-				}
+				getStudySubjectService().restoreStudySubject(studySub, displayEvents, currentUser);
 
 				String emailBody = new StringBuilder("")
 						.append(respage.getString("the_subject"))

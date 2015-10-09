@@ -15,7 +15,6 @@ package com.clinovo.clincapture.control.managestudy;
 
 import java.util.ResourceBundle;
 
-import com.clinovo.service.EventCRFService;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -29,13 +28,15 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Mock;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import com.clinovo.service.EventCRFService;
 
 public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 
@@ -47,9 +48,11 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 
 	private StudyUserRoleBean currentRole;
 
-	@Mock private RemoveStudyEventServlet removeStudyEventServlet;
+	@Mock
+	private RemoveStudyEventServlet removeStudyEventServlet;
 
-	@Mock private EventCRFService eventCRFService;
+	@Mock
+	private EventCRFService eventCRFService;
 
 	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 
@@ -77,6 +80,7 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		Mockito.doReturn(crfVersionDao).when(removeStudyEventServlet).getCRFVersionDAO();
 		Mockito.doReturn(codedItemService).when(removeStudyEventServlet).getCodedItemService();
 		Mockito.doReturn(eventCRFService).when(removeStudyEventServlet).getEventCRFService();
+		Mockito.doReturn(studyEventService).when(removeStudyEventServlet).getStudyEventService();
 
 		Whitebox.setInternalState(removeStudyEventServlet, "respage", respage);
 		Whitebox.setInternalState(removeStudyEventServlet, "resexception", resexception);
@@ -132,7 +136,7 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		int studySubId = 1;
 		String action = "confirm";
 		DisplayStudyEventBean displayEventBean;
-		
+
 		currentUser = new UserAccountBean();
 		currentUser.setId(1);
 		currentUser.setName(UserAccountBean.ROOT);
@@ -150,7 +154,7 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		removeStudyEventServlet.processRequest(request, response);
 
 		displayEventBean = (DisplayStudyEventBean) request.getAttribute("displayEvent");
-		
+
 		assertNotNull(displayEventBean);
 		assertTrue(displayEventBean.getStudyEvent().getId() == studyEventId);
 	}
@@ -162,7 +166,7 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		int studyEventId = 1;
 		int studySubId = 1;
 		String action = "submit";
-		
+
 		currentUser = new UserAccountBean();
 		currentUser.setId(1);
 		currentUser.setName(UserAccountBean.ROOT);
@@ -180,11 +184,11 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 		removeStudyEventServlet.processRequest(request, response);
 
 		event = (StudyEventBean) studyEventDao.findByPK(studyEventId);
-		
+
 		assertTrue(event.getStatus().isDeleted());
 		assertTrue(response.getStatus() == 302);
-		assertTrue(response.getHeader("Location").equals(request.getContextPath() 
-				+ Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + studySubId));
+		assertTrue(response.getHeader("Location").equals(
+				request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + studySubId));
 	}
 
 }

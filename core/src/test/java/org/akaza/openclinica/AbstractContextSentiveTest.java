@@ -20,6 +20,9 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import com.clinovo.service.DeleteCrfService;
+import com.clinovo.service.StudyEventService;
+import com.clinovo.service.StudyService;
+import com.clinovo.service.StudySubjectService;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -269,6 +272,12 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected EventDefinitionService eventDefinitionService;
 	@Autowired
 	protected DeleteCrfService deleteCrfService;
+	@Autowired
+	protected StudyEventService studyEventService;
+	@Autowired
+	protected StudySubjectService studySubjectService;
+	@Autowired
+	protected StudyService studyService;
 
 	protected static PlatformTransactionManager transactionManager;
 

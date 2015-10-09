@@ -324,4 +324,11 @@
             select distinct se.* from event_crf ec, study_event se where ec.crf_version_id = ? and ec.study_event_id = se.study_event_id and se.subject_event_status_id = ?
         </sql>
     </query>
+    <query>
+        <name>deleteStudyEvent</name>
+        <sql>
+            delete from event_crf where not_started = 1 and study_event_id = ?;
+            delete from study_event where study_event_id = ?;
+        </sql>
+    </query>
 </queries>

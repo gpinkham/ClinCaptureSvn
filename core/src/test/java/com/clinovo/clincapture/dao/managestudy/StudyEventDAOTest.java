@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
@@ -43,9 +44,9 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindStudyEventsByCrfVersionAndSubjectEventStatusReturnsCorrectSize()
 			throws OpenClinicaException {
-		assertEquals(studyEventDao
-				.findStudyEventsByCrfVersionAndSubjectEventStatus(1, SubjectEventStatus.SOURCE_DATA_VERIFIED).size(),
-				0);
+		assertEquals(
+				studyEventDao.findStudyEventsByCrfVersionAndSubjectEventStatus(1,
+						SubjectEventStatus.SOURCE_DATA_VERIFIED).size(), 0);
 	}
 
 	@Test
@@ -62,5 +63,38 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllByDefinitionWithNotRemovedStudySubjectMethodWorksFine() {
 		assertEquals(studyEventDao.findAllByDefinitionWithNotRemovedStudySubject(1).size(), 3);
+	}
+
+	@Test
+	public void testThatDeleteStudyEventMethodWorksFine() {
+		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByPK(1);
+
+		StudyEventBean studyEventBean = new StudyEventBean();
+		studyEventBean.setSampleOrdinal(1);
+		studyEventBean.setStudySubjectId(1);
+		studyEventBean.setOwner(userAccountBean);
+		studyEventBean.setDateStarted(new Date());
+		studyEventBean.setCreatedDate(new Date());
+		studyEventBean.setStatus(Status.AVAILABLE);
+		studyEventBean.setStudyEventDefinitionId(1);
+		studyEventBean.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+		int studyEventId = studyEventDao.create(studyEventBean).getId();
+		assertTrue(studyEventId > 0);
+
+		EventCRFBean eventCRFBean = new EventCRFBean();
+		eventCRFBean.setCRFVersionId(1);
+		eventCRFBean.setNotStarted(true);
+		eventCRFBean.setStudySubjectId(1);
+		eventCRFBean.setCompletionStatusId(1);
+		eventCRFBean.setOwner(userAccountBean);
+		eventCRFBean.setStatus(Status.AVAILABLE);
+		eventCRFBean.setStudyEventId(studyEventId);
+		int eventCrfId = eventCRFDAO.create(eventCRFBean).getId();
+		assertTrue(eventCrfId > 0);
+
+		studyEventDao.deleteStudyEvent(studyEventBean);
+
+		assertEquals(eventCRFDAO.findByPK(eventCrfId).getId(), 0);
+		assertEquals(studyEventDao.findByPK(studyEventId).getId(), 0);
 	}
 }

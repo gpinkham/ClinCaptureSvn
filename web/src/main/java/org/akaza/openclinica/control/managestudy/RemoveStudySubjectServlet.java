@@ -20,31 +20,28 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Removes a study subject and all the related data
@@ -77,7 +74,8 @@ public class RemoveStudySubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
@@ -116,16 +114,15 @@ public class RemoveStudySubjectServlet extends Controller {
 			study.getStudyParameterConfig().setSubjectPersonIdRequired(
 					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
 
-			StudyEventDAO sedao = getStudyEventDAO();
-
 			checkRoleByUserAndStudy(request, response, currentUser, study.getParentStudyId(), study.getId());
 
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
-					getDataSource(), currentUser, currentRole, false);
+			List<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
+					currentUser, currentRole, false);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studySub.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_subject_is_not_available_for_this_study") + " "
+					addPageMessage(
+							respage.getString("this_subject_is_not_available_for_this_study") + " "
 									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
@@ -139,30 +136,18 @@ public class RemoveStudySubjectServlet extends Controller {
 				forwardPage(Page.REMOVE_STUDY_SUBJECT, request, response);
 			} else {
 				logger.info("submit to remove the subject from study");
-				// remove subject from study
-				studySub.setStatus(Status.DELETED);
-				studySub.setUpdater(currentUser);
-				studySub.setUpdatedDate(new Date());
-				subdao.update(studySub);
 
-				// remove all study events
-				for (DisplayStudyEventBean dispEvent : displayEvents) {
-					StudyEventBean event = dispEvent.getStudyEvent();
-					if (!event.getStatus().equals(Status.DELETED)) {
+				getStudySubjectService().removeStudySubject(studySub, displayEvents, currentUser);
 
-						event.setStatus(Status.AUTO_DELETED);
-						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-						event.setUpdater(currentUser);
-						event.setUpdatedDate(new Date());
-						sedao.update(event);
-
-						getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
-					}
-				}
-
-				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ").append(studySub.getLabel()).append(" ")
-						.append((study.isSite(study.getParentStudyId()) ? respage.getString("has_been_removed_from_the_site") : respage.getString("has_been_removed_from_the_study")))
-						.append(study.getName()).append(".").toString();
+				String emailBody = new StringBuilder("")
+						.append(respage.getString("the_subject"))
+						.append(" ")
+						.append(studySub.getLabel())
+						.append(" ")
+						.append((study.isSite(study.getParentStudyId()) ? respage
+								.getString("has_been_removed_from_the_site") : respage
+								.getString("has_been_removed_from_the_study"))).append(study.getName()).append(".")
+						.toString();
 
 				addPageMessage(emailBody, request);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);

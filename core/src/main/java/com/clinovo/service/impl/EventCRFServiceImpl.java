@@ -42,6 +42,8 @@ import org.springframework.stereotype.Service;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.ItemDataService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * EventCRFServiceImpl class provides service implementation for EventCRFService interface.
@@ -153,10 +155,23 @@ public class EventCRFServiceImpl implements EventCRFService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
+	public void updateStudyEventStatus(EventCRFBean eventCRF, UserAccountBean updater) {
+		StudyEventDAO studyEventDao = getStudyEventDAO();
+		StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(eventCRF.getStudyEventId());
+		studyEventBean.setUpdater(updater);
+		studyEventBean.setUpdatedDate(new Date());
+		studyEventBean.setStatus(Status.AVAILABLE);
+		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(dataSource));
+		studyEventDao.update(studyEventBean);
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
 		if (eventCRF.getStatus().isDeleted()) {
 			restore(eventCRF, updater);
+			updateStudyEventStatus(eventCRF, updater);
 		}
 	}
 
@@ -204,8 +219,8 @@ public class EventCRFServiceImpl implements EventCRFService {
 	public EventCRFBean getNextEventCRFForDataEntry(StudyEventBean currentStudyEventBean,
 			EventDefinitionCRFBean currentEventDefCRF, UserAccountBean currentUser, StudyUserRoleBean currentUserRole,
 			StudyBean currentStudy) {
-		StudyEventDefinitionBean currentStudyEventDefinition = getStudyEventDefinitionDAO()
-				.findByEventDefinitionCRFId(currentEventDefCRF.getId());
+		StudyEventDefinitionBean currentStudyEventDefinition = getStudyEventDefinitionDAO().findByEventDefinitionCRFId(
+				currentEventDefCRF.getId());
 		Collection<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionCRFDAO()
 				.findAllActiveByEventDefinitionId(currentStudy, currentStudyEventDefinition.getId());
 		EventCRFBean eventCRF = getNextCrfAvailableForDataEntry(currentStudy, currentStudyEventBean,

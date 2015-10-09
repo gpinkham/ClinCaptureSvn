@@ -83,6 +83,16 @@ public interface EventCRFService {
 			throws Exception;
 
 	/**
+	 * Updates study event state by event crf.
+	 * 
+	 * @param eventCRF
+	 *            EventCRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 */
+	void updateStudyEventStatus(EventCRFBean eventCRF, UserAccountBean updater);
+
+	/**
 	 * Restores given EventCRFBean with previous status.
 	 * 
 	 * @param eventCRF

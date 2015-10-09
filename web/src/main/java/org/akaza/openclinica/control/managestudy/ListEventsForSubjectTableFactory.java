@@ -13,10 +13,15 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.EventCRFUtil;
-import com.clinovo.util.SignUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -73,15 +78,10 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.EventCRFUtil;
+import com.clinovo.util.SignUtil;
 
 /**
  * ListEventsForSubjectTableFactory class.
@@ -1101,6 +1101,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		String occurrenceXOf = resword.getString("ocurrence");
 		String status = resword.getString("status");
 
+		ListStudySubjectTableFactory.deleteNotScheduledEventsIfItIsNecessary(getStudyBean(),
+				eventDivBuilderWrapper.studyEvents, getStudyEventDAO(), getStudyEventDefinitionDAO());
+
+		boolean studyEventDoesNotExist = eventDivBuilderWrapper.studyEvents.size() == 0;
 		SubjectEventStatus eventStatus = eventDivBuilderWrapper.studyEvents.size() == 0
 				? SubjectEventStatus.NOT_SCHEDULED
 				: eventDivBuilderWrapper.studyEvents.get(0).getSubjectEventStatus();
@@ -1151,20 +1155,21 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED
 				|| eventSysStatus == Status.LOCKED) {
 
-			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED
-					&& canScheduleStudySubject(eventDivBuilderWrapper.studySubject)
+			if (studyEventDoesNotExist && canScheduleStudySubject(eventDivBuilderWrapper.studySubject)
 					&& !Role.isMonitor(currentRole.getRole()) && studyBean.getStatus().isAvailable()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				String href1 = "PageToCreateNewStudyEvent?studySubjectId="
-						+ eventDivBuilderWrapper.studySubject.getId() + "&studyEventDefinition="
-						+ eventDivBuilderWrapper.sed.getId();
+				String href1 = "?studySubjectId=" + eventDivBuilderWrapper.studySubject.getId()
+						+ "&studyEventDefinition=" + eventDivBuilderWrapper.sed.getId();
 				eventDiv.div()
-						.id("eventScheduleWrapper_"
+						.id((ListStudySubjectTableFactory.skipScheduling(getStudyBean(), eventDivBuilderWrapper.sed)
+								? "crfListWrapper_"
+								: "eventScheduleWrapper_")
 								+ studySubjectLabel
 								+ "_"
 								+ (eventDivBuilderWrapper.eventDefintionCRFId == null ? eventDivBuilderWrapper.sed
-										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId) + "_"
+										.getId() + "ev" : eventDivBuilderWrapper.eventDefintionCRFId)
+								+ "_"
 								+ eventDivBuilderWrapper.rowCount).rel(href1).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
@@ -1269,7 +1274,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 		return true;
 	}
-	
+
 	@Override
 	public int[] getMaxRowIncrements() {
 		return new int[]{1, 5, 15, 25, 50};

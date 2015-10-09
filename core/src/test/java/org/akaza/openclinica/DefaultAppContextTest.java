@@ -117,6 +117,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			resetSequence(session, "event_crf_id", "event_crf");
 			resetSequence(session, "item_group_id", "item_group");
 			resetSequence(session, "crf_version_id", "crf_version");
+			resetSequence(session, "study_event_id", "study_event");
 			resetSequence(session, "response_set_id", "response_set");
 			resetSequence(session, "dynamic_event_id", "dynamic_event");
 			resetSequence(session, "study_subject_id", "study_subject");
@@ -150,9 +151,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			max = (Integer) session.createSQLQuery("SELECT max(".concat(idField).concat(") from ").concat(tableName))
 					.uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE ".concat(sequenceName)).executeUpdate();
-			session.createSQLQuery("CREATE SEQUENCE ".concat(sequenceName).concat(
-					" START WITH " + ((max == null ? 0 : max) + 1) + " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20"))
-					.executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE ".concat(sequenceName).concat(
+							" START WITH " + ((max == null ? 0 : max) + 1)
+									+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20")).executeUpdate();
 		}
 	}
 }

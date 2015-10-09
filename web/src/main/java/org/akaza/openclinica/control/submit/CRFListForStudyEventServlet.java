@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.submit;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -106,15 +108,41 @@ public class CRFListForStudyEventServlet extends Controller {
 	public static final String EVENT_DEFINITION_CRF_ID_PARAMETER = "eventDefintionCRFId";
 	public static final String PAGE_PARAMETER = "page";
 	public static final String PAGE_TO_RENDER = "pageToRender";
+	public static final String STUDY_SUBJECT_ID = "studySubjectId";
+	public static final String STUDY_EVENT_DEFINITION = "studyEventDefinition";
 
 	@Autowired
 	private CRFMaskingService maskingService;
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
+		FormProcessor fp = new FormProcessor(request);
+
 		StudyEventDAO sedao = getStudyEventDAO();
+
+		if (eventId == 0) {
+			int studySubjectId = fp.getInt(STUDY_SUBJECT_ID);
+			int studyEventDefinitionId = fp.getInt(STUDY_EVENT_DEFINITION);
+			List<StudyEventBean> studyEventBeanList = sedao.findAllByDefinitionAndSubjectOrderByOrdinal(
+					studyEventDefinitionId, studySubjectId);
+			if (studyEventBeanList.size() == 0) {
+				StudyEventBean studyEventBean = new StudyEventBean();
+				studyEventBean.setOwner(ub);
+				studyEventBean.setSampleOrdinal(1);
+				studyEventBean.setDateStarted(new Date());
+				studyEventBean.setCreatedDate(new Date());
+				studyEventBean.setStatus(Status.AVAILABLE);
+				studyEventBean.setStudySubjectId(studySubjectId);
+				studyEventBean.setStudyEventDefinitionId(studyEventDefinitionId);
+				studyEventBean.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+				eventId = sedao.create(studyEventBean).getId();
+			} else {
+				eventId = studyEventBeanList.get(0).getId();
+			}
+		}
 
 		StudyBean studyWithSED = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
@@ -152,17 +180,14 @@ public class CRFListForStudyEventServlet extends Controller {
 		removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
 
-		int eventId = fp.getInt(INPUT_EVENT_ID, true);
+		StudyEventDAO sedao = getStudyEventDAO();
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 
+		int eventId = fp.getInt(INPUT_EVENT_ID, true);
+		StudyEventBean seb = getStudyEvent(request, eventId);
+		eventId = seb.getId();
 		request.setAttribute("eventId", eventId + "");
 
-		// so we can display the event for which we're entering data
-		StudyEventBean seb = getStudyEvent(request, eventId);
-
-		StudyEventDAO sedao = getStudyEventDAO();
-
-		// so we can display the subject's label
-		StudySubjectDAO ssdao = getStudySubjectDAO();
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
 		int studyId = studySubjectBean.getStudyId();
 

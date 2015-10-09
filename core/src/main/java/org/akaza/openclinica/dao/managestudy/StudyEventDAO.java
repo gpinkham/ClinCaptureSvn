@@ -364,8 +364,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 *            String
 	 * @return ArrayList
 	 */
-	public ArrayList findAllByStudyEventDefinitionAndCrfOids(String studyEventDefinitionOid,
-			String crfOrCrfVersionOid) {
+	public ArrayList findAllByStudyEventDefinitionAndCrfOids(String studyEventDefinitionOid, String crfOrCrfVersionOid) {
 		this.setTypesExpected(true);
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		int ind = 1;
@@ -574,8 +573,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject,
-			int definitionId) {
+	public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject, int definitionId) {
 		this.setTypesExpected(true);
 		int ind = 1;
 		HashMap variables = new HashMap();
@@ -1520,9 +1518,24 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 */
 	public List<StudyEventBean> findStudyEventsByCrfVersionAndSubjectEventStatus(int crfVersionId,
 			SubjectEventStatus subjectEventStatus) {
+		int ind = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, crfVersionId);
-		variables.put(2, subjectEventStatus.getId());
+		variables.put(ind++, crfVersionId);
+		variables.put(ind, subjectEventStatus.getId());
 		return executeFindAllQuery("findStudyEventsByCrfVersionAndSubjectEventStatus", variables);
+	}
+
+	/**
+	 * Deletes study event. Call this method only if you want to delete a not scheduled study event.
+	 *
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 */
+	public void deleteStudyEvent(StudyEventBean studyEventBean) {
+		int ind = 1;
+		HashMap variables = new HashMap();
+		variables.put(ind++, studyEventBean.getId());
+		variables.put(ind, studyEventBean.getId());
+		execute(digester.getQuery("deleteStudyEvent"), variables);
 	}
 }

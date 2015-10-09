@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import com.clinovo.service.StudyEventService;
+import com.clinovo.service.StudyService;
+import com.clinovo.service.StudySubjectService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -271,6 +274,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private DeleteCrfService deleteCrfService;
 	@Autowired
 	private MessageSource messageSource;
+	@Autowired
+	private StudyEventService studyEventService;
+	@Autowired
+	private StudySubjectService studySubjectService;
+	@Autowired
+	private StudyService studyService;
 
 	/**
 	 * Allow access to this for other users.
@@ -829,5 +838,17 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public MessageSource getMessageSource() {
 		return messageSource;
+	}
+
+	public StudyEventService getStudyEventService() {
+		return studyEventService;
+	}
+
+	public StudySubjectService getStudySubjectService() {
+		return studySubjectService;
+	}
+
+	public StudyService getStudyService() {
+		return studyService;
 	}
 }

@@ -48,6 +48,7 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
+import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -70,11 +71,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * @author jxu
- * 
- *         Processes 'view subject' request
+ * ViewStudySubjectServlet.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked", "serial", "unused"})
 @Component
 public class ViewStudySubjectServlet extends RememberLastPage {
 
@@ -105,9 +104,11 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	// request attribute for a discrepancy note
 	public static final String ENROLLMENT_NOTE = "enrollmentNote";
 	public static final String SAVED_VIEW_STUDY_SUBJECT_URL = "savedViewStudySubjectUrl";
+	public static final int INT_4 = 4;
+	public static final int INT_5 = 5;
 
 	/**
-	 * Checks whether the user has the right permission to proceed function
+	 * Checks whether the user has the right permission to proceed function.
 	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -127,8 +128,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS,
 				resexception.getString("not_study_director"), "1");
 	}
@@ -178,15 +180,15 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			if (studySub.getDynamicGroupClassId() == 0) {
 				request.setAttribute("subjDynGroupIsDefault", true);
-				StudyGroupClassBean defaultGroup = (StudyGroupClassBean) sgcdao
-						.findDefaultByStudyId(study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId());
+				StudyGroupClassBean defaultGroup = sgcdao.findDefaultByStudyId(study.getParentStudyId() > 0 ? study
+						.getParentStudyId() : study.getId());
 				if (defaultGroup.getId() > 0) {
 					subjDynGroup = defaultGroup;
 				} else {
 					request.setAttribute("defaultGroupNotExist", true);
 				}
 			} else {
-				subjDynGroup = (StudyGroupClassBean) sgcdao.findByPK(studySub.getDynamicGroupClassId());
+				subjDynGroup = sgcdao.findByPK(studySub.getDynamicGroupClassId());
 			}
 			ArrayList<StudyEventDefinitionBean> listSEDBeans = seddao
 					.findAllActiveOrderedByStudyGroupClassId(subjDynGroup.getId());
@@ -197,6 +199,10 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			request.setAttribute("studyEventDefinitionsString", studyEventDefinitionsString.replaceFirst(", ", ""));
 
 			List<StudyEventBean> studyEventBeanList = sedao.findAllByStudySubject(studySub);
+
+			ListStudySubjectTableFactory.deleteNotScheduledEventsIfItIsNecessary(currentStudy, studyEventBeanList,
+					getStudyEventDAO(), getStudyEventDefinitionDAO());
+
 			if (studyEventBeanList.size() > 0) {
 				boolean allLocked = true;
 				boolean hasLockedBy = false;
@@ -226,16 +232,18 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySub.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(
+							respage.getString("no_have_correct_privilege_current_study") + " "
+									+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				} else {
 					// The SubjectStudy is not belong to currentstudy and current study is not a site.
 					Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
 					if (!sites.contains(study.getId())) {
-						addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_active_study_or_contact"), request);
+						addPageMessage(
+								respage.getString("no_have_correct_privilege_current_study") + " "
+										+ respage.getString("change_active_study_or_contact"), request);
 						forwardPage(Page.MENU_SERVLET, request, response);
 						return;
 					}
@@ -265,15 +273,15 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study,
 							subjectId);
 
-					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent,
-							study, studySubId));
+					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(
+							stParent, study, studySubId));
 
 				} else {
 					allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(currentStudy, study,
 							subjectId);
 
-					allNotesforSubject.addAll(discrepancyNoteDAO
-							.findAllStudySubjectByStudiesAndStudySubjectId(currentStudy, study, studySubId));
+					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(
+							currentStudy, study, studySubId));
 				}
 			}
 
@@ -359,8 +367,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					resword.getString("start_date1"), resword.getString("location"), resword.getString("status"),
 					resword.getString("actions"), resword.getString("CRFs_atrib")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
-			table.hideColumnLink(4);
-			table.hideColumnLink(5);
+			table.hideColumnLink(INT_4);
+			table.hideColumnLink(INT_5);
 
 			if (!"removed".equalsIgnoreCase(studySub.getStatus().getName())
 					&& !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
@@ -391,13 +399,13 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			UserAccountDAO udao = getUserAccountDAO();
 			ArrayList eventLogs = new ArrayList();
 			for (Object log : logs) {
-				// FIXME is there a way to fix this loop so that we only have 2-3 hits to the DB?
+				// is there a way to fix this loop so that we only have 2-3 hits to the DB?
 				AuditEventBean avb = (AuditEventBean) log;
 				StudyEventAuditBean sea = new StudyEventAuditBean();
 				sea.setAuditEvent(avb);
 				StudyEventBean se = (StudyEventBean) sedao.findByPK(avb.getEntityId());
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
-						.findByPK(se.getStudyEventDefinitionId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
+						.getStudyEventDefinitionId());
 				sea.setDefinition(sed);
 				String old = avb.getOldValue().trim();
 				try {
@@ -438,8 +446,11 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	/**
 	 * Current User may access a requested study subject in the current user's studies.
 	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @throws InsufficientPermissionException
+	 *             the InsufficientPermissionException
 	 */
-	@SuppressWarnings("unused")
 	public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -500,8 +511,10 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		String id = request.getParameter("id");
 		if (request.getQueryString() != null && request.getQueryString().equalsIgnoreCase("id=" + id)) {
 			String savedUrl = (String) request.getSession().getAttribute(getUrlKey(request));
-			result = savedUrl != null && savedUrl.contains("id=" + id) && !savedUrl.equalsIgnoreCase(request
-					.getContextPath().concat(request.getServletPath()).concat("?").concat(request.getQueryString()));
+			result = savedUrl != null
+					&& savedUrl.contains("id=" + id)
+					&& !savedUrl.equalsIgnoreCase(request.getContextPath().concat(request.getServletPath()).concat("?")
+							.concat(request.getQueryString()));
 		} else {
 			result = request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 		}

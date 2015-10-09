@@ -46,6 +46,8 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		mockEventCRFDAO = mock(EventCRFDAO.class);
 		setInternalState(mockEventCRFService, "itemDataService", mockItemDataService);
 		Mockito.doReturn(mockEventCRFDAO).when(mockEventCRFService).getEventCRFDAO();
+		Mockito.doNothing().when(mockEventCRFService)
+				.updateStudyEventStatus(Mockito.any(EventCRFBean.class), Mockito.any(UserAccountBean.class));
 
 		updater = new UserAccountBean();
 		updater.setId(144);

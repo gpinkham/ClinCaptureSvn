@@ -12,6 +12,13 @@
  ******************************************************************************/
 package com.clinovo.util;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -26,13 +33,6 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.util.SignedData;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * SubjectEventStatusUtil class.
@@ -366,7 +366,9 @@ public final class SubjectEventStatusUtil {
 				studyEventBean.setSubjectEventStatus(status);
 				break;
 			case DENS :
-				studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+				if (!studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)) {
+					studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+				}
 				break;
 			default :
 		}

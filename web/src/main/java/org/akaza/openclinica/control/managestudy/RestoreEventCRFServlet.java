@@ -21,16 +21,12 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -59,13 +55,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.EmailUtil;
+
 /**
  * Processes request of 'restore an event CRF from a event.
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings({"serial"})
 @Component
 public class RestoreEventCRFServlet extends Controller {
 
@@ -186,28 +184,16 @@ public class RestoreEventCRFServlet extends Controller {
 
 				getEventCRFService().restoreEventCRF(eventCRF, currentUser);
 
-				boolean hasStarted = hasStarted(event, ecdao);
-
-				event.setSubjectEventStatus(!hasStarted
-						? SubjectEventStatus.SCHEDULED
-						: SubjectEventStatus.DATA_ENTRY_STARTED);
-				event.setStatus(Status.AVAILABLE);
-				event.setUpdater(currentUser);
-				event.setUpdatedDate(new Date());
-				sedao.update(event);
-
-				String messageBody = respage.getString("the_event_CRF")
-						+ cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
+				String messageBody = respage.getString("the_event_CRF") + cb.getName() + " "
+						+ respage.getString("has_been_restored_to_the_event") + " "
 						+ event.getStudyEventDefinition().getName() + ".";
 				addPageMessage(messageBody, request);
-				String emailBody = EmailUtil.getEmailBodyStart()
-						+ messageBody + "<br/><ul>"
+				String emailBody = EmailUtil.getEmailBodyStart() + messageBody + "<br/><ul>"
 						+ resword.getString("job_error_mail.serverUrl") + " " + SQLInitServlet.getSystemURL() + "</li>"
-						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>"
-						+ "<li><b>" + resword.getString("mail.restored_by") + ":</b> " + currentUser.getName() + "</li>"
+						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>" + "<li><b>"
+						+ resword.getString("mail.restored_by") + ":</b> " + currentUser.getName() + "</li>"
 						+ "<li><b>" + resword.getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
-						+ EmailUtil.getEmailBodyEnd()
-						+ EmailUtil.getEmailFooter(getLocale());
+						+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(getLocale());
 				String emailHeader = respage.getString("restore_event_CRF_to_event") + " "
 						+ resword.getString("subject") + ": " + studySub.getLabel();
 				sendEmail(emailHeader, emailBody, request);
@@ -216,15 +202,6 @@ public class RestoreEventCRFServlet extends Controller {
 						.concat("?id=").concat(Integer.toString(studySubId)));
 			}
 		}
-	}
-	private boolean hasStarted(StudyEventBean event, EventCRFDAO ecdao) {
-
-		boolean hasStarted = false;
-		ArrayList<EventCRFBean> eCRFs = (ArrayList<EventCRFBean>) ecdao.findAllByStudyEvent(event);
-		for (EventCRFBean eCRF : eCRFs) {
-			hasStarted = hasStarted || !eCRF.isNotStarted();
-		}
-		return hasStarted;
 	}
 
 	/**
@@ -240,8 +217,7 @@ public class RestoreEventCRFServlet extends Controller {
 		logger.info("Sending email...");
 		sendEmail(ub.getEmail().trim(), emailHeader, emailBody, false, request);
 		// to admin
-		sendEmail(EmailEngine.getAdminEmail(), emailHeader, emailBody, false,
-				request);
+		sendEmail(EmailEngine.getAdminEmail(), emailHeader, emailBody, false, request);
 		logger.info("Sending email done..");
 	}
 

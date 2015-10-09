@@ -13,12 +13,21 @@
 
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.tag.SDVStudySubjectLinkTag;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.SignUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -75,17 +84,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.tag.SDVStudySubjectLinkTag;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * ListStudySubjectTableFactory class.
@@ -95,6 +99,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(ListStudySubjectTableFactory.class);
 
+	public static final String COMMON = "common";
+	public static final String UNSCHEDULED = "unscheduled";
+	public static final String SCHEDULED = "scheduled";
+	public static final String NOT_USED = "not_used";
 	public static final String WRAPPER = "wrapper";
 	public static final int FOUR = 4;
 	public static final int EIGHT = 8;
@@ -842,6 +850,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private class ListSubjectsActionsFilterEditor extends DefaultActionsEditor {
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param locale
+		 *            Locale
+		 */
 		public ListSubjectsActionsFilterEditor(Locale locale) {
 			super(locale);
 		}
@@ -862,6 +877,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		private StudyGroupClassBean studyGroupClass;
 		private String groupName;
 
+		/**
+		 * Default constructor.
+		 * 
+		 * @param studyGroupClass
+		 *            StudyGroupClassBean
+		 */
 		public StudyGroupClassCellEditor(StudyGroupClassBean studyGroupClass) {
 			this.studyGroupClass = studyGroupClass;
 		}
@@ -946,7 +967,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove"))
 				.title(resword.getString("remove")).append("hspace=\"4\"").end().aEnd();
 		return actionLink.toString();
-
 	}
 
 	private static String createNotesAndDiscrepanciesIcon(StudySubjectBean studySubject, String flagColor,
@@ -1312,6 +1332,61 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	}
 
+	/**
+	 * Returns true if CC should display popup with CRFs instead of the popup with scheduling stuff.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @return boolean
+	 */
+	public static boolean skipScheduling(StudyBean studyBean, StudyEventDefinitionBean sed) {
+		boolean result = false;
+		try {
+			result = sed.getType().equalsIgnoreCase(COMMON)
+					|| sed.getType().equalsIgnoreCase(UNSCHEDULED)
+					|| (sed.getType().equalsIgnoreCase(SCHEDULED) && studyBean.getStudyParameterConfig()
+							.getStartDateTimeRequired().equalsIgnoreCase(NOT_USED));
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return result;
+	}
+
+	/**
+	 * Deletes not scheduled study events if it is necessary.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param studyEvents
+	 *            List<StudyEventBean>
+	 * @param studyEventDao
+	 *            StudyEventDAO
+	 * @param studyEventDefinitionDao
+	 *            StudyEventDefinitionDAO
+	 */
+	public static void deleteNotScheduledEventsIfItIsNecessary(StudyBean studyBean, List<StudyEventBean> studyEvents,
+			StudyEventDAO studyEventDao, StudyEventDefinitionDAO studyEventDefinitionDao) {
+		try {
+			Iterator<StudyEventBean> iterator = studyEvents.iterator();
+			while (iterator.hasNext()) {
+				StudyEventBean studyEventBean = iterator.next();
+				StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDao
+						.findByPK(studyEventBean.getStudyEventDefinitionId());
+				if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)
+						&& (!Arrays.asList(COMMON, UNSCHEDULED, SCHEDULED).contains(studyEventDefinitionBean.getType()) || (studyEventDefinitionBean
+								.getType().equalsIgnoreCase(SCHEDULED) && !studyBean.getStudyParameterConfig()
+								.getStartDateTimeRequired().equalsIgnoreCase(NOT_USED)))) {
+					studyEventDao.deleteStudyEvent(studyEventBean);
+					iterator.remove();
+				}
+			}
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+	}
+
 	private void singleEventDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount,
 			List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
@@ -1320,6 +1395,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		String occurrenceXOf = resword.getString("ocurrence");
 		String status = resword.getString("status");
 
+		deleteNotScheduledEventsIfItIsNecessary(getStudyBean(), studyEvents, getStudyEventDAO(),
+				getStudyEventDefinitionDao());
+
+		boolean studyEventDoesNotExist = studyEvents.size() == 0;
 		SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents
 				.get(0).getSubjectEventStatus();
 
@@ -1356,14 +1435,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED
 				|| eventSysStatus == Status.LOCKED) {
 
-			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
+			if (studyEventDoesNotExist && canScheduleStudySubject(studySubject)
 					&& !Role.isMonitor(currentRole.getRole()) && studyBean.getStatus().isAvailable()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				String href1 = "PageToCreateNewStudyEvent?studySubjectId=" + studySubject.getId()
-						+ "&studyEventDefinition=" + sed.getId();
-				eventDiv.div().id("eventScheduleWrapper_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-						.rel(href1).styleClass(WRAPPER).close().divEnd();
+				String href1 = "?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId();
+				eventDiv.div()
+						.id((skipScheduling(getStudyBean(), sed) ? "crfListWrapper_" : "eventScheduleWrapper_")
+								+ studySubjectLabel + "_" + sed.getId() + "_" + rowCount).rel(href1)
+						.styleClass(WRAPPER).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
 				eventDiv.tr(0).valign("top").close();
