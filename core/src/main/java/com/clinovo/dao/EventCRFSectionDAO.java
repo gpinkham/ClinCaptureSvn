@@ -33,7 +33,7 @@ public class EventCRFSectionDAO  extends AbstractDomainDao<EventCRFSectionBean> 
 		this.getCurrentSession().delete(eventCRFSectionBean);
 	}
 	
-	public List<EventCRFSectionBean> findAllByEventCRFId(int eventCRFId) {
+	public List<EventCRFSectionBean> findAllPartiallySavedByEventCRFId(int eventCRFId) {
 		String query = "from " + getDomainClassName()
 				+ " ecs where ecs.eventCRFId = :eventCRFId and ecs.partialSaved = 'true'";
 		Query q = getCurrentSession().createQuery(query);

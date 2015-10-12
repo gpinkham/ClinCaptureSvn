@@ -68,15 +68,15 @@ public interface EventCRFSectionService {
 	 * 
 	 * @return List<EventCRFSectionBean>.
 	 */
-	public List<EventCRFSectionBean> findAllByEventCRFId(int eventCRFId);
+	public List<EventCRFSectionBean> findAllPartiallySavedByEventCRFId(int eventCRFId);
 
 	/**
 	 * Retrieves map with EventCRFSectionBeans with specified eventCRFId.
 	 * 
-	 * @param eventCRFId The id of eventCRF.
+	 * @param list The list of EventCRFSectionBeans.
 	 * 
 	 * @return Map<Integer, EventCRFSectionBean>.
 	 */
-	public Map<Integer, EventCRFSectionBean> getSectionIdToEvCRFSectionMap(int eventCRFId);
+	public Map<Integer, EventCRFSectionBean> getSectionIdToEvCRFSectionMap(List<EventCRFSectionBean> list);
 }
 

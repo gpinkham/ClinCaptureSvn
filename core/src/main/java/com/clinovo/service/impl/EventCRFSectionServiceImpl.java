@@ -34,13 +34,12 @@ public class EventCRFSectionServiceImpl implements EventCRFSectionService{
 		eventCRFSectionDAO.deleteEventCRFSection(eventCRFSectionBean);
 	}
 
-	public List<EventCRFSectionBean> findAllByEventCRFId(int eventCRFId) {
-		return eventCRFSectionDAO.findAllByEventCRFId(eventCRFId);
+	public List<EventCRFSectionBean> findAllPartiallySavedByEventCRFId(int eventCRFId) {
+		return eventCRFSectionDAO.findAllPartiallySavedByEventCRFId(eventCRFId);
 	}
 
-	public Map<Integer, EventCRFSectionBean> getSectionIdToEvCRFSectionMap(int eventCRFId) {
+	public Map<Integer, EventCRFSectionBean> getSectionIdToEvCRFSectionMap(List<EventCRFSectionBean> list) {
 		Map<Integer, EventCRFSectionBean> result = new HashMap<Integer, EventCRFSectionBean>();
-		List<EventCRFSectionBean> list = findAllByEventCRFId(eventCRFId);
 		for (EventCRFSectionBean ecsb: list) {
 			result.put(ecsb.getSectionId(), ecsb);
 		}

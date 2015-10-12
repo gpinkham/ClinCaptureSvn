@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -580,7 +581,8 @@ public abstract class DataEntryServlet extends Controller {
 			return;
 		} else {
 			logMe("Entering Checks !submitted not entered  " + System.currentTimeMillis());
-			boolean validate = (!fp.getString("markPartialSaved").equals(VALUE_YES)) && validateInputOnFirstRound();
+			boolean isMarkedPartialSaved = fp.getString("markPartialSaved").equals(VALUE_YES);
+			boolean validate = (!isMarkedPartialSaved) && validateInputOnFirstRound();
 			HashMap errors = new HashMap();
 
 			FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
@@ -917,18 +919,20 @@ public abstract class DataEntryServlet extends Controller {
 
 			section.setDisplayItemGroups(allItems);
 
-			if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")) {
+			if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes") && 
+					!isMarkedPartialSaved) {
 				v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
 			}
 
-			if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes")) {
+			if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes") && 
+					!isMarkedPartialSaved) {
 				v.addValidation(INPUT_INTERVIEW_DATE, Validator.NO_BLANKS);
 			}
 
-			if (!StringUtil.isBlank(fp.getString(INPUT_INTERVIEW_DATE))) {
+			if (!StringUtil.isBlank(fp.getString(INPUT_INTERVIEW_DATE)) && !isMarkedPartialSaved) {
 				v.addValidation(INPUT_INTERVIEW_DATE, Validator.IS_A_DATE);
 				v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
-			}
+			} 
 
 			if (section.getSection().hasSCDItem()) {
 				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
@@ -1086,8 +1090,8 @@ public abstract class DataEntryServlet extends Controller {
 
 				// save interviewer name and date into DB
 				ecb.setInterviewerName(fp.getString(INPUT_INTERVIEWER));
-				if (!StringUtil.isBlank(fp.getString(INPUT_INTERVIEW_DATE))) {
-
+				if (!StringUtil.isBlank(fp.getString(INPUT_INTERVIEW_DATE)) 
+						&& isValidFormatOfDateToSave(fp, INPUT_INTERVIEW_DATE)) {
 					if (ecb.getDateInterviewed() != null) {
 						String actualDateInterviewed = DateUtil.printDate(ecb.getDateInterviewed(),
 								ub.getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale());
@@ -1594,6 +1598,16 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
+	private boolean isValidFormatOfDateToSave(FormProcessor fp, String itemName) {
+		try {
+			fp.getDateInputWithServerTimeOfDay(itemName);
+		} catch (Exception e) {
+			return false; // format is wrong
+		}
+
+		return true;
+	}
+
 	private void runHardEditChecks(List<DisplayItemWithGroupBean> allItems, boolean validate, DisplayItemService displayItemService, 
 			FormProcessor fp, DiscrepancyValidator v, EventCRFBean ecb) {
 		runValidations(allItems, validate, displayItemService, fp, null, v, null, ecb);
@@ -1679,11 +1693,11 @@ public abstract class DataEntryServlet extends Controller {
 		ecsb.setEventCRFId(eventCRFBean.getId());
 		ecsb.setSectionId(sectionBeanId);
 		ecsb.setStudySubjectId(sSubjectId);
-		if ((ecsb.isPartialSaved() != markPartialSaved)) {
+		if (ecsb.isPartialSaved() != markPartialSaved) {
 			ecsb.setPartialSaved(markPartialSaved);
 			eventCRFSectionService.saveEventCRFSectionBean(ecsb);
 			
-			boolean doesPSSectionExist = eventCRFSectionService.findAllByEventCRFId(eventCRFBean.getId()).size() > 0;
+			boolean doesPSSectionExist = eventCRFSectionService.findAllPartiallySavedByEventCRFId(eventCRFBean.getId()).size() > 0;
 			if (!eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) && doesPSSectionExist) {
 				eventCRFBean.setStatus(Status.PARTIAL_DATA_ENTRY);
 			} else if (eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) && !doesPSSectionExist) {
@@ -1708,8 +1722,8 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("eventCRFSectionService");
 		EventCRFSectionBean ecsb = eventCRFSectionService.findByEventCRFIdAndSectionId(eventCRFId, dsb.getSection().getId());
-		List<EventCRFSectionBean> psSectionsList = eventCRFSectionService.findAllByEventCRFId(eventCRFId);
-		Map<Integer, EventCRFSectionBean> sectionIdToEvCRFSection = eventCRFSectionService.getSectionIdToEvCRFSectionMap(eventCRFId);
+		List<EventCRFSectionBean> psSectionsList = eventCRFSectionService.findAllPartiallySavedByEventCRFId(eventCRFId);
+		Map<Integer, EventCRFSectionBean> sectionIdToEvCRFSection = eventCRFSectionService.getSectionIdToEvCRFSectionMap(psSectionsList);
 		request.setAttribute("disableMarkCRFComplete", dsb.isLastSection() && (psSectionsList.size() > 1 
 				|| (psSectionsList.size() == 1 	&& !sectionIdToEvCRFSection.containsKey(dsb.getSection().getId()))));
 		request.setAttribute("psSectionsList", psSectionsList);
@@ -1718,8 +1732,6 @@ public abstract class DataEntryServlet extends Controller {
 		setPartialSavedSectionNames(request, sectionIdToEvCRFSection, dsb);
 	}
 
-	
-	
 	protected abstract void putDataEntryStageFlagToRequest(HttpServletRequest request);
 
 	private void goToNextCRF(HttpServletRequest request, HttpServletResponse response, EventCRFBean ecb,
