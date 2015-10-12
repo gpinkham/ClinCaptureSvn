@@ -138,6 +138,7 @@ import org.quartz.impl.StdScheduler;
 
 import com.clinovo.enums.CurrentDataEntryStage;
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.CodedItem;
 import com.clinovo.model.EventCRFSectionBean;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.DisplayItemService;
@@ -1937,7 +1938,7 @@ public abstract class DataEntryServlet extends Controller {
 									 ArrayList<DisplayItemBean> changedItemsList) throws Exception {
 
 		CodedTermValidator codedTermValidator = new CodedTermValidator(getDataSource(), getCodedItemService());
-
+		
 		for (int i = 0; i < allItems.size(); i++) {
 			DisplayItemWithGroupBean diwb = allItems.get(i);
 			if (diwb.isInGroup()) {
@@ -2413,6 +2414,16 @@ public abstract class DataEntryServlet extends Controller {
 					idb.setOwner(ub);
 					idb = (ItemDataBean) iddao.upsert(idb);
 					logger.debug("just ran upsert! " + idb.getId());
+				}
+				// this needs to update instead of create
+				if (getCodedItemService() != null) {
+					CodedItem codedItem = getCodedItemService().findCodedItem(idb.getId());
+					if (codedItem != null && codedItem.getId() > 0) {
+						codedItem.setPreferredTerm(idb.getValue());
+						getCodedItemService().saveCodedItem(codedItem);
+					} else {
+						getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
+					}
 				}
 
 			} else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
