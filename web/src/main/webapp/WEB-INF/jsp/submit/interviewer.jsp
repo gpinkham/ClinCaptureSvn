@@ -412,12 +412,12 @@
                     <c:choose>
                         <c:when test="${isInError_Int}">
                             <span class="aka_input_error" style="display:inline-block;height:22px;">
-                                <label for="interviewer"></label><input tabindex="${crfTabIndex}" id="interviewer" type="text" name="interviewer" size="15" value="<c:out value="${interviewer}" />" class="aka_input_error">
+                                <label for="interviewer"></label><input tabindex="${crfTabIndex}" id="interviewer" type="text" name="interviewer" maxlength="${interviewerNameMaxLength}" size="15" value="<c:out value="${interviewer}" />" class="aka_input_error">
                             </span>
                         </c:when>
                         <c:otherwise>
                             <span class="formfieldM_BG" style="display:inline-block;height:22px;">
-                                <input tabindex="${crfTabIndex}" type="text" id="interviewer" name="interviewer" size="15"
+                                <input tabindex="${crfTabIndex}" type="text" id="interviewer" name="interviewer" maxlength="${interviewerNameMaxLength}" size="15"
                                        value="<c:out value="${interviewer}" />" class="formfieldM">
                             </span>
                         </c:otherwise>

@@ -195,6 +195,7 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String HAS_DATA_FLAG = "hasDataFlag";
 	public static final String DDE_PROGESS = "doubleDataProgress";
 	public static final String INTERVIEWER_NAME = "interviewer_name";
+	public static final String INTERVIEWER_NAME_MAX_LENGTH = "interviewerNameMaxLength";
 	public static final String DATE_INTERVIEWED = "date_interviewed";
 	public static final String NOTE_SUBMITTED = "note_submitted";
 	public static final String SECTION_BEAN = "section_bean";
@@ -488,6 +489,7 @@ public abstract class DataEntryServlet extends Controller {
 		section.setFirstSection(!previousSec.isActive());
 		section.setLastSection(!nextSec.isActive());
 
+		request.setAttribute(INTERVIEWER_NAME_MAX_LENGTH, INT_255);
 		setPartialSaveParameters(request, ecb.getId(), section);
 		
 		SubjectDAO subjectDao = new SubjectDAO(getDataSource());
