@@ -58,7 +58,9 @@
 						</c:import>
 					</div>
 					<div style="display: inline-block">
-						<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+						<c:import url="../data-entry-include/discrepancy_flag.jsp">
+							<c:param name="originJSP" value="${originJSP}"/>
+						</c:import>
 					</div>
 					<c:if test="${displayItem.item.units != ''}">
 						<div style="display: inline-block">

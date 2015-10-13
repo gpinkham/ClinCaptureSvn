@@ -130,28 +130,40 @@ public class CreateNewSitePage extends BasePage {
         //iSiteStatusForThisStudy.type(subStudy.getSiteStatusForThisStudy());
         
         defineRadioButtons();
-                
-    	rInterviewDateDefault.selectByValue(subStudy.getInterviewDateDefault());
-        
-    	rCollectInterviewDate.selectByValue(subStudy.getCollectInterviewDate());
-    	
-    	rInterviewerNameDefault.selectByValue(subStudy.getInterviewerNameDefault());
-    	
-    	rCollectInterviewerName.selectByValue(subStudy.getCollectInterviewerName());
-    	
-    	rCollectPersonID.selectByValue(subStudy.getInterviewDateDefault());
+
+		rCollectInterviewDate.selectByValue(subStudy.getCollectInterviewDate());
+
+		rCollectInterviewerName.selectByValue(subStudy.getCollectInterviewerName());
+
+		rCollectPersonID.selectByValue(subStudy.getInterviewDateDefault());
+
+		if (interviewDateDefaultIsShown(subStudy)) {
+			rInterviewDateDefault.selectByValue(subStudy.getInterviewDateDefault());
+		}
+
+		if (interviewerNameDefaultIsShown(subStudy)) {
+			rInterviewerNameDefault.selectByValue(subStudy.getInterviewerNameDefault());
+		}
 	}
-	
-    @Override
+
+	private boolean interviewerNameDefaultIsShown(Study subStudy) {
+		return !subStudy.getCollectInterviewerName().equalsIgnoreCase("not_used");
+	}
+
+	private boolean interviewDateDefaultIsShown(Study subStudy) {
+		return !subStudy.getCollectInterviewDate().equalsIgnoreCase("not_used");
+	}
+
+	@Override
 	public boolean isOnPage(WebDriver driver) {
     	return (driver.getCurrentUrl().indexOf(PAGE_URL) > -1);
 	}
     
     private void defineRadioButtons() {
+		rCollectInterviewDate = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateRequired")));
+		rCollectInterviewerName = new RadioButtonGroup(formWithData.findElements(By.name("interviewerNameRequired")));
+		rCollectPersonID = new RadioButtonGroup(formWithData.findElements(By.name("subjectPersonIdRequired")));
     	rInterviewDateDefault = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateDefault")));
-    	rCollectInterviewDate = new RadioButtonGroup(formWithData.findElements(By.name("interviewDateRequired")));
     	rInterviewerNameDefault = new RadioButtonGroup(formWithData.findElements(By.name("interviewerNameDefault")));
-    	rCollectInterviewerName = new RadioButtonGroup(formWithData.findElements(By.name("interviewerNameRequired")));
-    	rCollectPersonID = new RadioButtonGroup(formWithData.findElements(By.name("subjectPersonIdRequired")));
     }
 }

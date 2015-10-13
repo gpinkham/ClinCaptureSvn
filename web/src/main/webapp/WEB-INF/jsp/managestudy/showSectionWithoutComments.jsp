@@ -130,7 +130,9 @@
         <%--    <c:import url="../showMessage.jsp"><c:param name="key" value="input${displayItem.item.id}" /></c:import> --%>
     </td>
 	<td>
-		<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+		<c:import url="../data-entry-include/discrepancy_flag.jsp">
+			<c:param name="originJSP" value="${originJSP}"/>
+		</c:import>
 	</td>
     <c:if test='${displayItem.item.units != ""}'>
       <td valign="top">
@@ -201,7 +203,9 @@
             </c:import>
           </td>
 			<td>
-				<c:import url="../data-entry-include/discrepancy_flag.jsp"/>
+				<c:import url="../data-entry-include/discrepancy_flag.jsp">
+					<c:param name="originJSP" value="${originJSP}"/>
+				</c:import>
 			</td>
           <c:if test='${childItem.item.units != ""}'>
             <td valign="top"> <c:out value="(${childItem.item.units})" escapeXml="false"/> </td>

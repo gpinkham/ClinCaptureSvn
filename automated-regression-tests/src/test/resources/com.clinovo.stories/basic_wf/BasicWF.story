@@ -126,21 +126,12 @@ Scenario: 8. "Root" changes System properties and Study Details to enable 'Medic
 
 Given User logs in as "Root"
 And User is on Home page
-And User goes to Configure System Properties page
-And User fills in Configure System Properties page:
-|Allow CRF evaluation|
-|yes                 |
-
-And User clicks 'Continue' button
-And User is on Confirm System Properties page
-And User clicks 'Submit' button
-And User is on Configure System Properties page
 And User goes to Build Study page
 And User sets Study status to 'Design'
 And User clicks 'Update Study' button on Build Study page
 And User fills in Update Study Details page:
-|Brief Summary|Expected total enrollment|Allow CRF evaluation|Allow medical coding|Auto-code Dictionary Name|How to Generate Subject ID|Collect Date of Enrollment for Study|Collect Gender|Collect Subject Date of Birth|Collect Person ID|
-|summary...   |144                      |yes                 |yes                 |alias                    |manual                    |no                                  |true          |1                            |optional         |
+|Brief Summary|Expected total enrollment|Allow CRF evaluation|Allow medical coding|Auto-code Dictionary Name|How to Generate Subject ID|Collect Date of Enrollment for Study|Collect Gender|Collect Subject Date of Birth|Collect Person ID|Collect Start Date|Collect Stop Date|
+|summary...   |144                      |yes                 |yes                 |alias                    |manual                    |no                                  |true          |1                            |optional         |no                |no               |
 
 When User clicks 'Submit' button
 Then User is on Build Study page
@@ -235,7 +226,7 @@ Then User is on Create Study Event Definition page
 Examples:
 {scope=Scenario}
 |<Name> |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                           |
-|Event A|             |Unscheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1|
+|Event A|             |Scheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1|
 
 
 Scenario: 12.2 "Root" creates Study Event Definitions
@@ -243,12 +234,12 @@ Scenario: 12.2 "Root" creates Study Event Definitions
 Given User logs in as "Root"
 And User goes to Create Study Event Definition page
 When User creates study event definitions:
-|Name   |Description|Type       |Category|Repeating|Reference Event|Day Schedule|Day Max|Day Min|Day Email|User Name|eCRFs                                     |
-|Event B|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_1, CRF_w_group_1       |
-|Event C|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_file_1               |
-|Event D|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_sections_1    |
-|Event E|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
-|Event F|           |Unscheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_sections_1           |
+|Name   |Description|Type     |Category|Repeating|Reference Event|Day Schedule|Day Max|Day Min|Day Email|User Name|eCRFs                                     |
+|Event B|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_1, CRF_w_group_1       |
+|Event C|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_file_1               |
+|Event D|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_sections_1    |
+|Event E|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
+|Event F|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_sections_1           |
 
 Then Study event definitions are created
 
@@ -568,7 +559,7 @@ And DNs are created
 
 Scenario: 20.10 "Study Admin" creates DNs for Study Event Definition 
 
-GivenStories: com.clinovo.stories/basic_wf/Preconditions.story#{0}
+GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{0}
 
 Given User goes to SM page
 When User creates DNs for Events using popup:
