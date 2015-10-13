@@ -80,5 +80,6 @@
 				</c:choose>
 			</c:if>
 		</c:forEach>
+		<th class="aka_headerBackground aka_padding_large aka_cellBorders"></th>
 	</tr>
 </c:if>
