@@ -32,6 +32,10 @@ View
                 <td><fmt:message key="scheduled" bundle="${reswords}"/></td>
             </tr>
             <tr>
+                <td>&nbsp;<img src="images/icon_PartialDE.gif"></td>
+                <td><fmt:message key="partial_data_entry" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
                 <td>&nbsp;<img src="images/icon_InitialDE.gif"></td>
                 <td><fmt:message key="data_entry_started" bundle="${reswords}"/></td>
             </tr>

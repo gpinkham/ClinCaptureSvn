@@ -83,6 +83,10 @@
 				<td><fmt:message key="completed" bundle="${resword}"/></td>
 			</tr>
 			<tr>
+                <td><img src="../images/icon_PartialDE.gif"></td>
+                <td><fmt:message key="partial_data_entry" bundle="${reswords}"/></td>
+            </tr>
+			<tr>
 				<td><img src="../images/icon_InitialDE.gif"></td>
 				<td><fmt:message key="started" bundle="${resword}"/></td>
 			</tr>
