@@ -45,7 +45,6 @@ import com.clinovo.lib.crf.enums.FormStudioElement;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.enums.RealValueKey;
 import com.clinovo.lib.crf.service.ImportCrfService;
-import com.clinovo.lib.crf.util.CrfMetadataUtil;
 import com.clinovo.lib.crf.validator.CommonValidator;
 import com.clinovo.util.CodingFieldsUtil;
 
@@ -123,10 +122,6 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private String getString(JSONObject jsonObject, String key) throws Exception {
-		return getString(jsonObject, key, false);
-	}
-
-	private String getString(JSONObject jsonObject, String key, boolean checkMetadataTags) {
 		String result = EMPTY;
 		try {
 			result = URLDecoder.decode(jsonObject.getString(key), UTF_8).replaceAll(LT, OPEN_TAG)
@@ -134,7 +129,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
-		return checkMetadataTags ? CrfMetadataUtil.removeAllMetadataTags(result) : result;
+		return result;
 	}
 
 	private int getInt(JSONObject jsonObject, String key) throws Exception {
@@ -166,7 +161,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 
 			crfBuilder.setCurrentSection(new SectionBean());
 			crfBuilder.getCurrentSection().setInstructions(getString(jsonObj, INSTRUCTIONS));
-			crfBuilder.getCurrentSection().setSubtitle(getString(jsonObj, SUB_TITLE, true));
+			crfBuilder.getCurrentSection().setSubtitle(getString(jsonObj, SUB_TITLE));
 			crfBuilder.getCurrentSection().setLabel(getString(jsonObj, NAME));
 			crfBuilder.getCurrentSection().setTitle(getString(jsonObj, TITLE));
 			if (crfBuilder.getCurrentSection().getTitle().trim().isEmpty()) {

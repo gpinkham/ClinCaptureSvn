@@ -37,7 +37,6 @@ import com.clinovo.lib.crf.enums.SheetName;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.producer.impl.ExcelErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
-import com.clinovo.lib.crf.util.CrfMetadataUtil;
 
 /**
  * ExcelCrfBuilder.
@@ -262,28 +261,9 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 * @return String
 	 */
 	public String getCellValue(CellName cellKey, boolean replaceSpecialSymbols) {
-		return getCellValue(cellKey, replaceSpecialSymbols, false);
-	}
-
-	/**
-	 * Returns cell value.
-	 *
-	 * @param cellKey
-	 *            CellKey
-	 * @param replaceSpecialSymbols
-	 *            boolean
-	 * @param removeMetadataTags
-	 *            boolean
-	 * @return String
-	 */
-	public String getCellValue(CellName cellKey, boolean replaceSpecialSymbols, boolean removeMetadataTags) {
 		String value = getValue(row.getCell(getColumnNumber(cellKey)));
-
 		if (replaceSpecialSymbols) {
 			value = value.replaceAll("<[^>]*>", "");
-		}
-		if (removeMetadataTags) {
-			value = CrfMetadataUtil.removeAllMetadataTags(value);
 		}
 		return value;
 	}

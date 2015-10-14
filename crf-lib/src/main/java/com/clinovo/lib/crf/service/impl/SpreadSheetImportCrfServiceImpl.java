@@ -161,7 +161,7 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 			String label = crfBuilder.getCellValue(CellName.SECTION_LABEL, true);
 			crfBuilder.setCurrentSection(newSectionBean(crfBuilder));
 			crfBuilder.getCurrentSection().setInstructions(crfBuilder.getCellValue(CellName.SECTION_INSTRUCTIONS));
-			crfBuilder.getCurrentSection().setSubtitle(crfBuilder.getCellValue(CellName.SECTION_SUBTITLE, false, true));
+			crfBuilder.getCurrentSection().setSubtitle(crfBuilder.getCellValue(CellName.SECTION_SUBTITLE, false));
 			crfBuilder.getCurrentSection().setTitle(crfBuilder.getCellValue(CellName.SECTION_TITLE, true));
 			crfBuilder.getCurrentSection().setLabel(label);
 			// we do not support parent sections

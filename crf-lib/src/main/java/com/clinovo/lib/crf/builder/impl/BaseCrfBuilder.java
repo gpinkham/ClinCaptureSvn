@@ -104,7 +104,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	private int sectionOrdinal;
 	private int itemMetadataOrdinal;
 	private int groupMetadataOrdinal;
-	private boolean hasWidthDecimalColumn;
 	private List codingRefItemNames = new ArrayList();
 	private Set<String> existingUnits = new TreeSet<String>();
 	private List<String> sysItemNames = new ArrayList<String>();
@@ -334,19 +333,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public List getCodingRefItemNames() {
 		return codingRefItemNames;
-	}
-
-	/**
-	 * Returns true if sheet has width decimal column.
-	 * 
-	 * @return boolean
-	 */
-	public boolean hasWidthDecimalColumn() {
-		return hasWidthDecimalColumn;
-	}
-
-	public void setHasWidthDecimalColumn(boolean hasWidthDecimalColumn) {
-		this.hasWidthDecimalColumn = hasWidthDecimalColumn;
 	}
 
 	/**
