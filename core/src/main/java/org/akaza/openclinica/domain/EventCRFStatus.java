@@ -10,7 +10,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 public enum EventCRFStatus implements CodedEnum {
 
     INVALID(0, "invalid"), UNCOMPLETED(1, "not_started"), INITIAL_DATA_ENTRY(2, "initial_data_entry"), INITIAL_DATA_ENTRY_COMPLETE(3, "initial_data_entry_complete"), DOUBLE_DATA_ENTRY(4, "double_data_entry"), DOUBLE_DATA_ENTRY_COMPLETE(5, "data_entry_complete"), ADMINISTRATIVE_EDITING(
-            6, "administrative_editing"), LOCKED(7, "locked");
+            6, "administrative_editing"), LOCKED(7, "locked"), PARTIAL_DATA_ENTRY (17, "partial_data_entry");
 
     private int code;
     private String description;

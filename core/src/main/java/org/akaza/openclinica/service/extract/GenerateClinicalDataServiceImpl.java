@@ -340,6 +340,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		if (ecrf.getEventCrfId() <= 0 || status.getCode() <= 0) {
 			stage = EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());
 		}
+		if (status.getCode().equals(EventCRFStatus.PARTIAL_DATA_ENTRY.getCode())) {
+			stage = EventCRFStatus.PARTIAL_DATA_ENTRY.getI18nDescription(getLocale());
+		}
 		if (status.equals(Status.AVAILABLE)) {
 			stage = EventCRFStatus.INITIAL_DATA_ENTRY.getI18nDescription(getLocale());
 		}
