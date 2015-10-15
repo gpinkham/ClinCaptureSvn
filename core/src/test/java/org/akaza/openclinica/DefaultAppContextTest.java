@@ -100,15 +100,14 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
 			Session session = sessionFactory.getCurrentSession();
 
+			resetSequence(session, "id", "event_crf_section");
 			resetSequence(session, "id", "term");
 			resetSequence(session, "id", "widget");
-			resetSequence(session, "crf_id", "crf");
 			resetSequence(session, "crf_id", "crf");
 			resetSequence(session, "item_id", "item");
 			resetSequence(session, "id", "dictionary");
 			resetSequence(session, "id", "coded_item");
 			resetSequence(session, "id", "widgets_layout");
-			resetSequence(session, "section_id", "section");
 			resetSequence(session, "section_id", "section");
 			resetSequence(session, "subject_id", "subject");
 			resetSequence(session, "id", "scd_item_metadata");

@@ -1097,4 +1097,7 @@
 
 	<crfs_masking id="1" version="0"  study_id="1" study_event_definition_id="1" event_definition_crf_id="1" user_id="1" study_user_role_id="1" status_id="1"/>
 	<crfs_masking id="2" version="0"  study_id="1" study_event_definition_id="2" event_definition_crf_id="4" user_id="1" study_user_role_id="1" status_id="5"/>
+	
+	<event_crf_section id="1" version="0" section_id="1" event_crf_id="1" study_subject_id="1" partial_saved="true"/>
+	<event_crf_section id="2" version="0" section_id="2" event_crf_id="2" study_subject_id="1" partial_saved="true"/>
 </dataset>

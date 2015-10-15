@@ -23,6 +23,7 @@ import com.clinovo.service.DeleteCrfService;
 import com.clinovo.service.StudyEventService;
 import com.clinovo.service.StudyService;
 import com.clinovo.service.StudySubjectService;
+
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -91,6 +92,7 @@ import com.clinovo.dao.CRFMaskingDAO;
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
 import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.dao.EventCRFSectionDAO;
 import com.clinovo.dao.StudySubjectIdDAO;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.dao.TermDAO;
@@ -103,6 +105,7 @@ import com.clinovo.service.DatasetService;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
@@ -207,6 +210,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected CRFMaskingDAO maskingDAO;
 
 	@Autowired
+	protected EventCRFSectionDAO eventCRFSectionDAO;
+	@Autowired
 	protected TermDAO termDAO;
 	@Autowired
 	protected CodedItemDAO codedItemDAO;
@@ -230,6 +235,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected DatasetService datasetService;
 
 	// Services
+	@Autowired
+	protected EventCRFSectionService eventCRFSectionService;
 	@Autowired
 	protected DiscrepancyDescriptionService discrepancyDescriptionService;
 	@Autowired
