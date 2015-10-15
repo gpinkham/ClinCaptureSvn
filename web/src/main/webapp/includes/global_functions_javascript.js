@@ -4476,10 +4476,10 @@ function refineHighlightForRowspans(element, row) {
 		if (parseInt($(this).attr("rowspan")) > rowspan) {
 			rowspan = parseInt($(this).attr("rowspan"));
 		}
-		if($(this).is(":visible") && parseInt($(this).attr("rowspan")) == 1) {
+		if($(this).is(":visible") && parseInt($(this).attr("rowspan")) == 1 && !isLastRow(this)) {
 			$(this).removeClass("borderHighlight");
 			$(this).addClass("borderHighlightTop");
-		}		
+		}
 	});	
 	
 	//Get the last row spanned and highlight the bottom border of the cells
@@ -4540,6 +4540,10 @@ function highlightRow(row, cssClass) {
 			$(this).addClass(cssClass);
 		}		
 	});	
+}
+
+function isLastRow(element) {
+	return $(element).closest("tr").is(":last-child");
 }
 
 function changeDefinitionOrdinal(params) {

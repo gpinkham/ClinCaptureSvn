@@ -58,7 +58,7 @@
         });
     }
     jQuery(window).load(function() {
-    	highlightLastAccessedObject(rowHighlightTypes.NORMAL);
+    	highlightLastAccessedObject(rowHighlightTypes.ROWSPAN);
     });
 </script>
 

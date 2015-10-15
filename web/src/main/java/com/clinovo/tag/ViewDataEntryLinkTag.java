@@ -40,6 +40,8 @@ public class ViewDataEntryLinkTag extends TagSupport {
 	private String hspace = "";
 	private String onClick = "";
 	private String queryTail = "";
+	private String highlightAttrName = "";
+	private String highlightAttrValue = "";
 
 	private void reset() {
 		object = null;
@@ -95,8 +97,10 @@ public class ViewDataEntryLinkTag extends TagSupport {
 							? "setImage(\"bt_View1\",\"images/bt_View_d.gif\");"
 							: onMouseDown;
 					onMouseUp = onMouseUp.isEmpty() ? "setImage('bt_View1','images/bt_View.gif');" : onMouseUp;
+					String highlightAttr = !highlightAttrName.isEmpty() && !highlightAttrValue.isEmpty() ?
+							highlightAttrName + "=\"" + highlightAttrValue + "\" " : "";
 
-					link = link.concat("onclick=\"" + onClick.replace("\"", "'") + "\"")
+					link = link.concat("onclick=\"" + onClick.replace("\"", "'") + "\" ").concat(highlightAttr)
 							.concat("onmousedown='" + onMouseDown + "' ").concat("onmouseup=\"" + onMouseUp + "\" >")
 							.concat("<img name='" + name + "' ")
 							.concat("src='images/bt_View.gif' border='" + border + "'")
@@ -204,5 +208,21 @@ public class ViewDataEntryLinkTag extends TagSupport {
 	public void release() {
 		reset();
 		super.release();
+	}
+
+	public String getHighlightAttrName() {
+		return highlightAttrName;
+	}
+
+	public void setHighlightAttrName(String highlightAttrName) {
+		this.highlightAttrName = highlightAttrName;
+	}
+
+	public String getHighlightAttrValue() {
+		return highlightAttrValue;
+	}
+
+	public void setHighlightAttrValue(String highlightAttrValue) {
+		this.highlightAttrValue = highlightAttrValue;
 	}
 }
