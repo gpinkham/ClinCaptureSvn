@@ -334,7 +334,7 @@ public class StudyInfoPanel {
 				ArrayList beans = (ArrayList) request.getAttribute("beans");
 				EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
 				this.reset();
-				addStudyEventTree(study, studySubject, beans, ecb, true);
+				addStudyEventTree(study, studySubject, beans, ecb, true, resword);
 
 				this.setStudyInfoShown(false);
 				this.setOrderedData(true);
@@ -356,7 +356,7 @@ public class StudyInfoPanel {
 				ArrayList beans = (ArrayList) request.getAttribute("beans");
 				EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
 				this.reset();
-				addStudyEventTree(study, studySubject, beans, ecb, false);
+				addStudyEventTree(study, studySubject, beans, ecb, false, resword);
 
 				this.setStudyInfoShown(false);
 				this.setOrderedData(true);
@@ -519,24 +519,30 @@ public class StudyInfoPanel {
 	 * 
 	 * @param stage
 	 *            DataEntryStage
+	 * @param Status
+	 * 			  status 
+	 * @param ResourceBundle
+	 * 			  resBundle 
 	 * @return String
 	 */
-	public String getStageImageText(DataEntryStage stage) {
+	public String getStageImageText(DataEntryStage stage, Status status, ResourceBundle resBundle) {
 		String answer;
-		if (stage.isInitialDE()) {
-			answer = "<img src='images/icon_InitialDE.gif' alt='Initial Data Entry'>";
+		if (status.isPartialDataEntry()) {
+			answer = "<img src='images/icon_PartialDE.gif' alt='" + resBundle.getString("partial_data_entry") + "'>";
+		} else if (stage.isInitialDE()) {
+			answer = "<img src='images/icon_InitialDE.gif' alt='" + resBundle.getString("initial_data_entry") + "'>";
 		} else if (stage.isInitialDE_Complete()) {
-			answer = "<img src='images/icon_InitialDEcomplete.gif' alt='Initial Data Entry Complete'>";
+			answer = "<img src='images/icon_InitialDEcomplete.gif' alt='" + resBundle.getString("initial_data_entry_complete") + "'>";
 		} else if (stage.isDoubleDE()) {
-			answer = "<img src='images/icon_DDE.gif' alt='Double Data Entry'>";
+			answer = "<img src='images/icon_DDE.gif' alt='" + resBundle.getString("double_data_entry") + "'>";
 		} else if (stage.isDoubleDE_Complete()) {
-			answer = "<img src='images/icon_DEcomplete.gif' alt='Data Entry Complete'>";
+			answer = "<img src='images/icon_DEcomplete.gif' alt='" + resBundle.getString("data_entry_complete") + "'>";
 		} else if (stage.isAdmin_Editing()) {
-			answer = "<img src='images/icon_AdminEdit.gif' alt='Administrative Editing'>";
+			answer = "<img src='images/icon_AdminEdit.gif' alt='" + resBundle.getString("administrative_editing") + "'>";
 		} else if (stage.isLocked()) {
-			answer = "<img src='images/icon_Locked.gif' alt='Locked'>";
+			answer = "<img src='images/icon_Locked.gif' alt='" + resBundle.getString("locked") + "'>";
 		} else {
-			answer = "<img src='images/icon_Invalid.gif' alt='Invalid'>";
+			answer = "<img src='images/icon_Invalid.gif' alt='" + resBundle.getString("invalid") + "'>";
 		}
 
 		return answer;
@@ -583,8 +589,8 @@ public class StudyInfoPanel {
 	 * @param withLink
 	 *            boolean
 	 */
-	public void addStudyEventRulesTree(StudyBean study, StudySubjectBean studySubject,
-			ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
+	public void addStudyEventRulesTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, 
+			EventCRFBean ecb, boolean withLink, ResourceBundle resBundle) {
 		// method behind madness: we want the other pages to show
 		// this information, but we don't want to hit the database when we do.
 		// so, we gather--and hide--the information here.
@@ -593,9 +599,9 @@ public class StudyInfoPanel {
 
 		ArrayList displayData = new ArrayList();
 		if (withLink) {
-			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb);
+			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
 		} else {
-			displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb);
+			displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
 
 		}
 		this.setUserOrderedData(displayData);
@@ -616,7 +622,7 @@ public class StudyInfoPanel {
 	 *            boolean
 	 */
 	public void addStudyEventTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans,
-			EventCRFBean ecb, boolean withLink) {
+			EventCRFBean ecb, boolean withLink,  ResourceBundle resBundle) {
 		// method behind madness: we want the other pages to show
 		// this information, but we don't want to hit the database when we do.
 		// so, we gather--and hide--the information here.
@@ -625,9 +631,9 @@ public class StudyInfoPanel {
 
 		ArrayList displayData = new ArrayList();
 		if (withLink) {
-			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb);
+			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
 		} else {
-			displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb);
+			displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
 
 		}
 		this.setUserOrderedData(displayData);
@@ -647,7 +653,7 @@ public class StudyInfoPanel {
 	 * @return ArrayList
 	 */
 	public ArrayList generateTreeFromBeans(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject,
-			EventCRFBean ecb) {
+			EventCRFBean ecb, ResourceBundle resBundle) {
 		for (Object row : rows) {
 			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) row;
 			StudyEventBean seBean = dseBean.getStudyEvent();
@@ -675,22 +681,22 @@ public class StudyInfoPanel {
 						// was
 						// getName(),
 						// tbh
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()),
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
 								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
 										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
 					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), " "
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), " "
 								+ dec.getEventCRF().getCrf().getName() + " "
 								+ dec.getEventCRF().getCrfVersion().getName() + "</a>", false, true, false));
 					}
 
 				} else {
 					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()),
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
 								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
 										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
 					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), " "
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), " "
 								+ dec.getEventCRF().getCrf().getName() + " "
 								+ dec.getEventCRF().getCrfVersion().getName() + "</a>", false, false, false));
 					}
@@ -753,8 +759,8 @@ public class StudyInfoPanel {
 	 *            EventCRFBean
 	 * @return ArrayList
 	 */
-	public ArrayList generateTreeFromBeansWithoutLink(ArrayList rows, ArrayList displayData,
-			StudySubjectBean studySubject, EventCRFBean ecb) {
+	public ArrayList generateTreeFromBeansWithoutLink(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject, 
+			EventCRFBean ecb, ResourceBundle resBundle) {
 
 		for (Object row : rows) {
 			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) row;
@@ -779,22 +785,22 @@ public class StudyInfoPanel {
 					// last event CRF for this event
 					// it's the current crf
 					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()),
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
 								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
 										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
 					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), dec
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), dec
 								.getEventCRF().getCrf().getName()
 								+ " " + dec.getEventCRF().getCrfVersion().getName(), false, true, false));
 					}
 
 				} else {
 					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()),
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
 								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
 										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
 					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), dec
+						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), dec
 								.getEventCRF().getCrf().getName()
 								+ " " + dec.getEventCRF().getCrfVersion().getName(), false, false, false));
 					}
