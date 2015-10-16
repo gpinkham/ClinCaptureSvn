@@ -2443,10 +2443,10 @@ function randomizeSubject() {
 	var eventCrfId = $("input:hidden[name='eventCRFId']").val();
 	var dateInputId = $("#Rand_Date").find(":input").attr("id").replace('input','');
 	var resultInputId = $("#Rand_Result").find(":input").attr("id").replace('input','');
-	if ($("#Rand_ID").length) {
-		var resultId = $("#Rand_ID").find(":input").attr("id").replace('input','');
-	} else {
-		var resultId = "";
+	var randoCodeInputId = "";
+	var $resultInput = $("#Rand_ID");
+	if ($resultInput.length) {
+		randoCodeInputId = $resultInput.find(":input").attr("id").replace('input','');
 	}
 	var eligibility = null;
 	// Check if the data entry step is IDE
@@ -2512,7 +2512,7 @@ function randomizeSubject() {
             eventCrfId: eventCrfId,
             dateInputId: dateInputId,
             resultInputId: resultInputId,
-            resultId: resultId,
+            randoCodeInputId: randoCodeInputId,
             subject: subject,
 	        subjectId: subjectId,
             trialId: trialId,

@@ -55,6 +55,7 @@ public class RandomizationUtil {
 
 	private static StudyBean currentStudy;
 	private static boolean itemDataExist;
+	private static boolean codeItemExists;
 
 	private static SessionManager sessionManager;
 	private static StudySubjectDAO studySubjectDAO;
@@ -199,31 +200,32 @@ public class RandomizationUtil {
 			HashMap<String, ItemDataBean> itemsMap) throws RandomizationException {
 
 		if (RandomizationUtil.itemDataDAO == null) {
-
 			RandomizationUtil.itemDataDAO = new ItemDataDAO(sessionManager.getDataSource());
 		}
-
 		ItemDataBean dateItem = itemsMap.get("dateItem");
 		ItemDataBean resultItem = itemsMap.get("resultItem");
-
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-
 		dateItem.setValue(formatter.format(new Date()));
 		resultItem.setValue(randomizationResult.getRandomizationResult());
 
 		if (itemDataExist) {
-
 			itemDataDAO.update(resultItem);
 			itemDataDAO.update(dateItem);
-
-			checQuerySuccessfull(itemDataDAO);
 		} else {
-
 			itemDataDAO.create(resultItem);
 			itemDataDAO.create(dateItem);
-
-			checQuerySuccessfull(itemDataDAO);
 		}
+
+		if (codeItemExists) {
+			ItemDataBean codeItem = itemsMap.get("codeItem");
+			codeItem.setValue(randomizationResult.getRandomizationID());
+			if (codeItem.getId() != 0) {
+				itemDataDAO.update(codeItem);
+			} else {
+				itemDataDAO.create(codeItem);
+			}
+		}
+		checQuerySuccessfull(itemDataDAO);
 
 		if (RandomizationUtil.studySubjectDAO == null) {
 			RandomizationUtil.studySubjectDAO = new StudySubjectDAO(sessionManager.getDataSource());
@@ -452,17 +454,12 @@ public class RandomizationUtil {
 		ItemDataBean dateItem = itemDataDAO.findByItemIdAndEventCRFId(dateItemId, eventCRFId);
 
 		if (dateItem.getEventCRFId() == 0 || resultItem.getEventCRFId() == 0) {
-
 			setAllFieldsForNewItem(dateItem, dateItemId, request);
 			setAllFieldsForNewItem(resultItem, resultItemId, request);
-
 			setItemDataExist(false);
-
 		} else {
-
 			setAllFieldsForUpdatedItem(dateItem, request);
 			setAllFieldsForUpdatedItem(resultItem, request);
-
 			setItemDataExist(true);
 		}
 
@@ -470,6 +467,22 @@ public class RandomizationUtil {
 
 		itemsMap.put("dateItem", dateItem);
 		itemsMap.put("resultItem", resultItem);
+
+		String randomizationCodeItemId = request.getParameter("randoCodeInputId");
+		if (randomizationCodeItemId != null && !randomizationCodeItemId.isEmpty()) {
+			int codeItemId = Integer.parseInt(randomizationCodeItemId);
+			ItemDataBean codeItem = itemDataDAO.findByItemIdAndEventCRFId(codeItemId, eventCRFId);
+
+			if (codeItem.getEventCRFId() == 0) {
+				setAllFieldsForNewItem(codeItem, codeItemId, request);
+			} else {
+				setAllFieldsForUpdatedItem(codeItem, request);
+			}
+			itemsMap.put("codeItem", codeItem);
+			setCodeItemExists(true);
+		} else {
+			setCodeItemExists(false);
+		}
 
 		return itemsMap;
 	}
@@ -542,43 +555,39 @@ public class RandomizationUtil {
 	}
 
 	private static boolean trialIdItemExists(HttpServletRequest request) {
-
 		String trialId = request.getParameter("trialId");
 		return isCRFSpecifiedTrialIdValid(trialId);
 	}
 
 	public static void setStudyGroupDAO(StudyGroupClassDAO studyGroupDAO) {
-
 		RandomizationUtil.studyGroupDAO = studyGroupDAO;
 	}
 
 	public static void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) {
-
 		RandomizationUtil.studySubjectDAO = studySubjectDAO;
 	}
 
 	public static void setSubjectDAO(SubjectDAO subjectDAO) {
-
 		RandomizationUtil.subjectDAO = subjectDAO;
 	}
 
 	public static void setSessionManager(SessionManager sessionManager) {
-
 		RandomizationUtil.sessionManager = sessionManager;
 	}
 
 	public static void setCurrentStudy(StudyBean currentStudy) {
-
 		RandomizationUtil.currentStudy = currentStudy;
 	}
 
 	public static void setItemDataDAO(ItemDataDAO itemDataDAO) {
-
 		RandomizationUtil.itemDataDAO = itemDataDAO;
 	}
 
 	public static void setItemDataExist(boolean itemDataExist) {
-
 		RandomizationUtil.itemDataExist = itemDataExist;
+	}
+
+	public static void setCodeItemExists(boolean codeItemExists) {
+		RandomizationUtil.codeItemExists = codeItemExists;
 	}
 }
