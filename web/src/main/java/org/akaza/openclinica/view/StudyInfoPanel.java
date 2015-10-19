@@ -1,13 +1,13 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
@@ -32,8 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.EventCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
@@ -48,18 +48,19 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import com.clinovo.i18n.LocaleResolver;
 
 /**
  * To create a flexible panel of information that will change while the user manages his or her session.
- * 
+ *
  * @author thickerson
- * 
+ *
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
-public class StudyInfoPanel {
+@SuppressWarnings({ "rawtypes", "unchecked" }) public class StudyInfoPanel {
 
 	private TreeMap data = new TreeMap();
 
@@ -159,7 +160,7 @@ public class StudyInfoPanel {
 
 	/**
 	 * Set data method.
-	 * 
+	 *
 	 * @param key
 	 *            String
 	 * @param value
@@ -171,7 +172,7 @@ public class StudyInfoPanel {
 
 	/**
 	 * Remove data method.
-	 * 
+	 *
 	 * @param key
 	 *            String
 	 */
@@ -211,8 +212,13 @@ public class StudyInfoPanel {
 	 *            HttpSession
 	 * @param request
 	 *            HttpServletRequest
+	 * @param crfVersionDAO
+	 *            CRFVersionDAO
+	 * @param eventDefCRFDAO
+	 *            EventDefinitionCRFDAO
 	 */
-	public void setData(Page page, HttpSession session, HttpServletRequest request) {
+	public void setData(Page page, HttpSession session, HttpServletRequest request, CRFVersionDAO crfVersionDAO,
+			EventDefinitionCRFDAO eventDefCRFDAO) {
 
 		Locale locale = LocaleResolver.getLocale(request);
 		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
@@ -334,36 +340,13 @@ public class StudyInfoPanel {
 				ArrayList beans = (ArrayList) request.getAttribute("beans");
 				EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
 				this.reset();
-				addStudyEventTree(study, studySubject, beans, ecb, true, resword);
-
+				this.setUserOrderedData(generateTreeFromBeans(beans, ecb, resword, crfVersionDAO, eventDefCRFDAO));
 				this.setStudyInfoShown(false);
 				this.setOrderedData(true);
 				this.setSubmitDataModule(true);
 				this.setExtractData(false);
 				this.setCreateDataset(false);
 				this.setIconInfoShown(false);
-
-			} else if (page.equals(Page.INTERVIEWER) || page.equals(Page.DATA_ENTRY)
-					|| page.equals(Page.INITIAL_DATA_ENTRY_SERVLET)
-					|| page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET)
-					|| page.equals(Page.ADMIN_EDIT_SERVLET)) {
-				/*
-				 * pages designed to also follow the above format; check to see if they are in the session already, and
-				 * does not refresh.
-				 */
-				StudyBean study = (StudyBean) session.getAttribute("study");
-				StudySubjectBean studySubject = (StudySubjectBean) request.getAttribute("studySubject");
-				ArrayList beans = (ArrayList) request.getAttribute("beans");
-				EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
-				this.reset();
-				addStudyEventTree(study, studySubject, beans, ecb, false, resword);
-
-				this.setStudyInfoShown(false);
-				this.setOrderedData(true);
-				this.setSubmitDataModule(true);
-				this.setExtractData(false);
-				this.setCreateDataset(false);
-				this.setIconInfoShown(true);
 
 			} else if (page.equals(Page.EDIT_DATASET)) {
 				this.reset();
@@ -514,146 +497,31 @@ public class StudyInfoPanel {
 		this.userOrderedData = userOrderedData;
 	}
 
-	/**
-	 * Note that this has to change if the texts change, so this might be something different in the future.
-	 * 
-	 * @param stage
-	 *            DataEntryStage
-	 * @param Status
-	 * 			  status 
-	 * @param ResourceBundle
-	 * 			  resBundle 
-	 * @return String
-	 */
-	public String getStageImageText(DataEntryStage stage, Status status, ResourceBundle resBundle) {
-		String answer;
-		if (status.isPartialDataEntry()) {
-			answer = "<img src='images/icon_PartialDE.gif' alt='" + resBundle.getString("partial_data_entry") + "'>";
-		} else if (stage.isInitialDE()) {
-			answer = "<img src='images/icon_InitialDE.gif' alt='" + resBundle.getString("initial_data_entry") + "'>";
-		} else if (stage.isInitialDE_Complete()) {
-			answer = "<img src='images/icon_InitialDEcomplete.gif' alt='" + resBundle.getString("initial_data_entry_complete") + "'>";
-		} else if (stage.isDoubleDE()) {
-			answer = "<img src='images/icon_DDE.gif' alt='" + resBundle.getString("double_data_entry") + "'>";
-		} else if (stage.isDoubleDE_Complete()) {
-			answer = "<img src='images/icon_DEcomplete.gif' alt='" + resBundle.getString("data_entry_complete") + "'>";
-		} else if (stage.isAdmin_Editing()) {
-			answer = "<img src='images/icon_AdminEdit.gif' alt='" + resBundle.getString("administrative_editing") + "'>";
-		} else if (stage.isLocked()) {
-			answer = "<img src='images/icon_Locked.gif' alt='" + resBundle.getString("locked") + "'>";
-		} else {
-			answer = "<img src='images/icon_Invalid.gif' alt='" + resBundle.getString("invalid") + "'>";
-		}
+	private String getStageImageText(StudySubjectBean studySubject, StudyEventBean studyEvent, DisplayEventCRFBean dec,
+			ResourceBundle resBundle, CRFVersionDAO crfVersionDAO, EventDefinitionCRFDAO eventDefCRFDAO) {
 
-		return answer;
+		Status eventCRFStatus = EventCRFUtil.getEventCRFCurrentStatus(studySubject, studyEvent,
+				dec.getEventDefinitionCRF(), dec.getEventCRF(), crfVersionDAO, eventDefCRFDAO);
+		return "<img src='" + EventCRFUtil.getEventCRFStatusIconPath(eventCRFStatus) + "' alt='"
+				+ resBundle.getString(EventCRFUtil.getStatusIconHintHandle(eventCRFStatus, dec.getEventDefinitionCRF()))
+				+ "'>";
 	}
 
 	/**
-	 * Returns TOC link.
-	 * 
-	 * @param dec
-	 *            DisplayEventCRFBean
-	 * @return String
-	 */
-	public String getTOCLink(DisplayEventCRFBean dec) {
-		String answer = "";
-		if (!dec.getEventCRF().getStatus().equals(Status.DELETED)
-				&& !dec.getEventCRF().getStatus().equals(Status.AUTO_DELETED)) {
-			if (dec.isContinueInitialDataEntryPermitted()) {
-				answer = "InitialDataEntry?eventCRFId=" + dec.getEventCRF().getId();
-			} else if (dec.isStartDoubleDataEntryPermitted()) {
-				answer = "DoubleDataEntry?eventCRFId=" + dec.getEventCRF().getId();
-			} else if (dec.isContinueDoubleDataEntryPermitted()) {
-				answer = "DoubleDataEntry?eventCRFId=" + dec.getEventCRF().getId();
-			} else if (dec.isPerformAdministrativeEditingPermitted()) {
-				answer = "AdministrativeEditing?eventCRFId=" + dec.getEventCRF().getId();
-			} else if (dec.isLocked()) {
-				answer = "ViewSectionDataEntry?eventDefinitionCRFId=" + dec.getEventDefinitionCRF().getId() + "&ecId="
-						+ dec.getEventCRF().getId() + "&tabId=1";
-			}
-		}
-		return answer;
-	}
-
-	/**
-	 * Add study event rules tree.
-	 * 
-	 * @param study
-	 *            StudyBean
-	 * @param studySubject
-	 *            StudySubjectBean
-	 * @param displayStudyEventBeans
-	 *            ArrayList
-	 * @param ecb
-	 *            EventCRFBean
-	 * @param withLink
-	 *            boolean
-	 */
-	public void addStudyEventRulesTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, 
-			EventCRFBean ecb, boolean withLink, ResourceBundle resBundle) {
-		// method behind madness: we want the other pages to show
-		// this information, but we don't want to hit the database when we do.
-		// so, we gather--and hide--the information here.
-		this.setStudyInfoShown(true);
-		this.setOrderedData(false);
-
-		ArrayList displayData = new ArrayList();
-		if (withLink) {
-			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
-		} else {
-			displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
-
-		}
-		this.setUserOrderedData(displayData);
-	}
-
-	/**
-	 * Adds study event tree.
-	 * 
-	 * @param study
-	 *            StudyBean
-	 * @param studySubject
-	 *            StudySubjectBean
-	 * @param displayStudyEventBeans
-	 *            ArrayList
-	 * @param ecb
-	 *            EventCRFBean
-	 * @param withLink
-	 *            boolean
-	 */
-	public void addStudyEventTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans,
-			EventCRFBean ecb, boolean withLink,  ResourceBundle resBundle) {
-		// method behind madness: we want the other pages to show
-		// this information, but we don't want to hit the database when we do.
-		// so, we gather--and hide--the information here.
-		this.setStudyInfoShown(true);
-		this.setOrderedData(false);
-
-		ArrayList displayData = new ArrayList();
-		if (withLink) {
-			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
-		} else {
-			displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb, resBundle);
-
-		}
-		this.setUserOrderedData(displayData);
-	}
-
-	/**
-	 * Generates a tree view in sdie info panel for submitting data page.
-	 * 
+	 * Generates a tree view in side info panel for submitting data page.
+	 *
 	 * @param rows
 	 *            ArrayList
-	 * @param displayData
-	 *            ArrayList
-	 * @param studySubject
-	 *            StudySubjectBean
 	 * @param ecb
 	 *            EventCRFBean
+	 * @param resBundle
+	 *            ResourceBundle
 	 * @return ArrayList
 	 */
-	public ArrayList generateTreeFromBeans(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject,
-			EventCRFBean ecb, ResourceBundle resBundle) {
+	private ArrayList generateTreeFromBeans(ArrayList rows, EventCRFBean ecb, ResourceBundle resBundle,
+			CRFVersionDAO crfVersionDAO, EventDefinitionCRFDAO eventDefCRFDAO) {
+
+		ArrayList displayData = new ArrayList();
 		for (Object row : rows) {
 			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) row;
 			StudyEventBean seBean = dseBean.getStudyEvent();
@@ -673,33 +541,17 @@ public class StudyInfoPanel {
 			int count = 0;
 			for (Object displayCRF : displayCRFs) {
 				DisplayEventCRFBean dec = (DisplayEventCRFBean) displayCRF;
-				if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
-					// last event CRF for this event
-					// it's the current crf
-					// JN:Removing the linkx, since the links are being shown in the tree without access, Mantis:9964
-					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						// was
-						// getName(),
-						// tbh
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
-								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
-										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
-					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), " "
-								+ dec.getEventCRF().getCrf().getName() + " "
-								+ dec.getEventCRF().getCrfVersion().getName() + "</a>", false, true, false));
-					}
-
+				boolean lastCRF = (count == displayCRFs.size() - 1) && (dseBean.getUncompletedCRFs().size() == 0);
+				String eventCRFStatusImgString = getStageImageText(dseBean.getStudySubject(), seBean, dec, resBundle,
+						crfVersionDAO, eventDefCRFDAO);
+				if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
+					displayData.add(new StudyInfoPanelLine(eventCRFStatusImgString,
+							"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
+									+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, lastCRF, true));
 				} else {
-					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
-								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
-										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
-					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), " "
-								+ dec.getEventCRF().getCrf().getName() + " "
-								+ dec.getEventCRF().getCrfVersion().getName() + "</a>", false, false, false));
-					}
+					displayData.add(new StudyInfoPanelLine(eventCRFStatusImgString,
+							" " + dec.getEventCRF().getCrf().getName() + " "
+									+ dec.getEventCRF().getCrfVersion().getName() + "</a>", false, lastCRF, false));
 				}
 				count++;
 			}
@@ -710,129 +562,25 @@ public class StudyInfoPanel {
 				if (count == uncompleted.size() - 1) {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()
 							&& ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
-						// logger.info("ecb id*******" + ecb.getId() +
-						// dedc.getEventCRF().getId());
-						displayData.add(
-								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+						displayData
+								.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
 										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</span>", false,
 										true, true));
 					} else {
-						displayData.add(
-								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+						displayData
+								.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
 										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, true,
 										false));
-
 					}
 				} else {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
-						// logger.info("ecb id*******" + ecb.getId() +
-						// dedc.getEventCRF().getId());
-						displayData.add(
-								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+						displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
 										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</span>", false,
 										false, true));
 					} else {
-						displayData.add(
-								new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
-										"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false,
-										false, false));
-
-					}
-				}
-				count++;
-			}
-		}
-
-		return displayData;
-	}
-
-	/**
-	 * Generates a tree view in sdie info panel for submitting data page.
-	 * 
-	 * @param rows
-	 *            ArrayList
-	 * @param displayData
-	 *            ArrayList
-	 * @param studySubject
-	 *            StudySubjectBean
-	 * @param ecb
-	 *            EventCRFBean
-	 * @return ArrayList
-	 */
-	public ArrayList generateTreeFromBeansWithoutLink(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject, 
-			EventCRFBean ecb, ResourceBundle resBundle) {
-
-		for (Object row : rows) {
-			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) row;
-			StudyEventBean seBean = dseBean.getStudyEvent();
-			// checks whether the event is the current one
-			if (ecb != null && ecb.getStudyEventId() == seBean.getId()) {
-				displayData.add(new StudyInfoPanelLine("Study Event", seBean.getStudyEventDefinition().getName(), true,
-						false, true));
-
-			} else {
-				displayData.add(new StudyInfoPanelLine("Study Event", seBean.getStudyEventDefinition().getName(), true,
-						false, false));
-			}
-
-			displayData.add(new StudyInfoPanelLine("<b>Status: </b>", seBean.getSubjectEventStatus().getName(), false,
-					false, false));
-			ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
-			int count = 0;
-			for (Object displayCRF : displayCRFs) {
-				DisplayEventCRFBean dec = (DisplayEventCRFBean) displayCRF;
-				if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
-					// last event CRF for this event
-					// it's the current crf
-					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
-								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
-										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
-					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), dec
-								.getEventCRF().getCrf().getName()
-								+ " " + dec.getEventCRF().getCrfVersion().getName(), false, true, false));
-					}
-
-				} else {
-					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle),
-								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
-										+ dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
-					} else {
-						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage(), dec.getEventCRF().getStatus(), resBundle), dec
-								.getEventCRF().getCrf().getName()
-								+ " " + dec.getEventCRF().getCrfVersion().getName(), false, false, false));
-					}
-				}
-				count++;
-			}
-			count = 0;
-			ArrayList uncompleted = dseBean.getUncompletedCRFs();
-			for (Object anUncompleted : uncompleted) {
-				DisplayEventDefinitionCRFBean dedc = (DisplayEventDefinitionCRFBean) anUncompleted;
-				if (count == uncompleted.size() - 1) {
-					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()
-							&& ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
-										+ dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
-					} else {
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", dedc.getEdc().getCrf()
-										.getName(), false, true, false));
-
-					}
-				} else {
-					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
-										+ dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
-					} else {
-						displayData.add(new StudyInfoPanelLine(
-								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", dedc.getEdc().getCrf()
-										.getName(), false, false, false));
-
+						displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+												"<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>",
+												false, false, false));
 					}
 				}
 				count++;

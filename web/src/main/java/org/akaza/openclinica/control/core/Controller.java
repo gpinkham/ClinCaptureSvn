@@ -876,7 +876,7 @@ public abstract class Controller extends BaseController {
 					}
 					request.getSession().setAttribute("trail", trail);
 					StudyInfoPanel panel = getStudyInfoPanel(request);
-					panel.setData(jspPage, request.getSession(), request);
+					panel.setData(jspPage, request.getSession(), request, getCRFVersionDAO(), getEventDefinitionCRFDAO());
 				}
 				// we are also using checkTrail to update the panel, tbh
 			}
