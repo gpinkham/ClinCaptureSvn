@@ -815,4 +815,10 @@
             having count(distinct id.item_data_id) = count(distinct ifm.item_form_metadata_id) and count(distinct dns.discrepancy_note_id) = 0)
         </sql>
     </query>
+    <query>
+        <name>savePartialSectionInfo</name>
+        <sql>
+            {call save_partial_section_info(?,?)}
+        </sql>
+    </query>
 </queries>

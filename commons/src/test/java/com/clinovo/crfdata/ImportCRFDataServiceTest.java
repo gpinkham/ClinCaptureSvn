@@ -1,4 +1,4 @@
-package com.clinovo.clincapture.web.crfdata;
+package com.clinovo.crfdata;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -10,13 +10,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.sax.SAXSource;
 
+import junit.framework.TestCase;
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -24,6 +25,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.xml.sax.InputSource;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.ItemSDVService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
 
@@ -53,7 +55,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 			permittedEventCRFIds.add(12);
 			permittedEventCRFIds.add(13);
 
-			Locale testLocale = new Locale(locale);
+			Locale testLocale = new Locale(AbstractContextSentiveTest.locale);
 			LocaleResolver.updateLocale(request, testLocale);
 			validatorHelper = new ValidatorHelper(request, configurationDao);
 		}
@@ -75,9 +77,10 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	private void parseFile(ObjectsHolder objectsHolder, String fileName) throws Exception {
 		Locale locale = new Locale("EN");
-		objectsHolder.service = new ImportCRFDataService(objectsHolder.studySubjectIdService, getDataSource(), locale);
+		objectsHolder.service = new ImportCRFDataService(Mockito.mock(RuleSetService.class),
+				Mockito.mock(ItemSDVService.class), objectsHolder.studySubjectIdService, getDataSource(), locale);
 		objectsHolder.container = new ODMContainer();
-		objectsHolder.stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/" + fileName);
+		objectsHolder.stream = this.getClass().getClassLoader().getResourceAsStream("data/" + fileName);
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		if (objectsHolder.stream != null) {
@@ -86,10 +89,10 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 			try {
 				objectsHolder.container = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 			} catch (Exception e) {
-				fail("Unmarshaller exception: " + e.getMessage());
+				TestCase.fail("Unmarshaller exception: " + e.getMessage());
 			}
 		} else {
-			fail("XML not found!");
+			TestCase.fail("XML not found!");
 		}
 	}
 
@@ -106,134 +109,135 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	@Test
 	public void testThatErrorMessagesListIsNotNull() {
 		int currentStudyId = 1;
-		assertNotNull(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub));
+		TestCase.assertNotNull(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub));
 	}
 
 	@Test
 	public void testThatSizeOfTheErrorMessagesListIsCorrect() {
 		int currentStudyId = 1;
-		assertEquals(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub).size(), 1);
+		TestCase.assertEquals(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub).size(),
+				1);
 	}
 
 	@Test
 	public void testThatGeneratedSummaryStatsBeanIsNotNull() {
-		assertNotNull(holder.service
-				.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()));
+		TestCase.assertNotNull(
+				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()));
 	}
 
 	@Test
 	public void testThatGetEventCrfCountReturnsCorrectValue() {
-		assertEquals(1,
+		TestCase.assertEquals(1,
 				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
 						.getEventCrfCount());
 	}
 
 	@Test
 	public void testThatGetDiscNoteCountReturnsCorrectValue() {
-		assertEquals(0,
+		TestCase.assertEquals(0,
 				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
 						.getDiscNoteCount());
 	}
 
 	@Test
 	public void testThatGetStudySubjectCountReturnsCorrectValue() {
-		assertEquals(1,
+		TestCase.assertEquals(1,
 				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
 						.getStudySubjectCount());
 	}
 
 	@Test
 	public void testThatGetSubjectDataFromTestFile1ReturnsCorrectSize() throws Exception {
-		assertEquals(holder1.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
+		TestCase.assertEquals(holder1.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetStudyEventDataFromTestFile1ReturnsCorrectSize() throws Exception {
-		assertEquals(holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData()
-				.size(), 1);
+		TestCase.assertEquals(
+				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetFormDataFromTestFile1ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().size(), 2);
 	}
 
 	@Test
 	public void testThatGetItemGroupDataFromFirstFormDataFromTestFile1ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(0).getItemGroupData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetItemGroupDataFromSecondFormDataFromTestFile1ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(1).getItemGroupData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetSubjectDataFromTestFile2ReturnsCorrectSize() throws Exception {
-		assertEquals(holder2.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
+		TestCase.assertEquals(holder2.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetStudyEventDataFromTestFile2ReturnsCorrectSize() throws Exception {
-		assertEquals(holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData()
-				.size(), 2);
+		TestCase.assertEquals(
+				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().size(), 2);
 	}
 
 	@Test
 	public void testThatGetFormDataFromFirstStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetFormDataFromSecondStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(1)
 						.getFormData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetItemGroupDataFromFirstStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(0).getItemGroupData().size(), 5);
 	}
 
 	@Test
 	public void testThatGetItemGroupDataFromSecondStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(1)
 						.getFormData().get(0).getItemGroupData().size(), 5);
 	}
 
 	@Test
 	public void testThatGetSubjectDataFromTestFile3ReturnsCorrectSize() throws Exception {
-		assertEquals(holder3.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
+		TestCase.assertEquals(holder3.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetStudyEventFromTestFile3ReturnsCorrectSize() throws Exception {
-		assertEquals(holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData()
-				.size(), 1);
+		TestCase.assertEquals(
+				holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetFormDataFromTestFile3ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().size(), 1);
 	}
 
 	@Test
 	public void testThatGetItemGroupDataFromTestFile3ReturnsCorrectSize() throws Exception {
-		assertEquals(
+		TestCase.assertEquals(
 				holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(0).getItemGroupData().size(), 6);
 	}
@@ -244,7 +248,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 				holder1.container, holder1.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder1.permittedEventCRFIds);
 		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
-		assertEquals(countFilterAutoAdd, 6);
+		TestCase.assertEquals(countFilterAutoAdd, 6);
 	}
 
 	@Test
@@ -254,7 +258,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 				holder2.permittedEventCRFIds);
 		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
 		countFilterAutoAdd += filterAutoAddedCount(wrappers, 1);
-		assertEquals(countFilterAutoAdd, 48);
+		TestCase.assertEquals(countFilterAutoAdd, 48);
 	}
 
 	@Test
@@ -263,6 +267,6 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 				holder3.container, holder3.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder3.permittedEventCRFIds);
 		int countFilterAutoAdd = filterAutoAddedCount(wrappers, 0);
-		assertEquals(countFilterAutoAdd, 29);
+		TestCase.assertEquals(countFilterAutoAdd, 29);
 	}
 }

@@ -266,13 +266,13 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
 		PreparedStatement ps = null;
 
-		boolean isTrasactional = false;
+		boolean isTransactional = false;
 		if (con != null) {
-			isTrasactional = true;
+			isTransactional = true;
 		}
 
 		try {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				con = ds.getConnection();
 			}
 			if (con.isClosed()) {
@@ -302,7 +302,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				sqle.printStackTrace();
 			}
 		} finally {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				closeIfNecessary(con, rs, ps);
 			} else {
 				closeIfNecessary(rs, ps);
@@ -475,13 +475,13 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	public void execute(String query, Connection con) {
 		clearSignals();
 
-		boolean isTrasactional = false;
+		boolean isTransactional = false;
 		if (con != null) {
-			isTrasactional = true;
+			isTransactional = true;
 		}
 		PreparedStatement ps = null;
 		try {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				con = ds.getConnection();
 			}
 			if (con.isClosed()) {
@@ -510,31 +510,35 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				this.closeIfNecessary(con, ps);
 			} else {
 				closePreparedStatement(ps);
 			}
 		}
 	}
-
+	
 	public void execute(String query, HashMap variables) {
 		con = null;
-		execute(query, variables, (Connection) null);
+		execute(query, variables, null, false);
 	}
 
 	public void execute(String query, HashMap variables, Connection con) {
+		execute(query, variables, con, false);
+	}
+
+	public void execute(String query, HashMap variables, Connection con, boolean useCallableStatement) {
 		clearSignals();
 
-		boolean isTrasactional = false;
+		boolean isTransactional = false;
 		if (con != null) {
-			isTrasactional = true;
+			isTransactional = true;
 		}
 
 		PreparedStatement ps = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
 		try {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				con = ds.getConnection();
 			}
 			if (con.isClosed()) {
@@ -542,7 +546,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					logger.warn("Connection is closed: EntityDAO.execute!");
 				throw new SQLException();
 			}
-			ps = con.prepareStatement(query);
+			ps = useCallableStatement ? con.prepareCall(query) : con.prepareStatement(query);
 			ps = psf.generate(ps);// enter variables here!
 			if (ps.executeUpdate() < 0) {// change by jxu, delete can affect
 				// more than one row
@@ -565,7 +569,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				this.closeIfNecessary(con, ps);
 			} else {
 				closePreparedStatement(ps);
@@ -581,15 +585,15 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	public void execute(String query, HashMap variables, HashMap nullVars, Connection con) {
 		clearSignals();
 
-		boolean isTrasactional = false;
+		boolean isTransactional = false;
 		if (con != null) {
-			isTrasactional = true;
+			isTransactional = true;
 		}
 
 		PreparedStatement ps = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
 		try {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				con = ds.getConnection();
 			}
 			if (con.isClosed()) {
@@ -619,7 +623,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				this.closeIfNecessary(con, ps);
 			} else {
 				closePreparedStatement(ps);
@@ -660,15 +664,15 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	public void executeWithPK(String query, HashMap variables, HashMap nullVars, Connection con) {
 		clearSignals();
 
-		boolean isTrasactional = false;
+		boolean isTransactional = false;
 		if (con != null) {
-			isTrasactional = true;
+			isTransactional = true;
 		}
 
 		PreparedStatement ps = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
 		try {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				con = ds.getConnection();
 			}
 			if (con.isClosed()) {
@@ -720,7 +724,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				logger.error(sqle.getMessage(), sqle);
 			}
 		} finally {
-			if (!isTrasactional) {
+			if (!isTransactional) {
 				this.closeIfNecessary(con, ps);
 			} else {
 				closePreparedStatement(ps);

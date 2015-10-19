@@ -16,6 +16,8 @@ package org.akaza.openclinica.bean.submit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Display Item Bean Wrapper, code to generate a front end view of errors generated during Data Import.
@@ -25,26 +27,55 @@ import java.util.List;
  */
 @SuppressWarnings("rawtypes")
 public class DisplayItemBeanWrapper {
-	boolean isOverwrite = false;
-	boolean isSavable = false;
-	List<DisplayItemBean> displayItemBeans;
-	HashMap validationErrors;
-	// Values to display on the jsp
-	String studyEventId;
-	String crfVersionId;
-	//
-	String studyEventName;
-	String studySubjectName;
-	Date dateOfEvent;
-	String nameOfEvent;
-	String crfName;
-	String crfVersionName;
-	String studySubjectOid;
-	String studyEventRepeatKey;
 
-	// need to add here
-	// study_subject_id, date_of_event, name_of_event, crf_name and version
+	private boolean isOverwrite;
+	private boolean isSavable;
+	private List<DisplayItemBean> displayItemBeans;
+	private HashMap validationErrors;
 
+	private String studyEventId;
+	private String crfVersionId;
+
+	private String studyEventName;
+	private String studySubjectName;
+	private Date dateOfEvent;
+	private String nameOfEvent;
+	private String crfName;
+	private String crfVersionName;
+	private String studySubjectOid;
+	private String studyEventRepeatKey;
+	private Map<Integer, Set<Integer>> partialSectionIdMap;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param displayItemBeans
+	 *            List of DisplayItemBean
+	 * @param isSavable
+	 *            boolean
+	 * @param isOverwrite
+	 *            boolean
+	 * @param validationErrors
+	 *            HashMap
+	 * @param studyEventId
+	 *            String
+	 * @param crfVersionId
+	 *            String
+	 * @param studyEventName
+	 *            String
+	 * @param studySubjectName
+	 *            String
+	 * @param dateOfEvent
+	 *            Date
+	 * @param crfName
+	 *            String
+	 * @param crfVersionName
+	 *            String
+	 * @param studySubjectOid
+	 *            String
+	 * @param studyEventRepeatKey
+	 *            String
+	 */
 	public DisplayItemBeanWrapper(List<DisplayItemBean> displayItemBeans, boolean isSavable, boolean isOverwrite,
 			HashMap validationErrors, String studyEventId, String crfVersionId, String studyEventName,
 			String studySubjectName, Date dateOfEvent, String crfName, String crfVersionName, String studySubjectOid,
@@ -62,7 +93,7 @@ public class DisplayItemBeanWrapper {
 		this.crfVersionName = crfVersionName;
 		this.studySubjectOid = studySubjectOid;
 		this.studyEventRepeatKey = studyEventRepeatKey;
-
+		partialSectionIdMap = new HashMap<Integer, Set<Integer>>();
 	}
 
 	public HashMap getValidationErrors() {
@@ -173,4 +204,11 @@ public class DisplayItemBeanWrapper {
 		this.studyEventRepeatKey = studyEventRepeatKey;
 	}
 
+	public Map<Integer, Set<Integer>> getPartialSectionIdMap() {
+		return partialSectionIdMap;
+	}
+
+	public void setPartialSectionIdMap(Map<Integer, Set<Integer>> partialSectionIdMap) {
+		this.partialSectionIdMap = partialSectionIdMap;
+	}
 }

@@ -55,7 +55,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
+import com.clinovo.crfdata.ImportCRFDataService;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -70,7 +70,7 @@ import com.clinovo.util.ValidatorHelper;
  * import all the XML in the ODM 1.3 standard.
  * 
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "rawtypes"})
 @Component
 public class ImportCRFDataServlet extends Controller {
 
@@ -100,13 +100,12 @@ public class ImportCRFDataServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+				"1");
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
@@ -190,8 +189,10 @@ public class ImportCRFDataServlet extends Controller {
 				return;
 			}
 
-			List<String> errors = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(),
-					LocaleResolver.getLocale(request)).validateStudyMetadata(odmContainer, ub.getActiveStudyId(), ub);
+			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getRuleSetService(),
+					getItemSDVService(), getStudySubjectIdService(), getDataSource(),
+					LocaleResolver.getLocale(request));
+			List<String> errors = importCRFDataService.validateStudyMetadata(odmContainer, ub.getActiveStudyId(), ub);
 			if (errors != null) {
 				// add to session
 				// forward to another page
@@ -211,8 +212,6 @@ public class ImportCRFDataServlet extends Controller {
 			}
 			logger.debug("passed error check");
 
-			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getStudySubjectIdService(),
-					getDataSource(), LocaleResolver.getLocale(request));
 			List<EventCRFBean> eventCRFBeans = importCRFDataService.fetchEventCRFBeans(odmContainer, ub);
 			List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 			HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
@@ -253,9 +252,9 @@ public class ImportCRFDataServlet extends Controller {
 
 					try {
 						List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers;
-						tempDisplayItemBeanWrappers = importCRFDataService.lookupValidationErrors(new ValidatorHelper(
-								request, getConfigurationDao()), odmContainer, ub, totalValidationErrors,
-								hardValidationErrors, permittedEventCRFIds);
+						tempDisplayItemBeanWrappers = importCRFDataService.lookupValidationErrors(
+								new ValidatorHelper(request, getConfigurationDao()), odmContainer, ub,
+								totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
 						logger.info("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
 						logger.info("size of total validation errors: " + totalValidationErrors.size());
 						logger.info("size of hard validation errors: " + hardValidationErrors.size());
@@ -267,8 +266,8 @@ public class ImportCRFDataServlet extends Controller {
 						addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"), request);
 					} catch (OpenClinicaException oce1) {
 						fail = true;
-						logger.debug("threw an OCE after calling lookup validation errors "
-								+ oce1.getOpenClinicaMessage());
+						logger.debug(
+								"threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
 						addPageMessage(oce1.getOpenClinicaMessage(), request);
 					}
 				} else {
@@ -287,19 +286,17 @@ public class ImportCRFDataServlet extends Controller {
 				request.getSession().setAttribute("hardValidationErrors", hardValidationErrors);
 
 				logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
-				SummaryStatsBean ssBean = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(),
-						LocaleResolver.getLocale(request)).generateSummaryStatsBean(odmContainer,
+				SummaryStatsBean ssBean = importCRFDataService.generateSummaryStatsBean(odmContainer,
 						displayItemBeanWrappers);
 				request.getSession().setAttribute("summaryStats", ssBean);
 				request.getSession().setAttribute("subjectData",
 						odmContainer.getCrfDataPostImportContainer().getSubjectData());
 				if (request.getAttribute("hasSkippedItems") != null) {
-					addPageMessage(
-							resword.getString("import_msg_part1")
-									+ " "
-									+ (currentStudy.getParentStudyId() > 0 ? resword.getString("site") : resword
-											.getString("study")) + " " + resword.getString("import_msg_part2"),
-							request);
+					addPageMessage(resword.getString("import_msg_part1") + " "
+							+ (currentStudy.getParentStudyId() > 0
+									? resword.getString("site")
+									: resword.getString("study"))
+							+ " " + resword.getString("import_msg_part2"), request);
 				}
 				forwardPage(Page.VERIFY_IMPORT_SERVLET, request, response);
 			}
@@ -309,7 +306,6 @@ public class ImportCRFDataServlet extends Controller {
 	/*
 	 * Given the MultipartRequest extract the first File validate that it is an xml file and then return it.
 	 */
-	@SuppressWarnings("rawtypes")
 	private File getFirstFile(HttpServletRequest request, HashMap errorsMap) {
 		File f = null;
 		FileUploadHelper uploadHelper = new FileUploadHelper();
@@ -330,11 +326,16 @@ public class ImportCRFDataServlet extends Controller {
 	}
 
 	/**
-	 * Uploads the xml file
+	 * Uploads the xml file.
 	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param errorsMap
+	 *            HashMap
+	 * @return File
 	 * @throws Exception
+	 *             an Exception
 	 */
-	@SuppressWarnings("rawtypes")
 	public File uploadFile(HttpServletRequest request, HashMap errorsMap) throws Exception {
 		return getFirstFile(request, errorsMap);
 	}

@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-import com.clinovo.service.StudyEventService;
-import com.clinovo.service.StudyService;
-import com.clinovo.service.StudySubjectService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -67,6 +64,7 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.StudyInfoPanel;
+import com.clinovo.crfdata.ImportCRFDataService;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.quartz.impl.StdScheduler;
@@ -86,11 +84,15 @@ import com.clinovo.service.DcfService;
 import com.clinovo.service.DeleteCrfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
+import com.clinovo.service.StudyEventService;
+import com.clinovo.service.StudyService;
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.StudySubjectService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
@@ -280,6 +282,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private StudySubjectService studySubjectService;
 	@Autowired
 	private StudyService studyService;
+	@Autowired
+	private EventCRFSectionService eventCRFSectionService;
 
 	/**
 	 * Allow access to this for other users.
@@ -474,6 +478,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public RuleSetService getRuleSetService() {
 		return RuleSetServiceUtil.getRuleSetService();
+	}
+	
+	public ImportCRFDataService getImportCRFDataService() {
+		return new ImportCRFDataService(getRuleSetService(), itemSDVService, getStudySubjectIdService(),
+				getDataSource(), LocaleResolver.getLocale());
 	}
 
 	public DataSource getDataSource() {
@@ -850,5 +859,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public StudyService getStudyService() {
 		return studyService;
+	}
+
+	public EventCRFSectionService getEventCRFSectionService() {
+		return eventCRFSectionService;
 	}
 }

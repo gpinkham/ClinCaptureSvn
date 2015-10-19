@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="skirpichenok" id="2015-10-13-TICKET2589-02" dbms="postgresql">
+		<comment>Create stored function</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE FUNCTION save_partial_section_info(eventCrfId INTEGER, sectionId INTEGER) RETURNS void AS
+			'DECLARE
+			  ecsId INTEGER DEFAULT 0;
+			BEGIN
+			  select id into ecsId from event_crf_section where event_crf_id = eventCrfId and section_id = sectionId;
+			  IF ecsId > 0
+			  THEN
+			    update event_crf_section set partial_saved = true where event_crf_id = eventCrfId and section_id = sectionId;
+			  ELSE
+			    insert into event_crf_section (event_crf_id, section_id, "version", partial_saved) values (eventCrfId, sectionId, 0, true);
+			  END IF;
+			END;
+			'LANGUAGE plpgsql;
+			COMMIT;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

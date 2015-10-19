@@ -22,33 +22,34 @@
 
 package org.akaza.openclinica.bean.odmbeans;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
+ * OdmClinicalDataBean.
  * 
  * @author ywang (May, 2008)
- * 
  */
-
 public class OdmClinicalDataBean {
 	private String studyOID;
 	private String metaDataVersionOID;
+	private Set<Integer> partialEventCrfIdList;
 	private List<ExportSubjectDataBean> exportSubjectData;
+	private Map<Integer, Set<Integer>> partialSectionIdMap;
 
-	/*
-	 * private List<StudyEventDataBean> studyEventData; private List<FormDataBean> formData; private
-	 * List<ImportItemGroupDataBean> itemGroupData; private List<ImportItemDataBean> itemData;
+	/**
+	 * Constructor.
 	 */
-
 	public OdmClinicalDataBean() {
+		partialEventCrfIdList = new HashSet<Integer>();
+		partialSectionIdMap = new HashMap<Integer, Set<Integer>>();
 		exportSubjectData = new ArrayList<ExportSubjectDataBean>();
-		/*
-		 * studyEventData = new ArrayList<StudyEventDataBean>(); formData = new ArrayList<FormDataBean>(); itemGroupData
-		 * = new ArrayList<ImportItemGroupDataBean>(); itemData = new ArrayList<ImportItemDataBean>();
-		 */
 	}
 
 	public void setStudyOID(String studyOID) {
@@ -75,21 +76,11 @@ public class OdmClinicalDataBean {
 		return this.exportSubjectData;
 	}
 
-	/*
-	 * public void setStudyEventData(List<StudyEventDataBean> studyEventData) { this.studyEventData = studyEventData; }
-	 * 
-	 * public List<StudyEventDataBean> getStudyEventData() { return this.studyEventData; }
-	 * 
-	 * public void setFormData(List<FormDataBean> formData) { this.formData = formData; }
-	 * 
-	 * public List<FormDataBean> getFormData() { return this.formData; }
-	 * 
-	 * public void setItemGroupData(List<ImportItemGroupDataBean> itemGroupData) { this.itemGroupData = itemGroupData; }
-	 * 
-	 * public List<ImportItemGroupDataBean> getItemGroupData() { return this.itemGroupData; }
-	 * 
-	 * public void setItemData(List<ImportItemDataBean> itemData) { this.itemData = itemData; }
-	 * 
-	 * public List<ImportItemDataBean> getItemData() { return this.itemData; }
-	 */
+	public Set<Integer> getPartialEventCrfIdList() {
+		return partialEventCrfIdList;
+	}
+
+	public Map<Integer, Set<Integer>> getPartialSectionIdMap() {
+		return partialSectionIdMap;
+	}
 }

@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -62,6 +63,19 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 */
 	public EventDefinitionCRFDAO(DataSource ds) {
 		super(ds);
+		setQueryNames();
+	}
+
+	/**
+	 * EventDefinitionCRFDAO constructor.
+	 *
+	 * @param ds
+	 *            DataSource
+	 * @param con
+	 *            Connection
+	 */
+	public EventDefinitionCRFDAO(DataSource ds, Connection con) {
+		super(ds, con);
 		setQueryNames();
 	}
 

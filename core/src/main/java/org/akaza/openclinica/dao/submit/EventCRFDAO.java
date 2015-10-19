@@ -1148,8 +1148,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return Integer
 	 */
-	public Integer getCountOfAvailableWithFilter(int studyId, EventCRFSDVFilter filter,
-			boolean allowSdvWithOpenQueries, int userId) {
+	public Integer getCountOfAvailableWithFilter(int studyId, EventCRFSDVFilter filter, boolean allowSdvWithOpenQueries,
+			int userId) {
 		setTypesExpected();
 		int ind = 1;
 		HashMap variables = new HashMap();
@@ -1969,8 +1969,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		String partialSql = sort.execute("");
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			if (partialSql.equals("")) {
-				sql = sql.concat(" ORDER BY ec.date_created )x)where r between ")
-						.concat(Integer.toString(rowStart + 1)).concat(" and ").concat(Integer.toString(rowEnd));
+				sql = sql.concat(" ORDER BY ec.date_created )x)where r between ").concat(Integer.toString(rowStart + 1))
+						.concat(" and ").concat(Integer.toString(rowEnd));
 			} else {
 				sql = sql.concat(")x)where r between ").concat(Integer.toString(rowStart + 1)).concat(" and ")
 						.concat(Integer.toString(rowEnd)).concat(" ").concat(partialSql);
@@ -2067,5 +2067,24 @@ public class EventCRFDAO extends AuditableEntityDAO {
 				: "sdvEventCRFsWithoutOutstandingDNsWhenCRFMetadataWasChangedAndAllItemsAreSDV"), variables);
 
 		return isQuerySuccessful();
+	}
+
+	/**
+	 * Saves partial section info.
+	 * 
+	 * @param eventCrfId
+	 *            int
+	 * @param sectionId
+	 *            int
+	 * @param connection
+	 *            Connection
+	 */
+	public void savePartialSectionInfo(int eventCrfId, int sectionId, Connection connection) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, eventCrfId);
+		variables.put(ind, sectionId);
+		execute(digester.getQuery("savePartialSectionInfo"), variables, connection, true);
 	}
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ODM1-3.xsd" ODMVersion="1.3" FileOID="1D20080412202420" FileType="Snapshot" Description="For ClinCapture Data Import" CreationDateTime="2008-04-12T20:24:20">
+	<ClinicalData StudyOID="S_001" MetaDataVersionOID="v1.0.0">
+		<SubjectData SubjectKey="SS_001000">
+			<StudyEventData StudyEventOID="SE_EVENT">
+				<FormData FormOID="F_FORM_0">
+					<ItemGroupData ItemGroupOID="IG_FORM_UNGROUPED" TransactionType="Insert">
+						<ItemData ItemOID="I_FORM_RCPT001_TXT_SUBINT" Value="NPC"/>
+						<ItemData ItemOID="I_FORM_RCPT001_TXT_SAMPLEID" Value="70792"/>
+						<ItemData ItemOID="I_FORM_RCPT001_RBD_SAMPREC" Value="1"/>
+					</ItemGroupData>
+				</FormData>
+			</StudyEventData>
+		</SubjectData >
+	</ClinicalData>
+</ODM>

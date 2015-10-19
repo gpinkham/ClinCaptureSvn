@@ -1,6 +1,7 @@
 package com.clinovo.clincapture.control.managestudy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,17 +22,17 @@ import org.junit.Test;
 import org.xml.sax.InputSource;
 
 public class DataImportServletTest {
-	
+
 	protected InputStream stream;
-	
+
 	@Before
 	public void setUp() throws Exception {
-		stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/DataImportServletXmlTest.xml");
+		stream = this.getClass().getClassLoader().getResourceAsStream("data/DataImportServletXmlTest.xml");
 	}
-	
+
 	@Test
 	public void DataImportTest() throws Exception {
-		ODMContainer odmContainer = new ODMContainer();
+		ODMContainer odmContainer;
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		if (stream != null) {
@@ -57,10 +58,10 @@ public class DataImportServletTest {
 				assertEquals(importItemDataBean.get(2).getItemOID(), "I_FORM_RCPT001_RBD_SAMPREC");
 				assertEquals(importItemDataBean.get(2).getValue(), "1");
 			} catch (Exception e) {
-				fail("Unmarshaller exception: " +e.getMessage());
+				fail("Unmarshaller exception: " + e.getMessage());
 			}
 		} else {
-				fail("Import xml not found");
+			fail("Import xml not found");
 		}
 
 	}

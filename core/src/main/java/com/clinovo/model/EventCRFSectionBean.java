@@ -19,7 +19,6 @@ import javax.persistence.Transient;
 public class EventCRFSectionBean extends AbstractMutableDomainObject {
 
 	private int sectionId;
-	private int studySubjectId;
 	private int eventCRFId;
 	private boolean partialSaved;
 	
@@ -41,14 +40,6 @@ public class EventCRFSectionBean extends AbstractMutableDomainObject {
 
 	public void setSectionId(int sectionId) {
 		this.sectionId = sectionId;
-	}
-
-	public int getStudySubjectId() {
-		return studySubjectId;
-	}
-
-	public void setStudySubjectId(int studySubjectId) {
-		this.studySubjectId = studySubjectId;
 	}
 	
 	@Column(name="event_crf_id")

@@ -71,6 +71,18 @@ public class ItemDAO extends AuditableEntityDAO {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param ds
+	 *            DataSource
+	 * @param con
+	 *            Connection
+	 */
+	public ItemDAO(DataSource ds, Connection con) {
+		super(ds, con);
+	}
+
+	/**
+	 * Constructor.
 	 * 
 	 * @param ds
 	 *            DataSource

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="skirpichenok" id="2015-10-13-TICKET2589-01">
+		<comment>Delete the study_subject_id field from the event_crf_section table</comment>
+		<dropForeignKeyConstraint baseTableName="event_crf_section" constraintName="event_crf_section_fk_study_subject_id"/>
+		<dropColumn tableName="event_crf_section" columnName="study_subject_id"/>
+	</changeSet>
+
+</databaseChangeLog>

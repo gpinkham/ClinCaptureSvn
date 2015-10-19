@@ -20,7 +20,11 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import com.clinovo.util.DateUtil;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Set;
+
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -36,8 +40,7 @@ import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.ArrayList;
-import java.util.Date;
+import com.clinovo.util.DateUtil;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -169,12 +172,21 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 						}
 						String status = form.getStatus();
 						if (status != null && status.length() > 0) {
-							xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
+							if (form.isShowStatus()) {
+								xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
+							}
+							Set<Integer> sectionIdList = clinicalData.getPartialSectionIdMap().get(form.getId());
+							if (status.equalsIgnoreCase(Status.PARTIAL_DATA_ENTRY.getName()) && sectionIdList != null
+									&& sectionIdList.size() > 0) {
+								xml.append("\" " + "PartialSections=\""
+										+ sectionIdList.toString().replaceAll("\\[|\\]", ""));
+							}
 						}
 					}
+
 					xml.append("\">");
 					xml.append(nls);
-					//
+
 					ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
 					for (ImportItemGroupDataBean ig : igs) {
 						xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""

@@ -232,7 +232,7 @@ public abstract class Controller extends BaseController {
 			pageMessages = new ArrayList();
 		}
 
-		if (!pageMessages.contains(message)) {
+		if (!pageMessages.contains(message) && !message.isEmpty()) {
 			pageMessages.add(message);
 		}
 		aLogger.debug(message);

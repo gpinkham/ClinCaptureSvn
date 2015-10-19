@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="skirpichenok" id="2015-10-13-TICKET2589-02" dbms="oracle">
+		<comment>Create stored procedure</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE PROCEDURE save_partial_section_info(eventCrfId IN NUMBER, sectionId IN NUMBER)
+			AS
+			 ecsId NUMBER;
+			BEGIN
+			 select id into ecsId from event_crf_section where event_crf_id = eventCrfId and section_id = sectionId;
+			 update event_crf_section set partial_saved = 1 where event_crf_id = eventCrfId and section_id = sectionId;
+			 EXCEPTION  WHEN NO_DATA_FOUND THEN insert into event_crf_section (event_crf_id, section_id, version, partial_saved) values (eventCrfId, sectionId, 0, 1);
+			END save_partial_section_info;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

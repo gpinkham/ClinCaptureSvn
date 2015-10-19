@@ -1695,7 +1695,6 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFSectionBean ecsb = eventCRFSectionService.findByEventCRFIdAndSectionId(eventCRFBean.getId(), sectionBeanId);
 		ecsb.setEventCRFId(eventCRFBean.getId());
 		ecsb.setSectionId(sectionBeanId);
-		ecsb.setStudySubjectId(sSubjectId);
 		if (ecsb.isPartialSaved() != markPartialSaved) {
 			ecsb.setPartialSaved(markPartialSaved);
 			eventCRFSectionService.saveEventCRFSectionBean(ecsb);

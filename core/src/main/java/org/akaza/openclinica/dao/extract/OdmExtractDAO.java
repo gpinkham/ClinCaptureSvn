@@ -369,7 +369,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(11, TypeNames.INT); // item_data_id
         this.setTypeExpected(12, TypeNames.STRING); // mu_oid
         this.setTypeExpected(13, TypeNames.INT); // study_event_definition_id
-        this.setTypeExpected(14, TypeNames.BOOL); //repeating_group
+        this.setTypeExpected(14, TypeNames.BOOL); // repeating_group
     }
 
     public void setEventCrfIdsByItemDataTypesExpected() {
@@ -1512,6 +1512,27 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
+	private void preparePartialSectionIdMap(OdmClinicalDataBean data) {
+		if (data.getPartialEventCrfIdList().size() > 0) {
+			int index = 1;
+			String query = "select ecs.event_crf_id as event_crf_id, ecs.section_id as section_id from event_crf_section ecs where ecs.partial_saved = true and ecs.event_crf_id in "
+					.concat(data.getPartialEventCrfIdList().toString().replace("[", "(").replace("]", ")"));
+			setTypeExpected(index++, TypeNames.INT); // event_crf_id
+			setTypeExpected(index, TypeNames.INT); // section_id
+			List<Map> rows = select(query);
+			for (Map row : rows) {
+				Integer sectionId = (Integer) row.get("section_id");
+				Integer eventCrfId = (Integer) row.get("event_crf_id");
+				Set<Integer> sectionIdList = data.getPartialSectionIdMap().get(eventCrfId);
+				if (sectionIdList == null) {
+					sectionIdList = new HashSet<Integer>();
+					data.getPartialSectionIdMap().put(eventCrfId, sectionIdList);
+				}
+				sectionIdList.add(sectionId);
+			}
+		}
+	}
+
     public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion,
                                 String studySubjectIds, String odmType, boolean skipBlanks) {
         String dbType = CoreResources.getDBType();
@@ -1597,6 +1618,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 oidPos += "---" + (sub.getExportStudyEventData().size() - 1);
                 ExportFormDataBean form = new ExportFormDataBean();
+                form.setId(ecId);
                 key += cvOID;
                 if (formprev.equals(key)) {
                     form = se.getExportFormData().get(se.getExportFormData().size() - 1);
@@ -1612,7 +1634,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 oidPos = "";
             }
         }
-
+        preparePartialSectionIdMap(data);
         this.setEventGroupItemDataWithUnitTypesExpected();
         logger.debug("Begin to GetEventGroupItemWithUnitSql");
         String query = getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
@@ -1639,7 +1661,7 @@ public class OdmExtractDAO extends DatasetDAO {
             int ecprev = -1;
             igprev = "";
             boolean goon = true;
-            String itprev = "";
+			String itprev = "";
 
             HashMap<String, String> nullValueCVs = this.getNullValueCVs(study);
             while (iter.hasNext()) {
@@ -1671,6 +1693,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     }
                     ecprev = ecId;
                 }
+                form.setId(ecId);
                 if (goon) {
                     ImportItemGroupDataBean ig = new ImportItemGroupDataBean();
                     key = ecId + "-" + igId;
@@ -1729,8 +1752,8 @@ public class OdmExtractDAO extends DatasetDAO {
                             } else if (datatypeid == 9) {
                                 try {
                                     if (!StringUtil.isFormatDate(itValue, "yyyy-MM-dd")) {
-                                        itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(
-                                                local_df_string, locale).parse(itValue));
+                                        itValue = new SimpleDateFormat("yyyy-MM-dd").format(
+                                                new SimpleDateFormat(local_df_string, locale).parse(itValue));
                                     }
                                 } catch (Exception fe) {
                                     logger.debug("Item -" + itOID + " value " + itValue
@@ -2547,6 +2570,7 @@ public class OdmExtractDAO extends DatasetDAO {
             oidPos += "---" + (sub.getExportStudyEventData().size() - 1);
             evnOidPoses.put(key, oidPos);
             ExportFormDataBean form = new ExportFormDataBean();
+            form.setId(ecId);
             key += cvOID;
             if (formprev.equals(key)) {
                 form = se.getExportFormData().get(se.getExportFormData().size() - 1);
@@ -2557,11 +2581,13 @@ public class OdmExtractDAO extends DatasetDAO {
                 if (dataset.isShowCRFversion()) {
                     form.setCrfVersion((String) row.get("crf_version"));
                 }
-                if (dataset.isShowCRFstatus()) {
-                    form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Boolean) row.get("ec_sdv_status"),
-                            (Integer) row.get("cv_status_id"), (Integer) row.get("ec_status_id"),
-                            (Integer) row.get("validator_id")));
-                }
+				if (Status.get((Integer) row.get("ec_status_id")).isPartialDataEntry()) {
+					data.getPartialEventCrfIdList().add(ecId);
+				}
+				form.setShowStatus(dataset.isShowCRFstatus());
+				form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Boolean) row.get("ec_sdv_status"),
+						(Integer) row.get("cv_status_id"), (Integer) row.get("ec_status_id"),
+						(Integer) row.get("validator_id")));
                 if (dataset.isShowCRFinterviewerName()) {
                     form.setInterviewerName((String) row.get("interviewer_name"));
                 }
@@ -3154,7 +3180,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " join item i on i.item_id = id.item_id \n"
 				+ " join item_group_metadata igm on igm.crf_version_id = ec.crf_version_id and igm.item_id = i.item_id \n"
 				+ " join item_group ig on ig.item_group_id = igm.item_group_id \n"
-				+ " left join measurement_unit mu on mu.name = i.units\n"
+				+ " left join measurement_unit mu on mu.name = i.units \n"
 				+ "where ec.status_id "
 				+ ecStatusConstraint
 				+ " \n";
@@ -3487,7 +3513,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     scd.setOptionValue(option);
                     scd.setMessage(message);
                     if (itPoses.containsKey(itOID) && inFormPoses.containsKey(itOID + "-" + cvOID)) {
-                        its.get(itPoses.get(itOID)).getItemDetails().getItemPresentInForm().get(inFormPoses.get(itOID + "-" + cvOID)).setSimpleConditionalDisplay(scd);
+                        its.get(itPoses.get(itOID)).getItemDetails().getItemPresentInForm().get(
+                                inFormPoses.get(itOID + "-" + cvOID)).setSimpleConditionalDisplay(scd);
                     } else {
                         logger.info("There is no <ItemDef> with item_oid=" + itOID + " or has <ItemPresentInForm> with FormOID=" + cvOID + ".");
                     }
