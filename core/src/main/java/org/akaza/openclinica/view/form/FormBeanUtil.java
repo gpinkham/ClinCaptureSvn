@@ -242,10 +242,12 @@ public class FormBeanUtil {
 		for (ItemBean iBean : itemBeans) {
 			displayBean = new DisplayItemBean();
 			displayBean.setEventDefinitionCRF(edcb);
-
 			meta = itemFormMetadataCache.get(iBean.getId()).copy();
-
 			List<ItemDataBean> itemDataBeanList = itemDataCache.get(iBean.getId());
+
+			if (itemDataBeanList != null && ordinal - 1 > itemDataBeanList.size()) {
+				ordinal = itemDataBeanList.size();
+			}
 			ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0
 					? new ItemDataBean()
 					: itemDataBeanList.get(ordinal - 1).copy();
