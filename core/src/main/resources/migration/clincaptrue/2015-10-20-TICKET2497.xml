@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-10-20-TICKET2497-0">
+		<preConditions onFail="CONTINUE">
+			<columnExists tableName="event_definition_crf"
+					columnName="participant_form"/>
+		</preConditions>
+		<comment>Remove unused OC column 'participant_form' from event_definition_crf table.</comment>
+		<dropColumn columnName="participant_form"
+					tableName="event_definition_crf"/>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-10-20-TICKET2497-1">
+		<preConditions onFail="CONTINUE">
+			<columnExists tableName="event_definition_crf"
+						  columnName="submission_url"/>
+		</preConditions>
+		<comment>Remove unused OC column 'submission_url' from event_definition_crf table.</comment>
+		<dropColumn columnName="submission_url"
+					tableName="event_definition_crf"/>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-10-20-TICKET2497-2">
+		<preConditions onFail="CONTINUE">
+			<columnExists tableName="event_definition_crf"
+						  columnName="allow_anonymous_submission"/>
+		</preConditions>
+		<comment>Remove unused OC column 'allow_anonymous_submission' from event_definition_crf table.</comment>
+		<dropColumn columnName="allow_anonymous_submission"
+					tableName="event_definition_crf"/>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-10-20-TICKET2497-3">
+		<preConditions onFail="CONTINUE">
+			<columnExists tableName="study_subject"
+						  columnName="time_zone"/>
+		</preConditions>
+		<comment>Remove unused OC column 'time_zone' from table study_subject.</comment>
+		<dropColumn columnName="time_zone"
+					tableName="study_subject"/>
+	</changeSet>
+
+</databaseChangeLog>
