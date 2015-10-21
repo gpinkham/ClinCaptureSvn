@@ -31,9 +31,6 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
-import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
-import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.json.JSONObject;
@@ -48,7 +45,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * End-point for all randomization calls.
@@ -88,32 +84,26 @@ public class RandomizeServlet extends Controller {
 
 		// Set expected context
 		RandomizationUtil.setSessionManager(getSessionManager(request));
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
 		StudySubjectBean subject = RandomizationUtil.getStudySubjectBean(request);
 
 		PrintWriter writer = response.getWriter();
 
 		try {
-			String crfId = request.getParameter("crf");
 			String eligibility = request.getParameter("eligibility");
 
 			if (isSubjectConfiguredValid(subject, request)) {
-				if (isCrfComplete(currentStudy, ub, crfId)) {
-					if (!eligibility.equals("null")) {
-						// YES
-						if ("0".equals(eligibility)) {
-							randomize(request, writer);
-						} else if ("1".equals(eligibility)) {
-							throw new RandomizationException(
-									resexception.getString("subject_has_not_completed_ie_criteria"));
-						}
-					} else {
+				if (!eligibility.equals("null")) {
+					// YES
+					if ("0".equals(eligibility)) {
 						randomize(request, writer);
+					} else if ("1".equals(eligibility)) {
+						throw new RandomizationException(
+								resexception.getString("subject_has_not_completed_ie_criteria"));
 					}
 				} else {
-					throw new RandomizationException(resexception.getString("crf_is_not_complete"));
+					randomize(request, writer);
 				}
+
 			} else {
 				throw new RandomizationException(resexception.getString("subject_label_and_id_not_equals"));
 			}
@@ -225,16 +215,6 @@ public class RandomizeServlet extends Controller {
 		protocol.setSubmissionContext(context);
 
 		return protocol.call();
-	}
-
-	private boolean isCrfComplete(StudyBean currentStudy, UserAccountBean ub, String crfId) {
-
-		log.info("Asserting the status of crf with id: {0} ", crfId);
-		// Run rules on the CRF
-		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = getRuleSetService()
-				.runRulesInBulk(crfId, ExecutionMode.DRY_RUN, currentStudy, ub);
-
-		return result.isEmpty();
 	}
 
 	protected String getSite(StudyBean currentStudy) throws RandomizationException {
