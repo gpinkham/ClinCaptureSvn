@@ -1037,8 +1037,13 @@ function setDNFlag(strImageName,strParentWinImageFullPath, resolutionStatusId) {
 			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>"
 				   class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
             <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"/>
-            <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
-            <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" "/>
+
+			<c:set var="startDataEntryBTNCaption"><fmt:message key="start_data_entry" bundle="${resword}"/></c:set>
+            <input type="button" name="StartDataEntry" value="${startDataEntryBTNCaption}"
+				   class="${ui:getHtmlButtonCssClass(startDataEntryBTNCaption, "")}"
+				   onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
+
+			<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" "/>
         </td>
     </tr></table>
 </form>

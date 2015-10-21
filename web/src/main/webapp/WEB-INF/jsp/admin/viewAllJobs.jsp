@@ -63,9 +63,21 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="button" name="<fmt:message key="export_jobs" bundle="${resword}"/>" value="<fmt:message key="export_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewJob'"/>
-<input type="button" name="<fmt:message key="import_jobs" bundle="${resword}"/>" value="<fmt:message key="import_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewImportJob'"/>
-<input type="button" name="<fmt:message key="running_jobs" bundle="${resword}"/>" value="<fmt:message key="running_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='pages/listCurrentScheduledJobs'"/>
+
+<c:set var="exportJobsBTNCaption"><fmt:message key="export_jobs" bundle="${resword}"/></c:set>
+<input type="button" name="viewExportJobsBTN" value="${exportJobsBTNCaption}"
+	   class="${ui:getHtmlButtonCssClass(exportJobsBTNCaption, "")}"
+	   onClick="window.location.href='ViewJob'"/>
+
+<c:set var="importJobsBTNCaption"><fmt:message key="import_jobs" bundle="${resword}"/></c:set>
+<input type="button" name="viewImportJobsBTN" value="${importJobsBTNCaption}"
+	   class="${ui:getHtmlButtonCssClass(importJobsBTNCaption, "")}"
+	   onClick="window.location.href='ViewImportJob'"/>
+
+<c:set var="runningJobsBTNCaption"><fmt:message key="running_jobs" bundle="${resword}"/></c:set>
+<input type="button" name="viewRunningJobsBTN" value="${runningJobsBTNCaption}"
+	   class="${ui:getHtmlButtonCssClass(runningJobsBTNCaption, "")}"
+	   onClick="window.location.href='pages/listCurrentScheduledJobs'"/>
 
 
  <jsp:include page="../include/footer.jsp"/>

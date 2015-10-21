@@ -49,11 +49,5 @@
         <name>sideicons</name>
         <path>/WEB-INF/tags/sideicons.tag</path>
     </tag-file>
-    
-    <function>
-        <name>getHtmlButtonCssClass</name>
-        <function-class>com.clinovo.tag.Functions</function-class>
-        <function-signature>java.lang.String getHtmlButtonCssClass(java.lang.String, java.lang.String)</function-signature>
-    </function>
 
 </taglib>

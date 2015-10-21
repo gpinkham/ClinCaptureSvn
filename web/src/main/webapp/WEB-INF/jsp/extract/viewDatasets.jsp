@@ -62,20 +62,18 @@
 	</span>
 </h1>
 
-
-<%--<p><center><a href="ViewDatasets?action=owner&ownerId=<c:out value="${userBean.id}"/>">Show Only My Datasets</a> |
-<a href="ViewDatasets">Show All Datasets</a></center></p>
---%>
-
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showDatasetRow.jsp" /></c:import>
 
 <br>
-       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium medium_back"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-       <input type="button" name="BTN_Create" id="CreateDataset" value="<fmt:message key="create_dataset" bundle="${resword}"/>" class="button_medium" size="50" onclick="window.location.href=('CreateDataset');"/>
-</br>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+	   value="<fmt:message key="back" bundle="${resword}"/>"
+	   class="button_medium medium_back"
+	   onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+
+<c:set var="createDatasetBTNCaption"><fmt:message key="create_dataset" bundle="${resword}"/></c:set>
+<input type="button" name="BTN_Create" id="CreateDataset" value="${createDatasetBTNCaption}"
+	   class="${ui:getHtmlButtonCssClass(createDatasetBTNCaption, "")}"
+	   onclick="window.location.href=('CreateDataset');"/>
 
 
 <input id="accessAttributeName" type="hidden" value="data-cc-datasetId">

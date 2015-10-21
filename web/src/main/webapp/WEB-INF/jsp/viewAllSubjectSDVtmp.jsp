@@ -138,9 +138,10 @@
 			class="button_medium medium_back"
 			onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-		<input type="submit" name="sdvAllFormSubmit" class="button_medium"
-			value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>"
-			onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();" />
+		<c:set var="sdvAllFormBTNCaption"><fmt:message key="sdv_all_checked" bundle="${resword}"/></c:set>
+		<input type="submit" name="sdvAllFormSubmit" value="${sdvAllFormBTNCaption}"
+			   class="${ui:getHtmlButtonCssClass(sdvAllFormBTNCaption, "")}"
+			   onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();" />
 	</form>
 </div>
 <input id="accessAttributeName" type="hidden" value="data-cc-sdvCrfId"/>

@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
-<%@ taglib prefix="view" uri="com.akazaresearch.viewtags" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -21,7 +20,7 @@
 		<c:if test="${!dataEntryStage.isAdmin_Editing() and section.lastSection and hideSaveAndNextButton eq null }">
 			<td>
 				<input type="button" id="snl" name="saveAndNext" value="${save_and_next_button_caption}"
-					   class="${view:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="submitCrfForm(this);"/>
+					   class="${ui:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="submitCrfForm(this);"/>
 			</td>
 		</c:if>
 		<td><input type="submit" id="sel" name="submittedExit"

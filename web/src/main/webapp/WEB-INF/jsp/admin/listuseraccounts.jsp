@@ -72,16 +72,28 @@
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
- <input id="CreateUser" class="button_medium" type="button" name="BTN_Create" value="<fmt:message key="create_user" bundle="${resword}"/>" onclick="window.location.href=('CreateUserAccount');"/>
+	<c:set var="createUserBTNCaption"><fmt:message key="create_user" bundle="${resword}"/></c:set>
+	<input id="CreateUser" type="button" name="BTN_Create" value="${createUserBTNCaption}"
+		   class="${ui:getHtmlButtonCssClass(createUserBTNCaption, "")}"
+		   onclick="window.location.href=('CreateUserAccount');"/>
 </td>
 <td>
- <input id="AuditLogins" class="button_medium" type="button" name="BTN_Audit" value="<fmt:message key="audit_logins" bundle="${resword}"/>" onclick="window.location.href=('AuditUserActivity?restore=true');"/>
+	<c:set var="auditLoginsBTNCaption"><fmt:message key="audit_logins" bundle="${resword}"/></c:set>
+	<input id="AuditLogins" type="button" name="BTN_Audit" value="${auditLoginsBTNCaption}"
+		   class="${ui:getHtmlButtonCssClass(auditLoginsBTNCaption, "")}"
+		   onclick="window.location.href=('AuditUserActivity?restore=true');"/>
 </td>
-<td> 
- <input id="LoginLockout" class="button_medium" type="button" name="BTN_Login" value="<fmt:message key="login_lockout" bundle="${resword}"/>" onclick="window.location.href=('Configure');"/>
+<td>
+	<c:set var="loginLockoutBTNCaption"><fmt:message key="login_lockout" bundle="${resword}"/></c:set>
+	<input id="LoginLockout" type="button" name="BTN_Login" value="${loginLockoutBTNCaption}"
+		   class="${ui:getHtmlButtonCssClass(loginLockoutBTNCaption, "")}"
+		   onclick="window.location.href=('Configure');"/>
 </td>
-<td> 
- <input id="PasswordPolicies" class="button_medium" type="button" name="BTN_Password" value="<fmt:message key="password_policies" bundle="${resword}"/>" onclick="window.location.href=('ConfigurePasswordRequirements');"/>
+<td>
+	<c:set var="passwordPoliciesBTNCaption"><fmt:message key="password_policies" bundle="${resword}"/></c:set>
+	<input id="PasswordPolicies" type="button" name="BTN_Password" value="${passwordPoliciesBTNCaption}"
+		   class="${ui:getHtmlButtonCssClass(passwordPoliciesBTNCaption, "")}"
+		   onclick="window.location.href=('ConfigurePasswordRequirements');"/>
 </td>
 </table>
 

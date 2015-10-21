@@ -75,7 +75,11 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="button" name="<fmt:message key="create_import_job" bundle="${resword}"/>" value="<fmt:message key="create_import_job" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='CreateJobImport'"/>
+
+<c:set var="createImportJobBTNCaption"><fmt:message key="create_import_job" bundle="${resword}"/></c:set>
+<input type="button" name="createImportJobBTN" value="${createImportJobBTNCaption}"
+	   class="${ui:getHtmlButtonCssClass(createImportJobBTNCaption, "")}"
+	   onClick="window.location.href='CreateJobImport'"/>
 
 <br><br>
 

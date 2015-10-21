@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -128,11 +127,12 @@
 		<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 			value="<fmt:message key="back" bundle="${resword}"/>"
 			class="button_medium medium_back"
-			onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" /> 
-			
-		<input type="submit" name="sdvAllFormSubmit" class="button_medium"
-			value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>"
-			onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/sdvStudySubjects';this.form.submit();" />
+			onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+
+		<c:set var="sdvAllFormBTNCaption"><fmt:message key="sdv_all_checked" bundle="${resword}"/></c:set>
+		<input type="submit" name="sdvAllFormSubmit" value="${sdvAllFormBTNCaption}"
+			   class="${ui:getHtmlButtonCssClass(sdvAllFormBTNCaption, "")}"
+			   onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/sdvStudySubjects';this.form.submit();" />
 
 		<script type="text/javascript">hideCols('s_sdv',[2,3,4])</script>
 	</form>

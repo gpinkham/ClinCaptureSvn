@@ -105,7 +105,7 @@
     <c:set var="studySubjectLabel" value="${study.studyParameterConfig.studySubjectIdLabel}"/>
 </c:if>
 
-<div style="width: 600px">
+<div style="width: 100%">
 
 <!-- These DIVs define shaded box borders -->
 	<div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -965,13 +965,29 @@
 
 <table border="0" cellpadding="0" cellspacing="0" class="popup-box-buttons">
 <tr>
-    <td>
-      <input type="button" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent('${page}', event);"/>
-      <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
-      <input type="submit" name="Submit" value="<fmt:message key="view_event" bundle="${resword}"/>" class="button_medium"/>
-      <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="createNewEvent_ClosePopup(event);"/>
+    <td style="padding-right: 2px;">
+		<c:set var="scheduleEventBTNCaption"><fmt:message key="schedule_event" bundle="${resword}"/></c:set>
+		<input type="button" name="Schedule" value="${scheduleEventBTNCaption}"
+			   class="${ui:getHtmlButtonCssClass(scheduleEventBTNCaption, "")}"
+			   onClick="createNewEvent('${page}', event);"/>
+	</td>
+	<td style="padding-left: 2px; padding-right: 2px;">
+		<c:set var="startDataEntryBTNCaption"><fmt:message key="start_data_entry" bundle="${resword}"/></c:set>
+		<input type="button" name="StartDataEntry" value="${startDataEntryBTNCaption}"
+			   class="${ui:getHtmlButtonCssClass(startDataEntryBTNCaption, "")}"
+			   onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
+	</td>
+	<td style="padding-left: 2px; padding-right: 2px;">
+		<c:set var="viewEventBTNCaption"><fmt:message key="view_event" bundle="${resword}"/></c:set>
+		<input type="submit" name="Submit" value="${viewEventBTNCaption}"
+			   class="${ui:getHtmlButtonCssClass(viewEventBTNCaption, "")}"/>
+	</td>
+	<td style="padding-left: 2px;">
+		<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"
+			 class="button_medium medium_cancel" onClick="createNewEvent_ClosePopup(event);"/>
     </td>
-</tr></table>
+</tr>
+</table>
 </form>
 
 </td>

@@ -364,7 +364,9 @@
 			<input type="submit" name="continue" value="<fmt:message key="continue" bundle="${resword}"/>"
 			       class="button_medium medium_continue"/>
 			<c:if test="${userBean.sysAdmin && editedUser.name != 'root' && isSiteLevelUser && study.studyParameterConfig.crfMasking != 'no'}">
-				<input type="button" value="<fmt:message key="crfs_masking" bundle="${resword}"/>" class="button_medium"
+				<c:set var="crfMaskingBTNCaption"><fmt:message key="crfs_masking" bundle="${resword}"/></c:set>
+				<input type="button" value="${crfMaskingBTNCaption}"
+					   class="${ui:getHtmlButtonCssClass(crfMaskingBTNCaption, "")}"
 				       onclick="redirectRequestToMaskingPage();"/>
 			</c:if>
 			<br/>

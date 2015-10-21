@@ -58,9 +58,6 @@
 	</span>
 </h1>
 
-<%-- 
-<div class="homebox_bullets"><a href="AssignUserToStudy"><fmt:message key="assign_new_user_to_current_study" bundle="${restext}"/></a></div>
---%>
 <p>
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showUserInStudyRow.jsp" /></c:import>
 </p>
@@ -69,12 +66,10 @@
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
   </td>
   <td>
-    
-	<%-- <a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a> --%>
-	<%-- <input type="button" name="BTN_Build" id="GoToBuildStudyPage" value="<fmt:message key="build_study" bundle="${resword}"/>" class="button_medium" size="50" onclick="window.location.href=('pages/studymodule');"/> --%>
-    
-    <input type="button" name="BTN_Assign" id="GoToAssignUser" value="<fmt:message key="assign_users" bundle="${resword}"/>" class="button_medium" size="50" onclick="window.location.href=('AssignUserToStudy');"/>
-    
+	  <c:set var="assignBTNCaption"><fmt:message key="assign_users" bundle="${resword}"/></c:set>
+	  <input type="button" name="BTN_Assign" id="GoToAssignUser" value="${assignBTNCaption}"
+			 class="${ui:getHtmlButtonCssClass(assignBTNCaption, "")}"
+			 onclick="window.location.href=('AssignUserToStudy');"/>
   </td>  
 </table>
 <input id="accessAttributeName" type="hidden" value="data-cc-userInStudyId">

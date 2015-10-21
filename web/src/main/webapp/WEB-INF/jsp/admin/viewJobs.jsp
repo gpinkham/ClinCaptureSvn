@@ -76,7 +76,11 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="button" name="<fmt:message key="create_export_job" bundle="${resword}"/>" value="<fmt:message key="create_export_job" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='CreateJobExport'"/>
+
+<c:set var="createExportJobBTNCaption"><fmt:message key="create_export_job" bundle="${resword}"/></c:set>
+<input type="button" name="createExportJobBTN" value="${createExportJobBTNCaption}"
+	   class="${ui:getHtmlButtonCssClass(createExportJobBTNCaption, "")}"
+	   onClick="window.location.href='CreateJobExport'"/>
            
 <br><br>
 

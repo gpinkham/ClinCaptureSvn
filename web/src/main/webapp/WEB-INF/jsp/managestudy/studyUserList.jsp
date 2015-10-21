@@ -105,7 +105,10 @@
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
 </td>
 <td>
-<input type="button" name="BTN_Change" id="ChangeStudySite" value="<fmt:message key="change_study_site" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.location.href=('ChangeStudy');"/>
+    <c:set var="changeStudySiteBTNCaption"><fmt:message key="change_study_site" bundle="${resword}"/></c:set>
+	<input type="button" name="BTN_Change" id="ChangeStudySite" value="${changeStudySiteBTNCaption}"
+		   class="${ui:getHtmlButtonCssClass(changeStudySiteBTNCaption, "")}"
+		   onClick="javascript:window.location.href=('ChangeStudy');"/>
 </td>
 
 <td>

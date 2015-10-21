@@ -492,12 +492,18 @@
 			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 		</td>
 		<td>
-			<input id="NotesDiscrepancies" class="button_long" type="button" name="BTN_NotesDiscrepancies" value="<fmt:message key="subjects_discrepancies" bundle="${resword}"/>" onclick="window.location.href=('ViewNotes?module=<c:out value="${module}"/>&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=<c:out value="${studySub.label}"/>');"/>
+			<c:set var="notesDiscrepanciesBTNCaption"><fmt:message key="subjects_discrepancies" bundle="${resword}"/></c:set>
+			<input id="NotesDiscrepancies" type="button" name="BTN_NotesDiscrepancies" value="${notesDiscrepanciesBTNCaption}"
+				   class="${ui:getHtmlButtonCssClass(notesDiscrepanciesBTNCaption, "")}"
+				   onclick="window.location.href=('ViewNotes?module=<c:out value="${module}"/>&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=<c:out value="${studySub.label}"/>');"/>
 		</td>
 		<c:if test="${userRole.role.id != 4 && userRole.role.id != 5}">
-		<td> 
-			<input id="ViewAuditLog" class="button_long" type="submit" name="BTN_View" value="<fmt:message key="subjects_audit_log" bundle="${resword}"/>" onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
-		</td>
+			<td>
+				<c:set var="viewAuditLogBTNCaption"><fmt:message key="subjects_audit_log" bundle="${resword}"/></c:set>
+				<input id="ViewAuditLog" type="submit" name="BTN_View" value="${viewAuditLogBTNCaption}"
+					   class="${ui:getHtmlButtonCssClass(viewAuditLogBTNCaption, "")}"
+					   onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
+			</td>
 		</c:if>
 	</tr>
 </table> 
