@@ -14,8 +14,6 @@
 package org.akaza.openclinica.web.filter;
 
 import java.util.Date;
-import java.util.ResourceBundle;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -30,9 +28,10 @@ import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.InactiveAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -78,6 +77,12 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
 	@Autowired
 	private CoreResources coreResources;
+	
+	@Autowired
+	private MessageSource messageSource;
+
+	@Autowired
+	private JavaMailSenderImpl mailSender;
 
 	/**
 	 * OpenClinicaUsernamePasswordAuthenticationFilter constructor.
@@ -142,8 +147,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		UserAccountBean userAccountBean = null;
 
 		LocaleResolver.resolveLocale();
-		ResourceBundle restext = ResourceBundleProvider.getTextsBundle();
-
+		
 		try {
 			EntityBean eb = getUserAccountDao().findByUserName(username);
 			if (eb.getId() != 0) {
@@ -157,7 +161,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 				throw new LockedException("locked");
 			}
 
-			InactiveAnalyzer.analyze(userAccountBean, getUserAccountDao(), restext);
+			InactiveAnalyzer.analyze(userAccountBean, getUserAccountDao(), messageSource, mailSender);
 
 			if (!userAccountBean.getAccountNonLocked()) {
 				throw new LockedException("user locked");

@@ -16,15 +16,21 @@ package org.akaza.openclinica.util;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import com.clinovo.util.EmailUtil;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.Locale;
+import javax.mail.internet.MimeMessage;
 
 //Added by Clinovo
 public class InactiveAnalyzer {
@@ -33,7 +39,7 @@ public class InactiveAnalyzer {
 
 	private static final String INACTIVE_ACCOUNT = "INACTIVE_ACCOUNT";
 
-	public static void analyze(UserAccountBean userAccountBean, UserAccountDAO userAccountDao, ResourceBundle restext) {
+	public static void analyze(UserAccountBean userAccountBean, UserAccountDAO userAccountDao, MessageSource messageSource, JavaMailSenderImpl mailSender) {
 		// Clinovo - tbh - protect your inputs!
 		String strMaxInactiveAccount = SQLInitServlet.getField("max_inactive_account") != "" ? SQLInitServlet
 				.getField("max_inactive_account") : "90";
@@ -54,14 +60,14 @@ public class InactiveAnalyzer {
 						if (userAccountBean.getLastVisitDate().before(cutoffDate)) {
 							userAccountDao.lockUser(userAccountBean.getId()); // lock
 							updateBean(userAccountBean);
-							sendAccountLockEmail(userAccountBean, restext, INACTIVE_ACCOUNT, maxInactiveAccount);
+							sendAccountLockEmail(userAccountBean, messageSource, INACTIVE_ACCOUNT, maxInactiveAccount, mailSender);
 						}
 					} else { // new user
 						if (userAccountBean.getCreatedDate().before(cutoffDate)) { // account was created before cut-off
 																					// date
 							userAccountDao.lockUser(userAccountBean.getId()); // lock
 							updateBean(userAccountBean);
-							sendAccountLockEmail(userAccountBean, restext, INACTIVE_ACCOUNT, maxInactiveAccount);
+							sendAccountLockEmail(userAccountBean, messageSource, INACTIVE_ACCOUNT, maxInactiveAccount, mailSender);
 						}
 					}
 				}
@@ -74,37 +80,37 @@ public class InactiveAnalyzer {
 		uab.setStatus(Status.LOCKED);
 	}
 
-	private static void sendAccountLockEmail(UserAccountBean u, ResourceBundle restext, String reason, int numdays) {
-		EmailEngine emailEngine = new EmailEngine(EmailEngine.getSMTPHost(), "5");
-		String body;
-		String subject;
-		String to;
-		String from;
+	private static void sendAccountLockEmail(UserAccountBean userAccountBean, MessageSource messageSource, 
+			String reason, int numdays, JavaMailSenderImpl mailSender) {
 		try {
-			logger.info("Notifying  " + restext.getString("openclinica_administrator") + " about locking the account '"
-					+ u.getName() + "'");
-			to = SQLInitServlet.getField("adminEmail");
-			from = SQLInitServlet.getField("adminEmail");
-			subject = restext.getString("openclinica_account") + " '" + u.getName() + "' "
-					+ restext.getString("has_been_locked") + " " + restext.getString("for_security_reasons");
-			body = restext.getString("dear_openclinica_administrator") + ",\n\n";
-			body += restext.getString("please_be_informed_that") + " " + subject + ". ";
-			body += restext.getString("this_action_was_triggered") + " ";
+			Locale locale = CoreResources.getSystemLocale();
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+			helper.setFrom(EmailEngine.getAdminEmail());
+			helper.setTo(userAccountBean.getEmail());
+			String subject = messageSource.getMessage("openclinica_account", null, locale) + " '" + userAccountBean.getName() + "' " +
+					messageSource.getMessage("has_been_locked", null, locale) + " " + messageSource.getMessage("for_security_reasons", null, locale);
+			helper.setSubject(subject);
+			String text = "";
 			if (reason.equals(INACTIVE_ACCOUNT)) {
-				body += restext.getString("when_a_user_tried_to_login_with_this_account") + " "
-						+ restext.getString("after_a_period_of_inactivity_of_more_than") + " " + (-1) * numdays
-						+ " " + restext.getString("days");
+				text = messageSource.getMessage("when_a_user_tried_to_login_with_this_account", null, locale) +
+				" " + messageSource.getMessage("after_a_period_of_inactivity_of_more_than", null, locale) + " "+(-1) * numdays + 
+				" " + messageSource.getMessage("days_", null, locale) + ".";
 			} else {
-				body += restext.getString("due_to_excessive_failed_login_attempts") + ".\n\n\n\n";
+				text = messageSource.getMessage("due_to_excessive_failed_login_attempts", null, locale) + ".";
 			}
-			body += "** This message was automatically generated by ClinCapture EDC System ** \n";
-			logger.info("Sending email...begin");
-			emailEngine.process(to, from, subject, body);
-		} catch (MissingResourceException mre) {
-			throw mre;
-		} catch (Exception e) {
-			logger.error("Error: " + e.getMessage());
+			helper.setText(
+					EmailUtil.getEmailBodyStart().concat(messageSource.getMessage("dear_openclinica_administrator", null, locale))
+							.concat(",<br><br>")
+							.concat(messageSource.getMessage("please_be_informed_that", null, locale) + " " + subject + ". ")
+							.concat(messageSource.getMessage("this_action_was_triggered", null, locale)).concat(" ")
+							.concat(text).concat("<br><br><br>").concat(CoreResources.getSystemURL()).concat("<br><br> ")
+							.concat(messageSource.getMessage("best_system_admin", null, locale).replace("{0}",""))
+							.concat(EmailUtil.getEmailBodyEnd()).concat(EmailUtil.getEmailFooter(CoreResources.getSystemLocale()))
+							, true);
+			mailSender.send(mimeMessage);
+		} catch (Exception ex) {
+			logger.error("Error has occurred.", ex);
 		}
-		logger.info("Sending email...done");
 	}
 }

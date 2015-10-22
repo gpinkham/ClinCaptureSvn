@@ -40,7 +40,6 @@ import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.util.InactiveAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -99,10 +98,6 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		}
 
 		setStudyNamesInStudyUserRoles(allUsers);
-
-		for (Object allUser : allUsers) {
-			InactiveAnalyzer.analyze((UserAccountBean) allUser, udao, restext);
-		}
 
 		Map<String, Integer> userRolesRemovedCountMap = new HashMap<String, Integer>();
 		int removedRolesCount;
