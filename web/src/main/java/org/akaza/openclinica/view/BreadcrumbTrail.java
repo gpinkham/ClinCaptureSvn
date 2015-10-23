@@ -686,11 +686,6 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("rule_manage_assignment"), "ViewRuleAssignment",
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("rule_manage"), "#", Status.PENDING));
-			} else if (jspPage.equals(Page.VIEW_RULE_SETS)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("rule_manage_assignment"), "ViewRuleAssignment",
-						Status.AVAILABLE));
 			} else if (jspPage.equals(Page.IMPORT_RULES)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("import_rules_1"), "ManageStudy", Status.AVAILABLE));

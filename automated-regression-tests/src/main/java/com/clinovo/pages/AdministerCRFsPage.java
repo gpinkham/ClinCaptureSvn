@@ -19,7 +19,7 @@ public class AdministerCRFsPage extends BasePage {
     @FindBy(name = "ebl_filterKeyword")
     private WebElementFacade iFind;
     
-    @FindBy(xpath = ".//input[@class='button_search']")
+    @FindBy(xpath = ".//img[@name='btnSearch']")
     private WebElementFacade iFindButton;
     
     @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[1]")

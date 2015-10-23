@@ -17,7 +17,7 @@ public class ManageEventDefinitionsPage extends BasePage {
     @FindBy(name = "ebl_filterKeyword")
     private WebElementFacade iFind;
     
-    @FindBy(xpath = ".//input[@class='button_search']")
+    @FindBy(xpath = ".//img[@name='btnSearch']")
     private WebElementFacade iFindButton;
     
     @FindBy(xpath = ".//*[@id='Table0']/tbody/tr//table//table//tr[2]/td[2]")

@@ -396,11 +396,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>auditLogUserServlet</servlet-name>
-        <display-name>AuditLogUser</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>techAdminServlet</servlet-name>
         <display-name>TechAdmin</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1341,10 +1336,6 @@
     <servlet-mapping>
         <servlet-name>showFileServlet</servlet-name>
         <url-pattern>/ShowFile</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>auditLogUserServlet</servlet-name>
-        <url-pattern>/AuditLogUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>studyAuditLogServlet</servlet-name>

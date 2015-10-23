@@ -416,10 +416,7 @@ public final class Page {
 	 * Page for creating rule imports.
 	 */
 	public static final Page IMPORT_RULES = new Page("/WEB-INF/jsp/submit/importRules.jsp", "Import Rules");
-	public static final Page VIEW_RULE_SETS = new Page("/WEB-INF/jsp/submit/listRuleSets.jsp", "List Rule Assignments");
 	public static final Page VIEW_RULE_SETS2 = new Page("/WEB-INF/jsp/submit/listRuleSets2.jsp",
-			"List Rule Assignments");
-	public static final Page VIEW_RULE_SETS_DESIGNER = new Page("/WEB-INF/jsp/submit/listRuleSetsDesigner.jsp",
 			"List Rule Assignments");
 	public static final Page VERIFY_RULES_IMPORT_SERVLET = new Page("/VerifyImportedRule",
 			"Verify Imported Rule Servlet");
@@ -459,8 +456,6 @@ public final class Page {
 	public static final Page REMOVE_CRF_VERSION_DEF = new Page("/WEB-INF/jsp/admin/removeCRFVersionDef.jsp",
 			"Remove CRF Version From Definition");
 
-	public static final Page AUDIT_LOG_USER = new Page("/WEB-INF/jsp/admin/auditLogUser.jsp",
-			"Audit Log display by User");
 	public static final Page AUDIT_LOG_STUDY = new Page("/WEB-INF/jsp/admin/auditLogStudy.jsp",
 			"Audit Log display by Study");
 	public static final Page AUDIT_LOGS_STUDY = new Page("/WEB-INF/jsp/admin/studyAuditLog.jsp",

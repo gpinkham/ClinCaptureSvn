@@ -84,11 +84,11 @@
 
 	<!-- Search cell (for multi-page tables) -->
 
-		<c:if test="${searchFormDisplayed != 0}">
-			<form action="<c:out value="${table.postAction}" />" method="POST">
-		</c:if>
-
 		<td width="33%" valign="top" align="center" class="table_actions">
+
+				<c:if test="${searchFormDisplayed != 0}">
+					<form action="<c:out value="${table.postAction}" />" method="POST">
+				</c:if>
 
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -100,17 +100,19 @@
 					</td>
 					<td valign="top">
 						<c:set var="searchQuery" value="${table.baseGetQuery}&ebl_page=1&ebl_sortColumnInd=${table.sortingColumnInd}&ebl_sortAscending=${ascending}&ebl_filtered=1&ebl_paginated=${paginated}" />
-						<input type="button" name="FindButton" class="button_search" value="<fmt:message key='find' bundle='${resword}'/>"
-							   onclick="document.forms[1].action='<c:out value="${searchQuery}"/>';document.forms[1].submit();"/>
+						<img name="btnSearch" src="images/bt_View.gif" alt="<fmt:message key="find" bundle="${resword}"/>"
+							 title="<fmt:message key="find" bundle="${resword}"/>" border="0"
+							 style="margin-top: 3px; margin-right: 4px; margin-left: 4px;"
+							 onclick="document.forms[1].action='<c:out value="${searchQuery}"/>';document.forms[1].submit();">
 					</td>
 				</tr>
 			</table>
 
-		</td>
+					<c:if test="${searchFormDisplayed != 0}">
+						</form>
+					</c:if>
 
-		<c:if test="${searchFormDisplayed != 0}">
-			</form>
-		</c:if>
+		</td>
 
 	<!-- End Search cell -->
 

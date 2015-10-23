@@ -85,13 +85,12 @@
 	<!-- End Pagination cell -->
 	
 	<!-- Search cell (for multi-page tables) -->
-
-		<c:if test="${searchFormDisplayed != 0}">
-			<form action="<c:out value="${table.postAction}" />?module=${module}" method="GET">
-		</c:if>
 	
 		<td width="33%" valign="top" align="center" class="table_actions">
-		
+
+					<c:if test="${searchFormDisplayed != 0}">
+						<form action="<c:out value="${table.postAction}" />?module=${module}" method="GET">
+					</c:if>
 
 				<jsp:include page="showSubmitted.jsp" />
 				<c:forEach var="postArg" items="${table.postArgs}">
@@ -106,29 +105,41 @@
 				<tr>
 					<td valign="top">
 						<div class="formfieldM_BG">
-						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>" /> 
+						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>" />
 						</div>
 					</td>
 					<td valign="top">
-						<input type="submit" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>" 
-							<c:choose>
-								<c:when test="${searchFormDisplayed == 0}">
-									onClick="if (document.<c:out value="${outerFormName}"/>.ebl_filterKeyword.value == '') return false; document.<c:out value="${outerFormName}"/>.elements['submitted'].value=0;document.<c:out value="${outerFormName}"/>.elements['action'].value='';<c:out value="${searchFormOnClickJS}" escapeXml="false" />"
-								</c:when>
-								<c:otherwise>
-									onClick="if (document.forms[0].ebl_filterKeyword.value == '') return false;"
-								</c:otherwise>
-							</c:choose>
-						/>
+						<c:choose>
+							<c:when test="${searchFormDisplayed == 0}">
+								<c:set var="btnSearchOnclick" >
+									var form = $('form[name=<c:out value="${outerFormName}"/>]');
+									if ($(form).find('input[name=ebl_filterKeyword]').val() != '') {
+										$(form).find('input[name=submitted]').val(0);
+										$(form).find('input[name=action]').val('');
+										<c:out value="${searchFormOnClickJS}" escapeXml="false" />
+										$(form).submit();
+									}
+								</c:set>
+							</c:when>
+							<c:otherwise>
+								<c:set var="btnSearchOnclick" >
+									var searchForm = $(this).closest('form');
+									if ($(searchForm).find('input[name=ebl_filterKeyword]').val() != '') {
+										$(searchForm).submit();
+									}
+								</c:set>
+							</c:otherwise>
+						</c:choose>
+						<img name="btnSearch" src="images/bt_View.gif" alt="<fmt:message key="find" bundle="${resword}"/>"
+							 title="<fmt:message key="find" bundle="${resword}"/>" border="0" onclick="${btnSearchOnclick}"
+							 style="margin-top: 3px; margin-right: 4px; margin-left: 4px;">
 					</td>
 				</tr>
 			</table>
-
+						<c:if test="${searchFormDisplayed != 0}">
+							</form>
+						</c:if>
 		</td>
-
-		<c:if test="${searchFormDisplayed != 0}">
-			</form>
-		</c:if>
 	
 	<!-- End Search cell -->
 	
