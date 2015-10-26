@@ -1092,9 +1092,10 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-right: 10px;
 }
 
-.button_search_dis { background-color:transparent;
+.button_add_disabled {
+	background-color:transparent;
     border-width: 0px;
-    background-image: url(../images/button_Search_BG_dis.gif);
+    background-image: url(../images/create_new_d.gif);
     background-repeat: no-repeat;
     background-position: bottom;
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
@@ -1102,15 +1103,17 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     line-height: 11px;
     color: #E6E6E6;
     font-weight: bold;
-    width: 37px;
-    height: 17px;
+    width: 24px;
+    height: 15px;
     margin-top: 2px;
     margin-left: 3px;
+	margin-bottom: 2px;
 }
 
-.button_search { background-color:transparent;
+.button_add {
+	background-color:transparent;
     border-width: 0px;
-    background-image: url(../images/button_Search_BG.gif);
+    background-image: url(../images/create_new.gif);
     background-repeat: no-repeat;
     background-position: bottom;
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
@@ -1118,10 +1121,12 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     line-height: 11px;
     color: #FFFFFF;
     font-weight: bold;
-    width: 37px;
-    height: 17px;
+    width: 24px;
+    height: 15px;
     margin-top: 2px;
     margin-left: 3px;
+    margin-bottom: 2px;
+    cursor: pointer;
 }
 
 .button_remove {

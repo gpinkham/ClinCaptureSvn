@@ -76,7 +76,9 @@
 				<c:if test="${displayItemWithGroup.itemGroup.groupMetaBean.repeatingGroup}">
 					<tr>
 						<td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-							<button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
+							<button stype="add" type="button" template="<c:out value="${repeatParentId}"/>"
+									class="button_add" title="<fmt:message key="add" bundle="${resword}"/>"></button>
+						</td>
 					</tr>
 				</c:if>
 				</tbody>

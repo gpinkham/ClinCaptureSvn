@@ -955,38 +955,6 @@
 																										<c:set var="uniqueId" value="${uniqueId +1}" />
 																										<!-- repeating rows in an item group end -->
 																									</c:forEach>
-																									<c:if
-																										test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-																										<tr>
-																											<c:choose>
-																												<c:when test="${sectionBorders == 1}">
-																													<%-- Add 1 to the totalColsPlusSubcols variable to accomodate the cell containing the remove button--%>
-																													<td
-																														class="aka_padding_norm aka_cellBorders_dark"
-																														colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-																														<button stype="add" type="button"
-																															template="<c:out value="${repeatParentId}"/>"
-																															class="button_search">
-																															<fmt:message key="add"
-																																bundle="${resword}" />
-																														</button>
-																													</td>
-																												</c:when>
-																												<c:otherwise>
-																													<td
-																														class="aka_padding_norm aka_cellBorders"
-																														colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-																														<button stype="add" type="button"
-																															template="<c:out value="${repeatParentId}"/>"
-																															class="button_search">
-																															<fmt:message key="add"
-																																bundle="${resword}" />
-																														</button>
-																													</td>
-																												</c:otherwise>
-																											</c:choose>
-																										</tr>
-																									</c:if>
 																								</tbody>
 
 																							</table>

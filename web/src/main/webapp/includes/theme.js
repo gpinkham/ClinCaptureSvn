@@ -214,7 +214,7 @@ var applyCommonStylesForTheme = function(theme) {
         $(this).css('background-image', newSrc);
     });
 
-    $('button.button_search').css('background-image', 'url(images/' + theme.name + '/button_Search_BG.gif)');
+    $('button.button_add').css('background-image', 'url(images/' + theme.name + '/create_new.gif)');
     $('.sidebar').css('color', theme.mainColor);
 
     $("img[src*='images/code_blue.png']").each(function () {

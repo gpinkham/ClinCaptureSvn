@@ -436,8 +436,8 @@ if (!window.RepetitionElement || (
 				//GLOBAL_FUNCTIONS_JAVASCRIPT.JS FILE
 				global_addButtonClicked=true;   //added for functions in OpenClinica 2.2
 				rt.addRepetitionBlock();
-				if(btn.disabled){ changeBtnDisabledState(btn,'button_search',
-					'button_search_dis',false); }     //added for functions in OpenClinica 2.2
+				if(btn.disabled){ changeBtnDisabledState(btn,'button_add',
+					'button_add_disabled',false); }     //added for functions in OpenClinica 2.2
 			}
 			else
 				btn.disabled = true; //NOTE: THIS IS NOT A VALID IMPLEMENTATION
@@ -1025,7 +1025,7 @@ if (!window.RepetitionElement || (
 						btns[i].disabled = true;
 						//line 1217, changeBtnDisabledState() METHOD DEFINED OUTSIDE OF THIS LIBRARY, IN
 						//global_functions_javascript.js
-						changeBtnDisabledState(btns[i],'button_search','button_search_dis',false) //part of OPENCLINICA 2.2 functionality
+						changeBtnDisabledState(btns[i],'button_add','button_add_disabled',false) //part of OPENCLINICA 2.2 functionality
 					}
 				}
 			}

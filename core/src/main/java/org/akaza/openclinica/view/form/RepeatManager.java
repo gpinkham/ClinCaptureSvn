@@ -98,8 +98,8 @@ public class RepeatManager {
 		if (type != null && type.equalsIgnoreCase("remove")) {
 			element.setAttribute("class", "button_remove");
 		} else {
-			element.setAttribute("class", "button_search");
-			element.addContent(type);
+			element.setAttribute("class", "button_add");
+			element.setAttribute("title", type);
 		}
 
 		return element;

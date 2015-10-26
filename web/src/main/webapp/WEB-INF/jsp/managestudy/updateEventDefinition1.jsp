@@ -468,7 +468,10 @@
 				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="validateCustomFields(['email'],['.email_to_check_field'],'#updateEventDefinition');">
 			</td>
 			<td>
-				<input type="button" name="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" value="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" class="button_medium" onclick="upateEventDefinitionAddCRF()">
+				<c:set var="addNewCRFBTNCaption"><fmt:message key="add_a_new_CRF" bundle="${resword}"/></c:set>
+				<input type="button" name="addNewCRFBTN" value="${addNewCRFBTNCaption}"
+					   class="${ui:getHtmlButtonCssClass(addNewCRFBTNCaption, "")}"
+					   onclick="upateEventDefinitionAddCRF()">
 			</td>
 			<td>
 				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
