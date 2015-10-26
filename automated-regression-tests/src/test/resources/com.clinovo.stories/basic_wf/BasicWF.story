@@ -10,7 +10,7 @@ Lifecycle:
 After:
 Outcome: ANY
 Given User logs out
-
+ 
 
 
 Scenario: 1. "Root" logs in first time
@@ -559,7 +559,7 @@ And DNs are created
 
 Scenario: 20.10 "Study Admin" creates DNs for Study Event Definition 
 
-GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{0}
+GivenStories: com.clinovo.stories/preconditions/PreconditionScenarios#{0}
 
 Given User goes to SM page
 When User creates DNs for Events using popup:

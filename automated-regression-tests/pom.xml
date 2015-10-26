@@ -96,9 +96,6 @@
     	<testResources>
             <testResource>
                 <directory>src/test/resources</directory>
-                <excludes>
-                    <exclude>**/Preconditions.story</exclude>
-                </excludes>
             </testResource>
         </testResources>
         <plugins>
