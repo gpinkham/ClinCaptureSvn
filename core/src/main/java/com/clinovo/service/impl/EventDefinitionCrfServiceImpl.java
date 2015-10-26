@@ -96,11 +96,15 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
-			Map<Integer, EventDefinitionCRFBean> parentsMap, UserAccountBean updater) {
+			Map<Integer, EventDefinitionCRFBean> parentsMap, Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap,
+			UserAccountBean updater) {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 		for (EventDefinitionCRFBean childEdc : childEventDefinitionCRFsToUpdate) {
 			EventDefinitionCRFBean parentEdc = parentsMap.get(childEdc.getParentId());
-			if (parentEdc != null) {
+			EventDefinitionCRFBean oldParentEdc = parentsBeforeUpdateMap.get(childEdc.getParentId());
+
+			if (parentEdc != null && oldParentEdc != null) {
+				int propagateChange = parentEdc.getPropagateChange();
 				String versionIds = childEdc.getSelectedVersionIds();
 				childEdc.setDefaultVersionId(parentEdc.getDefaultVersionId());
 				childEdc.setAcceptNewCrfVersions(parentEdc.isAcceptNewCrfVersions());
@@ -114,6 +118,35 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				}
 				childEdc.setUpdater(updater);
 				childEdc.setUpdatedDate(new Date());
+
+				if (shouldParameterBeUpdated(oldParentEdc.isRequiredCRF(), childEdc.isRequiredCRF(), propagateChange)) {
+					childEdc.setRequiredCRF(parentEdc.isRequiredCRF());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.isElectronicSignature(), childEdc.isElectronicSignature(), propagateChange)) {
+					childEdc.setElectronicSignature(parentEdc.isElectronicSignature());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.isHideCrf(), childEdc.isHideCrf(), propagateChange)) {
+					childEdc.setHideCrf(parentEdc.isHideCrf());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.getSourceDataVerification(), childEdc.getSourceDataVerification(), propagateChange)) {
+					childEdc.setSourceDataVerification(parentEdc.getSourceDataVerification());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.isDoubleEntry(), childEdc.isDoubleEntry(), propagateChange)) {
+					childEdc.setDoubleEntry(parentEdc.isDoubleEntry());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.isEvaluatedCRF(), childEdc.isEvaluatedCRF(), propagateChange)) {
+					childEdc.setEvaluatedCRF(parentEdc.isEvaluatedCRF());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.getEmailStep(), childEdc.getEmailStep(), propagateChange)) {
+					childEdc.setEmailStep(parentEdc.getEmailStep());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.getEmailTo(), childEdc.getEmailTo(), propagateChange)) {
+					childEdc.setEmailTo(parentEdc.getEmailTo());
+				}
+				if (shouldParameterBeUpdated(oldParentEdc.getTabbingMode(), childEdc.getTabbingMode(), propagateChange)) {
+					childEdc.setTabbingMode(parentEdc.getTabbingMode());
+				}
+
 				eventDefinitionCrfDao.update(childEdc);
 			}
 		}
@@ -244,6 +277,10 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 			}
 		}
 		return flags;
+	}
+
+	private boolean shouldParameterBeUpdated(Object parentValue, Object childValue, int propagateChange) {
+		return propagateChange == 1 || (propagateChange == 2 && parentValue.equals(childValue));
 	}
 
 	private CRFDAO getCRFDAO() {

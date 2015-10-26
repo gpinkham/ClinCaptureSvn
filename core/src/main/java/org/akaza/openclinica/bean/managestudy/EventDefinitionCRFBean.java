@@ -178,6 +178,10 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 
+	@JsonIgnore
+	@XmlTransient
+	private int propagateChange; // not in DB
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -678,5 +682,61 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public String getSdvCode() {
 		return sdvCode;
+	}
+
+	public void setSdvCode(String sdvCode) {
+		this.sdvCode = sdvCode;
+	}
+
+	public int getPropagateChange() {
+		return propagateChange;
+	}
+
+	public void setPropagateChange(int propagateChange) {
+		this.propagateChange = propagateChange;
+	}
+
+	/**
+	 * Empty constructor.
+	 */
+	public EventDefinitionCRFBean() {
+	}
+
+	/**
+	 * Clone constructor
+	 * @param instance from which all parameters will be cloned.
+	 */
+	public EventDefinitionCRFBean(EventDefinitionCRFBean instance) {
+		this.eventName = instance.getEventName();
+		this.crfName = instance.getCrfName();
+		this.defaultVersionName = instance.getDefaultVersionName();
+		this.hideCrf = instance.isHideCrf();
+		this.hidden = instance.isHidden();
+		this.requiredCRF = instance.isRequiredCRF();
+		this.electronicSignature = instance.isElectronicSignature();
+		this.acceptNewCrfVersions = instance.isAcceptNewCrfVersions();
+		this.evaluatedCRF = instance.isEvaluatedCRF();
+		this.doubleEntry = instance.isDoubleEntry();
+		this.sdvCode = instance.getSdvCode();
+		this.sourceDataVerification = instance.getSourceDataVerification();
+		this.tabbingMode = instance.getTabbingMode();
+		this.ordinal = instance.getOrdinal();
+		this.studyId = instance.getStudyId();
+		this.requireAllTextFilled = instance.isRequireAllTextFilled();
+		this.decisionCondition = instance.isDecisionCondition();
+		this.studyEventDefinitionId = instance.getStudyEventDefinitionId();
+		this.emailStep = instance.getEmailStep();
+		this.emailTo = instance.getEmailTo();
+		this.crfId = instance.getCrfId();
+		this.parentId = instance.getParentId();
+		this.defaultVersionId = instance.getDefaultVersionId();
+		this.selectedVersionIds = instance.getSelectedVersionIds();
+		this.selectedVersionNames = instance.getSelectedVersionNames();
+		this.crf = instance.getCrf();
+		this.versions = instance.getVersions();
+		this.selectedVersionIdList = instance.getSelectedVersionIdList();
+		this.sdvOptions = instance.getSdvOptions();
+		this.propagateChange = instance.getPropagateChange();
+		this.id = instance.getId();
 	}
 }

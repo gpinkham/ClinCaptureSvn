@@ -237,7 +237,7 @@
 
 	<div style="width: 600px">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
+	<div class="tablebox_center">
 
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<c:set var="count" value="0"/>
@@ -439,6 +439,15 @@
                     <input type="radio" name="tabbingMode${count}" onchange="javascript:changeIcon();" value="topToBottom" ${topToBottomTabbingMode}/> <fmt:message key="topToBottom" bundle="${resword}"/>
                 </td>
             </tr>
+
+			<tr>
+				<td class="table_cell" colspan="4">
+					<fmt:message key="propagate_change" bundle="${resword}"/>:
+					<input type="radio" name="propagateChange${count}" onchange="changeIcon();" value="1" ${edc.propagateChange == "1" ? "checked" : ""}/> <fmt:message key="yes_unconditionally" bundle="${resword}"/>
+					<input type="radio" name="propagateChange${count}" onchange="changeIcon();" value="2" ${edc.propagateChange == "2" ? "checked" : ""}/> <fmt:message key="yes_preserve_different" bundle="${resword}"/>
+					<input type="radio" name="propagateChange${count}" onchange="changeIcon();" value="3" ${edc.propagateChange == "3" || edc.propagateChange == "0" ? "checked" : ""}/> <fmt:message key="no" bundle="${resword}"/>
+				</td>
+			</tr>
 
 			<tr><td class="table_divider" colspan="4">&nbsp;</td></tr>
 			</c:if>

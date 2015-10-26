@@ -207,6 +207,10 @@ public class UpdateEventDefinitionServletTest {
 		childEventDefinitionCRFsToUpdate.add(childEventDefinitionCRF);
 		request.getSession().setAttribute("childEventDefCRFs", childEventDefinitionCRFsToUpdate);
 
+		List<EventDefinitionCRFBean> oldEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
+		oldEventDefinitionCRFsToUpdate.add(parentEventDefinitionCRF);
+		request.getSession().setAttribute("oldEventDefinitionCRFs", eventDefinitionCRFsToUpdate);
+
 		// EXECUTE
 
 		spyUpdateEventDefinitionServlet.processRequest(request, response);
@@ -262,6 +266,10 @@ public class UpdateEventDefinitionServletTest {
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
 		childEventDefinitionCRFsToUpdate.add(childEventDefinitionCRF);
 		request.getSession().setAttribute("childEventDefCRFs", childEventDefinitionCRFsToUpdate);
+
+		List<EventDefinitionCRFBean> oldEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
+		oldEventDefinitionCRFsToUpdate.add(parentEventDefinitionCRF);
+		request.getSession().setAttribute("oldEventDefinitionCRFs", eventDefinitionCRFsToUpdate);
 
 		// EXECUTE
 
@@ -319,6 +327,10 @@ public class UpdateEventDefinitionServletTest {
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
 		childEventDefinitionCRFsToUpdate.add(childEventDefinitionCRF);
 		request.getSession().setAttribute("childEventDefCRFs", childEventDefinitionCRFsToUpdate);
+
+		List<EventDefinitionCRFBean> oldEventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
+		oldEventDefinitionCRFsToUpdate.add(parentEventDefinitionCRF);
+		request.getSession().setAttribute("oldEventDefinitionCRFs", eventDefinitionCRFsToUpdate);
 
 		spyUpdateEventDefinitionServlet.processRequest(request, response);
 

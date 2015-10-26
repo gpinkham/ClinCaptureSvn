@@ -69,7 +69,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 */
 	public void updateTheWholeStudyEventDefinition(StudyBean studyBean, UserAccountBean updater,
 			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
-			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, SignStateRestorer signStateRestorer)
+			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, List<EventDefinitionCRFBean> oldEDCs,
+			SignStateRestorer signStateRestorer)
 					throws Exception {
 		studyEventDefinitionBean.setUpdater(updater);
 		studyEventDefinitionBean.setUpdatedDate(new Date());
@@ -101,7 +102,12 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 				createChildEventDefinitionCrfs(createdEdc, studyBean);
 			}
 		}
-		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, parentsMap, updater);
+
+		Map<Integer, EventDefinitionCRFBean> oldEDCsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+		for (EventDefinitionCRFBean edc : oldEDCs) {
+			oldEDCsMap.put(edc.getId(), edc);
+		}
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, parentsMap, oldEDCsMap, updater);
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
 				new DAOWrapper(dataSource), signStateRestorer);
 	}

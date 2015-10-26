@@ -155,6 +155,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 				.getAttribute("eventDefinitionCRFs");
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request
 				.getSession().getAttribute("childEventDefCRFs");
+		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = (List<EventDefinitionCRFBean>) request.getSession()
+				.getAttribute("oldEventDefinitionCRFs");
 
 		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession()
 				.getAttribute("signStateRestorer");
@@ -162,7 +164,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				.getAttribute("definition");
 
 		getEventDefinitionService().updateTheWholeStudyEventDefinition(currentStudy, updater, studyEventDefinitionBean,
-				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, signStateRestorer);
+				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, oldEventDefinitionCRFs, signStateRestorer);
 
 		clearSession(request.getSession());
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
@@ -210,6 +212,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				String emailStep = fp.getString("emailOnStep" + i);
 				String emailTo = fp.getString("mailTo" + i);
 				String tabbingMode = fp.getString("tabbingMode" + i);
+				int propagateChange = fp.getInt("propagateChange" + i);
 
 				if (!StringUtil.isBlank(tabbingMode) && ("leftToRight".equalsIgnoreCase(tabbingMode.trim())
 						|| "topToBottom".equalsIgnoreCase(tabbingMode.trim()))) {
@@ -275,6 +278,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 					edcBean.setEmailStep("");
 				}
 
+				edcBean.setPropagateChange(propagateChange);
 			}
 
 		}
@@ -309,10 +313,10 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		session.removeAttribute("definition");
 		session.removeAttribute("eventDefinitionCRFs");
+		session.removeAttribute("oldEventDefinitionCRFs");
 		session.removeAttribute("childEventDefCRFs");
 		session.removeAttribute("tmpCRFIdMap");
 		session.removeAttribute("crfsWithVersion");
-		session.removeAttribute("eventDefinitionCRFs");
 		session.removeAttribute("showCalendaredVisitBox");
 		session.removeAttribute("changedReference");
 		session.removeAttribute("userNameInsteadEmail");

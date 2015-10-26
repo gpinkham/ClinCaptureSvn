@@ -33,6 +33,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -147,6 +148,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 			request.getSession().setAttribute("definition", studyEventDefinitionBean);
 			request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
+			request.getSession().setAttribute("oldEventDefinitionCRFs", EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
 			// store child list to session
 			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs

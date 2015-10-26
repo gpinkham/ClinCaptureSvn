@@ -12,12 +12,20 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * EventDefinitionCrfServiceTest.
  */
 public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
+
+	private UserAccountBean userBean;
+
+	@Before
+	public void before() {
+		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+	}
 
 	@Test
 	public void testThatUpdateChildEventDefinitionCrfsForNewCrfVersionSetsCorrectValues() throws Exception {
@@ -53,6 +61,7 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 
 		List<EventDefinitionCRFBean> childEventDefCRFs = new ArrayList<EventDefinitionCRFBean>();
 		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> oldParentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
 
 		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		eventDefinitionCrfBean.setUpdater(updater);
@@ -69,7 +78,9 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		eventDefinitionCRFDAO.update(childEventDefinitionCrfBean);
 		childEventDefCRFs.add(childEventDefinitionCrfBean);
 
-		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, updater);
+		oldParentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
+
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, updater);
 
 		childEventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(8);
 		assertTrue(childEventDefinitionCrfBean.getDefaultVersionId() == 1);
@@ -143,5 +154,97 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		List<CRFVersionBean> crfVersions = crfVersionDao.findAllByCRFId(crfVersionBean.getCrfId());
 		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(eventDefinitionCrfBean, crfVersions, userBean);
 		assertTrue(crfVersionBean.getId() != eventDefinitionCrfBean.getDefaultVersionId());
+	}
+
+	@Test
+	public void testThatUpdateAllChildEventDefinitionCRFsUpdatesChildIfPropagateModeEqOverrideAll() {
+		List<EventDefinitionCRFBean> childEventDefCRFs = new ArrayList<EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> oldParentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		eventDefinitionCrfBean.setUpdater(userBean);
+		eventDefinitionCrfBean.setRequiredCRF(false);
+		eventDefinitionCrfBean.setElectronicSignature(false);
+		eventDefinitionCrfBean.setPropagateChange(1);
+		eventDefinitionCRFDAO.update(eventDefinitionCrfBean);
+		parentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
+
+		EventDefinitionCRFBean childEventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(8);
+		childEventDefinitionCrfBean.setUpdater(userBean);
+		childEventDefinitionCrfBean.setRequiredCRF(true);
+		childEventDefinitionCrfBean.setElectronicSignature(true);
+		childEventDefinitionCrfBean.setParentId(eventDefinitionCrfBean.getId());
+		eventDefinitionCRFDAO.update(childEventDefinitionCrfBean);
+		childEventDefCRFs.add(childEventDefinitionCrfBean);
+
+		oldParentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
+
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, userBean);
+
+		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() == eventDefinitionCrfBean.isRequiredCRF());
+		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() == eventDefinitionCrfBean.isElectronicSignature());
+	}
+
+	@Test
+	public void testThatUpdateAllChildEventDefinitionCRFsUpdatesChildIfPropagateModeEqNotOverride() {
+		List<EventDefinitionCRFBean> childEventDefCRFs = new ArrayList<EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> oldParentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		eventDefinitionCrfBean.setUpdater(userBean);
+		eventDefinitionCrfBean.setRequiredCRF(false);
+		eventDefinitionCrfBean.setElectronicSignature(false);
+		eventDefinitionCrfBean.setPropagateChange(3);
+		eventDefinitionCRFDAO.update(eventDefinitionCrfBean);
+		parentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
+
+		EventDefinitionCRFBean childEventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(8);
+		childEventDefinitionCrfBean.setUpdater(userBean);
+		childEventDefinitionCrfBean.setRequiredCRF(true);
+		childEventDefinitionCrfBean.setElectronicSignature(true);
+		childEventDefinitionCrfBean.setParentId(eventDefinitionCrfBean.getId());
+		eventDefinitionCRFDAO.update(childEventDefinitionCrfBean);
+		childEventDefCRFs.add(childEventDefinitionCrfBean);
+
+		oldParentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
+
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, userBean);
+
+		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() != eventDefinitionCrfBean.isRequiredCRF());
+		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
+	}
+
+	@Test
+	public void testThatUpdateAllChildEventDefinitionCRFsUpdatesChildIfPropagateModeEqOverrideNotDifferent() {
+		List<EventDefinitionCRFBean> childEventDefCRFs = new ArrayList<EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+		Map<Integer, EventDefinitionCRFBean> oldParentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
+
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		eventDefinitionCrfBean.setUpdater(userBean);
+		eventDefinitionCrfBean.setRequiredCRF(false);
+		eventDefinitionCrfBean.setElectronicSignature(false);
+		eventDefinitionCrfBean.setPropagateChange(2);
+		eventDefinitionCRFDAO.update(eventDefinitionCrfBean);
+		parentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
+
+		EventDefinitionCRFBean childEventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(8);
+		childEventDefinitionCrfBean.setUpdater(userBean);
+		childEventDefinitionCrfBean.setRequiredCRF(true);
+		childEventDefinitionCrfBean.setElectronicSignature(true);
+		childEventDefinitionCrfBean.setParentId(eventDefinitionCrfBean.getId());
+		eventDefinitionCRFDAO.update(childEventDefinitionCrfBean);
+		childEventDefCRFs.add(childEventDefinitionCrfBean);
+
+		EventDefinitionCRFBean oldEventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
+		oldEventDefinitionCrfBean.setRequiredCRF(true);
+		oldParentsMap.put(eventDefinitionCrfBean.getId(), oldEventDefinitionCrfBean);
+
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, userBean);
+
+		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() == eventDefinitionCrfBean.isRequiredCRF());
+		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
 	}
 }

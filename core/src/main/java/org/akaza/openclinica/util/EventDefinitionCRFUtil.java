@@ -22,6 +22,7 @@
 package org.akaza.openclinica.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -60,5 +61,20 @@ public final class EventDefinitionCRFUtil {
 				eventCRFDAO.update(crf);
 			}
 		}
+	}
+
+	/**
+	 * Create list of clones of this entity.
+	 * @param originalList array of originals
+	 * @return ArrayList<EventDefinitionCRFBean>
+	 */
+	public static ArrayList<EventDefinitionCRFBean> cloneList(List<EventDefinitionCRFBean> originalList) {
+		ArrayList<EventDefinitionCRFBean> clonedList = new ArrayList<EventDefinitionCRFBean>();
+
+		for (EventDefinitionCRFBean edc : originalList) {
+			EventDefinitionCRFBean clone = new EventDefinitionCRFBean(edc);
+			clonedList.add(clone);
+		}
+		return clonedList;
 	}
 }

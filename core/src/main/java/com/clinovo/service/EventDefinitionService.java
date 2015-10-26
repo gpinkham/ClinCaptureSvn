@@ -40,6 +40,7 @@ public interface EventDefinitionService {
 	 *            list of parent's EventDefinitionCRFBeans
 	 * @param childEventDefinitionCRFsToUpdate
 	 *            list of child's EventDefinitionCRFBeans
+	 * @param oldEventDefinitionCRFs list of EventDefinitionCRFs before update.
 	 * @param signStateRestorer
 	 *            SignStateRestorer
 	 * @throws Exception
@@ -48,7 +49,9 @@ public interface EventDefinitionService {
 	void updateTheWholeStudyEventDefinition(StudyBean studyBean, UserAccountBean updater,
 			StudyEventDefinitionBean studyEventDefinitionBean,
 			List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
-			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, SignStateRestorer signStateRestorer)
+			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
+			List<EventDefinitionCRFBean> oldEventDefinitionCRFs,
+			SignStateRestorer signStateRestorer)
 			throws Exception;
 
 	/**

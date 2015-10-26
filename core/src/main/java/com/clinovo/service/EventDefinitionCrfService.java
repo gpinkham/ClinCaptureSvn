@@ -40,15 +40,14 @@ public interface EventDefinitionCrfService {
 	/**
 	 * Method updates child event definition crfs.
 	 *
-	 * @param childEventDefinitionCRFsToUpdate
-	 *            List<EventDefinitionCRFBean>
-	 * @param parentsMap
-	 *            Map<Integer, EventDefinitionCRFBean>
-	 * @param updater
-	 *            UserAccountBean
+	 * @param childEventDefinitionCRFsToUpdate List<EventDefinitionCRFBean>
+	 * @param parentsMap Map<Integer, EventDefinitionCRFBean>
+	 * @param updater UserAccountBean
+	 * @param parentsBeforeUpdateMap Map<Integer, EventDefinitionCRFBean>
 	 */
 	void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
-			Map<Integer, EventDefinitionCRFBean> parentsMap, UserAccountBean updater);
+			Map<Integer, EventDefinitionCRFBean> parentsMap,
+			Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap, UserAccountBean updater);
 
 	/**
 	 * Fills info for EventDefinitionCRFBean.
