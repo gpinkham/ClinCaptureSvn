@@ -41,7 +41,6 @@ import org.akaza.openclinica.bean.extract.FilterBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -335,8 +334,6 @@ import com.clinovo.i18n.LocaleResolver;
 			} else if (page.equals(Page.ENTER_DATA_FOR_STUDY_EVENT)
 					|| page.equals(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET)) {
 
-				StudyBean study = (StudyBean) session.getAttribute("study");
-				StudySubjectBean studySubject = (StudySubjectBean) request.getAttribute("studySubject");
 				ArrayList beans = (ArrayList) request.getAttribute("beans");
 				EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
 				this.reset();
