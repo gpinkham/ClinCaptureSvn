@@ -163,7 +163,9 @@ public class ViewSiteServlet extends Controller {
 							}
 						}
 					}
-					idNames = idNames.substring(0, idNames.length() - 1);
+					if (!idNames.isEmpty()) {
+						idNames = idNames.substring(0, idNames.length() - 1);
+					}
 				}
 				edcBean.setSelectedVersionIdList(idList);
 				edcBean.setSelectedVersionNames(idNames);
