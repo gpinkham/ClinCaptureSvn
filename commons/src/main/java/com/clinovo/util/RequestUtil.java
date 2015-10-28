@@ -36,4 +36,67 @@ public final class RequestUtil {
 	public static HttpServletRequest getRequest() {
 		return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 	}
+
+	/**
+	 * Returns relative url with context path.
+	 *
+	 * @param withContext
+	 *            boolean
+	 * @return String
+	 */
+	public static String getRelative(boolean withContext) {
+		HttpServletRequest request = RequestUtil.getRequest();
+		String queryString = request.getQueryString();
+		return (withContext ? request.getContextPath() : "").concat(request.getRequestURI()).concat("?")
+				.concat(queryString == null ? "" : queryString);
+	}
+
+	/**
+	 * Returns relative url without context path.
+	 *
+	 * @return String
+	 */
+	public static String getRelative() {
+		return getRelative(false);
+	}
+
+	/**
+	 * Returns relative url with context path and with new parameters.
+	 *
+	 * @param withContext
+	 *            boolean
+	 * @param pairs
+	 *            String...
+	 * @return String
+	 */
+	public static String getRelativeWithNewParameters(boolean withContext, String... pairs) {
+		String url = getRelative(withContext);
+		if (pairs != null) {
+			for (String pair : pairs) {
+				pair = pair.trim();
+				if (pair.indexOf("=") >= 1) {
+					String[] pairArray = pair.split("=");
+					if (url.contains("&".concat(pairArray[0]).concat("="))) {
+						url = url.replaceAll("&".concat(pairArray[0]).concat("=[^&.]*"), "&".concat(pair));
+					} else if (url.contains("?".concat(pairArray[0]).concat("="))) {
+						url = url.replaceAll("\\?".concat(pairArray[0]).concat("=[^&.]*"), "?".concat(pair));
+					} else {
+						url = url.concat(url.contains("?") ? "&" : "?").concat(pair);
+					}
+				}
+			}
+		}
+		return url;
+	}
+
+	/**
+	 * Returns relative url without context path and with new parameters.
+	 *
+	 * @param pairs
+	 *            String...
+	 * @return String
+	 */
+	public static String getRelativeWithNewParameters(String... pairs) {
+		return getRelativeWithNewParameters(false, pairs);
+	}
 }

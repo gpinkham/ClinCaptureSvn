@@ -50,6 +50,8 @@ import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.RequestUtil;
+
 /**
  * ViewDatasetsServlet.java, the view datasets function accessed from the extract datasets main page.
  * 
@@ -77,8 +79,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String action = request.getParameter("action");
-		if (!(action != null && (action.equalsIgnoreCase("details") || action.equalsIgnoreCase("owner")))
-				&& shouldRedirect(request, response)) {
+		if (!(action != null && action.equalsIgnoreCase("details")) && shouldRedirect(request, response)) {
 			return;
 		}
 		if ("ongoing".equals(request.getSession().getAttribute("exportStatus"))) {
@@ -122,8 +123,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 					resword.getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
-			table.addLink(resword.getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
-			table.setQuery("ViewDatasets", new HashMap());
+			table.addLink(resword.getString("show_only_my_datasets"), RequestUtil
+					.getRelativeWithNewParameters("action=owner", "ownerId=".concat(Integer.toString(ub.getId()))));
+			table.setQuery("ViewDatasets", getOwnerQueryArgs("", ""));
 			table.setRows(datasetRows);
 			table.computeDisplay();
 			request.setAttribute("table", table);
@@ -140,8 +142,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 						resword.getString("status"), resword.getString("actions")};
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.hideColumnLink(FIVE);
-				table.addLink(resword.getString("show_all_datasets"), "ViewDatasets");
-				table.setQuery("ViewDatasets", getOwnerQueryArgs(ub.getId()));
+				table.addLink(resword.getString("show_all_datasets"),
+						RequestUtil.getRelativeWithNewParameters("action=", "ownerId="));
+				table.setQuery("ViewDatasets", getOwnerQueryArgs(Integer.toString(ub.getId()), "owner"));
 				table.setRows(datasetRows);
 				table.computeDisplay();
 				request.setAttribute("table", table);
@@ -165,10 +168,10 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		}
 	}
 
-	private HashMap<String, String> getOwnerQueryArgs(Integer ownerId) {
+	private HashMap<String, String> getOwnerQueryArgs(String ownerId, String action) {
 		HashMap<String, String> args = new HashMap<String, String>();
-		args.put("ownerId", ownerId.toString());
-		args.put("action", "owner");
+		args.put("ownerId", ownerId);
+		args.put("action", action);
 		return args;
 	}
 
@@ -236,6 +239,8 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
+		String action = fp.getString("action");
+		String ownerId = fp.getString("ownerId");
 		String eblFiltered = fp.getString("ebl_filtered");
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
@@ -244,7 +249,8 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				+ (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
 				+ (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
 				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
-				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&&ebl_paginated=1";
+				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&ebl_paginated=1" + "&action=" + action
+				+ "&ownerId=" + ownerId;
 	}
 
 	@Override
