@@ -421,7 +421,7 @@
               <xsl:text></xsl:text>
               <xsl:copy-of select="$TAB" />
               <xsl:text></xsl:text>
-              <xsl:value-of select="normalize-space(string($item/@Value))" />
+              <xsl:value-of select="normalize-space($item/@Value)" />
               <xsl:text></xsl:text>
             </xsl:for-each>
             <xsl:text></xsl:text>
@@ -532,13 +532,11 @@
     <xsl:copy-of select="$TAB" />
   </xsl:template>
 
-  <xsl:template mode="head" match="group">
+  <xsl:template mode="body" match="group">
     <xsl:param name="subject" />
 
-    <xsl:if test="$subject/OC:SubjectGroupData
-        [@OC:StudyGroupClassName = current()/@name]">
-      <xsl:value-of select="@name" />
-    </xsl:if>
+    <xsl:value-of select="$subject/OC:SubjectGroupData
+        [@OC:StudyGroupClassName = current()/@name]" />
     <xsl:copy-of select="$TAB" />
   </xsl:template>
 
