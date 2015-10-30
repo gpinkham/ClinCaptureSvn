@@ -247,4 +247,18 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() == eventDefinitionCrfBean.isRequiredCRF());
 		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
 	}
+
+	@Test(expected = Exception.class)
+	public void testThatExceptionIsThrownIfStartedEventCRFsExistsWhileDeletion() throws Exception{
+		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
+		eventDefinitionCRFBean.setId(1);
+		eventDefinitionCrfService.deleteEventDefinitionCrf(eventDefinitionCRFBean);
+	}
+
+	@Test
+	public void testThatExceptionIsNotThrownIfStartedEventCRFsNotExistsWhileDeletion() throws Exception{
+		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
+		eventDefinitionCRFBean.setId(11);
+		eventDefinitionCrfService.deleteEventDefinitionCrf(eventDefinitionCRFBean);
+	}
 }

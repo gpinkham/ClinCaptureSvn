@@ -2998,3 +2998,8 @@ input.randButton {
 span.autoChange {
     color: silver;
 }
+
+.table_shadow_bottom {
+	border: 1px solid #cccccc;
+	box-shadow: 5px 5px 5px #ccc;
+}

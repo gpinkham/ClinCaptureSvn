@@ -33,11 +33,13 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
 public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService {
 
 	public static final String ARRAY_TO_STRING_PATTERN = "\\]|\\[| ";
+	public static final String STARTED_EVENT_CRF_FOUND = "started_event_crf_found";
 
 	@Autowired
 	private DataSource dataSource;
@@ -257,6 +260,27 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				}
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception {
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByEventDefinitionCRFId(eventDefinitionCRFBean.getId());
+		for (EventCRFBean eventCRFBean : eventCRFBeans) {
+			if (!eventCRFBean.isNotStarted()) {
+				throw new Exception(STARTED_EVENT_CRF_FOUND);
+			} else {
+				eventCRFDAO.delete(eventCRFBean.getId());
+			}
+		}
+		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionCRFDAO.findAllChildrenByParentId(eventDefinitionCRFBean.getId());
+		for (EventDefinitionCRFBean child : childEventDefinitionCRFs) {
+			eventDefinitionCRFDAO.delete(child.getId());
+		}
+		eventDefinitionCRFDAO.delete(eventDefinitionCRFBean.getId());
 	}
 
 	private HashMap processNullValues(EventDefinitionCRFBean edc) {

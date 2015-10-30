@@ -242,7 +242,7 @@
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<c:set var="count" value="0"/>
 		
-		<c:forEach var="edc" items="${eventDefinitionCRFs}">
+		<c:forEach var="edc" items="${eventDefinitionCRFs}" varStatus="edcStatus">
 			<%-- above added by tbh, 102007 --%>
 
 			<input type="hidden" name="id<c:out value="${count}"/>" value="<c:out value="${edc.id}"/>">
@@ -271,6 +271,15 @@
 			                        </td>
 			                    </c:otherwise>
 			                </c:choose>
+							<c:if test="${edc.id != 0}">
+							<td>
+								<a href="pages/deleteEventDefinitionCRF?id=${edc.id}&edId=${definition.id}">
+									<img name="bt_delete" class="bt_delete_${edcStatus.index}" src="images/bt_Delete.gif" border="0"
+										 alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"
+										 align="left" hspace="6">
+								</a>
+							</td>
+							</c:if>
 			            </tr>
 			        </table>
 			    </td>

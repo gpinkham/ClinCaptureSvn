@@ -900,6 +900,21 @@ public class RuleSetService implements RuleSetServiceInterface {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public List<RuleSetRuleBean> findAllRulesForEventDefinitionCRF(String eventOid, int crfId) {
+		CRFBean crfBean = (CRFBean) getCrfDao().findByPK(crfId);
+		ArrayList crfVersionBeans = getCrfVersionDao().findAllByCRFId(crfId);
+		ArrayList<String> crfOIDs = new ArrayList<String>();
+		crfOIDs.add(crfBean.getOid());
+		for (Object version : crfVersionBeans) {
+			CRFVersionBean crfVersionBean = (CRFVersionBean) version;
+			crfOIDs.add(crfVersionBean.getOid());
+		}
+		return getRuleSetRuleDao().findAllRulesForEventDefinitionCRF(eventOid, crfOIDs);
+	}
+
+	/**
 	 * @return the contextPath
 	 */
 	public String getContextPath() {

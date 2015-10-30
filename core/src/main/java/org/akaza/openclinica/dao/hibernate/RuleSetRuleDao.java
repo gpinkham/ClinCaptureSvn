@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -125,31 +126,32 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 	public ArrayList<RuleSetRuleBean> getWithFilterAndSort(final ViewRuleAssignmentFilter filter,
 			final ViewRuleAssignmentSort sort, final int rowStart, final int rowEnd) {
 
-		String select = "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name as iname,re.value as revalue,sed.name as sedname,c.name as cname,cv.name as cvname,ig.name as igname,rer.value as rervalue,r.oc_oid as rocoid,r.description as rdescription,r.name as rname from rule_set_rule rsr ";
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
-			select = "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name iname,re.value revalue,sed.name sedname,c.name cname,cv.name cvname,ig.name igname,rer.value rervalue,r.oc_oid rocoid,r.description rdescription,r.name rname from rule_set_rule rsr ";
-		}
-
-		String query = select
-				+ " join rule_set rs on rs.id = rsr.rule_set_id "
-				+ " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
-				+ " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id and cv.status_id = 1 "
-				+ " left outer join (SELECT c2.* FROM crf_version cv2 join crf c2 on c2.crf_id = cv2.crf_id where cv2.status_id = 1) c on rs.crf_id = c.crf_id and c.status_id = 1 "
-				+ " left outer join item i on rs.item_id = i.item_id "
-				+ " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
-				+ " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "
-				+ " join rule_expression rer on r.rule_expression_id = rer.id "
-				+ " join rule_action ra on ra.rule_set_rule_id = rsr.id "
-				+ " left join event_definition_crf related_edc on related_edc.parent_id is null and related_edc.crf_id = c.crf_id and related_edc.study_event_definition_id = rs.study_event_definition_id and related_edc.status_id = 1 and related_edc.study_id = rs.study_id "
-				+ " left join event_definition_crf actual_edc on actual_edc.parent_id is null and actual_edc.crf_id = c.crf_id and actual_edc.status_id = 1 and actual_edc.study_id = rs.study_id "
-				+ " where ";
-
+		String query = getFindAllRuleSetRulesQuery();
 		query += filter.execute("");
 		query += " and ((rs.study_event_definition_id is null and actual_edc.event_definition_crf_id is not null) or (rs.study_event_definition_id is not null and related_edc.event_definition_crf_id is not null)) ";
 		query += sort.execute("");
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
 		q.setFirstResult(rowStart);
 		q.setMaxResults(rowEnd - rowStart);
+		return (ArrayList<RuleSetRuleBean>) q.list();
+	}
+
+	/**
+	 * Find all ruleSetRules for some EventDefinitionCRF by event oid and CRF Id.
+	 * @param eventOid String
+	 * @param crfOIDs list of CRF oids.
+	 * @return List of RuleSetRuleBeans
+	 */
+	public List<RuleSetRuleBean> findAllRulesForEventDefinitionCRF(String eventOid, ArrayList<String> crfOIDs) {
+		String query = getFindAllRuleSetRulesQuery();
+		query += " ((re.target_event_oid = '" + eventOid + "' OR re.value LIKE '%" + eventOid + ".%') AND (";
+		int index = 0;
+		for (String oid : crfOIDs) {
+			query += (index == 0 ? "" : " OR ") + "re.target_version_oid = '" + oid + "' OR re.value LIKE '%" + oid + "%'";
+			index++;
+		}
+		query += "))";
+		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
 		return (ArrayList<RuleSetRuleBean>) q.list();
 	}
 
@@ -178,5 +180,25 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 
 	public void setCoreResources(CoreResources coreResources) {
 		this.coreResources = coreResources;
+	}
+
+	private String getFindAllRuleSetRulesQuery() {
+		String select = "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name as iname,re.value as revalue,sed.name as sedname,c.name as cname,cv.name as cvname,ig.name as igname,rer.value as rervalue,r.oc_oid as rocoid,r.description as rdescription,r.name as rname from rule_set_rule rsr ";
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
+			select = "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name iname,re.value revalue,sed.name sedname,c.name cname,cv.name cvname,ig.name igname,rer.value rervalue,r.oc_oid rocoid,r.description rdescription,r.name rname from rule_set_rule rsr ";
+		}
+		return select
+				+ " join rule_set rs on rs.id = rsr.rule_set_id "
+				+ " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
+				+ " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id and cv.status_id = 1 "
+				+ " left outer join (SELECT c2.* FROM crf_version cv2 join crf c2 on c2.crf_id = cv2.crf_id where cv2.status_id = 1) c on rs.crf_id = c.crf_id and c.status_id = 1 "
+				+ " left outer join item i on rs.item_id = i.item_id "
+				+ " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
+				+ " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "
+				+ " join rule_expression rer on r.rule_expression_id = rer.id "
+				+ " join rule_action ra on ra.rule_set_rule_id = rsr.id "
+				+ " left join event_definition_crf related_edc on related_edc.parent_id is null and related_edc.crf_id = c.crf_id and related_edc.study_event_definition_id = rs.study_event_definition_id and related_edc.status_id = 1 and related_edc.study_id = rs.study_id "
+				+ " left join event_definition_crf actual_edc on actual_edc.parent_id is null and actual_edc.crf_id = c.crf_id and actual_edc.status_id = 1 and actual_edc.study_id = rs.study_id "
+				+ " where ";
 	}
 }

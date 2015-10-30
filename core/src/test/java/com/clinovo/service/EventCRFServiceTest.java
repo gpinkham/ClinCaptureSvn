@@ -16,7 +16,10 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +37,9 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 
 	private EventCRFDAO mockEventCRFDAO;
 
+	private StudySubjectDAO mockStudySubjectDAO;
+	private StudyDAO mockStudyDAO;
+
 	private UserAccountBean updater;
 
 	List<EventCRFBean> eventCRFList;
@@ -44,10 +50,22 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		mockEventCRFService = mock(EventCRFServiceImpl.class);
 		mockItemDataService = mock(ItemDataServiceImpl.class);
 		mockEventCRFDAO = mock(EventCRFDAO.class);
+		mockStudySubjectDAO = mock(StudySubjectDAO.class);
+		mockStudyDAO = mock(StudyDAO.class);
 		setInternalState(mockEventCRFService, "itemDataService", mockItemDataService);
 		Mockito.doReturn(mockEventCRFDAO).when(mockEventCRFService).getEventCRFDAO();
+		Mockito.doReturn(mockStudySubjectDAO).when(mockEventCRFService).getStudySubjectDAO();
+		Mockito.doReturn(mockStudyDAO).when(mockEventCRFService).getStudyDAO();
 		Mockito.doNothing().when(mockEventCRFService)
 				.updateStudyEventStatus(Mockito.any(EventCRFBean.class), Mockito.any(UserAccountBean.class));
+
+		StudySubjectBean subject = new StudySubjectBean();
+		subject.setStudyId(1);
+		subject.setName("TestSubject1");
+		Mockito.doReturn(subject).when(mockStudySubjectDAO).findByPK(Mockito.anyInt());
+		StudyBean study = new StudyBean();
+		study.setName("TestStudy1");
+		Mockito.doReturn(study).when(mockStudyDAO).findByPK(Mockito.anyInt());
 
 		updater = new UserAccountBean();
 		updater.setId(144);
@@ -60,6 +78,7 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		addEventToList(5, Status.PENDING, null);
 		addEventToList(6, Status.AVAILABLE, null);
 		Mockito.doCallRealMethod().when(mockEventCRFService).setEventCRFsToAutoRemovedState(eventCRFList, updater);
+		Mockito.doCallRealMethod().when(mockEventCRFService).getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
 		Mockito.doCallRealMethod().when(mockEventCRFService)
 				.restoreEventCRFsFromAutoRemovedState(eventCRFList, updater);
 	}
@@ -328,5 +347,35 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		EventCRFBean nextEventCRF = eventCRFService.getNextEventCRFForDataEntry(currentStudyEventBean,
 				currentEventDefCRF, currentUser, studyUserRole, currentStudy);
 		assertNull(nextEventCRF);
+	}
+
+	@Test
+	public void testThatGetAllStartedEventCRFsWithStudyAndEventNameReturnsCorrectResult() {
+		EventCRFBean newEventCRF = new EventCRFBean();
+		newEventCRF.setNotStarted(false);
+		newEventCRF.setStudySubjectId(1);
+		eventCRFList.add(newEventCRF);
+		List<EventCRFBean> eventCRFBeanList = mockEventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
+		assertEquals(1, eventCRFBeanList.size());
+	}
+
+	@Test
+	public void testThatGetAllStartedEventCRFsWithStudyAndEventNameReturnsCorrectSubjectName() {
+		EventCRFBean newEventCRF = new EventCRFBean();
+		newEventCRF.setNotStarted(false);
+		newEventCRF.setStudySubjectId(1);
+		eventCRFList.add(newEventCRF);
+		List<EventCRFBean> eventCRFBeanList = mockEventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
+		assertEquals("TestSubject1", eventCRFBeanList.get(0).getStudySubjectName());
+	}
+
+	@Test
+	public void testThatGetAllStartedEventCRFsWithStudyAndEventNameReturnsCorrectStudyName() {
+		EventCRFBean newEventCRF = new EventCRFBean();
+		newEventCRF.setNotStarted(false);
+		newEventCRF.setStudySubjectId(1);
+		eventCRFList.add(newEventCRF);
+		List<EventCRFBean> eventCRFBeanList = mockEventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
+		assertEquals("TestStudy1", eventCRFBeanList.get(0).getStudyName());
 	}
 }

@@ -94,4 +94,11 @@ public interface EventDefinitionCrfService {
 	 */
 	void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean, List<CRFVersionBean> versionList,
 												  UserAccountBean updater);
+
+	/**
+	 * Delete crf from study event definition.
+	 * @param eventDefinitionCRFBean EventDefinitionCRFBean
+	 * @throws Exception in case if some item data is present for this Event Definition CRF.
+	 */
+	void deleteEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception;
 }

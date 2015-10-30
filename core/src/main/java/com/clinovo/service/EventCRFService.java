@@ -164,4 +164,11 @@ public interface EventCRFService {
 	EventCRFBean getNextEventCRFForDataEntry(StudyEventBean currentStudyEventBean,
 			EventDefinitionCRFBean currentEventDefCRF, UserAccountBean currentUser, StudyUserRoleBean currentUserRole,
 			StudyBean currentStudy);
+
+	/**
+	 * Get all started event CRF, and set correct Study name and Event Name for them.
+	 * @param eventCRFBeans original list of event CRFs
+	 * @return filtered list.
+	 */
+	List<EventCRFBean> getAllStartedEventCRFsWithStudyAndEventName(List<EventCRFBean> eventCRFBeans);
 }

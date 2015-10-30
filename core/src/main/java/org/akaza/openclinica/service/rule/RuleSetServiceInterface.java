@@ -610,4 +610,12 @@ public interface RuleSetServiceInterface {
 	@Transactional
 	boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase);
 
+	/**
+	 * Find all ruleSetRules for some EventDefinitionCRF by event name and CRF Id.
+	 * @param eventName String
+	 * @param crfId int
+	 * @return List of RuleSetRuleBeans
+	 */
+	@Transactional
+	List<RuleSetRuleBean> findAllRulesForEventDefinitionCRF(String eventName, int crfId);
 }

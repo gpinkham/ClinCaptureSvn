@@ -88,7 +88,7 @@
 										</a>
 										<div id="e${eventNum.count}s${site.id}">
 											<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-												<div class="tablebox_center">
+												<div class="tablebox_center table_shadow_bottom_left">
 													<table width="100%" class="table_horizontal">
 														<tr style="background-color:#F5F5F5">
 															<td style="min-width:500px"><fmt:message bundle="${resword}" key="CRF_name"/></td>

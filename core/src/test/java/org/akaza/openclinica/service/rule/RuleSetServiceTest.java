@@ -35,6 +35,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.junit.Before;
@@ -177,5 +178,11 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 		ruleSets.add(ruleSet);
 		ruleSets = ruleSetService.filterRuleSetsByGroupOrdinal(ruleSets);
 		assertEquals(0, ruleSets.get(0).getExpressions().size());
+	}
+
+	@Test
+	public void testFindAllRulesForEventDefinitionCRFReturnsCorrectResult() {
+		List<RuleSetRuleBean> ruleSetRuleBeans = ruleSetService.findAllRulesForEventDefinitionCRF("SE_ED1NONRE", 1);
+		assertEquals(3, ruleSetRuleBeans.size());
 	}
 }

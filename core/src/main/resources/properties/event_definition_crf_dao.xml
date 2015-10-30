@@ -343,4 +343,8 @@
 			END) AS result
 		</sql>
 	</query>
+	<query>
+		<name>delete</name>
+		<sql>DELETE FROM event_definition_crf WHERE event_definition_crf_id = ?</sql>
+	</query>
 </queries>

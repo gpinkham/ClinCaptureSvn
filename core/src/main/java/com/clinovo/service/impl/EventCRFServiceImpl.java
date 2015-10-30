@@ -29,13 +29,16 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,8 +80,12 @@ public class EventCRFServiceImpl implements EventCRFService {
 		return new EventDefinitionCRFDAO(dataSource);
 	}
 
-	private StudyDAO getStudyDAO() {
+	public StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
+	}
+
+	public StudySubjectDAO getStudySubjectDAO() {
+		return new StudySubjectDAO(dataSource);
 	}
 
 	private void remove(EventCRFBean eventCRF, Status crfStatusToSet, UserAccountBean updater) throws Exception {
@@ -230,6 +237,25 @@ public class EventCRFServiceImpl implements EventCRFService {
 			return eventCRF;
 		}
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<EventCRFBean> getAllStartedEventCRFsWithStudyAndEventName(List<EventCRFBean> eventCRFBeans) {
+		List<EventCRFBean> startedList = new ArrayList<EventCRFBean>();
+
+		for (EventCRFBean eventCRF : eventCRFBeans) {
+			if (eventCRF.isNotStarted()) {
+				continue;
+			}
+			StudySubjectBean subjectBean = (StudySubjectBean) getStudySubjectDAO().findByPK(eventCRF.getStudySubjectId());
+			eventCRF.setStudySubjectName(subjectBean.getName());
+			StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(subjectBean.getStudyId());
+			eventCRF.setStudyName(studyBean.getName());
+			startedList.add(eventCRF);
+		}
+		return startedList;
 	}
 
 	private EventCRFBean getNextCrfAvailableForDataEntry(StudyBean currentStudy, StudyEventBean currentStudyEvent,

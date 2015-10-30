@@ -1225,4 +1225,15 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 		return al;
 	}
+
+	/**
+	 * Delete crf from study event definition.
+	 * @param eventDefinitionCRFId int
+	 */
+	public void delete(int eventDefinitionCRFId) {
+		HashMap variables = new HashMap();
+		variables.put(1, eventDefinitionCRFId);
+		String sql = digester.getQuery("delete");
+		this.execute(sql, variables);
+	}
 }

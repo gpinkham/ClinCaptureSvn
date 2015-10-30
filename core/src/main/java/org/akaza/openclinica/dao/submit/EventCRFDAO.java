@@ -2087,4 +2087,28 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(ind, sectionId);
 		execute(digester.getQuery("savePartialSectionInfo"), variables, connection, true);
 	}
+
+	/**
+	 * Find all eventCrfs by EventDefinitionCRF id.
+	 * @param eventDefinitionCRFId int
+	 * @return ArrayList<EventCRFBean>
+	 */
+	public ArrayList<EventCRFBean> findAllByEventDefinitionCRFId(int eventDefinitionCRFId) {
+		this.unsetTypeExpected();
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		int index = 1;
+		variables.put(index++, eventDefinitionCRFId);
+		variables.put(index, eventDefinitionCRFId);
+		String sql = digester.getQuery("findAllByEventDefinitionCRFId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			al.add(getEntityFromHashMap(hm));
+		}
+		return al;
+	}
 }

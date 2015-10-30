@@ -56,6 +56,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest {
 	public static final String EVALUATION_PROGRESS_WIDGET = "/initEvaluationProgressWidget";
 	public static final String ESPAS_WIDGET = "/initESPASWidget";
 	public static final String ESPAS_LIGEND = "/getESPASLegendValues";
+	public static final String DELETE_EVENT_DEFINITION_CRF_CONTROLLER = "/deleteEventDefinitionCRF";
 
 	public static final Locale LOCALE = new Locale("en");
 
