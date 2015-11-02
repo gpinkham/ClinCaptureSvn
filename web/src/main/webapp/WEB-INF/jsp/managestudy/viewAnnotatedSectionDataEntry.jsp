@@ -365,14 +365,14 @@
 															</c:forEach>
 														</c:when>
 														<c:when test="${sectionBorders == 1}">
-															<th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
+															<th class="aka_headerBackground aka_padding_large aka_cellBorders_dark"></th>
 														</c:when>
 														<c:otherwise>
-															<th class="aka_headerBackground aka_padding_large aka_cellBorders" />
+															<th class="aka_headerBackground aka_padding_large aka_cellBorders"></th>
 														</c:otherwise>
 														</c:choose>
 													</c:forEach>
-														<th/>
+													<th class="aka_headerBackground aka_padding_large aka_cellBorders"></th>
 												</tr>
 											</c:if>
 										</thead>
