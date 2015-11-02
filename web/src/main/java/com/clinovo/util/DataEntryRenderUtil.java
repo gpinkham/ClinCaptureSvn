@@ -99,7 +99,11 @@ public final class DataEntryRenderUtil {
 		int columnsShown = 1;
 		for (DisplayItemBean item : items) {
 			if (item.getMetadata().isShowItem()) {
-				columnsShown++;
+				if (item.getMetadata().getResponseLayout().equalsIgnoreCase("horizontal")) {
+					columnsShown += item.getMetadata().getResponseSet().getOptions().size();
+				} else {
+					columnsShown++;
+				}
 			}
 		}
 		displayItemWithGroup.setColumnsShown(columnsShown);
