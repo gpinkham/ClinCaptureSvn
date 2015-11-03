@@ -507,14 +507,19 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-		boolean result;
+		boolean result = false;
 		String id = request.getParameter("id");
 		if (request.getQueryString() != null && request.getQueryString().equalsIgnoreCase("id=" + id)) {
 			String savedUrl = (String) request.getSession().getAttribute(getUrlKey(request));
-			result = savedUrl != null
-					&& savedUrl.contains("id=" + id)
-					&& !savedUrl.equalsIgnoreCase(request.getContextPath().concat(request.getServletPath()).concat("?")
+			// Was added in order to prevent situation when id = 1 and saved id = 10, in this case result will be invalid.
+			if (savedUrl != null && savedUrl.length() != 0) {
+				String savedUrlWithoutCharacter = savedUrl.substring(0, savedUrl.length() - 1);
+
+				result = savedUrl.contains("id=" + id)
+						&& !savedUrlWithoutCharacter.contains("id=" + id)
+						&& !savedUrl.equalsIgnoreCase(request.getContextPath().concat(request.getServletPath()).concat("?")
 							.concat(request.getQueryString()));
+			}
 		} else {
 			result = request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 		}
