@@ -46,7 +46,10 @@ public class RandomizeServletTest {
 		study = new StudyBean();
 		study.setId(1);
 		study.setStudyParameterConfig(new StudyParameterConfig());
+		study.setParentStudyId(2);
+		study.setIdentifier("Test Study");
 		PowerMockito.when(randomizeServlet.getCurrentStudy(request)).thenReturn(study);
+		PowerMockito.when(randomizeServlet.getSite(study)).thenReturn("testId");
 		PowerMockito
 				.when(randomizeServlet,
 						PowerMockito.method(RandomizeServlet.class, "initiateRandomizationCall",

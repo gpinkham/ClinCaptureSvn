@@ -190,7 +190,7 @@ public class RandomizeServlet extends Controller {
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request
 				.getParameter("strataLevel");
 
-		String siteId = getSite(currentStudy);
+		String siteId = getSite(currentStudy).toLowerCase();
 		String patientId = request.getParameter("subject");
 		String randomizationEnviroment = currentStudy.getStudyParameterConfig().getRandomizationEnviroment();
 
