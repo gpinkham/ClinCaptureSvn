@@ -33,6 +33,7 @@ import java.util.List;
 
 @Repository
 @Transactional
+@SuppressWarnings("unchecked")
 public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 
 	private CoreResources coreResources;
@@ -43,7 +44,6 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 		return RuleSetRuleBean.class;
 	}
 
-	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetRuleBean> findByRuleSetBeanAndRuleBean(RuleSetBean ruleSetBean, RuleBean ruleBean) {
 		String query = "from " + getDomainClassName() + " ruleSetRule  where ruleSetRule.ruleSetBean = :ruleSetBean"
 				+ " AND ruleSetRule.ruleBean = :ruleBean ";
@@ -61,7 +61,6 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 	 *            Integer
 	 * @return List of RuleSetRuleBeans
 	 */
-	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetRuleBean> findByRuleSetStudyIdAndStatusAvail(Integer studyId) {
 		String query = "from " + getDomainClassName()
 				+ " ruleSetRule  where ruleSetRule.ruleSetBean.studyId = :studyId and status = :status ";
@@ -122,7 +121,6 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 		return ((Number) q.uniqueResult()).intValue();
 	}
 
-	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetRuleBean> getWithFilterAndSort(final ViewRuleAssignmentFilter filter,
 			final ViewRuleAssignmentSort sort, final int rowStart, final int rowEnd) {
 

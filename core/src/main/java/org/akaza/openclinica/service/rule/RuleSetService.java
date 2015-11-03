@@ -89,6 +89,7 @@ import java.util.Set;
 /**
  * Contains RuleSet services.
  */
+@SuppressWarnings("rawtypes")
 public class RuleSetService implements RuleSetServiceInterface {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
