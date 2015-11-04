@@ -17,6 +17,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -114,5 +115,16 @@ public class StudyModuleStatus extends AbstractAuditableMutableDomainObject {
 
 	public void setStudyStatus(int studyStatus) {
 		this.studyStatus = studyStatus;
+	}
+
+	public void setUpdatedValues(StudyModuleStatus updatedEntity, UserAccountBean updater) {
+		this.setStudy(updatedEntity.getStudy());
+		this.setCrf(updatedEntity.getCrf());
+		this.setEventDefinition(updatedEntity.getEventDefinition());
+		this.setSubjectGroup(updatedEntity.getSubjectGroup());
+		this.setRule(updatedEntity.getRule());
+		this.setSite(updatedEntity.getSite());
+		this.setUsers(updatedEntity.getUsers());
+		this.setUpdateId(updater.getId());
 	}
 }

@@ -213,8 +213,16 @@ public class StudyModuleController {
 	public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus,
 								SessionStatus status, HttpServletRequest request) {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 		if (request.getParameter("saveStudyStatus") == null) {
-			studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
+			StudyModuleStatus statusInDB = studyModuleStatusDao.findByStudyId(studyModuleStatus.getStudyId());
+			if (statusInDB == null) {
+				statusInDB = studyModuleStatus;
+				statusInDB.setOwner(userBean);
+			} else {
+				statusInDB.setUpdatedValues(studyModuleStatus, userBean);
+			}
+			studyModuleStatusDao.saveOrUpdate(statusInDB);
 			status.setComplete();
 		} else {
 			StudyDAO studyDao = new StudyDAO(dataSource);
