@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-0" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_event_crf_study_id'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for event_crf table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_event_crf_study_id ON event_crf (study_event_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-1" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_event_crf_crf_version'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for event_crf table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_event_crf_crf_version ON event_crf (crf_version_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-2" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_event_crf_sdv_status'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for event_crf table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_event_crf_sdv_status ON event_crf (sdv_status);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-3" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_study_subject_study_id'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for study_subject table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_study_subject_study_id ON study_subject (study_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-4" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_study_subject_status_id'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for study_subject table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_study_subject_status_id ON study_subject (status_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-5" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_discrepancy_note_resolution_status_id'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for discrepancy_note table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_discrepancy_note_resolution_status_id ON discrepancy_note (resolution_status_id);
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-6" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_study_event_study_event_definition_id'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for study_event table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_study_event_study_event_definition_id ON study_event (study_event_definition_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-03-TICKET2637-7" dbms="oracle">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from user_indexes where index_name = 'i_event_definition_crf_study_event_definition_id'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add new index for study_event table.</comment>
+		<sql splitStatements="false">
+			CREATE INDEX i_event_definition_crf_study_event_definition_id ON event_definition_crf (study_event_definition_id);
+		</sql>
+	</changeSet>
+</databaseChangeLog>
