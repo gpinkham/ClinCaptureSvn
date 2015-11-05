@@ -345,7 +345,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		rsb.setResponseType(getResponseSet().getResponseType());
 		rsb.setResponseTypeId(getResponseSet().getResponseTypeId());
 		for (ResponseOptionBean ro : (List<ResponseOptionBean>) getResponseSet().getOptions()) {
-			rsb.setOptions(ro.getText(), ro.getValue());
+			rsb.addOption(ro);
 		}
 		ifmb.setResponseSet(rsb);
 		ifmb.setSdvRequired(isSdvRequired());
