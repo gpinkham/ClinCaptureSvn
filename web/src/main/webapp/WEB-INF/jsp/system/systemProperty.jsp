@@ -42,7 +42,7 @@
       <p><fmt:message key="systemProperty.${systemProperty.name}.description" bundle="${resword}"/></p>
     </div>
   </c:if>
-  <div class="propertyInputHolder">
+  <div class="propertyInputHolder" property="${systemProperty.name}">
     <div class="propertyLabel"><span class="table_title_Admin"><fmt:message
         key="systemProperty.${systemProperty.name}.label" bundle="${resword}"/>:</span></div>
     <div class="propertyInput">

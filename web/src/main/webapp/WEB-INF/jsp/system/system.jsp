@@ -93,4 +93,6 @@
 	</div>
 </form:form>
 
+<input type="hidden" value='<fmt:message key="file_path_should_end_with_a_slash" bundle="${resword}"/>' id="fileNotFoundMessage"/>
+<input type="hidden" value="${userBean.name == 'root'}" id="isRootUser"/>
 <jsp:include page="../include/footer.jsp" />

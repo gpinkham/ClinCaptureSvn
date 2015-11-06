@@ -1,10 +1,31 @@
 function doSubmit() {
+	if (!filePathIsValid()) {
+		return;
+	}
     $("input").each(function () {
         if ($(this).attr("disabled") != undefined) {
             $(this).removeAttr("disabled");
         }
     });
     $("#systemForm").submit();
+}
+
+function filePathIsValid() {
+	var $filePathInput = $("[property=filePath]").find("input.formfieldXL");
+	if ($filePathInput.attr("disabled")) {
+		return true;
+	} else {
+		var value = $filePathInput.val();
+		if (value.slice(-1) != "/" && value.slice(-1) != "\\") {
+			alertDialog({
+				message: $("#fileNotFoundMessage").val(),
+				height: 150,
+				width: 500
+			});
+		} else {
+			return true;
+		}
+	}
 }
 
 function cancel() {
@@ -32,3 +53,9 @@ function changeGroupState(themeColor, id) {
         $("#div_group_id_" + id + " div[id^=div_sub_group_id_] input[id^=state_group_id_]").val("false");
     }
 }
+
+$(window).load(function() {
+	if ($("#isRootUser").val() != "true") {
+		$(".root_only").remove();
+	}
+});
