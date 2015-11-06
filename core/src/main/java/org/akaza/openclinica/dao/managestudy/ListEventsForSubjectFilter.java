@@ -166,12 +166,15 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				} else if (value.equals(Status.PARTIAL_DATA_ENTRY.getName())) {
 
-					sqlCriteria.append(" AND se.study_event_definition_id = ").append(getStudyEventDefinitionId())
-							.append(" AND se.study_event_id IN").append(" (SELECT study_event_id")
+					sqlCriteria.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
+							.append(" AND se.study_event_id IN")
+							.append(" (SELECT study_event_id")
 							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
 							.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ")
 							.append(Status.PARTIAL_DATA_ENTRY.getId())
-							.append(" AND cv.status_id = ").append(Status.AVAILABLE.getId()).append(")");
+							.append(" AND cv.status_id = ")
+							.append(Status.AVAILABLE.getId()).append(")");
 
 				} else if (value.equals(Status.INITIAL_DATA_ENTRY_COMPLETED.getName())) {
 
@@ -189,6 +192,22 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 							.append(" AND ec.validator_id = 0 AND ec.date_validate_completed IS NULL AND cv.status_id = ")
 							.append(Status.AVAILABLE.getId()).append(")");
 
+				} else if (value.equals(Status.PARTIAL_DOUBLE_DATA_ENTRY.getName())) {
+
+					sqlCriteria
+							.append(" AND se.study_event_definition_id = ")
+							.append(getStudyEventDefinitionId())
+							.append(" AND se.study_event_id IN")
+							.append(" (SELECT study_event_id")
+							.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+							.append(" WHERE crf_id = ")
+							.append(crfId)
+							.append(" AND ec.status_id = ")
+							.append(Status.PARTIAL_DOUBLE_DATA_ENTRY.getId())
+							.append(" AND ec.date_completed IS NOT NULL")
+							.append(" AND ec.validator_id > 0 AND ec.date_validate_completed IS NULL AND cv.status_id = ")
+							.append(Status.AVAILABLE.getId()).append(")");
+					
 				} else if (value.equals(Status.DOUBLE_DATA_ENTRY.getName())) {
 
 					sqlCriteria

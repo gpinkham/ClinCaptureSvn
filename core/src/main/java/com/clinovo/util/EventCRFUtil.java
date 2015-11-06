@@ -44,6 +44,7 @@ public final class EventCRFUtil {
 		CRF_STATUS_ICON_PATH.put(Status.PARTIAL_DATA_ENTRY.getId(), "images/icon_PartialDE.gif");
 		CRF_STATUS_ICON_PATH.put(Status.INITIAL_DATA_ENTRY_COMPLETED.getId(), "images/icon_InitialDEcomplete.gif");
 		CRF_STATUS_ICON_PATH.put(Status.DOUBLE_DATA_ENTRY.getId(), "images/icon_DDE.gif");
+		CRF_STATUS_ICON_PATH.put(Status.PARTIAL_DOUBLE_DATA_ENTRY.getId(), "images/icon_PartialDDE.gif");
 		CRF_STATUS_ICON_PATH.put(Status.SOURCE_DATA_VERIFIED.getId(), "images/icon_DoubleCheck.gif");
 		CRF_STATUS_ICON_PATH.put(Status.SIGNED.getId(), "images/icon_Signed.gif");
 		CRF_STATUS_ICON_PATH.put(Status.COMPLETED.getId(), "images/icon_DEcomplete.gif");
@@ -55,6 +56,7 @@ public final class EventCRFUtil {
 		CRF_STATUS_LARGE_ICON_PATH.put(Status.DATA_ENTRY_STARTED.getId(), "images/icon_InitialDE_long.gif");
 		CRF_STATUS_LARGE_ICON_PATH.put(Status.PARTIAL_DATA_ENTRY.getId(), "images/icon_PartialDE_long.gif");
 		CRF_STATUS_LARGE_ICON_PATH.put(Status.INITIAL_DATA_ENTRY_COMPLETED.getId(), "images/icon_InitialDEcomplete.gif");
+		CRF_STATUS_LARGE_ICON_PATH.put(Status.PARTIAL_DOUBLE_DATA_ENTRY.getId(), "images/icon_PartialDDE_long.gif");
 		CRF_STATUS_LARGE_ICON_PATH.put(Status.DOUBLE_DATA_ENTRY.getId(), "images/icon_DDE.gif");
 		CRF_STATUS_LARGE_ICON_PATH.put(Status.SOURCE_DATA_VERIFIED.getId(), "images/icon_DoubleCheck_long.gif");
 		CRF_STATUS_LARGE_ICON_PATH.put(Status.SIGNED.getId(), "images/icon_Signed_long.gif");
@@ -163,6 +165,8 @@ public final class EventCRFUtil {
 				eventCRFStatus = Status.DATA_ENTRY_STARTED;
 			} else if (eventCrf.getStage().isInitialDE_Complete()) {
 				eventCRFStatus = Status.INITIAL_DATA_ENTRY_COMPLETED;
+			} else if (eventCrf.getStatus().isPartialDoubleDataEntry()) {
+				eventCRFStatus = Status.PARTIAL_DOUBLE_DATA_ENTRY;
 			} else if (eventCrf.getStage().isDoubleDE()) {
 				eventCRFStatus = Status.DOUBLE_DATA_ENTRY;
 			} else if (eventCrf.getStage().isDoubleDE_Complete()) {
@@ -193,6 +197,8 @@ public final class EventCRFUtil {
 			hintHandle = "partial_data_entry";
 		} else if (eventCRFStatus.isInitialDataEntryCompleted()) {
 			hintHandle = "initial_data_entry_complete";
+		} else if (eventCRFStatus.isPartialDoubleDataEntry()) {
+			hintHandle = "partial_double_data_entry";
 		} else if (eventCRFStatus.isDoubleDataEntry()) {
 			hintHandle = eventDefinitionCRFBean.isEvaluatedCRF() ? "evaluation" : "double_data_entry";
 		} else if (eventCRFStatus.isSDVed()) {

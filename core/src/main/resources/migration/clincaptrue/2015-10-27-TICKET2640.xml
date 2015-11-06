@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="igor" id="2015-10-27-TICKET2640">
+		<comment>Insert record for a new status "Partial Double Data Entry"</comment>
+		<insert tableName="status"> 
+			<column name="status_id" valueNumeric="18"/> 
+			<column name="name" value="partial_double_data_entry"/> 
+			<column name="description" value="indicates that CRF contains unvalidated data" /> 
+		</insert> 
+	</changeSet>
+</databaseChangeLog>

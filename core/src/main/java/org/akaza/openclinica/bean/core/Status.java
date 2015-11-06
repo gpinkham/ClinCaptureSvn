@@ -48,10 +48,11 @@ public final class Status extends Term implements Comparable {
 	public static final Status COMPLETED = new Status(15, "completed");
 	public static final Status INITIAL = new Status(16, "initial");
 	public static final Status PARTIAL_DATA_ENTRY = new Status(17, "partial_data_entry");
+	public static final Status PARTIAL_DOUBLE_DATA_ENTRY = new Status(18, "partial_double_data_entry");
 
 	private static final Status[] MEMBERS = { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED,
 			AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFIED, NOT_STARTED, DATA_ENTRY_STARTED, PARTIAL_DATA_ENTRY,
-			INITIAL_DATA_ENTRY_COMPLETED, DOUBLE_DATA_ENTRY, COMPLETED, INITIAL };
+			PARTIAL_DOUBLE_DATA_ENTRY, INITIAL_DATA_ENTRY_COMPLETED, DOUBLE_DATA_ENTRY, COMPLETED, INITIAL };
 	private static List list = Arrays.asList(MEMBERS);
 
 	private static final Status[] ACTIVE_MEMBERS = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
@@ -66,7 +67,7 @@ public final class Status extends Term implements Comparable {
 	private static final Status[] STUDY_UPDATE_MEMBERS = { PENDING, AVAILABLE, FROZEN, LOCKED };
 	private static List studyUpdateMembersList = Arrays.asList(STUDY_UPDATE_MEMBERS);
 
-	private static List crfStatusList = Arrays.asList(NOT_STARTED, DATA_ENTRY_STARTED, PARTIAL_DATA_ENTRY,
+	private static List crfStatusList = Arrays.asList(NOT_STARTED, DATA_ENTRY_STARTED, PARTIAL_DATA_ENTRY, PARTIAL_DOUBLE_DATA_ENTRY,
 			INITIAL_DATA_ENTRY_COMPLETED, DOUBLE_DATA_ENTRY, COMPLETED, SOURCE_DATA_VERIFIED, SIGNED, LOCKED, DELETED);
 
 	private Status(int id, String name) {
@@ -225,6 +226,10 @@ public final class Status extends Term implements Comparable {
 		return this == Status.PARTIAL_DATA_ENTRY;
 	}
 
+	public boolean isPartialDoubleDataEntry() {
+		return this == Status.PARTIAL_DOUBLE_DATA_ENTRY;
+	}
+	
 	public boolean isDataEntryStarted() {
 		return this == Status.DATA_ENTRY_STARTED;
 	}

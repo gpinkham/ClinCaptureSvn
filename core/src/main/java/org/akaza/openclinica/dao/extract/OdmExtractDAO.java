@@ -2649,10 +2649,10 @@ public class OdmExtractDAO extends DatasetDAO {
             stage = DataEntryStage.UNCOMPLETED;
         }
 
-        if (status.equals(Status.AVAILABLE)) {
+        if (status.equals(Status.AVAILABLE) || status.equals(Status.PARTIAL_DATA_ENTRY)) {
             stage = DataEntryStage.INITIAL_DATA_ENTRY;
         }
-        if (status.equals(Status.PENDING)) {
+        if (status.equals(Status.PENDING) || status.equals(Status.PARTIAL_DOUBLE_DATA_ENTRY)) {
             if (validatorId != 0) {
                 stage = DataEntryStage.DOUBLE_DATA_ENTRY;
             } else {
@@ -2664,9 +2664,6 @@ public class OdmExtractDAO extends DatasetDAO {
         }
         if (status.equals(Status.LOCKED)) {
             stage = DataEntryStage.LOCKED;
-        }
-        if (status.equals(Status.PARTIAL_DATA_ENTRY)) {
-            stage = DataEntryStage.INITIAL_DATA_ENTRY;
         }
 
         try {
@@ -2693,6 +2690,8 @@ public class OdmExtractDAO extends DatasetDAO {
             result = SubjectEventStatus.SIGNED.getName();
         } else if (status == Status.PARTIAL_DATA_ENTRY) {
         	result = Status.PARTIAL_DATA_ENTRY.getName();
+        } else if (status == Status.PARTIAL_DOUBLE_DATA_ENTRY) {
+        	result = Status.PARTIAL_DOUBLE_DATA_ENTRY.getName();
         } else {
         	result = stage.getName();
         }

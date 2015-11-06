@@ -397,7 +397,7 @@ public class EventCRFBean extends AuditableEntityBean {
 			stage = DataEntryStage.INITIAL_DATA_ENTRY;
 		}
 
-		if (status.equals(Status.PENDING)) {
+		if (status.equals(Status.PENDING) || status.isPartialDoubleDataEntry()) {
 			if (validatorId != 0) {
 				stage = DataEntryStage.DOUBLE_DATA_ENTRY;
 			} else {

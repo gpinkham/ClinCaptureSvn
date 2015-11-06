@@ -100,8 +100,13 @@
 			<c:set var="completedItems" value="${section.numItemsNeedingValidation}"/>
 		</c:if>
 		<c:choose>
-			<c:when test="${sectionIdToEvCRFSection[section.id] ne null && sectionIdToEvCRFSection[section.id].partialSaved}">
+			<c:when test="${sectionIdToEvCRFSection[section.id] ne null && sectionIdToEvCRFSection[section.id].partialSaved 
+					&& !(dataEntryStage.isDoubleDE() || dataEntryStage.isInitialDE_Complete())}">
 				<c:set var="section_icon" value="<img title='partial data entry' style='position: relative; margin-bottom: -3px' alt='partial data entry' src='images/icon_PartialDE.gif'/>"/>
+			</c:when>
+			<c:when test="${sectionIdToEvCRFSection[section.id] ne null && sectionIdToEvCRFSection[section.id].partialSaved 
+					&& (dataEntryStage.isDoubleDE() || dataEntryStage.isInitialDE_Complete())}">
+				<c:set var="section_icon" value="<img title='partial data entry' style='position: relative; margin-bottom: -3px' alt='partial data entry' src='images/icon_PartialDDE.gif'/>"/>
 			</c:when>
 			<c:otherwise>
 			   	<c:set var="section_icon" value=""/>
