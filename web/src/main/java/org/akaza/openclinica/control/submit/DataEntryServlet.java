@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -3696,6 +3696,12 @@ public abstract class DataEntryServlet extends Controller {
 		return dataEntryService;
 	}
 
+	private ItemRenderMetadataService getItemRenderMetadataService(ServletContext context) {
+		ItemRenderMetadataService renderMetadataService = (ItemRenderMetadataService) SpringServletAccess.getApplicationContext(context)
+				.getBean("itemRenderMetadataService");
+		return renderMetadataService;
+	}
+
 	protected DisplayItemService getDisplayItemService(ServletContext context) {
 		return (DisplayItemService) SpringServletAccess.getApplicationContext(context).getBean("displayItemService");
 	}
@@ -3774,10 +3780,17 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private DisplaySectionBean getDisplaySectionBeanDependingOnStage(DisplaySectionBean sectionBean) {
+		populateItemsWithRenderMetadata(sectionBean);
+
 		if (getCurrentDataEntryStage() == CurrentDataEntryStage.VIEW_DATA_ENTRY) {
 			return sectionBean;
 		} else {
 			return DataEntryRenderUtil.convertSingleItemsToDisplayItemRowsDependingOnSource(sectionBean);
 		}
+	}
+
+	private void populateItemsWithRenderMetadata(DisplaySectionBean sectionBean) {
+		ItemRenderMetadataService renderMetadataService = getItemRenderMetadataService(getServletContext());
+		renderMetadataService.populateDisplayItemsWithRenderMetadata(sectionBean);
 	}
 }

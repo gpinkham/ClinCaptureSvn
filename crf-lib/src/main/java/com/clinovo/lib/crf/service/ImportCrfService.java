@@ -51,6 +51,7 @@ public interface ImportCrfService {
 	String AMP = "&amp;";
 	String OPEN_TAG = "<";
 	String LABEL = "label";
+	String WIDTH = "width";
 	String CLOSE_TAG = ">";
 	String VALUE = "value";
 	String UTF_8 = "UTF-8";
@@ -101,6 +102,7 @@ public interface ImportCrfService {
 	String RANDOMIZATION = "Randomization";
 	String WIDTH_DECIMAL = "width_decimal";
 	String RESPONSE_LABEL = "responseLabel";
+	String LEFT_TEXT_WIDTH = "leftTextWidth";
 	String REPEATING_GROUP = "repeatingGroup";
 	String STRATA_VARIABLE = "Strata Variable";
 	String FIELD_VALIDATION = "fieldValidation";

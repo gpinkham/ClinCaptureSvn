@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.json.JSONObject;
@@ -57,10 +58,11 @@ public class JsonCrfBuilder extends BaseCrfBuilder {
 	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
+	 * @param metadataService ItemRenderMetadataService
 	 */
 	public JsonCrfBuilder(JSONObject jsonObject, UserAccountBean owner, StudyBean studyBean, DataSource dataSource,
-			Locale locale, MessageSource messageSource, ImportCrfService importCrfService) {
-		super(owner, studyBean, dataSource, locale, messageSource, importCrfService);
+			Locale locale, MessageSource messageSource, ImportCrfService importCrfService, ItemRenderMetadataService metadataService) {
+		super(owner, studyBean, dataSource, locale, messageSource, importCrfService, metadataService);
 		this.jsonObject = jsonObject;
 	}
 

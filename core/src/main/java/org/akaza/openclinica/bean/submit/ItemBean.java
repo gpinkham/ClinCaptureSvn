@@ -18,6 +18,7 @@ import java.util.Comparator;
 
 import javax.sql.DataSource;
 
+import com.clinovo.model.ItemRenderMetadata;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.extract.SasNameValidator;
@@ -43,6 +44,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 	private int itemReferenceTypeId = 0;
 	private int statusId = 1;
 	private ItemFormMetadataBean itemMeta; // not in DB, for display
+	private ItemRenderMetadata itemRenderMetadata;
 	private ArrayList itemMetas; // not in DB, one item can have multiple meta
 	private ArrayList<ItemDataBean> itemDataElements;
 	private boolean selected = false; // not in DB, used for creating dataset
@@ -54,6 +56,9 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 	private String datasetItemMapKey = "";
 	private String sasName = "";
 
+	/**
+	 * Default constructor.
+	 */
 	public ItemBean() {
 		dataType = ItemDataType.ST;
 		itemMetas = new ArrayList();
@@ -62,7 +67,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
 	/**
 	 * Clones to ItemBean.
-	 *
+	 * @param ib ItemBean
 	 * @return ItemBean
 	 */
 	public ItemBean cloneTo(ItemBean ib) {
@@ -99,6 +104,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 		ib.oidGenerator = oidGenerator;
 		ib.datasetItemMapKey = datasetItemMapKey;
 		ib.sasName = sasName;
+		ib.itemRenderMetadata = itemRenderMetadata;
 		return ib;
 	}
 
@@ -262,6 +268,10 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 		return itemDataElements;
 	}
 
+	/**
+	 * Add new item data element.
+	 * @param el ItemDataBean.
+	 */
 	public void addItemDataElement(ItemDataBean el) {
 		if (itemDataElements == null) {
 			itemDataElements = new ArrayList<ItemDataBean>();
@@ -330,6 +340,11 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 		this.oid = oid;
 	}
 
+	/**
+	 * Get OidGenerator.
+	 * @param ds DataSource
+	 * @return OidGenerator
+	 */
 	public OidGenerator getOidGenerator(DataSource ds) {
 		if (oidGenerator != null) {
 			oidGenerator.setDataSource(ds);
@@ -365,6 +380,19 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 		this.importItemDataBean = importItemDataBean;
 	}
 
+	public ItemRenderMetadata getItemRenderMetadata() {
+		return itemRenderMetadata;
+	}
+
+	public void setItemRenderMetadata(ItemRenderMetadata itemRenderMetadata) {
+		this.itemRenderMetadata = itemRenderMetadata;
+	}
+
+	/**
+	 * ItemBean comparator.
+	 * @param o Object to compare with.
+	 * @return int
+	 */
 	public int compareTo(Object o) {
 		if (!o.getClass().equals(this.getClass())) {
 			return 0;
@@ -380,6 +408,10 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 		}
 	}
 
+	/**
+	 * Get valid sas name.
+	 * @return String
+	 */
 	public String getSasName() {
 		if (sasName.isEmpty()) {
 			SasNameValidator sasNameValidator = new SasNameValidator();
@@ -392,8 +424,17 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 		this.sasName = sasName;
 	}
 
+	/**
+	 * Custom ItemBean Comparator.
+	 */
 	public static class ItemBeanComparator implements Comparator<ItemBean> {
 
+		/**
+		 * Custom comparator.
+		 * @param itemBean1 ItemBean
+		 * @param itemBean2 ItemBean
+		 * @return comparison result.
+		 */
 		public int compare(ItemBean itemBean1, ItemBean itemBean2) {
 			int result;
 
@@ -437,77 +478,106 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ItemBean other = (ItemBean) obj;
 		if (crfName == null) {
-			if (other.crfName != null)
+			if (other.crfName != null) {
 				return false;
-		} else if (!crfName.equals(other.crfName))
+			}
+		} else if (!crfName.equals(other.crfName)) {
 			return false;
+		}
 		if (dataType == null) {
-			if (other.dataType != null)
+			if (other.dataType != null) {
 				return false;
-		} else if (!dataType.equals(other.dataType))
+			}
+		} else if (!dataType.equals(other.dataType)) {
 			return false;
+		}
 		if (datasetItemMapKey == null) {
-			if (other.datasetItemMapKey != null)
+			if (other.datasetItemMapKey != null) {
 				return false;
-		} else if (!datasetItemMapKey.equals(other.datasetItemMapKey))
+			}
+		} else if (!datasetItemMapKey.equals(other.datasetItemMapKey)) {
 			return false;
-		if (defId != other.defId)
+		}
+		if (defId != other.defId) {
 			return false;
+		}
 		if (defName == null) {
-			if (other.defName != null)
+			if (other.defName != null) {
 				return false;
-		} else if (!defName.equals(other.defName))
+			}
+		} else if (!defName.equals(other.defName)) {
 			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
-		if (itemDataTypeId != other.itemDataTypeId)
+		}
+		if (itemDataTypeId != other.itemDataTypeId) {
 			return false;
+		}
 		if (itemMeta == null) {
-			if (other.itemMeta != null)
+			if (other.itemMeta != null) {
 				return false;
-		} else if (!itemMeta.equals(other.itemMeta))
+			}
+		} else if (!itemMeta.equals(other.itemMeta)) {
 			return false;
+		}
 		if (itemMetas == null) {
-			if (other.itemMetas != null)
+			if (other.itemMetas != null) {
 				return false;
-		} else if (!itemMetas.equals(other.itemMetas))
+			}
+		} else if (!itemMetas.equals(other.itemMetas)) {
 			return false;
-		if (itemReferenceTypeId != other.itemReferenceTypeId)
+		}
+		if (itemReferenceTypeId != other.itemReferenceTypeId) {
 			return false;
+		}
 		if (oid == null) {
-			if (other.oid != null)
+			if (other.oid != null) {
 				return false;
-		} else if (!oid.equals(other.oid))
+			}
+		} else if (!oid.equals(other.oid)) {
 			return false;
+		}
 		if (oidGenerator == null) {
-			if (other.oidGenerator != null)
+			if (other.oidGenerator != null) {
 				return false;
-		} else if (!oidGenerator.equals(other.oidGenerator))
+			}
+		} else if (!oidGenerator.equals(other.oidGenerator)) {
 			return false;
-		if (phiStatus != other.phiStatus)
+		}
+		if (phiStatus != other.phiStatus) {
 			return false;
-		if (selected != other.selected)
+		}
+		if (selected != other.selected) {
 			return false;
-		if (statusId != other.statusId)
+		}
+		if (statusId != other.statusId) {
 			return false;
+		}
 		if (units == null) {
-			if (other.units != null)
+			if (other.units != null) {
 				return false;
-		} else if (!units.equals(other.units))
+			}
+		} else if (!units.equals(other.units)) {
 			return false;
-		else if (!sasName.equals(other.sasName))
+		} else if (!sasName.equals(other.sasName)) {
 			return false;
+		}
 		return true;
 	}
 }

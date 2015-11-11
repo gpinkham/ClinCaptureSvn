@@ -1,5 +1,6 @@
 package com.clinovo.util;
 
+import com.clinovo.model.ItemRenderMetadata;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemRowBean;
 import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
@@ -31,6 +32,7 @@ public final class DataEntryRenderUtil {
 		DisplaySectionBean newSection = displaySection.cloneWithoutDisplayItemGroups();
 		List<DisplayItemWithGroupBean> itemContainers = displaySection.getDisplayItemGroups();
 		DisplayItemRowBean newRow = new DisplayItemRowBean();
+		DisplayItemRowBean prevRow = new DisplayItemRowBean();
 		DisplayItemWithGroupBean previousContainer = null;
 		int counter = 1;
 
@@ -49,7 +51,7 @@ public final class DataEntryRenderUtil {
 			if (newRow.shouldItemBeAddedToThisRow(itemBean)) {
 				newRow.addNewItem(itemBean);
 			} else {
-				processRowWhenAllItemsAreAdded(newRow);
+				processRowWhenAllItemsAreAdded(newRow, prevRow);
 				if (previousContainer != null) {
 					previousContainer.setItemsRow(newRow);
 					newSection.getDisplayItemGroups().add(previousContainer);
@@ -57,11 +59,12 @@ public final class DataEntryRenderUtil {
 					itemContainer.setItemsRow(newRow);
 					newSection.getDisplayItemGroups().add(itemContainer);
 				}
+				prevRow = newRow.clone();
 				newRow = new DisplayItemRowBean();
 				newRow.addNewItem(itemBean);
 			}
 			if (counter++ == itemContainers.size()) {
-				processRowWhenAllItemsAreAdded(newRow);
+				processRowWhenAllItemsAreAdded(newRow, prevRow);
 				itemContainer.setItemsRow(newRow);
 				newSection.getDisplayItemGroups().add(itemContainer);
 			}
@@ -79,8 +82,31 @@ public final class DataEntryRenderUtil {
 		}
 	}
 
-	private static void processRowWhenAllItemsAreAdded(DisplayItemRowBean newRow) {
+	private static void processRowWhenAllItemsAreAdded(DisplayItemRowBean newRow,
+													   DisplayItemRowBean prevRow) {
 		processSCDLogic(newRow);
+
+		if (prevRow != null) {
+			populateRenderMetadataFromPrevRow(newRow, prevRow);
+		}
+	}
+
+	private static void populateRenderMetadataFromPrevRow(DisplayItemRowBean newRow, DisplayItemRowBean previousRow) {
+		if (previousRow.getTotalItemsInRow() == newRow.getTotalItemsInRow()) {
+			List<DisplayItemBean> newDisplayItemBeans = newRow.getItems();
+			List<DisplayItemBean> prevDisplayItemBeans = previousRow.getItems();
+			if (newDisplayItemBeans.size() == prevDisplayItemBeans.size()) {
+				int size = newDisplayItemBeans.size();
+				for (int i = 0; i < size; i++) {
+					DisplayItemBean prevDisplay = prevDisplayItemBeans.get(i);
+					ItemRenderMetadata prevRenderMetadata = prevDisplay.getItem().getItemRenderMetadata();
+					if (prevRenderMetadata != null) {
+						DisplayItemBean newItem = newDisplayItemBeans.get(i);
+						newItem.getItem().setItemRenderMetadata(prevRenderMetadata);
+					}
+				}
+			}
+		}
 	}
 
 	private static void processSCDLogic(DisplayItemRowBean row) {

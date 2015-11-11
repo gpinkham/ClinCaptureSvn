@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -45,6 +46,8 @@ public class ItemBeanExtTest {
 	private ImportCrfService importCrfService;
 	@Mock
 	private MessageSource messageSource;
+	@Mock
+	private ItemRenderMetadataService metadataService;
 
 	@Before
 	public void before() {
@@ -57,7 +60,7 @@ public class ItemBeanExtTest {
 	@Test
 	public void testDefaultValues() {
 		ItemBeanExt itemBeanExt = new ItemBeanExt(new ExcelCrfBuilder(workbook, owner, studyBean, dataSource,
-				Locale.ENGLISH, messageSource, importCrfService));
+				Locale.ENGLISH, messageSource, importCrfService, metadataService));
 		assertNull(itemBeanExt.getSectionBean());
 		assertNull(itemBeanExt.getResponseSet());
 		assertNull(itemBeanExt.getParentItemBean());

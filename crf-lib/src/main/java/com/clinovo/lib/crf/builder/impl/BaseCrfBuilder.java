@@ -26,6 +26,7 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -74,6 +75,8 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	// import service
 	private ImportCrfService importCrfService;
+
+	private ItemRenderMetadataService itemRenderMetadataService;
 
 	// data source
 	private DataSource dataSource;
@@ -152,9 +155,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
+	 * @param metadataService ItemRenderMetadataService
 	 */
 	public BaseCrfBuilder(UserAccountBean owner, StudyBean studyBean, DataSource dataSource, Locale locale,
-			MessageSource messageSource, ImportCrfService importCrfService) {
+			MessageSource messageSource, ImportCrfService importCrfService, ItemRenderMetadataService metadataService) {
 		this.owner = owner;
 		this.locale = locale;
 		groupNames.add(UNGROUPED);
@@ -162,6 +166,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		this.dataSource = dataSource;
 		this.messageSource = messageSource;
 		this.importCrfService = importCrfService;
+		this.itemRenderMetadataService = metadataService;
 		sheetContainer = new SheetValidationContainer();
 		instantValidator = new OnChangeSheetValidator(sheetContainer, ResourceBundleProvider.getPageMessagesBundle());
 	}
@@ -561,6 +566,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	 */
 	public CRFVersionBean save() {
 		Connection connection = null;
+		boolean operationSuccessful = false;
 		try {
 			List<String> itemOidList = new ArrayList<String>();
 			List<String> itemGroupOidList = new ArrayList<String>();
@@ -672,6 +678,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 				itemBean.getItemMeta().setResponseSetId(itemBean.getResponseSet().getResponseSetId());
 				itemFormMetadataDao.create(itemBean.getItemMeta(), connection);
 				itemNameToMetaMap.put(itemBean.getName(), itemBean.getItemMeta());
+
 				// create group meta
 				itemBean.getItemGroupBean().getMeta().setItemGroupId(itemBean.getItemGroupBean().getId());
 				itemBean.getItemGroupBean().getMeta().setCrfVersionId(crfVersionBean.getId());
@@ -689,6 +696,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 			}
 
 			connection.commit();
+			operationSuccessful = true;
 		} catch (Exception e) {
 			LOGGER.error("Error has occurred.", e);
 			try {
@@ -702,6 +710,24 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 			try {
 				if (connection != null && !connection.isClosed()) {
 					connection.close();
+				}
+			} catch (Exception ex) {
+				LOGGER.error("Error has occurred.", ex);
+			}
+		}
+
+		// create item render meta
+		if (operationSuccessful) {
+			try {
+				for (ItemBean item : items) {
+					ItemBeanExt itemBean = (ItemBeanExt) item;
+					// create item render meta
+					if (itemBean.getItemRenderMetadata() != null && (itemBean.getItemRenderMetadata().getWidth() != 0
+							|| itemBean.getItemRenderMetadata().getLeftItemTextWidth() != 0)) {
+						itemBean.getItemRenderMetadata().setItemId(itemBean.getId());
+						itemBean.getItemRenderMetadata().setCrfVersionId(crfVersionBean.getId());
+						itemRenderMetadataService.save(itemBean.getItemRenderMetadata());
+					}
 				}
 			} catch (Exception ex) {
 				LOGGER.error("Error has occurred.", ex);

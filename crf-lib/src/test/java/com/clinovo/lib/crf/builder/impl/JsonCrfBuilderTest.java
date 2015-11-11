@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -31,13 +32,15 @@ public class JsonCrfBuilderTest {
 	@Mock
 	private ImportCrfService importCrfService;
 	@Mock
+	private ItemRenderMetadataService metadataService;
+	@Mock
 	private MessageSource messageSource;
 
 	@Before
 	public void before() throws Exception {
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		jsonCrfBuilder = new JsonCrfBuilder(new JSONObject("{}"), owner, studyBean, dataSource, Locale.ENGLISH,
-				messageSource, importCrfService);
+				messageSource, importCrfService, metadataService);
 	}
 
 	@Test

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.admin.Preview;
@@ -77,10 +78,12 @@ public class ExcelCrfBuilder extends BaseCrfBuilder {
 	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
+	 * @param  metadataService ItemRenderMetadataService
 	 */
 	public ExcelCrfBuilder(Workbook workbook, UserAccountBean owner, StudyBean studyBean, DataSource dataSource,
-			Locale locale, MessageSource messageSource, ImportCrfService importCrfService) {
-		super(owner, studyBean, dataSource, locale, messageSource, importCrfService);
+			Locale locale, MessageSource messageSource, ImportCrfService importCrfService,
+			ItemRenderMetadataService metadataService) {
+		super(owner, studyBean, dataSource, locale, messageSource, importCrfService, metadataService);
 		this.workbook = workbook;
 		hasWidthDecimalColumn = getValue(workbook.getSheetAt(SheetName.ITEMS.getSheetNumber()).getRow(0)
 				.getCell(CellName.ITEM_WIDTH_DECIMAL.getColumnNumber())).equalsIgnoreCase(WIDTH_DECIMAL);

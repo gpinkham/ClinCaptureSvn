@@ -202,4 +202,31 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 		crfBuilder.build();
 		assertEquals(crfBuilder.getItems().size(), 19);
 	}
+
+	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfAndSavesItemRenderMetadata() throws Exception {
+		String jsonData = IOUtils
+				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertNotNull(crfBuilder.getItems().get(0).getItemRenderMetadata());
+	}
+
+	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfAndSavesItemRenderMetadataWithCorrectWidth() throws Exception {
+		String jsonData = IOUtils
+				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(350, crfBuilder.getItems().get(0).getItemRenderMetadata().getWidth());
+	}
+
+	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfAndSavesItemRenderMetadataWithCorrectLeftTextWidth() throws Exception {
+		String jsonData = IOUtils
+				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(50, crfBuilder.getItems().get(0).getItemRenderMetadata().getLeftItemTextWidth());
+	}
 }

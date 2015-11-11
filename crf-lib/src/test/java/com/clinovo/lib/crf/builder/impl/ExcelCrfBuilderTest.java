@@ -9,6 +9,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -50,6 +51,8 @@ public class ExcelCrfBuilderTest {
 	private ImportCrfService importCrfService;
 	@Mock
 	private MessageSource messageSource;
+	@Mock
+	private ItemRenderMetadataService metadataService;
 
 	@Before
 	public void before() {
@@ -58,7 +61,7 @@ public class ExcelCrfBuilderTest {
 		Mockito.when(row.getCell(Mockito.anyInt())).thenReturn(cell);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
 		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH, messageSource,
-				importCrfService);
+				importCrfService, metadataService);
 	}
 
 	@Test

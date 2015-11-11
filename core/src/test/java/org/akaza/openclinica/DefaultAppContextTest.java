@@ -114,6 +114,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			resetSequence(session, "id", "coded_item_element");
 			resetSequence(session, "item_data_id", "item_data");
 			resetSequence(session, "event_crf_id", "event_crf");
+			resetSequence(session, "id", "item_render_metadata");
 			resetSequence(session, "item_group_id", "item_group");
 			resetSequence(session, "crf_version_id", "crf_version");
 			resetSequence(session, "study_event_id", "study_event");

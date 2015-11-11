@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="denis" id="2015-11-06-TICKET2578-0">
+		<comment>Create new table item_render_metadata for new CRF render support.</comment>
+		<createTable tableName="item_render_metadata">
+			<column name="id" type="int" autoIncrement="true" >
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="crf_version_id" type="int"/>
+			<column name="item_id" type="int"/>
+			<column name="width" type="int"/>
+			<column name="left_item_text_width" type="int"/>
+			<column name="version" type="int"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-06-TICKET2578-1">
+		<comment>Add foreign keys for item_render_metadata table.</comment>
+		<addForeignKeyConstraint constraintName="item_render_metadata_fk_crf_version_id"
+								 baseColumnNames="crf_version_id"
+								 baseTableName="item_render_metadata"
+								 onDelete="CASCADE"
+								 referencedColumnNames="crf_version_id"
+								 referencedTableName="crf_version"/>
+		<addForeignKeyConstraint constraintName="item_render_metadata_fk_item_id"
+								 baseColumnNames="item_id"
+								 baseTableName="item_render_metadata"
+								 onDelete="CASCADE"
+								 referencedColumnNames="item_id"
+								 referencedTableName="item"/>
+	</changeSet>
+</databaseChangeLog>

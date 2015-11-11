@@ -19,10 +19,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import com.clinovo.service.DeleteCrfService;
-import com.clinovo.service.StudyEventService;
-import com.clinovo.service.StudyService;
-import com.clinovo.service.StudySubjectService;
+import com.clinovo.dao.ItemRenderMetadataDAO;
+import com.clinovo.service.*;
 
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -233,6 +231,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected SCDItemMetadataDao scdItemMetadataDao;
 	@Autowired
 	protected DatasetService datasetService;
+	@Autowired
+	protected ItemRenderMetadataDAO itemRenderMetadataDAO;
 
 	// Services
 	@Autowired
@@ -285,6 +285,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected StudySubjectService studySubjectService;
 	@Autowired
 	protected StudyService studyService;
+	@Autowired
+	protected ItemRenderMetadataService itemRenderMetadataService;
 
 	protected static PlatformTransactionManager transactionManager;
 

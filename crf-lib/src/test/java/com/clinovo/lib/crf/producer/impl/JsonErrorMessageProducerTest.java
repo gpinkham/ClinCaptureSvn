@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -41,6 +42,8 @@ public class JsonErrorMessageProducerTest extends DefaultAppContextTest {
 
 	@Mock
 	private ImportCrfService importCrfService;
+	@Mock
+	private ItemRenderMetadataService metadataService;
 
 	@Override
 	protected void restoreDb() throws Exception {
@@ -51,7 +54,7 @@ public class JsonErrorMessageProducerTest extends DefaultAppContextTest {
 	public void before() {
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		jsonCrfBuilder = new JsonCrfBuilder(jsonObject, owner, studyBean, dataSource, Locale.ENGLISH, messageSource,
-				importCrfService);
+				importCrfService, metadataService);
 		jsonErrorMessageProducer = new JsonErrorMessageProducer(jsonCrfBuilder);
 		jsonCrfBuilder.setCurrentMessage(new StringBuffer());
 		jsonCrfBuilder.setCurrentItemGroup(new ItemGroupBean());

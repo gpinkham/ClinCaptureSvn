@@ -136,4 +136,22 @@ public class DisplayItemRowBean {
 	public void setShown(boolean isShown) {
 		this.isShown = isShown;
 	}
+
+	/**
+	 * Clone DisplayItemRowBean.
+	 * @return DisplayItemRowBean
+	 */
+	public DisplayItemRowBean clone() {
+		DisplayItemRowBean clone = new DisplayItemRowBean();
+		clone.setItems(items);
+		clone.setHeaders(headers);
+		clone.setSubHeaders(subHeaders);
+		clone.setTotalItemsInRow(totalItemsInRow);
+		clone.setMaxColumn(maxColumn);
+		clone.setContainsItemsWithCustomWidth(containsItemsWithCustomWidth);
+		clone.setHaveSubHeaders(haveSubHeaders);
+		clone.setHaveHeaders(haveHeaders);
+		clone.setShown(isShown);
+		return clone;
+	}
 }

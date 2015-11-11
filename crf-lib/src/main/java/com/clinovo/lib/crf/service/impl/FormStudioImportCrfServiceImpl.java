@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.clinovo.model.ItemRenderMetadata;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -142,6 +143,26 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		return result;
 	}
 
+	private float getFloat(JSONObject jsonObject, String key) throws Exception {
+		float result = 0;
+		try {
+			result = Float.parseFloat(URLDecoder.decode(jsonObject.getString(key), UTF_8));
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return result;
+	}
+
+	private int getIntFromFloat(JSONObject jsonObject, String key)  throws Exception {
+		int result = 0;
+		try {
+			result = Math.round(getFloat(jsonObject, key));
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return result;
+	}
+
 	private ItemGroupBean createItemGroup(String groupName, JsonCrfBuilder crfBuilder) {
 		ItemGroupBean itemGroupBean = new ItemGroupBean();
 		itemGroupBean.setStatus(Status.AVAILABLE);
@@ -252,6 +273,11 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().getItemMeta()
 				.setGroupLabel(crfBuilder.getCurrentItem().getItemGroupBean().getName());
 		generateHiddenDataForStrataData(crfBuilder);
+	}
+
+	private void createItemRenderMetadata(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
+		crfBuilder.getCurrentItem().getItemRenderMetadata().setLeftItemTextWidth(getIntFromFloat(jsonObj, LEFT_TEXT_WIDTH));
+		crfBuilder.getCurrentItem().getItemRenderMetadata().setWidth(getIntFromFloat(jsonObj, WIDTH));
 	}
 
 	private void createItemGroupMetadata(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
@@ -525,6 +551,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().setItemDataTypeId(getItemDataTypeId(jsonObj, crfBuilder));
 		crfBuilder.getCurrentItem().setSectionBean(crfBuilder.getCurrentSection());
 		crfBuilder.getCurrentItem().setItemMeta(new ItemFormMetadataBean());
+		crfBuilder.getCurrentItem().setItemRenderMetadata(new ItemRenderMetadata());
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.REQUIRED, getString(jsonObj, REQUIRED));
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.PHI, getString(jsonObj, PHI_DATA));
 		crfBuilder.getItemNameToItemMap().put(crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem());
@@ -540,6 +567,8 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		createItemGroupMetadata(jsonObj, crfBuilder);
 
 		createItemFormMetadata(jsonObj, crfBuilder);
+
+		createItemRenderMetadata(jsonObj, crfBuilder);
 
 		createSimpleConditionalDisplay(jsonObj, crfBuilder);
 

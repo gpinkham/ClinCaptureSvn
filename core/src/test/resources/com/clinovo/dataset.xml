@@ -1100,4 +1100,8 @@
 	
 	<event_crf_section id="1" version="0" section_id="1" event_crf_id="1" partial_saved="true"/>
 	<event_crf_section id="2" version="0" section_id="2" event_crf_id="2" partial_saved="true"/>
+
+	<item_render_metadata id="1" crf_version_id="1" item_id="1" width="0" left_item_text_width="50" version="0"/>
+	<item_render_metadata id="2" crf_version_id="1" item_id="2" width="350" left_item_text_width="50" version="0"/>
+	<item_render_metadata id="3" crf_version_id="1" item_id="3" width="350" left_item_text_width="0" version="0"/>
 </dataset>

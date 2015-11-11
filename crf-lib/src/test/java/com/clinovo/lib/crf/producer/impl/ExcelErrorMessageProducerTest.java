@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
@@ -56,6 +57,8 @@ public class ExcelErrorMessageProducerTest {
 
 	@Mock
 	private ImportCrfService importCrfService;
+	@Mock
+	private ItemRenderMetadataService metadataService;
 
 	@Mock
 	private MessageSource messageSource;
@@ -68,7 +71,7 @@ public class ExcelErrorMessageProducerTest {
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
 		Mockito.when(sheet.getRow(Mockito.anyInt())).thenReturn(row);
 		excelCrfBuilder = new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, Locale.ENGLISH, messageSource,
-				importCrfService);
+				importCrfService, metadataService);
 		excelErrorMessageProducer = new ExcelErrorMessageProducer(excelCrfBuilder);
 		excelCrfBuilder.setCurrentMessage(new StringBuffer());
 		excelCrfBuilder.setCurrentItemGroup(new ItemGroupBean());

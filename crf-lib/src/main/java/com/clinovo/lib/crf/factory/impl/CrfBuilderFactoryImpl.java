@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -49,12 +50,16 @@ public class CrfBuilderFactoryImpl implements CrfBuilderFactory {
 	@Autowired
 	private SpreadSheetImportCrfServiceImpl spreadSheetService;
 
+	@Autowired
+	private ItemRenderMetadataService itemRenderMetadataService;
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public CrfBuilder getCrfBuilder(Workbook workbook, StudyBean studyBean, UserAccountBean owner, Locale locale,
 			MessageSource messageSource) throws Exception {
-		return new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, locale, messageSource, spreadSheetService);
+		return new ExcelCrfBuilder(workbook, owner, studyBean, dataSource, locale, messageSource, spreadSheetService,
+				itemRenderMetadataService);
 	}
 
 	/**
@@ -63,6 +68,6 @@ public class CrfBuilderFactoryImpl implements CrfBuilderFactory {
 	public CrfBuilder getCrfBuilder(String jsonData, StudyBean studyBean, UserAccountBean owner, Locale locale,
 			MessageSource messageSource) throws Exception {
 		return new JsonCrfBuilder(new JSONObject(jsonData), owner, studyBean, dataSource, locale, messageSource,
-				formStudioService);
+				formStudioService, itemRenderMetadataService);
 	}
 }

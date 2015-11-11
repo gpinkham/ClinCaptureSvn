@@ -34,9 +34,13 @@
 	<c:forEach items="${displayItemWithGroup.itemsRow.items}" var="displayItem" varStatus="rowStatus">
 		<c:set var="displayItem" value="${displayItem}" scope="request"/>
 		<c:set var="itemShown" value="${displayItem.scdData.scdDisplayInfo.scdShowStatus != 2}" scope="request"/>
-		<div style="display: table-cell; padding: 5px; min-width: 555px; vertical-align: top;">
+		<c:set var="leftTextWidth" value="${(not empty displayItem.item.itemRenderMetadata && displayItem.item.itemRenderMetadata.leftItemTextWidth != 0)
+				? displayItem.item.itemRenderMetadata.leftItemTextWidth : '200'}" scope="request"/>
+		<c:set var="itemWidth" value="${(not empty displayItem.item.itemRenderMetadata && displayItem.item.itemRenderMetadata.width != 0)
+				? displayItem.item.itemRenderMetadata.width : '555'}" scope="request"/>
+		<div style="display: table-cell; padding: 5px; min-width: ${itemWidth}px; vertical-align: top;">
 			<div class="item-cell" style="position: relative; display: ${itemShown ? 'table' : 'none'}" id="t${displayItem.item.id}">
-				<div style="float: left; width: 200px; min-height: 10px">
+				<div style="float: left; width: ${leftTextWidth}px; min-height: 10px">
 					<div style="float: left;">
 						<c:out value="${displayItem.metadata.questionNumberLabel}" escapeXml="false"/> 
 					</div>
