@@ -518,7 +518,7 @@
     <c:param name="currStep" value="eventOverview" />
 </c:import>
 
-<c:if test="${showDDEColumn ne \"true\"}">
+<c:if test="${!showDDEColumn}">
     <script>
         jQuery(".ddeColumn").css("display", "none");
         jQuery(".ddeColumnHeader").css("display", "none");

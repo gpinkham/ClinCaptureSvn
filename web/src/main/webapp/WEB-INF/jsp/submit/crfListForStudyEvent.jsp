@@ -578,7 +578,7 @@
 
 <input type="hidden" id="popupTotalColumns" style="display: none;" value="8"/>
 
-<c:if test="${showDDEColumn ne \"true\"}">
+<c:if test="${!showDDEColumn}">
     <script>
         jQuery(".popupHeaderBlock").attr("colSpan", "3");
         jQuery(".ddeColumn").remove();//.css("display", "none");
