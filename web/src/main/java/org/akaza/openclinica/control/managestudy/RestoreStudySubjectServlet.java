@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,7 +27,6 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -59,16 +56,17 @@ public class RestoreStudySubjectServlet extends Controller {
 
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request,
+				response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request,
+				response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -106,16 +104,11 @@ public class RestoreStudySubjectServlet extends Controller {
 			study.getStudyParameterConfig().setSubjectPersonIdRequired(
 					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
 
-			// find study events
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
-					getDataSource(), currentUser, currentRole, false);
-
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (studySub.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(
-							respage.getString("this_subject_is_already_available_for_study") + " "
-									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(respage.getString("this_subject_is_already_available_for_study") + " "
+							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
 				}
@@ -123,23 +116,21 @@ public class RestoreStudySubjectServlet extends Controller {
 				request.setAttribute("subject", subject);
 				request.setAttribute("subjectStudy", study);
 				request.setAttribute("studySub", studySub);
-				request.setAttribute("events", displayEvents);
+				request.setAttribute("events", getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
+						currentUser, currentRole, false));
 
 				forwardPage(Page.RESTORE_STUDY_SUBJECT, request, response);
 			} else {
 				logger.info("submit to restore the subject from study");
 
-				getStudySubjectService().restoreStudySubject(studySub, displayEvents, currentUser);
+				getStudySubjectService().restoreStudySubject(studySub, currentUser);
 
-				String emailBody = new StringBuilder("")
-						.append(respage.getString("the_subject"))
-						.append(" ")
-						.append(studySub.getLabel())
-						.append(" ")
-						.append((study.isSite(study.getParentStudyId()) ? respage
-								.getString("has_been_restored_to_the_site") : respage
-								.getString("has_been_restored_to_the_study"))).append(" ").append(study.getName())
-						.append(".").toString();
+				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ")
+						.append(studySub.getLabel()).append(" ")
+						.append((study.isSite(study.getParentStudyId())
+								? respage.getString("has_been_restored_to_the_site")
+								: respage.getString("has_been_restored_to_the_study")))
+						.append(" ").append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 

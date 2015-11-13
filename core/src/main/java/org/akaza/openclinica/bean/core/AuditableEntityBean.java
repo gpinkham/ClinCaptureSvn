@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.bean.core;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,6 +29,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 
@@ -50,9 +53,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * 
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AuditableEntityBean extends EntityBean {
+
+	public static final int DEFAULT_STATES_LENGTH = 2;
 
 	@JsonIgnore
 	@XmlTransient
@@ -90,6 +95,10 @@ public class AuditableEntityBean extends EntityBean {
 	@XmlTransient
 	protected Status oldStatus;
 
+	@JsonIgnore
+	@XmlTransient
+	protected String states;
+
 	// used to retrieve the owner and updater when needed
 	@JsonIgnore
 	@XmlTransient
@@ -107,6 +116,7 @@ public class AuditableEntityBean extends EntityBean {
 		updater = null;
 		status = null;
 		udao = null;
+		initStates();
 	}
 
 	/**
@@ -264,5 +274,117 @@ public class AuditableEntityBean extends EntityBean {
 
 	public void setOldStatus(Status oldStatus) {
 		this.oldStatus = oldStatus;
+	}
+
+	public String getStates() {
+		return states;
+	}
+
+	public void setStates(String states) {
+		this.states = states;
+	}
+
+	/**
+	 * Returns length of states array.
+	 *
+	 * @return int
+	 */
+	protected int getStatesLength() {
+		return DEFAULT_STATES_LENGTH;
+	}
+
+	private void initStates() {
+		states = "";
+		int statesLength = getStatesLength();
+		for (int i = 0; i <= statesLength - 1; i++) {
+			states = states.concat(states.isEmpty() ? "" : ",").concat("0");
+		}
+	}
+
+	private void changeStates(int position, int value) {
+		String[] statesArray = states.split(",");
+		statesArray[position] = Integer.toString(value);
+		states = Arrays.asList(statesArray).toString().replaceAll("\\]|\\[| ", "");
+	}
+
+	/**
+	 * Applies status.
+	 * 
+	 * @param position
+	 *            int
+	 * @param status
+	 *            Status
+	 * @param updater
+	 *            UserAccountBean
+	 */
+	public void applyState(int position, Status status, UserAccountBean updater) {
+		if (statesIsEmpty()) {
+			oldStatus = this.status;
+		}
+		changeStates(position, status.getId());
+		String[] statesArray = states.split(",");
+		// set latest nonzero state as current state
+		for (int i = statesArray.length - 1; i >= 0; i--) {
+			int value = Integer.parseInt(statesArray[i]);
+			if (value != 0) {
+				this.status = Status.get(value);
+				break;
+			}
+		}
+		setUpdater(updater);
+		setUpdatedDate(new Date());
+	}
+
+	/**
+	 * Reverts state.
+	 * 
+	 * @param position
+	 *            int
+	 * @param updater
+	 *            UserAccountBean
+	 * @return boolean
+	 */
+	public boolean revertState(int position, UserAccountBean updater) {
+		if (position >= 0) {
+			changeStates(position, 0);
+		}
+		boolean available = true;
+		String[] statesArray = states.split(",");
+		for (int i = statesArray.length - 1; i >= 0; i--) {
+			int value = Integer.parseInt(statesArray[i]);
+			if (value != 0) {
+				status = Status.get(value);
+				available = false;
+				break;
+			}
+		}
+		if (available) {
+			status = !oldStatus.isInvalid() && !oldStatus.isDeleted() && !oldStatus.isLocked()
+					? oldStatus
+					: Status.AVAILABLE;
+			if (this instanceof EventCRFBean) {
+				status = ((EventCRFBean) this).getDateCompleted() != null ? Status.UNAVAILABLE : Status.AVAILABLE;
+			}
+		} else {
+			if (this instanceof StudyEventBean) {
+				if (status.isDeleted()) {
+					((StudyEventBean) this).setSubjectEventStatus(SubjectEventStatus.REMOVED);
+				} else if (status.isLocked()) {
+					((StudyEventBean) this).setSubjectEventStatus(SubjectEventStatus.LOCKED);
+				}
+			}
+		}
+		setUpdater(updater);
+		setUpdatedDate(new Date());
+		return available;
+	}
+
+	/**
+	 * Returns true if states contains only zero values.
+	 *
+	 * @return boolean
+	 */
+	public boolean statesIsEmpty() {
+		return states.replaceAll(",|0", "").isEmpty();
 	}
 }

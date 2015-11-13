@@ -14,12 +14,22 @@
  *******************************************************************************/
 package com.clinovo.model;
 
+/**
+ * Status.
+ */
 public class Status {
 
 	public enum DictionaryType {
 
 		UNKNOWN, EXTERNAL, CUSTOM;
 
+		/**
+		 * Returns DictionaryType.
+		 * 
+		 * @param type
+		 *            int
+		 * @return DictionaryType
+		 */
 		public static DictionaryType getType(int type) {
 
 			for (DictionaryType x : DictionaryType.values()) {
@@ -31,8 +41,8 @@ public class Status {
 			return UNKNOWN;
 		}
 	}
-	
+
 	public enum CodeStatus {
-		CODED, NOT_CODED, UNKNOWN, REMOVED, IN_PROCESS, CODE_NOT_FOUND
+		CODED, NOT_CODED, UNKNOWN, REMOVED, LOCKED, IN_PROCESS, CODE_NOT_FOUND
 	}
 }

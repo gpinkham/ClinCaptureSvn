@@ -15,7 +15,6 @@
 
 package com.clinovo.service;
 
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 
@@ -29,66 +28,70 @@ public interface StudyService {
 	 *
 	 * @param study
 	 *            StudyBean
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param currentRole
-	 *            StudyUserRoleBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeStudy(StudyBean study, StudyBean currentStudy, StudyUserRoleBean currentRole, UserAccountBean updater)
-			throws Exception;
+	void removeStudy(StudyBean study, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores study.
 	 *
 	 * @param study
 	 *            StudyBean
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param currentRole
-	 *            StudyUserRoleBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreStudy(StudyBean study, StudyBean currentStudy, StudyUserRoleBean currentRole, UserAccountBean updater)
-			throws Exception;
+	void restoreStudy(StudyBean study, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Removes site.
 	 * 
-	 * @param site
+	 * @param studyBean
 	 *            StudyBean
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param currentRole
-	 *            StudyUserRoleBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeSite(StudyBean site, StudyBean currentStudy, StudyUserRoleBean currentRole, UserAccountBean updater)
-			throws Exception;
+	void removeSite(StudyBean studyBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores site.
 	 *
-	 * @param site
+	 * @param studyBean
 	 *            StudyBean
-	 * @param currentStudy
-	 *            StudyBean
-	 * @param currentRole
-	 *            StudyUserRoleBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreSite(StudyBean site, StudyBean currentStudy, StudyUserRoleBean currentRole, UserAccountBean updater)
-			throws Exception;
+	void restoreSite(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Locks site.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void lockSite(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Unlocks site.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void unlockSite(StudyBean studyBean, UserAccountBean updater) throws Exception;
 }

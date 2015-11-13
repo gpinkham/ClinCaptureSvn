@@ -26,16 +26,24 @@ import java.util.HashMap;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * DatasetBean.
+ */
 @SuppressWarnings({"rawtypes", "serial"})
 public class DatasetBean extends AuditableEntityBean {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(DatasetBean.class);
+	public static final int FIRST_YEAR_DEFAULT_VALUE = 1900;
+	public static final int LAST_YEAR_DEFAULT_VALUE = 2100;
+
 	private int studyId;
+	private StudyBean studyBean;
 	private String description;
-	private String SQLStatement;
+	private String sqlStatement;
 	private int numRuns = 0;
 	private int runTime = 0;
 	private java.util.Date dateLastRun;
@@ -72,29 +80,32 @@ public class DatasetBean extends AuditableEntityBean {
 	// again, how is it different from Start/End?
 	private boolean showSubjectGroupInformation = false;
 	private boolean containsMaskedCRFs = false;
-	
+
 	private ArrayList itemDefCrf = new ArrayList();
 	// map items with definition and CRF
 
-	private String VIEW_NAME = "extract_data_table";
+	private static final String VIEW_NAME = "extract_data_table";
 	// put up here since we know it's going to be changed, tbh
 
 	private String odmMetaDataVersionName;
-    private String odmMetaDataVersionOid;
+	private String odmMetaDataVersionOid;
 	private String odmPriorStudyOid;
 	private String odmPriorMetaDataVersionOid;
 	private DatasetItemStatus datasetItemStatus;
 
-    private int firstMonth = 0;
-    private int firstYear = 1900;
-    private int lastMonth = 0;
-    private int lastYear = 2100;
+	private int firstMonth = 0;
+	private int firstYear = FIRST_YEAR_DEFAULT_VALUE;
+	private int lastMonth = 0;
+	private int lastYear = LAST_YEAR_DEFAULT_VALUE;
 
-    private ArrayList allSelectedGroups;
+	private ArrayList allSelectedGroups;
 
-    private String excludeItems;
+	private String excludeItems;
 	private String sedIdAndCRFIdPairs;
 
+	/**
+	 * Constructor.
+	 */
 	public DatasetBean() {
 	}
 
@@ -162,7 +173,7 @@ public class DatasetBean extends AuditableEntityBean {
 	 * @return Returns the sQLStatement.
 	 */
 	public String getSQLStatement() {
-		return SQLStatement;
+		return sqlStatement;
 	}
 
 	/**
@@ -170,7 +181,7 @@ public class DatasetBean extends AuditableEntityBean {
 	 *            The sQLStatement to set.
 	 */
 	public void setSQLStatement(String statement) {
-		SQLStatement = statement;
+		sqlStatement = statement;
 	}
 
 	/**
@@ -272,7 +283,7 @@ public class DatasetBean extends AuditableEntityBean {
 
 	/**
 	 * generateOracleQuery, generates the Oracle syntax for the query (this may have to be changed to reflect different
-	 * syntaxes in the future)
+	 * syntaxes in the future).
 	 * 
 	 * @return the Oracle SQL syntax to capture datasets.
 	 */
@@ -288,7 +299,7 @@ public class DatasetBean extends AuditableEntityBean {
 			String idList = this.getItemIds().toString();
 			sb.append("item_id in (" + idList + ") and ");
 		}
-		String pattern = "dd-MMM-yyyy";// changed by bads issue 2152
+		String pattern = "dd-MMM-yyyy"; // changed by bads issue 2152
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		String beginDate = sdf.format(this.dateStart);
 		String stopDate = sdf.format(this.dateEnd);
@@ -296,9 +307,9 @@ public class DatasetBean extends AuditableEntityBean {
 		sb.append("(date_created >= '" + beginDate + "') and (date_created <= '" + stopDate + "')");
 		// perform regexp here that pulls out [] square brackets
 
-		logger.info("-----------------------------");
-		logger.info(sb.toString());
-		logger.info("-----------------------------");
+		LOGGER.info("-----------------------------");
+		LOGGER.info(sb.toString());
+		LOGGER.info("-----------------------------");
 		String returnMe = sb.toString().replaceAll("\\[|\\]", "");
 		returnMe = returnMe + " order by date_start";
 		return returnMe;
@@ -559,92 +570,99 @@ public class DatasetBean extends AuditableEntityBean {
 		this.datasetItemStatus = datasetItemStatus;
 	}
 
+	/**
+	 * Returns sql with uniqe item ids.
+	 * 
+	 * @param itemIdStr
+	 *            String
+	 * @return String
+	 */
 	public String sqlWithUniqeItemIds(String itemIdStr) {
 		String sql = "";
-		String[] s1 = this.SQLStatement.split("item_id in");
+		String[] s1 = this.sqlStatement.split("item_id in");
 		sql += s1[0] + itemIdStr + s1[1].substring(s1[1].indexOf(")"));
 		return sql;
 	}
 
-    public int getFirstMonth() {
-        return firstMonth;
-    }
+	public int getFirstMonth() {
+		return firstMonth;
+	}
 
-    public void setFirstMonth(int firstMonth) {
-        this.firstMonth = firstMonth;
-    }
+	public void setFirstMonth(int firstMonth) {
+		this.firstMonth = firstMonth;
+	}
 
-    public int getFirstYear() {
-        return firstYear;
-    }
+	public int getFirstYear() {
+		return firstYear;
+	}
 
-    public void setFirstYear(int firstYear) {
-        this.firstYear = firstYear;
-    }
+	public void setFirstYear(int firstYear) {
+		this.firstYear = firstYear;
+	}
 
-    public int getLastMonth() {
-        return lastMonth;
-    }
+	public int getLastMonth() {
+		return lastMonth;
+	}
 
-    public void setLastMonth(int lastMonth) {
-        this.lastMonth = lastMonth;
-    }
+	public void setLastMonth(int lastMonth) {
+		this.lastMonth = lastMonth;
+	}
 
-    public int getLastYear() {
-        return lastYear;
-    }
+	public int getLastYear() {
+		return lastYear;
+	}
 
-    public void setLastYear(int lastYear) {
-        this.lastYear = lastYear;
-    }
+	public void setLastYear(int lastYear) {
+		this.lastYear = lastYear;
+	}
 
-    public String getOdmMetaDataVersionOid() {
-        return odmMetaDataVersionOid;
-    }
+	public String getOdmMetaDataVersionOid() {
+		return odmMetaDataVersionOid;
+	}
 
-    public void setOdmMetaDataVersionOid(String odmMetaDataVersionOid) {
-        this.odmMetaDataVersionOid = odmMetaDataVersionOid;
-    }
+	public void setOdmMetaDataVersionOid(String odmMetaDataVersionOid) {
+		this.odmMetaDataVersionOid = odmMetaDataVersionOid;
+	}
 
-    public String getOdmMetaDataVersionName() {
-        return odmMetaDataVersionName;
-    }
+	public String getOdmMetaDataVersionName() {
+		return odmMetaDataVersionName;
+	}
 
-    public void setOdmMetaDataVersionName(String odmMetaDataVersionName) {
-        this.odmMetaDataVersionName = odmMetaDataVersionName;
-    }
+	public void setOdmMetaDataVersionName(String odmMetaDataVersionName) {
+		this.odmMetaDataVersionName = odmMetaDataVersionName;
+	}
 
-    public String getOdmPriorStudyOid() {
-        return odmPriorStudyOid;
-    }
+	public String getOdmPriorStudyOid() {
+		return odmPriorStudyOid;
+	}
 
-    public void setOdmPriorStudyOid(String odmPriorStudyOid) {
-        this.odmPriorStudyOid = odmPriorStudyOid;
-    }
+	public void setOdmPriorStudyOid(String odmPriorStudyOid) {
+		this.odmPriorStudyOid = odmPriorStudyOid;
+	}
 
-    public String getOdmPriorMetaDataVersionOid() {
-        return odmPriorMetaDataVersionOid;
-    }
+	public String getOdmPriorMetaDataVersionOid() {
+		return odmPriorMetaDataVersionOid;
+	}
 
-    public void setOdmPriorMetaDataVersionOid(String odmPriorMetaDataVersionOid) {
-        this.odmPriorMetaDataVersionOid = odmPriorMetaDataVersionOid;
-    }
+	public void setOdmPriorMetaDataVersionOid(String odmPriorMetaDataVersionOid) {
+		this.odmPriorMetaDataVersionOid = odmPriorMetaDataVersionOid;
+	}
 
-    public ArrayList getAllSelectedGroups() {
-        return allSelectedGroups;
-    }
+	public ArrayList getAllSelectedGroups() {
+		return allSelectedGroups;
+	}
 
-    public void setAllSelectedGroups(ArrayList allSelectedGroups) {
-        this.allSelectedGroups = allSelectedGroups;
-    }
+	public void setAllSelectedGroups(ArrayList allSelectedGroups) {
+		this.allSelectedGroups = allSelectedGroups;
+	}
 
-    public String getExcludeItems() {
-        return excludeItems;
-    }
+	public String getExcludeItems() {
+		return excludeItems;
+	}
 
-    public void setExcludeItems(String excludeItems) {
-        this.excludeItems = excludeItems;
-    }
+	public void setExcludeItems(String excludeItems) {
+		this.excludeItems = excludeItems;
+	}
 
 	public String getSedIdAndCRFIdPairs() {
 		return sedIdAndCRFIdPairs;
@@ -652,7 +670,7 @@ public class DatasetBean extends AuditableEntityBean {
 
 	public void setSedIdAndCRFIdPairs(String sedIdAndCRFIdPairs) {
 		this.sedIdAndCRFIdPairs = sedIdAndCRFIdPairs;
-    }
+	}
 
 	public boolean isContainsMaskedCRFs() {
 		return containsMaskedCRFs;
@@ -660,5 +678,13 @@ public class DatasetBean extends AuditableEntityBean {
 
 	public void setContainsMaskedCRFs(boolean containsMaskedCRFs) {
 		this.containsMaskedCRFs = containsMaskedCRFs;
+	}
+
+	public StudyBean getStudyBean() {
+		return studyBean;
+	}
+
+	public void setStudyBean(StudyBean studyBean) {
+		this.studyBean = studyBean;
 	}
 }

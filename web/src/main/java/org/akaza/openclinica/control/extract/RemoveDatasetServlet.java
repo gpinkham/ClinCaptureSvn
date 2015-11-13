@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -65,25 +64,22 @@ public class RemoveDatasetServlet extends Controller {
 		StudyBean study = (StudyBean) sdao.findByPK(dataset.getStudyId());
 		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+					+ respage.getString("change_active_study_or_contact"), request);
 			throw new InsufficientPermissionException(Page.MENU,
 					resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 		}
 
 		if (!ub.isSysAdmin() && (dataset.getOwnerId() != ub.getId())) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+					+ respage.getString("change_active_study_or_contact"), request);
 			throw new InsufficientPermissionException(Page.MENU,
 					resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 		}
 
 		String action = request.getParameter("action");
 		if (resword.getString("submit").equalsIgnoreCase(action)) {
-			dataset.setStatus(Status.DELETED);
-			dsDAO.update(dataset);
+			getDatasetService().removeDataset(dataset, ub);
 			addPageMessage(respage.getString("dataset_removed"), request);// +
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
@@ -111,9 +107,8 @@ public class RemoveDatasetServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -125,8 +120,7 @@ public class RemoveDatasetServlet extends Controller {
 
 		EntityBeanTable table = getEntityBeanTable();
 		DatasetDAO dsdao = getDatasetDAO();
-		ArrayList datasets = new ArrayList();
-		datasets = dsdao.findAllByStudyId(currentStudy.getId());
+		ArrayList datasets = dsdao.findAllByStudyId(currentStudy);
 
 		ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
 

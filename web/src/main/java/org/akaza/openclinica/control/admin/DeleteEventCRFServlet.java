@@ -20,15 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -37,11 +34,9 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -49,21 +44,15 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
-
 /**
  * DeleteEventCRFServlet class.
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({"serial"})
 @Component
 public class DeleteEventCRFServlet extends Controller {
 
@@ -78,9 +67,8 @@ public class DeleteEventCRFServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_admin"), "1");
 
 	}
@@ -151,10 +139,7 @@ public class DeleteEventCRFServlet extends Controller {
 			dec.setFlags(eventCRF, ub, currentRole, edc);
 
 			// find all item data
-			ItemDataDAO iddao = getItemDataDAO();
-			DiscrepancyNoteDAO dnDao = getDiscrepancyNoteDAO();
-			ArrayList itemData = iddao.findAllByEventCRFId(eventCRF.getId());
-			request.setAttribute("items", itemData);
+			request.setAttribute("items", getItemDataDAO().findAllByEventCRFId(eventCRF.getId()));
 
 			if ("confirm".equalsIgnoreCase(action)) {
 
@@ -164,38 +149,7 @@ public class DeleteEventCRFServlet extends Controller {
 			} else {
 				logger.info("submit to delete the event CRF from event");
 
-				CodedItemService codedItemsService = getCodedItemService();
-
-				for (Object anItemData : itemData) {
-
-					ItemDataBean item = (ItemDataBean) anItemData;
-					CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
-					ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
-
-					iddao.deleteDnMap(item.getId());
-
-					for (Object aDiscrepancyList : discrepancyList) {
-						DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
-						dnDao.deleteNotes(noteBean.getId());
-					}
-
-					item.setUpdater(ub);
-					iddao.updateUser(item);
-					iddao.delete(item.getId());
-
-					if (codedItem != null) {
-						codedItemsService.deleteCodedItem(codedItem);
-					}
-				}
-				ecdao.deleteEventCRFDNMap(eventCRF.getId());
-				// update user id before deleting
-				eventCRF.setUpdater(ub);
-				ecdao.update(eventCRF);
-				// delete
-				ecdao.delete(eventCRF.getId());
-
-				SubjectEventStatusUtil.determineSubjectEventState(event, new DAOWrapper(getDataSource()));
-				event = (StudyEventBean) sedao.update(event);
+				getEventCRFService().deleteEventCRF(eventCRF, ub);
 
 				String emailBody = respage.getString("the_event_CRF") + cb.getName()
 						+ respage.getString("has_been_deleted_from_the_event")

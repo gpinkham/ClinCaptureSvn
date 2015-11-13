@@ -22,14 +22,28 @@ import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+/**
+ * StudyEventUtil.
+ */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class StudyEventUtil {
 
 	private StudyEventUtil() {
 	}
 
-	public static ArrayList<StudyEventDefinitionBean> selectStudyEventsSortedLikeOnSubjectMatrix(
-			int parentStudyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao) {
+	/**
+	 * Selects study events sorted like on subject matrix.
+	 * 
+	 * @param parentStudyId
+	 *            int
+	 * @param seddao
+	 *            StudyEventDefinitionDAO
+	 * @param sgcdao
+	 *            StudyGroupClassDAO
+	 * @return ArrayList of StudyEventDefinitionBean
+	 */
+	public static ArrayList<StudyEventDefinitionBean> selectStudyEventsSortedLikeOnSubjectMatrix(int parentStudyId,
+			StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao) {
 		/*
 		 * available eventDefs ordered like on Subject Matrix
 		 */
@@ -47,9 +61,9 @@ public final class StudyEventUtil {
 		ArrayList eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
 		// sort by study event definition ordinal
 		Collections.sort(eventDefinitionsNotFromDynGroup);
-		
+
 		result.addAll(eventDefinitionsNotFromDynGroup);
-		
+
 		return result;
 	}
 }

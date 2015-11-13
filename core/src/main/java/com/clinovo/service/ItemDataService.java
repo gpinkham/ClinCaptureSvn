@@ -18,21 +18,32 @@ package com.clinovo.service;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 
+/**
+ * ItemDataService.
+ */
 public interface ItemDataService {
 
 	/**
-	 * Removes all item data for given EventCRFBean.
+	 * Deletes all item data for given EventCRFBean.
 	 *
-	 * @param eventCRF EventCRFBean, which ItemDataBeans should be removed.
-	 * @param updater  user, that initiated action.
+	 * @param eventCrf
+	 *            EventCRFBean, which ItemDataBeans should be removed.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public void removeItemDataByEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception;
+	void deleteItemData(EventCRFBean eventCrf, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Restores all item data for given EventCRFBean.
+	 * Updates states for all item data for given EventCRFBean.
 	 *
-	 * @param eventCRF EventCRFBean, which ItemDataBeans should be restored.
-	 * @param updater  user, that initiated action.
+	 * @param eventCrf
+	 *            EventCRFBean, which ItemDataBeans should be removed.
+	 * @param updater
+	 *            user, that initiated action.
+	 * @throws Exception
+	 *             an Exception
 	 */
-	public void restoreItemDataByEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception;
+	void updateItemDataStates(EventCRFBean eventCrf, UserAccountBean updater) throws Exception;
 }

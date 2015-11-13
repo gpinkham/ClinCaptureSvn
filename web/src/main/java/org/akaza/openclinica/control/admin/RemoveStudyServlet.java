@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -53,9 +52,8 @@ public class RemoveStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
 
@@ -67,7 +65,6 @@ public class RemoveStudyServlet extends Controller {
 		int studyId = fp.getInt("id");
 		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean currentUser = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		// it's impossible to remove the current study
 		if ((currentStudy.getParentStudyId() > 0 && currentStudy.getParentStudyId() == studyId)
@@ -94,7 +91,7 @@ public class RemoveStudyServlet extends Controller {
 			} else {
 				logger.info("submit to remove the study");
 
-				getStudyService().removeStudy(study, currentStudy, currentRole, currentUser);
+				getStudyService().removeStudy(study, currentUser);
 
 				addPageMessage(resexception.getString("this_study_has_been_removed_succesfully"), request);
 				forwardPage(Page.STUDY_LIST_SERVLET, request, response);

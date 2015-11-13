@@ -180,6 +180,14 @@
                 </sql>
         </query>
         <query>
+            <name>findAllByStudyIdOnly</name>
+            <sql>SELECT sur.* FROM study_user_role sur, study st
+                WHERE sur.study_id=st.study_id
+                AND st.study_id=?
+                order by sur.date_updated desc
+            </sql>
+        </query>
+        <query>
                 <name>findAllByStudyIdAndLimit</name>
                 <sql>SELECT sur.* FROM study_user_role sur, study st
                  WHERE sur.study_id=st.study_id

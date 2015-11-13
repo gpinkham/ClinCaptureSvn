@@ -20,7 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SignStateRestorer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -38,10 +44,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
+import com.clinovo.util.SignStateRestorer;
 
 /**
  * Prepares to update study event definition.
@@ -81,9 +84,8 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 				return;
 			} else {
-				addPageMessage(
-						respage.getString("no_have_permission_to_update_study_event_definition")
-								+ respage.getString("please_contact_sysadmin_questions"), request);
+				addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
+						+ respage.getString("please_contact_sysadmin_questions"), request);
 				throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 						resexception.getString("not_study_director"), "1");
 
@@ -129,9 +131,8 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
 			if (currentStudy.getId() != studyEventDefinitionBean.getStudyId()) {
-				addPageMessage(
-						respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_active_study_or_contact"), request);
+				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_active_study_or_contact"), request);
 				forwardPage(Page.MENU_SERVLET, request, response);
 				return;
 			}
@@ -143,17 +144,18 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService()
 					.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
 
-			SignStateRestorer signStateRestorer = getEventDefinitionService().prepareSignStateRestorer(
-					eventDefinitionCRFs);
+			Map<Integer, SignStateRestorer> signStateRestorerMap = getEventDefinitionService()
+					.prepareSignStateRestorer(studyEventDefinitionBean);
 
 			request.getSession().setAttribute("definition", studyEventDefinitionBean);
 			request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-			request.getSession().setAttribute("oldEventDefinitionCRFs", EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
+			request.getSession().setAttribute("oldEventDefinitionCRFs",
+					EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
 			// store child list to session
 			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
 
-			request.getSession().setAttribute("signStateRestorer", signStateRestorer);
+			request.getSession().setAttribute("signStateRestorerMap", signStateRestorerMap);
 
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}

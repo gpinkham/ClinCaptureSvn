@@ -3,7 +3,6 @@ package com.clinovo.service;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
 
@@ -17,6 +16,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.clinovo.service.impl.CodedItemServiceImpl;
 import com.clinovo.service.impl.ItemDataServiceImpl;
@@ -31,9 +31,9 @@ public class ItemDataServiceTest {
 
 	private UserAccountBean updater;
 
-	private EventCRFBean EventCRFInstance;
+	private EventCRFBean eventCRFInstance;
 
-	List<ItemDataBean> ItemDataList;
+	List<ItemDataBean> itemDataList;
 
 	@Before
 	public void setUp() {
@@ -41,88 +41,93 @@ public class ItemDataServiceTest {
 		mockCodedItemService = mock(CodedItemServiceImpl.class);
 		mockItemDataDAO = mock(ItemDataDAO.class);
 
+		itemDataService = Mockito.spy(new ItemDataServiceImpl());
+
 		setInternalState(itemDataService, "codedItemService", mockCodedItemService);
-		setInternalState(itemDataService, "itemDataDAO", mockItemDataDAO);
+		Mockito.when(((ItemDataServiceImpl) itemDataService).getItemDataDAO()).thenReturn(mockItemDataDAO);
 
 		updater = new UserAccountBean();
 		updater.setId(96);
 
-		ItemDataList = new ArrayList<ItemDataBean>();
+		itemDataList = new ArrayList<ItemDataBean>();
 
 		// 0 test Item
-		ItemDataBean ItemDataInstance = new ItemDataBean();
-		ItemDataInstance.setId(1);
-		ItemDataInstance.setStatus(Status.AVAILABLE);
-		ItemDataList.add(ItemDataInstance);
+		ItemDataBean itemDataInstance = new ItemDataBean();
+		itemDataInstance.setId(1);
+		itemDataInstance.setStatus(Status.AVAILABLE);
+		itemDataList.add(itemDataInstance);
 
 		// 1 test Item
-		ItemDataInstance = new ItemDataBean();
-		ItemDataInstance.setId(2);
-		ItemDataInstance.setStatus(Status.DELETED);
-		ItemDataList.add(ItemDataInstance);
+		itemDataInstance = new ItemDataBean();
+		itemDataInstance.setId(2);
+		itemDataInstance.setStatus(Status.DELETED);
+		itemDataList.add(itemDataInstance);
 
 		// 2 test Item
-		ItemDataInstance = new ItemDataBean();
-		ItemDataInstance.setId(3);
-		ItemDataInstance.setStatus(Status.AUTO_DELETED);
-		ItemDataList.add(ItemDataInstance);
+		itemDataInstance = new ItemDataBean();
+		itemDataInstance.setId(3);
+		itemDataInstance.setStatus(Status.AUTO_DELETED);
+		itemDataList.add(itemDataInstance);
 
 		// 3 test Item
-		ItemDataInstance = new ItemDataBean();
-		ItemDataInstance.setId(4);
-		ItemDataInstance.setStatus(Status.AVAILABLE);
-		ItemDataList.add(ItemDataInstance);
+		itemDataInstance = new ItemDataBean();
+		itemDataInstance.setId(4);
+		itemDataInstance.setStatus(Status.AVAILABLE);
+		itemDataList.add(itemDataInstance);
 
-		EventCRFInstance = new EventCRFBean();
-		EventCRFInstance.setId(11);
+		eventCRFInstance = new EventCRFBean();
+		eventCRFInstance.setId(11);
 
-		doReturn(ItemDataList).when(mockItemDataDAO).findAllByEventCRFId(EventCRFInstance.getId());
+		doReturn(itemDataList).when(mockItemDataDAO).findAllByEventCRFId(eventCRFInstance.getId());
 	}
 
 	@Test
-	public void testThatRemoveItemDataByEventCRFDoesRemoveAvailableItemsOnly() throws Exception {
+	public void testThatUpdateItemDataStatesMethodSetsDeletedStateFromEventCRFBeanCorrectly() throws Exception {
 
-		itemDataService.removeItemDataByEventCRF(EventCRFInstance, updater);
+		eventCRFInstance.setStatus(Status.DELETED);
+		itemDataService.updateItemDataStates(eventCRFInstance, updater);
 
-		assertTrue(ItemDataList.get(0).getStatus().equals(Status.AUTO_DELETED));
-		assertTrue(ItemDataList.get(0).getUpdater().equals(updater));
-		verify(mockItemDataDAO).updateStatus(ItemDataList.get(0));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(0).getId());
+		assertTrue(itemDataList.get(0).getStatus().equals(Status.DELETED));
+		assertTrue(itemDataList.get(0).getUpdater().equals(updater));
+		verify(mockItemDataDAO).update(itemDataList.get(0));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(0).getId());
 
-		assertTrue(ItemDataList.get(1).getStatus().equals(Status.DELETED));
-		verify(mockItemDataDAO, never()).update(ItemDataList.get(1));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(1).getId());
+		assertTrue(itemDataList.get(1).getStatus().equals(Status.DELETED));
+		verify(mockItemDataDAO).update(itemDataList.get(1));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(1).getId());
 
-		assertTrue(ItemDataList.get(2).getStatus().equals(Status.AUTO_DELETED));
-		verify(mockItemDataDAO, never()).update(ItemDataList.get(2));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(2).getId());
+		assertTrue(itemDataList.get(2).getStatus().equals(Status.DELETED));
+		verify(mockItemDataDAO).update(itemDataList.get(2));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(2).getId());
 
-		assertTrue(ItemDataList.get(3).getStatus().equals(Status.AUTO_DELETED));
-		assertTrue(ItemDataList.get(3).getUpdater().equals(updater));
-		verify(mockItemDataDAO).updateStatus(ItemDataList.get(3));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(3).getId());
+		assertTrue(itemDataList.get(3).getStatus().equals(Status.DELETED));
+		assertTrue(itemDataList.get(3).getUpdater().equals(updater));
+		verify(mockItemDataDAO).update(itemDataList.get(3));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(3).getId());
 	}
 
 	@Test
-	public void testThatRestoreItemDataByEventCRFDoesRestoreItemsWithStateAutoRemovedOnly() throws Exception {
+	public void testThatUpdateItemDataStatesMethodSetsLockedStateFromEventCRFBeanCorrectly() throws Exception {
 
-		itemDataService.restoreItemDataByEventCRF(EventCRFInstance, updater);
+		eventCRFInstance.setStatus(Status.LOCKED);
+		itemDataService.updateItemDataStates(eventCRFInstance, updater);
 
-		assertTrue(ItemDataList.get(0).getStatus().equals(Status.AVAILABLE));
-		verify(mockItemDataDAO, never()).update(ItemDataList.get(0));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(0).getId());
+		assertTrue(itemDataList.get(0).getStatus().equals(Status.LOCKED));
+		assertTrue(itemDataList.get(0).getUpdater().equals(updater));
+		verify(mockItemDataDAO).update(itemDataList.get(0));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(0).getId());
 
-		assertTrue(ItemDataList.get(1).getStatus().equals(Status.DELETED));
-		verify(mockItemDataDAO, never()).update(ItemDataList.get(1));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(1).getId());
+		assertTrue(itemDataList.get(1).getStatus().equals(Status.LOCKED));
+		verify(mockItemDataDAO).update(itemDataList.get(1));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(1).getId());
 
-		assertTrue(ItemDataList.get(2).getStatus().equals(Status.UNAVAILABLE));
-		assertTrue(ItemDataList.get(2).getUpdater().equals(updater));
-		verify(mockItemDataDAO).updateStatus(ItemDataList.get(2));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(2).getId());
+		assertTrue(itemDataList.get(2).getStatus().equals(Status.LOCKED));
+		verify(mockItemDataDAO).update(itemDataList.get(2));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(2).getId());
 
-		assertTrue(ItemDataList.get(3).getStatus().equals(Status.AVAILABLE));
-		verify(mockItemDataDAO, never()).update(ItemDataList.get(3));
-		verify(mockCodedItemService).findCodedItem(ItemDataList.get(3).getId());
+		assertTrue(itemDataList.get(3).getStatus().equals(Status.LOCKED));
+		assertTrue(itemDataList.get(3).getUpdater().equals(updater));
+		verify(mockItemDataDAO).update(itemDataList.get(3));
+		verify(mockCodedItemService).findCodedItem(itemDataList.get(3).getId());
 	}
 }

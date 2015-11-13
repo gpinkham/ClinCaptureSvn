@@ -433,8 +433,8 @@ public class EventService extends BaseService {
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrf(eventId, crfName);
-		eventDefinitionCrfService.removeEventDefinitionCrf(eventDefinitionCRFBean, updater);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getParentEventDefinitionCrf(eventId, crfName);
+		eventDefinitionCrfService.removeParentEventDefinitionCrf(eventDefinitionCRFBean, updater);
 		return eventDefinitionCRFBean;
 	}
 
@@ -456,8 +456,8 @@ public class EventService extends BaseService {
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrf(eventId, crfName);
-		eventDefinitionCrfService.restoreEventDefinitionCrf(eventDefinitionCRFBean, updater);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getParentEventDefinitionCrf(eventId, crfName);
+		eventDefinitionCrfService.restoreParentEventDefinitionCrf(eventDefinitionCRFBean, updater);
 		return eventDefinitionCRFBean;
 	}
 
@@ -472,7 +472,7 @@ public class EventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
-	private EventDefinitionCRFBean getEventDefinitionCrf(int eventId, String crfName) throws Exception {
+	private EventDefinitionCRFBean getParentEventDefinitionCrf(int eventId, String crfName) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 
 		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);

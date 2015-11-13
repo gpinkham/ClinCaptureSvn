@@ -39,12 +39,19 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
  */
 @SuppressWarnings("serial")
 public class EventCRFBean extends AuditableEntityBean {
+
+	public static final int EVENT_CRF_STATES_LENGTH = 4;
+
+	public static final int BY_ITSELF = 0;
+	public static final int BY_CRF_VERSION = 2;
+	public static final int BY_STUDY_EVENT = 3;
+	public static final int BY_EVENT_DEFINITION_CRF = 1;
+
 	private int studyEventId = 0;
 	private int crfVersionId = 0;
 	private Date dateInterviewed;
 	private String interviewerName = "";
 	private int completionStatusId = 0;
-	private Status status;
 	private org.akaza.openclinica.domain.Status nexGenStatus;
 	private String annotations = "";
 	private Date dateCompleted;
@@ -556,5 +563,10 @@ public class EventCRFBean extends AuditableEntityBean {
 
 	public void setStudyEventBean(StudyEventBean studyEventBean) {
 		this.studyEventBean = studyEventBean;
+	}
+
+	@Override
+	protected int getStatesLength() {
+		return EVENT_CRF_STATES_LENGTH;
 	}
 }

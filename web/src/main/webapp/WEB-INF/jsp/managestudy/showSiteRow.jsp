@@ -44,7 +44,7 @@
 		</td>
 	  <c:if test="${ readOnly != 'true' }">	       
       <c:choose>
-       <c:when test="${(!currRow.bean.status.deleted)}">
+       <c:when test="${!currRow.bean.status.deleted and !currRow.bean.status.locked}">
           <c:if test="${!study.status.locked}">
           <td><a href="InitUpdateSubStudy?id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
@@ -52,18 +52,23 @@
 			onclick="setAccessedObjected(this);"><img
 			name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
 		  </td>
-           <td><a href="RemoveSite?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-			onclick="setAccessedObjected(this);"><img 
-			name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-		 </td>
+          <td>
+              <c:choose>
+                  <c:when test="${currRow.bean.id ne study.id}">
+                      <a href="RemoveSite?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
+                         onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+                         onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+                         onclick="setAccessedObjected(this);"><img
+                         name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                  </c:when>
+                  <c:otherwise>&nbsp;</c:otherwise>
+              </c:choose>
+		  </td>
          </c:if>
        </c:when>
        <c:otherwise>
-        <c:if test="${!study.status.locked}">
-		<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
-		</td>
+        <c:if test="${currRow.bean.id ne study.id and !currRow.bean.status.locked and !(study.status.deleted || study.status.locked)}">
+		<td><img name="bt_Transparent" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
         <td><a href="RestoreSite?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
@@ -74,19 +79,23 @@
        </c:otherwise>
       </c:choose>
       </c:if>
-      <c:if test="${userRoleId eq 1 or userRoleId eq 2}">
+      <c:if test="${currRow.bean.id ne study.id and (userRoleId eq 1 or userRoleId eq 2)}">
           <c:choose>
-              <c:when test="${currRow.bean.showUnlockEventsButton}">
+              <c:when test="${!currRow.bean.status.deleted and currRow.bean.showUnlockEventsButton}">
+                  <td><img name="bt_Transparent" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
+                  <td><img name="bt_Transparent" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
                   <td>
                       <a href="LockSite?id=${currRow.bean.id}&action=unlock" onclick="setAccessedObjected(this);"><img src="images/bt__Unlock.png" border="0" align="left" alt="<fmt:message key="unlockSiteStudySubjects" bundle="${resword}"/>" title="<fmt:message key="unlockSiteStudySubjects" bundle="${resword}"/>" hspace="4"/></a>
                   </td>
               </c:when>
-              <c:when test="${currRow.bean.showLockEventsButton}">
+              <c:when test="${!currRow.bean.status.deleted and currRow.bean.showLockEventsButton}">
                   <td>
                       <a href="LockSite?id=${currRow.bean.id}&action=lock" onclick="setAccessedObjected(this);"><img src="images/bt__Lock.png" border="0" align="left" alt="<fmt:message key="lockSiteStudySubjects" bundle="${resword}"/>" title="<fmt:message key="lockSiteStudySubjects" bundle="${resword}"/>" hspace="4"/></a>
                   </td>
               </c:when>
-              <c:otherwise> </c:otherwise>
+              <c:otherwise>
+                  <td><img name="bt_Transparent" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
+              </c:otherwise>
           </c:choose>
       </c:if>
       </tr>

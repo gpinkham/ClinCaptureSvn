@@ -128,9 +128,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS,
 				resexception.getString("not_study_director"), "1");
 	}
@@ -174,14 +173,16 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			int studyId = studySub.getStudyId();
 			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
+			request.setAttribute("viewModeOnly", study.getStatus().isDeleted() || study.getStatus().isLocked()
+					|| studySub.getStatus().isDeleted() || studySub.getStatus().isLocked());
 
 			StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
 			String studyEventDefinitionsString = "";
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			if (studySub.getDynamicGroupClassId() == 0) {
 				request.setAttribute("subjDynGroupIsDefault", true);
-				StudyGroupClassBean defaultGroup = sgcdao.findDefaultByStudyId(study.getParentStudyId() > 0 ? study
-						.getParentStudyId() : study.getId());
+				StudyGroupClassBean defaultGroup = sgcdao
+						.findDefaultByStudyId(study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId());
 				if (defaultGroup.getId() > 0) {
 					subjDynGroup = defaultGroup;
 				} else {
@@ -232,18 +233,16 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySub.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {
-					addPageMessage(
-							respage.getString("no_have_correct_privilege_current_study") + " "
-									+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				} else {
 					// The SubjectStudy is not belong to currentstudy and current study is not a site.
 					Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
 					if (!sites.contains(study.getId())) {
-						addPageMessage(
-								respage.getString("no_have_correct_privilege_current_study") + " "
-										+ respage.getString("change_active_study_or_contact"), request);
+						addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_active_study_or_contact"), request);
 						forwardPage(Page.MENU_SERVLET, request, response);
 						return;
 					}
@@ -273,15 +272,15 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study,
 							subjectId);
 
-					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(
-							stParent, study, studySubId));
+					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent,
+							study, studySubId));
 
 				} else {
 					allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(currentStudy, study,
 							subjectId);
 
-					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(
-							currentStudy, study, studySubId));
+					allNotesforSubject.addAll(discrepancyNoteDAO
+							.findAllStudySubjectByStudiesAndStudySubjectId(currentStudy, study, studySubId));
 				}
 			}
 
@@ -404,8 +403,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 				StudyEventAuditBean sea = new StudyEventAuditBean();
 				sea.setAuditEvent(avb);
 				StudyEventBean se = (StudyEventBean) sedao.findByPK(avb.getEntityId());
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
-						.getStudyEventDefinitionId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
+						.findByPK(se.getStudyEventDefinitionId());
 				sea.setDefinition(sed);
 				String old = avb.getOldValue().trim();
 				try {
@@ -511,14 +510,14 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		String id = request.getParameter("id");
 		if (request.getQueryString() != null && request.getQueryString().equalsIgnoreCase("id=" + id)) {
 			String savedUrl = (String) request.getSession().getAttribute(getUrlKey(request));
-			// Was added in order to prevent situation when id = 1 and saved id = 10, in this case result will be invalid.
+			// Was added in order to prevent situation when id = 1 and saved id = 10, in this case result will be
+			// invalid.
 			if (savedUrl != null && savedUrl.length() != 0) {
 				String savedUrlWithoutCharacter = savedUrl.substring(0, savedUrl.length() - 1);
 
-				result = savedUrl.contains("id=" + id)
-						&& !savedUrlWithoutCharacter.contains("id=" + id)
-						&& !savedUrl.equalsIgnoreCase(request.getContextPath().concat(request.getServletPath()).concat("?")
-							.concat(request.getQueryString()));
+				result = savedUrl.contains("id=" + id) && !savedUrlWithoutCharacter.contains("id=" + id)
+						&& !savedUrl.equalsIgnoreCase(request.getContextPath().concat(request.getServletPath())
+								.concat("?").concat(request.getQueryString()));
 			}
 		} else {
 			result = request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");

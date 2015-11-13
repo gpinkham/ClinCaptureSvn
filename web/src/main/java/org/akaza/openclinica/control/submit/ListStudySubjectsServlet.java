@@ -25,7 +25,6 @@ import java.util.Stack;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.CookiesUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,6 +38,8 @@ import org.akaza.openclinica.control.managestudy.ListEventsForSubjectsServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.CookiesUtil;
 
 /**
  * Servlet for creating subject matrix page.
@@ -135,7 +136,6 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
-		factory.setStudyBean(getCurrentStudy(request));
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
@@ -147,6 +147,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
 		factory.setDynamicEventDao(getDynamicEventDao());
+		factory.setStudyBean(getCurrentStudy(request));
 		return factory.createTable(request, response).render();
 	}
 

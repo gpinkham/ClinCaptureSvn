@@ -1,5 +1,12 @@
 package org.akaza.openclinica.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -9,20 +16,14 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * StudyEventDefinitionUtil class.
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class StudyEventDefinitionUtil {
 
 	private StudyEventDefinitionUtil() {
@@ -127,7 +128,7 @@ public final class StudyEventDefinitionUtil {
 		List<StudyEventDefinitionBean> studyEventDefinitionUpdated = new ArrayList<StudyEventDefinitionBean>();
 		List<EventDefinitionCRFBean> eventDefinitionCrfList = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
 				.findAllByCRF(crfId);
-		
+
 		HashMap<Integer, String> studyIdName = new HashMap<Integer, String>();
 		ArrayList<Integer> studyIds = studyDao.getStudyIdsByCRF(crfId);
 
@@ -166,8 +167,8 @@ public final class StudyEventDefinitionUtil {
 			if (!eventDefCrfBean.getStatus().isDeleted()) {
 				StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao
 						.findByPK(eventDefCrfBean.getStudyEventDefinitionId());
-				UserAccountBean userAccountBean = (UserAccountBean) userAccountDao.findByPK(studyEventDefinition
-						.getOwnerId());
+				UserAccountBean userAccountBean = (UserAccountBean) userAccountDao
+						.findByPK(studyEventDefinition.getOwnerId());
 				studyEventDefinition.setOwner(userAccountBean);
 
 				studyEventDefinitionListFiltered.add(studyEventDefinition);

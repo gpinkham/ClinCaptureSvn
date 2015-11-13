@@ -44,9 +44,8 @@ public class DeleteEventCRFLinkTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		hspace = hspace.isEmpty() ? "6" : hspace;
 		String link = "<img src=\"images/bt_Transparent.gif\" border=\"0\" align=\"left\" hspace=\"" + hspace + "\">";
-		WebApplicationContext appContext = WebApplicationContextUtils
-				.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
-						.getServletContext());
+		WebApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(
+				((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT)).getServletContext());
 		CRFMaskingService maskingService = (CRFMaskingService) appContext.getBean("crfMaskingService");
 		MessageSource messageSource = (MessageSource) appContext.getBean("messageSource");
 		Locale locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest());
@@ -55,7 +54,10 @@ public class DeleteEventCRFLinkTag extends TagSupport {
 		if (object != null && object instanceof DisplayEventCRFBean) {
 			DisplayEventCRFBean decBean = (DisplayEventCRFBean) object;
 			EventDefinitionCRFBean edcBean = decBean.getEventDefinitionCRF();
-			if (!maskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(), edcBean.getStudyId())) {
+			boolean studyEventIsNotAvailable = decBean.getEventCRF().getStudyEventBean().getStatus().isDeleted()
+					|| decBean.getEventCRF().getStudyEventBean().getStatus().isLocked();
+			if (!studyEventIsNotAvailable && !maskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(),
+					edcBean.getStudyId())) {
 				link = "<a href=\"DeleteEventCRF?action=confirm&ssId=" + subjectId + "&ecId="
 						+ decBean.getEventCRF().getId() + "\" "
 						+ "onMouseDown=\"javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');\" "

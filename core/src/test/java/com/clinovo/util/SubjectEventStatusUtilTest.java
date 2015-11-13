@@ -51,6 +51,7 @@ public class SubjectEventStatusUtilTest {
 		studyBean.setId(1);
 		StudySubjectBean studySubjectBean = new StudySubjectBean();
 		studySubjectBean.setStudyId(1);
+		studySubjectBean.setStatus(Status.AVAILABLE);
 		studyEventBean = new StudyEventBean();
 		studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 		studyEventBean.setStudySubjectId(1);
@@ -76,7 +77,8 @@ public class SubjectEventStatusUtilTest {
 				.thenReturn((ArrayList) eventDefCrfs);
 	}
 
-	private EventDefinitionCRFBean getEventDefinitionCRFBean(Status status, boolean required, SourceDataVerification sdv) {
+	private EventDefinitionCRFBean getEventDefinitionCRFBean(Status status, boolean required,
+			SourceDataVerification sdv) {
 		return getEventDefinitionCRFBean(status, required, false, sdv);
 	}
 
@@ -111,15 +113,12 @@ public class SubjectEventStatusUtilTest {
 		idCounter++;
 		eventCrfList.add(eventCRFBean);
 		eventDefCrfs.add(eventDefinitionCRFBean);
-		Mockito.when(
-				daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
-						eventCRFBean.getCRFVersionId())).thenReturn(eventDefinitionCRFBean);
-		Mockito.when(
-				daoWrapper.getEdcdao().findAllActiveByEventDefinitionId(studyBean,
-						eventDefinitionCRFBean.getStudyEventDefinitionId())).thenReturn(eventDefCrfs);
-		Mockito.when(
-				daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(),
-						eventCRFBean.getCRFVersionId())).thenReturn(eventDefinitionCRFBean);
+		Mockito.when(daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
+				eventCRFBean.getCRFVersionId())).thenReturn(eventDefinitionCRFBean);
+		Mockito.when(daoWrapper.getEdcdao().findAllActiveByEventDefinitionId(studyBean,
+				eventDefinitionCRFBean.getStudyEventDefinitionId())).thenReturn(eventDefCrfs);
+		Mockito.when(daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(),
+				eventCRFBean.getCRFVersionId())).thenReturn(eventDefinitionCRFBean);
 	}
 
 	private StudyEventBean getStudyEventBean(SubjectEventStatus status) {
@@ -136,10 +135,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SCHEDULED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SCHEDULED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SCHEDULED.getId())));
 	}
 
 	@Test
@@ -150,8 +149,8 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SIGNED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
 				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.DATA_ENTRY_STARTED.getId())));
 	}
@@ -164,10 +163,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SIGNED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.COMPLETED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.COMPLETED.getId())));
 	}
 
 	@Test
@@ -178,8 +177,8 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SOURCE_DATA_VERIFIED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SIGNED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
 		assertTrue(url.toString().contains(
 				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SOURCE_DATA_VERIFIED.getId())));
 	}
@@ -192,10 +191,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SKIPPED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SIGNED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SIGNED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SIGNED.getId())));
 	}
 
 	@Test
@@ -206,10 +205,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.LOCKED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.LOCKED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.LOCKED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.LOCKED.getId())));
 	}
 
 	@Test
@@ -220,10 +219,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.STOPPED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.LOCKED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.REMOVED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.REMOVED.getId())));
 	}
 
 	@Test
@@ -234,10 +233,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SKIPPED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.LOCKED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SKIPPED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.SKIPPED.getId())));
 	}
 
 	@Test
@@ -248,10 +247,10 @@ public class SubjectEventStatusUtilTest {
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.SKIPPED));
 		studyEvents.add(getStudyEventBean(SubjectEventStatus.LOCKED));
 		StringBuilder url = new StringBuilder();
-		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(),
-				new StudySubjectBean(), studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
-		assertTrue(url.toString().contains(
-				SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.STOPPED.getId())));
+		SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, new StudyBean(), new StudySubjectBean(),
+				studyEvents, SubjectEventStatus.SCHEDULED, resword, true);
+		assertTrue(url.toString()
+				.contains(SubjectEventStatusUtil.getImageIconPaths().get(SubjectEventStatus.STOPPED.getId())));
 	}
 
 	@Test

@@ -15,11 +15,10 @@
 
 package com.clinovo.service;
 
-import java.util.List;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 
 /**
  * StudySubjectService.
@@ -31,28 +30,142 @@ public interface StudySubjectService {
 	 *
 	 * @param studySubjectBean
 	 *            StudySubjectBean
-	 * @param displayEvents
-	 *            List of DisplayStudyEventBean
-	 * @param userAccountBean
+	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeStudySubject(StudySubjectBean studySubjectBean, List<DisplayStudyEventBean> displayEvents,
-			UserAccountBean userAccountBean) throws Exception;
+	void removeStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores study subject.
 	 *
 	 * @param studySubjectBean
 	 *            StudySubjectBean
-	 * @param displayEvents
-	 *            List of DisplayStudyEventBean
-	 * @param userAccountBean
+	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreStudySubject(StudySubjectBean studySubjectBean, List<DisplayStudyEventBean> displayEvents,
-			UserAccountBean userAccountBean) throws Exception;
+	void restoreStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Removes study subjects.
+	 *
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Restores study subjects.
+	 *
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Removes study subjects.
+	 *
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void lockStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Restores study subjects.
+	 *
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void unlockStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Removes study subjects.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Restores study subjects.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Locks study subject.
+	 *
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void lockStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * unlocks study subject.
+	 *
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void unlockStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Locks study subjects.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void lockStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * unlocks study subjects.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void unlockStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception;
 }

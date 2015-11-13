@@ -20,49 +20,44 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Removes a crf.
  * 
  * @author jxu
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class RemoveCRFServlet extends Controller {
 	/**
-     *
-     */
+	 *
+	 */
 
 	private static final String CRF_ID_PARAMETER = "id";
 
@@ -80,9 +75,8 @@ public class RemoveCRFServlet extends Controller {
 		if (userCanRemoveCRF(request)) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
 
@@ -109,11 +103,8 @@ public class RemoveCRFServlet extends Controller {
 
 		CRFVersionDAO cvdao;
 		ArrayList<CRFVersionBean> versions;
-		ArrayList edcs;
 		ArrayList<EventCRFBean> eventCRFs;
-		SectionDAO secdao;
 		EventCRFDAO evdao;
-		EventDefinitionCRFDAO edcdao;
 		StudyEventDAO seDao;
 		StudyEventDefinitionDAO sedDao;
 		CRFDAO cdao = getCRFDAO();
@@ -130,17 +121,16 @@ public class RemoveCRFServlet extends Controller {
 			sedDao = getStudyEventDefinitionDAO();
 			for (Object ecBean : eventCRFs) {
 				StudyEventBean seBean = (StudyEventBean) seDao.findByPK(((EventCRFBean) ecBean).getStudyEventId());
-				StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) sedDao.findByPK(seBean
-						.getStudyEventDefinitionId());
+				StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) sedDao
+						.findByPK(seBean.getStudyEventDefinitionId());
 				((EventCRFBean) ecBean).setEventName(sedBean.getName());
 			}
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 
 				if (!userCanRemoveCRF(request)) {
-					addPageMessage(
-							respage.getString("no_have_correct_privilege_current_study") + " "
-									+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
@@ -150,55 +140,16 @@ public class RemoveCRFServlet extends Controller {
 				forwardPage(Page.REMOVE_CRF, request, response);
 				return;
 
-			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
-					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
+			} else
+				if (ACTION_SUBMIT.equalsIgnoreCase(action)
+						&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
 
 				logger.info("submit to remove the crf");
-				crf.setStatus(Status.DELETED);
-				crf.setUpdater(currentUser);
-				crf.setUpdatedDate(new Date());
-				cdao.update(crf);
 
-				secdao = getSectionDAO();
-				for (CRFVersionBean version : versions) {
-					if (!version.getStatus().equals(Status.DELETED)) {
-						version.setStatus(Status.AUTO_DELETED);
-						version.setUpdater(currentUser);
-						version.setUpdatedDate(new Date());
-						cvdao.update(version);
+				getCrfVersionService().removeCrf(crf, currentUser);
 
-						ArrayList<SectionBean> sections = secdao.findAllByCRFVersionId(version.getId());
-						for (SectionBean section : sections) {
-							if (!section.getStatus().equals(Status.DELETED)) {
-								section.setStatus(Status.AUTO_DELETED);
-								section.setUpdater(currentUser);
-								section.setUpdatedDate(new Date());
-								secdao.update(section);
-							}
-						}
-
-						// Remove coded items
-						getCodedItemService().removeByCRFVersion(version.getId());
-					}
-				}
-
-				edcdao = getEventDefinitionCRFDAO();
-				edcs = (ArrayList) edcdao.findAllByCRF(crfId);
-				for (Object edc1 : edcs) {
-					EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
-					if (!edc.getStatus().equals(Status.DELETED)) {
-						edc.setStatus(Status.AUTO_DELETED);
-						edc.setUpdater(currentUser);
-						edc.setUpdatedDate(new Date());
-						edcdao.update(edc);
-					}
-				}
-
-				getEventCRFService().setEventCRFsToAutoRemovedState(eventCRFs, currentUser);
-
-				addPageMessage(
-						new StringBuilder("").append(respage.getString("the_CRF")).append(crf.getName()).append(" ")
-								.append(respage.getString("has_been_removed_succesfully")).toString(), request);
+				addPageMessage(new StringBuilder("").append(respage.getString("the_CRF")).append(crf.getName())
+						.append(" ").append(respage.getString("has_been_removed_succesfully")).toString(), request);
 
 			} else {
 				addPageMessage(respage.getString("invalid_http_request_parameters"), request);

@@ -20,35 +20,29 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
-import org.akaza.openclinica.bean.core.Status;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Restores a subject to system, also restore all the related data.
  *
  * @author jxu
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class RestoreSubjectServlet extends Controller {
 	/**
@@ -70,9 +64,8 @@ public class RestoreSubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
@@ -107,41 +100,8 @@ public class RestoreSubjectServlet extends Controller {
 				forwardPage(Page.RESTORE_SUBJECT, request, response);
 			} else {
 				logger.info("submit to restore the subject");
-				// change all statuses to AVAILABLE
-				subject.setStatus(Status.AVAILABLE);
-				subject.setUpdater(currentUser);
-				subject.setUpdatedDate(new Date());
-				sdao.update(subject);
 
-				// remove subject references from study
-				for (Object studySub1 : studySubs) {
-					StudySubjectBean studySub = (StudySubjectBean) studySub1;
-					if (studySub.getStatus().equals(Status.AUTO_DELETED)) {
-						studySub.setStatus(Status.AVAILABLE);
-						studySub.setUpdater(currentUser);
-						studySub.setUpdatedDate(new Date());
-						ssdao.update(studySub);
-					}
-				}
-
-				EventCRFDAO ecdao = getEventCRFDAO();
-
-				for (Object event1 : events) {
-					StudyEventBean event = (StudyEventBean) event1;
-					if (event.getStatus().equals(Status.AUTO_DELETED)) {
-						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(currentUser);
-						event.setUpdatedDate(new Date());
-						sedao.update(event);
-
-						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-						getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
-
-						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(
-								getDataSource()));
-					}
-				}
+				getSubjectService().restoreSubject(subject, currentUser);
 
 				String emailBody = new StringBuilder("").append(respage.getString("the_subject"))
 						.append(subject.getName()).append(" ")

@@ -450,13 +450,13 @@
             , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
             , NOT_STARTED = ?
-            , OWNER_ID = ?
+            , STATES = ?
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
     <query>
         <name>updateStatus</name>
-        <sql>UPDATE EVENT_CRF SET OLD_STATUS_ID=STATUS_ID, STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE EVENT_CRF_ID=?</sql>
+        <sql>UPDATE EVENT_CRF SET STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE EVENT_CRF_ID=?</sql>
     </query>
     <query>
         <name>findAllByStudyEvent</name>
@@ -841,4 +841,52 @@
 					WHERE event_definition_crf_id = ?) )
 		</sql>
 	</query>
+    <query>
+        <name>disableEventCRF</name>
+        <sql>
+            {call disable_event_crf(?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRFsByCRFVersion</name>
+        <sql>
+            {call disable_event_crfs_by_crf_version(?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRFsByStudyEvent</name>
+        <sql>
+            {call disable_event_crfs_by_study_event(?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRFsByStudyEventAndCrfOid</name>
+        <sql>
+            {call disable_event_crfs_by_study_event_and_crf_oid(?,?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRF</name>
+        <sql>
+            {call enable_event_crf(?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRFsByCRFVersion</name>
+        <sql>
+            {call enable_event_crfs_by_crf_version(?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRFsByStudyEvent</name>
+        <sql>
+            {call enable_event_crfs_by_study_event(?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRFsByStudyEventAndCrfOid</name>
+        <sql>
+            {call enable_event_crfs_by_study_event_and_crf_oid(?,?,?,?)}
+        </sql>
+    </query>
 </queries>

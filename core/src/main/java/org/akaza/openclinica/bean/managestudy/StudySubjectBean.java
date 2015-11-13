@@ -13,16 +13,24 @@
 
 package org.akaza.openclinica.bean.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudySubjectOidGenerator;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Date;
-
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudySubjectBean extends AuditableEntityBean {
+
+	public static final int STUDY_SUBJECT_STATES_LENGTH = 4;
+
+	public static final int BY_SITE = 2;
+	public static final int BY_STUDY = 3;
+	public static final int BY_ITSELF = 0;
+	public static final int BY_SUBJECT = 1;
 
 	private String label = "";
 
@@ -301,5 +309,10 @@ public class StudySubjectBean extends AuditableEntityBean {
 
 	public void setRandomizationResult(String randomizationResult) {
 		this.randomizationResult = randomizationResult;
+	}
+
+	@Override
+	protected int getStatesLength() {
+		return STUDY_SUBJECT_STATES_LENGTH;
 	}
 }

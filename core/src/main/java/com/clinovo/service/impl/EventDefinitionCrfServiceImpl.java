@@ -31,12 +31,14 @@ import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -69,6 +71,295 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	@Autowired
 	private EventCRFService eventCRFService;
 
+	private CRFDAO getCRFDAO() {
+		return new CRFDAO(dataSource);
+	}
+
+	public StudyDAO getStudyDAO() {
+		return new StudyDAO(dataSource);
+	}
+
+	private CRFVersionDAO getCRFVersionDAO() {
+		return new CRFVersionDAO(dataSource);
+	}
+
+	private EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
+		return new EventDefinitionCRFDAO(dataSource);
+	}
+
+	private StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
+		return new StudyEventDefinitionDAO(dataSource);
+	}
+
+	private void disableEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater,
+			Status status) throws Exception {
+		eventDefinitionCRFBean.setStatus(status);
+		eventDefinitionCRFBean.setUpdater(updater);
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		getEventDefinitionCRFDAO().update(eventDefinitionCRFBean);
+	}
+
+	private void enableEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater)
+			throws Exception {
+		eventDefinitionCRFBean.setUpdater(updater);
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFBean.setStatus(Status.AVAILABLE);
+		getEventDefinitionCRFDAO().update(eventDefinitionCRFBean);
+	}
+
+	private void disableParentEventDefinitionCRF(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater, Status status) throws Exception {
+		disableEventDefinitionCrf(parentEventDefinitionCRFBean, updater, status);
+		disableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater, status);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+				.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
+		eventCRFService.removeEventCRFs(studyEventDefinitionBean.getOid(),
+				parentEventDefinitionCRFBean.getCrf().getOid(), updater);
+		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
+				new DAOWrapper(dataSource), null);
+	}
+
+	private void enableParentEventDefinitionCRF(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater) throws Exception {
+		enableEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
+		enableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+				.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
+		eventCRFService.restoreEventCRFs(studyEventDefinitionBean.getOid(),
+				parentEventDefinitionCRFBean.getCrf().getOid(), updater);
+		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
+				new DAOWrapper(dataSource), null);
+	}
+
+	private void disableChildEventDefinitionCRFs(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater, Status status) throws Exception {
+		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = getEventDefinitionCRFDAO()
+				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
+		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
+			if (childEventDefinitionCRFBean.getStatus().isAvailable()) {
+				disableEventDefinitionCrf(childEventDefinitionCRFBean, updater, status);
+			}
+		}
+	}
+
+	private void enableChildEventDefinitionCRFs(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater) throws Exception {
+		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = getEventDefinitionCRFDAO()
+				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
+		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
+			StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(childEventDefinitionCRFBean.getStudyId());
+			if (studyBean.getStatus().isAvailable() && !childEventDefinitionCRFBean.getStatus().isAvailable()) {
+				enableEventDefinitionCRF(childEventDefinitionCRFBean, updater);
+			} else if (!studyBean.getStatus().isAvailable()) {
+				disableEventDefinitionCrf(childEventDefinitionCRFBean, updater,
+						studyBean.getStatus().isDeleted() ? Status.AUTO_DELETED : studyBean.getStatus());
+			}
+		}
+	}
+
+	private void disableParentEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater, Status status) throws Exception {
+		List<EventDefinitionCRFBean> parentEventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
+		for (EventDefinitionCRFBean parentEventDefinitionCRFBean : parentEventDefinitionCRFBeanList) {
+			if (parentEventDefinitionCRFBean.getStatus().isAvailable()) {
+				disableEventDefinitionCrf(parentEventDefinitionCRFBean, updater, status);
+				disableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater, status);
+			}
+		}
+	}
+
+	private void enableParentEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater) throws Exception {
+		List<EventDefinitionCRFBean> parentEventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
+		for (EventDefinitionCRFBean parentEventDefinitionCRFBean : parentEventDefinitionCRFBeanList) {
+			CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(parentEventDefinitionCRFBean.getCrfId());
+			if (parentEventDefinitionCRFBean.getStatus().isAutoDeleted() && crfBean.getStatus().isAvailable()) {
+				enableEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
+				enableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater);
+			}
+		}
+	}
+
+	private void disableParentEventDefinitionCRFs(CRFBean crfBean, UserAccountBean updater, Status status)
+			throws Exception {
+		List<EventDefinitionCRFBean> parentEventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+				.findAllParentByCRFId(crfBean.getId());
+		for (EventDefinitionCRFBean parentEventDefinitionCRFBean : parentEventDefinitionCRFBeanList) {
+			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+					.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
+			if (parentEventDefinitionCRFBean.getStatus().isAvailable()) {
+				disableEventDefinitionCrf(parentEventDefinitionCRFBean, updater, status);
+				disableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater, status);
+			}
+			eventCRFService.removeEventCRFs(studyEventDefinitionBean.getOid(), crfBean.getOid(), updater);
+		}
+	}
+
+	private void enableParentEventDefinitionCRFs(CRFBean crfBean, UserAccountBean updater) throws Exception {
+		List<EventDefinitionCRFBean> parentEventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+				.findAllParentByCRFId(crfBean.getId());
+		for (EventDefinitionCRFBean parentEventDefinitionCRFBean : parentEventDefinitionCRFBeanList) {
+			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
+					.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
+			if (parentEventDefinitionCRFBean.getStatus().isAutoDeleted()
+					&& studyEventDefinitionBean.getStatus().isAvailable()) {
+				enableEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
+				enableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater);
+			}
+			eventCRFService.restoreEventCRFs(studyEventDefinitionBean.getOid(), crfBean.getOid(), updater);
+		}
+	}
+
+	private void disableChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater, Status status)
+			throws Exception {
+		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = getEventDefinitionCRFDAO()
+				.findAllChildrenByStudy(studyBean);
+		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
+			if (childEventDefinitionCRFBean.getStatus().isAvailable()) {
+				disableEventDefinitionCrf(childEventDefinitionCRFBean, updater, status);
+			}
+		}
+	}
+
+	private void enableChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = getEventDefinitionCRFDAO()
+				.findAllChildrenByStudy(studyBean);
+		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
+			EventDefinitionCRFBean parentEventDefinitionCRFBean = (EventDefinitionCRFBean) getEventDefinitionCRFDAO()
+					.findByPK(childEventDefinitionCRFBean.getParentId());
+			if (parentEventDefinitionCRFBean.getStatus().isAvailable()
+					&& !childEventDefinitionCRFBean.getStatus().isAvailable()) {
+				enableEventDefinitionCRF(childEventDefinitionCRFBean, updater);
+			} else if (!parentEventDefinitionCRFBean.getStatus().isAvailable()) {
+				disableEventDefinitionCrf(childEventDefinitionCRFBean, updater,
+						parentEventDefinitionCRFBean.getStatus());
+			}
+		}
+	}
+
+	private HashMap processNullValues(EventDefinitionCRFBean edc) {
+		String s = "";
+		HashMap flags = new LinkedHashMap();
+		for (int j = 0; j < edc.getNullValuesList().size(); j++) {
+			NullValue nv1 = (NullValue) edc.getNullValuesList().get(j);
+			s = s + nv1.getName().toUpperCase() + ",";
+		}
+		for (int i = 1; i <= NullValue.toArrayList().size(); i++) {
+			String nv = NullValue.get(i).getName().toUpperCase();
+			Pattern p = Pattern.compile(nv + "\\W");
+			Matcher m = p.matcher(s);
+			if (m.find()) {
+				flags.put(nv, "1");
+			} else {
+				flags.put(nv, "0");
+			}
+		}
+		return flags;
+	}
+
+	private void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean,
+			List<CRFVersionBean> versionList, UserAccountBean updater) {
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		if (!StringUtil.isBlank(edcBean.getSelectedVersionIds())) {
+			String sversionIds = edcBean.getSelectedVersionIds();
+			String[] ids = sversionIds.split("\\,");
+			for (String id : ids) {
+				idList.add(Integer.valueOf(id));
+			}
+		}
+		if ((null != versionList) && (versionList.size() > 0)) {
+			EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+			for (CRFVersionBean versionBean : versionList) {
+				if ((idList.size() == 0 || idList.contains(versionBean.getId())) && versionBean.isAvailable()) {
+					edcBean.setUpdater(updater);
+					edcBean.setDefaultVersionId(versionBean.getId());
+					eventDefinitionCRFDAO.update(edcBean);
+					break;
+				}
+			}
+		}
+	}
+
+	private boolean shouldParameterBeUpdated(Object parentValue, Object childValue, int propagateChange) {
+		return propagateChange == 1 || (propagateChange == 2 && parentValue.equals(childValue));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
+			throws Exception {
+		disableParentEventDefinitionCRFs(studyEventDefinitionBean, updater, Status.AUTO_DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
+			throws Exception {
+		enableParentEventDefinitionCRFs(studyEventDefinitionBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater) throws Exception {
+		disableParentEventDefinitionCRF(parentEventDefinitionCRFBean, updater, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater) throws Exception {
+		enableParentEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeParentEventDefinitionCRFs(CRFBean crfBean, UserAccountBean updater) throws Exception {
+		disableParentEventDefinitionCRFs(crfBean, updater, Status.AUTO_DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreParentEventDefinitionCRFs(CRFBean crfBean, UserAccountBean updater) throws Exception {
+		enableParentEventDefinitionCRFs(crfBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableChildEventDefinitionCRFs(studyBean, updater, Status.AUTO_DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableChildEventDefinitionCRFs(studyBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableChildEventDefinitionCRFs(studyBean, updater, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableChildEventDefinitionCRFs(studyBean, updater);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -99,10 +390,12 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
-			Map<Integer, EventDefinitionCRFBean> parentsMap, Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap,
-			UserAccountBean updater) {
+			Map<Integer, EventDefinitionCRFBean> parentsMap,
+			Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap, UserAccountBean updater) {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 		for (EventDefinitionCRFBean childEdc : childEventDefinitionCRFsToUpdate) {
+			StudyBean childEdcStudyBean = (StudyBean) getStudyDAO().findByPK(childEdc.getStudyId());
+
 			EventDefinitionCRFBean parentEdc = parentsMap.get(childEdc.getParentId());
 			EventDefinitionCRFBean oldParentEdc = parentsBeforeUpdateMap.get(childEdc.getParentId());
 
@@ -125,19 +418,22 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				if (shouldParameterBeUpdated(oldParentEdc.isRequiredCRF(), childEdc.isRequiredCRF(), propagateChange)) {
 					childEdc.setRequiredCRF(parentEdc.isRequiredCRF());
 				}
-				if (shouldParameterBeUpdated(oldParentEdc.isElectronicSignature(), childEdc.isElectronicSignature(), propagateChange)) {
+				if (shouldParameterBeUpdated(oldParentEdc.isElectronicSignature(), childEdc.isElectronicSignature(),
+						propagateChange)) {
 					childEdc.setElectronicSignature(parentEdc.isElectronicSignature());
 				}
 				if (shouldParameterBeUpdated(oldParentEdc.isHideCrf(), childEdc.isHideCrf(), propagateChange)) {
 					childEdc.setHideCrf(parentEdc.isHideCrf());
 				}
-				if (shouldParameterBeUpdated(oldParentEdc.getSourceDataVerification(), childEdc.getSourceDataVerification(), propagateChange)) {
+				if (shouldParameterBeUpdated(oldParentEdc.getSourceDataVerification(),
+						childEdc.getSourceDataVerification(), propagateChange)) {
 					childEdc.setSourceDataVerification(parentEdc.getSourceDataVerification());
 				}
 				if (shouldParameterBeUpdated(oldParentEdc.isDoubleEntry(), childEdc.isDoubleEntry(), propagateChange)) {
 					childEdc.setDoubleEntry(parentEdc.isDoubleEntry());
 				}
-				if (shouldParameterBeUpdated(oldParentEdc.isEvaluatedCRF(), childEdc.isEvaluatedCRF(), propagateChange)) {
+				if (shouldParameterBeUpdated(oldParentEdc.isEvaluatedCRF(), childEdc.isEvaluatedCRF(),
+						propagateChange)) {
 					childEdc.setEvaluatedCRF(parentEdc.isEvaluatedCRF());
 				}
 				if (shouldParameterBeUpdated(oldParentEdc.getEmailStep(), childEdc.getEmailStep(), propagateChange)) {
@@ -146,10 +442,16 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				if (shouldParameterBeUpdated(oldParentEdc.getEmailTo(), childEdc.getEmailTo(), propagateChange)) {
 					childEdc.setEmailTo(parentEdc.getEmailTo());
 				}
-				if (shouldParameterBeUpdated(oldParentEdc.getTabbingMode(), childEdc.getTabbingMode(), propagateChange)) {
+				if (shouldParameterBeUpdated(oldParentEdc.getTabbingMode(), childEdc.getTabbingMode(),
+						propagateChange)) {
 					childEdc.setTabbingMode(parentEdc.getTabbingMode());
 				}
-
+				if (childEdc.getStatus().isAvailable()
+						&& (childEdcStudyBean.getStatus().isDeleted() || childEdcStudyBean.getStatus().isLocked())) {
+					childEdc.setStatus(childEdcStudyBean.getStatus().isDeleted()
+							? Status.AUTO_DELETED
+							: childEdcStudyBean.getStatus());
+				}
 				eventDefinitionCrfDao.update(childEdc);
 			}
 		}
@@ -179,85 +481,13 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean, UserAccountBean updater)
-			throws Exception {
-		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
-				.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
-
-		parentEventDefinitionCRFBean.setUpdater(updater);
-		parentEventDefinitionCRFBean.setStatus(Status.DELETED);
-		eventDefinitionCrfDao.updateStatus(parentEventDefinitionCRFBean);
-		eventCRFService.removeEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
-				parentEventDefinitionCRFBean.getCrf().getOid(), updater);
-
-		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = eventDefinitionCrfDao
-				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
-		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
-			childEventDefinitionCRFBean.setUpdater(updater);
-			childEventDefinitionCRFBean.setStatus(Status.DELETED);
-			eventDefinitionCrfDao.updateStatus(childEventDefinitionCRFBean);
-			eventCRFService.removeEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
-					parentEventDefinitionCRFBean.getCrf().getOid(), updater);
-		}
-
-		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
-				new DAOWrapper(dataSource), null);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void restoreEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean, UserAccountBean updater)
-			throws Exception {
-		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
-				.findByPK(parentEventDefinitionCRFBean.getStudyEventDefinitionId());
-
-		parentEventDefinitionCRFBean.setUpdater(updater);
-		parentEventDefinitionCRFBean.setStatus(Status.AVAILABLE);
-		eventDefinitionCrfDao.updateStatus(parentEventDefinitionCRFBean);
-		eventCRFService.restoreEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
-				parentEventDefinitionCRFBean.getCrf().getOid(), updater);
-
-		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = eventDefinitionCrfDao
-				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
-		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
-			childEventDefinitionCRFBean.setUpdater(updater);
-			childEventDefinitionCRFBean.setStatus(Status.AVAILABLE);
-			eventDefinitionCrfDao.updateStatus(childEventDefinitionCRFBean);
-			eventCRFService.restoreEventCRFsByEventDefinitionCRF(studyEventDefinitionBean.getOid(),
-					parentEventDefinitionCRFBean.getCrf().getOid(), updater);
-		}
-
-		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
-				new DAOWrapper(dataSource), null);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean,
-														 List<CRFVersionBean> versionList, UserAccountBean updater) {
-		ArrayList<Integer> idList = new ArrayList<Integer>();
-
-		if (!StringUtil.isBlank(edcBean.getSelectedVersionIds())) {
-			String sversionIds = edcBean.getSelectedVersionIds();
-			String[] ids = sversionIds.split("\\,");
-			for (String id : ids) {
-				idList.add(Integer.valueOf(id));
-			}
-		}
-		if ((null != versionList) && (versionList.size() > 0)) {
-			EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-			for (CRFVersionBean versionBean : versionList) {
-				if ((idList.size() == 0 || idList.contains(versionBean.getId()))
-						&& versionBean.isAvailable()) {
-					edcBean.setDefaultVersionId(versionBean.getId());
-					edcBean.setUpdater(updater);
-					eventDefinitionCRFDAO.update(edcBean);
-					break;
-				}
+	public void updateDefaultVersionOfEventDefinitionCRF(CRFVersionBean crfVersionBean, UserAccountBean updater) {
+		ArrayList versionList = (ArrayList) getCRFVersionDAO().findAllByCRF(crfVersionBean.getCrfId());
+		List<EventDefinitionCRFBean> eventDefinitionCRFBeanList = (ArrayList) getEventDefinitionCRFDAO()
+				.findAllByCRF(crfVersionBean.getCrfId());
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFBeanList) {
+			if (eventDefinitionCRFBean.getDefaultVersionId() == crfVersionBean.getId()) {
+				updateDefaultVersionOfEventDefinitionCRF(eventDefinitionCRFBean, versionList, updater);
 			}
 		}
 	}
@@ -276,50 +506,11 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 			}
 		}
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionCRFDAO.findAllChildrenByParentId(eventDefinitionCRFBean.getId());
+		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionCRFDAO
+				.findAllChildrenByParentId(eventDefinitionCRFBean.getId());
 		for (EventDefinitionCRFBean child : childEventDefinitionCRFs) {
 			eventDefinitionCRFDAO.delete(child.getId());
 		}
 		eventDefinitionCRFDAO.delete(eventDefinitionCRFBean.getId());
-	}
-
-	private HashMap processNullValues(EventDefinitionCRFBean edc) {
-		String s = "";
-		HashMap flags = new LinkedHashMap();
-		for (int j = 0; j < edc.getNullValuesList().size(); j++) {
-			NullValue nv1 = (NullValue) edc.getNullValuesList().get(j);
-			s = s + nv1.getName().toUpperCase() + ",";
-		}
-		for (int i = 1; i <= NullValue.toArrayList().size(); i++) {
-			String nv = NullValue.get(i).getName().toUpperCase();
-			Pattern p = Pattern.compile(nv + "\\W");
-			Matcher m = p.matcher(s);
-			if (m.find()) {
-				flags.put(nv, "1");
-			} else {
-				flags.put(nv, "0");
-			}
-		}
-		return flags;
-	}
-
-	private boolean shouldParameterBeUpdated(Object parentValue, Object childValue, int propagateChange) {
-		return propagateChange == 1 || (propagateChange == 2 && parentValue.equals(childValue));
-	}
-
-	private CRFDAO getCRFDAO() {
-		return new CRFDAO(dataSource);
-	}
-
-	private CRFVersionDAO getCRFVersionDAO() {
-		return new CRFVersionDAO(dataSource);
-	}
-
-	private EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		return new EventDefinitionCRFDAO(dataSource);
-	}
-
-	private StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
-		return new StudyEventDefinitionDAO(dataSource);
 	}
 }

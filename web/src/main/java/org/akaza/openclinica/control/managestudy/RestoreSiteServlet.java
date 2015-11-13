@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -59,9 +58,8 @@ public class RestoreSiteServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
 
@@ -74,9 +72,7 @@ public class RestoreSiteServlet extends Controller {
 		String idString = request.getParameter("id");
 		logger.info("site id:" + idString);
 
-		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean currentUser = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		int siteId = Integer.valueOf(idString.trim());
 		StudyBean site = (StudyBean) sdao.findByPK(siteId);
@@ -107,7 +103,7 @@ public class RestoreSiteServlet extends Controller {
 			} else {
 				logger.info("submit to restore the site");
 
-				getStudyService().restoreSite(site, currentStudy, currentRole, currentUser);
+				getStudyService().restoreSite(site, currentUser);
 
 				addPageMessage(respage.getString("this_site_has_been_restored_succesfully"), request);
 				String fromListSite = (String) request.getSession().getAttribute("fromListSite");

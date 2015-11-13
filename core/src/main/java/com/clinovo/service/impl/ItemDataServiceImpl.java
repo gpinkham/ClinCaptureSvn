@@ -15,21 +15,29 @@
 
 package com.clinovo.service.impl;
 
-import com.clinovo.model.CodedItem;
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.ItemDataService;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.util.List;
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.ItemDataService;
 
+/**
+ * ItemDataServiceImpl.
+ */
 @Service("itemDataService")
+@SuppressWarnings("unchecked")
 public class ItemDataServiceImpl implements ItemDataService {
 
 	@Autowired
@@ -38,68 +46,88 @@ public class ItemDataServiceImpl implements ItemDataService {
 	@Autowired
 	private CodedItemService codedItemService;
 
-	private ItemDataDAO itemDataDAO;
-
-	private DataSource getDataSource() {
-		return dataSource;
+	public ItemDataDAO getItemDataDAO() {
+		return new ItemDataDAO(dataSource);
 	}
 
-	private CodedItemService getCodedItemService() {
-		return codedItemService;
+	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
+		return new DiscrepancyNoteDAO(dataSource);
 	}
 
-	private ItemDataDAO getItemDataDAO() {
-
-		if (itemDataDAO == null) {
-			return itemDataDAO = new ItemDataDAO(getDataSource());
-		} else {
-			return itemDataDAO;
+	private void disableItemDataBeans(ItemDataBean itemDataBean, UserAccountBean updater, Status status)
+			throws Exception {
+		itemDataBean.setStatus(status);
+		itemDataBean.setUpdater(updater);
+		getItemDataDAO().update(itemDataBean);
+		CodedItem codedItem = codedItemService.findCodedItem(itemDataBean.getId());
+		if (codedItem != null) {
+			codedItem.setStatus(status.isDeleted()
+					? com.clinovo.model.Status.CodeStatus.REMOVED.toString()
+					: com.clinovo.model.Status.CodeStatus.LOCKED.toString());
+			codedItemService.saveCodedItem(codedItem);
 		}
 	}
 
-	public void removeItemDataByEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
-
-		List<ItemDataBean> itemDataList = getItemDataDAO().findAllByEventCRFId(eventCRF.getId());
-
-		for (ItemDataBean item : itemDataList) {
-
-			if (!item.getStatus().isDeleted()) {
-				item.setStatus(Status.AUTO_DELETED);
-				item.setUpdater(updater);
-				getItemDataDAO().updateStatus(item);
-			}
-
-			CodedItem codedItem = getCodedItemService().findCodedItem(item.getId());
-
-			if (codedItem != null) {
-				codedItem.setStatus(com.clinovo.model.Status.CodeStatus.REMOVED.toString());
-				getCodedItemService().saveCodedItem(codedItem);
-			}
-		}
-	}
-
-	public void restoreItemDataByEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
-
-		List<ItemDataBean> itemDataList = getItemDataDAO().findAllByEventCRFId(eventCRF.getId());
-
-		for (ItemDataBean item : itemDataList) {
-
-			if (item.getStatus().equals(Status.AUTO_DELETED)) {
-				item.setStatus(Status.UNAVAILABLE);
-				item.setUpdater(updater);
-				getItemDataDAO().updateStatus(item);
-			}
-
-			CodedItem codedItem = getCodedItemService().findCodedItem(item.getId());
-			if (codedItem != null) {
-
+	private void enableItemDataBeans(ItemDataBean itemDataBean, UserAccountBean updater, Status status)
+			throws Exception {
+		itemDataBean.setStatus(status);
+		itemDataBean.setUpdater(updater);
+		getItemDataDAO().update(itemDataBean);
+		CodedItem codedItem = codedItemService.findCodedItem(itemDataBean.getId());
+		if (codedItem != null) {
+			if (itemDataBean.getStatus().isDeleted() || itemDataBean.getStatus().isLocked()) {
+				codedItem.setStatus(itemDataBean.getStatus().isDeleted()
+						? com.clinovo.model.Status.CodeStatus.REMOVED.toString()
+						: com.clinovo.model.Status.CodeStatus.LOCKED.toString());
+			} else {
 				if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
 					codedItem.setStatus(com.clinovo.model.Status.CodeStatus.NOT_CODED.toString());
 				} else {
 					codedItem.setStatus(com.clinovo.model.Status.CodeStatus.CODED.toString());
 				}
+			}
+			codedItemService.saveCodedItem(codedItem);
+		}
+	}
 
-				getCodedItemService().saveCodedItem(codedItem);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteItemData(EventCRFBean eventCrf, UserAccountBean updater) throws Exception {
+		ItemDataDAO iddao = getItemDataDAO();
+		DiscrepancyNoteDAO dnDao = getDiscrepancyNoteDAO();
+
+		List<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCrf.getId());
+		for (ItemDataBean itemDataBean : itemDataBeanList) {
+			CodedItem codedItem = codedItemService.findCodedItem(itemDataBean.getId());
+			List<DiscrepancyNoteBean> discrepancyList = dnDao.findExistingNotesForItemData(itemDataBean.getId());
+
+			iddao.deleteDnMap(itemDataBean.getId());
+
+			for (DiscrepancyNoteBean noteBean : discrepancyList) {
+				dnDao.deleteNotes(noteBean.getId());
+			}
+
+			itemDataBean.setUpdater(updater);
+			iddao.updateUser(itemDataBean);
+			iddao.delete(itemDataBean.getId());
+
+			if (codedItem != null) {
+				codedItemService.deleteCodedItem(codedItem);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateItemDataStates(EventCRFBean eventCrf, UserAccountBean updater) throws Exception {
+		List<ItemDataBean> itemDataList = getItemDataDAO().findAllByEventCRFId(eventCrf.getId());
+		for (ItemDataBean itemDataBean : itemDataList) {
+			if (eventCrf.getStatus().isDeleted() || eventCrf.getStatus().isLocked()) {
+				disableItemDataBeans(itemDataBean, updater, eventCrf.getStatus());
+			} else {
+				enableItemDataBeans(itemDataBean, updater, eventCrf.getStatus());
 			}
 		}
 	}

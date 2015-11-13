@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,13 +69,13 @@ public class ListSiteServlet extends RememberLastPage {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
@@ -103,32 +103,26 @@ public class ListSiteServlet extends RememberLastPage {
 			studyBean = (StudyBean) studyDao.findByPK(studyBean.getParentStudyId());
 		}
 
-		ArrayList studies = (ArrayList) studyDao.findAllByParent(studyBean.getId());
+		List<StudyBean> studies = (List<StudyBean>) studyDao.findAllByParent(studyBean.getId());
 
-		Map<Integer, Map<String, Integer>> infoMap = studyDao.analyzeEvents(studies);
-		for (Object studyObj : studies) {
-			StudyBean sb = ((StudyBean) studyObj);
-			Map<String, Integer> map = infoMap.get(sb.getId());
-			int countEvents = map.get("countEvents");
-			if (countEvents > 0) {
-				int countLockedEvents = map.get("countLockedEvents");
-				if (countEvents == countLockedEvents) {
+		if (studyBean.getStatus().isAvailable()) {
+			for (StudyBean sb : studies) {
+				if (sb.getStatus().isLocked()) {
 					sb.setShowUnlockEventsButton(true);
-				} else {
+				} else if (sb.getStatus().isAvailable()) {
 					sb.setShowLockEventsButton(true);
 				}
 			}
 		}
 
 		EntityBeanTable table = getEntityBeanTable();
-		ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);
+		ArrayList allStudyRows = StudyRow.generateRowsFromBeans((ArrayList) studies);
 
 		final int two = 2;
 		final int seven = 7;
-		String[] columns = {resword.getString("name"), resword.getString("unique_identifier"),
-				resword.getString("OID"), resword.getString("principal_investigator"),
-				resword.getString("facility_name"), resword.getString("date_created"), resword.getString("status"),
-				resword.getString("actions")};
+		String[] columns = {resword.getString("name"), resword.getString("unique_identifier"), resword.getString("OID"),
+				resword.getString("principal_investigator"), resword.getString("facility_name"),
+				resword.getString("date_created"), resword.getString("status"), resword.getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(two);
 		table.hideColumnLink(seven);

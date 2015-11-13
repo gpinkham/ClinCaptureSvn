@@ -97,16 +97,17 @@ public class ChangeStudyServlet extends Controller {
 		} else {
 			logger.info("confirm action");
 			changeStudy(request, response, studies);
-		} 
+		}
 	}
 
-	private void changeStudy(HttpServletRequest request, HttpServletResponse response, ArrayList<StudyUserRoleBean> studies) throws Exception {
-		
+	private void changeStudy(HttpServletRequest request, HttpServletResponse response,
+			ArrayList<StudyUserRoleBean> studies) throws Exception {
+
 		StudyBean currentStudy = getCurrentStudy(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("studyId", Validator.IS_AN_INTEGER);
-		
+
 		HashMap errors = v.validate();
 		if (!errors.isEmpty()) {
 			request.setAttribute("studies", studies);
@@ -116,7 +117,7 @@ public class ChangeStudyServlet extends Controller {
 
 		int studyId = fp.getInt("studyId");
 		logger.info("new study id: " + studyId);
-		
+
 		boolean isStudySelected = false;
 		for (StudyUserRoleBean studyWithRole : studies) {
 			if (studyWithRole.getStudyId() == studyId) {
@@ -131,13 +132,13 @@ public class ChangeStudyServlet extends Controller {
 				isStudySelected = true;
 			}
 		}
-		
+
 		if (!isStudySelected) {
 			addPageMessage(restext.getString("no_study_selected"), request);
 			forwardPage(Page.CHANGE_STUDY, request, response);
 			return;
 		}
-		
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 		int prevStudyId = currentStudy.getId();
@@ -151,8 +152,9 @@ public class ChangeStudyServlet extends Controller {
 
 		ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
 		current.setStudyParameters(studyParameters);
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-				.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0
+				? currentStudy.getParentStudyId()
+				: currentStudy.getId();
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 		current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 		String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
@@ -186,8 +188,9 @@ public class ChangeStudyServlet extends Controller {
 			ub.setUpdatedDate(new java.util.Date());
 			udao.update(ub);
 
-			int currentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-					.getId();
+			int currentStudyId = currentStudy.getParentStudyId() > 0
+					? currentStudy.getParentStudyId()
+					: currentStudy.getId();
 			boolean isEvaluationEnabled = StudyParameterPriorityUtil.isParameterEnabled(EVALUATION_ENABLED,
 					currentStudyId, getSystemDAO(), getStudyParameterValueDAO(), getStudyDAO());
 			request.getSession().setAttribute(EVALUATION_ENABLED, isEvaluationEnabled);
@@ -290,7 +293,6 @@ public class ChangeStudyServlet extends Controller {
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
-		factory.setStudyBean(currentStudy);
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
@@ -302,6 +304,7 @@ public class ChangeStudyServlet extends Controller {
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
 		factory.setDynamicEventDao(getDynamicEventDao());
+		factory.setStudyBean(currentStudy);
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}

@@ -15,111 +15,188 @@
 
 package com.clinovo.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.EventCRFService;
+import com.clinovo.service.StudyEventService;
 import com.clinovo.service.StudySubjectService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * StudySubjectServiceImpl.
  */
 @Service
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class StudySubjectServiceImpl implements StudySubjectService {
 
 	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
-	private EventCRFService eventCRFService;
-
-	private EventCRFDAO getEventCRFDAO() {
-		return new EventCRFDAO(dataSource);
-	}
-
-	private StudyEventDAO getStudyEventDAO() {
-		return new StudyEventDAO(dataSource);
-	}
+	private StudyEventService studyEventService;
 
 	private StudySubjectDAO getStudySubjectDAO() {
 		return new StudySubjectDAO(dataSource);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeStudySubject(StudySubjectBean studySubjectBean, List<DisplayStudyEventBean> displayEvents,
-			UserAccountBean userAccountBean) throws Exception {
-		StudyEventDAO studyEventDao = getStudyEventDAO();
+	private void disableChildObjects(StudySubjectBean studySubjectBean, UserAccountBean updater, Status status)
+			throws Exception {
+		if (status.isDeleted()) {
+			studyEventService.removeStudyEvents(studySubjectBean, updater);
+		} else {
+			studyEventService.lockStudyEvents(studySubjectBean, updater);
+		}
+	}
 
-		studySubjectBean.setStatus(Status.DELETED);
-		studySubjectBean.setUpdater(userAccountBean);
-		studySubjectBean.setUpdatedDate(new Date());
+	private void enableChildObjects(StudySubjectBean studySubjectBean, UserAccountBean updater, boolean restore)
+			throws Exception {
+		if (restore) {
+			studyEventService.restoreStudyEvents(studySubjectBean, updater);
+		} else {
+			studyEventService.unlockStudyEvents(studySubjectBean, updater);
+		}
+	}
+
+	private void disableStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater, int position,
+			Status status) throws Exception {
+		studySubjectBean.applyState(position, status, updater);
 		getStudySubjectDAO().update(studySubjectBean);
+		disableChildObjects(studySubjectBean, updater, studySubjectBean.getStatus());
+	}
 
-		for (DisplayStudyEventBean dispEvent : displayEvents) {
-			StudyEventBean event = dispEvent.getStudyEvent();
-			if (!event.getStatus().equals(Status.DELETED)) {
-				event.setPrevSubjectEventStatus(event.getSubjectEventStatus());
-				event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-				event.setStatus(Status.AUTO_DELETED);
-				event.setUpdater(userAccountBean);
-				event.setUpdatedDate(new Date());
-				studyEventDao.update(event);
+	private void enableStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater, int position,
+			boolean restore) throws Exception {
+		boolean available = studySubjectBean.revertState(position, updater);
+		getStudySubjectDAO().update(studySubjectBean);
+		if (!available) {
+			disableChildObjects(studySubjectBean, updater, studySubjectBean.getStatus());
+		} else {
+			enableChildObjects(studySubjectBean, updater, restore);
+		}
+	}
 
-				eventCRFService.removeEventCRFsByStudyEvent(event, userAccountBean);
-			}
+	private void disableStudySubjects(StudyBean studyBean, UserAccountBean updater, Status status) throws Exception {
+		List<StudySubjectBean> studySubjectBeanList = getStudySubjectDAO().findAllByStudy(studyBean);
+		for (StudySubjectBean studySubjectBean : studySubjectBeanList) {
+			disableStudySubject(studySubjectBean, updater,
+					studyBean.isSite() ? StudySubjectBean.BY_SITE : StudySubjectBean.BY_STUDY, status);
+		}
+	}
+
+	private void enableStudySubjects(StudyBean studyBean, UserAccountBean updater, boolean restore) throws Exception {
+		List<StudySubjectBean> studySubjectBeanList = getStudySubjectDAO().findAllByStudy(studyBean);
+		for (StudySubjectBean studySubjectBean : studySubjectBeanList) {
+			enableStudySubject(studySubjectBean, updater,
+					studyBean.isSite() ? StudySubjectBean.BY_SITE : StudySubjectBean.BY_STUDY, restore);
+		}
+	}
+
+	private void disableStudySubjects(SubjectBean subjectBean, UserAccountBean updater, Status status)
+			throws Exception {
+		List<StudySubjectBean> studySubjectBeanList = getStudySubjectDAO().findAllBySubjectId(subjectBean.getId());
+		for (StudySubjectBean studySubjectBean : studySubjectBeanList) {
+			disableStudySubject(studySubjectBean, updater, StudySubjectBean.BY_SUBJECT, status);
+		}
+	}
+
+	private void enableStudySubjects(SubjectBean subjectBean, UserAccountBean updater, boolean restore)
+			throws Exception {
+		List<StudySubjectBean> studySubjectBeanList = getStudySubjectDAO().findAllBySubjectId(subjectBean.getId());
+		for (StudySubjectBean studySubjectBean : studySubjectBeanList) {
+			enableStudySubject(studySubjectBean, updater, StudySubjectBean.BY_SUBJECT, restore);
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreStudySubject(StudySubjectBean studySubjectBean, List<DisplayStudyEventBean> displayEvents,
-			UserAccountBean userAccountBean) throws Exception {
-		EventCRFDAO eventCrfDao = getEventCRFDAO();
-		StudyEventDAO studyEventDao = getStudyEventDAO();
+	public void removeStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception {
+		disableStudySubject(studySubjectBean, updater, StudySubjectBean.BY_ITSELF, Status.DELETED);
+	}
 
-		studySubjectBean.setStatus(Status.AVAILABLE);
-		studySubjectBean.setUpdater(userAccountBean);
-		studySubjectBean.setUpdatedDate(new Date());
-		getStudySubjectDAO().update(studySubjectBean);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception {
+		enableStudySubject(studySubjectBean, updater, StudySubjectBean.BY_ITSELF, true);
+	}
 
-		for (DisplayStudyEventBean dispEvent : displayEvents) {
-			StudyEventBean event = dispEvent.getStudyEvent();
-			if (event.getStatus().equals(Status.AUTO_DELETED)) {
-				SubjectEventStatus subjectEventStatus = event.getSubjectEventStatus();
-				event.setSubjectEventStatus(event.getPrevSubjectEventStatus());
-				event.setPrevSubjectEventStatus(subjectEventStatus);
-				event.setStatus(Status.AVAILABLE);
-				event.setUpdater(userAccountBean);
-				event.setUpdatedDate(new Date());
-				studyEventDao.update(event);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception {
+		disableStudySubjects(subjectBean, updater, Status.DELETED);
+	}
 
-				ArrayList eventCRFs = eventCrfDao.findAllByStudyEvent(event);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception {
+		enableStudySubjects(subjectBean, updater, true);
+	}
 
-				eventCRFService.restoreEventCRFsFromAutoRemovedState(eventCRFs, userAccountBean);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception {
+		disableStudySubjects(subjectBean, updater, Status.LOCKED);
+	}
 
-				SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(dataSource));
-			}
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockStudySubjects(SubjectBean subjectBean, UserAccountBean updater) throws Exception {
+		enableStudySubjects(subjectBean, updater, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableStudySubjects(studyBean, updater, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableStudySubjects(studyBean, updater, true);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception {
+		disableStudySubject(studySubjectBean, updater, StudySubjectBean.BY_ITSELF, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockStudySubject(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception {
+		enableStudySubject(studySubjectBean, updater, StudySubjectBean.BY_ITSELF, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableStudySubjects(studyBean, updater, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockStudySubjects(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableStudySubjects(studyBean, updater, false);
 	}
 }

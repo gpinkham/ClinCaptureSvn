@@ -20,6 +20,9 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -32,9 +35,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Restores a removed study event definition and all its related data.
  * 
@@ -45,8 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class RestoreEventDefinitionServlet extends Controller {
 	/**
-     *
-     */
+	 *
+	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -60,9 +60,8 @@ public class RestoreEventDefinitionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -77,7 +76,6 @@ public class RestoreEventDefinitionServlet extends Controller {
 		int defId = Integer.valueOf(idString.trim());
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
 				.findByPK(defId);
-		studyEventDefinitionBean.setUpdater(updater);
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
@@ -86,9 +84,8 @@ public class RestoreEventDefinitionServlet extends Controller {
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studyEventDefinitionBean.getStatus().equals(Status.DELETED)) {
-					addPageMessage(
-							respage.getString("this_SED_cannot_be_restored") + " "
-									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(respage.getString("this_SED_cannot_be_restored") + " "
+							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					return;
 				}

@@ -47,9 +47,8 @@ public class RestoreEventCRFLinkTag extends TagSupport {
 
 	@Override
 	public int doStartTag() throws JspException {
-		WebApplicationContext appContext = WebApplicationContextUtils
-				.getRequiredWebApplicationContext(((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT))
-						.getServletContext());
+		WebApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(
+				((PageContext) pageContext.getAttribute(PageContext.PAGECONTEXT)).getServletContext());
 		CRFMaskingService crfMaskingService = (CRFMaskingService) appContext.getBean("crfMaskingService");
 		MessageSource messageSource = (MessageSource) appContext.getBean("messageSource");
 		Locale locale = LocaleResolver.getLocale((HttpServletRequest) pageContext.getRequest());
@@ -61,15 +60,17 @@ public class RestoreEventCRFLinkTag extends TagSupport {
 		if (object != null && object instanceof DisplayEventCRFBean && !subjectId.isEmpty()) {
 			DisplayEventCRFBean dec = (DisplayEventCRFBean) object;
 			edcBean = dec.getEventDefinitionCRF();
-
-			if (!crfMaskingService.isEventDefinitionCRFMasked(edcBean.getId(), user.getId(), edcBean.getStudyId())) {
+			boolean studyEventIsNotAvailable = !edcBean.getStatus().isAvailable()
+					|| dec.getEventCRF().getStudyEventBean().getStatus().isDeleted()
+					|| dec.getEventCRF().getStudyEventBean().getStatus().isLocked();
+			if (!studyEventIsNotAvailable && !crfMaskingService.isEventDefinitionCRFMasked(edcBean.getId(),
+					user.getId(), edcBean.getStudyId())) {
 				link = "<a href=\"RestoreEventCRF?action=confirm&id=" + dec.getEventCRF().getId() + "&studySubId="
 						+ subjectId + "\" "
 						+ "onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\" "
 						+ "onMouseUp=\"javascript:setImage('bt_Restore3','images/bt_Restore.gif');\" " + "onclick=\""
-						+ onClick + "\">" + "<img name=\"bt_Restore3\" "
-						+ "src=\"images/bt_Restore.gif\" border=\"0\" " + "alt=\""
-						+ messageSource.getMessage("restore", null, locale) + "\" " + "title=\""
+						+ onClick + "\">" + "<img name=\"bt_Restore3\" " + "src=\"images/bt_Restore.gif\" border=\"0\" "
+						+ "alt=\"" + messageSource.getMessage("restore", null, locale) + "\" " + "title=\""
 						+ messageSource.getMessage("restore", null, locale) + "\" " + "align=\"left\" " + "hspace=\""
 						+ hspace + "\"></a>";
 			}

@@ -20,14 +20,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -37,18 +37,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class RemoveSubjectServlet extends Controller {
 	/**
-     *
-     */
+	 *
+	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -62,7 +56,7 @@ public class RemoveSubjectServlet extends Controller {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
@@ -98,37 +92,8 @@ public class RemoveSubjectServlet extends Controller {
 				forwardPage(Page.REMOVE_SUBJECT, request, response);
 			} else {
 				logger.info("submit to remove the subject");
-				// change all statuses to deleted
-				subject.setStatus(Status.DELETED);
-				subject.setUpdater(currentUser);
-				subject.setUpdatedDate(new Date());
-				sdao.update(subject);
 
-				// remove subject references from study
-				for (Object studySub1 : studySubs) {
-					StudySubjectBean studySub = (StudySubjectBean) studySub1;
-					if (!studySub.getStatus().equals(Status.DELETED)) {
-						studySub.setStatus(Status.AUTO_DELETED);
-						studySub.setUpdater(currentUser);
-						studySub.setUpdatedDate(new Date());
-						ssdao.update(studySub);
-					}
-				}
-
-				for (Object event1 : events) {
-
-					StudyEventBean event = (StudyEventBean) event1;
-					if (!event.getStatus().equals(Status.DELETED)) {
-
-						event.setStatus(Status.AUTO_DELETED);
-						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-						event.setUpdater(currentUser);
-						event.setUpdatedDate(new Date());
-						sedao.update(event);
-
-						getEventCRFService().removeEventCRFsByStudyEvent(event, currentUser);
-					}
-				}
+				getSubjectService().removeSubject(subject, currentUser);
 
 				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ")
 						.append(subject.getUniqueIdentifier()).append(" ")

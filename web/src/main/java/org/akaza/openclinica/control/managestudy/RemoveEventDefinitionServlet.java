@@ -20,6 +20,9 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -31,9 +34,6 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Removes study event definition and all its related data.
@@ -55,9 +55,8 @@ public class RemoveEventDefinitionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -74,9 +73,8 @@ public class RemoveEventDefinitionServlet extends Controller {
 				.findByPK(defId);
 
 		if (currentStudy.getId() != studyEventDefinitionBean.getStudyId()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+					+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -88,9 +86,8 @@ public class RemoveEventDefinitionServlet extends Controller {
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(
-							respage.getString("this_SED_is_not_available_for_this_study")
-									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(respage.getString("this_SED_is_not_available_for_this_study")
+							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					return;
 				}

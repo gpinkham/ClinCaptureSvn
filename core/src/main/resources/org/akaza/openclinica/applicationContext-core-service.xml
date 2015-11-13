@@ -19,9 +19,7 @@
         <constructor-arg name="ds" ref="dataSource"/>
     </bean>
 
-    <bean id="subjectService" class="org.akaza.openclinica.service.subject.SubjectService">
-        <constructor-arg ref="dataSource"/>
-    </bean>
+    <bean id="subjectService" class="org.akaza.openclinica.service.subject.SubjectService"/>
 
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>

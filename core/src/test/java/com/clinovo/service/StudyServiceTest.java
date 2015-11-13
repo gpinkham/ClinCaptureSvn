@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.After;
@@ -17,9 +16,7 @@ public class StudyServiceTest extends DefaultAppContextTest {
 
 	private StudyBean site;
 	private StudyBean study;
-	private StudyBean currentStudyBean;
 	private UserAccountBean userAccountBean;
-	private StudyUserRoleBean currentUserRole;
 
 	private void createStudy(UserAccountBean owner, Status status) throws Exception {
 		study = new StudyBean();
@@ -43,8 +40,6 @@ public class StudyServiceTest extends DefaultAppContextTest {
 	@Before
 	public void before() {
 		userAccountBean = (UserAccountBean) userAccountDAO.findByPK(1);
-		currentUserRole = userAccountBean.getRoleByStudy(1);
-		currentStudyBean = (StudyBean) studyDAO.findByPK(1);
 	}
 
 	@After
@@ -66,7 +61,7 @@ public class StudyServiceTest extends DefaultAppContextTest {
 		StudyBean studyBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(studyBean.getStatus().equals(Status.DELETED));
 
-		studyService.restoreStudy(studyBean, currentStudyBean, currentUserRole, userAccountBean);
+		studyService.restoreStudy(studyBean, userAccountBean);
 		studyBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(studyBean.getStatus().equals(Status.AVAILABLE));
 	}
@@ -78,7 +73,7 @@ public class StudyServiceTest extends DefaultAppContextTest {
 		StudyBean studyBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(studyBean.getStatus().equals(Status.AVAILABLE));
 
-		studyService.removeStudy(studyBean, currentStudyBean, currentUserRole, userAccountBean);
+		studyService.removeStudy(studyBean, userAccountBean);
 		studyBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(studyBean.getStatus().equals(Status.DELETED));
 	}
@@ -91,7 +86,7 @@ public class StudyServiceTest extends DefaultAppContextTest {
 		StudyBean siteBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(siteBean.getStatus().equals(Status.DELETED));
 
-		studyService.restoreStudy(siteBean, currentStudyBean, currentUserRole, userAccountBean);
+		studyService.restoreStudy(siteBean, userAccountBean);
 		siteBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(siteBean.getStatus().equals(Status.AVAILABLE));
 	}
@@ -104,7 +99,7 @@ public class StudyServiceTest extends DefaultAppContextTest {
 		StudyBean siteBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(siteBean.getStatus().equals(Status.AVAILABLE));
 
-		studyService.removeStudy(siteBean, currentStudyBean, currentUserRole, userAccountBean);
+		studyService.removeStudy(siteBean, userAccountBean);
 		siteBean = (StudyBean) studyDAO.findByPK(study.getId());
 		assertTrue(siteBean.getStatus().equals(Status.DELETED));
 	}

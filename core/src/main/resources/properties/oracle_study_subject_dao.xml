@@ -211,6 +211,15 @@
 		</sql>
 	</query>
     <query>
+        <name>findAllByStudyOnly</name>
+        <sql>
+            SELECT ss.*
+            FROM study_subject ss, study st
+            WHERE ss.study_id = st.study_id
+            AND st.study_id=?
+        </sql>
+    </query>
+    <query>
         <name>findAllWithAllStatesByStudyId</name>
         <sql>
             SELECT  s.unique_identifier, s.gender, ss.*, stu.name
@@ -261,7 +270,7 @@
             UPDATE study_subject SET LABEL=?,  SUBJECT_ID=?,  STUDY_ID=?,
             STATUS_ID=?, ENROLLMENT_DATE=?, DATE_UPDATED=?,
             UPDATE_ID=?, SECONDARY_LABEL=?, DYNAMIC_GROUP_CLASS_ID=?,
-            RANDOMIZATION_DATE=?, RANDOMIZATION_RESULT=? WHERE STUDY_SUBJECT_ID=?
+            RANDOMIZATION_DATE=?, RANDOMIZATION_RESULT=?, OLD_STATUS_ID=?, STATES=? WHERE STUDY_SUBJECT_ID=?
         </sql>
     </query>
 	<query>

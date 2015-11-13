@@ -3,15 +3,18 @@ package com.clinovo.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -29,31 +32,122 @@ import com.clinovo.service.DatasetService;
  * Implementation of DatasetService interface.
  */
 @Service("datasetService")
-@SuppressWarnings({"rawtypes", "unused"})
+@SuppressWarnings({"rawtypes", "unused", "unchecked"})
 public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
-	private DataSource ds;
+	private DataSource dataSource;
 
 	@Autowired
 	private CRFMaskingService maskingService;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public DatasetBean create(DatasetBean datasetBean) {
-		DatasetDAO datasetDAO = new DatasetDAO(ds);
-		return (DatasetBean) datasetDAO.create(datasetBean);
+	private DatasetDAO getDatasetDAO() {
+		return new DatasetDAO(dataSource);
+	}
+
+	private void disableDataset(DatasetBean datasetBean, UserAccountBean updater, Status status) throws Exception {
+		datasetBean.setStatus(status);
+		datasetBean.setUpdater(updater);
+		datasetBean.setUpdatedDate(new Date());
+		getDatasetDAO().update(datasetBean);
+	}
+
+	private void enableDataset(DatasetBean datasetBean, UserAccountBean updater) throws Exception {
+		datasetBean.setUpdater(updater);
+		datasetBean.setUpdatedDate(new Date());
+		datasetBean.setStatus(Status.AVAILABLE);
+		getDatasetDAO().update(datasetBean);
+	}
+
+	private void disableDatasets(StudyBean studyBean, UserAccountBean updater, Status status) throws Exception {
+		List<DatasetBean> datasetBeanList = getDatasetDAO().findAllByStudyId(studyBean);
+		for (DatasetBean datasetBean : datasetBeanList) {
+			if (datasetBean.getStatus().isAvailable()) {
+				disableDataset(datasetBean, updater, status);
+			}
+		}
+	}
+
+	private void enableDatasets(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		List<DatasetBean> datasetBeanList = getDatasetDAO().findAllByStudyId(studyBean);
+		for (DatasetBean datasetBean : datasetBeanList) {
+			if (datasetBean.getStudyBean().getStatus().isAvailable()
+					&& (datasetBean.getStatus().isLocked() || datasetBean.getStatus().isAutoDeleted())) {
+				enableDataset(datasetBean, updater);
+			}
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	public void removeDataset(DatasetBean datasetBean, UserAccountBean updater) throws Exception {
+		disableDataset(datasetBean, updater, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreDataset(DatasetBean datasetBean, UserAccountBean updater) throws Exception {
+		enableDataset(datasetBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockDataset(DatasetBean datasetBean, UserAccountBean updater) throws Exception {
+		disableDataset(datasetBean, updater, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockDataset(DatasetBean datasetBean, UserAccountBean updater) throws Exception {
+		enableDataset(datasetBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeDatasets(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableDatasets(studyBean, updater, Status.AUTO_DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreDatasets(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableDatasets(studyBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockDatasets(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableDatasets(studyBean, updater, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockDatasets(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableDatasets(studyBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public DatasetBean create(DatasetBean datasetBean) {
+		return (DatasetBean) new DatasetDAO(dataSource).create(datasetBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public DatasetBean initialDatasetData(int datasetId, UserAccountBean ub) {
-		ItemDAO idao = new ItemDAO(ds);
+		ItemDAO idao = new ItemDAO(dataSource);
 		DatasetDAO datasetDAO = getDatasetDao();
 		DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(datasetId);
 		List<String> excludeItems = new ArrayList<String>();
@@ -140,7 +234,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (ub != null) {
 			int crfId = (Integer) map.get("crf_id");
 			int sedId = (Integer) map.get("sed_id");
-			EventDefinitionCRFDAO edcDao = new EventDefinitionCRFDAO(ds);
+			EventDefinitionCRFDAO edcDao = new EventDefinitionCRFDAO(dataSource);
 			EventDefinitionCRFBean edcBean = edcDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sedId, crfId,
 					ub.getActiveStudyId());
 			return maskingService.isEventDefinitionCRFMasked(edcBean.getId(), ub.getId(), ub.getActiveStudyId());
@@ -149,6 +243,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private DatasetDAO getDatasetDao() {
-		return new DatasetDAO(ds);
+		return new DatasetDAO(dataSource);
 	}
 }

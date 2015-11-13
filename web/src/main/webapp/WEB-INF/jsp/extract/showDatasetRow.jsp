@@ -38,7 +38,9 @@
 			<td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>	
 		</c:otherwise>
 	</c:choose>
-	
+
+    <c:set value="${currRow.bean.studyBean == null || !currRow.bean.studyBean.status.available}" var="viewModeOnly"/>
+
 	<%-- ACTIONS --%>
 	<td class="table_cell">
 	<table border="0" cellpadding="0" cellspacing="0">
@@ -46,7 +48,7 @@
           <c:when test="${userBean.sysAdmin}">
               <tr class="innerTable">
                 <c:choose>
-                    <c:when test='${currRow.bean.status.name == "removed"}'>
+                    <c:when test='${currRow.bean.status.name == "removed" and !viewModeOnly}'>
                         <%-- parts to be added later, look at showUserAccountRow.jsp, tbh --%>
                         <td>
                         	<a href="RestoreDataset?dsId=<c:out value="${currRow.bean.id}"/>"
@@ -68,29 +70,30 @@
                             onclick="setAccessedObjected(this)">
                             <img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6">
                         </a>
-                    </td><td>
-                    <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-                    onclick="setAccessedObjected(this)"><img
-                    name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
-
-                    <td>
-                    <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-                    onclick="setAccessedObjected(this)"><img
-                    name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-                    </td>
-
-                    <td>
-                    <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"
-                    onclick="setAccessedObjected(this)"><img
-                    name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
-                    </td>
+                    <c:if test="${!viewModeOnly}">
+                        <td>
+                        <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
+                        onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
+                        onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
+                        onclick="setAccessedObjected(this)"><img
+                        name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </td>
+                        <td>
+                        <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
+                        onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+                        onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+                        onclick="setAccessedObjected(this)"><img
+                        name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </td>
+                        <td>
+                        <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
+                        onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
+                        onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"
+                        onclick="setAccessedObjected(this)"><img
+                        name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </td>
+                    </c:if>
                     </c:otherwise>
                 </c:choose>
                 </tr>
@@ -98,9 +101,9 @@
           <c:otherwise>
               <tr class="innerTable">
                 <c:choose>
-                    <c:when test='${currRow.bean.status.name == "removed"}'>
+                    <c:when test='${currRow.bean.status.name == "removed" and !viewModeOnly}}'>
                         <c:choose>
-                         <c:when test="${currRow.bean.owner.name == userBean.name}">   
+                         <c:when test="${currRow.bean.owner.name == userBean.name}">
                         <%-- parts to be added later, look at showUserAccountRow.jsp, tbh --%>
                         <td><a href="RestoreDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                             onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
@@ -123,30 +126,33 @@
 	                    data-cc-datasetId="${currRow.bean.id}"
 	                    onclick="setAccessedObjected(this)"><img
                     name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-                    </td><td>
-                    <c:if test="${currRow.bean.owner.name == userBean.name}">
-                    <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
-	                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-	                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-	                    onclick="setAccessedObjected(this)"><img
-                    name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
+                    <c:if test="${!viewModeOnly}">
+                        <td>
+                        <c:if test="${currRow.bean.owner.name == userBean.name}">
+                        <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
+                            onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
+                            onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
+                            onclick="setAccessedObjected(this)"><img
+                        name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </td>
 
-                    <td>
-                    <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
-	                    onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-	                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-	                    onclick="setAccessedObjected(this)"><img
-                    name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-                    </td>
+                        <td>
+                        <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
+                            onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+                            onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+                            onclick="setAccessedObjected(this)"><img
+                        name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </td>
+                        </c:if>
+                        <td>
+                        <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
+                            onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
+                            onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"
+                            onclick="setAccessedObjected(this)"><img
+                        name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </td>
                     </c:if>
-                    <td>
-                    <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
-	                    onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
-	                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"
-	                    onclick="setAccessedObjected(this)"><img
-                    name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
-                    </td>
                     </c:otherwise>
                 </c:choose>
                 </tr>

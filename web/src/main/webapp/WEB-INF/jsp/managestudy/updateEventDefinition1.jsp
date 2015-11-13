@@ -264,11 +264,18 @@
 			                        </td>
 			                    </c:when>
 			                    <c:otherwise>
-			                        <td><a href="RestoreCRFFromDefinition?id=<c:out value="${edc.crfId}"/>"
-			                               onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-			                               onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img
-			                               name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
-			                        </td>
+									<c:choose>
+										<c:when test="${edc.crf.status.available}">
+											<td><a href="RestoreCRFFromDefinition?id=<c:out value="${edc.crfId}"/>"
+												   onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
+												   onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img
+													name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+											</td>
+										</c:when>
+										<c:otherwise>
+											<img src="images/bt_Transparent.gif" border="0" align="left" hspace="6"/>
+										</c:otherwise>
+									</c:choose>
 			                    </c:otherwise>
 			                </c:choose>
 							<c:if test="${edc.id != 0}">

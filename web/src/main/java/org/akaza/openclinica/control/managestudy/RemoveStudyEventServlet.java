@@ -71,9 +71,8 @@ public class RemoveStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
@@ -130,21 +129,17 @@ public class RemoveStudyEventServlet extends Controller {
 				forwardPage(Page.REMOVE_STUDY_EVENT, request, response);
 			} else if ("submit".equalsIgnoreCase(action)) {
 				logger.info("submit to remove the event from study");
-				// remove event from study
 
 				getStudyEventService().removeStudyEvent(event, currentUser);
 
-				String emailBody = new StringBuilder("")
-						.append(respage.getString("the_event"))
-						.append(" ")
-						.append(event.getStudyEventDefinition().getName())
-						.append(" ")
-						.append(respage.getString("has_been_removed_from_the_subject_record_for"))
-						.append(" ")
-						.append(studySub.getLabel())
-						.append(" ")
-						.append(study.isSite(study.getParentStudyId()) ? respage.getString("in_the_site") : respage
-								.getString("in_the_study")).append(" ").append(study.getName()).append(".").toString();
+				String emailBody = new StringBuilder("").append(respage.getString("the_event")).append(" ")
+						.append(event.getStudyEventDefinition().getName()).append(" ")
+						.append(respage.getString("has_been_removed_from_the_subject_record_for")).append(" ")
+						.append(studySub.getLabel()).append(" ")
+						.append(study.isSite(study.getParentStudyId())
+								? respage.getString("in_the_site")
+								: respage.getString("in_the_study"))
+						.append(" ").append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 				request.setAttribute("id", Integer.toString(studySubId));
@@ -157,13 +152,13 @@ public class RemoveStudyEventServlet extends Controller {
 			throws Exception {
 		storePageMessages(request);
 		String id = (String) request.getAttribute("id");
-		String savedUrl = (String) request.getSession().getAttribute(
-				ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
+		String savedUrl = (String) request.getSession()
+				.getAttribute(ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
 		if (savedUrl != null && savedUrl.contains("id=" + id)) {
 			response.sendRedirect(savedUrl);
 		} else {
-			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-					+ id);
+			response.sendRedirect(
+					request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + id);
 		}
 	}
 
@@ -177,7 +172,8 @@ public class RemoveStudyEventServlet extends Controller {
 	 *            The list of event definition CRFs for this study event.
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
-	private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs, HttpServletRequest request) {
+	private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
+			HttpServletRequest request) {
 		ArrayList answer = new ArrayList();
 
 		HashMap definitionsById = new HashMap();
@@ -206,8 +202,8 @@ public class RemoveStudyEventServlet extends Controller {
 			int studyEventId = ecb.getStudyEventId();
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
 
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(
-					new Integer(studyEventDefinitionId));
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById
+					.get(new Integer(studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);

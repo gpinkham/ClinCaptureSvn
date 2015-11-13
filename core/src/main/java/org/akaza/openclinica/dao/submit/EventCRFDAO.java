@@ -166,7 +166,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.BOOL); // sdv_status
 		this.setTypeExpected(ind++, TypeNames.INT); // old_status
 		this.setTypeExpected(ind++, TypeNames.INT); // sdv_update_id
-		this.setTypeExpected(ind, TypeNames.BOOL); // not_started
+		this.setTypeExpected(ind++, TypeNames.BOOL); // not_started
+		this.setTypeExpected(ind, TypeNames.STRING); // states
 
 	}
 
@@ -239,14 +240,10 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(ind++, ecb.isElectronicSignatureStatus());
 
 		variables.put(ind++, ecb.isSdvStatus());
-		if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
-			variables.put(ind++, ecb.getOldStatus().getId());
-		} else {
-			variables.put(ind++, 0);
-		}
+		variables.put(ind++, ecb.getOldStatus().getId());
 		variables.put(ind++, ecb.getSdvUpdateId());
 		variables.put(ind++, ecb.isNotStarted());
-		variables.put(ind++, ecb.getOwnerId());
+		variables.put(ind++, ecb.getStates());
 		variables.put(ind, ecb.getId());
 		this.execute(digester.getQuery("update"), variables, nullVars, con);
 		if (isQuerySuccessful()) {
@@ -372,10 +369,9 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		eb.setValidateString((String) hm.get("validate_string"));
 		eb.setStudySubjectId((Integer) hm.get("study_subject_id"));
 		eb.setSdvStatus((Boolean) hm.get("sdv_status"));
-		Integer oldStatusId = (Integer) hm.get("old_status_id");
-		eb.setOldStatus(Status.get(oldStatusId));
 		eb.setNotStarted((Boolean) hm.get("not_started"));
-
+		eb.setOldStatus(Status.get((Integer) hm.get("old_status_id")));
+		eb.setStates((String) hm.get("states"));
 		return eb;
 	}
 
@@ -2089,8 +2085,187 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Disable event CRF.
+	 *
+	 * @param eventCRFBean
+	 *            EventCRFBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 * @param status
+	 *            Status
+	 */
+	public void disableEventCRF(EventCRFBean eventCRFBean, int updaterId, int position, Status status) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, eventCRFBean.getId());
+		variables.put(ind++, updaterId);
+		variables.put(ind++, position + 1);
+		variables.put(ind, status.getId());
+		execute(digester.getQuery("disableEventCRF"), variables, null, true);
+	}
+
+	/**
+	 * Disable event CRFs by crf version.
+	 *
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 * @param status
+	 *            Status
+	 */
+	public void disableEventCRFsByCRFVersion(CRFVersionBean crfVersionBean, int updaterId, int position,
+			Status status) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, crfVersionBean.getId());
+		variables.put(ind++, updaterId);
+		variables.put(ind++, position + 1);
+		variables.put(ind, status.getId());
+		execute(digester.getQuery("disableEventCRFsByCRFVersion"), variables, null, true);
+	}
+
+	/**
+	 * Disable event CRFs by study event.
+	 *
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 */
+	public void disableEventCRFsByStudyEvent(StudyEventBean studyEventBean, int updaterId, int position) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, studyEventBean.getId());
+		variables.put(ind++, updaterId);
+		variables.put(ind++, position + 1);
+		variables.put(ind, studyEventBean.getStatus().getId());
+		execute(digester.getQuery("disableEventCRFsByStudyEvent"), variables, null, true);
+	}
+
+	/**
+	 * Disable event CRFs by study event and crf oid.
+	 *
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param crfOid
+	 *            String
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 * @param status
+	 *            Status
+	 */
+	public void disableEventCRFsByStudyEventAndCrfOid(StudyEventBean studyEventBean, String crfOid, int updaterId,
+			int position, Status status) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+		variables.put(ind++, studyEventBean.getId());
+		variables.put(ind++, crfOid);
+		variables.put(ind++, updaterId);
+		variables.put(ind++, position + 1);
+		variables.put(ind, status.getId());
+		execute(digester.getQuery("disableEventCRFsByStudyEventAndCrfOid"), variables, null, true);
+	}
+
+	/**
+	 * Enable event CRF.
+	 *
+	 * @param eventCRFBean
+	 *            EventCRFBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 */
+	public void enableEventCRF(EventCRFBean eventCRFBean, int updaterId, int position) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, eventCRFBean.getId());
+		variables.put(ind++, updaterId);
+		variables.put(ind, position + 1);
+		execute(digester.getQuery("enableEventCRF"), variables, null, true);
+	}
+
+	/**
+	 * Enable event CRFs by crf version.
+	 *
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 */
+	public void enableEventCRFsByCRFVersion(CRFVersionBean crfVersionBean, int updaterId, int position) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, crfVersionBean.getId());
+		variables.put(ind++, updaterId);
+		variables.put(ind, position + 1);
+		execute(digester.getQuery("enableEventCRFsByCRFVersion"), variables, null, true);
+	}
+
+	/**
+	 * Enable event CRFs by study event.
+	 *
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 */
+	public void enableEventCRFsByStudyEvent(StudyEventBean studyEventBean, int updaterId, int position) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+		variables.put(ind++, studyEventBean.getId());
+		variables.put(ind++, updaterId);
+		variables.put(ind, position + 1);
+		execute(digester.getQuery("enableEventCRFsByStudyEvent"), variables, null, true);
+	}
+
+	/**
+	 * Enable event CRFs by study event and crf oid.
+	 *
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param updaterId
+	 *            int
+	 * @param position
+	 *            int
+	 */
+	public void enableEventCRFsByStudyEventAndCrfOid(StudyEventBean studyEventBean, String crfOid, int updaterId,
+			int position) {
+		int ind = 1;
+		unsetTypeExpected();
+		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+		variables.put(ind++, studyEventBean.getId());
+		variables.put(ind++, crfOid);
+		variables.put(ind++, updaterId);
+		variables.put(ind, position + 1);
+		execute(digester.getQuery("enableEventCRFsByStudyEventAndCrfOid"), variables, null, true);
+	}
+
+	/**
 	 * Find all eventCrfs by EventDefinitionCRF id.
-	 * @param eventDefinitionCRFId int
+	 * 
+	 * @param eventDefinitionCRFId
+	 *            int
 	 * @return ArrayList<EventCRFBean>
 	 */
 	public ArrayList<EventCRFBean> findAllByEventDefinitionCRFId(int eventDefinitionCRFId) {

@@ -73,7 +73,7 @@
         <!-- Subject Controls section -->
         <td class="table_header_row" style="white-space: nowrap;">
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not viewModeOnly and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudySubject?id=${studySubject.id}&action=show"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_subject" bundle="${resword}"/>" title="<fmt:message key="edit_study_subject" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -85,7 +85,7 @@
             <a href="ViewStudySubject?id=${studySubject.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_subject_record" bundle="${resword}"/>" title="<fmt:message key="view_subject_record" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked and not studySubject.status.signed}">
+                <c:when test="${not viewModeOnly and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked and not studySubject.status.signed}">
                     <c:set var="insertBlankCell" value="true"/>
                     <c:choose>
                         <c:when test="${not studySubject.status.deleted}">
@@ -108,7 +108,7 @@
             <ui:sdvStudySubjectLink studySubject="${studySubject}" studySubjectHasUnclosedDNs="${subjectFlagColor != null}" page="${pageToRender}"/>
 
             <c:choose>
-                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 1 or studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 8 or studyEvent.subjectEventStatus.id eq 9) and userRole.id eq 4 and not study.status.locked and not study.status.pending}">
+                <c:when test="${not viewModeOnly and showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 1 or studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 8 or studyEvent.subjectEventStatus.id eq 9) and userRole.id eq 4 and not study.status.locked and not study.status.pending}">
                     <c:set var="hideCol6" value="false"/>
                     <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject" bundle="${resword}"/>" title="<fmt:message key="sign_subject" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -118,7 +118,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not viewModeOnly and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol7" value="false"/>
                     <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -126,13 +126,14 @@
                     <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
                 </c:otherwise>
             </c:choose>
+
 			<c:choose>
-             	<c:when test="${subjectFlagColor eq 'yellow'}">
+             	<c:when test="${not viewModeOnly and subjectFlagColor eq 'yellow'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
                  		   <img src="images/icon_flagYellow.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             	</c:when>
-            	<c:when test="${subjectFlagColor eq 'red'}">
+            	<c:when test="${not viewModeOnly and subjectFlagColor eq 'red'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=New">
                  		   <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
@@ -158,7 +159,7 @@
         <td class="table_header_row" style="white-space: nowrap;">
 
             <c:choose>
-                <c:when test="${not(studyEvent.subjectEventStatus.id eq 7 and (userRole.id eq 4 or userRole.id eq 5 or userRole.id eq 6 or userRole.id eq 7 or userRole.role.id eq 9)) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not viewModeOnly and not(studyEvent.subjectEventStatus.id eq 7 and (userRole.id eq 4 or userRole.id eq 5 or userRole.id eq 6 or userRole.id eq 7 or userRole.role.id eq 9)) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -170,7 +171,7 @@
             <a href="EnterDataForStudyEvent?eventId=${studyEvent.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_study_event" bundle="${resword}"/>" title="<fmt:message key="view_study_event" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not viewModeOnly and not studyEvent.status.locked and not studySubject.status.deleted and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and not study.status.frozen and not study.status.locked}">
                     <c:choose>
                         <c:when test="${studyEvent.subjectEventStatus.id ne 10}">
                             <c:set var="hideCol3" value="false"/>
@@ -190,7 +191,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 9 or userRole.role.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not viewModeOnly and showSDVButton and not studySubject.status.deleted and !studyEvent.subjectEventStatus.stopped and !studyEvent.subjectEventStatus.skipped and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 9 or userRole.role.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol5" value="false"/>
                     <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -198,8 +199,9 @@
                     <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
                 </c:otherwise>
             </c:choose>
+
             <c:choose>
-                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and userRole.id eq 4 and not study.status.locked and not study.status.pending}">
+                <c:when test="${not viewModeOnly and showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and userRole.id eq 4 and not study.status.locked and not study.status.pending}">
                     <c:set var="hideCol6" value="false"/>
                     <c:set var="signUrl" value="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate="/>
 	                    <c:if test="${study.studyParameterConfig.startDateTimeRequired != 'not_used'}">
@@ -257,12 +259,12 @@
 
             <!-- View DNs icons -->
             <c:choose>
-             	<c:when test="${eventFlagColor eq 'yellow'}">
+             	<c:when test="${not viewModeOnly and eventFlagColor eq 'yellow'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_eventName=${studyEventName}&listNotes_f_studySubject.label=${studySubject.label}">
                  		   <img src="images/icon_flagYellow.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             	</c:when>
-            	<c:when test="${eventFlagColor eq 'red'}">
+            	<c:when test="${not viewModeOnly and eventFlagColor eq 'red'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=New&listNotes_f_eventName=${studyEventName}&listNotes_f_studySubject.label=${studySubject.label}">
                  		   <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
@@ -401,7 +403,7 @@
 
                                 <td class="table_cell_left" style="vertical-align: middle;">
                                     <c:choose>
-                                        <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
+                                        <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped  || studyEvent.subjectEventStatus.stopped}">
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>

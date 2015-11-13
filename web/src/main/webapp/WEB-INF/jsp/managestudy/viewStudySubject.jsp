@@ -184,7 +184,7 @@
 							<td class="table_tools">
 								<table>
 									<td style="white-space: nowrap;">
-									<c:if test="${study.status.available}">
+									<c:if test="${not viewModeOnly and study.status.available}">
 										<c:if test="${userRole.role.id ne 6 and userRole.role.id ne 9}">
 											<a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show" onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
 													onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');">
@@ -193,10 +193,10 @@
 										</c:if>
 									</c:if>
 									<c:choose>
-										<c:when test="${showUnlockEventsButton}">
+										<c:when test="${not viewModeOnly and showUnlockEventsButton}">
 											<a href="LockStudySubject?id=${studySub.id}&action=unlock"><img src="images/bt__Unlock.png" border="0" alt="<fmt:message key="unlockStudySubject" bundle="${resword}"/>" title="<fmt:message key="unlockStudySubject" bundle="${resword}"/>" hspace="4"></a>
 										</c:when>
-										<c:when test="${showLockEventsButton}">
+										<c:when test="${not viewModeOnly and showLockEventsButton}">
 											<a href="LockStudySubject?id=${studySub.id}&action=lock"><img src="images/bt__Lock.png" border="0" alt="<fmt:message key="lockStudySubject" bundle="${resword}"/>" title="<fmt:message key="lockStudySubject" bundle="${resword}"/>" hspace="4"></a>
 										</c:when>
 									</c:choose>

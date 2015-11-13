@@ -20,30 +20,26 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
-
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -51,7 +47,7 @@ import java.util.Map;
  * 
  */
 @Component
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 public class RestoreCRFVersionServlet extends Controller {
 
 	private static final String CRF_VERSION_ID_PARAMETER = "id";
@@ -70,9 +66,8 @@ public class RestoreCRFVersionServlet extends Controller {
 		if (userCanRestoreCRFVersion(request)) {
 			return;
 		}
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
 
@@ -100,7 +95,6 @@ public class RestoreCRFVersionServlet extends Controller {
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
 		EventCRFDAO evdao;
-		SectionDAO secdao;
 		List<EventCRFBean> eventCRFs;
 
 		if (version.getId() != 0 && !StringUtil.isBlank(action)) {
@@ -111,9 +105,8 @@ public class RestoreCRFVersionServlet extends Controller {
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 				if (!userCanRestoreCRFVersion(request)) {
-					addPageMessage(
-							respage.getString("no_have_correct_privilege_current_study") + " "
-									+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
@@ -122,30 +115,12 @@ public class RestoreCRFVersionServlet extends Controller {
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.RESTORE_CRF_VERSION, request, response);
 				return;
-			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
-					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
+			} else
+				if (ACTION_SUBMIT.equalsIgnoreCase(action)
+						&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
 				logger.info("submit to restore the crf version");
-				// version
-				version.setStatus(Status.AVAILABLE);
-				version.setUpdater(currentUser);
-				version.setUpdatedDate(new Date());
-				cvdao.update(version);
 
-				secdao = getSectionDAO();
-				List<SectionBean> sections = secdao.findAllByCRFVersionId(version.getId());
-				for (SectionBean section : sections) {
-					if (section.getStatus().equals(Status.AUTO_DELETED)) {
-						section.setStatus(Status.AVAILABLE);
-						section.setUpdater(currentUser);
-						section.setUpdatedDate(new Date());
-						secdao.update(section);
-					}
-				}
-
-				getEventCRFService().restoreEventCRFsFromAutoRemovedState(eventCRFs, currentUser);
-
-				// Restore coded items
-				getCodedItemService().restoreByCRFVersion(versionId);
+				getCrfVersionService().restoreCrfVersion(version, currentUser);
 
 				addPageMessage(
 						new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())

@@ -30,6 +30,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -87,176 +88,6 @@ public class EventCRFServiceImpl implements EventCRFService {
 		return new StudySubjectDAO(dataSource);
 	}
 
-	private void remove(EventCRFBean eventCRF, Status crfStatusToSet, UserAccountBean updater) throws Exception {
-
-		if (!eventCRF.getStatus().isDeleted()) {
-
-			if (!eventCRF.getStatus().isLocked()) {
-				eventCRF.setOldStatus(eventCRF.getStatus());
-			}
-			eventCRF.setStatus(crfStatusToSet);
-			eventCRF.setUpdater(updater);
-			eventCRF.setUpdatedDate(new Date());
-			getEventCRFDAO().update(eventCRF);
-
-			itemDataService.removeItemDataByEventCRF(eventCRF, updater);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
-
-		remove(eventCRF, Status.DELETED, updater);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeEventCRFsByStudyEvent(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
-
-		List<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) getEventCRFDAO().findAllByStudyEvent(studyEvent);
-		setEventCRFsToAutoRemovedState(eventCRFs, updater);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setEventCRFsToAutoRemovedState(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception {
-
-		for (EventCRFBean eventCRF : eventCRFs) {
-			remove(eventCRF, Status.AUTO_DELETED, updater);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID,
-			UserAccountBean updater) throws Exception {
-
-		List<StudyEventBean> studyEventsToUpdate = getStudyEventDAO().findAllByStudyEventDefinitionAndCrfOids(
-				studyEventDefinitionOID, crfOID);
-
-		for (StudyEventBean studyEvent : studyEventsToUpdate) {
-			List<EventCRFBean> eventCRFsToRemove = getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(
-					studyEvent, crfOID);
-			setEventCRFsToAutoRemovedState(eventCRFsToRemove, updater);
-		}
-	}
-
-	private void restore(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
-
-		eventCRF.setStatus(eventCRF.getOldStatus());
-		eventCRF.setUpdater(updater);
-		eventCRF.setUpdatedDate(new Date());
-		eventCRF.setSdvStatus(false);
-		eventCRF.setElectronicSignatureStatus(false);
-		getEventCRFDAO().update(eventCRF);
-
-		itemDataService.restoreItemDataByEventCRF(eventCRF, updater);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void updateStudyEventStatus(EventCRFBean eventCRF, UserAccountBean updater) {
-		StudyEventDAO studyEventDao = getStudyEventDAO();
-		StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(eventCRF.getStudyEventId());
-		studyEventBean.setUpdater(updater);
-		studyEventBean.setUpdatedDate(new Date());
-		studyEventBean.setStatus(Status.AVAILABLE);
-		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(dataSource));
-		studyEventDao.update(studyEventBean);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void restoreEventCRF(EventCRFBean eventCRF, UserAccountBean updater) throws Exception {
-		if (eventCRF.getStatus().isDeleted()) {
-			restore(eventCRF, updater);
-			updateStudyEventStatus(eventCRF, updater);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void restoreEventCRFsByStudyEvent(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
-
-		List<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) getEventCRFDAO().findAllByStudyEvent(studyEvent);
-		restoreEventCRFsFromAutoRemovedState(eventCRFs, updater);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void restoreEventCRFsFromAutoRemovedState(List<EventCRFBean> eventCRFs, UserAccountBean updater)
-			throws Exception {
-
-		for (EventCRFBean eventCRF : eventCRFs) {
-			if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-				restore(eventCRF, updater);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void restoreEventCRFsByEventDefinitionCRF(String studyEventDefinitionOID, String crfOID,
-			UserAccountBean updater) throws Exception {
-
-		List<StudyEventBean> studyEventsToUpdate = getStudyEventDAO().findAllByStudyEventDefinitionAndCrfOids(
-				studyEventDefinitionOID, crfOID);
-
-		for (StudyEventBean studyEvent : studyEventsToUpdate) {
-			List<EventCRFBean> eventCRFsToRestore = getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(
-					studyEvent, crfOID);
-			restoreEventCRFsFromAutoRemovedState(eventCRFsToRestore, updater);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public EventCRFBean getNextEventCRFForDataEntry(StudyEventBean currentStudyEventBean,
-			EventDefinitionCRFBean currentEventDefCRF, UserAccountBean currentUser, StudyUserRoleBean currentUserRole,
-			StudyBean currentStudy) {
-		StudyEventDefinitionBean currentStudyEventDefinition = getStudyEventDefinitionDAO().findByEventDefinitionCRFId(
-				currentEventDefCRF.getId());
-		Collection<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionCRFDAO()
-				.findAllActiveByEventDefinitionId(currentStudy, currentStudyEventDefinition.getId());
-		EventCRFBean eventCRF = getNextCrfAvailableForDataEntry(currentStudy, currentStudyEventBean,
-				currentEventDefCRF, currentUser, currentUserRole, eventDefinitionCRFs);
-		if (eventCRF != null) {
-			eventCRF.setStudyEventBean(currentStudyEventBean);
-			return eventCRF;
-		}
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<EventCRFBean> getAllStartedEventCRFsWithStudyAndEventName(List<EventCRFBean> eventCRFBeans) {
-		List<EventCRFBean> startedList = new ArrayList<EventCRFBean>();
-
-		for (EventCRFBean eventCRF : eventCRFBeans) {
-			if (eventCRF.isNotStarted()) {
-				continue;
-			}
-			StudySubjectBean subjectBean = (StudySubjectBean) getStudySubjectDAO().findByPK(eventCRF.getStudySubjectId());
-			eventCRF.setStudySubjectName(subjectBean.getName());
-			StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(subjectBean.getStudyId());
-			eventCRF.setStudyName(studyBean.getName());
-			startedList.add(eventCRF);
-		}
-		return startedList;
-	}
-
 	private EventCRFBean getNextCrfAvailableForDataEntry(StudyBean currentStudy, StudyEventBean currentStudyEvent,
 			EventDefinitionCRFBean currentEventDefinitionCRF, UserAccountBean currentUser,
 			StudyUserRoleBean currentUserRole, Collection<EventDefinitionCRFBean> eventDefinitionCRFs) {
@@ -267,8 +98,9 @@ public class EventCRFServiceImpl implements EventCRFService {
 			if (currentStudy.isSite() && edcBean.isHideCrf()) {
 				continue;
 			}
-			int studyId = currentEventDefinitionCRF == null ? getStudyDAO().findByStudySubjectId(
-					currentStudyEvent.getStudySubjectId()).getId() : currentEventDefinitionCRF.getStudyId();
+			int studyId = currentEventDefinitionCRF == null
+					? getStudyDAO().findByStudySubjectId(currentStudyEvent.getStudySubjectId()).getId()
+					: currentEventDefinitionCRF.getStudyId();
 			int eventDefinitionCRFId = edcBean.getId();
 			if (studyId != currentStudy.getId()) {
 				eventDefinitionCRFId = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
@@ -320,5 +152,326 @@ public class EventCRFServiceImpl implements EventCRFService {
 			}
 		}
 		return null;
+	}
+
+	private void deleteEventCrf(EventCRFBean eventCrf, UserAccountBean updater) throws Exception {
+		itemDataService.deleteItemData(eventCrf, updater);
+		EventCRFDAO eventCrfDao = getEventCRFDAO();
+		eventCrfDao.deleteEventCRFDNMap(eventCrf.getId());
+		eventCrf.setUpdater(updater);
+		eventCrfDao.update(eventCrf);
+		eventCrfDao.delete(eventCrf.getId());
+
+	}
+
+	private void disableEventCrf(EventCRFBean eventCrf, UserAccountBean updater, int position, Status status)
+			throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		if (eventCRFDao.dbIsOracle()) {
+			// This action affects performance especially during an action on site / study. That's why for postgres we
+			// use the stored function that is much faster.
+			eventCrf.applyState(position, status, updater);
+			getEventCRFDAO().update(eventCrf);
+			itemDataService.updateItemDataStates(eventCrf, updater);
+		} else {
+			eventCRFDao.disableEventCRF(eventCrf, updater.getId(), position, status);
+		}
+	}
+
+	private void enableEventCrf(EventCRFBean eventCrf, UserAccountBean updater, int position) throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		if (eventCRFDao.dbIsOracle()) {
+			// This action affects performance especially during an action on site / study. That's why for postgres we
+			// use the stored function that is much faster.
+			eventCrf.revertState(position, updater);
+			getEventCRFDAO().update(eventCrf);
+			itemDataService.updateItemDataStates(eventCrf, updater);
+		} else {
+			eventCRFDao.enableEventCRF(eventCrf, updater.getId(), position);
+		}
+	}
+
+	private void disableEventCrfBeans(String studyEventDefinitionOID, String crfOID, UserAccountBean updater,
+			Status status) throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		List<StudyEventBean> studyEventsToUpdate = getStudyEventDAO()
+				.findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOID, crfOID);
+		for (StudyEventBean studyEvent : studyEventsToUpdate) {
+			if (eventCRFDao.dbIsOracle()) {
+				// This action affects performance especially during an action on site / study. That's why for postgres
+				// we use the stored function that is much faster.
+				disableEventCrfBeans(getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent, crfOID),
+						updater, EventCRFBean.BY_EVENT_DEFINITION_CRF, status);
+			} else {
+				eventCRFDao.disableEventCRFsByStudyEventAndCrfOid(studyEvent, crfOID, updater.getId(),
+						EventCRFBean.BY_EVENT_DEFINITION_CRF, status);
+			}
+		}
+	}
+
+	private void enableEventCrfBeans(String studyEventDefinitionOID, String crfOID, UserAccountBean updater)
+			throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		List<StudyEventBean> studyEventsToUpdate = getStudyEventDAO()
+				.findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOID, crfOID);
+		for (StudyEventBean studyEvent : studyEventsToUpdate) {
+			if (eventCRFDao.dbIsOracle()) {
+				// This action affects performance especially during an action on site / study. That's why for postgres
+				// we use the stored function that is much faster.
+				enableEventCrfBeans(getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent, crfOID),
+						updater, EventCRFBean.BY_EVENT_DEFINITION_CRF);
+			} else {
+				eventCRFDao.enableEventCRFsByStudyEventAndCrfOid(studyEvent, crfOID, updater.getId(),
+						EventCRFBean.BY_EVENT_DEFINITION_CRF);
+			}
+		}
+	}
+
+	private void disableEventCrfBeans(CRFVersionBean crfVersionBean, UserAccountBean updater, Status status)
+			throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		if (eventCRFDao.dbIsOracle()) {
+			// This action affects performance especially during an action on site / study. That's why for postgres we
+			// use the stored function that is much faster.
+			List<EventCRFBean> eventCrfBeanList = getEventCRFDAO().findAllByCRFVersion(crfVersionBean.getId());
+			for (EventCRFBean eventCrfBean : eventCrfBeanList) {
+				disableEventCrf(eventCrfBean, updater, EventCRFBean.BY_CRF_VERSION, status);
+			}
+		} else {
+			eventCRFDao.disableEventCRFsByCRFVersion(crfVersionBean, updater.getId(), EventCRFBean.BY_CRF_VERSION,
+					status);
+		}
+	}
+
+	private void enableEventCrfBeans(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		if (eventCRFDao.dbIsOracle()) {
+			// This action affects performance especially during an action on site / study. That's why for postgres we
+			// use the stored function that is much faster.
+			List<EventCRFBean> eventCrfBeanList = getEventCRFDAO().findAllByCRFVersion(crfVersionBean.getId());
+			for (EventCRFBean eventCrfBean : eventCrfBeanList) {
+				enableEventCrf(eventCrfBean, updater, EventCRFBean.BY_CRF_VERSION);
+			}
+		} else {
+			eventCRFDao.enableEventCRFsByCRFVersion(crfVersionBean, updater.getId(), EventCRFBean.BY_CRF_VERSION);
+		}
+	}
+
+	private void disableEventCrfBeans(List<EventCRFBean> eventCrfBeanList, UserAccountBean updater, int position,
+			Status status) throws Exception {
+		for (EventCRFBean eventCrfBean : eventCrfBeanList) {
+			disableEventCrf(eventCrfBean, updater, position, status);
+		}
+	}
+
+	private void enableEventCrfBeans(List<EventCRFBean> eventCrfBeanList, UserAccountBean updater, int position)
+			throws Exception {
+		for (EventCRFBean eventCrfBean : eventCrfBeanList) {
+			enableEventCrf(eventCrfBean, updater, position);
+		}
+	}
+
+	private void disableEventCRFs(StudyEventBean studyEvent, UserAccountBean updater, Status status) throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		if (eventCRFDao.dbIsOracle()) {
+			// This action affects performance especially during an action on site / study. That's why for postgres we
+			// use the stored function that is much faster.
+			disableEventCrfBeans((List<EventCRFBean>) getEventCRFDAO().findAllByStudyEvent(studyEvent), updater,
+					EventCRFBean.BY_STUDY_EVENT, status);
+		} else {
+			eventCRFDao.disableEventCRFsByStudyEvent(studyEvent, updater.getId(), EventCRFBean.BY_STUDY_EVENT);
+		}
+	}
+
+	private void enableEventCRFs(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
+		EventCRFDAO eventCRFDao = getEventCRFDAO();
+		if (eventCRFDao.dbIsOracle()) {
+			// This action affects performance especially during an action on site / study. That's why for postgres we
+			// use the stored function that is much faster.
+			enableEventCrfBeans((List<EventCRFBean>) getEventCRFDAO().findAllByStudyEvent(studyEvent), updater,
+					EventCRFBean.BY_STUDY_EVENT);
+		} else {
+			eventCRFDao.enableEventCRFsByStudyEvent(studyEvent, updater.getId(), EventCRFBean.BY_STUDY_EVENT);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteEventCRF(EventCRFBean eventCrf, UserAccountBean updater) throws Exception {
+		deleteEventCrf(eventCrf, updater);
+		updateStudyEventStatus(eventCrf, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeEventCRF(EventCRFBean eventCrf, UserAccountBean updater) throws Exception {
+		disableEventCrf(eventCrf, updater, EventCRFBean.BY_ITSELF, Status.DELETED);
+		updateStudyEventStatus(eventCrf, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventCRF(EventCRFBean eventCrf, UserAccountBean updater) throws Exception {
+		enableEventCrf(eventCrf, updater, EventCRFBean.BY_ITSELF);
+		updateStudyEventStatus(eventCrf, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeEventCRFs(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
+		disableEventCRFs(studyEvent, updater, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventCRFs(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
+		enableEventCRFs(studyEvent, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockEventCRFs(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
+		disableEventCRFs(studyEvent, updater, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockEventCRFs(StudyEventBean studyEvent, UserAccountBean updater) throws Exception {
+		enableEventCRFs(studyEvent, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeEventCRFs(String studyEventDefinitionOID, String crfOID, UserAccountBean updater)
+			throws Exception {
+		disableEventCrfBeans(studyEventDefinitionOID, crfOID, updater, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventCRFs(String studyEventDefinitionOID, String crfOID, UserAccountBean updater)
+			throws Exception {
+		enableEventCrfBeans(studyEventDefinitionOID, crfOID, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeEventCRFs(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception {
+		disableEventCrfBeans(eventCRFs, updater, EventCRFBean.BY_ITSELF, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventCRFs(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception {
+		enableEventCrfBeans(eventCRFs, updater, EventCRFBean.BY_ITSELF);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockEventCRFs(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception {
+		disableEventCrfBeans(eventCRFs, updater, EventCRFBean.BY_ITSELF, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockEventCRFs(List<EventCRFBean> eventCRFs, UserAccountBean updater) throws Exception {
+		enableEventCrfBeans(eventCRFs, updater, EventCRFBean.BY_ITSELF);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeEventCRFs(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception {
+		disableEventCrfBeans(crfVersionBean, updater, Status.DELETED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreEventCRFs(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception {
+		enableEventCrfBeans(crfVersionBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockEventCRFs(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception {
+		disableEventCrfBeans(crfVersionBean, updater, Status.LOCKED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockEventCRFs(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception {
+		enableEventCrfBeans(crfVersionBean, updater);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateStudyEventStatus(EventCRFBean eventCRF, UserAccountBean updater) {
+		StudyEventDAO studyEventDao = getStudyEventDAO();
+		StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(eventCRF.getStudyEventId());
+		if (!studyEventBean.getSubjectEventStatus().isSkipped() && !studyEventBean.getSubjectEventStatus().isStopped()
+				&& !studyEventBean.getSubjectEventStatus().isRemoved()
+				&& !studyEventBean.getSubjectEventStatus().isLocked()) {
+			studyEventBean.setUpdater(updater);
+			studyEventBean.setUpdatedDate(new Date());
+			studyEventBean.setStatus(Status.AVAILABLE);
+			SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(dataSource));
+			studyEventDao.update(studyEventBean);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public EventCRFBean getNextEventCRFForDataEntry(StudyEventBean currentStudyEventBean,
+			EventDefinitionCRFBean currentEventDefCRF, UserAccountBean currentUser, StudyUserRoleBean currentUserRole,
+			StudyBean currentStudy) {
+		StudyEventDefinitionBean currentStudyEventDefinition = getStudyEventDefinitionDAO()
+				.findByEventDefinitionCRFId(currentEventDefCRF.getId());
+		Collection<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionCRFDAO()
+				.findAllActiveByEventDefinitionId(currentStudy, currentStudyEventDefinition.getId());
+		EventCRFBean eventCRF = getNextCrfAvailableForDataEntry(currentStudy, currentStudyEventBean, currentEventDefCRF,
+				currentUser, currentUserRole, eventDefinitionCRFs);
+		if (eventCRF != null) {
+			eventCRF.setStudyEventBean(currentStudyEventBean);
+			return eventCRF;
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<EventCRFBean> getAllStartedEventCRFsWithStudyAndEventName(List<EventCRFBean> eventCRFBeans) {
+		List<EventCRFBean> startedList = new ArrayList<EventCRFBean>();
+
+		for (EventCRFBean eventCRF : eventCRFBeans) {
+			if (eventCRF.isNotStarted()) {
+				continue;
+			}
+			StudySubjectBean subjectBean = (StudySubjectBean) getStudySubjectDAO()
+					.findByPK(eventCRF.getStudySubjectId());
+			eventCRF.setStudySubjectName(subjectBean.getName());
+			StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(subjectBean.getStudyId());
+			eventCRF.setStudyName(studyBean.getName());
+			startedList.add(eventCRF);
+		}
+		return startedList;
 	}
 }

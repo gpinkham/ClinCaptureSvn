@@ -20,12 +20,9 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.EmailUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -38,7 +35,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.EmailEngine;
@@ -50,11 +46,12 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.EmailUtil;
 
 /**
  * Removes an Event CRF.
@@ -80,9 +77,8 @@ public class RemoveEventCRFServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
@@ -148,19 +144,13 @@ public class RemoveEventCRFServlet extends Controller {
 			dec.setEventCRF(eventCRF);
 			dec.setFlags(eventCRF, currentUser, currentRole, edc);
 
-			// find all item data
-			ItemDataDAO iddao = getItemDataDAO();
-
-			ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRF.getId());
-
-			request.setAttribute("items", itemData);
+			request.setAttribute("items", getItemDataDAO().findAllByEventCRFId(eventCRF.getId()));
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (eventCRF.getStatus().isDeleted()) {
-					addPageMessage(
-							respage.getString("this_event_CRF_is_removed_for_this_study") + " "
-									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(respage.getString("this_event_CRF_is_removed_for_this_study") + " "
+							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 					return;
@@ -174,16 +164,15 @@ public class RemoveEventCRFServlet extends Controller {
 
 				getEventCRFService().removeEventCRF(eventCRF, currentUser);
 
-				String messageBody = respage.getString("the_event_CRF") + " "
-						+ cb.getName() + " " + respage.getString("has_been_removed_from_the_event")
+				String messageBody = respage.getString("the_event_CRF") + " " + cb.getName() + " "
+						+ respage.getString("has_been_removed_from_the_event")
 						+ event.getStudyEventDefinition().getName() + ".";
 				addPageMessage(messageBody, request);
-				String emailBody = EmailUtil.getEmailBodyStart()
-						+ messageBody + "<br/><ul>"
+				String emailBody = EmailUtil.getEmailBodyStart() + messageBody + "<br/><ul>"
 						+ resword.getString("job_error_mail.serverUrl") + " " + SQLInitServlet.getSystemURL() + "</li>"
-						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>"
-						+ "<li><b>" + resword.getString("mail.removed_by") + ":</b> " + currentUser.getName() + "</li>"
-						+ "<li><b>" + resword.getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
+						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>" + "<li><b>"
+						+ resword.getString("mail.removed_by") + ":</b> " + currentUser.getName() + "</li>" + "<li><b>"
+						+ resword.getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
 						+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(getLocale());
 				String emailHeader = respage.getString("remove_event_CRF_from_event") + " "
 						+ resword.getString("subject") + ": " + studySub.getLabel();
@@ -208,8 +197,7 @@ public class RemoveEventCRFServlet extends Controller {
 		// to study director
 
 		sendEmail(ub.getEmail().trim(), emailHeader, emailBody, false, request);
-		sendEmail(EmailEngine.getAdminEmail(), emailHeader, emailBody, false,
-				request);
+		sendEmail(EmailEngine.getAdminEmail(), emailHeader, emailBody, false, request);
 		logger.info("Sending email done..");
 	}
 

@@ -42,13 +42,13 @@
 			</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
-		</tr>
+            <td>&nbsp;</td>
+        </tr>
 
-		<c:if test="${(!studySub.status.deleted && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available) and userRole.id ne 6 and userRole.id ne 9}">
-			<tr class="innerTable">
-				<td>
-					<a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
+        <c:if test="${not viewModeOnly and (!studySub.status.deleted && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available) and userRole.id ne 6 and userRole.id ne 9}">
+            <tr class="innerTable">
+                <td>
+                    <a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
 					   onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 					   onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
 					   onclick="setAccessedObjectWithRowspans(this)"><img
@@ -64,47 +64,48 @@
 
 		<tr class="innerTable">
 			<td>
-				<c:choose>
-				<c:when test="${!currRow.bean.studyEvent.status.deleted}">
-				<c:if test="${userRole.manageStudy && study.status.available}">
-				<a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-				   onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-				   onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-				   onclick="setAccessedObjectWithRowspans(this)"><img
-						name="bt_Remove1" src="images/bt_Remove.gif" border="0"
-						alt="<fmt:message key="remove" bundle="${resword}"/>"
-						title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+				<c:if test="${not viewModeOnly and not currRow.bean.studyEvent.status.locked}">
+					<c:choose>
+						<c:when test="${!currRow.bean.studyEvent.status.deleted}">
+							<c:if test="${userRole.manageStudy && study.status.available}">
+								<a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+								   onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+								   onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+								   onclick="setAccessedObjectWithRowspans(this)"><img
+										name="bt_Remove1" src="images/bt_Remove.gif" border="0"
+										alt="<fmt:message key="remove" bundle="${resword}"/>"
+										title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+							</c:if>
+						</c:when>
+						<c:otherwise>
+							<c:if test="${(userRole.manageStudy && !studySub.status.deleted) && (study.status.available)}">
+								<a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+								   onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
+								   onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
+								   onclick="setAccessedObjectWithRowspans(this)"><img
+										name="bt_Restore3" src="images/bt_Restore.gif" border="0"
+										alt="<fmt:message key="restore" bundle="${resword}"/>"
+										title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+							</c:if>
+						</c:otherwise>
+					</c:choose>
 				</c:if>
-				</c:when>
-				<c:otherwise>
-				<c:if test="${(userRole.manageStudy && !studySub.status.deleted) && (study.status.available)}">
-				<a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-				   onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-				   onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
-				   onclick="setAccessedObjectWithRowspans(this)"><img
-						name="bt_Restore3" src="images/bt_Restore.gif" border="0"
-						alt="<fmt:message key="restore" bundle="${resword}"/>"
-						title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+				<c:if test="${not viewModeOnly and empty currRow.bean.uncompletedCRFs and empty currRow.bean.displayEventCRFs and currRow.bean.studyEvent.subjectEventStatus.scheduled && userRole.manageStudy && study.status.available}">
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr class="innerTable">
+						<td>
+							<a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+							   onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+							   onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
+							   onclick="setAccessedObjectWithRowspans(this)"><img
+									name="bt_Remove1" src="images/bt_Delete.gif" border="0"
+									alt="<fmt:message key="delete" bundle="${resword}"/>"
+									title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
+						</td>
+					</tr>
 				</c:if>
-				</c:otherwise>
-				</c:choose>
-
-				<c:if test="${currRow.bean.studyEvent.subjectEventStatus.scheduled && userRole.manageStudy && study.status.available}">
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<tr class="innerTable">
-			<td>
-				<a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-				   onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-				   onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-				   onclick="setAccessedObjectWithRowspans(this)"><img
-						name="bt_Remove1" src="images/bt_Delete.gif" border="0"
-						alt="<fmt:message key="delete" bundle="${resword}"/>"
-						title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
-			</td>
-		</tr>
-		</c:if>
 
 
 		</td>
@@ -226,7 +227,7 @@
 							</c:choose>
 						</td>
 
-						<td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
+						<td class="table_cell" bgcolor="#F5F5F5" align="center">
 							<ui:displayEventCRFStatusIcon studySubject="${studySub}" studyEvent="${currRow.bean.studyEvent}"
 														  eventDefinitionCRF="${dedc.edc}" eventCrf="${dedc.eventCRF}"/>
 						</td>
@@ -237,7 +238,7 @@
 								<tr class="innerTable">
 									<td>
 										<c:choose>
-											<c:when test="${!dedc.status.locked && !currRow.bean.studyEvent.subjectEventStatus.locked && !studySub.status.deleted && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+											<c:when test="${!dedc.status.locked && !currRow.bean.studyEvent.subjectEventStatus.locked && !currRow.bean.studyEvent.subjectEventStatus.skipped && !currRow.bean.studyEvent.subjectEventStatus.stopped && !studySub.status.deleted && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
 												<ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${currRow.bean.studyEvent.id}${dedc.edc.crf.id}" onClickFunction="setAccessedObjectWithRowspans(this); checkCRFLockedInitial"  imgAlign="right" imgHSpace="6"/>
 											</c:when>
 											<c:otherwise>
@@ -329,7 +330,7 @@
 										</c:if>
 									</c:when>
 									<c:otherwise>
-										<c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (!studySub.status.deleted) && (study.status.available)}">
+										<c:if test="${(!dec.locked) && (!dec.stage.locked) && userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (!studySub.status.deleted) && (study.status.available)}">
 											<td>
 												<ui:restoreEventCRFLink object="${dec}" subjectId="${studySub.id}" hspace="6" onClick="setAccessedObjectWithRowspans(this)"/>
 											</td>

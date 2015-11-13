@@ -15,135 +15,84 @@
 
 package com.clinovo.service;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 
 /**
- * StudyEventService.
+ * CrfVersionService.
  */
-public interface StudyEventService {
+public interface CrfVersionService {
 
 	/**
-	 * Removes study event.
+	 * Removes crf.
 	 *
-	 * @param studyEventBean
-	 *            StudyEventBean
+	 * @param crfBean
+	 *            CRFBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeStudyEvent(StudyEventBean studyEventBean, UserAccountBean updater) throws Exception;
+	void removeCrf(CRFBean crfBean, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Restores study event.
+	 * Restores crf.
 	 *
-	 * @param studyEventBean
-	 *            StudyEventBean
+	 * @param crfBean
+	 *            CRFBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreStudyEvent(StudyEventBean studyEventBean, UserAccountBean updater) throws Exception;
+	void restoreCrf(CRFBean crfBean, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Locks study event.
+	 * Removes crf version.
 	 *
-	 * @param studyEventBean
-	 *            StudyEventBean
+	 * @param crfVersionBean
+	 *            CRFVersionBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void lockStudyEvent(StudyEventBean studyEventBean, UserAccountBean updater) throws Exception;
+	void removeCrfVersion(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Unlocks study event.
+	 * Restores crf version.
 	 *
-	 * @param studyEventBean
-	 *            StudyEventBean
+	 * @param crfVersionBean
+	 *            CRFVersionBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void unlockStudyEvent(StudyEventBean studyEventBean, UserAccountBean updater) throws Exception;
+	void restoreCrfVersion(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Removes study events.
+	 * Locks crf version.
 	 *
-	 * @param studyEventDefinitionBean
-	 *            StudyEventDefinitionBean
+	 * @param crfVersionBean
+	 *            CRFVersionBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeStudyEvents(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater) throws Exception;
+	void lockCrfVersion(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception;
 
 	/**
-	 * Restores study events.
+	 * Unlocks crf version.
 	 *
-	 * @param studyEventDefinitionBean
-	 *            StudyEventDefinitionBean
+	 * @param crfVersionBean
+	 *            CRFVersionBean
 	 * @param updater
 	 *            UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreStudyEvents(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
-			throws Exception;
-
-	/**
-	 * Removes study events.
-	 *
-	 * @param studySubjectBean
-	 *            StudySubjectBean
-	 * @param updater
-	 *            UserAccountBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void removeStudyEvents(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
-
-	/**
-	 * Restores study events.
-	 *
-	 * @param studySubjectBean
-	 *            StudySubjectBean
-	 * @param updater
-	 *            UserAccountBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void restoreStudyEvents(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
-
-	/**
-	 * Locks study events.
-	 *
-	 * @param studySubjectBean
-	 *            StudySubjectBean
-	 * @param updater
-	 *            UserAccountBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void lockStudyEvents(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
-
-	/**
-	 * unlocks study events.
-	 *
-	 * @param studySubjectBean
-	 *            StudySubjectBean
-	 * @param updater
-	 *            UserAccountBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void unlockStudyEvents(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
-
+	void unlockCrfVersion(CRFVersionBean crfVersionBean, UserAccountBean updater) throws Exception;
 }

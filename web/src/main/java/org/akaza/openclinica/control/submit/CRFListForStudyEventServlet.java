@@ -126,8 +126,8 @@ public class CRFListForStudyEventServlet extends Controller {
 		if (eventId == 0) {
 			int studySubjectId = fp.getInt(STUDY_SUBJECT_ID);
 			int studyEventDefinitionId = fp.getInt(STUDY_EVENT_DEFINITION);
-			List<StudyEventBean> studyEventBeanList = sedao.findAllByDefinitionAndSubjectOrderByOrdinal(
-					studyEventDefinitionId, studySubjectId);
+			List<StudyEventBean> studyEventBeanList = sedao
+					.findAllByDefinitionAndSubjectOrderByOrdinal(studyEventDefinitionId, studySubjectId);
 			if (studyEventBeanList.size() == 0) {
 				StudyEventBean studyEventBean = new StudyEventBean();
 				studyEventBean.setOwner(ub);
@@ -165,7 +165,8 @@ public class CRFListForStudyEventServlet extends Controller {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
+		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
+				&& seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}
 		return seb;
@@ -193,6 +194,8 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		StudyDAO studydao = getStudyDAO();
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
+		request.setAttribute("viewModeOnly", study.getStatus().isDeleted() || study.getStatus().isLocked()
+				|| studySubjectBean.getStatus().isDeleted() || studySubjectBean.getStatus().isLocked());
 
 		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
 		boolean isParentStudy = study.getParentStudyId() < 1;
@@ -327,9 +330,8 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
 				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
 
-				if (!getMaskingService().isEventDefinitionCRFMasked(
-						displayEventCRFBean.getEventDefinitionCRF().getId(), ub.getId(),
-						displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
+				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventCRFBean.getEventDefinitionCRF().getId(),
+						ub.getId(), displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
 					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						String crfFlagColor = "yellow";
@@ -364,8 +366,8 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		request.setAttribute("crfNDsMap", notedMap);
 
-		request.setAttribute("eventName", seb.getStudyEventDefinition() != null ? seb.getStudyEventDefinition()
-				.getDescription() : "");
+		request.setAttribute("eventName",
+				seb.getStudyEventDefinition() != null ? seb.getStudyEventDefinition().getDescription() : "");
 
 		// this is for generating side info panel
 		request.setAttribute("beans", new ArrayList());
@@ -378,9 +380,10 @@ public class CRFListForStudyEventServlet extends Controller {
 		DAOWrapper daoWrapper = new DAOWrapper(getDataSource());
 		request.setAttribute(SHOW_SIGN_BUTTON, SignUtil.permitSign(seb, study, daoWrapper));
 		request.setAttribute(SHOW_SUBJECT_SIGN_BUTTON, SignUtil.permitSign(studySubjectBean, daoWrapper));
-		request.setAttribute(SHOW_SDV_BUTTON, SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper,
-				currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap,
-				ub.getId(), maskingService));
+		request.setAttribute(SHOW_SDV_BUTTON,
+				SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper,
+						currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap,
+						ub.getId(), maskingService));
 		request.setAttribute(PAGE_TO_RENDER, Page.CRF_LIST_FOR_STUDY_EVENT);
 
 		boolean allLocked = true;

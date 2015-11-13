@@ -447,13 +447,13 @@
             , SDV_STATUS=?
             , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
-            , OWNER_ID = ?
+            , STATES = ?
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
     <query>
         <name>updateStatus</name>
-        <sql>UPDATE EVENT_CRF SET OLD_STATUS_ID=STATUS_ID, STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE EVENT_CRF_ID=?</sql>
+        <sql>UPDATE EVENT_CRF SET STATUS_ID=?, DATE_UPDATED=NOW(), UPDATE_ID=? WHERE EVENT_CRF_ID=?</sql>
     </query>
     <query>
         <name>findAllByStudyEvent</name>
@@ -830,6 +830,74 @@
         <name>savePartialSectionInfo</name>
         <sql>
             {call save_partial_section_info(?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>findAllByEventDefinitionCRFId</name>
+        <sql>
+            SELECT * FROM event_crf
+            WHERE study_event_id IN
+            (SELECT study_event_id
+            FROM study_event
+            WHERE study_event_definition_id IN
+            (SELECT study_event_definition_id
+            FROM event_definition_crf
+            WHERE event_definition_crf_id = ?))
+            AND crf_version_id IN
+            (SELECT crf_version_id
+            FROM crf_version
+            WHERE crf_id IN
+            (SELECT crf_id
+            FROM event_definition_crf
+            WHERE event_definition_crf_id = ?) )
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRF</name>
+        <sql>
+            {call disable_event_crf(?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRFsByCRFVersion</name>
+        <sql>
+            {call disable_event_crfs_by_crf_version(?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRFsByStudyEvent</name>
+        <sql>
+            {call disable_event_crfs_by_study_event(?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>disableEventCRFsByStudyEventAndCrfOid</name>
+        <sql>
+            {call disable_event_crfs_by_study_event_and_crf_oid(?,?,?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRF</name>
+        <sql>
+            {call enable_event_crf(?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRFsByCRFVersion</name>
+        <sql>
+            {call enable_event_crfs_by_crf_version(?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRFsByStudyEvent</name>
+        <sql>
+            {call enable_event_crfs_by_study_event(?,?,?)}
+        </sql>
+    </query>
+    <query>
+        <name>enableEventCRFsByStudyEventAndCrfOid</name>
+        <sql>
+            {call enable_event_crfs_by_study_event_and_crf_oid(?,?,?,?)}
         </sql>
     </query>
 </queries>

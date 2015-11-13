@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.CookiesUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,6 +38,8 @@ import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.CookiesUtil;
 
 @Component
 @SuppressWarnings("unused")
@@ -110,7 +111,6 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
-		factory.setStudyBean(currentStudy);
 		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
 		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
 		factory.setStudyDAO(getStudyDAO());
@@ -124,6 +124,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setSelectedStudyEventDefinition(
 				(StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(definitionId));
+		factory.setStudyBean(currentStudy);
 		String listEventsForSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("listEventsForSubjectsHtml", listEventsForSubjectsHtml);
 		request.setAttribute("defId", definitionId);
@@ -158,7 +159,8 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
 		}
 		StudyBean study = getCurrentStudy();
-		String pageSize = CookiesUtil.getCookie(request, study.getOid() + ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE);
+		String pageSize = CookiesUtil.getCookie(request,
+				study.getOid() + ListStudySubjectsServlet.SUBJECT_MATRIX_PAGE_SIZE);
 		pageSize = pageSize == null ? "15" : pageSize;
 		return "?module=" + fp.getString("module") + "&defId=" + newDefId + "&maxRows=" + pageSize + "&showMoreLink="
 				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="

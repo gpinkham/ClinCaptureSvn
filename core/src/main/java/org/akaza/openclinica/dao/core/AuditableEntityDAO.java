@@ -1,14 +1,14 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * <p/>
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ * <p/>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
- \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
+ * <p/>
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
+ * \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
 /*
@@ -20,10 +20,6 @@
  */
 package org.akaza.openclinica.dao.core;
 
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,31 +28,33 @@ import java.util.Iterator;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+
 /**
- * <P>
+ * <p/>
  * AuditableEntityDAO.java, an extension of EntityDAO.java.
- * <P>
+ * <p/>
  * A DAO Class meant to represent an object in the database which is auditable; that is, carry extra information about
  * that object in the object and the database.
- * 
+ *
  * @author thickerson
- * 
- * 
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 	/**
 	 * Should the name of a query which refers to a SQL command of the following form:
-	 * 
+	 * <p/>
 	 * <code>
-	 * 	SELECT t.*
-	 * 	FROM tableName t, study s
-	 * 	WHERE t.study_id=s.study_id
-	 * 	AND (s.study_id=? or s.parent_study_id=?)
+	 * SELECT t.*
+	 * FROM tableName t, study s
+	 * WHERE t.study_id=s.study_id
+	 * AND (s.study_id=? or s.parent_study_id=?)
 	 * </code>
 	 */
 	protected String findAllByStudyName;
-	
+
 	/**
 	 * status =1
 	 */
@@ -64,36 +62,52 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 	/**
 	 * Should the name of a query which refers to a SQL command of the following form:
-	 * 
+	 * <p/>
 	 * <code>
-	 * 	SELECT t.*
-	 * 	FROM tableName t, study s
-	 * 	WHERE t.id=?
-	 * 		AND t.study_id=s.study_id
-	 * 		AND (s.study_id=? or s.parent_study_id=?)
+	 * SELECT t.*
+	 * FROM tableName t, study s
+	 * WHERE t.id=?
+	 * AND t.study_id=s.study_id
+	 * AND (s.study_id=? or s.parent_study_id=?)
 	 * </code>
 	 */
 	protected String findByPKAndStudyName;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param ds
+	 *            DataSource
+	 */
 	public AuditableEntityDAO(DataSource ds) {
 		super(ds);
 		setDigesterName();
 		digester = SQLFactory.getInstance().getDigester(digesterName);
 	}
-	
-	
+
+	/**
+	 * Constructor.
+	 *
+	 * @param ds
+	 *            DataSource
+	 * @param transactionCon
+	 *            Connection
+	 */
 	public AuditableEntityDAO(DataSource ds, Connection transactionCon) {
 		super(ds, transactionCon);
 		setDigesterName();
 		digester = SQLFactory.getInstance().getDigester(digesterName);
 	}
 
+	/**
+	 * Sets expected types.
+	 */
 	public abstract void setTypesExpected();
 
 	/**
 	 * Note: The subclass must define findAllByStudyName before calling this method. Otherwise an empty array will be
 	 * returned.
-	 * 
+	 *
 	 * @param study
 	 *            The study to which the entities belong.
 	 * @return An array containing all the entities which belong to <code>study</code>.
@@ -107,29 +121,41 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 		setTypesExpected();
 
+		int ind = 1;
 		HashMap variables = new HashMap();
-
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(ind++, study.getId());
+		variables.put(ind, study.getId());
 
 		String sql = digester.getQuery(findAllByStudyName);
 
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			AuditableEntityBean aeb = (AuditableEntityBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			AuditableEntityBean aeb = (AuditableEntityBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(aeb);
 		}
 
 		return answer;
 	}
 
+	/**
+	 * Returns all active by study.
+	 *
+	 * @param study
+	 *            StudyBean
+	 * @return ArrayList
+	 */
 	public ArrayList findAllActiveByStudy(StudyBean study) {
 		return findAllActiveByStudyId(study.getId());
 	}
 
+	/**
+	 * Returns all active by study id.
+	 *
+	 * @param study
+	 *            StudyBean
+	 * @return ArrayList
+	 */
 	public ArrayList findAllActiveByStudyId(int id) {
 		ArrayList answer = new ArrayList();
 
@@ -139,31 +165,29 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 		setTypesExpected();
 
+		int ind = 1;
 		HashMap variables = new HashMap();
-
 		// study.study_id=?
-		variables.put(Integer.valueOf(1), Integer.valueOf(id));
-
+		variables.put(ind++, id);
 		// or study.parent_study_id=?
-		variables.put(Integer.valueOf(2), Integer.valueOf(id));
+		variables.put(ind, id);
 
 		String sql = digester.getQuery(findAllActiveByStudyName);
 
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			AuditableEntityBean aeb = (AuditableEntityBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			AuditableEntityBean aeb = (AuditableEntityBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(aeb);
 		}
 
 		return answer;
 	}
-	
+
 	/**
 	 * Note: The subclass must define findByPKAndStudyName before calling this method. Otherwise an inactive
 	 * AuditableEntityBean will be returned.
-	 * 
+	 *
 	 * @param id
 	 *            The primary key of the AuditableEntity which is sought.
 	 * @param study
@@ -179,15 +203,14 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 		setTypesExpected();
 
+		int ind = 1;
 		HashMap variables = new HashMap();
 		// id=?
-		variables.put(Integer.valueOf(1), Integer.valueOf(id));
-
+		variables.put(ind++, id);
 		// study.study_id = ?
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-
+		variables.put(ind++, study.getId());
 		// study.parent_study_id = ?
-		variables.put(Integer.valueOf(3), Integer.valueOf(study.getId()));
+		variables.put(ind, study.getId());
 
 		String sql = digester.getQuery(findByPKAndStudyName);
 
@@ -216,8 +239,8 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 			aeb.setCreatedDate(dateCreated);
 			aeb.setUpdatedDate(dateUpdated);
 			aeb.setStatus(Status.get(statusId));
-			aeb.setOwnerId(ownerId.intValue());
-			aeb.setUpdaterId(updateId.intValue());
+			aeb.setOwnerId(ownerId);
+			aeb.setUpdaterId(updateId);
 		}
 	}
 
@@ -229,10 +252,10 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 	 * columns.)
 	 * <li>It returns multiple AuditableEntityBeans.
 	 * </ol>
-	 * 
+	 * <p/>
 	 * Note that queries which join two tables may be included in the definition of "findAll-style" query, as long as
 	 * the first criterion is met.
-	 * 
+	 *
 	 * @param queryName
 	 *            The name of the query which should be executed.
 	 * @param variables
@@ -252,10 +275,9 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 		} else {
 			rows = this.select(sql, variables);
 		}
-		Iterator it = rows.iterator();
 
-		while (it.hasNext()) {
-			answer.add(this.getEntityFromHashMap((HashMap) it.next()));
+		for (Object row : rows) {
+			answer.add(this.getEntityFromHashMap((HashMap) row));
 		}
 
 		return answer;
@@ -263,12 +285,21 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 	/**
 	 * This method executes a "findAll-style" query which does not accept any variables.
-	 * 
+	 *
 	 * @param queryName
 	 *            The name of the query which selects the AuditableEntityBeans.
 	 * @return An ArrayList of AuditableEntityBeans selected by the query.
 	 */
 	public ArrayList executeFindAllQuery(String queryName) {
 		return executeFindAllQuery(queryName, new HashMap());
+	}
+
+	/**
+	 * Returns true if current DB is oracle.
+	 * 
+	 * @return boolean
+	 */
+	public boolean dbIsOracle() {
+		return digesterName.toLowerCase().startsWith("oracle");
 	}
 }

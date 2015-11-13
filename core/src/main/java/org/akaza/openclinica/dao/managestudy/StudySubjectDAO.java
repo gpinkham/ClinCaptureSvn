@@ -12,6 +12,19 @@
  ******************************************************************************/
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -25,20 +38,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.exception.OpenClinicaException;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * StudySubjectDAO class. It performs the CRUD operations related to study subject items.
@@ -135,9 +135,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // Randomization Date
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // Randomization Result
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; //
 		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // old_status_id
+		this.setTypeExpected(ind, TypeNames.STRING);
+		// states
 	}
 
 	/**
@@ -175,7 +176,13 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
 		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
-		ind++;
+		ind++; // Randomization Date
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // Randomization Result
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // old_status_id
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // states
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++;
 		this.setTypeExpected(ind, TypeNames.STRING);
@@ -210,6 +217,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		eb.setDynamicGroupClassId((Integer) hm.get("dynamic_group_class_id"));
 		eb.setRandomizationDate((Date) hm.get("randomization_date"));
 		eb.setRandomizationResult((String) hm.get("randomization_result"));
+
+		eb.setOldStatus(Status.get((Integer) hm.get("old_status_id")));
+		eb.setStates((String) hm.get("states"));
+
 		return eb;
 	}
 
@@ -253,6 +264,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Method that returns Collection of all study subjects.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @return List of StudySubjectBeans
+	 */
+	public List<StudySubjectBean> findAllByStudyOnly(StudyBean studyBean) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, studyBean.getId());
+		return executeFindAllQuery("findAllByStudyOnly", variables);
+	}
+
+	/**
 	 * Method that checks that study subject is ready to be source data verified.
 	 *
 	 * @param currentStudy
@@ -267,8 +292,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		int studyId = currentStudy.getId();
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-				.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0
+				? currentStudy.getParentStudyId()
+				: currentStudy.getId();
 		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
 
 		int index = 1;
@@ -315,8 +341,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		int studyId = currentStudy.getId();
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-				.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0
+				? currentStudy.getParentStudyId()
+				: currentStudy.getId();
 		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
 
 		int index = 1;
@@ -362,7 +389,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *            rowStart
 	 * @param rowEnd
 	 *            rowEnd
-	 * @param userId int
+	 * @param userId
+	 *            int
 	 * @return boolean
 	 */
 	public ArrayList findAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, StudySubjectSDVSort sort,
@@ -370,8 +398,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		int studyId = currentStudy.getId();
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-				.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0
+				? currentStudy.getParentStudyId()
+				: currentStudy.getId();
 		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
 
 		int index = 1;
@@ -385,16 +414,13 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 				+ " INNER JOIN event_crf ON event_crf.study_event_id = study_event.study_event_id "
 				+ " INNER JOIN crf_version cv ON event_crf.crf_version_id = cv.crf_version_id "
 				+ " LEFT JOIN event_definition_crf edc  ON study_event.study_event_definition_id = edc.study_event_definition_id "
-				+ " AND cv.crf_id = edc.crf_id "
-				+ " AND mss.study_id = edc.study_id "
-				+ " LEFT JOIN study s on s.study_id = mss.study_id "
-				+ " WHERE event_crf.status_id = 2 "
+				+ " AND cv.crf_id = edc.crf_id " + " AND mss.study_id = edc.study_id "
+				+ " LEFT JOIN study s on s.study_id = mss.study_id " + " WHERE event_crf.status_id = 2 "
 				+ " AND (SELECT COUNT (*) FROM crfs_masking "
-					+ "WHERE edc.event_definition_crf_id = crfs_masking.event_definition_crf_id AND user_id = " + userId
-					+ " AND mss.study_id = crfs_masking.study_id) = 0 "
-				+ " AND mss.study_subject_id IN ("
-		.concat(digester.getQuery("findAllByStudySDV"));
-		
+				+ "WHERE edc.event_definition_crf_id = crfs_masking.event_definition_crf_id AND user_id = " + userId
+				+ " AND mss.study_id = crfs_masking.study_id) = 0 "
+				+ " AND mss.study_subject_id IN (".concat(digester.getQuery("findAllByStudySDV"));
+
 		if (withoutDns) {
 			sql = sql.concat(" ").concat(digester.getQuery("withoutDns"));
 		}
@@ -465,7 +491,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *            StudyBean
 	 * @param filter
 	 *            StudySubjectSDVFilter
-	 * @param userId int
+	 * @param userId
+	 *            int
 	 * @return int
 	 */
 	public int countAllByStudySDV(StudyBean currentStudy, StudySubjectSDVFilter filter, int userId) {
@@ -473,8 +500,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		int studyId = currentStudy.getId();
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy
-				.getId();
+		int parentStudyId = currentStudy.getParentStudyId() > 0
+				? currentStudy.getParentStudyId()
+				: currentStudy.getId();
 		boolean withoutDns = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries().equalsIgnoreCase("no");
 
 		int index = 1;
@@ -488,15 +516,12 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 				+ " INNER JOIN event_crf ON event_crf.study_event_id = study_event.study_event_id "
 				+ " INNER JOIN crf_version cv ON event_crf.crf_version_id = cv.crf_version_id "
 				+ " LEFT JOIN event_definition_crf edc  ON study_event.study_event_definition_id = edc.study_event_definition_id "
-					+ " AND cv.crf_id = edc.crf_id "
-					+ " AND mss.study_id = edc.study_id "
-				+ " LEFT JOIN study s on s.study_id = mss.study_id "
-				+ " WHERE event_crf.status_id = 2 "
+				+ " AND cv.crf_id = edc.crf_id " + " AND mss.study_id = edc.study_id "
+				+ " LEFT JOIN study s on s.study_id = mss.study_id " + " WHERE event_crf.status_id = 2 "
 				+ " AND (SELECT COUNT (*) FROM crfs_masking "
-					+ " WHERE edc.event_definition_crf_id = crfs_masking.event_definition_crf_id "
-					+ " AND user_id = " + userId + " AND mss.study_id = crfs_masking.study_id) = 0 "
-				+ " AND mss.study_subject_id IN ("
-		.concat(digester.getQuery("findAllByStudySDV"));
+				+ " WHERE edc.event_definition_crf_id = crfs_masking.event_definition_crf_id " + " AND user_id = "
+				+ userId + " AND mss.study_id = crfs_masking.study_id) = 0 "
+				+ " AND mss.study_subject_id IN (".concat(digester.getQuery("findAllByStudySDV"));
 		if (withoutDns) {
 			sql = sql.concat(" ").concat(digester.getQuery("withoutDns"));
 		}
@@ -1445,6 +1470,11 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		}
 		ind++;
 
+		variables.put(ind, sb.getOldStatus().getId());
+		ind++;
+		variables.put(ind, sb.getStates());
+		ind++;
+
 		variables.put(ind, sb.getId());
 
 		String sql = digester.getQuery("update");
@@ -1582,6 +1612,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // randomization_date
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // randomization_result
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // old_status_id
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // states
 		this.setTypeExpected(ind, TypeNames.STRING);
 		// studyName
 
@@ -1669,6 +1703,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		ind++; // randomization_date
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // randomization_result
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // old_status_id
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // states
 		this.setTypeExpected(ind, TypeNames.STRING);
 		// studyName
 
@@ -1749,7 +1787,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *
 	 * @param studyBean
 	 *            study from which generation format will be taken.
-	 * @param studyToSearch study by which subject with same ID will be searched.
+	 * @param studyToSearch
+	 *            study by which subject with same ID will be searched.
 	 * @return String study subject label
 	 */
 	public String findNextLabel(StudyBean studyBean, StudyBean studyToSearch) {
@@ -1804,8 +1843,8 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		queryParameters.put(index++, studyId);
 		queryParameters.put(index, dynamicGroupClassId);
 
-		List<HashMap<String, Object>> recordsFromDB = this.select(
-				digester.getQuery("getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId"), queryParameters);
+		List<HashMap<String, Object>> recordsFromDB = this
+				.select(digester.getQuery("getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId"), queryParameters);
 
 		return (Integer) recordsFromDB.get(0).get("count");
 	}

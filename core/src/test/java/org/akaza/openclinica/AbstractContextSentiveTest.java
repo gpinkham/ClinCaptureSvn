@@ -19,9 +19,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import com.clinovo.dao.ItemRenderMetadataDAO;
-import com.clinovo.service.*;
-
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -68,6 +65,7 @@ import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
+import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
 import org.dbunit.dataset.IDataSet;
@@ -91,6 +89,7 @@ import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
 import com.clinovo.dao.DiscrepancyDescriptionDAO;
 import com.clinovo.dao.EventCRFSectionDAO;
+import com.clinovo.dao.ItemRenderMetadataDAO;
 import com.clinovo.dao.StudySubjectIdDAO;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.dao.TermDAO;
@@ -98,18 +97,25 @@ import com.clinovo.dao.WidgetDAO;
 import com.clinovo.dao.WidgetsLayoutDAO;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.CrfVersionService;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.DatasetService;
 import com.clinovo.service.DcfService;
+import com.clinovo.service.DeleteCrfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
+import com.clinovo.service.ItemDataService;
+import com.clinovo.service.ItemRenderMetadataService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.service.ReportCRFService;
+import com.clinovo.service.StudyEventService;
+import com.clinovo.service.StudyService;
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.StudySubjectService;
 import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
 import com.clinovo.service.UserAccountService;
@@ -282,9 +288,15 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	@Autowired
 	protected StudyEventService studyEventService;
 	@Autowired
+	protected SubjectServiceInterface subjectService;
+	@Autowired
 	protected StudySubjectService studySubjectService;
 	@Autowired
 	protected StudyService studyService;
+	@Autowired
+	protected ItemDataService itemDataService;
+	@Autowired
+	protected CrfVersionService crfVersionService;
 	@Autowired
 	protected ItemRenderMetadataService itemRenderMetadataService;
 

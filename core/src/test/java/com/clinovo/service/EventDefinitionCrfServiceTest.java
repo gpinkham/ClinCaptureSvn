@@ -101,19 +101,20 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatRemoveEventDefinitionCrfMethodRemovesEventDefinitionCRFBeanCorrectly() throws Exception {
+	public void testThatRemoveParentEventDefinitionCrfMethodRemovesEventDefinitionCRFBeanCorrectly() throws Exception {
 		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
 		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(eventDefinitionCrfBean.getCrfId());
 		eventDefinitionCrfBean.setCrf(crfBean);
 		assertTrue(eventDefinitionCrfBean.getStatus() == Status.AVAILABLE);
-		eventDefinitionCrfService.removeEventDefinitionCrf(eventDefinitionCrfBean, userBean);
+		eventDefinitionCrfService.removeParentEventDefinitionCrf(eventDefinitionCrfBean, userBean);
 		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		assertTrue(eventDefinitionCrfBean.getStatus() == Status.DELETED);
 	}
 
 	@Test
-	public void testThatRestoreEventDefinitionCrfMethodRestoresEventDefinitionCRFBeanCorrectly() throws Exception {
+	public void testThatRestoreParentEventDefinitionCrfMethodRestoresEventDefinitionCRFBeanCorrectly()
+			throws Exception {
 		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
 		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(eventDefinitionCrfBean.getCrfId());
@@ -123,36 +124,32 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		eventDefinitionCrfBean.setCrf(crfBean);
 		assertTrue(eventDefinitionCrfBean.getStatus() == Status.DELETED);
-		eventDefinitionCrfService.restoreEventDefinitionCrf(eventDefinitionCrfBean, userBean);
+		eventDefinitionCrfService.restoreParentEventDefinitionCrf(eventDefinitionCrfBean, userBean);
 		eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		assertTrue(eventDefinitionCrfBean.getStatus() == Status.AVAILABLE);
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testThatUpdateDefaultVersionMethodWorksCorrectlyForRemovedCRFs() {
 		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
-		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
 		crfVersionBean.setUpdater(userBean);
 		crfVersionBean.setStatus(Status.AUTO_DELETED);
 		crfVersionDao.update(crfVersionBean);
-		List<CRFVersionBean> crfVersions = crfVersionDao.findAllByCRFId(crfVersionBean.getCrfId());
-		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(eventDefinitionCrfBean, crfVersions, userBean);
+		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(crfVersionBean, userBean);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
 		assertTrue(crfVersionBean.getId() != eventDefinitionCrfBean.getDefaultVersionId());
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testThatUpdateDefaultVersionMethodWorksCorrectlyForLockedCRFs() {
 		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
-		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
 		crfVersionBean.setUpdater(userBean);
 		crfVersionBean.setStatus(Status.LOCKED);
 		crfVersionDao.update(crfVersionBean);
-		List<CRFVersionBean> crfVersions = crfVersionDao.findAllByCRFId(crfVersionBean.getCrfId());
-		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(eventDefinitionCrfBean, crfVersions, userBean);
+		eventDefinitionCrfService.updateDefaultVersionOfEventDefinitionCRF(crfVersionBean, userBean);
+		EventDefinitionCRFBean eventDefinitionCrfBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
 		assertTrue(crfVersionBean.getId() != eventDefinitionCrfBean.getDefaultVersionId());
 	}
 
@@ -180,10 +177,12 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 
 		oldParentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
 
-		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, userBean);
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap,
+				userBean);
 
 		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() == eventDefinitionCrfBean.isRequiredCRF());
-		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() == eventDefinitionCrfBean.isElectronicSignature());
+		assertTrue(
+				childEventDefinitionCrfBean.isElectronicSignature() == eventDefinitionCrfBean.isElectronicSignature());
 	}
 
 	@Test
@@ -210,10 +209,12 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 
 		oldParentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
 
-		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, userBean);
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap,
+				userBean);
 
 		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() != eventDefinitionCrfBean.isRequiredCRF());
-		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
+		assertTrue(
+				childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
 	}
 
 	@Test
@@ -242,21 +243,23 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		oldEventDefinitionCrfBean.setRequiredCRF(true);
 		oldParentsMap.put(eventDefinitionCrfBean.getId(), oldEventDefinitionCrfBean);
 
-		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap, userBean);
+		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap,
+				userBean);
 
 		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() == eventDefinitionCrfBean.isRequiredCRF());
-		assertTrue(childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
+		assertTrue(
+				childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
 	}
 
 	@Test(expected = Exception.class)
-	public void testThatExceptionIsThrownIfStartedEventCRFsExistsWhileDeletion() throws Exception{
+	public void testThatExceptionIsThrownIfStartedEventCRFsExistsWhileDeletion() throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
 		eventDefinitionCRFBean.setId(1);
 		eventDefinitionCrfService.deleteEventDefinitionCrf(eventDefinitionCRFBean);
 	}
 
 	@Test
-	public void testThatExceptionIsNotThrownIfStartedEventCRFsNotExistsWhileDeletion() throws Exception{
+	public void testThatExceptionIsNotThrownIfStartedEventCRFsNotExistsWhileDeletion() throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
 		eventDefinitionCRFBean.setId(11);
 		eventDefinitionCrfService.deleteEventDefinitionCrf(eventDefinitionCRFBean);

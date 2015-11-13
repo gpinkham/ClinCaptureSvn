@@ -71,9 +71,8 @@ public class RestoreStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
@@ -127,11 +126,10 @@ public class RestoreStudyEventServlet extends Controller {
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (event.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(
-							new StringBuilder("")
-									.append(respage.getString("this_event_is_already_available_for_study")).append(" ")
-									.append(respage.getString("please_contact_sysadmin_for_more_information"))
-									.toString(), request);
+					addPageMessage(new StringBuilder("")
+							.append(respage.getString("this_event_is_already_available_for_study")).append(" ")
+							.append(respage.getString("please_contact_sysadmin_for_more_information")).toString(),
+							request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardToViewStudySubjectPage(request, response);
 					return;
@@ -159,8 +157,8 @@ public class RestoreStudyEventServlet extends Controller {
 
 				String emailBody = new StringBuilder("").append(respage.getString("the_event"))
 						.append(event.getStudyEventDefinition().getName()).append(" ")
-						.append(respage.getString("has_been_restored_to_the_study")).append(" ")
-						.append(study.getName()).append(".").toString();
+						.append(respage.getString("has_been_restored_to_the_study")).append(" ").append(study.getName())
+						.append(".").toString();
 
 				addPageMessage(emailBody, request);
 				request.setAttribute("id", Integer.toString(studySubId));
@@ -173,13 +171,13 @@ public class RestoreStudyEventServlet extends Controller {
 			throws Exception {
 		storePageMessages(request);
 		String id = (String) request.getAttribute("id");
-		String savedUrl = (String) request.getSession().getAttribute(
-				ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
+		String savedUrl = (String) request.getSession()
+				.getAttribute(ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
 		if (savedUrl != null && savedUrl.contains("id=" + id)) {
 			response.sendRedirect(savedUrl);
 		} else {
-			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-					+ id);
+			response.sendRedirect(
+					request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + id);
 		}
 	}
 
@@ -193,7 +191,8 @@ public class RestoreStudyEventServlet extends Controller {
 	 *            The list of event definition CRFs for this study event.
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
-	private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs, HttpServletRequest request) {
+	private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
+			HttpServletRequest request) {
 		ArrayList answer = new ArrayList();
 
 		HashMap definitionsById = new HashMap();
@@ -221,8 +220,8 @@ public class RestoreStudyEventServlet extends Controller {
 			int studyEventId = ecb.getStudyEventId();
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
 
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(
-					new Integer(studyEventDefinitionId));
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById
+					.get(new Integer(studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);

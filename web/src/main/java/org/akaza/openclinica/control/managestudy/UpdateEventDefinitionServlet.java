@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -158,13 +159,14 @@ public class UpdateEventDefinitionServlet extends Controller {
 		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = (List<EventDefinitionCRFBean>) request.getSession()
 				.getAttribute("oldEventDefinitionCRFs");
 
-		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession()
-				.getAttribute("signStateRestorer");
+		Map<Integer, SignStateRestorer> signStateRestorerMap = (Map<Integer, SignStateRestorer>) request.getSession()
+				.getAttribute("signStateRestorerMap");
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) request.getSession()
 				.getAttribute("definition");
 
 		getEventDefinitionService().updateTheWholeStudyEventDefinition(currentStudy, updater, studyEventDefinitionBean,
-				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, oldEventDefinitionCRFs, signStateRestorer);
+				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, oldEventDefinitionCRFs,
+				signStateRestorerMap);
 
 		clearSession(request.getSession());
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);

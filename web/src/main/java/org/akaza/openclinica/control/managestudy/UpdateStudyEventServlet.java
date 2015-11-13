@@ -20,11 +20,19 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.SignUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -65,7 +73,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
-import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.joda.time.DateTime;
@@ -73,17 +80,11 @@ import org.joda.time.DateTimeZone;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.SignUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Performs updating study event action.
@@ -113,25 +114,24 @@ public class UpdateStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+				+ respage.getString("change_active_study_or_contact"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
-	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId)
-			throws Exception {
+	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response,
+			int studySubjectId) throws Exception {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
-		String viewStudySubjectUrl = (String) request.getSession().getAttribute(
-				ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
+		String viewStudySubjectUrl = (String) request.getSession()
+				.getAttribute(ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
 		if (viewStudySubjectUrl != null && viewStudySubjectUrl.contains("id=" + studySubjectId + "&")) {
 			response.sendRedirect(viewStudySubjectUrl);
 		} else {
-			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-					+ studySubjectId);
+			response.sendRedirect(
+					request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + studySubjectId);
 		}
 	}
 
@@ -186,9 +186,9 @@ public class UpdateStudyEventServlet extends Controller {
 
 		Status s = ssub.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-			addPageMessage(
-					resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("updated")
-							+ "." + respage.getString("study_subject_has_been_deleted"), request);
+			addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
+					+ resterm.getString("updated") + "." + respage.getString("study_subject_has_been_deleted"),
+					request);
 			request.setAttribute("id", Integer.toString(studySubjectId));
 			redirectToStudySubjectView(request, response, studySubjectId);
 		}
@@ -280,8 +280,8 @@ public class UpdateStudyEventServlet extends Controller {
 		request.setAttribute("statuses", statuses);
 
 		String action = fp.getString("action");
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEvent
-				.getStudyEventDefinitionId());
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
+				.findByPK(studyEvent.getStudyEventDefinitionId());
 		request.setAttribute(EVENT_DEFINITION_BEAN, sed);
 		if (action.equalsIgnoreCase("submit")) {
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -289,22 +289,17 @@ public class UpdateStudyEventServlet extends Controller {
 					discNotes);
 			SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
 
-			if (ses == SubjectEventStatus.LOCKED && studyEvent.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
-				studyEvent.setPrevSubjectEventStatus(studyEvent.getSubjectEventStatus());
-				studyEvent.setSubjectEventStatus(SubjectEventStatus.LOCKED);
-			} else if (ses == SubjectEventStatus.UNLOCK) {
-				studyEvent.setSubjectEventStatus(studyEvent.getPrevSubjectEventStatus());
-			} else if (ses.equals(SubjectEventStatus.NOT_SCHEDULED)) {
+			if (ses.equals(SubjectEventStatus.NOT_SCHEDULED)) {
 				request.setAttribute("enent_id", studyEventId);
 				request.setAttribute("deletedDurringUpdateStudyEvent", "true");
 				forwardPage(Page.DELETE_STUDY_EVENT_SERVLET, request, response);
 				return;
-			} else {
-				studyEvent.setSubjectEventStatus(ses);
 			}
 
 			if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
 				studyEvent.setStatus(Status.UNAVAILABLE);
+			} else {
+				studyEvent.setStatus(Status.AVAILABLE);
 			}
 
 			Date start = null;
@@ -328,13 +323,15 @@ public class UpdateStudyEventServlet extends Controller {
 
 			if (!errors.containsKey(INPUT_STARTDATE_PREFIX)) {
 				start = fp.getString(INPUT_STARTDATE_PREFIX + "Date").isEmpty()
-						? studyEvent.getDateStarted() : fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
+						? studyEvent.getDateStarted()
+						: fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 			}
 
 			if (!strEnd.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX)
 					&& !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
 				end = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX);
-				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date").equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
+				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date")
+						.equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
 						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
 								resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
@@ -367,8 +364,8 @@ public class UpdateStudyEventServlet extends Controller {
 				request.setAttribute(EVENT_BEAN, studyEvent);
 				forwardPage(Page.UPDATE_STUDY_EVENT, request, response);
 
-			} else if (studyEvent.getSubjectEventStatus().isSigned()) {
-
+			} else if (ses.isSigned()) {
+				studyEvent.setSubjectEventStatus(SubjectEventStatus.SIGNED);
 				request.setAttribute(STUDY_SUBJECT_ID, Integer.toString(studySubjectId));
 				if (fp.getString(INPUT_STARTDATE_PREFIX + "Hour").equals("-1")
 						&& fp.getString(INPUT_STARTDATE_PREFIX + "Minute").equals("-1")
@@ -459,19 +456,6 @@ public class UpdateStudyEventServlet extends Controller {
 				studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 
 				logger.info("Update study event");
-				studyEvent.setUpdater(ub);
-				studyEvent.setUpdatedDate(new Date());
-				sedao.update(studyEvent);
-
-				if (ses == SubjectEventStatus.UNLOCK) {
-					ssub.setStatus(Status.AVAILABLE);
-					ssdao.update(ssub);
-				} else {
-					List<Integer> studyEventDefinitionIds = StudyEventDefinitionUtil
-							.getStudyEventDefinitionIdsForStudySubject(ssub, studyBean, getDynamicEventDao(),
-									getStudyGroupClassDAO(), seddao);
-					updateStudySubjectStatus(studyEventDefinitionIds, ssdao, ssub, sedao, studyEvent, studyBean, ub);
-				}
 
 				if (studyEvent.getSubjectEventStatus().isCompleted()) {
 					StdScheduler scheduler = getStdScheduler();
@@ -484,8 +468,8 @@ public class UpdateStudyEventServlet extends Controller {
 				}
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
-						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
+						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 				dnService.saveFieldNotes(INPUT_LOCATION, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 				dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
@@ -494,6 +478,20 @@ public class UpdateStudyEventServlet extends Controller {
 				addPageMessage(respage.getString("study_event_updated"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
 				request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+
+				if (ses == SubjectEventStatus.REMOVED) {
+					getStudyEventService().removeStudyEvent(studyEvent, ub);
+				} else if (ses == SubjectEventStatus.LOCKED) {
+					getStudyEventService().lockStudyEvent(studyEvent, ub);
+				} else {
+					if (studyEvent.getSubjectEventStatus().isLocked()) {
+						getStudyEventService().unlockStudyEvent(studyEvent, ub);
+					}
+					if (ses != SubjectEventStatus.UNLOCK) {
+						studyEvent.setSubjectEventStatus(ses);
+						sedao.update(studyEvent);
+					}
+				}
 
 				redirectToStudySubjectView(request, response, studySubjectId);
 			}
@@ -508,6 +506,7 @@ public class UpdateStudyEventServlet extends Controller {
 				seb.setUpdater(ub);
 				seb.setUpdatedDate(new Date());
 				sedao.update(seb);
+
 				// set Study Subject's status to available
 				ssub.setStatus(Status.AVAILABLE);
 
@@ -530,8 +529,8 @@ public class UpdateStudyEventServlet extends Controller {
 				ssdao.update(ssub);
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
-						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
+						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 				dnService.saveFieldNotes(INPUT_LOCATION, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 				dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
@@ -571,8 +570,8 @@ public class UpdateStudyEventServlet extends Controller {
 		} else {
 			logger.info("No action, go to update page");
 			StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
-			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(
-					studySubjectBean, currentStudy, sm);
+			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
+					.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
 
 			EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm,
 					request);
@@ -646,25 +645,6 @@ public class UpdateStudyEventServlet extends Controller {
 			forwardPage(Page.UPDATE_STUDY_EVENT, request, response);
 		}
 
-	}
-
-	void updateStudySubjectStatus(List<Integer> studyEventDefinitionIds, StudySubjectDAO ssdao, StudySubjectBean ssub,
-			StudyEventDAO sedao, StudyEventBean studyEvent, StudyBean studyBean, UserAccountBean ub) {
-		int count = 0;
-		List<StudyEventBean> studyEventList = sedao.findAllByStudySubject(ssub);
-		for (StudyEventBean studyEventBean : studyEventList) {
-			studyEventDefinitionIds.remove((Integer) studyEventBean.getStudyEventDefinitionId());
-			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
-				count++;
-			}
-		}
-		if (count == studyEventList.size() && studyEventDefinitionIds.size() == 0) {
-			ssub.setStatus(Status.LOCKED);
-		} else {
-			ssub.setStatus(Status.AVAILABLE);
-		}
-		ssub.setUpdater(ub);
-		ssdao.update(ssub);
 	}
 
 	private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {

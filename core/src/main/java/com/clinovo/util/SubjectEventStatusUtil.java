@@ -32,12 +32,13 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.akaza.openclinica.util.SignedData;
 
 /**
  * SubjectEventStatusUtil class.
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "unused"})
 public final class SubjectEventStatusUtil {
 
 	private static HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
@@ -99,27 +100,19 @@ public final class SubjectEventStatusUtil {
 		if (studyEvents.size() <= 1) {
 			if (studySubjectBean.getStatus().isLocked() && subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("locked");
-				url.append("<img src='")
-						.append(imageIconPaths.get(SubjectEventStatus.LOCKED.getId()))
-						.append("' title='")
-						.append(txt)
-						.append("' alt='")
-						.append(txt)
+				url.append("<img src='").append(imageIconPaths.get(SubjectEventStatus.LOCKED.getId()))
+						.append("' title='").append(txt).append("' alt='").append(txt)
 						.append("' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
-			} else if (studySubjectBean.getStatus().isDeleted()
-					&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
+			} else
+				if (studySubjectBean.getStatus().isDeleted()
+						&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("removed");
-				url.append("<img src='")
-						.append(imageIconPaths.get(SubjectEventStatus.REMOVED.getId()))
-						.append("' title='")
-						.append(txt)
-						.append("' alt='")
-						.append(txt)
+				url.append("<img src='").append(imageIconPaths.get(SubjectEventStatus.REMOVED.getId()))
+						.append("' title='").append(txt).append("' alt='").append(txt)
 						.append("' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
 			} else {
 				if (!subjectEventStatus.isNotScheduled() || permissionForDynamic) {
-					url.append("<img src='")
-							.append(imageIconPaths.get(subjectEventStatus.getId()))
+					url.append("<img src='").append(imageIconPaths.get(subjectEventStatus.getId()))
 							.append("' border='0' style='position: relative;' title=\"")
 							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled()
 									? resword.getString("message_for_not_scheduled_event_if_study_is_not_available")
@@ -127,7 +120,8 @@ public final class SubjectEventStatusUtil {
 							.append("\" alt=\"")
 							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled()
 									? resword.getString("message_for_not_scheduled_event_if_study_is_not_available")
-									: "").append("\">");
+									: "")
+							.append("\">");
 				} else {
 					url.delete(0, url.length());
 					url.append("<img src='' border='0' style='position: relative; display: none;'>");
@@ -230,13 +224,13 @@ public final class SubjectEventStatusUtil {
 	 *            StudyEventBean
 	 * @param daoWrapper
 	 *            DAOWrapper
-	 * @param signStateRestorer
-	 *            SignStateRestorer
+	 * @param signStateRestorerMap
+	 *            Map<Integer, SignStateRestorer>
 	 */
 	public static void determineSubjectEventState(StudyEventBean studyEventBean, DAOWrapper daoWrapper,
-			SignStateRestorer signStateRestorer) {
+			Map<Integer, SignStateRestorer> signStateRestorerMap) {
 		ArrayList<EventCRFBean> eventCRFs = daoWrapper.getEcdao().findAllByStudyEvent(studyEventBean);
-		analyzeSubjectEventState(studyEventBean, eventCRFs, daoWrapper, signStateRestorer);
+		analyzeSubjectEventState(studyEventBean, eventCRFs, daoWrapper, signStateRestorerMap);
 	}
 
 	/**
@@ -266,13 +260,13 @@ public final class SubjectEventStatusUtil {
 	 *            UserAccountBean
 	 * @param daoWrapper
 	 *            DAOWrapper
-	 * @param signStateRestorer
-	 *            SignStateRestorer
+	 * @param signStateRestorerMap
+	 *            Map<Integer, SignStateRestorer>
 	 */
 	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, UserAccountBean userAccountBean,
-			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+			DAOWrapper daoWrapper, Map<Integer, SignStateRestorer> signStateRestorerMap) {
 		for (StudyEventBean studyEventBean : studyEvents) {
-			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorer);
+			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorerMap);
 			studyEventBean.setUpdater(userAccountBean);
 			studyEventBean.setUpdatedDate(new Date());
 			daoWrapper.getSedao().update(studyEventBean);
@@ -288,24 +282,45 @@ public final class SubjectEventStatusUtil {
 	 *            UserAccountBean
 	 * @param daoWrapper
 	 *            DAOWrapper
-	 * @param signStateRestorer
-	 *            SignStateRestorer
+	 * @param signStateRestorerMap
+	 *            Map<Integer, SignStateRestorer>
 	 */
 	public static void determineSubjectEventStates(StudyEventDefinitionBean studyEventDefinitionBean,
-			UserAccountBean userAccountBean, DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+			UserAccountBean userAccountBean, DAOWrapper daoWrapper,
+			Map<Integer, SignStateRestorer> signStateRestorerMap) {
 		StudyBean study = (StudyBean) daoWrapper.getSdao().findByPK(studyEventDefinitionBean.getStudyId());
 		List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>) daoWrapper.getSedao()
-				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study,
-						studyEventDefinitionBean.getId());
+				.findAllByStudyAndEventDefinitionId(study, studyEventDefinitionBean.getId());
+		// findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved
 		for (StudyEventBean studyEventBean : studyEvents) {
-			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorer);
+			boolean studyEventIsNotAvailable = false;
+			SubjectEventStatus subjectEventStatus = studyEventBean.getSubjectEventStatus();
+			SubjectEventStatus prevSubjectEventStatus = studyEventBean.getPrevSubjectEventStatus();
+			if (prevSubjectEventStatus.isSkipped() || prevSubjectEventStatus.isStopped()) {
+				continue;
+			}
+			if (subjectEventStatus.isLocked() || subjectEventStatus.isSkipped() || subjectEventStatus.isStopped()
+					|| subjectEventStatus.isRemoved()) {
+				studyEventIsNotAvailable = true;
+			}
+			determineSubjectEventState(studyEventBean, daoWrapper, signStateRestorerMap);
+			if (studyEventIsNotAvailable) {
+				if (!studyEventBean.getSubjectEventStatus().equals(prevSubjectEventStatus.isSigned()
+						? SubjectEventStatus.SOURCE_DATA_VERIFIED
+						: prevSubjectEventStatus)) {
+					studyEventBean.setPrevSubjectEventStatus(studyEventBean.getSubjectEventStatus());
+					studyEventBean.setSubjectEventStatus(subjectEventStatus);
+				} else {
+					continue;
+				}
+			}
 			studyEventBean.setUpdater(userAccountBean);
 			studyEventBean.setUpdatedDate(new Date());
 			daoWrapper.getSedao().update(studyEventBean);
 		}
 	}
 
-	private static enum State {
+	private enum State {
 		DES(1), DEC(2), SDV(3), DENS(4);
 
 		private int id;
@@ -374,8 +389,23 @@ public final class SubjectEventStatusUtil {
 		}
 	}
 
+	private static SignStateRestorer prepareSignStateRestorer(List<EventDefinitionCRFBean> eventDefinitionCRFBeanList) {
+		SignStateRestorer signStateRestorer = new SignStateRestorer();
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFBeanList) {
+			if (eventDefinitionCRFBean.getStatus() != Status.AVAILABLE || !eventDefinitionCRFBean.isActive()) {
+				continue;
+			}
+			EventDefinitionInfo edi = new EventDefinitionInfo();
+			edi.id = eventDefinitionCRFBean.getId();
+			edi.required = eventDefinitionCRFBean.isRequiredCRF();
+			edi.defaultVersionId = eventDefinitionCRFBean.getDefaultVersionId();
+			signStateRestorer.getEventDefinitionInfoMap().put(eventDefinitionCRFBean.getId(), edi);
+		}
+		return signStateRestorer;
+	}
+
 	private static void analyzeSubjectEventState(StudyEventBean studyEventBean, List<EventCRFBean> eventCRFs,
-			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+			DAOWrapper daoWrapper, Map<Integer, SignStateRestorer> signStateRestorerMap) {
 		State state = State.DENS;
 		boolean hasStarted = false;
 		boolean justScheduled = true;
@@ -383,8 +413,8 @@ public final class SubjectEventStatusUtil {
 		List<Integer> requiredCrfIds = new ArrayList<Integer>();
 		SubjectEventStatus savedPrevSubjectEventStatus = studyEventBean.getPrevSubjectEventStatus();
 		SubjectEventStatus savedCurrentSubjectEventStatus = studyEventBean.getSubjectEventStatus();
-		StudySubjectBean studySubjectBean = (StudySubjectBean) daoWrapper.getSsdao().findByPK(
-				studyEventBean.getStudySubjectId());
+		StudySubjectBean studySubjectBean = (StudySubjectBean) daoWrapper.getSsdao()
+				.findByPK(studyEventBean.getStudySubjectId());
 		StudyBean studySubjectStudyBean = (StudyBean) daoWrapper.getSdao().findByPK(studySubjectBean.getStudyId());
 		List<EventDefinitionCRFBean> eventDefCrfs = (List<EventDefinitionCRFBean>) daoWrapper.getEdcdao()
 				.findAllActiveByEventDefinitionId(studySubjectStudyBean, studyEventBean.getStudyEventDefinitionId());
@@ -395,6 +425,9 @@ public final class SubjectEventStatusUtil {
 				crfsToProcess.add(eventDefinitionCRFBean.getCrfId());
 			}
 		}
+		SignStateRestorer signStateRestorer = signStateRestorerMap != null
+				? signStateRestorerMap.get(studySubjectBean.getStudyId())
+				: null;
 		Map<Integer, SignedData> preSignedData = SignStateRestorer.initPreSignedData(savedCurrentSubjectEventStatus,
 				signStateRestorer);
 		Map<Integer, SignedData> postSignedData = SignStateRestorer.initPostSignedData(eventDefCrfs);
@@ -424,16 +457,20 @@ public final class SubjectEventStatusUtil {
 					studySubjectStudyBean, studyEventBean.getId(), eventCRFBean.getCRFVersionId());
 			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, preSignedData);
 			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, postSignedData);
+			if (!eventCRFBean.statesIsEmpty()) {
+				eventCRFBean.setStatus(eventCRFBean.getDateCompleted() != null ? Status.UNAVAILABLE : Status.AVAILABLE);
+				eventCRFBean.setStage(null);
+			}
 			State eventCRFState = getState(eventCRFBean);
 			if (eventCRFBean.getStatus() == Status.UNAVAILABLE
 					&& eventCRFBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
 				if (eventDefinitionCrf.isRequiredCRF()) {
 					requiredCrfIds.remove((Integer) eventDefinitionCrf.getId());
 				}
-				if (hasSDVRequiredCRFs
-						&& !eventCRFBean.isSdvStatus()
-						&& (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf
-								.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)) {
+				if (hasSDVRequiredCRFs && !eventCRFBean.isSdvStatus()
+						&& (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
+								|| eventDefinitionCrf
+										.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)) {
 					notAllStartedSDVRequiredCRFsAreSDVed = true;
 				}
 				if (!hasSDVedCRFs && eventCRFBean.isSdvStatus()) {
@@ -455,13 +492,18 @@ public final class SubjectEventStatusUtil {
 		}
 		setSubjectEventState(studyEventBean, studySubjectStudyBean, daoWrapper, state);
 		if (!studyEventBean.getSubjectEventStatus().equals(savedCurrentSubjectEventStatus)
-				|| (studyEventBean.getPrevSubjectEventStatus().equals(SubjectEventStatus.SIGNED) && studyEventBean
-						.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))) {
+				|| (studyEventBean.getPrevSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
+						&& studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))) {
 			studyEventBean.setPrevSubjectEventStatus(savedCurrentSubjectEventStatus);
 			if (signStateRestorer != null) {
 				SignStateRestorer.restoreSignState(studyEventBean, savedCurrentSubjectEventStatus,
 						savedPrevSubjectEventStatus, preSignedData, postSignedData);
 			}
+		}
+		if (!studyEventBean.getSubjectEventStatus().isSigned() && studySubjectBean.getStatus().isSigned()) {
+			studySubjectBean.setStatus(Status.AVAILABLE);
+			studySubjectBean.setUpdatedDate(new Date());
+			daoWrapper.getSsdao().update(studySubjectBean);
 		}
 	}
 

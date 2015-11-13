@@ -1,12 +1,9 @@
 package com.clinovo.service;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.akaza.openclinica.DefaultAppContextTest;
@@ -24,7 +21,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 
 import com.clinovo.service.impl.EventCRFServiceImpl;
 import com.clinovo.service.impl.ItemDataServiceImpl;
@@ -56,8 +52,8 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		Mockito.doReturn(mockEventCRFDAO).when(mockEventCRFService).getEventCRFDAO();
 		Mockito.doReturn(mockStudySubjectDAO).when(mockEventCRFService).getStudySubjectDAO();
 		Mockito.doReturn(mockStudyDAO).when(mockEventCRFService).getStudyDAO();
-		Mockito.doNothing().when(mockEventCRFService)
-				.updateStudyEventStatus(Mockito.any(EventCRFBean.class), Mockito.any(UserAccountBean.class));
+		Mockito.doNothing().when(mockEventCRFService).updateStudyEventStatus(Mockito.any(EventCRFBean.class),
+				Mockito.any(UserAccountBean.class));
 
 		StudySubjectBean subject = new StudySubjectBean();
 		subject.setStudyId(1);
@@ -71,234 +67,25 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		updater.setId(144);
 
 		eventCRFList = new ArrayList<EventCRFBean>();
-		addEventToList(1, Status.UNAVAILABLE, null);
+		addEventToList(1, Status.UNAVAILABLE, Status.AVAILABLE);
 		addEventToList(2, Status.DELETED, Status.AVAILABLE);
 		addEventToList(3, Status.AUTO_DELETED, Status.UNAVAILABLE);
 		addEventToList(4, Status.LOCKED, Status.PENDING);
-		addEventToList(5, Status.PENDING, null);
-		addEventToList(6, Status.AVAILABLE, null);
-		Mockito.doCallRealMethod().when(mockEventCRFService).setEventCRFsToAutoRemovedState(eventCRFList, updater);
+		addEventToList(5, Status.PENDING, Status.AVAILABLE);
+		addEventToList(6, Status.AVAILABLE, Status.AVAILABLE);
+		Mockito.doCallRealMethod().when(mockEventCRFService).removeEventCRFs(eventCRFList, updater);
 		Mockito.doCallRealMethod().when(mockEventCRFService).getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
-		Mockito.doCallRealMethod().when(mockEventCRFService)
-				.restoreEventCRFsFromAutoRemovedState(eventCRFList, updater);
+		Mockito.doCallRealMethod().when(mockEventCRFService).restoreEventCRFs(eventCRFList, updater);
 	}
 
 	private void addEventToList(int id, Status status, Status oldStatus) throws Exception {
 		EventCRFBean eventCRFInstance = new EventCRFBean();
 		eventCRFInstance.setId(id);
 		eventCRFInstance.setStatus(status);
-		if (oldStatus != null) {
-			eventCRFInstance.setOldStatus(oldStatus);
-		}
+		eventCRFInstance.setOldStatus(oldStatus);
 		eventCRFList.add(eventCRFInstance);
 		Mockito.doCallRealMethod().when(mockEventCRFService).removeEventCRF(eventCRFInstance, updater);
 		Mockito.doCallRealMethod().when(mockEventCRFService).restoreEventCRF(eventCRFInstance, updater);
-	}
-
-	@PrepareForTest(EventCRFServiceImpl.class)
-	@Test
-	public void testThatRemoveEventCRFDoesSetCRFIntoRemovedState1() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(5); // CRF in state DES
-		Status statusBeforeRemoved = testEventCRF.getStatus();
-		mockEventCRFService.removeEventCRF(testEventCRF, updater);
-
-		assertTrue(testEventCRF.getStatus().equals(Status.DELETED));
-		assertTrue(testEventCRF.getOldStatus().equals(statusBeforeRemoved));
-		assertTrue(testEventCRF.getUpdater().equals(updater));
-		assertTrue(testEventCRF.getUpdatedDate().after(new Date(0)));
-
-		verify(mockEventCRFDAO).update(testEventCRF);
-		verify(mockItemDataService).removeItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRemoveEventCRFDoesSetCRFIntoRemovedState2() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(4); // CRF in state DDE
-		Status statusBeforeRemoved = testEventCRF.getStatus();
-		mockEventCRFService.removeEventCRF(testEventCRF, updater);
-
-		assertTrue(testEventCRF.getStatus().equals(Status.DELETED));
-		assertTrue(testEventCRF.getOldStatus().equals(statusBeforeRemoved));
-		assertTrue(testEventCRF.getUpdater().equals(updater));
-		assertTrue(testEventCRF.getUpdatedDate().after(new Date(0)));
-
-		verify(mockEventCRFDAO).update(testEventCRF);
-		verify(mockItemDataService).removeItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRemoveEventCRFDoesSetCRFIntoRemovedState3() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(0); // CRF in state COMPLETED
-		Status statusBeforeRemoved = testEventCRF.getStatus();
-		mockEventCRFService.removeEventCRF(testEventCRF, updater);
-
-		assertTrue(testEventCRF.getStatus().equals(Status.DELETED));
-		assertTrue(testEventCRF.getOldStatus().equals(statusBeforeRemoved));
-		assertTrue(testEventCRF.getUpdater().equals(updater));
-		assertTrue(testEventCRF.getUpdatedDate().after(new Date(0)));
-
-		verify(mockEventCRFDAO).update(testEventCRF);
-		verify(mockItemDataService).removeItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRemoveEventCRFDoesNotChangeStateOfCRFWithStatusRemoved() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(1);
-		mockEventCRFService.removeEventCRF(testEventCRF, updater);
-
-		verify(mockEventCRFDAO, never()).update(testEventCRF);
-		verify(mockItemDataService, never()).removeItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRemoveEventCRFDoesNotChangeStateOfCRFWithStatusAutoRemoved() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(2);
-		mockEventCRFService.removeEventCRF(testEventCRF, updater);
-
-		verify(mockEventCRFDAO, never()).update(testEventCRF);
-		verify(mockItemDataService, never()).removeItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRemoveEventCRFDoesSetLockedCRFIntoRemovedStateWithoutUpdatingItsOldStatus() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(3);
-		mockEventCRFService.removeEventCRF(testEventCRF, updater);
-
-		assertTrue(testEventCRF.getStatus().equals(Status.DELETED));
-		assertTrue(!testEventCRF.getOldStatus().isLocked());
-		assertTrue(testEventCRF.getUpdater().equals(updater));
-		assertTrue(testEventCRF.getUpdatedDate().after(new Date(0)));
-
-		verify(mockEventCRFDAO).update(testEventCRF);
-		verify(mockItemDataService).removeItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatSetEventCRFsToAutoRemovedStateDoesSetAvailableCRFsIntoAutoRemovedStateOnly() throws Exception {
-
-		mockEventCRFService.setEventCRFsToAutoRemovedState(eventCRFList, updater);
-
-		assertTrue(eventCRFList.get(0).getStatus().equals(Status.AUTO_DELETED));
-		verify(mockEventCRFDAO).update(eventCRFList.get(0));
-		verify(mockItemDataService).removeItemDataByEventCRF(eventCRFList.get(0), updater);
-
-		assertTrue(eventCRFList.get(1).getStatus().equals(Status.DELETED));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(1));
-		verify(mockItemDataService, never()).removeItemDataByEventCRF(eventCRFList.get(1), updater);
-
-		assertTrue(eventCRFList.get(2).getStatus().equals(Status.AUTO_DELETED));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(2));
-		verify(mockItemDataService, never()).removeItemDataByEventCRF(eventCRFList.get(2), updater);
-
-		assertTrue(eventCRFList.get(3).getStatus().equals(Status.AUTO_DELETED));
-		verify(mockEventCRFDAO).update(eventCRFList.get(3));
-		verify(mockItemDataService).removeItemDataByEventCRF(eventCRFList.get(3), updater);
-
-		assertTrue(eventCRFList.get(4).getStatus().equals(Status.AUTO_DELETED));
-		verify(mockEventCRFDAO).update(eventCRFList.get(4));
-		verify(mockItemDataService).removeItemDataByEventCRF(eventCRFList.get(4), updater);
-
-		assertTrue(eventCRFList.get(5).getStatus().equals(Status.AUTO_DELETED));
-		verify(mockEventCRFDAO).update(eventCRFList.get(5));
-		verify(mockItemDataService).removeItemDataByEventCRF(eventCRFList.get(5), updater);
-	}
-
-	@Test
-	public void testThatRestoreEventCRFDoesRestoreCRFIntoPreviousState1() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(1); // CRF previous state was DES
-		mockEventCRFService.restoreEventCRF(testEventCRF, updater);
-
-		assertTrue(testEventCRF.getStatus().equals(testEventCRF.getOldStatus()));
-		assertTrue(testEventCRF.getUpdater().equals(updater));
-		assertTrue(testEventCRF.getUpdatedDate().after(new Date(0)));
-		assertFalse(testEventCRF.isSdvStatus());
-		assertFalse(testEventCRF.isElectronicSignatureStatus());
-
-		verify(mockEventCRFDAO).update(testEventCRF);
-		verify(mockItemDataService).restoreItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRestoreEventCRFDoesRestoreCRFIntoPreviousState2() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(2); // CRF previous state was COMPLETED
-		mockEventCRFService.restoreEventCRF(testEventCRF, updater);
-
-		assertTrue(testEventCRF.getStatus().equals(testEventCRF.getOldStatus()));
-		assertTrue(testEventCRF.getUpdater().equals(updater));
-		assertTrue(testEventCRF.getUpdatedDate().after(new Date(0)));
-		assertFalse(testEventCRF.isSdvStatus());
-		assertFalse(testEventCRF.isElectronicSignatureStatus());
-
-		verify(mockEventCRFDAO).update(testEventCRF);
-		verify(mockItemDataService).restoreItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRestoreEventCRFDoesNotChangeCRFStateIfItsNotRemoved1() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(5); // CRF in state DES
-		mockEventCRFService.restoreEventCRF(testEventCRF, updater);
-
-		verify(mockEventCRFDAO, never()).update(testEventCRF);
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRestoreEventCRFDoesNotChangeCRFStateIfItsNotRemoved2() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(4); // CRF in state DDE
-		mockEventCRFService.restoreEventCRF(testEventCRF, updater);
-
-		verify(mockEventCRFDAO, never()).update(testEventCRF);
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRestoreEventCRFDoesNotChangeCRFStateIfItsNotRemoved3() throws Exception {
-
-		EventCRFBean testEventCRF = eventCRFList.get(0); // CRF in state COMPLETED
-		mockEventCRFService.restoreEventCRF(testEventCRF, updater);
-
-		verify(mockEventCRFDAO, never()).update(testEventCRF);
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(testEventCRF, updater);
-	}
-
-	@Test
-	public void testThatRestoreEventCRFsFromAutoRemovedStateDoesRestoreCRFsWithAutoRemovedStateOnly() throws Exception {
-
-		mockEventCRFService.restoreEventCRFsFromAutoRemovedState(eventCRFList, updater);
-
-		assertTrue(eventCRFList.get(0).getStatus().equals(Status.UNAVAILABLE));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(0));
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(eventCRFList.get(0), updater);
-
-		assertTrue(eventCRFList.get(1).getStatus().equals(Status.DELETED));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(1));
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(eventCRFList.get(1), updater);
-
-		assertTrue(eventCRFList.get(2).getStatus().equals(eventCRFList.get(2).getOldStatus()));
-		verify(mockEventCRFDAO).update(eventCRFList.get(2));
-		verify(mockItemDataService).restoreItemDataByEventCRF(eventCRFList.get(2), updater);
-
-		assertTrue(eventCRFList.get(3).getStatus().equals(Status.LOCKED));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(3));
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(eventCRFList.get(3), updater);
-
-		assertTrue(eventCRFList.get(4).getStatus().equals(Status.PENDING));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(4));
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(eventCRFList.get(4), updater);
-
-		assertTrue(eventCRFList.get(5).getStatus().equals(Status.AVAILABLE));
-		verify(mockEventCRFDAO, never()).update(eventCRFList.get(5));
-		verify(mockItemDataService, never()).restoreItemDataByEventCRF(eventCRFList.get(5), updater);
 	}
 
 	@Test
@@ -355,7 +142,8 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		newEventCRF.setNotStarted(false);
 		newEventCRF.setStudySubjectId(1);
 		eventCRFList.add(newEventCRF);
-		List<EventCRFBean> eventCRFBeanList = mockEventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
+		List<EventCRFBean> eventCRFBeanList = mockEventCRFService
+				.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
 		assertEquals(1, eventCRFBeanList.size());
 	}
 
@@ -365,7 +153,8 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		newEventCRF.setNotStarted(false);
 		newEventCRF.setStudySubjectId(1);
 		eventCRFList.add(newEventCRF);
-		List<EventCRFBean> eventCRFBeanList = mockEventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
+		List<EventCRFBean> eventCRFBeanList = mockEventCRFService
+				.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
 		assertEquals("TestSubject1", eventCRFBeanList.get(0).getStudySubjectName());
 	}
 
@@ -375,7 +164,8 @@ public class EventCRFServiceTest extends DefaultAppContextTest {
 		newEventCRF.setNotStarted(false);
 		newEventCRF.setStudySubjectId(1);
 		eventCRFList.add(newEventCRF);
-		List<EventCRFBean> eventCRFBeanList = mockEventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
+		List<EventCRFBean> eventCRFBeanList = mockEventCRFService
+				.getAllStartedEventCRFsWithStudyAndEventName(eventCRFList);
 		assertEquals("TestStudy1", eventCRFBeanList.get(0).getStudyName());
 	}
 }

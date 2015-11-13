@@ -13,6 +13,15 @@
 
 package org.akaza.openclinica.ws.client;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
@@ -24,17 +33,25 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-
 public class SoapCreateSubject extends WebServiceGatewaySupport implements SubjectServiceInterface {
 
 	private static final String NAMESPACE_URI = "http://openclinica.org/create-subject";
+
+	public void removeSubject(SubjectBean subjectBean, UserAccountBean updater) throws Exception {
+		//
+	}
+
+	public void restoreSubject(SubjectBean subjectBean, UserAccountBean updater) throws Exception {
+		//
+	}
+
+	public void removeSubjects(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		//
+	}
+
+	public void restoreSubjects(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		//
+	}
 
 	public String createSubject(SubjectBean subjectBean, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
 		Element requestElement = prepareRequest(subjectBean, studyBean);

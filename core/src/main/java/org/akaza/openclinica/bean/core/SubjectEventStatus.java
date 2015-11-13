@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class SubjectEventStatus extends Term implements Comparable {
@@ -55,9 +55,10 @@ public class SubjectEventStatus extends Term implements Comparable {
 
 	public static final SubjectEventStatus REMOVED = new SubjectEventStatus(10, "removed");
 
-    public static final SubjectEventStatus UNLOCK = new SubjectEventStatus(11, "unlock");
+	public static final SubjectEventStatus UNLOCK = new SubjectEventStatus(11, "unlock");
 
-	private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, REMOVED, UNLOCK});
+	private static List list = Arrays.asList(new SubjectEventStatus[]{SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED,
+			COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, REMOVED, UNLOCK});
 
 	// Solve the problem with the get() method...
 	private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();
@@ -145,8 +146,8 @@ public class SubjectEventStatus extends Term implements Comparable {
 	}
 
 	public static ArrayList toArrayList() {
-        ArrayList newList = new ArrayList(list);
-        newList.remove(UNLOCK);
+		ArrayList newList = new ArrayList(list);
+		newList.remove(UNLOCK);
 		return newList;
 	}
 
@@ -229,4 +230,12 @@ public class SubjectEventStatus extends Term implements Comparable {
 		return INVALID;
 	}
 
+	public boolean isActive() {
+		return isScheduled() || isNotScheduled() || isDE_Started() || isCompleted() || isSourceDataVerified()
+				|| isSigned() || isSkipped() || isStopped();
+	}
+
+	public boolean isNotActive() {
+		return isRemoved() || isLocked();
+	}
 }

@@ -13,18 +13,65 @@
 
 package org.akaza.openclinica.service.subject;
 
+import java.util.Date;
+import java.util.List;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 
-import java.util.Date;
-import java.util.List;
-
+/**
+ * SubjectServiceInterface.
+ */
 public interface SubjectServiceInterface {
 
-	public abstract String createSubject(SubjectBean subjectBean, StudyBean studyBean, Date enrollmentDate,
-			String secondaryId);
+	/**
+	 * Removes subject.
+	 *
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeSubject(SubjectBean subjectBean, UserAccountBean updater) throws Exception;
 
-	public List<StudySubjectBean> getStudySubject(StudyBean study);
+	/**
+	 * Restores subject.
+	 *
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreSubject(SubjectBean subjectBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Create subject.
+	 * 
+	 * @param subjectBean
+	 *            SubjectBean
+	 * @param studyBean
+	 *            StudyBean
+	 * @param enrollmentDate
+	 *            Date
+	 * @param secondaryId
+	 *            String
+	 * @return String
+	 */
+	String createSubject(SubjectBean subjectBean, StudyBean studyBean, Date enrollmentDate, String secondaryId);
+
+	/**
+	 * Returns Study subject.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @return List of StudySubjectBean
+	 */
+	List<StudySubjectBean> getStudySubject(StudyBean study);
 
 }

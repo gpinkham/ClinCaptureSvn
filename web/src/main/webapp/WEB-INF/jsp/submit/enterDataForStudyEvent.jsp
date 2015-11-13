@@ -380,7 +380,7 @@
 <td class="table_cell" style="vertical-align: middle; width:200px;">
             <c:choose>
 
-                <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked}">
+                <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped  || studyEvent.subjectEventStatus.stopped}">
                     <%--<c:when test="${dedc.status.name=='locked'}">--%>
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4"/>
                 </c:when>

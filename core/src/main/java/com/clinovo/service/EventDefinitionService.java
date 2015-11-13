@@ -1,13 +1,15 @@
 package com.clinovo.service;
 
-import com.clinovo.util.SignStateRestorer;
+import java.util.List;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 
-import java.util.List;
+import com.clinovo.util.SignStateRestorer;
 
 /**
  * EventDefinitionService.
@@ -40,19 +42,18 @@ public interface EventDefinitionService {
 	 *            list of parent's EventDefinitionCRFBeans
 	 * @param childEventDefinitionCRFsToUpdate
 	 *            list of child's EventDefinitionCRFBeans
-	 * @param oldEventDefinitionCRFs list of EventDefinitionCRFs before update.
-	 * @param signStateRestorer
-	 *            SignStateRestorer
+	 * @param oldEventDefinitionCRFs
+	 *            list of EventDefinitionCRFs before update.
+	 * @param signStateRestorerMap
+	 *            Map<Integer, SignStateRestorer>
 	 * @throws Exception
 	 *             an Exception
 	 */
 	void updateTheWholeStudyEventDefinition(StudyBean studyBean, UserAccountBean updater,
-			StudyEventDefinitionBean studyEventDefinitionBean,
-			List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
+			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
 			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
-			List<EventDefinitionCRFBean> oldEventDefinitionCRFs,
-			SignStateRestorer signStateRestorer)
-			throws Exception;
+			List<EventDefinitionCRFBean> oldEventDefinitionCRFs, Map<Integer, SignStateRestorer> signStateRestorerMap)
+					throws Exception;
 
 	/**
 	 * Method that updates only the study event definition without its event definition crfs.
@@ -83,11 +84,11 @@ public interface EventDefinitionService {
 	/**
 	 * Method prepares the SignStateRestorer.
 	 * 
-	 * @param eventDefinitionCRFBeanList
-	 *            List<EventDefinitionCRFBean>
-	 * @return SignStateRestorer
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @return Map<Integer, SignStateRestorer>
 	 */
-	SignStateRestorer prepareSignStateRestorer(List<EventDefinitionCRFBean> eventDefinitionCRFBeanList);
+	Map<Integer, SignStateRestorer> prepareSignStateRestorer(StudyEventDefinitionBean studyEventDefinitionBean);
 
 	/**
 	 * Returns all children EventDefinitionCRFBeans.
@@ -151,4 +152,27 @@ public interface EventDefinitionService {
 	void restoreStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
 			throws Exception;
 
+	/**
+	 * Removes study event definitions
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeStudyEventDefinitions(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Restores study event definitions
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreStudyEventDefinitions(StudyBean studyBean, UserAccountBean updater) throws Exception;
 }

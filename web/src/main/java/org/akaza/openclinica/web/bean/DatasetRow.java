@@ -20,23 +20,29 @@
  */
 package org.akaza.openclinica.web.bean;
 
-import com.clinovo.i18n.LocaleResolver;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import com.clinovo.i18n.LocaleResolver;
 
+/**
+ * DatasetRow.
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DatasetRow extends EntityBeanRow {
 
+	public static final int COL_STATUS = 4;
 	public static final int COL_DATASETNAME = 0;
 	public static final int COL_DATASETDESC = 1;
 	public static final int COL_DATASETOWNER = 2;
 	public static final int COL_DATASETCREATEDDATE = 3;
-	public static final int COL_STATUS = 4;
-	public SimpleDateFormat sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString(
-			"date_format_string"), LocaleResolver.getLocale());
+
+	private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+			ResourceBundleProvider.getFormatBundle().getString("date_format_string"), LocaleResolver.getLocale());
 
 	@Override
 	protected int compareColumn(Object row, int sortingColumn) {
@@ -47,24 +53,27 @@ public class DatasetRow extends EntityBeanRow {
 		DatasetBean thisAccount = (DatasetBean) bean;
 		DatasetBean argAccount = (DatasetBean) ((DatasetRow) row).bean;
 
-		int answer = 0;
+		int answer;
 		switch (sortingColumn) {
-		case COL_DATASETNAME:
-			answer = thisAccount.getName().toLowerCase().compareTo(argAccount.getName().toLowerCase());
-			break;
-		case COL_DATASETDESC:
-			answer = thisAccount.getDescription().toLowerCase().compareTo(argAccount.getDescription().toLowerCase());
-			break;
-		case COL_DATASETOWNER:
-			answer = thisAccount.getOwner().getName().toLowerCase()
-					.compareTo(argAccount.getOwner().getName().toLowerCase());
-			break;
-		case COL_STATUS:
-			answer = thisAccount.getStatus().compareTo(argAccount.getStatus());
-			break;
-		case COL_DATASETCREATEDDATE:
-			answer = thisAccount.getCreatedDate().compareTo(argAccount.getCreatedDate());
-			break;
+			case COL_DATASETNAME :
+				answer = thisAccount.getName().toLowerCase().compareTo(argAccount.getName().toLowerCase());
+				break;
+			case COL_DATASETDESC :
+				answer = thisAccount.getDescription().toLowerCase()
+						.compareTo(argAccount.getDescription().toLowerCase());
+				break;
+			case COL_DATASETOWNER :
+				answer = thisAccount.getOwner().getName().toLowerCase()
+						.compareTo(argAccount.getOwner().getName().toLowerCase());
+				break;
+			case COL_STATUS :
+				answer = thisAccount.getStatus().compareTo(argAccount.getStatus());
+				break;
+			case COL_DATASETCREATEDDATE :
+				answer = thisAccount.getCreatedDate().compareTo(argAccount.getCreatedDate());
+				break;
+			default :
+				answer = 0;
 		}
 
 		return answer;
@@ -73,30 +82,28 @@ public class DatasetRow extends EntityBeanRow {
 	@Override
 	public String getSearchString() {
 		DatasetBean thisAccount = (DatasetBean) bean;
-		return thisAccount.getName() + " " + thisAccount.getDescription() + " " + thisAccount.getOwner().getName()
-				+ " " + sdf.format(thisAccount.getCreatedDate());
+		return thisAccount.getName() + " " + thisAccount.getDescription() + " " + thisAccount.getOwner().getName() + " "
+				+ simpleDateFormat.format(thisAccount.getCreatedDate());
 	}
 
+	/**
+	 * Generates rows from beans.
+	 * 
+	 * @param beans
+	 *            ArrayList
+	 * @return ArrayList
+	 */
 	public static ArrayList generateRowsFromBeans(ArrayList beans) {
 		ArrayList answer = new ArrayList();
-
-		for (int i = 0; i < beans.size(); i++) {
+		for (DatasetBean datasetBean : (List<DatasetBean>) beans) {
 			try {
 				DatasetRow row = new DatasetRow();
-				row.setBean((DatasetBean) beans.get(i));
+				row.setBean(datasetBean);
 				answer.add(row);
-			} catch (Exception e) {
+			} catch (Exception ex) {
+				//
 			}
 		}
-
-		return answer;
-	}
-
-	public static ArrayList generateRowFromBean(DatasetBean db) {
-		ArrayList answer = new ArrayList();
-		DatasetRow row = new DatasetRow();
-		row.setBean(db);
-		answer.add(row);
 		return answer;
 	}
 

@@ -44,6 +44,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import com.clinovo.util.OdmExtractUtil;
 
@@ -68,7 +69,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a DatasetDAO object, for use in the application only.
 	 * 
-	 * @param ds DataSource
+	 * @param ds
+	 *            DataSource
 	 */
 	public DatasetDAO(DataSource ds) {
 		super(ds);
@@ -78,8 +80,10 @@ public class DatasetDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a DatasetDAO object suitable for testing purposes only.
 	 *
-	 * @param ds DataSource
-	 * @param digester DAODigester
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
 	 */
 	public DatasetDAO(DataSource ds, DAODigester digester) {
 		super(ds);
@@ -127,8 +131,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING); // odm_prior_metadataversion_oid
 		this.setTypeExpected(index++, TypeNames.BOOL); // show_secondary_id
 		this.setTypeExpected(index++, TypeNames.INT); // dataset_item_status_id
-        this.setTypeExpected(index++, TypeNames.STRING); // exclude_items
-		this.setTypeExpected(index, TypeNames.STRING); //sed_id_and_crf_id_pairs
+		this.setTypeExpected(index++, TypeNames.STRING); // exclude_items
+		this.setTypeExpected(index, TypeNames.STRING); // sed_id_and_crf_id_pairs
 	}
 
 	/**
@@ -164,14 +168,16 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.STRING); // sed_name
 		this.setTypeExpected(index++, TypeNames.INT); // crf_id
 		this.setTypeExpected(index++, TypeNames.STRING); // crf_name
-        this.setTypeExpected(index++, TypeNames.INT); // cv_version_id
-        this.setTypeExpected(index++, TypeNames.STRING); // cv_name
+		this.setTypeExpected(index++, TypeNames.INT); // cv_version_id
+		this.setTypeExpected(index++, TypeNames.STRING); // cv_name
 		this.setTypeExpected(index, TypeNames.INT); // crfs_masking id
 	}
 
 	/**
 	 * Update DatasetBean.
-	 * @param eb EntityBean.
+	 * 
+	 * @param eb
+	 *            EntityBean.
 	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb) {
@@ -192,18 +198,18 @@ public class DatasetDAO extends AuditableEntityDAO {
 		}
 		variables.put(index++, db.getApproverId() <= 0 ? null : db.getApproverId());
 
-        if (db.getDateStart() == null) {
-            nullVars.put(index, Types.TIMESTAMP);
+		if (db.getDateStart() == null) {
+			nullVars.put(index, Types.TIMESTAMP);
 			variables.put(index, null);
-        } else {
+		} else {
 			variables.put(index, new Timestamp(db.getDateStart().getTime()));
 		}
 		index++;
 
-        if (db.getDateEnd() == null) {
-            nullVars.put(index, Types.TIMESTAMP);
+		if (db.getDateEnd() == null) {
+			nullVars.put(index, Types.TIMESTAMP);
 			variables.put(index, null);
-        } else {
+		} else {
 			variables.put(index, new Timestamp(db.getDateEnd().getTime()));
 		}
 		index++;
@@ -215,20 +221,22 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Create DatasetBean.
-	 * @param eb EntityBean
+	 * 
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 */
 	public EntityBean create(EntityBean eb) {
 		DatasetBean db = (DatasetBean) eb;
-        String excludeItems = "";
+		String excludeItems = "";
 		String sedIdAndCrfIdPairs = "";
-        for (String key : (Set<String>) db.getItemMap().keySet()) {
-            ItemBean ib = (ItemBean) db.getItemMap().get(key);
-            if (!ib.isSelected()) {
-                excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
-            }
+		for (String key : (Set<String>) db.getItemMap().keySet()) {
+			ItemBean ib = (ItemBean) db.getItemMap().get(key);
+			if (!ib.isSelected()) {
+				excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
+			}
 			sedIdAndCrfIdPairs = addSedIdAndCRFIdIfUnique(sedIdAndCrfIdPairs, key);
-        }
+		}
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		HashMap nullVars = new HashMap();
 		int index = 1;
@@ -297,7 +305,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 	}
 
 	private String addSedIdAndCRFIdIfUnique(String sedIdAndCrfIdPairs, String key) {
-		String [] arguments = key.split("_");
+		String[] arguments = key.split("_");
 		String sedAndCrfId = arguments[0] + "_" + arguments[1];
 		if (!sedIdAndCrfIdPairs.contains(sedAndCrfId)) {
 			sedIdAndCrfIdPairs += (sedIdAndCrfIdPairs.isEmpty() ? "" : ",") + sedAndCrfId;
@@ -307,7 +315,9 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Get entity from hash map.
-	 * @param hm HashMap
+	 * 
+	 * @param hm
+	 *            HashMap
 	 * @return DatasetBean
 	 */
 	public Object getEntityFromHashMap(HashMap hm) {
@@ -349,14 +359,16 @@ public class DatasetDAO extends AuditableEntityDAO {
 		isId = isId > 0 ? isId : 1;
 		DatasetItemStatus dis = DatasetItemStatus.get(isId);
 		eb.setDatasetItemStatus(dis);
-        eb.setExcludeItems((String) hm.get("exclude_items"));
+		eb.setExcludeItems((String) hm.get("exclude_items"));
 		eb.setSedIdAndCRFIdPairs((String) hm.get("sed_id_and_crf_id_pairs"));
 		return eb;
 	}
 
 	/**
 	 * Get Ids of the groups.
-	 * @param datasetId int
+	 * 
+	 * @param datasetId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList getGroupIds(int datasetId) {
@@ -380,6 +392,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all datasets.
+	 * 
 	 * @return Collection
 	 */
 	public Collection findAll() {
@@ -395,6 +408,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all and order by study id and name.
+	 * 
 	 * @return Collection
 	 */
 	public Collection findAllOrderByStudyIdAndName() {
@@ -410,22 +424,27 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find top five.
-	 * @param currentStudy StudyBean
+	 * 
+	 * @param studyBean
+	 *            StudyBean
 	 * @return Collection
 	 */
-	public Collection findTopFive(StudyBean currentStudy) {
-		int studyId = currentStudy.getId();
-		this.setTypesExpected();
+	public Collection findTopFive(StudyBean studyBean) {
+		int index = 1;
+		setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
-		ArrayList alist = this.select(digester.getQuery("findTopFive"), variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			DatasetBean eb = (DatasetBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
+		variables.put(index++, studyBean.getId());
+		variables.put(index, studyBean.getId());
+		List<HashMap> mapList = select(digester.getQuery("findTopFive"), variables);
+		ArrayList result = new ArrayList();
+		for (HashMap map : mapList) {
+			DatasetBean eb = (DatasetBean) getEntityFromHashMap(map);
+			eb.setStudyBean(eb.getStudyId() != studyBean.getId()
+					? (StudyBean) new StudyDAO(ds).findByPK(eb.getStudyId())
+					: studyBean);
+			result.add(eb);
 		}
-		return al;
+		return result;
 	}
 
 	/**
@@ -433,32 +452,38 @@ public class DatasetDAO extends AuditableEntityDAO {
 	 *
 	 * @param ownerId
 	 *            studyId
-	 * @param studyId int
+	 * @param studyBean
+	 *            StudyBean
 	 * @return Collection
 	 */
-	public Collection findByOwnerId(int ownerId, int studyId) {
-		this.setTypesExpected();
-
-		HashMap variables = new HashMap();
+	public Collection findByOwnerId(int ownerId, StudyBean studyBean) {
 		int index = 1;
-		variables.put(index++, studyId);
-		variables.put(index++, studyId);
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(index++, studyBean.getId());
+		variables.put(index++, studyBean.getId());
 		variables.put(index, ownerId);
-
-		ArrayList alist = this.select(digester.getQuery("findByOwnerId"), variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			DatasetBean eb = (DatasetBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
+		ArrayList result = new ArrayList();
+		List<HashMap> mapList = select(digester.getQuery("findByOwnerId"), variables);
+		for (HashMap map : mapList) {
+			DatasetBean eb = (DatasetBean) getEntityFromHashMap(map);
+			eb.setStudyBean(eb.getStudyId() != studyBean.getId()
+					? (StudyBean) new StudyDAO(ds).findByPK(eb.getStudyId())
+					: studyBean);
+			result.add(eb);
 		}
-		return al;
+		return result;
 	}
 
 	/**
 	 * Not implemented.
-	 * @param strOrderByColumn String
-	 * @param blnAscendingSort boolean
-	 * @param strSearchPhrase String
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
 	 * @return new ArrayList
 	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -467,7 +492,9 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find by ID.
-	 * @param id int
+	 * 
+	 * @param id
+	 *            int
 	 * @return EntityBean
 	 */
 	public EntityBean findByPK(int id) {
@@ -489,8 +516,11 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all by name and study.
-	 * @param name dataset name
-	 * @param study StudyBean
+	 * 
+	 * @param name
+	 *            dataset name
+	 * @param study
+	 *            StudyBean
 	 * @return EntityBean
 	 */
 	public EntityBean findByNameAndStudy(String name, StudyBean study) {
@@ -514,9 +544,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Implements the Data Algorithm described in Dataset Export Algorithms, stores output in the returned ExtractBean.
-	 * @param eb The ExtractBean containing the dataset and study for which data is being retrieved.
-	 * @param currentstudyid int
-	 * @param parentstudyid int
+	 * 
+	 * @param eb
+	 *            The ExtractBean containing the dataset and study for which data is being retrieved.
+	 * @param currentstudyid
+	 *            int
+	 * @param parentstudyid
+	 *            int
 	 * @return An ExtractBean containing structured data stored by subject, study event definition, ordinal, CRF and
 	 *         item, as well as the maximum ordinal per study event definition.
 	 */
@@ -550,11 +584,17 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Not implemented!
-	 * @param objCurrentUser Object
-	 * @param intActionType int
-	 * @param strOrderByColumn String
-	 * @param blnAscendingSort boolean
-	 * @param strSearchPhrase String
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
 	 * @return new ArrayList
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
@@ -564,8 +604,11 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Not implemented!
-	 * @param objCurrentUser Object
-	 * @param intActionType int
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
 	 * @return new ArrayList
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
@@ -573,21 +616,35 @@ public class DatasetDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Find all by studyId.
-	 * @param studyId int.
+	 * Find all by studyBean.
+	 * 
+	 * @param studyBean
+	 *            StudyBean.
 	 * @return ArrayList
 	 */
-	public ArrayList findAllByStudyId(int studyId) {
+	public ArrayList findAllByStudyId(StudyBean studyBean) {
+		int index = 1;
+		setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
-
-		return executeFindAllQuery("findAllByStudyId", variables);
+		variables.put(index++, studyBean.getId());
+		variables.put(index, studyBean.getId());
+		ArrayList result = new ArrayList();
+		List<HashMap> mapList = select(digester.getQuery("findAllByStudyId"), variables);
+		for (HashMap map : mapList) {
+			DatasetBean eb = (DatasetBean) getEntityFromHashMap(map);
+			eb.setStudyBean(eb.getStudyId() != studyBean.getId()
+					? (StudyBean) new StudyDAO(ds).findByPK(eb.getStudyId())
+					: studyBean);
+			result.add(eb);
+		}
+		return result;
 	}
 
 	/**
 	 * Find all by studyId admin.
-	 * @param studyId int
+	 * 
+	 * @param studyId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findAllByStudyIdAdmin(int studyId) {
@@ -623,41 +680,38 @@ public class DatasetDAO extends AuditableEntityDAO {
 	 * @return ArrayList
 	 */
 	public ArrayList selectNotMaskedDefinitionCrfItemIds(int userId, int studyId, String sedIds, String itemIds) {
-		return select("select i.item_id as item_id, sed.study_event_definition_id as sed_id, sed.name as sed_name,c.crf_id as crf_id, c.name as crf_name, cv.crf_version_id as cv_version_id, cv.name as cv_name, cm.id as masked "
-				+ "from study_event_definition sed "
-				+ "join study s on s.study_id = "
-				+ studyId
-				+ " join event_definition_crf edc on edc.study_event_definition_id = sed.study_event_definition_id and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id))) "
-				+ "join crf c on c.crf_id = edc.crf_id "
-				+ "join crf_version cv on cv.crf_id = c.crf_id "
-				+ "join item_form_metadata ifm on ifm.crf_version_id = cv.crf_version_id "
-				+ "join item i on i.item_id = ifm.item_id "
-				+ "left join crfs_masking cm on cm.user_id = "
-				+ userId
-				+ " and cm.study_event_definition_id = sed.study_event_definition_id and cm.event_definition_crf_id = edc.event_definition_crf_id "
-				+ "and cm.study_id = s.study_id "
-				+ "and cm.status_id != 5 "
-				+ "where sed.study_event_definition_id in " + sedIds + " and i.item_id in " + itemIds);
+		return select(
+				"select i.item_id as item_id, sed.study_event_definition_id as sed_id, sed.name as sed_name,c.crf_id as crf_id, c.name as crf_name, cv.crf_version_id as cv_version_id, cv.name as cv_name, cm.id as masked "
+						+ "from study_event_definition sed " + "join study s on s.study_id = " + studyId
+						+ " join event_definition_crf edc on edc.study_event_definition_id = sed.study_event_definition_id and ((s.parent_study_id is null and edc.study_id = s.study_id) or (not(s.parent_study_id is null) and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id) and edc.event_definition_crf_id not in (select parent_id from event_definition_crf edc where edc.study_id = s.study_id))) "
+						+ "join crf c on c.crf_id = edc.crf_id " + "join crf_version cv on cv.crf_id = c.crf_id "
+						+ "join item_form_metadata ifm on ifm.crf_version_id = cv.crf_version_id "
+						+ "join item i on i.item_id = ifm.item_id " + "left join crfs_masking cm on cm.user_id = "
+						+ userId
+						+ " and cm.study_event_definition_id = sed.study_event_definition_id and cm.event_definition_crf_id = edc.event_definition_crf_id "
+						+ "and cm.study_id = s.study_id " + "and cm.status_id != 5 "
+						+ "where sed.study_event_definition_id in " + sedIds + " and i.item_id in " + itemIds);
 	}
 
 	/**
 	 * Update all columns of the dataset table except owner_id.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 */
 	public EntityBean updateAll(EntityBean eb) {
 		eb.setActive(false);
 		DatasetBean db = (DatasetBean) eb;
-        String excludeItems = "";
+		String excludeItems = "";
 		String sedIdAndCrfIdPairs = "";
-        for (String key : (Set<String>) db.getItemMap().keySet()) {
-            ItemBean ib = (ItemBean) db.getItemMap().get(key);
-            if (!ib.isSelected()) {
-                excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
-            }
+		for (String key : (Set<String>) db.getItemMap().keySet()) {
+			ItemBean ib = (ItemBean) db.getItemMap().get(key);
+			if (!ib.isSelected()) {
+				excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
+			}
 			sedIdAndCrfIdPairs = addSedIdAndCRFIdIfUnique(sedIdAndCrfIdPairs, key);
-        }
+		}
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 		int index = 1;
@@ -666,7 +720,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(index++, db.getName());
 		variables.put(index++, db.getDescription());
 		variables.put(index++, db.getSQLStatement());
-        variables.put(index++, excludeItems);
+		variables.put(index++, excludeItems);
 		variables.put(index++, db.getDateLastRun());
 		variables.put(index++, db.getNumRuns());
 		variables.put(index++, db.getUpdaterId());
@@ -723,7 +777,9 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Update Group Map.
-	 * @param db DatasetBean
+	 * 
+	 * @param db
+	 *            DatasetBean
 	 * @return EntityBean
 	 */
 	public EntityBean updateGroupMap(DatasetBean db) {
@@ -785,9 +841,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 
 	/**
 	 * Parse Dataset from SQL.
-	 * @param sql String
-	 * @param issed boolean
-	 * @param hasfilterzero boolean
+	 * 
+	 * @param sql
+	 *            String
+	 * @param issed
+	 *            boolean
+	 * @param hasfilterzero
+	 *            boolean
 	 * @return String
 	 */
 	public String parseSQLDataset(String sql, boolean issed, boolean hasfilterzero) {

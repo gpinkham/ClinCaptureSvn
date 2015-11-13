@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -53,9 +52,8 @@ public class RestoreStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
@@ -67,9 +65,7 @@ public class RestoreStudyServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
 
-		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean currentUser = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 		StudyBean study = (StudyBean) studyDao.findByPK(studyId);
 
 		String action = request.getParameter("action");
@@ -87,7 +83,7 @@ public class RestoreStudyServlet extends Controller {
 			} else {
 				logger.info("submit to restore the study");
 
-				getStudyService().restoreStudy(study, currentStudy, currentRole, currentUser);
+				getStudyService().restoreStudy(study, currentUser);
 
 				addPageMessage(respage.getString("this_study_has_been_restored_succesfully"), request);
 				forwardPage(Page.STUDY_LIST_SERVLET, request, response);

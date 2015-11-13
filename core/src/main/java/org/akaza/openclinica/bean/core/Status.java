@@ -198,6 +198,10 @@ public final class Status extends Term implements Comparable {
 		return this == Status.DELETED || this == Status.AUTO_DELETED;
 	}
 
+	public boolean isAutoDeleted() {
+		return this == Status.AUTO_DELETED;
+	}
+
 	public boolean isLocked() {
 		return this == Status.LOCKED;
 	}

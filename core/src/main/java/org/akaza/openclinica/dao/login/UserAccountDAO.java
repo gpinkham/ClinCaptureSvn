@@ -877,6 +877,26 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	}
 
 	/**
+	 * Finds roles by study id only.
+	 *
+	 * @param studyId
+	 *            int
+	 * @return ArrayList
+	 */
+	public ArrayList findAllByStudyIdOnly(int studyId) {
+		this.setRoleTypesExpected();
+		ArrayList answer = new ArrayList();
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		ArrayList alist = this.select(digester.getQuery("findAllByStudyIdOnly"), variables);
+		for (Object anAlist : alist) {
+			StudyUserRoleBean surb = this.getRoleFromHashMap((HashMap) anAlist);
+			answer.add(surb);
+		}
+		return answer;
+	}
+
+	/**
 	 * Delete StudyUserRoleBean.
 	 *
 	 * @param role

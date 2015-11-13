@@ -16,11 +16,21 @@ package org.akaza.openclinica.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * SubjectLabelNormalizer.
+ */
 public final class SubjectLabelNormalizer {
 
 	private SubjectLabelNormalizer() {
 	}
 
+	/**
+	 * Normalizes the study subject label.
+	 * 
+	 * @param studySubjectLabel
+	 *            String
+	 * @return String
+	 */
 	public static String normalizeSubjectLabel(String studySubjectLabel) {
 		String normalizedStudySubjectLabel = "";
 		Pattern pattern = Pattern.compile("(_*-*\\w*\\d*)");

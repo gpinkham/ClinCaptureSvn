@@ -21,19 +21,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.clinovo.exception.CodeException;
-import com.clinovo.model.CodedItemElement;
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -43,7 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.exception.CodeException;
 import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
 
@@ -75,7 +70,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns all coded items by study id.
 	 *
-	 * @param studyId The study to which the coded items were created
+	 * @param studyId
+	 *            The study to which the coded items were created
 	 * @return the list of coded items created for study.
 	 */
 	public List<CodedItem> findByStudy(int studyId) {
@@ -88,8 +84,10 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns all coded items by study id and site id.
 	 *
-	 * @param studyId The study to which the coded items were created.
-	 * @param siteId  The site in the study (above) to which the coded items were created.
+	 * @param studyId
+	 *            The study to which the coded items were created.
+	 * @param siteId
+	 *            The site in the study (above) to which the coded items were created.
 	 * @return the list of coded items.
 	 */
 	public List<CodedItem> findByStudyAndSite(int studyId, int siteId) {
@@ -102,7 +100,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns coded item by coded item id.
 	 *
-	 * @param codedItemId the coded item id.
+	 * @param codedItemId
+	 *            the coded item id.
 	 * @return the coded item.
 	 */
 	public CodedItem findById(int codedItemId) {
@@ -112,7 +111,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns coded item by item id.
 	 *
-	 * @param codedItemId The id of the coded item to retrieve.
+	 * @param codedItemId
+	 *            The id of the coded item to retrieve.
 	 * @return the coded item.
 	 */
 	public CodedItem findCodedItem(int codedItemId) {
@@ -122,7 +122,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns the list of coded item filtered by dictionary.
 	 *
-	 * @param dictionary The dictionary to filter on.
+	 * @param dictionary
+	 *            The dictionary to filter on.
 	 * @return the filtered list of coded items.
 	 */
 	public List<CodedItem> findCodedItemsByDictionary(String dictionary) {
@@ -132,7 +133,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns the list of coded item filtered by status.
 	 *
-	 * @param status The status to filter on.
+	 * @param status
+	 *            The status to filter on.
 	 * @return the filtered list of coded items.
 	 */
 	public List<CodedItem> findCodedItemsByStatus(CodeStatus status) {
@@ -142,7 +144,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns the list of coded item filtered by event crf id.
 	 *
-	 * @param eventCRFId The eventCRF to filter on.
+	 * @param eventCRFId
+	 *            The eventCRF to filter on.
 	 * @return the filtered list of coded items.
 	 */
 	public List<CodedItem> findByEventCRF(int eventCRFId) {
@@ -152,7 +155,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns the list of coded item filtered by crf version id.
 	 *
-	 * @param crfVersionId the crf version id.
+	 * @param crfVersionId
+	 *            the crf version id.
 	 * @return the list of coded items.
 	 */
 	public List<CodedItem> findByCRFVersion(int crfVersionId) {
@@ -162,7 +166,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns the list of coded item filtered by subject id.
 	 *
-	 * @param subject the subject id.
+	 * @param subject
+	 *            the subject id.
 	 * @return the list of coded items.
 	 */
 	public List<CodedItem> findBySubject(int subject) {
@@ -172,21 +177,26 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns the created coded item.
 	 *
-	 * @param eventCRF the event-crf the coded item belongs to.
-	 * @param item     the reference CRF-item for the coded item.
-	 * @param itemData the data that contains the verbatim term.
-	 * @param study    the study bean.
+	 * @param eventCRF
+	 *            the event-crf the coded item belongs to.
+	 * @param item
+	 *            the reference CRF-item for the coded item.
+	 * @param itemData
+	 *            the data that contains the verbatim term.
+	 * @param study
+	 *            the study bean.
 	 * @return the created coded item.
-	 * @throws Exception for all exceptions.
+	 * @throws Exception
+	 *             for all exceptions.
 	 */
-	public CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean study) throws Exception {
+	public CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean study)
+			throws Exception {
 
 		CodedItem cItem = new CodedItem();
 
 		ItemDAO itemDAO = new ItemDAO(dataSource);
 		ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(dataSource);
-		ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(),
-				eventCRF.getCRFVersionId());
+		ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(), eventCRF.getCRFVersionId());
 		if (currentDictionaryIsValid(meta.getCodeRef()) && !itemData.getValue().isEmpty()) {
 
 			if (study.isSite(study.getParentStudyId())) {
@@ -208,23 +218,31 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 		} else if (item.getDataType().equals(ItemDataType.CODE)) {
 
-			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(), eventCRF.getCRFVersionId());
-			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
+			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
+					eventCRF.getCRFVersionId());
+			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(),
+					eventCRF.getId(), itemData.getOrdinal());
 			CodedItem codedItem = codeItemDAO.findByItemId(refItemData.getId());
 
 			if (codedItem != null) {
-				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfterLast(item.getName(), "_"));
+				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(),
+						StringUtils.substringAfterLast(item.getName(), "_"));
 				codedItem.addCodedItemElements(codedItemElement);
 				codeItemDAO.saveOrUpdate(codedItem);
 
 				return codedItem;
 			}
-		} else if (item.getDataType().equals(ItemDataType.INTEGER) && !meta.getCodeRef().isEmpty() && !itemData.getValue().isEmpty()) {
-			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(), eventCRF.getCRFVersionId());
-			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
+		} else
+			if (item.getDataType().equals(ItemDataType.INTEGER) && !meta.getCodeRef().isEmpty()
+					&& !itemData.getValue().isEmpty()) {
+			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
+					eventCRF.getCRFVersionId());
+			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(),
+					eventCRF.getId(), itemData.getOrdinal());
 			CodedItem codedItem = codeItemDAO.findByItemId(refItemData.getId());
 			if (codedItem != null) {
-				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfterLast(item.getName(), "_"));
+				CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(),
+						StringUtils.substringAfterLast(item.getName(), "_"));
 				codedItemElement.setItemCode(itemData.getValue());
 				codedItem.addCodedItemElements(codedItemElement);
 				codeItemDAO.saveOrUpdate(codedItem);
@@ -238,9 +256,11 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Returns updated coded item.
 	 *
-	 * @param codedItem The coded item to save.
+	 * @param codedItem
+	 *            The coded item to save.
 	 * @return the created coded item.
-	 * @throws Exception for all exceptions.
+	 * @throws Exception
+	 *             for all exceptions.
 	 */
 	public CodedItem saveCodedItem(CodedItem codedItem) throws Exception {
 
@@ -256,14 +276,14 @@ public class CodedItemServiceImpl implements CodedItemService {
 			}
 		}
 
-		resetEventAndCrfStatus(codedItem);
 		return codeItemDAO.saveOrUpdate(codedItem);
 	}
 
 	/**
 	 * Deletes coded items.
 	 *
-	 * @param codedItem The coded item to delete.
+	 * @param codedItem
+	 *            The coded item to delete.
 	 */
 	public void deleteCodedItem(CodedItem codedItem) {
 		codeItemDAO.deleteCodedItem(codedItem);
@@ -279,7 +299,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Updates coded item status to removed.
 	 *
-	 * @param versionId The crf version for which to remove coded items.
+	 * @param versionId
+	 *            The crf version for which to remove coded items.
 	 */
 	public void removeByCRFVersion(int versionId) {
 
@@ -294,7 +315,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Deletes coded item.
 	 *
-	 * @param versionId The crf version for which to purge coded items.
+	 * @param versionId
+	 *            The crf version for which to purge coded items.
 	 */
 	public void deleteByCRFVersion(int versionId) {
 
@@ -308,7 +330,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 	/**
 	 * Restores coded item status to coded or not coded.
 	 *
-	 * @param versionId The crf version for which to restore coded items.
+	 * @param versionId
+	 *            The crf version for which to restore coded items.
 	 */
 	public void restoreByCRFVersion(int versionId) {
 
@@ -333,32 +356,9 @@ public class CodedItemServiceImpl implements CodedItemService {
 		return validItems;
 	}
 
-
 	private boolean currentDictionaryIsValid(String dictionaryName) {
-		return dictionaryName.equalsIgnoreCase("icd_10")
-				|| dictionaryName.equalsIgnoreCase("icd_9cm")
-				|| dictionaryName.toLowerCase().contains("meddra")
-				|| dictionaryName.toLowerCase().contains("whod")
+		return dictionaryName.equalsIgnoreCase("icd_10") || dictionaryName.equalsIgnoreCase("icd_9cm")
+				|| dictionaryName.toLowerCase().contains("meddra") || dictionaryName.toLowerCase().contains("whod")
 				|| dictionaryName.equalsIgnoreCase("ctcae");
-	}
-
-	private void resetEventAndCrfStatus(CodedItem codedItem) {
-
-		EventCRFDAO eventEcrfDAO = new EventCRFDAO(dataSource);
-		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-
-		EventCRFBean eventCRFBean = (EventCRFBean) eventEcrfDAO.findByPK(codedItem.getEventCrfId());
-		StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
-
-		if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED) || eventCRFBean.isSdvStatus()) {
-
-			eventCRFBean.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
-			eventCRFBean.setSdvStatus(false);
-			eventEcrfDAO.update(eventCRFBean);
-
-			studyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-			studyEventBean.setUpdatedDate(new Date());
-			studyEventDAO.update(studyEventBean);
-		}
 	}
 }

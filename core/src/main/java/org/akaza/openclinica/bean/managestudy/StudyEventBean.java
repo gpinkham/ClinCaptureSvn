@@ -20,22 +20,29 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.util.SignedData;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * StudyEventBean class.
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventBean extends AuditableEntityBean {
+
+	public static final int STUDY_EVENT_STATES_LENGTH = 3;
+
+	public static final int BY_ITSELF = 0;
+	public static final int BY_STUDY_SUBJECT = 2;
+	public static final int BY_STUDY_EVENT_DEFINITION = 1;
+
 	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
 	// LOCATION SAMPLE_ORDINAL DATE_START DATE_END
 	// OWNER_ID STATUS_ID DATE_CREATED DATE_UPDATED
@@ -429,5 +436,10 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	public void setStudyEventDefinitionOrdinal(int studyEventDefinitionOrdinal) {
 		this.studyEventDefinitionOrdinal = studyEventDefinitionOrdinal;
+	}
+
+	@Override
+	protected int getStatesLength() {
+		return STUDY_EVENT_STATES_LENGTH;
 	}
 }

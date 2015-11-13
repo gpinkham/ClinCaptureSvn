@@ -20,6 +20,17 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
@@ -38,16 +49,6 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base. Modified by ywang (12-07-2007) to convert
@@ -499,12 +500,12 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 */
 	public String formatPDate(String pDate) {
 		String temp = "";
-		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year_month"));
-		String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year"));
-		String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_string"));
+		String yearMonthFormat = StringUtil
+				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
+		String yearFormat = StringUtil
+				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
+		String dateFormat = StringUtil
+				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
 		try {
 			if (StringUtil.isFormatDate(pDate, "yyyy-MM-dd") || StringUtil.isFormatDate(pDate, "yyyy-MM")
 					|| StringUtil.isFormatDate(pDate, "yyyy")) {
@@ -514,8 +515,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			} else if (StringUtil.isPartialYear(pDate, yearFormat, locale)) {
 				temp = pDate;
 			} else if (StringUtil.isPartialYearMonth(pDate, yearMonthFormat, locale)) {
-				temp = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat, locale)
-						.parse(pDate));
+				temp = new SimpleDateFormat("yyyy-MM")
+						.format(new SimpleDateFormat(yearMonthFormat, locale).parse(pDate));
 			}
 		} catch (Exception ex) {
 			logger.warn("Partial Date Parsing Exception........");
@@ -532,12 +533,12 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 */
 	public String reFormatPDate(String pDate) {
 		String temp = "";
-		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year_month"));
-		String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year"));
-		String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_string"));
+		String yearMonthFormat = StringUtil
+				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
+		String yearFormat = StringUtil
+				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
+		String dateFormat = StringUtil
+				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
 		try {
 			if (StringUtil.isFormatDate(pDate, dateFormat, locale)
 					|| StringUtil.isFormatDate(pDate, yearMonthFormat, locale)
@@ -548,8 +549,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			} else if (StringUtil.isPartialYear(pDate, "yyyy")) {
 				temp = pDate;
 			} else if (StringUtil.isPartialYearMonth(pDate, "yyyy-MM")) {
-				temp = new SimpleDateFormat(yearMonthFormat, locale).format(new SimpleDateFormat("yyyy-MM")
-						.parse(pDate));
+				temp = new SimpleDateFormat(yearMonthFormat, locale)
+						.format(new SimpleDateFormat("yyyy-MM").parse(pDate));
 			}
 		} catch (Exception ex) {
 			logger.warn("Partial Date Parsing Exception........");

@@ -1993,6 +1993,7 @@ public abstract class Controller extends BaseController {
 				}
 				dec.setEventDefinitionCRF(edc);
 				dec.setFlags(ecb, ub, currentRole, edc);
+				dec.getEventCRF().setStudyEventBean((StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId()));
 
 				ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
 				if (!idata.isEmpty()) {

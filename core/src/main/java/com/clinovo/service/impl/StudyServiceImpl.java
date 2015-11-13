@@ -20,40 +20,21 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.EventCRFService;
+import com.clinovo.service.DatasetService;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.StudyService;
+import com.clinovo.service.StudySubjectService;
 import com.clinovo.service.UserAccountService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * StudyServiceImpl.
@@ -66,536 +47,160 @@ public class StudyServiceImpl implements StudyService {
 	private DataSource dataSource;
 
 	@Autowired
-	private EventCRFService eventCRFService;
+	private DatasetService datasetService;
 
 	@Autowired
 	private UserAccountService userAccountService;
 
-	private EventCRFDAO getEventCRFDAO() {
-		return new EventCRFDAO(dataSource);
-	}
+	@Autowired
+	private StudySubjectService studySubjectService;
+
+	@Autowired
+	private EventDefinitionService eventDefinitionService;
+
+	@Autowired
+	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	private StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
-	}
-
-	private StudyEventDAO getStudyEventDAO() {
-		return new StudyEventDAO(dataSource);
-	}
-
-	private StudySubjectDAO getStudySubjectDAO() {
-		return new StudySubjectDAO(dataSource);
 	}
 
 	private UserAccountDAO getUserAccountDAO() {
 		return new UserAccountDAO(dataSource);
 	}
 
-	private StudyGroupDAO getStudyGroupDAO() {
-		return new StudyGroupDAO(dataSource);
+	private void autoRemoveStudyUserRole(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		List<StudyUserRoleBean> studyUserRoleBeanList = getUserAccountDAO().findAllByStudyIdOnly(studyBean.getId());
+		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeanList) {
+			userAccountService.autoRemoveStudyUserRole(studyUserRoleBean, updater);
+		}
 	}
 
-	private StudyGroupClassDAO getStudyGroupClassDAO() {
-		return new StudyGroupClassDAO(dataSource);
+	private void autoRestoreStudyUserRole(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		List<StudyUserRoleBean> studyUserRoleBeanList = getUserAccountDAO().findAllByStudyIdOnly(studyBean.getId());
+		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeanList) {
+			userAccountService.autoRestoreStudyUserRole(studyUserRoleBean, updater);
+		}
 	}
 
-	private SubjectGroupMapDAO getSubjectGroupMapDAO() {
-		return new SubjectGroupMapDAO(dataSource);
-	}
-
-	private DatasetDAO getDatasetDAO() {
-		return new DatasetDAO(dataSource);
-	}
-
-	private EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		return new EventDefinitionCRFDAO(dataSource);
-	}
-
-	private StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
-		return new StudyEventDefinitionDAO(dataSource);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeStudy(StudyBean study, StudyBean currentStudy, StudyUserRoleBean currentRole,
-			UserAccountBean updater) throws Exception {
-		StudyDAO studyDao = getStudyDAO();
-		DatasetDAO datasetDao = getDatasetDAO();
-		StudyEventDAO studyEventDao = getStudyEventDAO();
-		UserAccountDAO userAccountDao = getUserAccountDAO();
-		StudySubjectDAO studySubjectDao = getStudySubjectDAO();
-		StudyGroupClassDAO studyGroupClassDao = getStudyGroupClassDAO();
-		SubjectGroupMapDAO subjectGroupMapDao = getSubjectGroupMapDAO();
-		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
-		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
-
-		if (study.getStatus() != Status.DELETED) {
-			study.setOldStatus(study.getStatus());
+	private void disableStudyObjects(StudyBean studyBean, UserAccountBean updater, Status status) throws Exception {
+		if (status.isDeleted()) {
+			autoRemoveStudyUserRole(studyBean, updater);
+			studySubjectService.removeStudySubjects(studyBean, updater);
+			datasetService.removeDatasets(studyBean, updater);
+			if (!studyBean.isSite()) {
+				eventDefinitionService.removeStudyEventDefinitions(studyBean, updater);
+			} else {
+				eventDefinitionCrfService.removeChildEventDefinitionCRFs(studyBean, updater);
+			}
 		} else {
-			study.setOldStatus(Status.AVAILABLE);
-		}
-		study.setStatus(Status.DELETED);
-		study.setUpdater(updater);
-		study.setUpdatedDate(new Date());
-		studyDao.update(study);
-
-		// remove all sites
-		List<StudyBean> sites = (List<StudyBean>) studyDao.findAllByParent(study.getId());
-		for (StudyBean site : sites) {
-			if (!site.getStatus().equals(Status.DELETED)) {
-				site.setOldStatus(site.getStatus());
-				site.setStatus(Status.AUTO_DELETED);
-				site.setUpdater(updater);
-				site.setUpdatedDate(new Date());
-				studyDao.update(site);
-			}
-		}
-
-		// remove all users and roles
-		List<StudyUserRoleBean> userRoles = userAccountDao.findAllByStudyId(study.getId());
-		for (StudyUserRoleBean role : userRoles) {
-			userAccountService.autoRemoveStudyUserRole(role, updater);
-		}
-
-		// YW << bug fix for that current active study has been deleted
-		if (study.getId() == currentStudy.getId()) {
-			currentStudy.setStatus(Status.DELETED);
-			currentRole.setStatus(Status.DELETED);
-		} else if (currentStudy.getParentStudyId() == study.getId()) {
-			// if current active study is a site and the deleted study is
-			// this active site's parent study,
-			// then this active site has to be removed as well
-			// (auto-removed)
-
-			currentStudy.setStatus(Status.AUTO_DELETED);
-			// we may need handle this later?
-			currentRole.setStatus(Status.DELETED);
-		}
-
-		// remove all subjects
-		List<StudySubjectBean> subjects = studySubjectDao.findAllByStudy(study);
-		for (StudySubjectBean subject : subjects) {
-			if (!subject.getStatus().equals(Status.DELETED)) {
-				subject.setStatus(Status.AUTO_DELETED);
-				subject.setUpdater(updater);
-				subject.setUpdatedDate(new Date());
-				studySubjectDao.update(subject);
-			}
-		}
-
-		// remove all study_group_class
-		// changed by jxu on 08-31-06, to fix the problem of no study_id
-		// in study_group table
-		List<StudyGroupClassBean> groups = studyGroupClassDao.findAllByStudy(study);
-		for (StudyGroupClassBean group : groups) {
-			if (!group.getStatus().equals(Status.DELETED)) {
-				group.setStatus(Status.AUTO_DELETED);
-				group.setUpdater(updater);
-				group.setUpdatedDate(new Date());
-				studyGroupClassDao.update(group);
-				// all subject_group_map
-				List<SubjectGroupMapBean> subjectGroupMaps = subjectGroupMapDao.findAllByStudyGroupClassId(group
-						.getId());
-				for (SubjectGroupMapBean sgMap : subjectGroupMaps) {
-					if (!sgMap.getStatus().equals(Status.DELETED)) {
-						sgMap.setStatus(Status.AUTO_DELETED);
-						sgMap.setUpdater(updater);
-						sgMap.setUpdatedDate(new Date());
-						subjectGroupMapDao.update(sgMap);
-					}
-				}
-			}
-		}
-
-		List<StudyGroupClassBean> groupClasses = studyGroupClassDao.findAllActiveByStudy(study);
-		for (StudyGroupClassBean gc : groupClasses) {
-			if (!gc.getStatus().equals(Status.DELETED)) {
-				gc.setStatus(Status.AUTO_DELETED);
-				gc.setUpdater(updater);
-				gc.setUpdatedDate(new Date());
-				studyGroupClassDao.update(gc);
-			}
-		}
-
-		// remove all event definitions and event
-		List<StudyEventDefinitionBean> definitions = studyEventDefinitionDao.findAllByStudy(study);
-		for (StudyEventDefinitionBean definition : definitions) {
-			if (!definition.getStatus().equals(Status.DELETED)) {
-				definition.setStatus(Status.AUTO_DELETED);
-				definition.setUpdater(updater);
-				definition.setUpdatedDate(new Date());
-				studyEventDefinitionDao.update(definition);
-				List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
-						.findAllByDefinition(definition.getId());
-
-				for (EventDefinitionCRFBean edc : edcs) {
-					if (!edc.getStatus().equals(Status.DELETED)) {
-						edc.setStatus(Status.AUTO_DELETED);
-						edc.setUpdater(updater);
-						edc.setUpdatedDate(new Date());
-						eventDefinitionCrfDao.update(edc);
-					}
-				}
-
-				List<StudyEventBean> events = (List<StudyEventBean>) studyEventDao.findAllByDefinition(definition
-						.getId());
-				for (StudyEventBean event : events) {
-					if (!event.getStatus().equals(Status.DELETED)) {
-						event.setStatus(Status.AUTO_DELETED);
-						event.setUpdater(updater);
-						event.setUpdatedDate(new Date());
-						studyEventDao.update(event);
-
-						eventCRFService.removeEventCRFsByStudyEvent(event, updater);
-					}
-				}
-			}
-		}
-
-		List<DatasetBean> datasets = datasetDao.findAllByStudyId(study.getId());
-		for (DatasetBean data : datasets) {
-			if (!data.getStatus().equals(Status.DELETED)) {
-				data.setStatus(Status.AUTO_DELETED);
-				data.setUpdater(updater);
-				data.setUpdatedDate(new Date());
-				datasetDao.update(data);
-			}
+			studySubjectService.lockStudySubjects(studyBean, updater);
+			datasetService.lockDatasets(studyBean, updater);
+			eventDefinitionCrfService.lockChildEventDefinitionCRFs(studyBean, updater);
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void restoreStudy(StudyBean study, StudyBean currentStudy, StudyUserRoleBean currentRole,
-			UserAccountBean updater) throws Exception {
-		StudyDAO studyDao = getStudyDAO();
-		DatasetDAO datasetDao = getDatasetDAO();
-		EventCRFDAO eventCrfDao = getEventCRFDAO();
-		StudyEventDAO studyEventDao = getStudyEventDAO();
-		UserAccountDAO userAccountDao = getUserAccountDAO();
-		StudySubjectDAO studySubjectDao = getStudySubjectDAO();
-		StudyGroupClassDAO studyGroupClassDao = getStudyGroupClassDAO();
-		SubjectGroupMapDAO subjectGroupMapDao = getSubjectGroupMapDAO();
-		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
-		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
-
-		if (study.getOldStatus() != Status.DELETED) {
-			study.setStatus(study.getOldStatus());
+	private void enableStudyObjects(StudyBean studyBean, UserAccountBean updater, boolean restore) throws Exception {
+		if (restore) {
+			autoRestoreStudyUserRole(studyBean, updater);
+			studySubjectService.restoreStudySubjects(studyBean, updater);
+			datasetService.restoreDatasets(studyBean, updater);
+			if (!studyBean.isSite()) {
+				eventDefinitionService.restoreStudyEventDefinitions(studyBean, updater);
+			} else {
+				eventDefinitionCrfService.restoreChildEventDefinitionCRFs(studyBean, updater);
+			}
 		} else {
-			study.setStatus(Status.AVAILABLE);
+			studySubjectService.unlockStudySubjects(studyBean, updater);
+			datasetService.unlockDatasets(studyBean, updater);
+			eventDefinitionCrfService.unlockChildEventDefinitionCRFs(studyBean, updater);
 		}
-		study.setUpdater(updater);
-		study.setUpdatedDate(new Date());
-		studyDao.update(study);
+	}
 
-		// restore auto-removed sites
-		List<StudyBean> sites = (List<StudyBean>) studyDao.findAllByParent(study.getId());
-		for (StudyBean site : sites) {
-			if (site.getStatus() == Status.AUTO_DELETED) {
-				site.setStatus(site.getOldStatus());
-				site.setUpdater(updater);
-				site.setUpdatedDate(new Date());
-				studyDao.update(site);
-			}
+	private void disableStudy(StudyBean studyBean, UserAccountBean updater, Status status) throws Exception {
+		studyBean.setOldStatus(studyBean.getStatus());
+		studyBean.setStatus(status);
+		studyBean.setUpdater(updater);
+		studyBean.setUpdatedDate(new Date());
+		getStudyDAO().update(studyBean);
+	}
+
+	private void enableStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		studyBean.setStatus(studyBean.getOldStatus());
+		studyBean.setOldStatus(Status.AVAILABLE);
+		studyBean.setUpdater(updater);
+		studyBean.setUpdatedDate(new Date());
+		getStudyDAO().update(studyBean);
+	}
+
+	private void disableStudyAndItsSites(StudyBean studyBean, UserAccountBean updater, Status status) throws Exception {
+		disableStudy(studyBean, updater, status);
+		disableStudyObjects(studyBean, updater, status);
+		List<StudyBean> siteList = (List<StudyBean>) getStudyDAO().findAllByParent(studyBean.getId());
+		for (StudyBean site : siteList) {
+			disableStudy(site, updater, status);
 		}
-		// restore all users and roles
-		List<StudyUserRoleBean> userRoles = userAccountDao.findAllByStudyId(study.getId());
-		for (StudyUserRoleBean role : userRoles) {
-			userAccountService.autoRestoreStudyUserRole(role, updater);
+	}
+
+	private void enableStudyAndItsSites(StudyBean studyBean, UserAccountBean updater, boolean restore)
+			throws Exception {
+		enableStudy(studyBean, updater);
+		List<StudyBean> siteList = (List<StudyBean>) getStudyDAO().findAllByParent(studyBean.getId());
+		for (StudyBean site : siteList) {
+			enableStudy(site, updater);
 		}
+		enableStudyObjects(studyBean, updater, restore);
+	}
 
-		// YW << Meanwhile update current active study if restored study
-		// is current active study
-		if (study.getId() == currentStudy.getId()) {
-			currentStudy.setStatus(Status.AVAILABLE);
+	private void disableSite(StudyBean studyBean, UserAccountBean updater, Status status) throws Exception {
+		disableStudy(studyBean, updater, status);
+		disableStudyObjects(studyBean, updater, status);
+	}
 
-			StudyUserRoleBean r = userAccountDao.findRoleByUserNameAndStudyId(updater.getName(), currentStudy.getId());
-			currentRole.setRole(r.getRole());
-		} else if (currentStudy.getParentStudyId() == study.getId() && currentStudy.getStatus() == Status.AUTO_DELETED) {
-			// when an active site's parent study has been restored, this
-			// active site will be restored as well if it was auto-removed
-			currentStudy.setStatus(Status.AVAILABLE);
-
-			StudyUserRoleBean r = userAccountDao.findRoleByUserNameAndStudyId(updater.getName(), currentStudy.getId());
-			StudyUserRoleBean rInParent = userAccountDao.findRoleByUserNameAndStudyId(updater.getName(),
-					currentStudy.getParentStudyId());
-			// according to logic in Controller.java: inherited
-			// role from parent study, pick the higher role
-			currentRole.setRole(Role.get(Role.max(r.getRole(), rInParent.getRole()).getId()));
-		}
-		// YW 06-18-2007 >>
-
-		// restore all subjects
-		List<StudySubjectBean> subjects = studySubjectDao.findAllByStudy(study);
-		for (StudySubjectBean subject : subjects) {
-			if (subject.getStatus().equals(Status.AUTO_DELETED)) {
-				subject.setStatus(Status.AVAILABLE);
-				subject.setUpdater(updater);
-				subject.setUpdatedDate(new Date());
-				studySubjectDao.update(subject);
-			}
-		}
-
-		List<StudyGroupClassBean> groups = studyGroupClassDao.findAllByStudy(study);
-		for (StudyGroupClassBean group : groups) {
-			if (group.getStatus().equals(Status.AUTO_DELETED)) {
-				group.setStatus(Status.AVAILABLE);
-				group.setUpdater(updater);
-				group.setUpdatedDate(new Date());
-				studyGroupClassDao.update(group);
-				// all subject_group_map
-				List<SubjectGroupMapBean> subjectGroupMaps = subjectGroupMapDao.findAllByStudyGroupClassId(group
-						.getId());
-				for (SubjectGroupMapBean sgMap : subjectGroupMaps) {
-					if (sgMap.getStatus().equals(Status.AUTO_DELETED)) {
-						sgMap.setStatus(Status.AVAILABLE);
-						sgMap.setUpdater(updater);
-						sgMap.setUpdatedDate(new Date());
-						subjectGroupMapDao.update(sgMap);
-					}
-				}
-			}
-		}
-
-		// restore all event definitions and event
-		List<StudyEventDefinitionBean> definitions = studyEventDefinitionDao.findAllByStudy(study);
-		for (StudyEventDefinitionBean definition : definitions) {
-			if (definition.getStatus().equals(Status.AUTO_DELETED)) {
-				definition.setStatus(Status.AVAILABLE);
-				definition.setUpdater(updater);
-				definition.setUpdatedDate(new Date());
-				studyEventDefinitionDao.update(definition);
-
-				List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
-						.findAllByDefinition(definition.getId());
-				for (EventDefinitionCRFBean edc : edcs) {
-					if (edc.getStatus().equals(Status.AUTO_DELETED)) {
-						edc.setStatus(Status.AVAILABLE);
-						edc.setUpdater(updater);
-						edc.setUpdatedDate(new Date());
-						eventDefinitionCrfDao.update(edc);
-					}
-				}
-
-				List<StudyEventBean> events = (List<StudyEventBean>) studyEventDao.findAllByDefinition(definition
-						.getId());
-				for (StudyEventBean event : events) {
-					if (event.getStatus().equals(Status.AUTO_DELETED)) {
-						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(updater);
-						event.setUpdatedDate(new Date());
-						studyEventDao.update(event);
-
-						List<EventCRFBean> eventCRFs = eventCrfDao.findAllByStudyEvent(event);
-
-						eventCRFService.restoreEventCRFsFromAutoRemovedState(eventCRFs, updater);
-					}
-				}
-			}
-		}
-
-		List<DatasetBean> datasets = datasetDao.findAllByStudyId(study.getId());
-		for (DatasetBean data : datasets) {
-			if (data.getStatus().equals(Status.AUTO_DELETED)) {
-				data.setStatus(Status.AVAILABLE);
-				data.setUpdater(updater);
-				data.setUpdatedDate(new Date());
-				datasetDao.update(data);
-			}
-		}
+	private void enableSite(StudyBean studyBean, UserAccountBean updater, boolean restore) throws Exception {
+		enableStudy(studyBean, updater);
+		enableStudyObjects(studyBean, updater, restore);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeSite(StudyBean site, StudyBean currentStudy, StudyUserRoleBean currentRole,
-			UserAccountBean updater) throws Exception {
-		StudyDAO studyDao = getStudyDAO();
-		DatasetDAO datasetDao = getDatasetDAO();
-		StudyEventDAO studyEventDao = getStudyEventDAO();
-		StudyGroupDAO studyGroupDao = getStudyGroupDAO();
-		UserAccountDAO userAccountDao = getUserAccountDAO();
-		StudySubjectDAO studySubjectDao = getStudySubjectDAO();
-		SubjectGroupMapDAO subjectGroupMapDao = getSubjectGroupMapDAO();
-
-		// change all statuses to unavailable
-		site.setOldStatus(site.getStatus());
-		site.setStatus(Status.DELETED);
-		site.setUpdater(updater);
-		site.setUpdatedDate(new Date());
-		studyDao.update(site);
-
-		// remove all users and roles
-		List<StudyUserRoleBean> userRoles = userAccountDao.findAllByStudyId(site.getId());
-		for (StudyUserRoleBean role : userRoles) {
-			userAccountService.autoRemoveStudyUserRole(role, updater);
-		}
-
-		if (site.getId() == currentStudy.getId()) {
-			currentStudy.setStatus(Status.DELETED);
-			currentRole.setStatus(Status.DELETED);
-		}
-
-		// remove all study_group
-		List<StudyGroupBean> groups = studyGroupDao.findAllByStudy(site);
-		for (StudyGroupBean group : groups) {
-			if (!group.getStatus().equals(Status.DELETED)) {
-				group.setStatus(Status.AUTO_DELETED);
-				group.setUpdater(updater);
-				group.setUpdatedDate(new Date());
-				studyGroupDao.update(group);
-				// all subject_group_map
-				List<SubjectGroupMapBean> subjectGroupMaps = subjectGroupMapDao.findAllByStudyGroupId(group.getId());
-				for (SubjectGroupMapBean sgMap : subjectGroupMaps) {
-					if (!sgMap.getStatus().equals(Status.DELETED)) {
-						sgMap.setStatus(Status.AUTO_DELETED);
-						sgMap.setUpdater(updater);
-						sgMap.setUpdatedDate(new Date());
-						subjectGroupMapDao.update(sgMap);
-					}
-				}
-			}
-		}
-
-		List<StudySubjectBean> subjects = studySubjectDao.findAllByStudy(site);
-		for (StudySubjectBean subject : subjects) {
-			if (!subject.getStatus().equals(Status.DELETED)) {
-				subject.setStatus(Status.AUTO_DELETED);
-				subject.setUpdater(updater);
-				subject.setUpdatedDate(new Date());
-				studySubjectDao.update(subject);
-
-				List<StudyEventBean> events = studyEventDao.findAllByStudySubject(subject);
-				for (StudyEventBean event : events) {
-					if (!event.getStatus().equals(Status.DELETED)) {
-						event.setPrevSubjectEventStatus(event.getSubjectEventStatus());
-						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-						event.setStatus(Status.AUTO_DELETED);
-						event.setUpdater(updater);
-						event.setUpdatedDate(new Date());
-						studyEventDao.update(event);
-
-						eventCRFService.removeEventCRFsByStudyEvent(event, updater);
-					}
-				}
-			}
-		}
-
-		List<DatasetBean> dataset = datasetDao.findAllByStudyId(site.getId());
-		for (DatasetBean data : dataset) {
-			if (!data.getStatus().equals(Status.DELETED)) {
-				data.setStatus(Status.AUTO_DELETED);
-				data.setUpdater(updater);
-				data.setUpdatedDate(new Date());
-				datasetDao.update(data);
-			}
-		}
+	public void removeStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableStudyAndItsSites(studyBean, updater, Status.DELETED);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreSite(StudyBean site, StudyBean currentStudy, StudyUserRoleBean currentRole,
-			UserAccountBean updater) throws Exception {
-		StudyDAO studyDao = getStudyDAO();
-		DatasetDAO datasetDao = getDatasetDAO();
-		EventCRFDAO eventCrfDao = getEventCRFDAO();
-		StudyEventDAO studyEventDao = getStudyEventDAO();
-		StudyGroupDAO studyGroupDao = getStudyGroupDAO();
-		UserAccountDAO userAccountDao = getUserAccountDAO();
-		StudySubjectDAO studySubjectDao = getStudySubjectDAO();
-		SubjectGroupMapDAO subjectGroupMapDao = getSubjectGroupMapDAO();
+	public void restoreStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableStudyAndItsSites(studyBean, updater, true);
+	}
 
-		Status newStatus = Status.AVAILABLE;
-		if (site.getParentStudyId() > 0) {
-			StudyBean parentStudy = (StudyBean) studyDao.findByPK(site.getParentStudyId());
-			newStatus = parentStudy.getStatus();
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeSite(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableSite(studyBean, updater, Status.DELETED);
+	}
 
-		site.setOldStatus(site.getStatus());
-		site.setStatus(newStatus);
-		site.setUpdater(updater);
-		site.setUpdatedDate(new Date());
-		studyDao.update(site);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void restoreSite(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableSite(studyBean, updater, true);
+	}
 
-		// restore all users and roles
-		List<StudyUserRoleBean> userRoles = userAccountDao.findAllByStudyId(site.getId());
-		for (StudyUserRoleBean role : userRoles) {
-			userAccountService.autoRestoreStudyUserRole(role, updater);
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lockSite(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		disableSite(studyBean, updater, Status.LOCKED);
+	}
 
-		// Meanwhile update current active study
-		// attribute of session if restored study is current active
-		// study
-		if (site.getId() == currentStudy.getId()) {
-			currentStudy.setStatus(Status.AVAILABLE);
-
-			StudyUserRoleBean r = userAccountDao.findRoleByUserNameAndStudyId(updater.getName(), currentStudy.getId());
-			StudyUserRoleBean rInParent = userAccountDao.findRoleByUserNameAndStudyId(updater.getName(),
-					currentStudy.getParentStudyId());
-			// according to logic in Controller.java: inherited
-			// role from parent study, pick the higher role
-			currentRole.setRole(Role.max(r.getRole(), rInParent.getRole()));
-		}
-
-		// restore all study_group
-		List<StudyGroupBean> groups = (List<StudyGroupBean>) studyGroupDao.findAllByStudy(site);
-		for (StudyGroupBean group : groups) {
-			if (group.getStatus().equals(Status.AUTO_DELETED)) {
-				group.setStatus(Status.AVAILABLE);
-				group.setUpdater(updater);
-				group.setUpdatedDate(new Date());
-				studyGroupDao.update(group);
-				// all subject_group_map
-				List<SubjectGroupMapBean> subjectGroupMaps = (List<SubjectGroupMapBean>) subjectGroupMapDao
-						.findAllByStudyGroupId(group.getId());
-				for (SubjectGroupMapBean sgMap : subjectGroupMaps) {
-					if (sgMap.getStatus().equals(Status.AUTO_DELETED)) {
-						sgMap.setStatus(Status.AVAILABLE);
-						sgMap.setUpdater(updater);
-						sgMap.setUpdatedDate(new Date());
-						subjectGroupMapDao.update(sgMap);
-					}
-				}
-			}
-		}
-
-		List<StudySubjectBean> subjects = (List<StudySubjectBean>) studySubjectDao.findAllByStudy(site);
-		for (StudySubjectBean subject : subjects) {
-			if (subject.getStatus().equals(Status.AUTO_DELETED)) {
-				subject.setStatus(Status.AVAILABLE);
-				subject.setUpdater(updater);
-				subject.setUpdatedDate(new Date());
-				studySubjectDao.update(subject);
-
-				List<StudyEventBean> events = (List<StudyEventBean>) studyEventDao.findAllByStudySubject(subject);
-				for (StudyEventBean event : events) {
-					if (event.getStatus().equals(Status.AUTO_DELETED)) {
-						SubjectEventStatus subjectEventStatus = event.getSubjectEventStatus();
-						event.setSubjectEventStatus(event.getPrevSubjectEventStatus());
-						event.setPrevSubjectEventStatus(subjectEventStatus);
-						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(updater);
-						event.setUpdatedDate(new Date());
-						studyEventDao.update(event);
-
-						List<EventCRFBean> eventCRFs = (List<EventCRFBean>) eventCrfDao.findAllByStudyEvent(event);
-
-						eventCRFService.restoreEventCRFsFromAutoRemovedState(eventCRFs, updater);
-
-						SubjectEventStatusUtil.determineSubjectEventState(event, eventCRFs, new DAOWrapper(dataSource));
-					}
-				}
-			}
-		}
-
-		List<DatasetBean> dataset = (List<DatasetBean>) datasetDao.findAllByStudyId(site.getId());
-		for (DatasetBean data : dataset) {
-			data.setStatus(Status.AVAILABLE);
-			data.setUpdater(updater);
-			data.setUpdatedDate(new Date());
-			datasetDao.update(data);
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlockSite(StudyBean studyBean, UserAccountBean updater) throws Exception {
+		enableSite(studyBean, updater, false);
 	}
 }

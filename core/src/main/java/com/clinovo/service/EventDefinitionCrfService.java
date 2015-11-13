@@ -17,8 +17,10 @@ package com.clinovo.service;
 import java.util.List;
 import java.util.Map;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 
@@ -26,6 +28,130 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
  * EventDefinitionCrfService.
  */
 public interface EventDefinitionCrfService {
+
+	/**
+	 * Removes event definition crfs.
+	 * 
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
+			throws Exception;
+
+	/**
+	 * Restores event definition crfs.
+	 * 
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
+			throws Exception;
+
+	/**
+	 * Method that removes parent event definition crf.
+	 *
+	 * @param parentEventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean, UserAccountBean updater)
+			throws Exception;
+
+	/**
+	 * Method that restores parent event definition crf.
+	 *
+	 * @param parentEventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean, UserAccountBean updater)
+			throws Exception;
+
+	/**
+	 * Method that removes parent event definition crfs.
+	 *
+	 * @param crfBean
+	 *            CRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeParentEventDefinitionCRFs(CRFBean crfBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Method that restores parent event definition crfs.
+	 *
+	 * @param crfBean
+	 *            CRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreParentEventDefinitionCRFs(CRFBean crfBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Method that removes child event definition crfs.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void removeChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Method that restores child event definition crfs
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void restoreChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Method that locks child event definition crfs.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void lockChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Method that unlocks child event definition crfs
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void unlockChildEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Method updates chiild event definition crfs for new crf version.
@@ -40,10 +166,14 @@ public interface EventDefinitionCrfService {
 	/**
 	 * Method updates child event definition crfs.
 	 *
-	 * @param childEventDefinitionCRFsToUpdate List<EventDefinitionCRFBean>
-	 * @param parentsMap Map<Integer, EventDefinitionCRFBean>
-	 * @param updater UserAccountBean
-	 * @param parentsBeforeUpdateMap Map<Integer, EventDefinitionCRFBean>
+	 * @param childEventDefinitionCRFsToUpdate
+	 *            List<EventDefinitionCRFBean>
+	 * @param parentsMap
+	 *            Map<Integer, EventDefinitionCRFBean>
+	 * @param updater
+	 *            UserAccountBean
+	 * @param parentsBeforeUpdateMap
+	 *            Map<Integer, EventDefinitionCRFBean>
 	 */
 	void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
 			Map<Integer, EventDefinitionCRFBean> parentsMap,
@@ -61,44 +191,22 @@ public interface EventDefinitionCrfService {
 			StudyEventDefinitionBean studyEventDefinitionBean);
 
 	/**
-	 * Method that removes study event definition crf.
-	 *
-	 * @param eventDefinitionCRFBean
-	 *            EventDefinitionCRFBean
-	 * @param updater
-	 *            UserAccountBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void removeEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater)
-			throws Exception;
-
-	/**
-	 * Method that restores event definition crf.
-	 *
-	 * @param eventDefinitionCRFBean
-	 *            EventDefinitionCRFBean
-	 * @param updater
-	 *            UserAccountBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void restoreEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater)
-			throws Exception;
-
-	/**
 	 * This method will check if current default version is available and set another one if not.
-	 * @param edcBean EventDefinitionCRFBean
-	 * @param versionList List<CRFVersionBean>
-	 * @param updater UserAccountBean
+	 * 
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param updater
+	 *            UserAccountBean
 	 */
-	void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean, List<CRFVersionBean> versionList,
-												  UserAccountBean updater);
+	void updateDefaultVersionOfEventDefinitionCRF(CRFVersionBean crfVersionBean, UserAccountBean updater);
 
 	/**
 	 * Delete crf from study event definition.
-	 * @param eventDefinitionCRFBean EventDefinitionCRFBean
-	 * @throws Exception in case if some item data is present for this Event Definition CRF.
+	 * 
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @throws Exception
+	 *             in case if some item data is present for this Event Definition CRF.
 	 */
 	void deleteEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception;
 }

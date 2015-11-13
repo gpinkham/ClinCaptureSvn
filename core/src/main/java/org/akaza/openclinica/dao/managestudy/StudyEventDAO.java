@@ -41,6 +41,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -148,9 +149,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.BOOL); // start_time_flag
 		this.setTypeExpected(ind++, TypeNames.BOOL); // end_time_flag
-		this.setTypeExpected(ind++, TypeNames.INT); // prev_status
+		this.setTypeExpected(ind++, TypeNames.INT); // prev_subject_event_status
 		this.setTypeExpected(ind++, TypeNames.INT); // reference_visit_id
-		this.setTypeExpected(ind, TypeNames.BINARY_STREAM); // signed_data
+		this.setTypeExpected(ind++, TypeNames.BINARY_STREAM); // signed_data
+		this.setTypeExpected(ind++, TypeNames.INT); // old_status_id
+		this.setTypeExpected(ind, TypeNames.STRING); // states
 	}
 
 	/**
@@ -182,8 +185,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.BOOL); // start_time_flag
 		this.setTypeExpected(ind++, TypeNames.BOOL); // end_time_flag
 
-		this.setTypeExpected(ind++, TypeNames.INT); // prev_status
+		this.setTypeExpected(ind++, TypeNames.INT); // prev_subject_event_status
 		this.setTypeExpected(ind++, TypeNames.INT); // reference_visit_id
+		this.setTypeExpected(ind++, TypeNames.BINARY_STREAM); // signed_data
+		this.setTypeExpected(ind++, TypeNames.INT); // old_status_id
+		this.setTypeExpected(ind++, TypeNames.STRING); // states
+
 		if (withSubject) {
 			this.setTypeExpected(ind, TypeNames.STRING);
 		}
@@ -238,6 +245,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		Integer referenceVisitId = (Integer) hm.get("reference_visit_id");
 		eb.setReferenceVisitId(referenceVisitId);
 
+		eb.setOldStatus(Status.get((Integer) hm.get("old_status_id")));
+		eb.setStates((String) hm.get("states"));
+
 		try {
 			eb.getSignedData().clear();
 			ByteArrayInputStream bais = (ByteArrayInputStream) hm.get("signed_data");
@@ -289,6 +299,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
 
 		eb.setReferenceVisitId((Integer) hm.get("reference_visit_id"));
+
+		eb.setOldStatus(Status.get((Integer) hm.get("old_status_id")));
+		eb.setStates((String) hm.get("states"));
 
 		if (withSubject) {
 			eb.setStudySubjectLabel((String) hm.get("label"));
@@ -364,7 +377,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 *            String
 	 * @return ArrayList
 	 */
-	public ArrayList findAllByStudyEventDefinitionAndCrfOids(String studyEventDefinitionOid, String crfOrCrfVersionOid) {
+	public ArrayList findAllByStudyEventDefinitionAndCrfOids(String studyEventDefinitionOid,
+			String crfOrCrfVersionOid) {
 		this.setTypesExpected(true);
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		int ind = 1;
@@ -573,7 +587,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject, int definitionId) {
+	public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject,
+			int definitionId) {
 		this.setTypesExpected(true);
 		int ind = 1;
 		HashMap variables = new HashMap();
@@ -848,6 +863,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		} catch (Exception e) {
 			nullVars.put(ind++, null);
 		}
+
+		variables.put(ind++, sb.getOldStatus().getId());
+		variables.put(ind++, sb.getStates());
 
 		variables.put(ind, sb.getId());
 

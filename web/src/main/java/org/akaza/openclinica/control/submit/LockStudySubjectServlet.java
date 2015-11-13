@@ -10,45 +10,36 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class LockStudySubjectServlet extends Controller {
 
 	public static final String REFERER_URL = "refererUrl";
 	public static final String REFERER = "referer";
 	public static final String LOCK_STUDY_SUBJECT = "LockStudySubject";
-
-	public final static String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
-	public final static String HAS_DOB_NOTE = "hasDOBNote";
-	public final static String HAS_GENDER_NOTE = "hasGenderNote";
-	public final static String HAS_ENROLLMENT_NOTE = "hasEnrollmentNote";
-	public final static String UNIQUE_ID_NOTE = "uniqueIDNote";
-	public final static String DOB_NOTE = "dOBNote";
-	public final static String GENDER_NOTE = "genderNote";
-	public final static String ENROLLMENT_NOTE = "enrollmentNote";
+	public static final String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
+	public static final String HAS_DOB_NOTE = "hasDOBNote";
+	public static final String HAS_GENDER_NOTE = "hasGenderNote";
+	public static final String HAS_ENROLLMENT_NOTE = "hasEnrollmentNote";
+	public static final String UNIQUE_ID_NOTE = "uniqueIDNote";
+	public static final String DOB_NOTE = "dOBNote";
+	public static final String GENDER_NOTE = "genderNote";
+	public static final String ENROLLMENT_NOTE = "enrollmentNote";
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -64,10 +55,10 @@ public class LockStudySubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+				"1");
 	}
 
 	@Override
@@ -75,12 +66,8 @@ public class LockStudySubjectServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		StudySubjectDAO ssdao = getStudySubjectDAO();
-		SubjectDAO sdao = getSubjectDAO();
 		StudyDAO studyDao = getStudyDAO();
-		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
-		StudyEventDAO sedao = getStudyEventDAO();
-		EventCRFDAO ecdao = getEventCRFDAO();
+		SubjectDAO subjectDao = getSubjectDAO();
 
 		String referer = request.getHeader(REFERER);
 		if (referer != null && !referer.contains(LOCK_STUDY_SUBJECT)) {
@@ -89,14 +76,15 @@ public class LockStudySubjectServlet extends Controller {
 
 		String action = request.getParameter("action");
 		int studySubjectId = Integer.parseInt(request.getParameter("id"));
-		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studySubjectId);
-		SubjectBean subjectBean = (SubjectBean) sdao.findByPK(studySubjectBean.getSubjectId());
+		StudySubjectBean studySubjectBean = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubjectId);
+		SubjectBean subjectBean = (SubjectBean) subjectDao.findByPK(studySubjectBean.getSubjectId());
 		StudyBean studyBean = (StudyBean) studyDao.findByPK(studySubjectBean.getStudyId());
-		StudyBean parentStudyBean = studyBean.getParentStudyId() > 0 ? (StudyBean) studyDao.findByPK(studyBean
-				.getParentStudyId()) : null;
+		StudyBean parentStudyBean = studyBean.getParentStudyId() > 0
+				? (StudyBean) studyDao.findByPK(studyBean.getParentStudyId())
+				: null;
 
 		studyBean.getStudyParameterConfig().setCollectDob(
-				spvdao.findByHandleAndStudy(studyBean.getId(), "collectDob").getValue());
+				getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getId(), "collectDob").getValue());
 
 		boolean subjectStudyIsCurrentStudy = studySubjectBean.getStudyId() == currentStudy.getId();
 		boolean isParentStudy = studyBean.getParentStudyId() < 1;
@@ -109,8 +97,8 @@ public class LockStudySubjectServlet extends Controller {
 		if (subjectStudyIsCurrentStudy && isParentStudy) {
 			allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudyAndId(studyBean,
 					studySubjectBean.getSubjectId());
-			allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(studyBean,
-					studySubjectBean.getSubjectId()));
+			allNotesforSubject.addAll(
+					discrepancyNoteDAO.findAllStudySubjectByStudyAndId(studyBean, studySubjectBean.getSubjectId()));
 		} else {
 			if (!isParentStudy) {
 				StudyBean stParent = (StudyBean) studyDao.findByPK(studyBean.getParentStudyId());
@@ -124,8 +112,8 @@ public class LockStudySubjectServlet extends Controller {
 				allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(currentStudy, studyBean,
 						studySubjectBean.getSubjectId());
 
-				allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(
-						currentStudy, studyBean, studySubjectId));
+				allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(currentStudy,
+						studyBean, studySubjectId));
 			}
 
 		}
@@ -134,14 +122,14 @@ public class LockStudySubjectServlet extends Controller {
 			setRequestAttributesForNotes(request, allNotesforSubject);
 		}
 
-		SubjectBean subject = (SubjectBean) sdao.findByPK(studySubjectBean.getSubjectId());
+		SubjectBean subject = (SubjectBean) subjectDao.findByPK(studySubjectBean.getSubjectId());
 		if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
 			Date dob = subject.getDateOfBirth();
 			if (dob != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dob);
 				int year = cal.get(Calendar.YEAR);
-				request.setAttribute("yearOfBirth", new Integer(year));
+				request.setAttribute("yearOfBirth", year);
 			} else {
 				request.setAttribute("yearOfBirth", "");
 			}
@@ -156,44 +144,12 @@ public class LockStudySubjectServlet extends Controller {
 
 		if (request.getParameter("Submit") != null) {
 			String message = "";
-			List<StudyEventBean> studyEventBeanList = sedao.findAllByStudySubject(studySubjectBean);
 			if (action.equalsIgnoreCase("lock")) {
 				message = resword.getString("lockStudySubjectResultMsg");
-				for (StudyEventBean studyEventBean : studyEventBeanList) {
-					if (studyEventBean.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
-						studyEventBean.setPrevSubjectEventStatus(studyEventBean.getSubjectEventStatus());
-						studyEventBean.setSubjectEventStatus(SubjectEventStatus.LOCKED);
-						studyEventBean.setUpdater(ub);
-						studyEventBean.setUpdatedDate(new Date());
-						ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
-						for (EventCRFBean eventCRFBean : eventCRFs) {
-							eventCRFBean.setUpdater(ub);
-							eventCRFBean.setUpdatedDate(new Date());
-							ecdao.update(eventCRFBean);
-						}
-						sedao.update(studyEventBean);
-					}
-				}
-				studySubjectBean.setStatus(Status.LOCKED);
-				ssdao.update(studySubjectBean);
+				getStudySubjectService().lockStudySubject(studySubjectBean, ub);
 			} else if (action.equalsIgnoreCase("unlock")) {
 				message = resword.getString("unlockStudySubjectResultMsg");
-				for (StudyEventBean studyEventBean : studyEventBeanList) {
-					if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
-						studyEventBean.setSubjectEventStatus(studyEventBean.getPrevSubjectEventStatus());
-						studyEventBean.setUpdater(ub);
-						studyEventBean.setUpdatedDate(new Date());
-						ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
-						for (EventCRFBean eventCRFBean : eventCRFs) {
-							eventCRFBean.setUpdater(ub);
-							eventCRFBean.setUpdatedDate(new Date());
-							ecdao.update(eventCRFBean);
-						}
-						sedao.update(studyEventBean);
-					}
-				}
-				studySubjectBean.setStatus(Status.AVAILABLE);
-				ssdao.update(studySubjectBean);
+				getStudySubjectService().unlockStudySubject(studySubjectBean, ub);
 			}
 			showResultMessage(request, studySubjectBean, message);
 			response.sendRedirect((String) request.getSession().getAttribute(REFERER_URL));

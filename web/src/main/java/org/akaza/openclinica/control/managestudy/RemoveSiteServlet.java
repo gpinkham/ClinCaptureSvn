@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -56,9 +55,8 @@ public class RemoveSiteServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
 	}
@@ -72,14 +70,12 @@ public class RemoveSiteServlet extends Controller {
 
 		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean currentUser = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		int siteId = Integer.valueOf(idString.trim());
 		StudyBean site = (StudyBean) sdao.findByPK(siteId);
 		if (currentStudy.getId() != site.getParentStudyId()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+					+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -100,7 +96,7 @@ public class RemoveSiteServlet extends Controller {
 			} else {
 				logger.info("submit to remove the site");
 
-				getStudyService().removeSite(site, currentStudy, currentRole, currentUser);
+				getStudyService().removeSite(site, currentUser);
 
 				addPageMessage(respage.getString("this_site_has_been_removed_succesfully"), request);
 

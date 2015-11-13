@@ -79,7 +79,6 @@ public class ListSiteServletTest {
 		Mockito.doReturn(studyDAO).when((BaseController) listSiteServlet).getStudyDAO();
 		Mockito.doReturn(studyFromDb).when((BaseController) listSiteServlet).getCurrentStudy(request);
 		Mockito.doReturn(studies).when(studyDAO).findAllByParent(studyFromDb.getId());
-		Mockito.doReturn(mapContainer).when(studyDAO).analyzeEvents(studies);
 		Mockito.doCallRealMethod().when(listSiteServlet).processRequest(request, response);
 
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);

@@ -49,6 +49,10 @@
 		<sql>SELECT * FROM event_definition_crf WHERE parent_id = ? ORDER BY ordinal ASC</sql>
 	</query>
 	<query>
+		<name>findAllChildrenByStudy</name>
+		<sql>SELECT distinct(edc.*) FROM event_definition_crf edc, study s WHERE (s.parent_study_id = ? or s.study_id = ?) and edc.study_id = s.study_id and edc.parent_id is not null ORDER BY edc.ordinal ASC</sql>
+	</query>
+	<query>
 		<name>findAllByDefinitionAndSiteIdAndParentStudyId</name>
 		<!-- find for the site given site_id or its parentStudy_id:
 		     SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=?
@@ -272,6 +276,13 @@
 		<sql>
 			SELECT * FROM EVENT_DEFINITION_CRF
 			WHERE crf_id = ?
+		</sql>
+	</query>
+	<query>
+		<name>findAllParentByCRFId</name>
+		<sql>
+			SELECT * FROM EVENT_DEFINITION_CRF
+			WHERE crf_id = ? and parent_id is null
 		</sql>
 	</query>
 	<query>
