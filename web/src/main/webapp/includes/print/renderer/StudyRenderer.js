@@ -636,6 +636,9 @@ function StudyRenderer(json) {
 
             var repeatingRows = "";
             var itemDef = orderedItems[orderedItemIndex];
+			if (itemDef === undefined) {
+				continue;
+			}
             var itemOID = itemDef["@OID"];
             var itemName = itemDef["@Name"];
 
@@ -729,12 +732,14 @@ function StudyRenderer(json) {
 
             if (orderedItemIndex + 1 < orderedItems.length) {
                 nextItemDef = orderedItems[orderedItemIndex + 1];
-                var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
-                nextColumnNumber = nextItemDetails["@ColumnNumber"];
-                var nextItemOID = nextItemDef["@OID"];
-                nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
-                debug("next item column number: " + nextColumnNumber,
-                    util_logDebug);
+				if (nextItemDef) {
+					var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
+					nextColumnNumber = nextItemDetails["@ColumnNumber"];
+					var nextItemOID = nextItemDef["@OID"];
+					nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
+					debug("next item column number: " + nextColumnNumber,
+						util_logDebug);
+				}
             }
 
             if (currentItemGroupOID != previousItemGroupOID) {
