@@ -18,9 +18,12 @@ package com.clinovo.states;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -31,11 +34,18 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.domain.SourceDataVerification;
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
 
 @SuppressWarnings("rawtypes")
 public class StatesTest extends DefaultAppContextTest {
@@ -66,6 +76,8 @@ public class StatesTest extends DefaultAppContextTest {
 	private EventDefinitionCRFBean siteEventDefinitionCRFBean2;
 	private StudyEventDefinitionBean studyEventDefinitionBean;
 
+	Map<Integer, Status> itemDataStatusMap = new HashMap<Integer, Status>();
+
 	@Before
 	public void before() throws Exception {
 		timestamp = new Date().getTime();
@@ -73,6 +85,8 @@ public class StatesTest extends DefaultAppContextTest {
 
 		createStudy();
 		createSite();
+
+		fillItemDataStatusMap();
 
 		subjectBean = (SubjectBean) subjectDAO.findByPK(SUBJECT_ID);
 		eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(EVENT_CRF_ID);
@@ -145,6 +159,13 @@ public class StatesTest extends DefaultAppContextTest {
 		studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(study.getId())), new HashMap());
 	}
 
+	private void fillItemDataStatusMap() throws Exception {
+		List<ItemDataBean> itemDataList = itemDataDAO.findAllByEventCRFId(EVENT_CRF_ID);
+		for (ItemDataBean itemDataBean : itemDataList) {
+			itemDataStatusMap.put(itemDataBean.getId(), itemDataBean.getStatus());
+		}
+	}
+
 	private void createStudy() throws Exception {
 		study = new StudyBean();
 		study.setName("study_".concat(Long.toString(timestamp)));
@@ -166,7 +187,11 @@ public class StatesTest extends DefaultAppContextTest {
 
 	private void checkItemDataStatus(ItemDataBean itemDataBean, Status status) {
 		itemDataBean = (ItemDataBean) itemDataDAO.findByPK(itemDataBean.getId());
-		assertTrue(itemDataBean.getStatus().equals(status));
+		if (status.isDeleted() || status.isLocked()) {
+			assertTrue(itemDataBean.getStatus().equals(status));
+		} else {
+			assertTrue(itemDataBean.getStatus().equals(itemDataStatusMap.get(itemDataBean.getId())));
+		}
 	}
 
 	private void checkCRFStatusOnly(Status status) {
@@ -188,6 +213,11 @@ public class StatesTest extends DefaultAppContextTest {
 		}
 	}
 
+	private void checkEventCRFSDVStatusOnly(boolean sdv) {
+		EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(EVENT_CRF_ID);
+		assertTrue(eventCRFBean.isSdvStatus() == sdv);
+	}
+
 	private void checkStudyEventStatusOnly(Status status) {
 		StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(STUDY_EVENT_ID);
 		assertTrue(studyEventBean.getStatus().equals(status));
@@ -196,6 +226,11 @@ public class StatesTest extends DefaultAppContextTest {
 		} else if (status.isLocked()) {
 			assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED));
 		}
+	}
+
+	private void checkStudyEventSubjectEventStatusOnly(SubjectEventStatus subjectEventStatus) {
+		StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(STUDY_EVENT_ID);
+		assertTrue(studyEventBean.getSubjectEventStatus().equals(subjectEventStatus));
 	}
 
 	private void checkStudyEventStatus(Status status) {
@@ -2188,5 +2223,276 @@ public class StatesTest extends DefaultAppContextTest {
 		checkStudyEDCStatus(Status.AVAILABLE);
 		checkSiteEDCStatus(Status.AVAILABLE);
 		checkStudySubjectStatus(Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatObjectsGetStatusesCorrectlyCase42() throws Exception {
+		eventCRFBean.setUpdatedDate(new Date());
+		eventCRFBean.setUpdater(updater);
+		eventCRFBean.setStatus(Status.UNAVAILABLE);
+		eventCRFBean.setSdvStatus(true);
+		eventCRFDAO.update(eventCRFBean);
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = eventDefinitionCRFDAO
+				.findForSiteByEventCrfId(eventCRFBean.getId());
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFBean.setUpdater(updater);
+		eventDefinitionCRFBean.setSourceDataVerification(SourceDataVerification.AllREQUIRED);
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+
+		studyEventBean.setSubjectEventStatus(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+		studyEventBean.setUpdatedDate(new Date());
+		studyEventBean.setUpdater(updater);
+		studyEventDao.update(studyEventBean);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+
+		studyEventService.removeStudyEvent(studyEventBean, updater);
+
+		checkEventCRFStatus(Status.DELETED);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.DELETED);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.REMOVED);
+
+		studyEventService.restoreStudyEvent(studyEventBean, updater);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+	}
+
+	@Test
+	public void testThatObjectsGetStatusesCorrectlyCase43() throws Exception {
+		eventCRFBean.setUpdatedDate(new Date());
+		eventCRFBean.setUpdater(updater);
+		eventCRFBean.setStatus(Status.UNAVAILABLE);
+		eventCRFBean.setSdvStatus(true);
+		eventCRFDAO.update(eventCRFBean);
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = eventDefinitionCRFDAO
+				.findForSiteByEventCrfId(eventCRFBean.getId());
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFBean.setUpdater(updater);
+		eventDefinitionCRFBean.setSourceDataVerification(SourceDataVerification.AllREQUIRED);
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+
+		siteEventDefinitionCRFBean1.setStatus(Status.DELETED);
+		siteEventDefinitionCRFBean1.setUpdatedDate(new Date());
+		siteEventDefinitionCRFBean1.setUpdater(updater);
+		eventDefinitionCRFDAO.update(siteEventDefinitionCRFBean1);
+
+		studyEventBean.setSubjectEventStatus(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+		studyEventBean.setUpdatedDate(new Date());
+		studyEventBean.setUpdater(updater);
+		studyEventDao.update(studyEventBean);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+
+		List<ItemDataBean> itemDataBeanList = itemDataDAO.findAllByEventCRFId(eventCRFBean.getId());
+		ItemDataBean itemDataBean = itemDataBeanList.get(0);
+		itemDataBean.setValue("tooth pain");
+		itemDataBean.setUpdatedDate(new Date());
+		itemDataBean.setUpdater(updater);
+		itemDataDAO.update(itemDataBean);
+
+		ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
+		itemBean.setDataType(ItemDataType.CODE);
+		itemBean.setUpdatedDate(new Date());
+		itemBean.setUpdater(updater);
+		idao.update(itemBean);
+
+		ItemFormMetadataBean itemFormMetadataBean = imfdao.findByItemIdAndCRFVersionId(itemBean.getId(),
+				eventCRFBean.getCRFVersionId());
+		itemFormMetadataBean.setCodeRef("icd_9cm");
+		imfdao.update(itemFormMetadataBean);
+
+		CodedItem codedItem = codedItemService.createCodedItem(eventCRFBean, itemBean, itemDataBean, site);
+		assertTrue(codedItem.getId() > 0);
+
+		CodedItemElement codedItemElement = new CodedItemElement(itemDataBean.getId(),
+				StringUtils.substringAfterLast(itemBean.getName(), "_"));
+		codedItem.addCodedItemElements(codedItemElement);
+		codedItemDAO.saveOrUpdate(codedItem);
+
+		studyEventService.removeStudyEvent(studyEventBean, updater);
+
+		checkStudyEventStatus(Status.DELETED);
+
+		studyEventService.restoreStudyEvent(studyEventBean, updater);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+
+		codedItemService.saveCodedItem(codedItem);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(false);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.COMPLETED);
+	}
+
+	@Test
+	public void testThatObjectsGetStatusesCorrectlyCase44() throws Exception {
+		eventCRFBean.setUpdatedDate(new Date());
+		eventCRFBean.setUpdater(updater);
+		eventCRFBean.setStatus(Status.UNAVAILABLE);
+		eventCRFBean.setSdvStatus(true);
+		eventCRFDAO.update(eventCRFBean);
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = eventDefinitionCRFDAO
+				.findForSiteByEventCrfId(eventCRFBean.getId());
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFBean.setUpdater(updater);
+		eventDefinitionCRFBean.setSourceDataVerification(SourceDataVerification.AllREQUIRED);
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+
+		siteEventDefinitionCRFBean1.setStatus(Status.DELETED);
+		siteEventDefinitionCRFBean1.setUpdatedDate(new Date());
+		siteEventDefinitionCRFBean1.setUpdater(updater);
+		eventDefinitionCRFDAO.update(siteEventDefinitionCRFBean1);
+
+		studyEventBean.setSubjectEventStatus(SubjectEventStatus.SIGNED);
+		studyEventBean.setUpdatedDate(new Date());
+		studyEventBean.setUpdater(updater);
+		studyEventDao.update(studyEventBean);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.SIGNED);
+
+		List<ItemDataBean> itemDataBeanList = itemDataDAO.findAllByEventCRFId(eventCRFBean.getId());
+		ItemDataBean itemDataBean = itemDataBeanList.get(0);
+		itemDataBean.setValue("tooth pain");
+		itemDataBean.setUpdatedDate(new Date());
+		itemDataBean.setUpdater(updater);
+		itemDataDAO.update(itemDataBean);
+
+		ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
+		itemBean.setDataType(ItemDataType.CODE);
+		itemBean.setUpdatedDate(new Date());
+		itemBean.setUpdater(updater);
+		idao.update(itemBean);
+
+		ItemFormMetadataBean itemFormMetadataBean = imfdao.findByItemIdAndCRFVersionId(itemBean.getId(),
+				eventCRFBean.getCRFVersionId());
+		itemFormMetadataBean.setCodeRef("icd_9cm");
+		imfdao.update(itemFormMetadataBean);
+
+		CodedItem codedItem = codedItemService.createCodedItem(eventCRFBean, itemBean, itemDataBean, site);
+		assertTrue(codedItem.getId() > 0);
+
+		CodedItemElement codedItemElement = new CodedItemElement(itemDataBean.getId(),
+				StringUtils.substringAfterLast(itemBean.getName(), "_"));
+		codedItem.addCodedItemElements(codedItemElement);
+		codedItemDAO.saveOrUpdate(codedItem);
+
+		studyEventService.removeStudyEvent(studyEventBean, updater);
+
+		checkStudyEventStatus(Status.DELETED);
+
+		studyEventService.restoreStudyEvent(studyEventBean, updater);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(true);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.SIGNED);
+
+		codedItemService.saveCodedItem(codedItem);
+
+		checkEventCRFStatus(Status.UNAVAILABLE);
+		checkEventCRFSDVStatusOnly(false);
+		checkStudyEventStatusOnly(Status.AVAILABLE);
+		checkStudyEventSubjectEventStatusOnly(SubjectEventStatus.COMPLETED);
+	}
+
+	@Test
+	public void testThatObjectsGetStatusesCorrectlyCase45() throws Exception {
+		eventCRFBean.setUpdatedDate(new Date());
+		eventCRFBean.setUpdater(updater);
+		eventCRFBean.setStatus(Status.PENDING);
+		eventCRFBean.setSdvStatus(false);
+		eventCRFBean.setValidatorId(0);
+		eventCRFDAO.update(eventCRFBean);
+
+		checkEventCRFStatus(Status.PENDING);
+		assertTrue(eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE));
+
+		studySubjectService.removeStudySubject(studySubjectBean, updater);
+
+		checkStudySubjectStatus(Status.DELETED);
+
+		studySubjectService.restoreStudySubject(studySubjectBean, updater);
+
+		checkEventCRFStatus(Status.PENDING);
+		assertTrue(eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE));
+	}
+
+	@Test
+	public void testThatObjectsGetStatusesCorrectlyCase46() throws Exception {
+		eventCRFBean.setUpdatedDate(new Date());
+		eventCRFBean.setUpdater(updater);
+		eventCRFBean.setStatus(Status.PENDING);
+		eventCRFBean.setSdvStatus(false);
+		eventCRFBean.setValidatorId(1);
+		eventCRFDAO.update(eventCRFBean);
+
+		List<ItemDataBean> itemDataList = itemDataDAO.findAllByEventCRFId(EVENT_CRF_ID);
+
+		ItemDataBean itemDataBean = itemDataList.get(0);
+		itemDataBean.setUpdater(updater);
+		itemDataBean.setUpdatedDate(new Date());
+		itemDataBean.setStatus(Status.UNAVAILABLE);
+		itemDataDAO.update(itemDataBean);
+
+		itemDataBean = itemDataList.get(1);
+		itemDataBean.setUpdater(updater);
+		itemDataBean.setUpdatedDate(new Date());
+		itemDataBean.setStatus(Status.PENDING);
+		itemDataDAO.update(itemDataBean);
+
+		fillItemDataStatusMap();
+
+		checkEventCRFStatus(Status.PENDING);
+		assertTrue(eventCRFBean.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY));
+
+		studySubjectService.removeStudySubject(studySubjectBean, updater);
+
+		checkStudySubjectStatus(Status.DELETED);
+
+		studySubjectService.restoreStudySubject(studySubjectBean, updater);
+
+		checkEventCRFStatus(Status.PENDING);
+		assertTrue(eventCRFBean.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY));
+	}
+
+	@Test
+	public void testThatObjectsGetStatusesCorrectlyCase47() throws Exception {
+		eventCRFBean.setUpdatedDate(new Date());
+		eventCRFBean.setUpdater(updater);
+		eventCRFBean.setStatus(Status.PARTIAL_DATA_ENTRY);
+		eventCRFBean.setSdvStatus(false);
+		eventCRFDAO.update(eventCRFBean);
+
+		checkEventCRFStatus(Status.PARTIAL_DATA_ENTRY);
+		assertTrue(eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY));
+
+		studySubjectService.removeStudySubject(studySubjectBean, updater);
+
+		checkStudySubjectStatus(Status.DELETED);
+
+		studySubjectService.restoreStudySubject(studySubjectBean, updater);
+
+		checkEventCRFStatus(Status.PARTIAL_DATA_ENTRY);
+		assertTrue(eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY));
 	}
 }

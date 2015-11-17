@@ -25,7 +25,7 @@ import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
 
 public interface CodedItemService {
-	
+
 	/**
 	 * Retrieves all the coded items from storage
 	 * 
@@ -36,17 +36,20 @@ public interface CodedItemService {
 	/**
 	 * Returns all the coded items that belong to the specified study.
 	 * 
-	 * @param studyId The study to which the coded items were created
+	 * @param studyId
+	 *            The study to which the coded items were created
 	 * 
 	 * @return List of coded items that belong to the specified study
 	 */
 	List<CodedItem> findByStudy(int studyId);
-	
+
 	/**
 	 * Returns all the coded items that belong to the specified scope.
 	 * 
-	 * @param studyId The study to which the coded items were created
-	 * @param siteId The site in the study (above) to which the coded items were created
+	 * @param studyId
+	 *            The study to which the coded items were created
+	 * @param siteId
+	 *            The site in the study (above) to which the coded items were created
 	 * 
 	 * @return List of coded items that belong to the specified scope
 	 */
@@ -55,7 +58,8 @@ public interface CodedItemService {
 	/**
 	 * Retrieves all coded items that belong to the specified event-crf
 	 * 
-	 * @param eventCRFId The eventCRF to filter on
+	 * @param eventCRFId
+	 *            The eventCRF to filter on
 	 * 
 	 * @return List of coded items belonging to the specified event-crf
 	 */
@@ -64,18 +68,20 @@ public interface CodedItemService {
 	/**
 	 * Retrieves all coded items that belong to the specified crf-version
 	 * 
-	 * @param crfVersion The crf-version to filter on
+	 * @param crfVersion
+	 *            The crf-version to filter on
 	 * 
 	 * @return List of coded items belonging to the specified crf-version
 	 */
 	List<CodedItem> findByCRFVersion(int crfVersion);
-	
+
 	/**
-	 * Retrieves all coded items that belong to the specified subject. 
+	 * Retrieves all coded items that belong to the specified subject.
 	 * <p>
 	 * The coded items should have been created for the specified subject to qualify.
 	 * 
-	 * @param crfVersion The crf-version to filter on
+	 * @param crfVersion
+	 *            The crf-version to filter on
 	 * 
 	 * @return List of coded items belonging to the specified crf-version
 	 */
@@ -87,7 +93,8 @@ public interface CodedItemService {
 	 * <p>
 	 * The coded items should have been coded with the specified dictionary to qualify.
 	 * 
-	 * @param dictionary The dictionary to filter on.
+	 * @param dictionary
+	 *            The dictionary to filter on.
 	 * 
 	 * @return List of coded items that were coded with a dictionary matching the specified dictionary.
 	 */
@@ -96,7 +103,8 @@ public interface CodedItemService {
 	/**
 	 * Retrieves all the coded items that have the specified status
 	 * 
-	 * @param status The status to filter on.
+	 * @param status
+	 *            The status to filter on.
 	 * 
 	 * @return List of coded items that have the specified status.
 	 */
@@ -105,34 +113,62 @@ public interface CodedItemService {
 	/**
 	 * Creates and prepares a coded item for saving -
 	 * 
-	 * @param eventCRF The event-crf the coded item belongs to
-	 * @param item The reference CRF-item for the coded item
-	 * @param itemData The data that contains the verbatim term
-	 * @param currentStudy The study to which the coded item should be scoped
+	 * @param eventCRF
+	 *            The event-crf the coded item belongs to
+	 * @param item
+	 *            The reference CRF-item for the coded item
+	 * @param itemData
+	 *            The data that contains the verbatim term
+	 * @param currentStudy
+	 *            The study to which the coded item should be scoped
 	 * 
 	 * @return The coded item
 	 * 
-	 * @throws Exception For any errors during persistence.
- 	 */
-	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean currentStudy) throws Exception;
+	 * @throws Exception
+	 *             For any errors during persistence.
+	 */
+	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean currentStudy)
+			throws Exception;
 
-    /**
-     * Save the given coded item to storage.
-     * <p>
-     * Note that this method also updates the referenced CRF item with the coded item value.
-     *
-     * @param codedItem The coded item to save
-     *
-     * @return The saved coded item
-     *
-     * @throws Exception If the item data for the coded item does not exist, or any other exception during persistence routines.
-     */
-    CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
+	/**
+	 * Save the given coded item to storage.
+	 * <p>
+	 * Note that this method also updates the referenced CRF item with the coded item value. This method also resets the
+	 * sdv / signed status for study event and event crf.
+	 *
+	 * @param codedItem
+	 *            The coded item to save
+	 *
+	 * @return The saved coded item
+	 *
+	 * @throws Exception
+	 *             If the item data for the coded item does not exist, or any other exception during persistence
+	 *             routines.
+	 */
+	CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
 
-    /**
+	/**
+	 * Save the given coded item to storage.
+	 * <p>
+	 * Note that this method also updates the referenced CRF item with the coded item value.
+	 *
+	 * @param codedItem
+	 *            The coded item to save
+	 * @param resetStates
+	 *            If it's true then method will reset the sdv / signed status for study event and event crf
+	 * @return The saved coded item
+	 *
+	 * @throws Exception
+	 *             If the item data for the coded item does not exist, or any other exception during persistence
+	 *             routines.
+	 */
+	CodedItem saveCodedItem(CodedItem codedItem, boolean resetStates) throws Exception;
+
+	/**
 	 * Retrieves a coded item given a unique id
 	 * 
-	 * @param codedItemId The id of the coded item to retrieve
+	 * @param codedItemId
+	 *            The id of the coded item to retrieve
 	 * 
 	 * @return The coded item, if it exists, otherwise null.
 	 */
@@ -141,32 +177,36 @@ public interface CodedItemService {
 	/**
 	 * Deletes the given coded item from storage
 	 * 
-	 * @param codedItem The coded item to delete.
+	 * @param codedItem
+	 *            The coded item to delete.
 	 */
 	void deleteCodedItem(CodedItem codedItem);
-	
+
 	/**
-	 * Sets the status of the coded items belong to the specified CRF-Version to deleted! 
+	 * Sets the status of the coded items belong to the specified CRF-Version to deleted!
 	 * <p>
 	 * This means they will not show up when querying by scope
 	 * 
-	 * @param versionId The crf version for which to remove coded items
+	 * @param versionId
+	 *            The crf version for which to remove coded items
 	 */
 	void removeByCRFVersion(int versionId);
 
 	/**
-	 * Restores the deleted coded items that belong to the specified crf-version 
+	 * Restores the deleted coded items that belong to the specified crf-version
 	 * 
-	 * @param versionId The crf version for which to restore coded items
+	 * @param versionId
+	 *            The crf version for which to restore coded items
 	 */
 	void restoreByCRFVersion(int versionId);
 
 	/**
-	 * Purges from the database all coded items belonging to the specified crf-version 
+	 * Purges from the database all coded items belonging to the specified crf-version
 	 * <p>
 	 * This means they will not show up when querying by scope
 	 * 
-	 * @param versionId The crf version for which to purge coded items
+	 * @param versionId
+	 *            The crf version for which to purge coded items
 	 */
 	void deleteByCRFVersion(int versionId);
 

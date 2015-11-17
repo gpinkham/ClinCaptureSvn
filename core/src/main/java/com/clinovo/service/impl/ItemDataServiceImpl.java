@@ -56,6 +56,10 @@ public class ItemDataServiceImpl implements ItemDataService {
 
 	private void disableItemDataBeans(ItemDataBean itemDataBean, UserAccountBean updater, Status status)
 			throws Exception {
+		if (!itemDataBean.getStatus().isInvalid() && !itemDataBean.getStatus().isDeleted()
+				&& !itemDataBean.getStatus().isLocked()) {
+			itemDataBean.setOldStatus(itemDataBean.getStatus());
+		}
 		itemDataBean.setStatus(status);
 		itemDataBean.setUpdater(updater);
 		getItemDataDAO().update(itemDataBean);
@@ -64,13 +68,18 @@ public class ItemDataServiceImpl implements ItemDataService {
 			codedItem.setStatus(status.isDeleted()
 					? com.clinovo.model.Status.CodeStatus.REMOVED.toString()
 					: com.clinovo.model.Status.CodeStatus.LOCKED.toString());
-			codedItemService.saveCodedItem(codedItem);
+			codedItemService.saveCodedItem(codedItem, false);
 		}
 	}
 
 	private void enableItemDataBeans(ItemDataBean itemDataBean, UserAccountBean updater, Status status)
 			throws Exception {
-		itemDataBean.setStatus(status);
+		if (!itemDataBean.getOldStatus().isInvalid() && !itemDataBean.getOldStatus().isDeleted()
+				&& !itemDataBean.getOldStatus().isLocked()) {
+			itemDataBean.setStatus(itemDataBean.getOldStatus());
+		} else {
+			itemDataBean.setStatus(status);
+		}
 		itemDataBean.setUpdater(updater);
 		getItemDataDAO().update(itemDataBean);
 		CodedItem codedItem = codedItemService.findCodedItem(itemDataBean.getId());
@@ -86,7 +95,7 @@ public class ItemDataServiceImpl implements ItemDataService {
 					codedItem.setStatus(com.clinovo.model.Status.CodeStatus.CODED.toString());
 				}
 			}
-			codedItemService.saveCodedItem(codedItem);
+			codedItemService.saveCodedItem(codedItem, false);
 		}
 	}
 

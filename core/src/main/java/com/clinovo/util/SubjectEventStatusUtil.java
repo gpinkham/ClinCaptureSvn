@@ -458,7 +458,13 @@ public final class SubjectEventStatusUtil {
 			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, preSignedData);
 			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, postSignedData);
 			if (!eventCRFBean.statesIsEmpty()) {
-				eventCRFBean.setStatus(eventCRFBean.getDateCompleted() != null ? Status.UNAVAILABLE : Status.AVAILABLE);
+				Status status = eventCRFBean.getOldStatus();
+				if (!status.isInvalid() && !status.isDeleted() && !status.isLocked()) {
+					eventCRFBean.setStatus(status);
+				} else {
+					eventCRFBean
+							.setStatus(eventCRFBean.getDateCompleted() != null ? Status.UNAVAILABLE : Status.AVAILABLE);
+				}
 				eventCRFBean.setStage(null);
 			}
 			State eventCRFState = getState(eventCRFBean);
@@ -481,7 +487,6 @@ public final class SubjectEventStatusUtil {
 			}
 			state = getHighestState(state, eventCRFState);
 		}
-
 		if (!justScheduled && !hasStarted) {
 			if (hasRequiredCRFs) {
 				state = requiredCrfIds.size() > 0 ? State.DES : state;

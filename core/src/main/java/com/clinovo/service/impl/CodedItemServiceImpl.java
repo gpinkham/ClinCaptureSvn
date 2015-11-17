@@ -21,12 +21,17 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -41,6 +46,8 @@ import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * Class implements basic CRUD operations for coding items.
@@ -254,16 +261,16 @@ public class CodedItemServiceImpl implements CodedItemService {
 	}
 
 	/**
-	 * Returns updated coded item.
-	 *
-	 * @param codedItem
-	 *            The coded item to save.
-	 * @return the created coded item.
-	 * @throws Exception
-	 *             for all exceptions.
+	 * {@inheritDoc}
 	 */
 	public CodedItem saveCodedItem(CodedItem codedItem) throws Exception {
+		return saveCodedItem(codedItem, true);
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public CodedItem saveCodedItem(CodedItem codedItem, boolean resetStates) throws Exception {
 		for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 			ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItemElement.getItemDataId());
 
@@ -275,7 +282,9 @@ public class CodedItemServiceImpl implements CodedItemService {
 				throw new CodeException("ItemData for this Item not found. Has the CRF been completed?");
 			}
 		}
-
+		if (resetStates) {
+			resetEventAndCrfStatus(codedItem);
+		}
 		return codeItemDAO.saveOrUpdate(codedItem);
 	}
 
@@ -360,5 +369,20 @@ public class CodedItemServiceImpl implements CodedItemService {
 		return dictionaryName.equalsIgnoreCase("icd_10") || dictionaryName.equalsIgnoreCase("icd_9cm")
 				|| dictionaryName.toLowerCase().contains("meddra") || dictionaryName.toLowerCase().contains("whod")
 				|| dictionaryName.equalsIgnoreCase("ctcae");
+	}
+
+	private void resetEventAndCrfStatus(CodedItem codedItem) {
+		EventCRFDAO eventEcrfDAO = new EventCRFDAO(dataSource);
+		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
+		EventCRFBean eventCRFBean = (EventCRFBean) eventEcrfDAO.findByPK(codedItem.getEventCrfId());
+		StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
+		if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED) || eventCRFBean.isSdvStatus()) {
+			eventCRFBean.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
+			eventCRFBean.setSdvStatus(false);
+			eventEcrfDAO.update(eventCRFBean);
+			studyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+			SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, new DAOWrapper(dataSource));
+			studyEventDAO.update(studyEventBean);
+		}
 	}
 }

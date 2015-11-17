@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2015-11-15-TICKET2656-01" dbms="postgresql">
+        <comment>Update stored functions</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION disable_event_crf(
+            ec_id integer,
+            u_id integer,
+            pos integer,
+            state integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, state), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = get_from_states(states, status_id, pos, state) where event_crf_id = ec_id;
+                update item_data idt set update_id = u_id, date_updated = now(), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id) where idt.event_crf_id = ec_id;
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else ci.status end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt where idt.event_crf_id = ec_id);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id and idt.event_crf_id = ec_id);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION disable_event_crfs_by_crf_version(
+            cv_id integer,
+            u_id integer,
+            pos integer,
+            state integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, state), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = get_from_states(states, status_id, pos, state) where event_crf_id in (select event_crf_id from event_crf where crf_version_id = cv_id);
+                update item_data idt set update_id = u_id, date_updated = now(), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id) where idt.event_crf_id in (select event_crf_id from event_crf where crf_version_id = cv_id);
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else ci.status end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.crf_version_id = cv_id);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.crf_version_id = cv_id);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION disable_event_crfs_by_study_event(
+            se_id integer,
+            u_id integer,
+            pos integer,
+            state integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, state), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = get_from_states(states, status_id, pos, state) where event_crf_id in (select event_crf_id from event_crf where study_event_id = se_id);
+                update item_data idt set update_id = u_id, date_updated = now(), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id) where idt.event_crf_id in (select event_crf_id from event_crf where study_event_id = se_id);
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else ci.status end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION disable_event_crfs_by_study_event_and_crf_oid(
+            se_id integer,
+            oid text,
+            u_id integer,
+            pos integer,
+            state integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, state), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = get_from_states(states, status_id, pos, state) where event_crf_id in (select ec.event_crf_id from event_crf ec join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid where ec.study_event_id = se_id);
+                update item_data idt set update_id = u_id, date_updated = now(), old_status_id = case when status_id != 0 and status_id != 5 and status_id != 6 and status_id != 7 then status_id else old_status_id end, status_id = (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id) where idt.event_crf_id in (select ec.event_crf_id from event_crf ec join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid where ec.study_event_id = se_id);
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else ci.status end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION enable_event_crf(
+            ec_id integer,
+            u_id integer,
+            pos integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, 0), status_id = revert_from_states(states, old_status_id, date_completed, pos) where event_crf_id = ec_id;
+                update item_data idt set update_id = u_id, date_updated = now(), status_id = enable_item_data(old_status_id, (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id)) where idt.event_crf_id = ec_id;
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else (case when ci.http_path is null or ci.http_path = '''' then ''NOT_CODED'' else ''CODED'' end) end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt where idt.event_crf_id = ec_id);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id and idt.event_crf_id = ec_id);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION enable_event_crfs_by_crf_version(
+            cv_id integer,
+            u_id integer,
+            pos integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, 0), status_id = revert_from_states(states, old_status_id, date_completed, pos) where event_crf_id in (select event_crf_id from event_crf where crf_version_id = cv_id);
+                update item_data idt set update_id = u_id, date_updated = now(), status_id = enable_item_data(old_status_id, (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id)) where idt.event_crf_id in (select event_crf_id from event_crf where crf_version_id = cv_id);
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else (case when ci.http_path is null or ci.http_path = '''' then ''NOT_CODED'' else ''CODED'' end) end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.crf_version_id = cv_id);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.crf_version_id = cv_id);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION enable_event_crfs_by_study_event(
+            se_id integer,
+            u_id integer,
+            pos integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, 0), status_id = revert_from_states(states, old_status_id, date_completed, pos) where event_crf_id in (select event_crf_id from event_crf where study_event_id = se_id);
+                update item_data idt set update_id = u_id, date_updated = now(), status_id = enable_item_data(old_status_id, (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id)) where idt.event_crf_id in (select event_crf_id from event_crf where study_event_id = se_id);
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else (case when ci.http_path is null or ci.http_path = '''' then ''NOT_CODED'' else ''CODED'' end) end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION enable_event_crfs_by_study_event_and_crf_oid(
+            se_id integer,
+            oid text,
+            u_id integer,
+            pos integer)
+            RETURNS void AS
+            'DECLARE
+            BEGIN
+                update event_crf set update_id = u_id, date_updated = now(), states = update_states(states, pos, 0), status_id = revert_from_states(states, old_status_id, date_completed, pos) where event_crf_id in (select ec.event_crf_id from event_crf ec join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid where ec.study_event_id = se_id);
+                update item_data idt set update_id = u_id, date_updated = now(), status_id = enable_item_data(old_status_id, (select ec.status_id from event_crf ec where ec.event_crf_id = idt.event_crf_id)) where idt.event_crf_id in (select ec.event_crf_id from event_crf ec join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid where ec.study_event_id = se_id);
+                update coded_item ci set status = (select case when idt.status_id = 5 or idt.status_id = 7 then ''REMOVED'' else (case when idt.status_id = 6 then ''LOCKED'' else (case when ci.http_path is null or ci.http_path = '''' then ''NOT_CODED'' else ''CODED'' end) end) end from item_data idt where idt.item_data_id = ci.item_id) where ci.item_id in (select idt.item_data_id from item_data idt join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid);
+                update item_data itdt set update_id = u_id, date_updated = now(), value = (select cie.item_code from coded_item_element cie where cie.item_data_id = itdt.item_data_id) where itdt.item_data_id in (select cie.item_data_id from coded_item_element cie join coded_item ci on ci.id = cie.coded_item_id join item_data idt on idt.item_data_id = ci.item_id join event_crf ec on ec.event_crf_id = idt.event_crf_id and ec.study_event_id = se_id join crf_version cv on cv.crf_version_id = ec.crf_version_id join crf c on c.crf_id = cv.crf_id and c.oc_oid = oid);
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION get_from_states(
+            states text,
+            current_status integer,
+            pos integer,
+            status integer)
+            RETURNS integer AS
+            'DECLARE
+            arr integer[];
+            val integer;
+            BEGIN
+                val = 0;
+                arr = regexp_split_to_array(states, '','');
+                arr[pos] = status;
+                FOR i IN REVERSE array_length(arr, 1)..1 LOOP
+                    IF val = 0 THEN
+                        val = arr[i];
+                    END IF;
+                END LOOP;
+                IF val = 0 THEN
+                    val = current_status;
+                END IF;
+                RETURN val;
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION enable_item_data(
+            old_status integer,
+            ev_status integer)
+            RETURNS integer AS
+            'DECLARE
+            val integer;
+            BEGIN
+                IF ev_status != 0 AND ev_status != 5 AND ev_status != 6 AND ev_status != 7 AND old_status != 0 AND old_status != 5 AND old_status != 6 AND old_status != 7 THEN
+                    val = old_status;
+                ELSE
+                    val = ev_status;
+                END IF;
+                RETURN val;
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION revert_from_states(
+            states text,
+            old_status integer,
+            dt_completed timestamp with time zone,
+            pos integer)
+            RETURNS integer AS
+            'DECLARE
+            arr integer[];
+            val integer;
+            BEGIN
+                val = 0;
+                arr = regexp_split_to_array(states, '','');
+                arr[pos] = 0;
+                FOR i IN REVERSE array_length(arr, 1)..1 LOOP
+                    IF val = 0 THEN
+                        val = arr[i];
+                    END IF;
+                END LOOP;
+                IF val = 0 THEN
+                    IF old_status != 0 AND old_status != 5 AND old_status != 6 AND old_status != 7 THEN
+                        val = old_status;
+                    ELSE
+                        IF dt_completed IS NOT NULL THEN
+                            val = 2;
+                        ELSE
+                            val = 1;
+                        END IF;
+                    END IF;
+                END IF;
+                RETURN val;
+            END;
+            'LANGUAGE plpgsql;
+
+            CREATE OR REPLACE FUNCTION update_states(
+            states text,
+            pos integer,
+            status integer)
+            RETURNS text AS
+            'DECLARE
+            arr integer[];
+            BEGIN
+                arr = regexp_split_to_array(states, '','');
+                arr[pos] = status;
+                RETURN array_to_string(arr, '','');
+            END;
+            'LANGUAGE plpgsql;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
