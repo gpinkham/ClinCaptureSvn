@@ -8,7 +8,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <c:choose> 
-	<c:when test="${!dataEntryStage.isAdmin_Editing() && !dataEntryStage.isDoubleDE()}">
+	<c:when test="${!dataEntryStage.isAdmin_Editing()}">
 		<td valign="bottom">  
 			<input type="checkbox" id="partialSaveId" name="markPartialSaved" value="Yes"
 				<c:if test="${markPartialSaved=='Yes'}"> checked </c:if> onchange="changeImage('markPartialSaved');" onclick="checkPartialSaveCheckboxes(this.name, this.checked, 'markComplete');">

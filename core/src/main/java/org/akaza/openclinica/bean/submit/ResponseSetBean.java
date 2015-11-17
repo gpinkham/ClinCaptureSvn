@@ -22,8 +22,6 @@ package org.akaza.openclinica.bean.submit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ResponseType;
 
@@ -38,7 +36,7 @@ public class ResponseSetBean extends EntityBean {
 	/**
 	 * A set of options to display to the user. The elements are ResponseOptionBean objects.
 	 */
-	private ArrayList options;
+	private ArrayList<ResponseOptionBean> options;
 
 	/**
 	 * A HashMap which tells us, for a given value, what is the index in the options array where the option with that
@@ -57,7 +55,7 @@ public class ResponseSetBean extends EntityBean {
 	public ResponseSetBean() {
 		super();
 		setResponseType(org.akaza.openclinica.bean.core.ResponseType.TEXT);
-		options = new ArrayList();
+		options = new ArrayList<ResponseOptionBean>();
 		optionIndexesByValue = new HashMap();
 	}
 
@@ -79,7 +77,7 @@ public class ResponseSetBean extends EntityBean {
 	/**
 	 * @return Returns the options.
 	 */
-	public ArrayList getOptions() {
+	public ArrayList<ResponseOptionBean> getOptions() {
 		return options;
 	}
 
@@ -214,7 +212,7 @@ public class ResponseSetBean extends EntityBean {
 	 */
 	public ArrayList removeSelection() {
 		ArrayList list = new ArrayList();
-		for (ResponseOptionBean rob : (List<ResponseOptionBean>) options) {
+		for (ResponseOptionBean rob : options) {
 			if (rob.isSelected()) {
 				rob.setSelected(false);
 			}

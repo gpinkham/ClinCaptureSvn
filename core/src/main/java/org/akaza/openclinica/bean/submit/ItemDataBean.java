@@ -96,6 +96,8 @@ public class ItemDataBean extends AuditableEntityBean {
 	private boolean auditLog = false;
 
 	private boolean sdv;
+	
+	private String partialDDEValue; // dde for PS
 
 	/**
 	 * Method that clones the ItemDataBean.
@@ -124,6 +126,8 @@ public class ItemDataBean extends AuditableEntityBean {
 		if (updater != null) {
 			idb.setUpdater(updater);
 		}
+		idb.setPartialDDEValue(getPartialDDEValue());
+		
 		return idb;
 	}
 
@@ -137,6 +141,7 @@ public class ItemDataBean extends AuditableEntityBean {
 		ordinal = 1;
 		selected = false;
 		auditLog = false;
+		partialDDEValue = "";
 	}
 
 	/**
@@ -228,5 +233,13 @@ public class ItemDataBean extends AuditableEntityBean {
 
 	public void setSdv(boolean sdv) {
 		this.sdv = sdv;
+	}
+
+	public String getPartialDDEValue() {
+		return partialDDEValue;
+	}
+
+	public void setPartialDDEValue(String partialDDEValue) {
+		this.partialDDEValue = partialDDEValue;
 	}
 }

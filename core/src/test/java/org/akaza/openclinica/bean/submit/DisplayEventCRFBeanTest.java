@@ -70,18 +70,20 @@ public class DisplayEventCRFBeanTest {
 		eventCRFBean.setStage(DataEntryStage.DOUBLE_DATA_ENTRY);
 		eventCRFBean.setNotStarted(false);
 		eventCRFBean.setValidatorId(2);
+		
 
 		UserAccountBean userAccountBean = new UserAccountBean();
 		userAccountBean.setId(3);
 		userAccountBean.setActiveStudyId(1);
-
+		
+		eventCRFBean.setOwner(userAccountBean);
+		
 		List<StudyUserRoleBean> userRolesList = new ArrayList<StudyUserRoleBean>();
 		StudyUserRoleBean roleBean = new StudyUserRoleBean();
 		roleBean.setRole(Role.STUDY_ADMINISTRATOR);
 		roleBean.setStudyId(1);
 		userRolesList.add(roleBean);
 		userAccountBean.setRoles((ArrayList<StudyUserRoleBean>) userRolesList);
-
 
 		StudyUserRoleBean studyUserRoleBean = new StudyUserRoleBean();
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();

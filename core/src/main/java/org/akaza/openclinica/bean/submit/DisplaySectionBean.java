@@ -28,6 +28,8 @@ import java.util.Set;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 
+import com.clinovo.model.EventCRFSectionBean;
+
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DisplaySectionBean {
 	private CRFBean crf;
@@ -35,6 +37,7 @@ public class DisplaySectionBean {
 	private EventCRFBean eventCRF;
 	private EventDefinitionCRFBean eventDefinitionCRF;
 	private SectionBean section;
+	private EventCRFSectionBean eventCRFSection;
 	private ArrayList<DisplayItemBean> items; // an array of DisplayItemBeans which belong to
 	// this section
 	private final boolean checkInputs;
@@ -48,7 +51,7 @@ public class DisplaySectionBean {
 	// groups
 
 	private List<DisplayItemWithGroupBean> displayItemGroups; // for all items
-
+	
 	// including
 	// single ones
 	// and in group
@@ -267,5 +270,13 @@ public class DisplaySectionBean {
 		newSection.setShowSCDItemIds(showSCDItemIds);
 		newSection.setDisplayFormGroups(displayFormGroups);
 		return newSection;
+	}
+
+	public EventCRFSectionBean getEventCRFSection() {
+		return eventCRFSection;
+	}
+
+	public void setEventCRFSection(EventCRFSectionBean eventCRFSection) {
+		this.eventCRFSection = eventCRFSection;
 	}
 }

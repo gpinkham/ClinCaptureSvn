@@ -170,7 +170,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT); // update id
 		this.setTypeExpected(index++, TypeNames.INT); // ordinal
 		this.setTypeExpected(index++, TypeNames.INT); // old status id
-		this.setTypeExpected(index, TypeNames.BOOL); // sdv
+		this.setTypeExpected(index++, TypeNames.BOOL); // sdv
+		this.setTypeExpected(index, TypeNames.STRING); // dde value
 	}
 
 	/**
@@ -218,6 +219,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(index++, idb.getOrdinal());
 		variables.put(index++, idb.getOldStatus().getId());
 		variables.put(index++, idb.isSdv());
+		variables.put(index++, idb.getPartialDDEValue());
 		variables.put(index, idb.getId());
 		this.execute(digester.getQuery("update"), variables, con);
 		if (isQuerySuccessful()) {
@@ -430,7 +432,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(index++, idb.getValue());
 		variables.put(index++, idb.getOwnerId());
 		variables.put(index++, idb.getOrdinal());
-		variables.put(index, idb.getStatus().getId());
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index, idb.getPartialDDEValue());
 		this.execute(digester.getQuery("create"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setId(id);
@@ -467,7 +470,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(index++, idb.getValue());
 		variables.put(index++, idb.getOwnerId());
 		variables.put(index++, idb.getOrdinal());
-		variables.put(index, idb.getUpdaterId());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index, idb.getPartialDDEValue());
 		this.execute(digester.getQuery("upsert"), variables);
 
 		if (isQuerySuccessful()) {
@@ -572,6 +576,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		eb.setEventCRFId((Integer) hm.get("event_crf_id"));
 		eb.setItemId((Integer) hm.get("item_id"));
 		eb.setValue((String) hm.get("value"));
+		eb.setPartialDDEValue((String) hm.get("partial_dde_value"));
 		// Since "getEntityFromHashMap" only be used for find
 		// right now,
 		// convert item date value to local_date_format_string pattern once
@@ -579,8 +584,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		ItemDataType dataType = getDataType(eb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
 			eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string, locale));
+			eb.setPartialDDEValue(Utils.convertedItemDateValue(eb.getPartialDDEValue(), oc_df_string, local_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			eb.setValue(reFormatPDate(eb.getValue()));
+			eb.setPartialDDEValue(reFormatPDate(eb.getPartialDDEValue()));
 		}
 		eb.setStatus(Status.get((Integer) hm.get("status_id")));
 		eb.setOrdinal((Integer) hm.get("ordinal"));
@@ -1316,5 +1323,31 @@ public class ItemDataDAO extends AuditableEntityDAO {
 				.concat(itemDataIds.toString().replace("[", "(").replace("]", ")")), variables);
 
 		return isQuerySuccessful();
+	}
+
+	public ItemDataBean updatePartialDDEValue(ItemDataBean idb) {
+		
+		ItemDataType dataType = getDataType(idb.getItemId());
+		if (dataType.equals(ItemDataType.DATE)) {
+			idb.setPartialDDEValue(Utils.convertedItemDateValue(idb.getPartialDDEValue(), local_df_string, oc_df_string, locale));
+		} else if (dataType.equals(ItemDataType.PDATE)) {
+			idb.setPartialDDEValue(formatPDate(idb.getPartialDDEValue()));
+		}
+
+		idb.setActive(false);
+		int index = 1;
+
+		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+		variables.put(index++, idb.getStatus().getId());
+		variables.put(index++, idb.getPartialDDEValue());
+		variables.put(index++, idb.getUpdaterId());
+		variables.put(index, idb.getId());
+		this.execute(digester.getQuery("updatePartialDDEValue"), variables);
+
+		if (isQuerySuccessful()) {
+			idb.setActive(true);
+		}
+
+		return idb;
 	}
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="igor" id="2015-10-28-TICKET2607">
+		<comment>Create partial_dde_value column in item_data table to implement Partial Save for DDE</comment>
+		<addColumn tableName="item_data">
+			<column name="partial_dde_value" type="varchar(4000)"/>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

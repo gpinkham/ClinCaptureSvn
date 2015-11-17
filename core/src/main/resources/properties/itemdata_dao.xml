@@ -23,25 +23,31 @@
 	<query>
 		<name>create</name>
 		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-		OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID)
-		VALUES (?,?,?,?,?,?,NOW(),?,?)</sql>
+		OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID, PARTIAL_DDE_VALUE)
+		VALUES (?,?,?,?,?,?,NOW(),?,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,STATUS_ID=?,
-		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=?, SDV=? WHERE
+		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=?, SDV=?, PARTIAL_DDE_VALUE=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
 	<query>
 		<name>upsert</name>
 		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-		OWNER_ID, DATE_CREATED, ORDINAL, DATE_UPDATED, UPDATE_ID)
-		VALUES (?,?,?,?,?,?,NOW(),?,NOW(),?)</sql>
+		OWNER_ID, DATE_CREATED, ORDINAL, DATE_UPDATED, UPDATE_ID, PARTIAL_DDE_VALUE)
+		VALUES (?,?,?,?,?,?,NOW(),?,NOW(),?,?)</sql>
 	</query>
 	<query>
 		<name>updateValue</name>
 		<sql>UPDATE ITEM_DATA SET STATUS_ID=?,
 		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=? WHERE
+		ITEM_DATA_ID=?</sql>
+	</query>
+	<query>
+		<name>updatePartialDDEValue</name>
+		<sql>UPDATE ITEM_DATA SET STATUS_ID=?,
+		PARTIAL_DDE_VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
 	<query>

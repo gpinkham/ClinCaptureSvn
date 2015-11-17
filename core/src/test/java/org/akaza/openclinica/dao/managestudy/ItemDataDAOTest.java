@@ -68,6 +68,7 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.INT, itemDataDAO.getTypeExpected(index++));
 		assertEquals((Integer) TypeNames.BOOL, itemDataDAO.getTypeExpected(index++));
+		assertEquals((Integer) TypeNames.STRING, itemDataDAO.getTypeExpected(index++));
 		assertNull(itemDataDAO.getTypeExpected(index));
 	}
 

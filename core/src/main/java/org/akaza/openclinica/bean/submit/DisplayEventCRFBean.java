@@ -22,6 +22,7 @@ package org.akaza.openclinica.bean.submit;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -200,7 +201,8 @@ public class DisplayEventCRFBean implements Comparable {
 				}
 			}
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY) && crfEvaluationOrDDEPermitted) {
-			if (eventCRF.getValidatorId() == user.getId() || isSuper(user.getActiveStudyRole())) {
+			if ((eventCRF.getValidatorId() == user.getId() || isSuper(user.getActiveStudyRole())) 
+					&& (!eventCRF.getOwner().equals(user) || eventCRF.getStatus() != Status.PARTIAL_DOUBLE_DATA_ENTRY)) {
 				continueDoubleDataEntryPermitted = true;
 			}
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {

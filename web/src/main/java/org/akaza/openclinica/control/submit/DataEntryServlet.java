@@ -585,6 +585,7 @@ public abstract class DataEntryServlet extends Controller {
 		} else {
 			logMe("Entering Checks !submitted not entered  " + System.currentTimeMillis());
 			boolean isMarkedPartialSaved = fp.getString("markPartialSaved").equals(VALUE_YES);
+			boolean isPSOnDDE = isMarkedPartialSaved && getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET);
 			boolean validate = (!isMarkedPartialSaved) && validateInputOnFirstRound();
 			HashMap errors = new HashMap();
 
@@ -1077,7 +1078,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
 				request.setAttribute("markPartialSaved", fp.getString(INPUT_MARK_PARTIAL_SAVED));
-				request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
+				request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section, !errors.isEmpty() || !warningMessages.isEmpty()));
 				request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 				setInputMessages(errors, request);
 				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
@@ -1219,7 +1220,7 @@ public abstract class DataEntryServlet extends Controller {
 										&& !newUploadedFiles.containsKey(fileName)) {
 									displayItem.getData().setValue("");
 								}
-								temp = writeToDB(displayItem, iddao, displayGroup.getOrdinal() + 1, request);
+								temp = writeToDB(displayItem, iddao, displayGroup.getOrdinal() + 1, isPSOnDDE, request);
 								logger.debug("just executed writeToDB - 1");
 								logger.debug("ordinal: " + displayGroup.getOrdinal() + 1);
 								if (temp && newUploadedFiles.containsKey(fileName)) {
@@ -1245,7 +1246,7 @@ public abstract class DataEntryServlet extends Controller {
 											&& !newUploadedFiles.containsKey(fileName)) {
 										displayItem.getData().setValue("");
 									}
-									temp = writeToDB(displayItem, iddao, 0, request);
+									temp = writeToDB(displayItem, iddao, 0, isPSOnDDE, request);
 									logger.debug("just executed writeToDB - 2");
 									if (temp && newUploadedFiles.containsKey(fileName)) {
 										newUploadedFiles.remove(fileName);
@@ -1257,7 +1258,7 @@ public abstract class DataEntryServlet extends Controller {
 					} else {
 						DisplayItemBean dib = diwb.getSingleItem();
 						this.addAttachedFilePath(dib, attachedFilePath);
-						temp = writeToDB(dib, iddao, 1, request);
+						temp = writeToDB(dib, iddao, 1, isPSOnDDE, request);
 						logger.debug("just executed writeToDB - 3");
 						if (temp && newUploadedFiles.containsKey(dib.getItem().getId() + "")) {
 							// so newUploadedFiles will contain only failed file
@@ -1275,7 +1276,7 @@ public abstract class DataEntryServlet extends Controller {
 						for (int j = 0; j < childItems.size(); j++) {
 							DisplayItemBean child = (DisplayItemBean) childItems.get(j);
 							this.addAttachedFilePath(child, attachedFilePath);
-							temp = writeToDB(child, iddao, 1, request);
+							temp = writeToDB(child, iddao, 1, isPSOnDDE, request);
 							logger.debug("just executed writeToDB - 4");
 							if (temp && newUploadedFiles.containsKey(child.getItem().getId() + "")) {
 								newUploadedFiles.remove(child.getItem().getId() + "");
@@ -1700,10 +1701,17 @@ public abstract class DataEntryServlet extends Controller {
 			eventCRFSectionService.saveEventCRFSectionBean(ecsb);
 			
 			boolean doesPSSectionExist = eventCRFSectionService.findAllPartiallySavedByEventCRFId(eventCRFBean.getId()).size() > 0;
-			if (!eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) && doesPSSectionExist) {
-				eventCRFBean.setStatus(Status.PARTIAL_DATA_ENTRY);
+			if (!(eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) || 
+					eventCRFBean.getStatus().equals(Status.PARTIAL_DOUBLE_DATA_ENTRY)) && doesPSSectionExist) {
+				if (getServletPage(fp.getRequest()).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+					eventCRFBean.setStatus(Status.PARTIAL_DOUBLE_DATA_ENTRY);
+				} else {
+					eventCRFBean.setStatus(Status.PARTIAL_DATA_ENTRY);
+				}
 			} else if (eventCRFBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY) && !doesPSSectionExist) {
 				eventCRFBean.setStatus(Status.AVAILABLE);
+			} else if (eventCRFBean.getStatus().equals(Status.PARTIAL_DOUBLE_DATA_ENTRY) && !doesPSSectionExist) {
+				eventCRFBean.setStatus(Status.PENDING);
 			}
 		}
 	}
@@ -1724,6 +1732,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("eventCRFSectionService");
 		EventCRFSectionBean ecsb = eventCRFSectionService.findByEventCRFIdAndSectionId(eventCRFId, dsb.getSection().getId());
+		dsb.setEventCRFSection(ecsb);
 		List<EventCRFSectionBean> psSectionsList = eventCRFSectionService.findAllPartiallySavedByEventCRFId(eventCRFId);
 		Map<Integer, EventCRFSectionBean> sectionIdToEvCRFSection = eventCRFSectionService.getSectionIdToEvCRFSectionMap(psSectionsList);
 		request.setAttribute("disableMarkCRFComplete", dsb.isLastSection() && (psSectionsList.size() > 1 
@@ -2310,7 +2319,7 @@ public abstract class DataEntryServlet extends Controller {
 	 * @return <code>true</code> if the query succeeded, <code>false</code> otherwise.
 	 * @throws Exception
 	 */
-	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request)
+	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, boolean isPSOnDDE, HttpServletRequest request)
 			throws Exception {
 		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		ItemDataBean idb = dib.getData();
@@ -2341,10 +2350,10 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		return writeToDB(idb, dib, iddao, ordinal, request);
+		return writeToDB(idb, dib, iddao, ordinal, isPSOnDDE, request);
 	}
 
-	protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal,
+	protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal, boolean isPSOnDDE,
 								HttpServletRequest request) throws Exception {
 		ItemDataBean idb = itemData;
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
@@ -2359,7 +2368,6 @@ public abstract class DataEntryServlet extends Controller {
 			idb.setStatus(getNonBlankItemStatus(request));
 		}
 		if (StringUtil.isBlank(dib.getEditFlag())) {
-
 			if (!idb.isActive()) {
 				// will this need to change for double data entry?
 				idb.setOrdinal(ordinal);
@@ -2372,6 +2380,10 @@ public abstract class DataEntryServlet extends Controller {
 					getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
 
+			} else if (isPSOnDDE) {
+				idb.setStatus(getBlankItemStatus());
+				idb.setPartialDDEValue(idb.getValue());
+				idb = (ItemDataBean) iddao.updatePartialDDEValue(idb);
 			} else {
 
 				idb.setUpdater(ub);
@@ -2389,6 +2401,13 @@ public abstract class DataEntryServlet extends Controller {
 				idb.setOwner(ub);
 				logger.debug("create a new item data" + idb.getItemId() + idb.getValue());
 				idb.setUpdater(ub);
+				
+				if (isPSOnDDE) {
+					idb.setStatus(getNonBlankItemStatus(request));
+					idb.setPartialDDEValue(idb.getValue());
+					idb.setValue("");
+				}
+				
 				idb = (ItemDataBean) iddao.upsert(idb);
 
 				if (getCodedItemService() != null) {
@@ -2400,14 +2419,16 @@ public abstract class DataEntryServlet extends Controller {
 				idb.setUpdater(ub);
 
 				logger.info("update item update_id " + idb.getUpdater().getId());
-				// update tbh #5999, #5998; if an item_data was not included in
-				// an import data, it won't exist; we need to check on item_data_id
-				// to make sure we are running the correct command on the db
+				
 				if (idb.getId() != 0) {
-
-					idb.setUpdatedDate(new Date());
-					idb = (ItemDataBean) iddao.updateValue(idb);
-
+					if (isPSOnDDE) {
+						idb.setStatus(getNonBlankItemStatus(request));
+						idb.setPartialDDEValue(idb.getValue());
+						idb = (ItemDataBean) iddao.updatePartialDDEValue(idb);
+					} else {
+						idb.setUpdatedDate(new Date());
+						idb = (ItemDataBean) iddao.updateValue(idb);
+					}
 				} else {
 
 					idb.setCreatedDate(new Date());
@@ -3780,9 +3801,18 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private DisplaySectionBean getDisplaySectionBeanDependingOnStage(DisplaySectionBean sectionBean) {
+		return getDisplaySectionBeanDependingOnStage(sectionBean, false);
+	}
+	
+	private DisplaySectionBean getDisplaySectionBeanDependingOnStage(DisplaySectionBean sectionBean, boolean isInError) {
 		populateItemsWithRenderMetadata(sectionBean);
 
 		if (getCurrentDataEntryStage() == CurrentDataEntryStage.VIEW_DATA_ENTRY) {
+			return sectionBean;
+		} else if (getCurrentDataEntryStage() == CurrentDataEntryStage.DOUBLE_DATA_ENTRY) {
+			if (sectionBean.getEventCRFSection().isPartialSaved() && !isInError) {
+				changeDDEItemValueToPartiallySavedIfExist(sectionBean);
+			}
 			return sectionBean;
 		} else {
 			return DataEntryRenderUtil.convertSingleItemsToDisplayItemRowsDependingOnSource(sectionBean);
@@ -3792,5 +3822,26 @@ public abstract class DataEntryServlet extends Controller {
 	private void populateItemsWithRenderMetadata(DisplaySectionBean sectionBean) {
 		ItemRenderMetadataService renderMetadataService = getItemRenderMetadataService(getServletContext());
 		renderMetadataService.populateDisplayItemsWithRenderMetadata(sectionBean);
+	}
+	
+	private void changeDDEItemValueToPartiallySavedIfExist(DisplaySectionBean sectionBean) {
+		for (DisplayItemWithGroupBean diwgb : sectionBean.getDisplayItemGroups()) {
+			if (diwgb.isInGroup()) {
+				for (DisplayItemGroupBean digb : diwgb.getItemGroups()) {
+					for (DisplayItemBean dib : digb.getItems()) {
+						dib.getMetadata().getResponseSet().setValue(dib.getData().getPartialDDEValue());
+						for (ResponseOptionBean rob : dib.getMetadata().getResponseSet().getOptions()) {
+							if (rob.getValue().equals(dib.getMetadata().getResponseSet().getValue())){
+								rob.setSelected(true);
+							} else {
+								rob.setSelected(false);
+							}
+						}
+					}
+				}
+			} else {
+				diwgb.getSingleItem().getMetadata().getResponseSet().setValue(diwgb.getSingleItem().getData().getPartialDDEValue());
+			}
+		}
 	}
 }

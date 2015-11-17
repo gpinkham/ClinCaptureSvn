@@ -47,6 +47,19 @@ public class ResponseOptionBean implements Serializable {
 	}
 
 	/**
+	 * @return Returns copy of ResponseOptionBean.
+	 */
+	public ResponseOptionBean copy() {
+		ResponseOptionBean rob = new ResponseOptionBean();
+		
+		rob.setText(text);
+		rob.setValue(value);
+		rob.setSelected(selected);
+		
+		return rob;
+	}
+	
+	/**
 	 * @return Returns the text.
 	 */
 	public String getText() {
