@@ -84,12 +84,16 @@
 			</tr>
 			<tr>
                 <td><img src="../images/icon_PartialDE.gif"></td>
-                <td><fmt:message key="partial_data_entry" bundle="${reswords}"/></td>
+                <td><fmt:message key="partial_data_entry" bundle="${resword}"/></td>
             </tr>
 			<tr>
 				<td><img src="../images/icon_InitialDE.gif"></td>
 				<td><fmt:message key="started" bundle="${resword}"/></td>
 			</tr>
+			<tr>
+                <td>&nbsp;<img src="images/icon_PartialDDE.gif"></td>
+                <td><fmt:message key="partial_double_data_entry" bundle="${resword}"/></td>
+            </tr>
 			<tr>
 				<td><img src="../images/icon_DDE.gif"></td>
 				<td><fmt:message key="double_data_entry_start" bundle="${resword}"/></td>
@@ -124,7 +128,6 @@
 			</tr>
 			
 		</table>
-
 </body>
 </html>	
 	
