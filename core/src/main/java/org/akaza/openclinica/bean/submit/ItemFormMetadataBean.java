@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import java.util.List;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.core.form.StringUtil;
 
@@ -30,7 +28,7 @@ import com.clinovo.util.DRUtil;
 /**
  * ItemFormMetadataBean.
  */
-@SuppressWarnings({"rawtypes", "serial", "unchecked"})
+@SuppressWarnings({"rawtypes", "serial"})
 public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	//
 	private int itemId;
@@ -344,8 +342,8 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		rsb.setLabel(getResponseSet().getLabel());
 		rsb.setResponseType(getResponseSet().getResponseType());
 		rsb.setResponseTypeId(getResponseSet().getResponseTypeId());
-		for (ResponseOptionBean ro : (List<ResponseOptionBean>) getResponseSet().getOptions()) {
-			rsb.addOption(ro);
+		for (ResponseOptionBean ro : getResponseSet().getOptions()) {
+			rsb.addOption(ro.copy());
 		}
 		ifmb.setResponseSet(rsb);
 		ifmb.setSdvRequired(isSdvRequired());
