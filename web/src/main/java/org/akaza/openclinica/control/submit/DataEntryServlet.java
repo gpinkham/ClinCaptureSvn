@@ -1728,7 +1728,7 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("partialSavedSectionNames", partialSavedSectionNames);
 	}
 	
-	private void setPartialSaveParameters(HttpServletRequest request, int eventCRFId, DisplaySectionBean dsb) {
+	protected void setPartialSaveParameters(HttpServletRequest request, int eventCRFId, DisplaySectionBean dsb) {
 		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
 				getServletContext()).getBean("eventCRFSectionService");
 		EventCRFSectionBean ecsb = eventCRFSectionService.findByEventCRFIdAndSectionId(eventCRFId, dsb.getSection().getId());

@@ -486,6 +486,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			if ("yes".equalsIgnoreCase(printVersion)) {
 				forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT, request, response);
 			} else {
+				setPartialSaveParameters(request, ecb.getId(), dsb);
 				forwardPage(Page.VIEW_SECTION_DATA_ENTRY, request, response);
 			}
 		}

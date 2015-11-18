@@ -175,8 +175,22 @@
 
     TabSectionId[<c:out value="${count}"/>] = <c:out value="${section.id}"/>;
 
-    TabLabel[<c:out value="${count}"/>] = "<c:out value="${section.label}"/> " + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>(<c:out value="${completedItems}"/>/<c:out value="${section.numItems}" />)</span>";
-
+	<c:choose>
+		<c:when test="${sectionIdToEvCRFSection[section.id] ne null && sectionIdToEvCRFSection[section.id].partialSaved 
+				&& !(toc.eventCRF.stage.id == 3 || toc.eventCRF.stage.id == 4)}">
+			<c:set var="section_icon" value="<img title='partial data entry' style='position: relative; margin-bottom: -3px' alt='partial data entry' src='images/icon_PartialDE.gif'/>"/>
+		</c:when>
+		<c:when test="${sectionIdToEvCRFSection[section.id] ne null && sectionIdToEvCRFSection[section.id].partialSaved 
+				&& (toc.eventCRF.stage.id == 3 || toc.eventCRF.stage.id == 4)}">
+			<c:set var="section_icon" value="<img title='partial data entry' style='position: relative; margin-bottom: -3px' alt='partial data entry' src='images/icon_PartialDDE.gif'/>"/>
+		</c:when>
+		<c:otherwise>
+		   	<c:set var="section_icon" value=""/>
+		</c:otherwise>
+	</c:choose>
+	
+	TabLabel[<c:out value="${count}"/>] = "<c:out value="${section.label}"/> " + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>(<c:out value="${completedItems}"/>/<c:out value="${section.numItems}" />) ${section_icon}</span>";
+	
     <c:set var="count" value="${count+1}"/>
     </c:forEach>
     DisplaySectionTabs();
@@ -201,7 +215,7 @@
             document.write('<td nowrap style="display:inline-block; overflow:hidden;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
             if (TabID != currTabID) {
                 document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
-                document.write('<a class="tabtext" title="' + TabFullName[(TabID - 1)] + '" href=' + url + '>' + TabLabel[(TabID - 1)] + '</a></div></div></div></div>');
+				document.write('<a class="tabtext" title="' + TabFullName[(TabID - 1)] + '" href=' + url + '>' + TabLabel[(TabID - 1)] + '</a></div></div></div></div>');
                 document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID - 1)] + '</span></div></div></div></div>');
                 document.write('</td>');
             }
