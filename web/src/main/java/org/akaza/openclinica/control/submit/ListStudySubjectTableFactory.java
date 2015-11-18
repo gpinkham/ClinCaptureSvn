@@ -1589,16 +1589,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	private static String calendaredEventsBuilder(StudyBean studyBean, StudySubjectBean studySubject,
 			ResourceBundle resword, StudyUserRoleBean currentRole, DAOWrapper daoWrapper) {
-		HtmlBuilder transparentIcon = new HtmlBuilder();
-		if (currentRole.getRole().getId() == 2) {
-			transparentIcon = new HtmlBuilder();
-			List<StudyEventBean> studyEventBeanList = daoWrapper.getSedao().findAllByStudySubject(studySubject);
-			if (studyEventBeanList.size() == 0) {
-				transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
-						.append("hspace=\"4\"").end();
-			}
-		}
-
 		boolean completedReferenceEvent = false;
 		List<StudyEventBean> studyEventBeanList = daoWrapper.getSedao().findAllByStudySubject(studySubject);
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
@@ -1629,7 +1619,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			actionLink.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"")
 					.end();
 		}
-		return transparentIcon.toString() + actionLink.toString();
+		return actionLink.toString();
 	}
 
 	private static boolean getCalendarIconColor(StudyBean studyBean, List<StudyEventBean> studyEventBeanList,
