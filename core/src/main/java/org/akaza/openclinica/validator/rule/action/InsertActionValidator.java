@@ -40,7 +40,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes" })
 public class InsertActionValidator implements Validator {
 
 	DataSource dataSource;
