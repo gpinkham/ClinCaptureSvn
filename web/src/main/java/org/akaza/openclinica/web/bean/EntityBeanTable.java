@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
@@ -214,8 +213,8 @@ public class EntityBeanTable {
 		// this.columns = columns;
 		ArrayList newColumns = new ArrayList();
 
-		for (int i = 0; i < columns.size(); i++) {
-			String name = (String) columns.get(i);
+		for (Object column : columns) {
+			String name = (String) column;
 			EntityBeanColumn c = new EntityBeanColumn();
 			c.setName(name);
 			newColumns.add(c);
@@ -268,7 +267,7 @@ public class EntityBeanTable {
 
 	/**
 	 * 
-	 * @param rows
+	 * @param rows ArrayList
 	 */
 	public void setRows(ArrayList rows) {
 		this.rows = rows;
@@ -312,14 +311,12 @@ public class EntityBeanTable {
 		baseGetQuery = baseURL + "?";
 		baseGetQuery += FormProcessor.FIELD_SUBMITTED + "=" + 1;
 
-		Iterator it = args.keySet().iterator();
-		while (it.hasNext()) {
-			String key = (String) it.next();
+		for (Object keyObject : args.keySet()) {
+			String key = (String) keyObject;
 			String value = (String) args.get(key);
 			// TODO: provide URL Encoding!
 			baseGetQuery += "&" + key + "=" + value;
 		}
-
 	}
 
 	/**
@@ -448,8 +445,7 @@ public class EntityBeanTable {
 			}
 
 			if (keywords != null) {
-				for (int j = 0; j < keywords.length; j++) {
-					String keyword = keywords[j];
+				for (String keyword : keywords) {
 					if (keyword == null || "".equals(keyword)) {
 						continue;
 					}
@@ -458,8 +454,9 @@ public class EntityBeanTable {
 
 					filterExecuted = true;
 
-					loopRows: for (int i = 0; i < rows.size(); i++) {
-						EntityBeanRow row = (EntityBeanRow) rows.get(i);
+					loopRows:
+					for (Object rowObject : rows) {
+						EntityBeanRow row = (EntityBeanRow) rowObject;
 						row.setLocale(getLocale());
 						String searchString = row.getSearchString().toLowerCase();
 						// If the keyword matches the whole search string,
@@ -467,22 +464,19 @@ public class EntityBeanTable {
 						if (searchString.equalsIgnoreCase(keyword)) {
 							temprows.add(row);
 							// continue searching the next row
-							continue loopRows;
+							continue;
 						}
-
 						if (searchString.contains("-")) {
-
 							// The searchString is the combination of the
 							// subject's primary
 							// and secondary identifiers
-
 							// First split the search string on a space, to
 							// accomodate
 							// substring searches on a search string like
 							// subject id - secondary id
 							String[] newSearchString = searchString.split(" ");
-
-							String[] subStrings = null;
+							String[] subStrings;
+							boolean shouldContinue = true;
 							// each component is half of a string like
 							// "subject id  secondary id"
 							for (String component : newSearchString) {
@@ -494,7 +488,6 @@ public class EntityBeanTable {
 									// continue searching the next row
 									continue loopRows;
 								}
-
 								// if the component does contain a "-" but the
 								// entire
 								// component does not match the keyword
@@ -507,8 +500,8 @@ public class EntityBeanTable {
 									// and exact seaches on the separate parts
 									// like 120
 									if (innerStr.equalsIgnoreCase(keyword)) {
+										shouldContinue = false;
 										temprows.add(row);
-
 									}
 								}
 							}
@@ -517,18 +510,19 @@ public class EntityBeanTable {
 							// and the keyword was searched for in both ways,
 							// with and without
 							// splitting on "-"
-							continue;
+							if (!shouldContinue) {
+								continue;
+							}
 						} // end searchString.contains("-")
-							// the search string doesn't contain "-"
-						if (searchString.indexOf(keyword) >= 0) {
+						// the search string doesn't contain "-"
+						if (searchString.contains(keyword)) {
 							temprows.add(row);
 						}
 					} // end of loop iterating over rows
 				} // end of loop iterating over keywords
 			}
-			Iterator it = temprows.iterator();
-			while (it.hasNext()) {
-				displayRows.add(it.next());
+			for (Object temprow : temprows) {
+				displayRows.add(temprow);
 			}
 		} // end of filtering by keywords
 
@@ -577,14 +571,12 @@ public class EntityBeanTable {
 				firstInd = 0;
 			}
 
-			ArrayList currPage = new ArrayList(displayRows.subList(firstInd, lastInd));
-
 			// it's important not to use setRows here
 			// calling setRows will change totalNumPages to be the number of
 			// pages in currPage (always 1)
 			// we don't want to change totalNumPages since it'll screw up the
 			// display of "Previous" and "Next" page links
-			rows = currPage;
+			rows = new ArrayList(displayRows.subList(firstInd, lastInd));
 		} else {
 			rows = displayRows;
 		}
