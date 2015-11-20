@@ -3800,7 +3800,7 @@ public abstract class DataEntryServlet extends Controller {
 		return sectionId;
 	}
 
-	private DisplaySectionBean getDisplaySectionBeanDependingOnStage(DisplaySectionBean sectionBean) {
+	protected DisplaySectionBean getDisplaySectionBeanDependingOnStage(DisplaySectionBean sectionBean) {
 		return getDisplaySectionBeanDependingOnStage(sectionBean, false);
 	}
 	
@@ -3808,6 +3808,10 @@ public abstract class DataEntryServlet extends Controller {
 		populateItemsWithRenderMetadata(sectionBean);
 
 		if (getCurrentDataEntryStage() == CurrentDataEntryStage.VIEW_DATA_ENTRY) {
+			if (sectionBean.getEventCRF().getStage() == DataEntryStage.DOUBLE_DATA_ENTRY 
+					&& sectionBean.getEventCRFSection().isPartialSaved()) {
+				changeDDEItemValueToPartiallySavedIfExist(sectionBean);
+			}
 			return sectionBean;
 		} else if (getCurrentDataEntryStage() == CurrentDataEntryStage.DOUBLE_DATA_ENTRY) {
 			if (sectionBean.getEventCRFSection().isPartialSaved() && !isInError) {
@@ -3830,17 +3834,22 @@ public abstract class DataEntryServlet extends Controller {
 				for (DisplayItemGroupBean digb : diwgb.getItemGroups()) {
 					for (DisplayItemBean dib : digb.getItems()) {
 						dib.getMetadata().getResponseSet().setValue(dib.getData().getPartialDDEValue());
-						for (ResponseOptionBean rob : dib.getMetadata().getResponseSet().getOptions()) {
-							if (rob.getValue().equals(dib.getMetadata().getResponseSet().getValue())){
-								rob.setSelected(true);
-							} else {
-								rob.setSelected(false);
-							}
-						}
+						changeResponseOptions(dib);
 					}
 				}
 			} else {
 				diwgb.getSingleItem().getMetadata().getResponseSet().setValue(diwgb.getSingleItem().getData().getPartialDDEValue());
+				changeResponseOptions(diwgb.getSingleItem());
+			}
+		}
+	}
+
+	private void changeResponseOptions(DisplayItemBean dib) {
+		for (ResponseOptionBean rob : dib.getMetadata().getResponseSet().getOptions()) {
+			if (rob.getValue().equals(dib.getMetadata().getResponseSet().getValue())){
+				rob.setSelected(true);
+			} else {
+				rob.setSelected(false);
 			}
 		}
 	}
