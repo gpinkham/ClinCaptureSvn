@@ -163,10 +163,10 @@ public final class EventCRFUtil {
 				eventCRFStatus = Status.PARTIAL_DATA_ENTRY;
 			} else if (eventCrf.getStage().isInitialDE()) {
 				eventCRFStatus = Status.DATA_ENTRY_STARTED;
-			} else if (eventCrf.getStage().isInitialDE_Complete()) {
-				eventCRFStatus = Status.INITIAL_DATA_ENTRY_COMPLETED;
 			} else if (eventCrf.getStatus().isPartialDoubleDataEntry()) {
 				eventCRFStatus = Status.PARTIAL_DOUBLE_DATA_ENTRY;
+			} else if (eventCrf.getStage().isInitialDE_Complete()) {
+				eventCRFStatus = Status.INITIAL_DATA_ENTRY_COMPLETED;
 			} else if (eventCrf.getStage().isDoubleDE()) {
 				eventCRFStatus = Status.DOUBLE_DATA_ENTRY;
 			} else if (eventCrf.getStage().isDoubleDE_Complete()) {
