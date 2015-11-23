@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller("restOdmService")
 @RequestMapping("/odm")
-public class OdmService {
+public class OdmService extends BaseService {
 
 	/**
 	 * Odm http method.
@@ -37,10 +37,10 @@ public class OdmService {
 	 * @throws IOException
 	 *             the IOException
 	 */
-	@RequestMapping
 	@ResponseBody
+	@RequestMapping
 	public String odm() throws IOException {
-		return IOUtils.toString(new FileSystemResourceLoader().getResource(
-				"classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
+		return IOUtils.toString(new FileSystemResourceLoader()
+				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
 	}
 }

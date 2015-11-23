@@ -246,6 +246,54 @@ public final class EventDefinitionValidator {
 		return isValid;
 	}
 
+	private static HashMap validateEDC(MessageSource messageSource, int eventId, String versionName, String crfName,
+			int sdvCode, String emailWhen, String email, boolean hasSDVRequiredItems,
+			StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+		HashMap errors = new HashMap();
+		Locale locale = LocaleResolver.getLocale();
+
+		if (studyEventDefinitionBean.getId() == 0) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.isNotFound", new Object[]{eventId}, locale));
+			errors.put("eventid", errorMessages);
+		} else if (crfVersionBean.getId() == 0) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound",
+					new Object[]{crfName, versionName}, locale));
+			errors.put("crfname", errorMessages);
+		} else if (!crfVersionBean.getStatus().equals(Status.AVAILABLE)) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable",
+					new Object[]{crfName, versionName}, locale));
+			errors.put("crfname", errorMessages);
+		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
+					new Object[]{eventId, currentStudy.getId()}, locale));
+			errors.put("eventid", errorMessages);
+		} else if (hasSDVRequiredItems && sdvCode != 2) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItems",
+					new Object[]{crfVersionBean.getCrfId()}, locale));
+			errors.put("sourcedataverification", errorMessages);
+		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && email.trim().isEmpty()) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.provideEmailAddress", null, locale));
+			errors.put("email", errorMessages);
+		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && !EmailUtil.isValid(email)) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.emailAddressIsNotValid", null, locale));
+			errors.put("email", errorMessages);
+		} else if (!(emailWhen.equals("sign") || emailWhen.equals("complete")) && !email.isEmpty()) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(
+					messageSource.getMessage("rest.eventservice.editstudycrf.emailCanBeSpecifiedOnlyIf", null, locale));
+			errors.put("email", errorMessages);
+		}
+
+		return errors;
+	}
+
 	/**
 	 * Method perform validation.
 	 *
@@ -275,51 +323,65 @@ public final class EventDefinitionValidator {
 	 *            StudyBean
 	 * @return HashMap
 	 */
-	public static HashMap validateCrfAdding(MessageSource messageSource, DataSource dataSource, int eventId,
+	public static HashMap validateEDCAdding(MessageSource messageSource, DataSource dataSource, int eventId,
 			String versionName, String crfName, int sdvCode, String emailWhen, String email,
 			boolean hasSDVRequiredItems, StudyEventDefinitionBean studyEventDefinitionBean,
 			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
-		HashMap errors = new HashMap();
 		Locale locale = LocaleResolver.getLocale();
+		HashMap errors = validateEDC(messageSource, eventId, versionName, crfName, sdvCode, emailWhen, email,
+				hasSDVRequiredItems, studyEventDefinitionBean, crfVersionBean, currentStudy);
 
-		EventDefinitionCRFBean eventDefinitionCrfBean = new EventDefinitionCRFDAO(dataSource)
-				.findByStudyEventDefinitionIdAndCRFId(studyEventDefinitionBean.getId(), crfVersionBean.getCrfId());
+		EventDefinitionCRFBean existingEventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
+				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinitionBean.getId(),
+						crfVersionBean.getCrfId(), currentStudy.getId());
 
-		if (studyEventDefinitionBean.getId() == 0) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.isNotFound", new Object[]{eventId}, locale));
-			errors.put("eventid", errorMessages);
-		} else if (crfVersionBean.getId() == 0) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound",
-					new Object[]{crfName, versionName}, locale));
-			errors.put("crfname", errorMessages);
-		} else if (!crfVersionBean.getStatus().equals(Status.AVAILABLE)) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable",
-					new Object[]{crfName, versionName}, locale));
-			errors.put("crfname", errorMessages);
-		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
-					new Object[]{eventId, currentStudy.getId()}, locale));
-			errors.put("eventid", errorMessages);
-		} else if (eventDefinitionCrfBean.getId() > 0) {
+		if (errors.isEmpty() && existingEventDefinitionCRFBean.getId() > 0) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.eventDefinitionCrfAlreadyExists",
-					new Object[]{crfVersionBean.getCrfId(), eventId}, locale));
+					new Object[]{crfName, studyEventDefinitionBean.getName()}, locale));
 			errors.put("eventid", errorMessages);
-		} else if (hasSDVRequiredItems && sdvCode != 2) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItems",
-					new Object[]{crfVersionBean.getCrfId()}, locale));
-			errors.put("sourcedataverification", errorMessages);
-		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && !EmailUtil.isValid(email)) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.emailAddressIsNotValid", null, locale));
-			errors.put("email", errorMessages);
 		}
 
 		return errors;
 	}
+
+	/**
+	 * Method perform validation.
+	 *
+	 * @param messageSource
+	 *            MessageSource
+	 * @param eventId
+	 *            int
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param hasSDVRequiredItems
+	 *            boolean
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return HashMap
+	 */
+	public static HashMap validateStudyEDCEditing(MessageSource messageSource, int eventId,
+			StudyEventDefinitionBean studyEventDefinitionBean, EventDefinitionCRFBean eventDefinitionCRFBean,
+			boolean hasSDVRequiredItems, CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+		Locale locale = LocaleResolver.getLocale();
+		HashMap errors = validateEDC(messageSource, eventId, eventDefinitionCRFBean.getDefaultVersionName(),
+				eventDefinitionCRFBean.getCrfName(), eventDefinitionCRFBean.getSourceDataVerification().getCode(),
+				eventDefinitionCRFBean.getEmailStep(), eventDefinitionCRFBean.getEmailTo(), hasSDVRequiredItems,
+				studyEventDefinitionBean, crfVersionBean, currentStudy);
+
+		if (errors.isEmpty() && !eventDefinitionCRFBean.getStatus().isAvailable()) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage(
+					"rest.eventservice.editstudycrf.eventDefinitionCrfIsNotAvailable",
+					new Object[]{eventDefinitionCRFBean.getCrfName(), studyEventDefinitionBean.getName()}, locale));
+			errors.put("eventid", errorMessages);
+		}
+
+		return errors;
+	}
+
 }

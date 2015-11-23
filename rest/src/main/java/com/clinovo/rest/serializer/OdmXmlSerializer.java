@@ -109,7 +109,6 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 				} catch (Exception ex) {
 					LOGGER.error("Error has occurred.", ex);
 				}
-
 			}
 			((StreamResult) result).setWriter(new StringWriter());
 			((StreamResult) result).getOutputStream().write(xmlOutput.toString().getBytes("UTF-8"));

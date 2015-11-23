@@ -24,7 +24,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParametersPossibleValues;
+import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.annotation.RestScope;
 import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.exception.RestException;
@@ -91,7 +91,8 @@ public class RequestParametersValidatorTest {
 	}
 
 	@Test(expected = RestException.class)
-	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
 	public void testThatRequestParametersValidatorWillThrowRestExceptionIfParameterValueDoesNotCorrespondToRestParameterPossibleValuesAnnotation()
 			throws Exception {
 		request.setParameter("dataentryquality", "2");
@@ -100,7 +101,8 @@ public class RequestParametersValidatorTest {
 	}
 
 	@Test
-	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
 	public void testThatRequestParametersValidatorDoesNotThrowRestExceptionIfParameterValueCorrespondToRestParameterPossibleValuesAnnotation()
 			throws Exception {
 		request.setParameter("dataentryquality", "dde");
@@ -109,7 +111,8 @@ public class RequestParametersValidatorTest {
 	}
 
 	@Test
-	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
 	public void testThatRequestParametersValidatorDoesNotThrowRestExceptionIfParameterValueWesNotSpecifiedAndTheCanBeNotSpecifiedIsTrue()
 			throws Exception {
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
@@ -117,7 +120,8 @@ public class RequestParametersValidatorTest {
 	}
 
 	@Test(expected = RestException.class)
-	@RestParametersPossibleValues({@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
 	public void testThatRequestParametersValidatorThrowsRestExceptionIfParameterValueWesNotSpecifiedAndTheCanBeNotSpecifiedIsFalse()
 			throws Exception {
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());

@@ -77,6 +77,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_EVENT_RESTORE = "/event/restore";
 	public static final String API_EVENT_EDIT = "/event/edit";
 	public static final String API_EVENT_ADD_CRF = "/event/addCrf";
+	public static final String API_EVENT_EDIT_STUDY_CRF = "/event/editStudyCrf";
 	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
 	public static final String API_USER_CREATE = "/user/create";

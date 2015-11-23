@@ -15,9 +15,240 @@
 
 package com.clinovo.rest.service;
 
+import java.net.URLDecoder;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.xml.namespace.QName;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.util.EventDefinitionCRFUtil;
+import org.json.JSONObject;
+import org.jvnet.ws.wadl.Resource;
+import org.jvnet.ws.wadl.Resources;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.lib.crf.builder.CrfBuilder;
+import com.clinovo.lib.crf.factory.CrfBuilderFactory;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.rest.validator.EventServiceValidator;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
+import com.clinovo.util.SignStateRestorer;
+
 /**
  * BaseService.
  */
+@SuppressWarnings("unchecked")
 public abstract class BaseService {
 
+	public static final String NAME = "name";
+	public static final String UTF_8 = "UTF-8";
+	public static final int PROPAGATE_CHANGE_NO = 3;
+	public static final String XS_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+
+	@Autowired
+	private CrfBuilderFactory crfBuilderFactory;
+
+	@Autowired
+	private EventDefinitionService eventDefinitionService;
+
+	@Autowired
+	private EventDefinitionCrfService eventDefinitionCrfService;
+
+	@Autowired
+	private MessageSource messageSource;
+
+	@Autowired
+	private DataSource dataSource;
+
+	protected QName convertJavaToXMLType(Class<?> type) {
+		QName nm = new QName("");
+		String className = type.toString();
+		if (className.contains("String")) {
+			nm = new QName(XS_NAMESPACE, "string", "xs");
+		} else if (className.contains("Integer")) {
+			nm = new QName(XS_NAMESPACE, "integer", "xs");
+		} else if (className.contains("int")) {
+			nm = new QName(XS_NAMESPACE, "int", "xs");
+		} else if (className.contains("boolean") || className.contains("Boolean")) {
+			nm = new QName(XS_NAMESPACE, "boolean", "xs");
+		}
+		return nm;
+	}
+
+	protected Resource createOrFind(String uri, Resources wadResources) {
+		List<Resource> current = wadResources.getResource();
+		for (Resource resource : current) {
+			if (resource.getPath().equalsIgnoreCase(uri)) {
+				return resource;
+			}
+		}
+		Resource wadlResource = new Resource();
+		current.add(wadlResource);
+		return wadlResource;
+	}
+
+	protected String getBaseUrl(HttpServletRequest request) {
+		String requestUri = request.getRequestURI();
+		return request.getScheme().concat("://").concat(request.getServerName()).concat(":")
+				.concat(Integer.toString(request.getServerPort())).concat(requestUri.replaceAll("/wadl.*", ""));
+	}
+
+	protected String cleanDefault(String value) {
+		value = value.replaceAll("\t", "");
+		value = value.replaceAll("\n", "");
+		return value;
+	}
+
+	protected CRFVersionBean processRequest(String jsonData, boolean importCrfVersion) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		UserAccountBean owner = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, currentStudy, owner,
+				LocaleResolver.getLocale(), messageSource);
+		if (importCrfVersion) {
+			crfBuilder.build(getCrfBean(jsonData).getId());
+		} else {
+			crfBuilder.build();
+		}
+		return save(crfBuilder, importCrfVersion);
+	}
+
+	protected CRFBean getCrfBean(String jsonData) throws Exception {
+		JSONObject jsonObject = new JSONObject(jsonData);
+		String crfName = URLDecoder.decode(jsonObject.getString(NAME), UTF_8).trim();
+		if (crfName.isEmpty()) {
+			throw new RestException(messageSource, "rest.crf.crfNameIsEmpty");
+		}
+		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
+		if (crfBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.crf.crfNameDoesNotExist", new Object[]{crfName},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		return crfBean;
+	}
+
+	protected CRFVersionBean save(CrfBuilder crfBuilder, boolean importCrfVersion) throws Exception {
+		ValidatorUtil.checkForErrors(crfBuilder.getErrorsList());
+		CRFVersionBean crfVersionBean = crfBuilder.save();
+		if (crfVersionBean.getId() == 0) {
+			throw new RestException(messageSource,
+					importCrfVersion ? "rest.importCrfVersion.operationFailed" : "rest.importCrf.operationFailed");
+		}
+		return crfVersionBean;
+	}
+
+	protected UserAccountBean getUserAccountBean(String userName) {
+		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
+		if (userName.equals("root")) {
+			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnRootUser",
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (userAccountBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.userAPI.userDoesNotExist",
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (userAccountBean.getId() == UserDetails.getCurrentUserDetails().getUserId()) {
+			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnYourself",
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
+			boolean allowToProceed = false;
+			List<StudyUserRoleBean> studyUserRoleBeanList = (List<StudyUserRoleBean>) userAccountDAO
+					.findAllRolesByUserName(UserDetails.getCurrentUserDetails().getUserName());
+			for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeanList) {
+				if (userAccountDAO.isUserPresentInStudy(userName, studyUserRoleBean.getStudyId())) {
+					allowToProceed = true;
+					break;
+				}
+			}
+			if (!allowToProceed) {
+				throw new RestException(messageSource,
+						"rest.userAPI.itIsForbiddenToPerformThisOperationOnUserThatDoesNotBelongToCurrentUserScope",
+						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+		}
+		userAccountBean.setUserTypeCode(
+				userAccountBean.hasUserType(UserType.SYSADMIN) ? UserType.SYSADMIN.getCode() : UserType.USER.getCode());
+		userAccountBean.setPasswd("");
+		return userAccountBean;
+	}
+
+	protected void updateEventDefinitionCRFForStudy(StudyEventDefinitionBean studyEventDefinitionBean,
+			EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+
+		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionService
+				.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
+		List<EventDefinitionCRFBean> eventDefinitionCRFs = eventDefinitionService
+				.getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
+		Map<Integer, SignStateRestorer> signStateRestorerMap = eventDefinitionService
+				.prepareSignStateRestorer(studyEventDefinitionBean);
+		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs);
+
+		for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
+			if (edc.getId() == eventDefinitionCRFBean.getId()) {
+				eventDefinitionCRFs.set(eventDefinitionCRFs.indexOf(edc), eventDefinitionCRFBean);
+			}
+		}
+
+		eventDefinitionService.updateAllEventDefinitionCRFs(currentStudy, updater, studyEventDefinitionBean,
+				eventDefinitionCRFs, childEventDefinitionCRFs, oldEventDefinitionCRFs, signStateRestorerMap);
+	}
+
+	protected StudyEventDefinitionBean getStudyEventDefinition(int id) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(id);
+
+		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
+
+		return studyEventDefinitionBean;
+	}
+
+	protected EventDefinitionCRFBean getEventDefinitionCrfForCurrentScope(int eventId, String crfName)
+			throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+
+		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(eventId);
+
+		if (studyEventDefinitionBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.event.isNotFound", new Object[]{eventId},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
+			throw new RestException(messageSource, "rest.event.cannotPerformOperationOnEDCBecauseTheSEDIsNotAvailable");
+		}
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
+				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventId, crfBean.getId(), currentStudy.getId());
+
+		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, eventId, crfName,
+				crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
+
+		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCRFBean, studyEventDefinitionBean);
+
+		return eventDefinitionCRFBean;
+	}
 }

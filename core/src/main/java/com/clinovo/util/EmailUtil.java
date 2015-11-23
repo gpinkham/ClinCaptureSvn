@@ -89,8 +89,10 @@ public final class EmailUtil {
 	public static boolean isValid(String email) {
 		boolean result = false;
 		try {
-			InternetAddress internetAddress = new InternetAddress(email);
-			internetAddress.validate();
+			for (String value : email.split(",")) {
+				InternetAddress internetAddress = new InternetAddress(value.trim());
+				internetAddress.validate();
+			}
 			result = true;
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
@@ -100,20 +102,19 @@ public final class EmailUtil {
 
 	/**
 	 * Get CRF report email body.
-	 * @param studyName String
-	 * @param locale Locale
+	 * 
+	 * @param studyName
+	 *            String
+	 * @param locale
+	 *            Locale
 	 * @return String
 	 */
 	public static String getCRFReportMessageBody(String studyName, Locale locale) {
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
-		return  (getEmailBodyStart()
-				+ MessageFormat.format(respage.getString("crf_report_email_body"), "completed"))
-				+ respage.getString("email_body_simple_separator")
-				+ respage.getString("email_body_simple_separator")
+		return (getEmailBodyStart() + MessageFormat.format(respage.getString("crf_report_email_body"), "completed"))
+				+ respage.getString("email_body_simple_separator") + respage.getString("email_body_simple_separator")
 				+ MessageFormat.format(respage.getString("thank_you_message"), studyName)
-				+ respage.getString("email_body_simple_separator")
-				+ getEmailBodyEnd()
-				+ getEmailFooter(locale);
+				+ respage.getString("email_body_simple_separator") + getEmailBodyEnd() + getEmailFooter(locale);
 	}
 }

@@ -19,6 +19,7 @@
             <StudyId>1</StudyId>
             <EmailWhen />
             <Email />
+            <ParentId>0</ParentId>
         </EventDefinitionCrf>
     </RestData>
 </ODM>

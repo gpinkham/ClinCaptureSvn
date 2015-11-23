@@ -44,7 +44,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "eventname", "crfname", "status", "defaultversion", "hidecrf", "required",
+@JsonPropertyOrder({"id", "eventname", "crfname", "status", "defaultversion", "hidecrf", "required", "parentid",
 		"passwordrequired", "acceptnewcrfversions", "evaluatedcrf", "doubledataentry", "sourcedataverification",
 		"tabbingmode", "ordinal", "studyid", "emailwhen", "email"})
 @SuppressWarnings({"serial", "rawtypes", "unchecked"})
@@ -134,8 +134,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private int crfId = 0;
 
-	@JsonIgnore
-	@XmlTransient
+	@JsonProperty("parentid")
+	@XmlElement(name = "ParentId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int parentId = 0;
 
 	@JsonIgnore
@@ -704,7 +704,9 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	/**
 	 * Clone constructor
-	 * @param instance from which all parameters will be cloned.
+	 * 
+	 * @param instance
+	 *            from which all parameters will be cloned.
 	 */
 	public EventDefinitionCRFBean(EventDefinitionCRFBean instance) {
 		this.eventName = instance.getEventName();

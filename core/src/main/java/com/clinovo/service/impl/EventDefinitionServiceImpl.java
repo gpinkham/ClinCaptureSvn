@@ -121,6 +121,17 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		studyEventDefinitionBean.setUpdatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
 		getStudyEventDefinitionDAO().update(studyEventDefinitionBean);
+		updateAllEventDefinitionCRFs(studyBean, updater, studyEventDefinitionBean, eventDefinitionCRFsToUpdate,
+				childEventDefinitionCRFsToUpdate, oldEDCs, signStateRestorerMap);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateAllEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater,
+			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
+			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, List<EventDefinitionCRFBean> oldEDCs,
+			Map<Integer, SignStateRestorer> signStateRestorerMap) throws Exception {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
 		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFsToUpdate) {
@@ -139,12 +150,7 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 							eventDefinitionCRFBean.getCrf().getOid(), updater);
 				}
 			} else {
-				eventDefinitionCRFBean.setOwner(updater);
-				eventDefinitionCRFBean.setCreatedDate(new Date());
-				eventDefinitionCRFBean.setStatus(Status.AVAILABLE);
-				EventDefinitionCRFBean createdEdc = (EventDefinitionCRFBean) eventDefinitionCrfDao
-						.create(eventDefinitionCRFBean);
-				createChildEventDefinitionCrfs(createdEdc, studyBean);
+				addEventDefinitionCRF(eventDefinitionCRFBean, studyBean, updater);
 			}
 		}
 
@@ -156,6 +162,18 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 				oldEDCsMap, updater);
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
 				new DAOWrapper(dataSource), signStateRestorerMap);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, StudyBean studyBean,
+			UserAccountBean updater) {
+		eventDefinitionCRFBean.setOwner(updater);
+		eventDefinitionCRFBean.setCreatedDate(new Date());
+		eventDefinitionCRFBean.setStatus(Status.AVAILABLE);
+		getEventDefinitionCRFDAO().create(eventDefinitionCRFBean);
+		createChildEventDefinitionCrfs(eventDefinitionCRFBean, studyBean);
 	}
 
 	/**
@@ -173,18 +191,9 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean) {
-		eventDefinitionCrfBean.setCreatedDate(new Date());
-		eventDefinitionCrfBean.setStatus(Status.AVAILABLE);
-		getEventDefinitionCRFDAO().create(eventDefinitionCrfBean);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public void fillEventDefinitionCrfs(StudyBean currentStudy, StudyEventDefinitionBean studyEventDefinitionBean) {
 		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
-				.findAllActiveByEventDefinitionId(currentStudy, studyEventDefinitionBean.getId());
+				.findAllActiveByEventDefinitionId(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		studyEventDefinitionBean.setEventDefinitionCrfs(eventDefinitionCrfs);
 	}
@@ -232,17 +241,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 			StudyEventDefinitionBean studyEventDefinitionBean) {
 		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
 				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
-		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
-		return eventDefinitionCrfs;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<EventDefinitionCRFBean> getAllEventDefinitionCrfsForStudy(StudyBean studyBean,
-			StudyEventDefinitionBean studyEventDefinitionBean) {
-		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
-				.findAllActiveByEventDefinitionId(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		return eventDefinitionCrfs;
 	}

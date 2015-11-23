@@ -56,20 +56,51 @@ public interface EventDefinitionService {
 					throws Exception;
 
 	/**
+	 * Method that updates all event definition crfs.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param eventDefinitionCRFsToUpdate
+	 *            list of parent's EventDefinitionCRFBeans
+	 * @param childEventDefinitionCRFsToUpdate
+	 *            list of child's EventDefinitionCRFBeans
+	 * @param oldEventDefinitionCRFs
+	 *            list of EventDefinitionCRFs before update.
+	 * @param signStateRestorerMap
+	 *            Map<Integer, SignStateRestorer>
+	 * @throws Exception
+	 *             an Exception
+	 */
+	void updateAllEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater,
+			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
+			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
+			List<EventDefinitionCRFBean> oldEventDefinitionCRFs, Map<Integer, SignStateRestorer> signStateRestorerMap)
+					throws Exception;
+
+	/**
+	 * Adds new eventDefinitionCRF.
+	 * 
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param studyBean
+	 *            StudyBean
+	 * @param updater
+	 *            UserAccountBean
+	 */
+	void addEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, StudyBean studyBean,
+			UserAccountBean updater);
+
+	/**
 	 * Method that updates only the study event definition without its event definition crfs.
 	 *
 	 * @param studyEventDefinitionBean
 	 *            StudyEventDefinitionBean
 	 */
 	void updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean);
-
-	/**
-	 * Add event definition crf.
-	 *
-	 * @param eventDefinitionCrfBean
-	 *            EventDefinitionCRFBean
-	 */
-	void addEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCrfBean);
 
 	/**
 	 * Fills info for EventDefinitionCRFBeans.

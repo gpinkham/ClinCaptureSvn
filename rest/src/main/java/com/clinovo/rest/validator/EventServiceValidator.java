@@ -15,10 +15,8 @@
 
 package com.clinovo.rest.validator;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.wrapper.RestRequestWrapper;
-import com.clinovo.util.RequestUtil;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -26,7 +24,10 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.springframework.context.MessageSource;
 
-import java.util.Locale;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.wrapper.RestRequestWrapper;
+import com.clinovo.util.RequestUtil;
 
 /**
  * EventServiceValidator.
@@ -62,11 +63,11 @@ public final class EventServiceValidator {
 		validateStudyEventDefinition(messageSource, eventId, studyEventDefinitionBean, currentStudy, null, false);
 		Locale locale = LocaleResolver.getLocale();
 		if (crfBean.getId() == 0) {
-			throw new RestException(messageSource.getMessage("rest.event.crfNameIsNotFound", new Object[]{crfName},
-					locale));
+			throw new RestException(
+					messageSource.getMessage("rest.event.crfNameIsNotFound", new Object[]{crfName}, locale));
 		} else if (eventDefinitionCRFBean.getId() == 0) {
-			throw new RestException(messageSource.getMessage("rest.event.eventDefinitionCrfIsNotFound", new Object[]{
-					crfName, studyEventDefinitionBean.getName()}, locale));
+			throw new RestException(messageSource.getMessage("rest.event.eventDefinitionCrfIsNotFound",
+					new Object[]{crfName, studyEventDefinitionBean.getName(), currentStudy.getName()}, locale));
 		}
 	}
 
@@ -114,9 +115,9 @@ public final class EventServiceValidator {
 		if (!(studyEventDefinitionBean.getId() > 0)) {
 			throw new RestException(messageSource.getMessage("rest.event.isNotFound", new Object[]{id}, locale));
 		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
-			throw new RestException(messageSource.getMessage(
-					"rest.event.studyEventDefinitionDoesNotBelongToCurrentScope",
-					new Object[]{id, currentStudy.getId()}, locale));
+			throw new RestException(
+					messageSource.getMessage("rest.event.studyEventDefinitionDoesNotBelongToCurrentScope",
+							new Object[]{id, currentStudy.getId()}, locale));
 		}
 		if (editMode) {
 			prepareForValidation("name", studyEventDefinitionBean.getName());
@@ -130,10 +131,9 @@ public final class EventServiceValidator {
 				prepareForValidation("maxday", !isRreference ? studyEventDefinitionBean.getMaxDay() : 0);
 				prepareForValidation("minday", !isRreference ? studyEventDefinitionBean.getMinDay() : 0);
 				prepareForValidation("emailday", !isRreference ? studyEventDefinitionBean.getEmailDay() : 0);
-				prepareForValidation("emailuser",
-						!isRreference
-								? userAccountDao.findByPK(studyEventDefinitionBean.getUserEmailId()).getName()
-								: "");
+				prepareForValidation("emailuser", !isRreference
+						? userAccountDao.findByPK(studyEventDefinitionBean.getUserEmailId()).getName()
+						: "");
 			}
 		}
 	}

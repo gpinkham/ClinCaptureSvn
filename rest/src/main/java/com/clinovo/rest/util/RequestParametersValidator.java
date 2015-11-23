@@ -27,16 +27,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.method.HandlerMethod;
 
-import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParametersPossibleValues;
+import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
+import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
 import com.clinovo.rest.annotation.RestScope;
 import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.exception.RestException;
@@ -64,6 +65,87 @@ public final class RequestParametersValidator {
 	}
 
 	/**
+	 * Method that validates RestScope annotation.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param dataSource
+	 *            DataSource
+	 * @param messageSource
+	 *            MessageSource
+	 * @param handler
+	 *            HandlerMethod
+	 * @throws RestException
+	 *             the RestException
+	 */
+	public static void validateRestScope(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
+			HandlerMethod handler) throws RestException {
+		Annotation[] annotationArray = handler.getMethod().getAnnotations();
+		if (annotationArray != null) {
+			for (Annotation annotation : annotationArray) {
+				if (annotation instanceof RestScope && UserDetails.getCurrentUserDetails() != null) {
+					StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+					if ((((RestScope) annotation).value() == Scope.STUDY && studyBean.getParentStudyId() > 0)
+							|| (((RestScope) annotation).value() == Scope.SITE && studyBean.getParentStudyId() == 0)) {
+						throw new RestException(messageSource, "rest.wrongScope");
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Method that validates RestParameterPossibleValues annotation.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param messageSource
+	 *            MessageSource
+	 * @param nullParameters
+	 *            Set<String>
+	 * @param handler
+	 *            HandlerMethod
+	 * @throws RestException
+	 *             the RestException
+	 */
+	public static void validateRestParametersPossibleValues(HttpServletRequest request, MessageSource messageSource,
+			Set<String> nullParameters, HandlerMethod handler) throws RestException {
+		Annotation[] annotationArray = handler.getMethod().getAnnotations();
+		if (annotationArray != null) {
+			for (Annotation annotation : annotationArray) {
+				if (annotation instanceof RestParameterPossibleValuesHolder) {
+					for (RestParameterPossibleValues restParameterPossibleValues : ((RestParameterPossibleValuesHolder) annotation)
+							.value()) {
+						String parameterName = restParameterPossibleValues.name();
+						String parameterValue = request.getParameter(parameterName);
+						if (restParameterPossibleValues.canBeNotSpecified()
+								&& (parameterValue == null || nullParameters.contains(parameterName))) {
+							continue;
+						}
+						if (parameterValue != null && restParameterPossibleValues.multiValue()
+								? !Arrays.asList(restParameterPossibleValues.values().split(","))
+										.containsAll(Arrays.asList(parameterValue.split(",")))
+								: !Arrays.asList(restParameterPossibleValues.values().split(","))
+										.contains(parameterValue)) {
+							throw new RestException(messageSource,
+									restParameterPossibleValues.valueDescriptions().isEmpty()
+											? "rest.possibleValuesAre"
+											: "rest.possibleValuesWithDescriptionsAre",
+									restParameterPossibleValues.valueDescriptions().isEmpty()
+											? new Object[]{parameterName, restParameterPossibleValues.values()}
+											: new Object[]{parameterName, restParameterPossibleValues.values(),
+													messageSource.getMessage(
+															restParameterPossibleValues.valueDescriptions(), null,
+															CoreResources.getSystemLocale())},
+									HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Method that validates request parameters.
 	 * 
 	 * @param request
@@ -79,12 +161,13 @@ public final class RequestParametersValidator {
 	 */
 	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
 			HandlerMethod handler) throws RestException {
-		int countOfRequiredParameters = 0;
-		int countOfNotRequiredParameters = 0;
+		int countOfProvidedNotRequiredParameters = 0;
 		Set<String> nullParameters = new HashSet<String>();
 		Set<String> declaredFields = new HashSet<String>();
 		Map<String, String> declaredParams = new HashMap<String, String>();
 		Annotation[][] annotationsHolder = handler.getMethod().getParameterAnnotations();
+		boolean atLeastOneNotRequiredShouldBeProvided = handler.getMethod()
+				.getAnnotation(RestProvideAtLeastOneNotRequired.class) != null;
 		boolean ignoreDefaultValues = handler.getMethod().getAnnotation(RestIgnoreDefaultValues.class) != null;
 		for (String paramName : ((Map<String, String>) request.getParameterMap()).keySet()) {
 			declaredParams.put(paramName.toLowerCase(), paramName);
@@ -104,24 +187,27 @@ public final class RequestParametersValidator {
 											HttpServletResponse.SC_BAD_REQUEST);
 								}
 								if (((RequestParam) annotation).required()) {
-									countOfRequiredParameters++;
 									if (request.getParameter(parameterName) == null) {
-										throw new RestException(messageSource, REST
-												.concat(handler.getBean().getClass().getSimpleName().toLowerCase())
-												.concat(DOT).concat(handler.getMethod().getName().toLowerCase())
-												.concat(MISSING).concat(parameterName.toLowerCase()),
+										throw new RestException(
+												messageSource, REST
+														.concat(handler.getBean().getClass().getSimpleName()
+																.toLowerCase())
+														.concat(DOT).concat(handler.getMethod().getName().toLowerCase())
+														.concat(MISSING).concat(parameterName.toLowerCase()),
 												HttpServletResponse.SC_BAD_REQUEST);
 									} else if (request.getParameter(parameterName).trim().isEmpty()) {
-										throw new RestException(messageSource, REST
-												.concat(handler.getBean().getClass().getSimpleName().toLowerCase())
-												.concat(DOT).concat(handler.getMethod().getName().toLowerCase())
-												.concat(EMPTY).concat(parameterName.toLowerCase()),
+										throw new RestException(
+												messageSource, REST
+														.concat(handler.getBean().getClass().getSimpleName()
+																.toLowerCase())
+														.concat(DOT).concat(handler.getMethod().getName().toLowerCase())
+														.concat(EMPTY).concat(parameterName.toLowerCase()),
 												HttpServletResponse.SC_BAD_REQUEST);
 									}
 								} else {
 									String parameterValue = request.getParameter(parameterName);
 									if (ignoreDefaultValues && parameterValue != null) {
-										countOfNotRequiredParameters++;
+										countOfProvidedNotRequiredParameters++;
 									} else if (!ignoreDefaultValues && parameterValue == null) {
 										nullParameters.add(parameterName);
 										String defaultValue = ((RequestParam) annotation).defaultValue();
@@ -142,43 +228,10 @@ public final class RequestParametersValidator {
 				}
 			}
 		}
-		if (ignoreDefaultValues && countOfNotRequiredParameters == 0 && countOfRequiredParameters == 1) {
+		if (ignoreDefaultValues && atLeastOneNotRequiredShouldBeProvided && countOfProvidedNotRequiredParameters == 0) {
 			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
-		Annotation[] annotationArray = handler.getMethod().getAnnotations();
-		if (annotationArray != null) {
-			for (Annotation annotation : annotationArray) {
-				if (annotation instanceof RestScope && UserDetails.getCurrentUserDetails() != null) {
-					StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-					if ((((RestScope) annotation).value() == Scope.STUDY && studyBean.getParentStudyId() > 0)
-							|| (((RestScope) annotation).value() == Scope.SITE && studyBean.getParentStudyId() == 0)) {
-						throw new RestException(messageSource.getMessage("rest.wrongScope", null,
-								LocaleResolver.getLocale()));
-					}
-				} else if (annotation instanceof RestParametersPossibleValues) {
-					for (RestParameterPossibleValues restParameterPossibleValues : ((RestParametersPossibleValues) annotation)
-							.value()) {
-						String parameterName = restParameterPossibleValues.name();
-						String parameterValue = request.getParameter(parameterName);
-						if (restParameterPossibleValues.canBeNotSpecified()
-								&& (parameterValue == null || nullParameters.contains(parameterName))) {
-							continue;
-						}
-						if (parameterValue != null && restParameterPossibleValues.multiValue() ? !Arrays.asList(
-								restParameterPossibleValues.values().split(",")).containsAll(
-								Arrays.asList(parameterValue.split(","))) : !Arrays.asList(
-								restParameterPossibleValues.values().split(",")).contains(parameterValue)) {
-							throw new RestException(messageSource, restParameterPossibleValues.valueDescriptions()
-									.isEmpty() ? "rest.possibleValuesAre" : "rest.possibleValuesWithDescriptionsAre",
-									restParameterPossibleValues.valueDescriptions().isEmpty() ? new Object[]{
-											parameterName, restParameterPossibleValues.values()} : new Object[]{
-											parameterName, restParameterPossibleValues.values(),
-											restParameterPossibleValues.valueDescriptions()},
-									HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-						}
-					}
-				}
-			}
-		}
+		validateRestScope(request, dataSource, messageSource, handler);
+		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
 	}
 }

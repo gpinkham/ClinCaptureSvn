@@ -16,14 +16,12 @@
 package com.clinovo.rest.service;
 
 import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -41,7 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParametersPossibleValues;
+import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
@@ -54,7 +52,7 @@ import com.clinovo.validator.UserValidator;
  */
 @Controller("restUserService")
 @RequestMapping("/user")
-@SuppressWarnings({"unused", "unchecked", "rawtypes"})
+@SuppressWarnings({"unused", "rawtypes"})
 public class UserService extends BaseService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -103,12 +101,12 @@ public class UserService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
-	@RestParametersPossibleValues({
-			@RestParameterPossibleValues(name = "usertype", values = "1,2", valueDescriptions = "1 -> ADMINISTRATOR, 2 -> USER"),
-			@RestParameterPossibleValues(name = "role", values = "1,2,6,7,8,4,5,9", valueDescriptions = "1 -> SYSTEM_ADMINISTRATOR, 2 -> STUDY_ADMINISTRATOR, 6 -> STUDY_MONITOR, 7 -> STUDY_CODER, 8 -> STUDY_EVALUATOR, 4 -> INVESTIGATOR, 5 -> CLINICAL_RESEARCH_COORDINATOR, 9 -> SITE_MONITOR")})
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "usertype", values = "1,2", valueDescriptions = "rest.usertype.valueDescription"),
+			@RestParameterPossibleValues(name = "role", values = "1,2,6,7,8,4,5,9", valueDescriptions = "rest.role.valueDescription")})
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public UserAccountBean createUser(@RequestParam("username") String userName,
 			@RequestParam("firstname") String firstName, @RequestParam("lastname") String lastName,
 			@RequestParam("email") String email, @RequestParam(value = "phone", required = false) String phone,
@@ -162,9 +160,9 @@ public class UserService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
+	@ResponseBody
 	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
-	@ResponseBody
 	public UserAccountBean removeUser(@RequestParam("username") String userName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 		UserAccountBean userAccountBean = getUserAccountBean(userName);
@@ -181,48 +179,13 @@ public class UserService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
+	@ResponseBody
 	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
-	@ResponseBody
 	public UserAccountBean restoreUser(@RequestParam("username") String userName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 		UserAccountBean userAccountBean = getUserAccountBean(userName);
 		userAccountService.restoreUser(userAccountBean, updater);
-		return userAccountBean;
-	}
-
-	private UserAccountBean getUserAccountBean(String userName) {
-		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
-		if (userName.equals("root")) {
-			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnRootUser",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (userAccountBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.userAPI.userDoesNotExist",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (userAccountBean.getId() == UserDetails.getCurrentUserDetails().getUserId()) {
-			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnYourself",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
-			boolean allowToProceed = false;
-			List<StudyUserRoleBean> studyUserRoleBeanList = (List<StudyUserRoleBean>) userAccountDAO
-					.findAllRolesByUserName(UserDetails.getCurrentUserDetails().getUserName());
-			for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeanList) {
-				if (userAccountDAO.isUserPresentInStudy(userName, studyUserRoleBean.getStudyId())) {
-					allowToProceed = true;
-					break;
-				}
-			}
-			if (!allowToProceed) {
-				throw new RestException(messageSource,
-						"rest.userAPI.itIsForbiddenToPerformThisOperationOnUserThatDoesNotBelongToCurrentUserScope",
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
-		}
-		userAccountBean.setUserTypeCode(
-				userAccountBean.hasUserType(UserType.SYSADMIN) ? UserType.SYSADMIN.getCode() : UserType.USER.getCode());
-		userAccountBean.setPasswd("");
 		return userAccountBean;
 	}
 }

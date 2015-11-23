@@ -1,15 +1,15 @@
 /*******************************************************************************
  * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
- *
+ * <p/>
  * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer.
  * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
  * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
- *
+ * <p/>
  * You may not modify, decompile, or reverse engineer the software.
  * Clinovo disclaims any express or implied warranty of fitness for use.
  * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
  * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
-
+ * <p/>
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
@@ -19,17 +19,13 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -44,7 +40,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParametersPossibleValues;
+import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
+import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
 import com.clinovo.rest.annotation.RestScope;
 import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.enums.UserRole;
@@ -112,12 +109,12 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
 	@RestScope(Scope.STUDY)
-	@RestParametersPossibleValues({
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
+	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public StudyEventDefinitionBean createEvent(@RequestParam("name") String name,
 			@RequestParam(value = "type") String type,
 			@RequestParam(value = "description", defaultValue = "", required = false) String description,
@@ -193,15 +190,15 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
-	@RequestMapping(value = "/addCrf", method = RequestMethod.POST)
 	@ResponseBody
 	@RestScope(Scope.STUDY)
-	@RestParametersPossibleValues({
-			@RestParameterPossibleValues(name = "sourcedataverification", values = "1,2,3", valueDescriptions = "1 -> Entire CRF, 2 -> Specific Items, 3 -> Not Required"),
-			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation"),
-			@RestParameterPossibleValues(name = "emailwhen", canBeNotSpecified = true, values = "complete,sign"),
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "sourcedataverification", values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataentryquality.valueDescription"),
+			@RestParameterPossibleValues(name = "emailwhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailwhen.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
+	@RequestMapping(value = "/addCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventid") int eventId,
 			@RequestParam("crfname") String crfName, @RequestParam("defaultversion") String defaultVersion,
 			@RequestParam(value = "required", defaultValue = "true", required = false) boolean required,
@@ -226,18 +223,12 @@ public class EventService extends BaseService {
 
 		boolean hasSDVRequiredItems = itemSDVService.hasItemsToSDV(crfVersionBean.getCrfId());
 
-		HashMap errors = EventDefinitionValidator.validateCrfAdding(messageSource, dataSource, eventId, defaultVersion,
-				crfName, sourceDataVerification, emailWhen, email, hasSDVRequiredItems, studyEventDefinitionBean,
-				crfVersionBean, currentStudy);
-
-		ValidatorUtil.checkForErrors(errors);
-
 		EventDefinitionCRFBean eventDefinitionCrfBean = new EventDefinitionCRFBean();
 		eventDefinitionCrfBean.setEventName(studyEventDefinitionBean.getName());
 		eventDefinitionCrfBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
 		eventDefinitionCrfBean.setRequiredCRF(required);
 		eventDefinitionCrfBean.setDefaultVersionId(crfVersionBean.getId());
-		eventDefinitionCrfBean.setDefaultVersionName(crfVersionBean.getName());
+		eventDefinitionCrfBean.setDefaultVersionName(defaultVersion);
 		eventDefinitionCrfBean.setElectronicSignature(passwordRequired);
 		eventDefinitionCrfBean.setAcceptNewCrfVersions(acceptNewCrfVersions);
 		eventDefinitionCrfBean.setHideCrf(hide);
@@ -252,13 +243,131 @@ public class EventService extends BaseService {
 		eventDefinitionCrfBean.setTabbingMode(tabbing);
 		eventDefinitionCrfBean.setOwner(currentUser);
 
-		eventDefinitionService.addEventDefinitionCrf(eventDefinitionCrfBean);
+		HashMap errors = EventDefinitionValidator.validateEDCAdding(messageSource, dataSource, eventId, defaultVersion,
+				crfName, sourceDataVerification, emailWhen, email, hasSDVRequiredItems, studyEventDefinitionBean,
+				crfVersionBean, currentStudy);
+
+		ValidatorUtil.checkForErrors(errors);
+
+		eventDefinitionService.addEventDefinitionCRF(eventDefinitionCrfBean, currentStudy, currentUser);
 
 		if (eventDefinitionCrfBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.addCrf.operationFailed");
 		}
 
 		return eventDefinitionCrfBean;
+	}
+
+	/**
+	 * Method edits crf of study level in the study event definition.
+	 *
+	 * @param eventId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @param required
+	 *            boolean
+	 * @param passwordRequired
+	 *            boolean
+	 * @param defaultVersion
+	 *            String
+	 * @param hide
+	 *            boolean
+	 * @param sourceDataVerification
+	 *            int
+	 * @param dataEntryQuality
+	 *            String
+	 * @param emailWhen
+	 *            String
+	 * @param email
+	 *            String
+	 * @param tabbing
+	 *            String
+	 * @param acceptNewCrfVersions
+	 *            boolean
+	 * @param propagateChange
+	 *            int
+	 * @return EventDefinitionCRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ResponseBody
+	@RestScope(Scope.STUDY)
+	@RestIgnoreDefaultValues
+	@RestProvideAtLeastOneNotRequired
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "sourcedataverification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataentryquality.withNone.valueDescription"),
+			@RestParameterPossibleValues(name = "emailwhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailwhen.withNone.valueDescription"),
+			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom"),
+			@RestParameterPossibleValues(name = "propagatechange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagatechange.valueDescription")})
+	@RequestMapping(value = "/editStudyCrf", method = RequestMethod.POST)
+	public EventDefinitionCRFBean editStudyCrf(@RequestParam(value = "eventid") int eventId,
+			@RequestParam("crfname") String crfName,
+			@RequestParam(value = "defaultversion", required = false) String defaultVersion,
+			@RequestParam(value = "required", required = false) Boolean required,
+			@RequestParam(value = "passwordrequired", required = false) Boolean passwordRequired,
+			@RequestParam(value = "hide", required = false) Boolean hide,
+			@RequestParam(value = "sourcedataverification", required = false) Integer sourceDataVerification,
+			@RequestParam(value = "dataentryquality", required = false) String dataEntryQuality,
+			@RequestParam(value = "emailwhen", required = false) String emailWhen,
+			@RequestParam(value = "email", required = false) String email,
+			@RequestParam(value = "tabbing", required = false) String tabbing,
+			@RequestParam(value = "acceptnewcrfversions", required = false) Boolean acceptNewCrfVersions,
+			@RequestParam(value = "propagatechange", required = false) Integer propagateChange) throws Exception {
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrfForCurrentScope(eventId, crfName);
+
+		CRFVersionBean crfVersionBean;
+		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
+		if (defaultVersion != null) {
+			crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(defaultVersion, crfName);
+			eventDefinitionCRFBean.setDefaultVersionId(crfVersionBean.getId());
+			eventDefinitionCRFBean.setDefaultVersionName(defaultVersion);
+		} else {
+			crfVersionBean = (CRFVersionBean) crfVersionDao
+					.findByFullName(eventDefinitionCRFBean.getDefaultVersionName(), crfName);
+		}
+		eventDefinitionCRFBean.setCrfName(crfName);
+		eventDefinitionCRFBean.setRequiredCRF(required != null ? required : eventDefinitionCRFBean.isRequiredCRF());
+		eventDefinitionCRFBean.setElectronicSignature(
+				passwordRequired != null ? passwordRequired : eventDefinitionCRFBean.isElectronicSignature());
+		eventDefinitionCRFBean.setHideCrf(hide != null ? hide : eventDefinitionCRFBean.isHideCrf());
+		eventDefinitionCRFBean.setSourceDataVerification(sourceDataVerification != null
+				? SourceDataVerification.getByCode(sourceDataVerification)
+				: eventDefinitionCRFBean.getSourceDataVerification());
+		eventDefinitionCRFBean.setDoubleEntry(dataEntryQuality != null
+				? !dataEntryQuality.equals("none") && dataEntryQuality.equalsIgnoreCase("dde")
+				: eventDefinitionCRFBean.isDoubleEntry());
+		eventDefinitionCRFBean.setEvaluatedCRF(dataEntryQuality != null
+				? !dataEntryQuality.equals("none") && dataEntryQuality.equalsIgnoreCase("evaluation")
+				: eventDefinitionCRFBean.isEvaluatedCRF());
+		eventDefinitionCRFBean.setEmailStep(emailWhen != null
+				? (emailWhen.equals("none") ? "" : emailWhen)
+				: eventDefinitionCRFBean.getEmailStep());
+		eventDefinitionCRFBean.setEmailTo(email != null
+				? email
+				: (eventDefinitionCRFBean.getEmailStep().isEmpty() ? "" : eventDefinitionCRFBean.getEmailTo()));
+		eventDefinitionCRFBean.setTabbingMode(tabbing != null ? tabbing : eventDefinitionCRFBean.getTabbingMode());
+		eventDefinitionCRFBean.setAcceptNewCrfVersions(
+				acceptNewCrfVersions != null ? acceptNewCrfVersions : eventDefinitionCRFBean.isAcceptNewCrfVersions());
+		eventDefinitionCRFBean.setPropagateChange(propagateChange != null ? propagateChange : PROPAGATE_CHANGE_NO);
+
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(eventId);
+
+		boolean hasSDVRequiredItems = itemSDVService.hasItemsToSDV(crfVersionBean.getCrfId());
+
+		HashMap errors = EventDefinitionValidator.validateStudyEDCEditing(messageSource, eventId,
+				studyEventDefinitionBean, eventDefinitionCRFBean, hasSDVRequiredItems, crfVersionBean, currentStudy);
+
+		ValidatorUtil.checkForErrors(errors);
+
+		updateEventDefinitionCRFForStudy(studyEventDefinitionBean, eventDefinitionCRFBean);
+
+		return eventDefinitionCRFBean;
 	}
 
 	/**
@@ -270,9 +379,9 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
 	@RestScope(Scope.STUDY)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(method = RequestMethod.GET)
 	public StudyEventDefinitionBean getInfo(@RequestParam(value = "id") int id) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
@@ -318,13 +427,14 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
-	@RequestMapping(value = "/edit", method = RequestMethod.POST)
-	@RestScope(Scope.STUDY)
-	@RestParametersPossibleValues({
-			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
-	@RestIgnoreDefaultValues
 	@ResponseBody
+	@RestScope(Scope.STUDY)
+	@RestIgnoreDefaultValues
+	@RestProvideAtLeastOneNotRequired
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
 	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int id,
 			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "type", required = false) String type,
@@ -384,9 +494,9 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
 	@RestScope(Scope.STUDY)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int id) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
@@ -404,9 +514,9 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
 	@RestScope(Scope.STUDY)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int id) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
@@ -426,14 +536,14 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
 	@RestScope(Scope.STUDY)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/removeCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getParentEventDefinitionCrf(eventId, crfName);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrfForCurrentScope(eventId, crfName);
 		eventDefinitionCrfService.removeParentEventDefinitionCrf(eventDefinitionCRFBean, updater);
 		return eventDefinitionCRFBean;
 	}
@@ -449,48 +559,15 @@ public class EventService extends BaseService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@ResponseBody
 	@RestScope(Scope.STUDY)
+	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/restoreCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getParentEventDefinitionCrf(eventId, crfName);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCrfForCurrentScope(eventId, crfName);
 		eventDefinitionCrfService.restoreParentEventDefinitionCrf(eventDefinitionCRFBean, updater);
-		return eventDefinitionCRFBean;
-	}
-
-	private StudyEventDefinitionBean getStudyEventDefinition(int id) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
-				dataSource).findByPK(id);
-
-		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
-
-		return studyEventDefinitionBean;
-	}
-
-	private EventDefinitionCRFBean getParentEventDefinitionCrf(int eventId, String crfName) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-
-		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
-				dataSource).findByPK(eventId);
-
-		if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
-			throw new RestException(messageSource, "rest.event.cannotPerformOperationOnEDCBecauseTheSEDIsNotAvailable");
-		}
-
-		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
-				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventId, crfBean.getId(), currentStudy.getId());
-
-		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, eventId, crfName,
-				crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
-
-		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCRFBean, studyEventDefinitionBean);
-
 		return eventDefinitionCRFBean;
 	}
 }

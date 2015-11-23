@@ -17,7 +17,6 @@ package com.clinovo.rest.service;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,9 +54,7 @@ import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
  * WadlService.
  */
 @Controller("restWadlService")
-public class WadlService {
-
-	public static final String XS_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+public class WadlService extends BaseService {
 
 	@Autowired
 	private ApplicationContext applicationContext;
@@ -69,8 +66,8 @@ public class WadlService {
 	 *            HttpServletRequest
 	 * @return Application
 	 */
-	@RequestMapping("/wadl")
 	@ResponseBody
+	@RequestMapping("/wadl")
 	public Application wadl(HttpServletRequest request) {
 		Application result = new Application();
 		Doc doc = new Doc();
@@ -187,44 +184,5 @@ public class WadlService {
 		result.getResources().add(wadResources);
 
 		return result;
-	}
-
-	private QName convertJavaToXMLType(Class<?> type) {
-		QName nm = new QName("");
-		String className = type.toString();
-		if (className.contains("String")) {
-			nm = new QName(XS_NAMESPACE, "string", "xs");
-		} else if (className.contains("Integer")) {
-			nm = new QName(XS_NAMESPACE, "integer", "xs");
-		} else if (className.contains("int")) {
-			nm = new QName(XS_NAMESPACE, "int", "xs");
-		} else if (className.contains("boolean") || className.contains("Boolean")) {
-			nm = new QName(XS_NAMESPACE, "boolean", "xs");
-		}
-		return nm;
-	}
-
-	private Resource createOrFind(String uri, Resources wadResources) {
-		List<Resource> current = wadResources.getResource();
-		for (Resource resource : current) {
-			if (resource.getPath().equalsIgnoreCase(uri)) {
-				return resource;
-			}
-		}
-		Resource wadlResource = new Resource();
-		current.add(wadlResource);
-		return wadlResource;
-	}
-
-	private String getBaseUrl(HttpServletRequest request) {
-		String requestUri = request.getRequestURI();
-		return request.getScheme().concat("://").concat(request.getServerName()).concat(":")
-				.concat(Integer.toString(request.getServerPort())).concat(requestUri.replaceAll("/wadl.*", ""));
-	}
-
-	private String cleanDefault(String value) {
-		value = value.replaceAll("\t", "");
-		value = value.replaceAll("\n", "");
-		return value;
 	}
 }

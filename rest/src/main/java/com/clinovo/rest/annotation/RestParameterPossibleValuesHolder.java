@@ -13,58 +13,26 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.rest.service;
+package com.clinovo.rest.annotation;
 
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.annotation.RestScope;
-import com.clinovo.rest.enums.Scope;
-import com.clinovo.rest.enums.UserRole;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * CrfService.
+ * Rest parameter possible values annotation holder.
+ * 
+ * Allows to specify possible values for certain request parameter.
  */
-@Controller("restCrfService")
-@RequestMapping("/crf")
-public class CrfService extends BaseService {
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface RestParameterPossibleValuesHolder {
 
 	/**
-	 * Method imports new crf.
-	 *
-	 * @param jsonData
-	 *            String
-	 * @return CRFVersionBean
-	 * @throws Exception
-	 *             an Exception
+	 * Method that returns annotation value.
 	 */
-	@ResponseBody
-	@RestScope(Scope.STUDY)
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
-	@RequestMapping(value = "/json/importCrf", method = RequestMethod.POST)
-	public CRFVersionBean importCrf(@RequestParam("jsondata") String jsonData) throws Exception {
-		return processRequest(jsonData, false);
-	}
-
-	/**
-	 * Method imports new crf version.
-	 *
-	 * @param jsonData
-	 *            String
-	 * @return CRFVersionBean
-	 * @throws Exception
-	 *             an Exception
-	 */
-	@ResponseBody
-	@RestScope(Scope.STUDY)
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
-	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
-	public CRFVersionBean importCrfVersion(@RequestParam("jsondata") String jsonData) throws Exception {
-		return processRequest(jsonData, true);
-	}
+	RestParameterPossibleValues[]value();
 }

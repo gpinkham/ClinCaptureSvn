@@ -34,6 +34,7 @@
                 <StudyId>1</StudyId>
                 <EmailWhen />
                 <Email />
+                <ParentId>0</ParentId>
             </EventDefinitionCrf>
             <EventDefinitionCrf>
                 <Id>60820</Id>
@@ -50,9 +51,10 @@
                 <SourceDataVerification>entireCRF</SourceDataVerification>
                 <TabbingMode>leftToRight</TabbingMode>
                 <Ordinal>2</Ordinal>
-                <StudyId>1</StudyId>
+                <StudyId>2</StudyId>
                 <EmailWhen />
                 <Email />
+                <ParentId>60825</ParentId>
             </EventDefinitionCrf>
         </StudyEventDefinition>
     </RestData>

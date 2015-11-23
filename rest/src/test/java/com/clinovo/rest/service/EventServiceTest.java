@@ -4,6 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -744,6 +746,7 @@ public class EventServiceTest extends BaseServiceTest {
 			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getTabbingMode(), "leftToRight");
 			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailStep(), "");
 			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailTo(), "");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getParentId(), 0);
 			assertEquals(
 					SourceDataVerification
 							.getByDescription(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSdvCode()),
@@ -779,6 +782,7 @@ public class EventServiceTest extends BaseServiceTest {
 			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getTabbingMode(), "topToBottom");
 			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailStep(), "complete");
 			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailTo(), "clinovo@gmail.com");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getParentId(), 0);
 			assertEquals(
 					SourceDataVerification
 							.getByDescription(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSdvCode()),
@@ -790,7 +794,7 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatHttpGetIsNotSupportedForToAddingCrfToStudyEventDefinition() throws Exception {
+	public void testThatHttpGetIsNotSupportedForAddingCrfToStudyEventDefinition() throws Exception {
 		this.mockMvc
 				.perform(get(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
@@ -1401,6 +1405,10 @@ public class EventServiceTest extends BaseServiceTest {
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1425,6 +1433,10 @@ public class EventServiceTest extends BaseServiceTest {
 				.andExpect(expectStatus);
 		this.mockMvc
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1453,6 +1465,10 @@ public class EventServiceTest extends BaseServiceTest {
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1479,6 +1495,10 @@ public class EventServiceTest extends BaseServiceTest {
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1503,6 +1523,10 @@ public class EventServiceTest extends BaseServiceTest {
 				.andExpect(expectStatus);
 		this.mockMvc
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1533,7 +1557,11 @@ public class EventServiceTest extends BaseServiceTest {
 		this.mockMvc
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1561,7 +1589,11 @@ public class EventServiceTest extends BaseServiceTest {
 		this.mockMvc
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1589,7 +1621,11 @@ public class EventServiceTest extends BaseServiceTest {
 		this.mockMvc
 				.perform(post(API_EVENT_ADD_CRF).param("eventid", "1").param("crfname", "Test CRF")
 						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.andExpect(expectStatus);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1777,5 +1813,358 @@ public class EventServiceTest extends BaseServiceTest {
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
 		this.mockMvc.perform(post(API_EVENT_RESTORE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionThatDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "1234").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodThrowsExceptionIfDefaultVersionParameterIsInWrongCase() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultvErsion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodThrowsExceptionIfCrfNameParameterIsInWrongCase() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfnAme", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodThrowsExceptionIfEventIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("evEntid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", "v1.0").param("xparamX", "56").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfCrfDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "xxxxxx")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfCrfVersionDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfCrfVersionIsLocked() throws Exception {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		crfVersionBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		crfVersionBean.setStatus(Status.LOCKED);
+		crfVersionDao.update(crfVersionBean);
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		assertTrue(crfVersionBean.getStatus().equals(Status.LOCKED));
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", crfVersionBean.getName()).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfCrfVersionIsDeleted() throws Exception {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		crfVersionBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		crfVersionBean.setStatus(Status.DELETED);
+		crfVersionDao.update(crfVersionBean);
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(5);
+		assertTrue(crfVersionBean.getStatus().equals(Status.DELETED));
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", crfVersionBean.getName()).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfEDCIsLocked() throws Exception {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		eventDefinitionCRFBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		eventDefinitionCRFBean.setStatus(Status.LOCKED);
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		assertTrue(eventDefinitionCRFBean.getStatus().equals(Status.LOCKED));
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfEDCIsDeleted() throws Exception {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		eventDefinitionCRFBean.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
+		eventDefinitionCRFBean.setStatus(Status.DELETED);
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		assertTrue(eventDefinitionCRFBean.getStatus().equals(Status.DELETED));
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfEventIdParameterIsMissing()
+			throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("crfname", "Test CRF")
+						.param("defaultversion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfEventIdParameterIsEmpty() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfCrfNameParameterIsMissing()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("defaultversion", "v1.000000")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfCrfNameParameterIsEmpty() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "")
+						.param("defaultversion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfSourceDataVerificationParameterHasWrongValue()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", "v1.0").param("sourcedataverification", "45").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfDataEntryQualityParameterHasWrongValue()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", "v1.0").param("dataentryquality", "x").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfEmailWhenParameterHasWrongValue()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", "v1.0").param("emailwhen", "z").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfTabbingParameterHasWrongValue()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", "v1.0").param("tabbing", "ppp").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionIfEmailParameterHasWrongValue()
+			throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.param("defaultversion", "v1.0").param("emailwhen", "complete").param("email", "sdfsdfsdf")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditStudyCrfOfStudyEventDefinitionUnderTheSiteLevel() throws Exception {
+		createNewStudy();
+		createNewSite(newStudy.getId());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItImpossibleToEditStudyCrfOfStudyEventDefinitionThatDoesNotBelongToCurrentScope()
+			throws Exception {
+		createNewStudy();
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatHttpGetIsNotSupportedForEditingStudyCrfOfStudyEventDefinition() throws Exception {
+		this.mockMvc
+				.perform(get(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsPossibleToEditStudyCrfOfStudyEventDefinitionIfOnlyRequiredParametersArePassed()
+			throws Exception {
+		result = this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEventName(),
+					"ED-9-NotRepeating");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getCrfName(), "Test CRF");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getDefaultVersionName(), "v1.0");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isHideCrf(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isRequiredCRF(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isElectronicSignature(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isAcceptNewCrfVersions(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isEvaluatedCRF(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isDoubleEntry(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getTabbingMode(), "leftToRight");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailStep(), "");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailTo(), "");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getParentId(), 0);
+			assertEquals(
+					SourceDataVerification
+							.getByDescription(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSdvCode()),
+					SourceDataVerification.NOTREQUIRED);
+			assertEquals(Status.getByName(restOdmContainer.getRestData().getEventDefinitionCRFBean().getStatusCode()),
+					Status.AVAILABLE);
+			assertTrue(restOdmContainer.getRestData().getEventDefinitionCRFBean().getId() > 0);
+		}
+	}
+
+	@Test
+	public void testThatItIsPossibleToEditStudyCrfOfStudyEventDefinitionIfAllParametersArePassed() throws Exception {
+		result = this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("emailwhen", "complete")
+						.param("email", "clinovo@gmail.com, clinovo2@gmail.com").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "dde").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEventName(),
+					"ED-9-NotRepeating");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getCrfName(), "Test CRF");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getDefaultVersionName(), "v1.0");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isHideCrf(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isRequiredCRF(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isElectronicSignature(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isAcceptNewCrfVersions(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isEvaluatedCRF(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isDoubleEntry(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getTabbingMode(), "topToBottom");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailStep(), "complete");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailTo(),
+					"clinovo@gmail.com, clinovo2@gmail.com");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getParentId(), 0);
+			assertEquals(
+					SourceDataVerification
+							.getByDescription(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSdvCode()),
+					SourceDataVerification.NOTREQUIRED);
+			assertEquals(Status.getByName(restOdmContainer.getRestData().getEventDefinitionCRFBean().getStatusCode()),
+					Status.AVAILABLE);
+			assertTrue(restOdmContainer.getRestData().getEventDefinitionCRFBean().getId() > 0);
+		}
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodCanUnsetTheEmailWhenParameter() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("emailwhen", "complete")
+						.param("email", "clinovo@gmail.com").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "dde").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		assertTrue(eventDefinitionCRFBean.getEmailStep().equals("complete"));
+		assertTrue(eventDefinitionCRFBean.getEmailTo().equals("clinovo@gmail.com"));
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("emailwhen", "none").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "dde").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		assertTrue(eventDefinitionCRFBean.getEmailStep().isEmpty());
+		assertTrue(eventDefinitionCRFBean.getEmailTo().isEmpty());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodCanUnsetTheDataEntryQualityParameter() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("emailwhen", "complete")
+						.param("email", "clinovo@gmail.com").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "dde").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		assertTrue(eventDefinitionCRFBean.isDoubleEntry());
+		assertFalse(eventDefinitionCRFBean.isEvaluatedCRF());
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("emailwhen", "none").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "none").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		assertFalse(eventDefinitionCRFBean.isDoubleEntry());
+		assertFalse(eventDefinitionCRFBean.isEvaluatedCRF());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodReturnsExceptionIfEmailParameterIsPresentWithoutEmailWhenParameter()
+			throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("email", "clinovo@gmail.com").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "dde").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEditStudyCrfMethodReturnsExceptionIfEmailParameterIsNotPresentButEmailWhenParameterIsPresent()
+			throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventid", "9").param("crfname", "Test CRF")
+						.param("defaultversion", "v1.0").param("emailwhen", "sign").param("required", "false")
+						.param("passwordrequired", "true").param("hide", "true").param("sourcedataverification", "3")
+						.param("dataentryquality", "dde").param("tabbing", "topToBottom")
+						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
 	}
 }

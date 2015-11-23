@@ -82,7 +82,7 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		eventDefinitionCrfBean.setEmailTo("");
 		eventDefinitionCrfBean.setTabbingMode("leftToRight");
 		eventDefinitionCrfBean.setOwner(userBean);
-		eventDefinitionService.addEventDefinitionCrf(eventDefinitionCrfBean);
+		eventDefinitionService.addEventDefinitionCRF(eventDefinitionCrfBean, studyBean, userBean);
 		eventDefinitionService.fillEventDefinitionCrfs(studyBean, studyEventDefinitionBean);
 		assertEquals(studyEventDefinitionBean.getEventDefinitionCrfs().size(), 4);
 	}
