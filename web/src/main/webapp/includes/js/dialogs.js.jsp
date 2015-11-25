@@ -4,6 +4,27 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="notes"/>
 
 <script>
+	function showLoadingDialog(){
+		if ($("#alertBox").length == 0) {
+			var params = new DefaultDialogParams();
+			params.height = 150;
+			params.bBoxTitle = "";
+			params.bBoxId = "alertBox";
+			params.selector = "#alertBox";
+			params.message = "<div style='text-align: center;'><fmt:message bundle="${words}" key="your_file_being_uploaded"/><br/><br/>" +
+			"<img style='display:block;margin:auto;' src='images/ajax-loader-blue.gif'/></div>";
+			params.width = 450;
+			params.showButtons = false;
+			params.open = function() {
+				openDialog({
+					dialogDiv: this,
+					imagesFolderPath: determineImagesPath()
+				});
+			};
+			createDialog(params);
+		}
+	}
+
 	function showMedicalCodingAlertBox(ajaxResponse){
 		if ($("#alertBox").length == 0) {
 			var params = new DefaultDialogParams();

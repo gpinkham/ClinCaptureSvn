@@ -140,7 +140,8 @@ form element in red --%>
 						<input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
 					</c:otherwise>
 				</c:choose>
-				<input type="button" id="up<c:out value="${itemId}"/>" name="uploadFile<c:out value="${itemId}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>'); changeImage('input${itemId}');">
+				<input type="button" id="up<c:out value="${itemId}"/>" name="uploadFile<c:out value="${itemId}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>"
+					   onClick="javascript:openFileWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>'); changeImage('input${itemId}');">
 				<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="upload">
 			</div>
 		</c:when>

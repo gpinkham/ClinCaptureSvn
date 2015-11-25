@@ -113,12 +113,6 @@ public class UploadFileServlet extends Controller {
 					}
 					if (fileName.length() > 0) {
 						newUploadedFiles.put(key, dir + File.separator + fileName);
-						addPageMessage(
-								fileName
-										+ " "
-										+ respage
-												.getString("uploaded_successfully_go_to_data_entry_page_to_save_into_database"),
-								request);
 					} else {
 						request.setAttribute("uploadFileStatus", "empty");
 						addPageMessage(respage.getString("no_file_uploaded_please_specify_file"), request);

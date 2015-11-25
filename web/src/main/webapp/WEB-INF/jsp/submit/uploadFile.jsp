@@ -51,7 +51,10 @@ response.setDateHeader ("Expires", 0);
 			window.close();
 		}
 	</script>
-     <ui:theme/>
+
+	<jsp:include page="/includes/js/dialogs.js.jsp" />
+
+	<ui:theme/>
  </head>
 
 <body>
@@ -90,7 +93,10 @@ response.setDateHeader ("Expires", 0);
 							</c:otherwise>
 							</c:choose>
 							<p>
-								<fmt:message key="select_close_window_button" bundle="${restext}"/>
+								<fmt:message bundle="${resword}" key="your_file"/>: "${fileName}" <fmt:message bundle="${resword}" key="was_successfully_uploaded"/>
+							</p>
+							<p>
+								<fmt:message key="will_be_saved_in_db_when_crf_is_saved" bundle="${resword}"/>
 							</p>
 							<p>
 								<input type="button" name="close" value="<fmt:message key="close_window" bundle="${resword}"/>" onClick="javascript:window.close();" class="button_long">

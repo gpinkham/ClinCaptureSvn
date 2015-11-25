@@ -1403,6 +1403,13 @@ function openVNoteWindow(inURL) {
 
 }
 
+function openFileWindow(inURL) {
+	openNewWindow(inURL,
+		'_blank',
+		'directories=no,location=no,menubar=yes,scrollbars=yes,toolbar=no,status=no,resizable=yes',
+		'file');
+}
+
 
 //-------------------------------------------------------------------------
 // Function: openNewWindow
@@ -1462,6 +1469,7 @@ function openNewWindow(inURL, name, features, windowSize) {
 
     // Add check for browser capability
     var old_browser = true;
+	var recalculate_size = true;
     if (window.screen != null) old_browser = false;
     /*
      Detect Internet Explorer, for the sake of printing CRFs.
@@ -1516,9 +1524,14 @@ function openNewWindow(inURL, name, features, windowSize) {
         width = 900;
     }
 
+	if (windowSize == 'file') {
+		height = 300;
+		width = 600;
+		recalculate_size = false;
+	}
 
 
-    if (window.screen != null)
+    if (window.screen != null && recalculate_size)
     {
         screenHeight = window.screen.height;
         screenWidth = window.screen.width;
@@ -4274,6 +4287,7 @@ function checkFileUpload(fileUploadId, message){
     	alertDialog({ message: message, height: 150, width: 400 });
         return false;
     }
+	showLoadingDialog();
     return true;
 }
 
