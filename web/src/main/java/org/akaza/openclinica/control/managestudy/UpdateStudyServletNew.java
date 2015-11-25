@@ -1235,19 +1235,23 @@ public class UpdateStudyServletNew extends Controller {
 			updateParameter(spvdao, childspv);
 			
 			childspv.setParameter("itemLevelSDV");
-			childspv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
+			childspv.setValue(study1.getStudyParameterConfig().getItemLevelSDV());
 			updateParameter(spvdao, childspv);
 			
 			childspv.setParameter("subjectCasebookInPDF");
 			childspv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
 			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("sasExtracts");
+
+			childspv.setParameter("crfMasking");
 			childspv.setValue(study1.getStudyParameterConfig().getCrfMasking());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("sasExtracts");
+			childspv.setValue(study1.getStudyParameterConfig().getSasExtracts());
 			updateParameter(spvdao, childspv);
 			
 			childspv.setParameter("studyEvaluator");
-			childspv.setValue(study1.getStudyParameterConfig().getSasExtracts());
+			childspv.setValue(study1.getStudyParameterConfig().getStudyEvaluator());
 			updateParameter(spvdao, childspv);
 			
 			childspv.setParameter("randomization");
