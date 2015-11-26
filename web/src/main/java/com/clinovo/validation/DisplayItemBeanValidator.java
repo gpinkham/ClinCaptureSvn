@@ -133,7 +133,7 @@ public final class DisplayItemBeanValidator {
 				if (rt.equals(ResponseType.TEXT) || rt.equals(ResponseType.TEXTAREA) || rt.equals(ResponseType.FILE)) {
 					dib = validateDisplayItemBeanText(v, dib, inputName, request);
 					if (validationCount == null || validationCount == 0) {
-						v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
+						v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false, dib.getItem().getItemDataTypeId());
 						v.setErrorMessage(messageSource.getMessage("value_you_specified", null, locale)
 								+ " " + valueToCompare.getValue() + " "
 								+ messageSource.getMessage("from_initial_data_entry", null, locale));
@@ -143,7 +143,7 @@ public final class DisplayItemBeanValidator {
 					dib = validateDisplayItemBeanCV(v, dib, inputName, true);
 
 					if (validationCount == null || validationCount == 0) {
-						v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
+						v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false, dib.getItem().getItemDataTypeId());
 						String errorValue = valueToCompare.getValue();
 						ArrayList options = dib.getMetadata().getResponseSet().getOptions();
 
@@ -162,7 +162,7 @@ public final class DisplayItemBeanValidator {
 					dib = validateDisplayItemBeanCV(v, dib, inputName, false);
 
 					if (validationCount == null || validationCount == 0) {
-						v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true);
+						v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true, dib.getItem().getItemDataTypeId());
 						String errorValue = valueToCompare.getValue();
 						String errorTexts = "";
 
@@ -492,7 +492,7 @@ public final class DisplayItemBeanValidator {
 					dib = validateDisplayItemBeanText(sv, dib, inputName, request);
 				}
 				if (showOriginalItem && showDuplicateItem || showItem) {
-					sv.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
+					sv.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false, dib.getItem().getItemDataTypeId());
 					sv.setErrorMessage(messageSource.getMessage("value_you_specified", null, locale) + " " + valueToCompare.getValue() + " "
 							+ messageSource.getMessage("from_initial_data_entry", null, locale));
 				}

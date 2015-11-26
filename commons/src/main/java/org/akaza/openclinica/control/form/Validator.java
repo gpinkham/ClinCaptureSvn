@@ -38,6 +38,7 @@ import java.util.regex.PatternSyntaxException;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -682,7 +683,7 @@ public class Validator {
 	 * @param isMultiple
 	 *            flag to let us know if multiples will be required or not.
 	 */
-	public void addValidation(String fieldName, int type, ItemDataBean idb, boolean isMultiple) {
+	public void addValidation(String fieldName, int type, ItemDataBean idb, boolean isMultiple, int itemDataType) {
 		Validation v = new Validation(type);
 		// we have to make this a a new String
 		// to ensure that if someone calls idb.setValue()
@@ -690,8 +691,8 @@ public class Validator {
 		// value
 		v.addArgument(idb.getValue());
 		v.addArgument(isMultiple);
+		v.addArgument(itemDataType);
 		lastField = fieldName;
-		// added tbh, 112007
 		addValidation(fieldName, v);
 	}
 
@@ -1185,7 +1186,8 @@ public class Validator {
 			case MATCHES_INITIAL_DATA_ENTRY_VALUE :
 				String oldValue = v.getString(0);
 				boolean isMultiple = v.getBoolean(1);
-				if (!valueMatchesInitialValue(fieldName, oldValue, isMultiple)) {
+				int itemDataType = v.getInt(2);
+				if (!valueMatchesInitialValue(fieldName, oldValue, isMultiple, itemDataType)) {
 					addError(fieldName, v);
 				}
 				break;
@@ -1851,9 +1853,10 @@ public class Validator {
 	 *            The data to be matched against the input value.
 	 * @param isMultiple
 	 *            <code>true</code> if the input is a checkbox or multiple select, <code>false</code> otherwise.
+	 * @param itemDataType 
 	 * @return <code>true</code> if the value of fieldName matches the value in idb, <code>false</code> otherwise.
 	 */
-	protected boolean valueMatchesInitialValue(String fieldName, String oldValue, boolean isMultiple) {
+	protected boolean valueMatchesInitialValue(String fieldName, String oldValue, boolean isMultiple, int itemDataType) {
 		String fieldValue = "";
 		String glue = "";
 
@@ -1876,7 +1879,6 @@ public class Validator {
 				logger.info("line 1444: validator: found NPE with " + fieldName);
 				return false;
 			}
-			// had to re-add: tbh 09222007
 		}
 
 		if (fieldValue == null) {
@@ -1885,6 +1887,11 @@ public class Validator {
 			// consider they match
 			return "".equals(oldValue);
 		}
+		
+		if (itemDataType == ItemDataType.FILE.getId()){
+			return oldValue.endsWith("\\"+fieldValue) ;
+		}
+		
 		logger.debug("value matches initial: found " + oldValue + " versus " + fieldValue);
 		return fieldValue.equals(oldValue);
 	}

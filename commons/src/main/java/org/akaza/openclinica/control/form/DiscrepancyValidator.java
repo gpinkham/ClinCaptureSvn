@@ -36,7 +36,7 @@ import com.clinovo.util.ValidatorHelper;
  * the class checks to see if a discrepancy note is available for the field. If so, it takes no action. Otherwise, it
  * executes the validation using the superclass's validate method.
  * 
- * You can use this class exactly as you use the Validator class. Simple declar objects to be DiscrepancyValidator,
+ * You can use this class exactly as you use the Validator class. Simple declare objects to be DiscrepancyValidator,
  * rather than Validator, objects, and provide the appropriate FormDiscrepancyNotes object in the constructor.
  * 
  * @author ssachs
