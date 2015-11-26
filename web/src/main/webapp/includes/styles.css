@@ -3003,3 +3003,7 @@ span.autoChange {
 	border: 1px solid #cccccc;
 	box-shadow: 5px 5px 5px #ccc;
 }
+
+.p10 {
+	padding: 10px;
+}
