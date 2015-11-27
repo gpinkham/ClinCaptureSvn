@@ -1889,7 +1889,7 @@ public class Validator {
 		}
 		
 		if (itemDataType == ItemDataType.FILE.getId()){
-			return oldValue.endsWith("\\"+fieldValue) ;
+			return oldValue.endsWith(fieldValue) ;
 		}
 		
 		logger.debug("value matches initial: found " + oldValue + " versus " + fieldValue);
