@@ -1715,18 +1715,6 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 	}
-
-	private void setPartialSavedSectionNames(HttpServletRequest request,
-			Map<Integer, EventCRFSectionBean> sectionIdToEvCRFSection, DisplaySectionBean dsb) {
-		List<String> partialSavedSectionNames = new ArrayList<String>();
-		List<SectionBean> sectionBeanList = getSectionDAO().findAllByCRFVersionId(dsb.getCrfVersion().getId());
-		for (SectionBean sectionBean : sectionBeanList) {
-			if (sectionIdToEvCRFSection.get(sectionBean.getId()) != null) {
-				partialSavedSectionNames.add(sectionBean.getName());
-			}
-		}
-		request.setAttribute("partialSavedSectionNames", partialSavedSectionNames);
-	}
 	
 	protected void setPartialSaveParameters(HttpServletRequest request, int eventCRFId, DisplaySectionBean dsb) {
 		EventCRFSectionService eventCRFSectionService = (EventCRFSectionService) SpringServletAccess.getApplicationContext(
@@ -1740,7 +1728,6 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("psSectionsList", psSectionsList);
 		request.setAttribute("sectionIdToEvCRFSection", sectionIdToEvCRFSection);
 		request.setAttribute("markPartialSaved", ecsb.isPartialSaved()? "Yes" : "No");
-		setPartialSavedSectionNames(request, sectionIdToEvCRFSection, dsb);
 	}
 
 	protected abstract void putDataEntryStageFlagToRequest(HttpServletRequest request);

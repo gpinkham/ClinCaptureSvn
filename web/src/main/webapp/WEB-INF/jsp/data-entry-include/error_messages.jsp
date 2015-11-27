@@ -47,12 +47,9 @@
 		</ul>
 	</div>
 </c:if>
-<c:if test="${partialSavedSectionNames ne null and fn:length(partialSavedSectionNames) gt 0}">
+<c:if test="${psSectionsList ne null and fn:length(psSectionsList) gt 0}">
 	<div class="alert">
-		<fmt:message key="dataEntry.thisCrfContainsPDForTheFollowingPages" bundle="${resword}"/>:<br/>
-		<c:forEach items="${partialSavedSectionNames}" var="partialSavedSectionName" varStatus="partialSavedSectionNameStatus">
-			- ${partialSavedSectionName}<br/>
-		</c:forEach>
+		<fmt:message key="dataEntry.thisCrfContainsPDForSomePages" bundle="${resword}"/><br/>
 	</div>
 	<br/>
 </c:if>
