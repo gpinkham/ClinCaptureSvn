@@ -381,7 +381,7 @@ public class CreateCRFVersionServlet extends Controller {
 	public String uploadFile(HttpServletRequest request, String theDir, CRFVersionBean version) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-		List<File> theFiles = new FileUploadHelper().returnFiles(request, getServletContext(), theDir);
+		List<File> theFiles = new FileUploadHelper().returnFiles(request, theDir);
 		boolean isXlsx;
 		HashMap errors = getErrorsHolder(request);
 		errors.remove("excel_file");

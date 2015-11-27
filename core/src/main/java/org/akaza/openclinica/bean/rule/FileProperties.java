@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -26,39 +26,43 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Setting configuration for file extensions & maxSize of files being uploaded
- * 
+ * Setting configuration for file extensions & maxSize of files being uploaded.
+ *
  * @author Krikor Krumlian
- * @since 3.1.0
  * @see FileUploadHelper
+ * @since 3.1.0
  */
 public class FileProperties {
 
 	private String extensions;
 	private ExtensionSettings extensionSettings;
-	private final Integer MB = 1024 * 1024;
+	private static final Integer MB = 1024 * 1024;
+	private static final int MAX_MB = 10;
 	private final Long fileSizeMax;
 
 	enum ExtensionSettings {
 		VALID, INVALID
 	}
 
+	/**
+	 * Default FileProperties constructor.
+	 */
 	public FileProperties() {
 		setExtensions("");
 		setExtensionSettings(ExtensionSettings.VALID);
-		fileSizeMax = Long.valueOf(MB * 10);
+		fileSizeMax = (long) (MB * MAX_MB);
 	}
 
 	public FileProperties(String extensions) {
 		setExtensions(extensions);
 		setExtensionSettings(ExtensionSettings.VALID);
-		fileSizeMax = Long.valueOf(MB * 10);
+		fileSizeMax = (long) (MB * MAX_MB);
 	}
 
 	public FileProperties(String extensions, String extensionSettings) {
 		setExtensions(extensions);
 		this.extensionSettings = getExtensionSettings(extensionSettings);
-		fileSizeMax = Long.valueOf(MB * 10);
+		fileSizeMax = (long) (MB * MAX_MB);
 	}
 
 	public void isValidExtension(String uploadedFileExtension) {
@@ -71,15 +75,15 @@ public class FileProperties {
 			if (extensionSettings.equals(ExtensionSettings.VALID)) {
 				return;
 			} else {
-				throw new OpenClinicaSystemException("prohibited_file_extensions", new Object[] { "ALL" });
+				throw new OpenClinicaSystemException("prohibited_file_extensions", new Object[]{"ALL"});
 			}
 		}
 		if (extensionSettings.equals(ExtensionSettings.VALID)) { // if the list is flagged as valid list
 			if (!extensionsList.contains(uploadedFileExtension)) // if valid list does not contain extension
-				throw new OpenClinicaSystemException("permitted_file_extensions", new Object[] { extensions });
+				throw new OpenClinicaSystemException("permitted_file_extensions", new Object[]{extensions});
 		} else { // if the list is flagged as prohibited list
 			if (extensionsList.contains(uploadedFileExtension)) // if deny list contains extension
-				throw new OpenClinicaSystemException("prohibited_file_extensions", new Object[] { extensions });
+				throw new OpenClinicaSystemException("prohibited_file_extensions", new Object[]{extensions});
 		}
 	}
 

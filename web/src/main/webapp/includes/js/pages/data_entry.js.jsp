@@ -192,7 +192,7 @@
 				new_up.setAttribute("value", '<fmt:message key="click_to_upload" bundle="${resword}"/>');
 				new_up.onclick = function () {
 					var itemid = itemId;
-					javascript:openDocWindow(uploadLink)
+					openFileWindow(uploadLink)
 				};
 				div.appendChild(new_up);
 			}

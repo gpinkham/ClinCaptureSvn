@@ -309,7 +309,7 @@ public class ImportCRFDataServlet extends Controller {
 	private File getFirstFile(HttpServletRequest request, HashMap errorsMap) {
 		File f = null;
 		FileUploadHelper uploadHelper = new FileUploadHelper();
-		List<File> files = uploadHelper.returnFiles(request, getServletContext());
+		List<File> files = uploadHelper.returnFiles(request);
 		for (File file : files) {
 			f = file;
 			if (f == null) {

@@ -93,7 +93,7 @@ response.setDateHeader ("Expires", 0);
 							</c:otherwise>
 							</c:choose>
 							<p>
-								<fmt:message bundle="${resword}" key="your_file"/>: "${fileName}" <fmt:message bundle="${resword}" key="was_successfully_uploaded"/>
+								<fmt:message bundle="${resword}" key="your_file"/>: "${displayedFileName}" <fmt:message bundle="${resword}" key="was_successfully_uploaded"/>
 							</p>
 							<p>
 								<fmt:message key="will_be_saved_in_db_when_crf_is_saved" bundle="${resword}"/>
