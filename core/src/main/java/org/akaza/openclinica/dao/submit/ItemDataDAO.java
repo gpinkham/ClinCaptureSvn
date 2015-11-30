@@ -1268,6 +1268,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
 		setTypesExpected();
 		int ind = INT_13;
+		setTypeExpected(ind++, TypeNames.STRING);
 		setTypeExpected(ind++, TypeNames.INT); // item_form_metadata_id
 		setTypeExpected(ind++, TypeNames.BOOL); // repeating
 		setTypeExpected(ind, TypeNames.INT); // section
