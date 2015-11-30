@@ -323,7 +323,7 @@
 								<c:choose>
 									<c:when test="${!dec.eventCRF.status.deleted}">
 
-										<c:if test="${userRole.manageStudy && study.status.available && (!dec.locked) && (!dec.stage.locked)}">
+										<c:if test="${allowDataEntry and userRole.manageStudy && study.status.available && (!dec.locked) && (!dec.stage.locked)}">
 											<td>
 												<ui:removeEventCRFLink object="${dec}" subjectId="${studySub.id}" onClick="setAccessedObjectWithRowspans(this)" hspace="6"/>
 											</td>
@@ -347,7 +347,7 @@
 										<img src="images/bt_Transparent.gif" border="0" hspace="6">
 									</td>
 								</c:if>
-								<c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (!studySub.status.deleted) && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
+								<c:if test="${allowDataEntry and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (!studySub.status.deleted) && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
 									<td>
 										<ui:deleteEventCRFLink object="${dec}" subjectId="${studySub.id}" onClick="setAccessedObjectWithRowspans(this)"/>
 									</td>
