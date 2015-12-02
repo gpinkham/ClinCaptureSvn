@@ -1,6 +1,5 @@
 package com.clinovo.clincapture.control.submit;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.servlet.RequestDispatcher;
@@ -8,7 +7,6 @@ import javax.servlet.ServletContext;
 
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.UpdateCRFHeaderServlet;

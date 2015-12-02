@@ -38,6 +38,7 @@ import java.util.HashMap;
  */
 @Controller
 @RequestMapping("/configureItemLevelSDV")
+@SuppressWarnings("rawtypes")
 public class ItemLevelSDVController {
 
 	@Autowired

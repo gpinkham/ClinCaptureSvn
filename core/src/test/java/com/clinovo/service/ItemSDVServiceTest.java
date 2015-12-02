@@ -11,7 +11,6 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

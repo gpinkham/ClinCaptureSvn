@@ -17,7 +17,6 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
