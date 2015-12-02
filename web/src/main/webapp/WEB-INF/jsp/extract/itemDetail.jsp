@@ -115,7 +115,6 @@
            <td class="table_header_column_top"><fmt:message key="validation_error_mgs" bundle="${resword}"/></td>
 
            <td class="table_header_column_top"><fmt:message key="required" bundle="${resword}"/></td>
-           <td class="table_header_column_top"><fmt:message key="itemLevelSDVRequired" bundle="${resword}"/></td>
           </tr>
           <tr valign="top">            
            <td class="table_header_column"><c:out value="${versionItem.leftItemText}"/>&nbsp;</td>
@@ -156,17 +155,6 @@
                        No
                    </c:otherwise>
                </c:choose>&nbsp;
-            </td>
-
-            <td class="table_header_column">
-                <c:choose>
-                    <c:when test="${versionItem.sdvRequired}">
-                        <fmt:message key="yes" bundle="${resword}" />
-                    </c:when>
-                    <c:otherwise>
-                        <fmt:message key="no" bundle="${resword}" />
-                    </c:otherwise>
-                </c:choose>
             </td>
            </tr>          
 	     </table>

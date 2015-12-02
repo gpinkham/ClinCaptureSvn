@@ -191,12 +191,6 @@ public final class Page {
 			"Confirm a new site");
 
 	/**
-	 * Page for confirming a new sub study.
-	 */
-	public static final Page CONFIRM_UPDATE_SUB_STUDY = new Page("/WEB-INF/jsp/managestudy/updateSubStudyConfirm.jsp",
-			"Confirm a site");
-
-	/**
 	 * Page for updating a new sub study.
 	 */
 	public static final Page UPDATE_SUB_STUDY = new Page("/WEB-INF/jsp/managestudy/updateSubStudy.jsp",

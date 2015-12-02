@@ -147,7 +147,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
 		answer.setShowItem(getBooleanFromRow(hm, "show_item"));
 		answer.setCodeRef(getStringFromRow(hm, "code_ref"));
-		answer.setSdvRequired(getBooleanFromRow(hm, "sdv_required"));
 
 		ResponseSetBean rsb = new ResponseSetBean();
 		rsb.setId(getIntFromRow(hm, "response_set_id"));
@@ -219,16 +218,14 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		ind++; // show_item 24
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // code_ref 25
-		this.setTypeExpected(ind, TypeNames.BOOL);
-		ind++; // sdv_required 26
 		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // response_set.response_type_id 27
+		ind++; // response_set.response_type_id 26
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.label 28
+		ind++; // response_set.label 27
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.options_text 29
+		ind++; // response_set.options_text 28
 		this.setTypeExpected(ind, TypeNames.STRING);
-		// response_set.options_values // 30
+		// response_set.options_values // 39
 		return ++ind;
 	}
 
@@ -695,8 +692,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
 			variables.put(ind++, ifmb.getWidthDecimal());
 		}
 		variables.put(ind++, ifmb.isShowItem());
-		variables.put(ind++, ifmb.getCodeRef());
-		variables.put(ind, ifmb.isSdvRequired());
+		variables.put(ind, ifmb.getCodeRef());
 
 		executeWithPK(digester.getQuery("create"), variables, nullVars, con);
 
@@ -750,7 +746,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		}
 		variables.put(ind++, ifmb.isShowItem());
 		variables.put(ind++, ifmb.getCodeRef());
-		variables.put(ind++, ifmb.isSdvRequired());
 		variables.put(ind, ifmb.getId());
 
 		execute(digester.getQuery("update"), variables, nullVars);
@@ -1130,27 +1125,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
 			crfSections = (Integer) ((HashMap) it.next()).get("total");
 		}
 		return crfSections;
-	}
-
-	/**
-	 * Method check that crf version has items to SDV.
-	 * 
-	 * @param crfId
-	 *            int
-	 * @return boolean
-	 */
-	public boolean hasItemsToSDV(int crfId) {
-		boolean has = false;
-		unsetTypeExpected();
-		setTypeExpected(1, TypeNames.BOOL);
-		HashMap variables = new HashMap();
-		variables.put(1, crfId);
-		ArrayList rows = select(digester.getQuery("hasItemsToSDV"), variables);
-		Iterator it = rows.iterator();
-		if (it.hasNext()) {
-			has = getBooleanFromRow((HashMap) it.next(), "has");
-		}
-		return has;
 	}
 
 	/**

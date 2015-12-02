@@ -9,7 +9,7 @@
 <c:set var="rowCount" value="${param.rowCount}" />
 <c:set var="inputName" value="${param.inputName}" />
 
-<c:if test="${displayItem.data.id > 0 && section.eventCRF.stage.doubleDE_Complete && displayItem.metadata.showItem && displayItem.metadata.sdvRequired && (userRole.studyAdministrator || userRole.monitor)}">
+<c:if test="${displayItem.data.id > 0 && section.eventCRF.stage.doubleDE_Complete && displayItem.metadata.showItem && displayItem.edcItemMetadata.sdvRequired() && (userRole.studyAdministrator || userRole.monitor)}">
     <c:set var="sdvItemLinkAdditionalClass" value="${study.studyParameterConfig.allowSdvWithOpenQueries == 'no' && !eventCrfDoesNotHaveOutstandingDNs ? 'hidden' : ''}"/>
     <a class="sdvItemLink ${sdvItemLinkAdditionalClass}">
         <fmt:message key="sdv_item" bundle="${resword}" var="sdvItemTitle"/>

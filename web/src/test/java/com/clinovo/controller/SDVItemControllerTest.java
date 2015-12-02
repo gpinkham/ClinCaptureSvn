@@ -34,6 +34,6 @@ public class SDVItemControllerTest extends BaseControllerTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(
 						content()
-								.string("{\"crf\":\"sdv\",\"totalItemsToSDV\":\"0\",\"item\":\"sdv\",\"itemDataItems\":[],\"totalSectionItemsToSDV\":\"0\"}"));
+								.string("{\"crf\":\"\",\"totalItemsToSDV\":\"1\",\"item\":\"sdv\",\"itemDataItems\":[{\"itemDataId\":2,\"rowCount\":0,\"itemId\":2}],\"totalSectionItemsToSDV\":\"1\"}"));
 	}
 }

@@ -592,7 +592,7 @@ function updateThis(multiSelEle, count) {
 		</c:choose>
 
 		<tr valign="top">
-			<td class="table_cell"><fmt:message key="required" bundle="${resword}"/>:
+			<td class="table_cell" colspan="2"><fmt:message key="required" bundle="${resword}"/>:
 				<c:choose>
 					<c:when test="${edc.requiredCRF == true}">
 						<input type="checkbox" checked name="requiredCRF<c:out value="${num}"/>" value="yes">
@@ -602,8 +602,6 @@ function updateThis(multiSelEle, count) {
 					</c:otherwise>
 				</c:choose>
 			</td>
-
-			<td class="table_cell">&nbsp;</td>
 
 			<td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:
 				<c:choose>
@@ -667,21 +665,13 @@ function updateThis(multiSelEle, count) {
 		</tr>
 
 		<tr>
-			<td class="table_cell" colspan="2"><fmt:message key="hidden_crf" bundle="${resword}"/> :
+			<td class="table_cell" colspan="4"><fmt:message key="hidden_crf" bundle="${resword}"/> :
 				<c:choose>
 					<c:when test="${!edc.hideCrf}">
 						<input type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes">
 					</c:when>
 					<c:otherwise><input checked="checked" type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes"></c:otherwise>
 				</c:choose>
-			</td>
-
-			<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
-				<select name="sdvOption<c:out value="${num}"/>">
-                    <c:forEach var="sdv" items="${edc.sdvOptions}">
-                        <option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterm}"/></option>
-                    </c:forEach>
-				</select>
 			</td>
 		</tr>
 
@@ -791,9 +781,9 @@ function updateThis(multiSelEle, count) {
              value="<fmt:message key="back" bundle="${resword}"/>"
              class="button_medium medium_back"
              onClick="javascript: formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
-      <input type="button" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#updateSubStudyForm');">
-      <%--input type="button" onclick="confirmCancel('ListSite');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/--%>
-	</table>
+      <input type="button" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit"
+			 onClick="javascript:validateCustomFields({expectedValues: ['email'], selectors: ['.email_to_check_field'], formToSubmit: '#updateSubStudyForm'});">
+  </table>
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 <jsp:include page="../include/footer.jsp"/>

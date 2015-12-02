@@ -2017,55 +2017,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method unsdvs event crfs when crf metadata was changed.
-	 *
-	 * @param crfVersionId
-	 *            crf version id
-	 * @param userId
-	 *            user id
-	 * @return boolean
-	 */
-	public boolean unsdvEventCRFsWhenCRFMetadataWasChanged(int crfVersionId, int userId) {
-		unsetTypeExpected();
-
-		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		int ind = 1;
-		variables.put(ind++, userId);
-		variables.put(ind, crfVersionId);
-
-		execute(digester.getQuery("unsdvEventCRFsWhenCRFMetadataWasChanged"), variables);
-
-		return isQuerySuccessful();
-	}
-
-	/**
-	 * Method sdvs event crfs when crf metadata was changed and al items are sdv.
-	 *
-	 * @param crfVersionId
-	 *            crf version id
-	 * @param userId
-	 *            user id
-	 * @param ignoreOutstandingQueries
-	 *            boolean
-	 * @return boolean
-	 */
-	public boolean sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(int crfVersionId, int userId,
-			boolean ignoreOutstandingQueries) {
-		unsetTypeExpected();
-
-		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		int ind = 1;
-		variables.put(ind++, userId);
-		variables.put(ind, crfVersionId);
-
-		execute(digester.getQuery(ignoreOutstandingQueries
-				? "sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV"
-				: "sdvEventCRFsWithoutOutstandingDNsWhenCRFMetadataWasChangedAndAllItemsAreSDV"), variables);
-
-		return isQuerySuccessful();
-	}
-
-	/**
 	 * Saves partial section info.
 	 * 
 	 * @param eventCrfId
@@ -2277,6 +2228,33 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(index++, eventDefinitionCRFId);
 		variables.put(index, eventDefinitionCRFId);
 		String sql = digester.getQuery("findAllByEventDefinitionCRFId");
+		ArrayList alist = this.select(sql, variables);
+		ArrayList al = new ArrayList();
+
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
+			al.add(getEntityFromHashMap(hm));
+		}
+		return al;
+	}
+
+	/**
+	 * Find all eventCrfs by EventDefinitionCRF id.
+	 *
+	 * @param eventDefinitionCRFId
+	 *            int
+	 * @return ArrayList<EventCRFBean>
+	 */
+	public ArrayList<EventCRFBean> findAllWithChildByEventDefinitionCRFId(int eventDefinitionCRFId) {
+		this.unsetTypeExpected();
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		int index = 1;
+		variables.put(index++, eventDefinitionCRFId);
+		variables.put(index++, eventDefinitionCRFId);
+		variables.put(index, eventDefinitionCRFId);
+		String sql = digester.getQuery("findAllWithChildByEventDefinitionCRFId");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 

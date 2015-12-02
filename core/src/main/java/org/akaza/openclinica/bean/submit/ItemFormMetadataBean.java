@@ -40,7 +40,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private int columnNumber;
 	private String pageNumberLabel;
 	private String codeRef = "";
-	private boolean sdvRequired;
 
 	@Override
 	public int hashCode() {
@@ -76,7 +75,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		result = prime * result + (showItem ? INT_1231 : INT_1237);
 		result = prime * result + ((subHeader == null) ? 0 : subHeader.hashCode());
 		result = prime * result + ((widthDecimal == null) ? 0 : widthDecimal.hashCode());
-		result = prime * result + (sdvRequired ? INT_1231 : INT_1237);
 		return result;
 	}
 
@@ -253,8 +251,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 			}
 		} else if (!widthDecimal.equals(other.widthDecimal)) {
 			return false;
-		} else if (sdvRequired != other.sdvRequired) {
-			return false;
 		}
 		return true;
 	}
@@ -346,7 +342,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 			rsb.addOption(ro.copy());
 		}
 		ifmb.setResponseSet(rsb);
-		ifmb.setSdvRequired(isSdvRequired());
 		return ifmb;
 	}
 
@@ -843,13 +838,5 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	 */
 	public String getTextFromRightItemText(String leftItemText) {
 		return DRUtil.getTextFromHTML(this.rightItemText.replaceAll("&nbsp;", ""));
-	}
-
-	public boolean isSdvRequired() {
-		return sdvRequired;
-	}
-
-	public void setSdvRequired(boolean sdvRequired) {
-		this.sdvRequired = sdvRequired;
 	}
 }

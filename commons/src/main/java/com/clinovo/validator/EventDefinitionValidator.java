@@ -247,8 +247,8 @@ public final class EventDefinitionValidator {
 	}
 
 	private static HashMap validateEDC(MessageSource messageSource, int eventId, String versionName, String crfName,
-			int sdvCode, String emailWhen, String email, boolean hasSDVRequiredItems,
-			StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+			String emailWhen, String email, StudyEventDefinitionBean studyEventDefinitionBean,
+			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
 		HashMap errors = new HashMap();
 		Locale locale = LocaleResolver.getLocale();
 
@@ -271,11 +271,6 @@ public final class EventDefinitionValidator {
 			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
 					new Object[]{eventId, currentStudy.getId()}, locale));
 			errors.put("eventid", errorMessages);
-		} else if (hasSDVRequiredItems && sdvCode != 2) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItems",
-					new Object[]{crfVersionBean.getCrfId()}, locale));
-			errors.put("sourcedataverification", errorMessages);
 		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && email.trim().isEmpty()) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.provideEmailAddress", null, locale));
@@ -307,14 +302,10 @@ public final class EventDefinitionValidator {
 	 *            String
 	 * @param crfName
 	 *            String
-	 * @param sdvCode
-	 *            int
 	 * @param emailWhen
 	 *            String
 	 * @param email
 	 *            String
-	 * @param hasSDVRequiredItems
-	 *            boolean
 	 * @param studyEventDefinitionBean
 	 *            StudyEventDefinitionBean
 	 * @param crfVersionBean
@@ -324,12 +315,12 @@ public final class EventDefinitionValidator {
 	 * @return HashMap
 	 */
 	public static HashMap validateEDCAdding(MessageSource messageSource, DataSource dataSource, int eventId,
-			String versionName, String crfName, int sdvCode, String emailWhen, String email,
-			boolean hasSDVRequiredItems, StudyEventDefinitionBean studyEventDefinitionBean,
+			String versionName, String crfName, String emailWhen, String email,
+			StudyEventDefinitionBean studyEventDefinitionBean,
 			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
 		Locale locale = LocaleResolver.getLocale();
-		HashMap errors = validateEDC(messageSource, eventId, versionName, crfName, sdvCode, emailWhen, email,
-				hasSDVRequiredItems, studyEventDefinitionBean, crfVersionBean, currentStudy);
+		HashMap errors = validateEDC(messageSource, eventId, versionName, crfName, emailWhen, email,
+				studyEventDefinitionBean, crfVersionBean, currentStudy);
 
 		EventDefinitionCRFBean existingEventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
 				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinitionBean.getId(),
@@ -356,8 +347,6 @@ public final class EventDefinitionValidator {
 	 *            StudyEventDefinitionBean
 	 * @param eventDefinitionCRFBean
 	 *            EventDefinitionCRFBean
-	 * @param hasSDVRequiredItems
-	 *            boolean
 	 * @param crfVersionBean
 	 *            CRFVersionBean
 	 * @param currentStudy
@@ -366,12 +355,11 @@ public final class EventDefinitionValidator {
 	 */
 	public static HashMap validateStudyEDCEditing(MessageSource messageSource, int eventId,
 			StudyEventDefinitionBean studyEventDefinitionBean, EventDefinitionCRFBean eventDefinitionCRFBean,
-			boolean hasSDVRequiredItems, CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
 		Locale locale = LocaleResolver.getLocale();
 		HashMap errors = validateEDC(messageSource, eventId, eventDefinitionCRFBean.getDefaultVersionName(),
-				eventDefinitionCRFBean.getCrfName(), eventDefinitionCRFBean.getSourceDataVerification().getCode(),
-				eventDefinitionCRFBean.getEmailStep(), eventDefinitionCRFBean.getEmailTo(), hasSDVRequiredItems,
-				studyEventDefinitionBean, crfVersionBean, currentStudy);
+				eventDefinitionCRFBean.getCrfName(), eventDefinitionCRFBean.getEmailStep(),
+				eventDefinitionCRFBean.getEmailTo(), studyEventDefinitionBean, crfVersionBean, currentStudy);
 
 		if (errors.isEmpty() && !eventDefinitionCRFBean.getStatus().isAvailable()) {
 			ArrayList errorMessages = new ArrayList();

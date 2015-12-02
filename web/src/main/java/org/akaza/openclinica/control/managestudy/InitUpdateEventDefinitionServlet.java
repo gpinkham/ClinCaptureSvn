@@ -20,13 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.SignStateRestorer;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -44,7 +38,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.SignStateRestorer;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Prepares to update study event definition.
@@ -143,6 +142,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			// Get list of child EventDefinitionCRFs for cascading actions
 			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService()
 					.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
+			HashMap<Integer, Integer> edcSDVMap = EventDefinitionCRFUtil.getEDCSDVMap(eventDefinitionCRFs);
 
 			Map<Integer, SignStateRestorer> signStateRestorerMap = getEventDefinitionService()
 					.prepareSignStateRestorer(studyEventDefinitionBean);
@@ -151,6 +151,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
 			request.getSession().setAttribute("oldEventDefinitionCRFs",
 					EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
+			request.getSession().setAttribute("edcSDVMap", edcSDVMap);
 			// store child list to session
 			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs

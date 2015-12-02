@@ -12,6 +12,8 @@
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/js/pages/study_event_definition.js"></script>
+
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 	<td class="sidebar_tab">

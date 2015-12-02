@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.clinovo.model.EDCItemMetadata;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -47,6 +48,7 @@ public class DisplayItemBean implements Comparable {
 	private ItemBean item;
 	private ItemFormMetadataBean metadata;
 	private ItemGroupMetadataBean groupMetadata;
+	private EDCItemMetadata edcItemMetadata; // used for item level SDV.
 	private String editFlag = ""; // used for items in a group
 	private ItemDataBean dbData; // used for DDE, items in a group
 	private boolean autoAdded; // used for data import
@@ -808,5 +810,13 @@ public class DisplayItemBean implements Comparable {
 			LOGGER.error("Error has occurred.", ex);
 		}
 		return maxLength;
+	}
+
+	public EDCItemMetadata getEdcItemMetadata() {
+		return edcItemMetadata;
+	}
+
+	public void setEdcItemMetadata(EDCItemMetadata edcItemMetadata) {
+		this.edcItemMetadata = edcItemMetadata;
 	}
 }

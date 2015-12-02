@@ -20,6 +20,17 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.domain.SourceDataVerification;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -30,18 +41,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.domain.SourceDataVerification;
 
 /**
  * EventDefinitionCRFDAO class.
@@ -1190,28 +1189,6 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		}
 
 		return answer;
-	}
-
-	/**
-	 * Method updates the source data verification code for event definition crfs.
-	 *
-	 * @param crfVersionId
-	 *            int
-	 * @param sourceDataVerification
-	 *            SourceDataVerification
-	 * @return boolean
-	 */
-	public boolean updateEDCThatHasItemsToSDV(int crfVersionId, SourceDataVerification sourceDataVerification) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		int ind = 1;
-		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(ind++, sourceDataVerification.getCode());
-		variables.put(ind, crfVersionId);
-
-		execute(digester.getQuery("updateEDCThatHasItemsToSDV"), variables);
-
-		return isQuerySuccessful();
 	}
 
 	/**

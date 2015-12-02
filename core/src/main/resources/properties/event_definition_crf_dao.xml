@@ -305,12 +305,6 @@
         </sql>
     </query>
 	<query>
-		<name>updateEDCThatHasItemsToSDV</name>
-		<sql>
-			update event_definition_crf set source_data_verification_code = ? where event_definition_crf_id in (select edc.event_definition_crf_id from event_definition_crf edc, crf_version cv, item_form_metadata ifm where cv.crf_version_id = ? and edc.crf_id = cv.crf_id and ifm.crf_version_id = cv.crf_version_id and ifm.sdv_required = true)
-		</sql>
-	</query>
-	<query>
 		<name>doesEventDefinitionCRFHaveAvailableCRFVersionsForDataEntry</name>
 		<sql>
 			SELECT (CASE

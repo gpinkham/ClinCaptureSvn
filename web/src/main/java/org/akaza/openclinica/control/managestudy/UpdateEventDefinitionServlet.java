@@ -20,15 +20,10 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.util.RequestUtil;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.validator.EventDefinitionValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -47,9 +42,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.RequestUtil;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.validator.EventDefinitionValidator;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
@@ -104,6 +103,14 @@ public class UpdateEventDefinitionServlet extends Controller {
 				} else {
 					forwardPage(Page.ADD_CRFTO_DEFINITION_SERVLET, request, response);
 				}
+			} else if ("configureItemLevelSDV".equalsIgnoreCase(action)) {
+				FormProcessor fp = new FormProcessor(request);
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession()
+						.getAttribute("definition");
+				saveEventDefinitionToSession(sed, fp);
+				saveEventDefinitionCRFsToSession(fp);
+				int edcId = fp.getInt("edcToConfigure");
+				response.sendRedirect(fp.getRequest().getContextPath().concat("/pages/configureItemLevelSDV?").concat("edcId=" + edcId));
 			} else {
 				addPageMessage(respage.getString("updating_ED_is_cancelled"), request);
 				clearSession(request.getSession());
@@ -164,9 +171,12 @@ public class UpdateEventDefinitionServlet extends Controller {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) request.getSession()
 				.getAttribute("definition");
 
+		HashMap<Integer, ArrayList<EDCItemMetadata>>  edcItemMetadataMap = (HashMap<Integer, ArrayList<EDCItemMetadata>>)
+				request.getSession().getAttribute("edcItemMetadataMap");
+
 		getEventDefinitionService().updateTheWholeStudyEventDefinition(currentStudy, updater, studyEventDefinitionBean,
 				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, oldEventDefinitionCRFs,
-				signStateRestorerMap);
+				signStateRestorerMap, edcItemMetadataMap);
 
 		clearSession(request.getSession());
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
@@ -196,6 +206,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		ArrayList edcs = (ArrayList) fp.getRequest().getSession().getAttribute("eventDefinitionCRFs");
 		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+
 		for (int i = 0; i < edcs.size(); i++) {
 			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
 			if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
@@ -326,6 +337,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 		session.removeAttribute("crfNameToEdcMap");
 		session.removeAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
 		session.removeAttribute("userNameInsteadEmail");
+		session.removeAttribute("edcItemMetadataMap");
+		session.removeAttribute("edcSDVMap");
 		RequestUtil.getRequest().removeAttribute("formWithStateFlag");
 	}
 

@@ -124,7 +124,7 @@
     </td>
     <td class="table_cell">
         <c:choose>
-            <c:when test="${did.metadata.sdvRequired}">
+            <c:when test="${did.edcItemMetadata.sdvRequired()}">
                 <fmt:message key="yes" bundle="${resword}" />
             </c:when>
             <c:otherwise>

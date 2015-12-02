@@ -335,7 +335,6 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 				.setResponseLayout(crfBuilder.getCellValue(CellName.ITEM_RESPONSE_LAYOUT, true));
 		crfBuilder.getCurrentItem().getItemMeta().setShowItem(isShowItem);
 		crfBuilder.getCurrentItem().getItemMeta().setCodeRef(codeRef);
-		crfBuilder.getCurrentItem().getItemMeta().setSdvRequired(false);
 		crfBuilder.getCurrentItem().getItemMeta().setWidthDecimal(crfBuilder.getCellValue(CellName.ITEM_WIDTH_DECIMAL));
 		crfBuilder.getCurrentItem().getItemMeta().setSectionName(crfBuilder.getCellValue(CellName.ITEM_SECTION_LABEL));
 		crfBuilder.getItemNameToMetaMap().put(crfBuilder.getCurrentItem().getName(),

@@ -187,7 +187,8 @@
 				<input type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="$('input[name=actionName]').val('back1');$('#defineStudyEventForm').submit();"/>
 			</td>
 			<td>
-				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#defineStudyEventForm');">
+				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue"
+					   onClick="javascript:validateCustomFields({expectedValues: ['email'], selectors: ['.email_to_check_field'], formToSubmit: '#defineStudyEventForm'});">
 			</td>
 			<td>
 				<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium medium_cancel" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>

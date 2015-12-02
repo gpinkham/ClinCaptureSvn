@@ -638,7 +638,7 @@
 		</c:choose>
 
 		<tr valign="top">
-			<td class="table_cell"><fmt:message key="required" bundle="${resword}"/>:
+			<td class="table_cell" colspan="2"><fmt:message key="required" bundle="${resword}"/>:
 				<c:choose>
 					<c:when test="${edc.requiredCRF == true}">
 						<input type="checkbox" checked name="requiredCRF<c:out value="${num}"/>" value="yes" disabled>
@@ -648,8 +648,6 @@
 					</c:otherwise>
 				</c:choose>
 			</td>
-
-			<td class="table_cell">&nbsp;</td>
 
 			<td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:
 				<c:choose>
@@ -713,19 +711,11 @@
 		</tr>
 
 		<tr>
-			<td class="table_cell" colspan="2"><fmt:message key="hidden_crf" bundle="${resword}"/> :
+			<td class="table_cell" colspan="4"><fmt:message key="hidden_crf" bundle="${resword}"/> :
 				<c:choose>
 					<c:when test="${!edc.hideCrf}"><input type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes" disabled></c:when>
 					<c:otherwise><input checked="checked" type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes" disabled></c:otherwise>
 				</c:choose>
-			</td>
-
-			<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
-				<select name="sdvOption<c:out value="${num}"/>" disabled>
-					<c:forEach var="sdv" items="${edc.sdvOptions}">
-						<option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
-					</c:forEach>
-				</select>
 			</td>
 		</tr>
 

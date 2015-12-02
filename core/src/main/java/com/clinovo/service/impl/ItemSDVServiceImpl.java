@@ -14,29 +14,26 @@
  *******************************************************************************/
 package com.clinovo.service.impl;
 
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.service.EDCItemMetadataService;
 import com.clinovo.service.ItemSDVService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SubjectEventStatusUtil;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.exception.OpenClinicaException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,49 +61,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 	private DataSource dataSource;
 
 	@Autowired
-	private SCDItemMetadataDao scdItemMetadataDao;
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void processChangedCrfVersionMetadata(StudyBean currentStudy, UserAccountBean userAccountBean,
-			int crfVersionId, Map<Integer, Boolean> metadata) throws Exception {
-		EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
-		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
-		StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
-		ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(dataSource);
-		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
-		boolean dataChanged = false;
-		boolean unSdvEventCrfBeans = false;
-		for (Integer itemFormMetaId : metadata.keySet()) {
-			boolean sdvRequired = metadata.get(itemFormMetaId);
-			ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) itemFormMetadataDao
-					.findByPK(itemFormMetaId);
-			if (itemFormMetadataBean.isShowItem() && itemFormMetadataBean.isSdvRequired() != sdvRequired) {
-				dataChanged = true;
-				if (!itemFormMetadataBean.isSdvRequired()) {
-					unSdvEventCrfBeans = true;
-				}
-			}
-			itemFormMetadataBean.setSdvRequired(sdvRequired);
-			itemFormMetadataDao.update(itemFormMetadataBean);
-		}
-		if (dataChanged) {
-			eventDefinitionCrfDao.updateEDCThatHasItemsToSDV(crfVersionId, SourceDataVerification.PARTIALREQUIRED);
-			itemDataDao.unsdvItemDataWhenCRFMetadataWasChanged(crfVersionId);
-			if (unSdvEventCrfBeans) {
-				eventCrfDao.unsdvEventCRFsWhenCRFMetadataWasChanged(crfVersionId, userAccountBean.getId());
-			} else {
-				eventCrfDao.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(crfVersionId,
-						userAccountBean.getId(), currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries()
-								.equalsIgnoreCase(YES));
-			}
-			SubjectEventStatusUtil.determineSubjectEventStates(studyEventDao
-					.findStudyEventsByCrfVersionAndSubjectEventStatus(crfVersionId, unSdvEventCrfBeans
-							? SubjectEventStatus.SOURCE_DATA_VERIFIED
-							: SubjectEventStatus.COMPLETED), userAccountBean, new DAOWrapper(dataSource), null);
-		}
-	}
+	private EDCItemMetadataService edcItemMetadataService;
 
 	/**
 	 * {@inheritDoc}
@@ -131,7 +86,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 		itemDataBean.setUpdatedDate(new Date());
 		itemDataDao.update(itemDataBean);
 
-		for (DisplayItemBean dib : itemDataDao.getListOfItemsToSDV(eventCrfBean.getId())) {
+		for (DisplayItemBean dib : getListOfItemsToSDV(eventCrfBean.getId())) {
 			crfShortcutsAnalyzer.prepareItemsToSDVShortcutLink(dib, eventCrfBean, eventDefinitionCrfId, sections,
 					deltaMap);
 			if (sectionId == dib.getMetadata().getSectionId()) {
@@ -189,7 +144,37 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 	 * {@inheritDoc}
 	 */
 	public List<DisplayItemBean> getListOfItemsToSDV(int eventCrfId) {
-		return new ItemDataDAO(dataSource).getListOfItemsToSDV(eventCrfId);
+		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
+		List<EDCItemMetadata> edcItemMetadataList = edcItemMetadataService.findAllByEventCRFId(eventCrfId);
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+		ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
+		ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
+
+		for (EDCItemMetadata edcItemMetadata : edcItemMetadataList) {
+			if (!edcItemMetadata.sdvRequired()) {
+				continue;
+			}
+			int itemId = edcItemMetadata.getItemId();
+			int crfVersionId = edcItemMetadata.getCrfVersionId();
+			DisplayItemBean displayItemBean = new DisplayItemBean();
+			displayItemBean.setEdcItemMetadata(edcItemMetadata);
+			ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFId(itemId, eventCrfId);
+			if (itemDataBean.isSdv()) {
+				continue;
+			}
+			displayItemBean.setData(itemDataBean);
+			ItemFormMetadataBean itemFormMetadataBean = itemFormMetadataDAO
+					.findAllByCRFVersionIdAndItemId(crfVersionId, itemId);
+			if (!itemFormMetadataBean.isShowItem()) {
+				continue;
+			}
+			displayItemBean.setMetadata(itemFormMetadataBean);
+			ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) itemGroupMetadataDAO
+					.findByItemAndCrfVersion(itemId, crfVersionId);
+			displayItemBean.setGroupMetadata(itemGroupMetadataBean);
+			result.add(displayItemBean);
+		}
+		return result;
 	}
 
 	/**
@@ -203,6 +188,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 	 * {@inheritDoc}
 	 */
 	public boolean sdvCrfItems(int eventCrfId, int userId, boolean sdv, Connection con) {
+
 		return new ItemDataDAO(dataSource).sdvCrfItems(eventCrfId, userId, sdv, con);
 	}
 
@@ -216,48 +202,10 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean hasItemsToSDV(int crfId) {
-		return new ItemFormMetadataDAO(dataSource).hasItemsToSDV(crfId);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void copySettingsFromPreviousVersion(int previousCrfVersionId, int newCrfVersionId)
-			throws OpenClinicaException {
-		ItemDAO itemDao = new ItemDAO(dataSource);
-		ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(dataSource);
-		Map<String, ItemFormMetadataBean> itemFormMetadataMap = new HashMap<String, ItemFormMetadataBean>();
-		List<ItemFormMetadataBean> newItemFormMetadataBeanList = itemFormMetadataDao
-				.findAllByCRFVersionId(newCrfVersionId);
-		List<ItemFormMetadataBean> prevItemFormMetadataBeanList = itemFormMetadataDao
-				.findAllByCRFVersionId(previousCrfVersionId);
-		for (ItemFormMetadataBean newItemFormMetadataBean : newItemFormMetadataBeanList) {
-			itemFormMetadataMap.put(itemDao.findByPK(newItemFormMetadataBean.getItemId()).getName(),
-					newItemFormMetadataBean);
-		}
-		for (ItemFormMetadataBean prevItemFormMetadataBean : prevItemFormMetadataBeanList) {
-			ItemFormMetadataBean newItemFormMetadataBean = itemFormMetadataMap.get(itemDao.findByPK(
-					prevItemFormMetadataBean.getItemId()).getName());
-			if (newItemFormMetadataBean != null) {
-				if (prevItemFormMetadataBean.isSdvRequired()
-						&& !scdItemMetadataDao.hasSCD(newItemFormMetadataBean.getId())) {
-					newItemFormMetadataBean.setSdvRequired(true);
-				} else {
-					newItemFormMetadataBean.setSdvRequired(false);
-				}
-				itemFormMetadataDao.update(newItemFormMetadataBean);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean hasChangedSDVRequiredItems(List<DisplayItemBean> changedItemsList) {
 		boolean result = false;
 		for (DisplayItemBean displayItemBean : changedItemsList) {
-			if (displayItemBean.getMetadata().isSdvRequired()) {
+			if (displayItemBean.getEdcItemMetadata().sdvRequired()) {
 				result = true;
 				break;
 			}

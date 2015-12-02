@@ -55,7 +55,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
-import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -175,85 +174,76 @@ public class CreateCRFVersionServlet extends Controller {
 		logger.info("commit sql");
 		CrfBuilder crfBuilder = (CrfBuilder) request.getSession().getAttribute("crfBuilder");
 		if (crfBuilder != null) {
-			try {
-				CRFVersionDAO cvdao = getCRFVersionDAO();
-				List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) cvdao
-						.findAllActiveByCRF(version.getCrfId());
-				crfBuilder.save();
 
-				ArrayList crfvbeans;
-				logger.info("CRF-ID [" + version.getCrfId() + "]");
-				int crfVersionId = 0;
-				if (version.getCrfId() != 0) {
-					crfvbeans = cvdao.findAllByCRFId(version.getCrfId());
-					CRFVersionBean cvbean = (CRFVersionBean) crfvbeans.get(crfvbeans.size() - 1);
-					crfVersionId = cvbean.getId();
-					for (Object crfvbean : crfvbeans) {
-						cvbean = (CRFVersionBean) crfvbean;
-						if (crfVersionId < cvbean.getId()) {
-							crfVersionId = cvbean.getId();
-						}
+			CRFVersionDAO cvdao = getCRFVersionDAO();
+			List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) cvdao
+					.findAllActiveByCRF(version.getCrfId());
+			crfBuilder.save();
+
+			ArrayList crfvbeans;
+			logger.info("CRF-ID [" + version.getCrfId() + "]");
+			int crfVersionId = 0;
+			if (version.getCrfId() != 0) {
+				crfvbeans = cvdao.findAllByCRFId(version.getCrfId());
+				CRFVersionBean cvbean = (CRFVersionBean) crfvbeans.get(crfvbeans.size() - 1);
+				crfVersionId = cvbean.getId();
+				for (Object crfvbean : crfvbeans) {
+					cvbean = (CRFVersionBean) crfvbean;
+					if (crfVersionId < cvbean.getId()) {
+						crfVersionId = cvbean.getId();
 					}
 				}
-				Integer cfvID = crfVersionId;
-				if (cfvID == 0) {
-					cfvID = cvdao.findCRFVersionId(crfBuilder.getCrfBean().getId(),
-							crfBuilder.getCrfVersionBean().getName());
-				}
-				CRFVersionBean finalVersion = (CRFVersionBean) cvdao.findByPK(cfvID);
-				if (crfVersionList != null && crfVersionList.size() > 0) {
-					getItemSDVService().copySettingsFromPreviousVersion(crfVersionList.get(0).getId(),
-							finalVersion.getId());
-				}
-				getEventDefinitionCrfService().updateChildEventDefinitionCrfsForNewCrfVersion(finalVersion, ub);
+			}
+			Integer cfvID = crfVersionId;
+			if (cfvID == 0) {
+				cfvID = cvdao.findCRFVersionId(crfBuilder.getCrfBean().getId(),
+						crfBuilder.getCrfVersionBean().getName());
+			}
+			CRFVersionBean finalVersion = (CRFVersionBean) cvdao.findByPK(cfvID);
+			getEventDefinitionCrfService().updateChildEventDefinitionCrfsForNewCrfVersion(finalVersion, ub);
 
-				version.setCrfId(crfBuilder.getCrfBean().getId());
-				version.setOid(finalVersion.getOid());
+			version.setCrfId(crfBuilder.getCrfBean().getId());
+			version.setOid(finalVersion.getOid());
 
-				CRFBean crfBean = (CRFBean) cdao.findByPK(version.getCrfId());
-				crfBean.setUpdatedDate(version.getCreatedDate());
-				crfBean.setUpdater(ub);
-				cdao.update(crfBean);
-				request.setAttribute("crfId", crfBean.getId());
-				request.setAttribute("crfVersionId", cfvID);
-				request.getSession().removeAttribute("version");
-				request.getSession().removeAttribute("crfName");
-				request.getSession().removeAttribute("eventsForVersion");
-				request.getSession().removeAttribute("itemsHaveData");
-				request.getSession().removeAttribute("nib");
-				request.getSession().removeAttribute("deletePreviousVersion");
-				request.getSession().removeAttribute("previousVersionId");
+			CRFBean crfBean = (CRFBean) cdao.findByPK(version.getCrfId());
+			crfBean.setUpdatedDate(version.getCreatedDate());
+			crfBean.setUpdater(ub);
+			cdao.update(crfBean);
+			request.setAttribute("crfId", crfBean.getId());
+			request.setAttribute("crfVersionId", cfvID);
+			request.getSession().removeAttribute("version");
+			request.getSession().removeAttribute("crfName");
+			request.getSession().removeAttribute("eventsForVersion");
+			request.getSession().removeAttribute("itemsHaveData");
+			request.getSession().removeAttribute("nib");
+			request.getSession().removeAttribute("deletePreviousVersion");
+			request.getSession().removeAttribute("previousVersionId");
 
-				String tempFile = (String) request.getSession().getAttribute("tempFileName");
-				if (tempFile != null) {
-					logger.info("*** ^^^ *** saving new version spreadsheet" + tempFile);
-					try {
-						String dir = SQLInitServlet.getField("filePath");
-						File f = new File(dir + "crf" + File.separator + "original" + File.separator + tempFile);
-						String finalDir = dir + "crf" + File.separator + "new" + File.separator;
-						if (!new File(finalDir).isDirectory()) {
-							logger.info("need to create folder for excel files" + finalDir);
-							new File(finalDir).mkdirs();
-						}
-						String newFile = version.getCrfId() + version.getOid() + ".xls";
-						logger.info("*** ^^^ *** new file: " + newFile);
-						File nf = new File(finalDir + newFile);
-						logger.info("copying old file " + f.getName() + " to new file " + nf.getName());
-						copy(f, nf);
-					} catch (IOException ie) {
-						logger.info("==============");
-						addPageMessage(respage.getString("CRF_version_spreadsheet_could_not_saved_contact"), request);
+			String tempFile = (String) request.getSession().getAttribute("tempFileName");
+			if (tempFile != null) {
+				logger.info("*** ^^^ *** saving new version spreadsheet" + tempFile);
+				try {
+					String dir = SQLInitServlet.getField("filePath");
+					File f = new File(dir + "crf" + File.separator + "original" + File.separator + tempFile);
+					String finalDir = dir + "crf" + File.separator + "new" + File.separator;
+					if (!new File(finalDir).isDirectory()) {
+						logger.info("need to create folder for excel files" + finalDir);
+						new File(finalDir).mkdirs();
 					}
+					String newFile = version.getCrfId() + version.getOid() + ".xls";
+					logger.info("*** ^^^ *** new file: " + newFile);
+					File nf = new File(finalDir + newFile);
+					logger.info("copying old file " + f.getName() + " to new file " + nf.getName());
+					copy(f, nf);
+				} catch (IOException ie) {
+					logger.info("==============");
+					addPageMessage(respage.getString("CRF_version_spreadsheet_could_not_saved_contact"), request);
 				}
-				request.getSession().removeAttribute("tempFileName");
-				request.getSession().removeAttribute("excelErrors");
+			}
+			request.getSession().removeAttribute("tempFileName");
+			request.getSession().removeAttribute("excelErrors");
 				request.getSession().removeAttribute("htmlTab");
 				forwardPage(Page.CREATE_CRF_VERSION_DONE, request, response);
-			} catch (OpenClinicaException pe) {
-				logger.info("--------------");
-				request.getSession().setAttribute("excelErrors", crfBuilder.getErrorsList());
-				forwardPage(Page.CREATE_CRF_VERSION_ERROR, request, response);
-			}
 		} else {
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
 		}

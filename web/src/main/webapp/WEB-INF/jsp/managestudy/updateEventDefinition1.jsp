@@ -51,6 +51,7 @@
 <form action="UpdateEventDefinition" method="post" name="UpdateEventDefinition" id="updateEventDefinition">
 	<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 	<input type="hidden" name="action" value="confirm">
+	<input type="hidden" name="edcToConfigure" value="">
 	<div style="width: 600px">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
@@ -348,11 +349,20 @@
 				</td>
 
 				<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
-					<select onchange="javascript:changeIcon();" name="sdvOption<c:out value="${count}"/>">
+					<select onchange="javascript:changeIcon(); checkItemLevelSDV(this);" name="sdvOption<c:out value="${count}"/>" initial-value="${edcSDVMap[edc.id]}">
 						<c:forEach var="sdv" items="${edc.sdvOptions}">
 							<option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
 						</c:forEach>
 					</select>
+
+					<c:if test="${edc.id != 0}">
+						<c:set var="display" value="${edc.sourceDataVerification.code != 2 ? 'none' : 'inline-block'}"/>
+						<img name="bt_edit_edc_sdv" class="bt_edit_edc_sdv_${edcStatus.index}" src="images/bt_Edit.gif" border="0"
+							 alt="<fmt:message key="configure_items_for_sdv" bundle="${resword}"/>"
+							 title="<fmt:message key="configure_items_for_sdv" bundle="${resword}"/>"
+							 onclick="configureItemLevelSDV(${edc.id});"
+							 hspace="6" style="vertical-align: sub; cursor: pointer; display: ${display}"/>
+					</c:if>
 				</td>
 			</tr>
 
@@ -481,13 +491,14 @@
 				<input id="GoBack" class="button_medium medium_back" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 			</td>
 			<td>
-				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="validateCustomFields(['email'],['.email_to_check_field'],'#updateEventDefinition');">
+				<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue"
+					   onClick="return checkItemLevelSDVChanges('<fmt:message bundle='${resword}' key='item_level_sdv_status_changed'/>', this);">
 			</td>
 			<td>
 				<c:set var="addNewCRFBTNCaption"><fmt:message key="add_a_new_CRF" bundle="${resword}"/></c:set>
 				<input type="button" name="addNewCRFBTN" value="${addNewCRFBTNCaption}"
 					   class="${ui:getHtmlButtonCssClass(addNewCRFBTNCaption, "")}"
-					   onclick="upateEventDefinitionAddCRF()">
+					   onclick="updateEventDefinitionAddCRF()">
 			</td>
 			<td>
 				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">

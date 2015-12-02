@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-11-10-TICKET2541-1">
+		<comment>
+			Add new entity edc_item_metadata to store item-level SDV configuration per event_definition_crf.
+		</comment>
+		<createTable tableName="edc_item_metadata">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="study_event_definition_id" type="int"/>
+			<column name="event_definition_crf_id" type="int"/>
+			<column name="crf_version_id" type="int"/>
+			<column name="item_id" type="int"/>
+			<column name="version" type="int"/>
+			<column name="sdv_required" type="java.sql.Types.CHAR(1)" defaultValue="0"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-10-TICKET2541-2">
+		<comment>
+			Add constrains for edc_item_metadata table.
+		</comment>
+		<addForeignKeyConstraint constraintName="fk_study_event_definition"
+								 baseColumnNames="study_event_definition_id"
+								 baseTableName="edc_item_metadata"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_event_definition_id"
+								 referencedTableName="study_event_definition"/>
+		<addForeignKeyConstraint constraintName="fk_event_definition_crf"
+								 baseColumnNames="event_definition_crf_id"
+								 baseTableName="edc_item_metadata"
+								 onDelete="CASCADE"
+								 referencedColumnNames="event_definition_crf_id"
+								 referencedTableName="event_definition_crf"/>
+		<addForeignKeyConstraint constraintName="fk_crf_version"
+								 baseColumnNames="crf_version_id"
+								 baseTableName="edc_item_metadata"
+								 onDelete="CASCADE"
+								 referencedColumnNames="crf_version_id"
+								 referencedTableName="crf_version"/>
+		<addForeignKeyConstraint constraintName="fk_item"
+								 baseColumnNames="item_id"
+								 baseTableName="edc_item_metadata"
+								 onDelete="CASCADE"
+								 referencedColumnNames="item_id"
+								 referencedTableName="item"/>
+	</changeSet>
+
+</databaseChangeLog>

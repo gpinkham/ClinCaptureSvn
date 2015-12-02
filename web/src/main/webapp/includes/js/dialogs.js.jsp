@@ -123,6 +123,26 @@
 		createDialog(params);
 	}
 
+	function showChangedSDVConfigMessage(version) {
+		var params = new DefaultDialogParams();
+		params.height = 150;
+		params.buttons = {
+			'<fmt:message bundle="${words}" key="yes"/>': function () {
+				closeDialog(params.selector);
+				submitItemLevelSDV(true);
+				setTimeout(function() {
+					getItemsTableForCRFVersion(version);
+				}, 2000)
+			},
+			'<fmt:message bundle="${words}" key="no"/>': function () {
+				closeDialog(params.selector);
+				getItemsTableForCRFVersion(version);
+			}
+		};
+		params.message = "<fmt:message bundle="${words}" key="item_sdv_configuration_changed_save_it"/>";
+		createDialog(params);
+	}
+
 	function showRandomizationDisabledDialog() {
 		alertDialog({ message: "<fmt:message bundle="${words}" key="randomization_disabled_update_plan"/>", height: 150, width: 500 });
 	}

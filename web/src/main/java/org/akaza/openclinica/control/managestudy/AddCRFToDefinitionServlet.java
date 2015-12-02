@@ -238,8 +238,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 				edcBean.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);
 				edcBean.setOrdinal(++ordinalForNewCRF);
 				edcBean.setVersions(crf.getVersions());
-				SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
-						getItemSDVService().hasItemsToSDV(crf.getId()));
+				SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions());
 				CRFVersionBean defaultVersion1 = (CRFVersionBean) vdao.findByPK(edcBean.getDefaultVersionId());
 				edcBean.setDefaultVersionName(defaultVersion1.getName());
 

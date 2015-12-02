@@ -1,14 +1,13 @@
 package com.clinovo.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.service.EventCRFService;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
+import com.clinovo.service.StudyEventService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -24,13 +23,13 @@ import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.clinovo.service.EventCRFService;
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.EventDefinitionService;
-import com.clinovo.service.StudyEventService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.util.SubjectEventStatusUtil;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * EventDefinitionServiceImpl.
@@ -116,13 +115,14 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	public void updateTheWholeStudyEventDefinition(StudyBean studyBean, UserAccountBean updater,
 			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
 			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, List<EventDefinitionCRFBean> oldEDCs,
-			Map<Integer, SignStateRestorer> signStateRestorerMap) throws Exception {
+			Map<Integer, SignStateRestorer> signStateRestorerMap,
+			HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap) throws Exception {
 		studyEventDefinitionBean.setUpdater(updater);
 		studyEventDefinitionBean.setUpdatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
 		getStudyEventDefinitionDAO().update(studyEventDefinitionBean);
 		updateAllEventDefinitionCRFs(studyBean, updater, studyEventDefinitionBean, eventDefinitionCRFsToUpdate,
-				childEventDefinitionCRFsToUpdate, oldEDCs, signStateRestorerMap);
+				childEventDefinitionCRFsToUpdate, oldEDCs, signStateRestorerMap, edcItemMetadataMap);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	public void updateAllEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater,
 			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
 			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, List<EventDefinitionCRFBean> oldEDCs,
-			Map<Integer, SignStateRestorer> signStateRestorerMap) throws Exception {
+			Map<Integer, SignStateRestorer> signStateRestorerMap, HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap) throws Exception {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
 		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFsToUpdate) {
@@ -160,6 +160,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		}
 		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, parentsMap,
 				oldEDCsMap, updater);
+		// Item Level SDV support
+		eventDefinitionCrfService.checkIfEventCRFSDVStatusWasUpdated(parentsMap, oldEDCsMap, edcItemMetadataMap, updater);
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
 				new DAOWrapper(dataSource), signStateRestorerMap);
 	}

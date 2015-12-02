@@ -166,9 +166,8 @@
                     response_layout,
                     width_decimal,
                     show_item,
-                    code_ref,
-                    sdv_required)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    code_ref)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>
         <query>
@@ -198,8 +197,7 @@
                     response_layout =?,
                     width_decimal =?,
                     show_item =?,
-                    code_ref=?,
-                    sdv_required=?
+                    code_ref=?
                     WHERE item_form_metadata_id = ?
                 </sql>
         </query>
@@ -278,12 +276,6 @@
 			and ss.study_subject_id = ec.study_subject_id
 			and sec.crf_version_id = ec.crf_version_id
 			and ss.study_id = s.study_id and (s.study_id = ? or s.parent_study_id = ?)
-        </sql>
-    </query>
-    <query>
-        <name>hasItemsToSDV</name>
-        <sql>
-            select count(distinct cv.crf_id) = 1 as has from crf_version cv, item_form_metadata ifm where cv.crf_id = ? and ifm.crf_version_id = cv.crf_version_id and ifm.sdv_required = 1
         </sql>
     </query>
     <query>

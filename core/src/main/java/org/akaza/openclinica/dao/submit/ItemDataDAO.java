@@ -35,13 +35,10 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -1195,25 +1192,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method unsdv fields in the item_data table when crf metadata was changed.
-	 *
-	 * @param crfVersionId
-	 *            int
-	 * @return boolean
-	 */
-	public boolean unsdvItemDataWhenCRFMetadataWasChanged(int crfVersionId) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-
-		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, crfVersionId);
-
-		execute(digester.getQuery("unsdvItemDataWhenCRFMetadataWasChanged"), variables);
-
-		return isQuerySuccessful();
-	}
-
-	/**
 	 * SDV crf items.
 	 *
 	 * @param eventCrfId
@@ -1258,48 +1236,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns list of items that are required to be SDV.
-	 * 
-	 * @param eventCrfId
-	 *            int
-	 * @return Map
-	 */
-	public List<DisplayItemBean> getListOfItemsToSDV(int eventCrfId) {
-		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
-		setTypesExpected();
-		int ind = INT_13;
-		setTypeExpected(ind++, TypeNames.STRING);
-		setTypeExpected(ind++, TypeNames.INT); // item_form_metadata_id
-		setTypeExpected(ind++, TypeNames.BOOL); // repeating
-		setTypeExpected(ind, TypeNames.INT); // section
-		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(1, eventCrfId);
-		ArrayList rows = select(digester.getQuery("itemsToSDV"), variables);
-		for (Object row : rows) {
-			DisplayItemBean dib = new DisplayItemBean();
-
-			ItemDataBean itemDataBean = (ItemDataBean) this.getEntityFromHashMap((HashMap) row);
-			dib.setData(itemDataBean);
-
-			Integer metadataId = (Integer) ((HashMap) row).get("item_form_metadata_id");
-			Integer sectionId = (Integer) ((HashMap) row).get("section");
-			ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
-			ifmb.setSectionId(sectionId != null ? sectionId : 0);
-			ifmb.setId(metadataId != null ? metadataId : 0);
-			ifmb.setSdvRequired(true);
-			dib.setMetadata(ifmb);
-
-			Boolean repeating = (Boolean) ((HashMap) row).get("repeating");
-			ItemGroupMetadataBean igmb = new ItemGroupMetadataBean();
-			igmb.setRepeatingGroup(repeating != null && repeating);
-			dib.setGroupMetadata(igmb);
-
-			result.add(dib);
-		}
-		return result;
-	}
-
-	/**
 	 * Set sdv status for item data id list.
 	 * 
 	 * @param itemDataIds
@@ -1326,8 +1262,28 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		return isQuerySuccessful();
 	}
 
+	/**
+	 * Set SDV = False by EventCRFId.
+	 * @param eventCrfId int.
+	 * @param updaterId int.
+	 * @param sdvStatusToSet boolean.
+	 */
+	public void setSDVByEventCRFId(int eventCrfId, int updaterId, boolean sdvStatusToSet) {
+		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+		int index = 1;
+		variables.put(index++, sdvStatusToSet);
+		variables.put(index++, updaterId);
+		variables.put(index, eventCrfId);
+		String sql = digester.getQuery("setSDVByEventCRFId");
+		execute(sql, variables);
+	}
+
+	/**
+	 * Update Partial DDE Value
+	 * @param idb ItemDataBean
+	 * @return ItemDataBean
+	 */
 	public ItemDataBean updatePartialDDEValue(ItemDataBean idb) {
-		
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
 			idb.setPartialDDEValue(Utils.convertedItemDateValue(idb.getPartialDDEValue(), local_df_string, oc_df_string, locale));

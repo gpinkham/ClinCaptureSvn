@@ -567,24 +567,6 @@ function setButtonsColor(selector) {
 }
 
 /**
- * This function is used to check if current url contains word "pages", and add
- * it if not.
- * 
- * @returns <String> prefix that will be used for ajax requests.
- */
-function getCurrentUrl() {
-	var urlTemp = new RegExp("^.*(pages)")
-			.exec(window.location.href.toString());
-	var url = "";
-	if (urlTemp == null) 
-		url = "pages/";
-	else
-		url = "";
-
-	return url;
-}
-
-/**
  * Create new cookie
  * 
  * @param c_name <String> name of cookie that will be created;

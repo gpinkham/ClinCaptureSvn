@@ -3861,11 +3861,6 @@ function viewCrfByVersion(eventDefinitionCRFId, studySubjectId, crfVersionId, ev
   $("#viewSectionDataEntryForm").submit();
 }
 
-function upateEventDefinitionAddCRF(){
-	$("input[name=action]").attr("value","addCrfs");
-	$("#updateEventDefinition").submit();
-}
-
 /* =======================================================================================
 * Adding an ability to uncheck radiobuttons on all pages
 * To make radiobutton uncheckable, you should add class "uncheckable_radio" to it
@@ -3972,7 +3967,11 @@ function FieldChecker(selector, checkType) {
 * 	<alert-block class="alert"> Error message </alert-block>
 * </wrapper>
 ========================================================================================== */
-function validateCustomFields(expectedValues, selectors, formToSubmit) {
+function validateCustomFields(params) {
+	var expectedValues = params.expectedValues;
+	var selectors = params.selectors;
+	var formToSubmit = params.formToSubmit;
+	var returnTrue = params.returnTrue;
 	var errorsExists = false;
 
 	selectors
@@ -3987,8 +3986,14 @@ function validateCustomFields(expectedValues, selectors, formToSubmit) {
 			});
 
 	if (!errorsExists) {
-		$(formToSubmit).submit();
+		if(formToSubmit) {
+			$(formToSubmit).submit();
+		} else if (returnTrue) {
+			return true;
+		}
 	}
+
+	return false;
 }
 
 function alertDialog(params){
@@ -4573,6 +4578,23 @@ function changeDefinitionOrdinal(params) {
     });
 }
 
+/**
+ * This function is used to check if current url contains word "pages", and add
+ * it if not.
+ *
+ * @returns <String> prefix that will be used for ajax requests.
+ */
+function getCurrentUrl() {
+	var urlTemp = new RegExp("^.*(pages)")
+		.exec(window.location.href.toString());
+	var url = "";
+	if (urlTemp == null)
+		url = "pages/";
+	else
+		url = "";
+
+	return url;
+}
 //-------------------------------------------------------------------------
 // Function: openDocWindow
 //

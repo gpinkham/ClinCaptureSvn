@@ -1,8 +1,10 @@
 package com.clinovo.service.impl;
 
 import com.clinovo.enums.CurrentDataEntryStage;
+import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.DisplayItemService;
+import com.clinovo.service.EDCItemMetadataService;
 import com.clinovo.util.DataEntryUtil;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -56,6 +58,8 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 	@Autowired
 	private DataEntryService dataEntryService;
+	@Autowired
+	private EDCItemMetadataService edcItemMetadataService;
 
 	private DynamicsMetadataService dynamicsMetadataService;
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -231,6 +235,8 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 		for (Object item1 : items) {
 			DisplayItemBean item = (DisplayItemBean) item1;
 			DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
+			EDCItemMetadata edcItemMetadata = edcItemMetadataService.findByEventCRFAndItemID(dsb.getEventCRF().getId(), item.getItem().getId());
+			item.setEdcItemMetadata(edcItemMetadata);
 			newOne.setSingleItem(DataEntryUtil.runDynamicsItemCheck(getDynamicsMetadataService(), item, ecb));
 			newOne.setOrdinal(item.getMetadata().getOrdinal());
 			newOne.setInGroup(false);

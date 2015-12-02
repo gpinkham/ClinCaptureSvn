@@ -16,6 +16,8 @@
 package com.clinovo.rest.service;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import com.clinovo.model.EDCItemMetadata;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -211,8 +214,9 @@ public abstract class BaseService {
 			}
 		}
 
+		HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap = new HashMap<Integer, ArrayList<EDCItemMetadata>>();
 		eventDefinitionService.updateAllEventDefinitionCRFs(currentStudy, updater, studyEventDefinitionBean,
-				eventDefinitionCRFs, childEventDefinitionCRFs, oldEventDefinitionCRFs, signStateRestorerMap);
+				eventDefinitionCRFs, childEventDefinitionCRFs, oldEventDefinitionCRFs, signStateRestorerMap, edcItemMetadataMap);
 	}
 
 	protected StudyEventDefinitionBean getStudyEventDefinition(int id) throws Exception {

@@ -21,15 +21,15 @@
 
 package org.akaza.openclinica.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Util to manage Event Definition CRFs.
@@ -76,5 +76,18 @@ public final class EventDefinitionCRFUtil {
 			clonedList.add(clone);
 		}
 		return clonedList;
+	}
+
+	/**
+	 * Get map of SDV codes for EDCs.
+	 * @param eventDefinitionCRFs List<EventDefinitionCRFBean> eventDefinitionCRFs
+	 * @return HashMap<Integer, Integer>
+	 */
+	public static HashMap<Integer, Integer> getEDCSDVMap(List<EventDefinitionCRFBean> eventDefinitionCRFs) {
+		HashMap<Integer, Integer> resultMap = new HashMap<Integer, Integer>();
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFs) {
+			resultMap.put(eventDefinitionCRFBean.getId(), eventDefinitionCRFBean.getSourceDataVerification().getCode());
+		}
+		return resultMap;
 	}
 }

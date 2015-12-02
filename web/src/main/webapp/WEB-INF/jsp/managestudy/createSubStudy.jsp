@@ -41,7 +41,6 @@
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
-<jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap"/>
@@ -595,7 +594,7 @@
 			</c:choose>
 
 			<tr valign="top">
-				<td class="table_cell"><fmt:message key="required" bundle="${resword}"/>:
+				<td class="table_cell" colspan="2"><fmt:message key="required" bundle="${resword}"/>:
 					<c:choose>
 						<c:when test="${edc.requiredCRF == true}">
 							<input type="checkbox" checked name="requiredCRF<c:out value="${num}"/>" value="yes">
@@ -605,9 +604,7 @@
 						</c:otherwise>
 					</c:choose>
 				</td>
-	
-				<td class="table_cell">&nbsp;</td>
-	
+
 				<td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>: 
 					<c:choose>
 						<c:when test="${edc.electronicSignature == true}">
@@ -670,19 +667,11 @@
 			</tr>
 
 			<tr>
-				<td class="table_cell" colspan="2"><fmt:message key="hidden_crf" bundle="${resword}"/> :
+				<td class="table_cell" colspan="4"><fmt:message key="hidden_crf" bundle="${resword}"/> :
 					<c:choose>
 						<c:when test="${!edc.hideCrf}"><input type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes"></c:when>
 						<c:otherwise><input checked="checked" type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes"></c:otherwise>
 					</c:choose>
-				</td>
-
-				<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
-					<select name="sdvOption<c:out value="${num}"/>">
-                        <c:forEach var="sdv" items="${edc.sdvOptions}">
-                            <option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
-                        </c:forEach>
-					</select>
 				</td>
 			</tr>
 
@@ -788,7 +777,8 @@
 		</td>
 
 		<td>
-			<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#createSubStudyForm');">
+			<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue"
+				   onClick="javascript:validateCustomFields({expectedValues: ['email'], selectors: ['.email_to_check_field'], formToSubmit: '#createSubStudyForm'});">
 		</td>
 	</tr>
 </table>

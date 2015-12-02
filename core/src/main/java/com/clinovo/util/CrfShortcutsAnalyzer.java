@@ -106,6 +106,16 @@ public class CrfShortcutsAnalyzer {
 
 	private ItemSDVService itemSDVService;
 
+	/**
+	 * CrfShortcutsAnalyzer constructor.
+	 * @param scheme String
+	 * @param requestMethod String
+	 * @param requestURI String
+	 * @param servletPath String
+	 * @param domainName String
+	 * @param attributes Map<String, Object>
+	 * @param itemSDVService ItemSDVService
+	 */
 	public CrfShortcutsAnalyzer(String scheme, String requestMethod, String requestURI, String servletPath,
 			String domainName, Map<String, Object> attributes, ItemSDVService itemSDVService) {
 		this.scheme = scheme;
@@ -487,7 +497,7 @@ public class CrfShortcutsAnalyzer {
 	public void prepareItemsToSDVShortcutLink(DisplayItemBean dib, EventCRFBean eventCrfBean, int eventDefinitionCRFId,
 			List<SectionBean> sections, Map<String, Integer> deltaMap) {
 		if (dib.getMetadata() != null && dib.getMetadata().getId() > 0 && dib.getMetadata().isShowItem()
-				&& dib.getMetadata().isSdvRequired()) {
+				&& dib.getEdcItemMetadata().sdvRequired()) {
 			CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(sections);
 			String link = buildLink(dib.getMetadata().getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
 			analyze(currentSectionInfo, deltaMap, link, FIRST_ITEM_TO_SDV, dib.getMetadata().getSectionId());
@@ -629,7 +639,7 @@ public class CrfShortcutsAnalyzer {
 	public void prepareCrfShortcutAnchors(DisplayItemBean dib, List<DiscrepancyNoteThread> noteThreads,
 			boolean additionalCheck) {
 		if (dib.getMetadata() != null && dib.getData() != null && dib.getData().getId() > 0
-				&& dib.getMetadata().getId() > 0 && dib.getMetadata().isShowItem() && dib.getMetadata().isSdvRequired()
+				&& dib.getMetadata().getId() > 0 && dib.getMetadata().isShowItem() && dib.getEdcItemMetadata() != null && dib.getEdcItemMetadata().sdvRequired()
 				&& !dib.getData().isSdv()) {
 			incItemsToSDVAnchorCounter();
 			dib.getItemToSDV().add(ITEM_TO_SDV.concat(Integer.toString(getItemsToSDVAnchorCounter())));

@@ -266,7 +266,6 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		if (CodingFieldsUtil.getEnumAsList(crfBuilder.getCurrentItem().getItemMeta().getCodeRef()) != null) {
 			crfBuilder.getCodingRefItemNames().add(crfBuilder.getCurrentItem().getName());
 		}
-		crfBuilder.getCurrentItem().getItemMeta().setSdvRequired(false);
 		crfBuilder.getItemNameToMetaMap().put(crfBuilder.getCurrentItem().getName(),
 				crfBuilder.getCurrentItem().getItemMeta());
 		crfBuilder.getCurrentItem().getItemMeta().setSectionName(crfBuilder.getCurrentSection().getLabel());

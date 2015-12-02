@@ -494,8 +494,7 @@ public class DefineStudyEventServlet extends Controller {
 				// only find active versions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
-						getItemSDVService().hasItemsToSDV(cb.getId()));
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions());
 				crfArray.add(cb);
 				if (crfNameToEdcMap.get(cb.getName()) == null) {
 					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());
@@ -525,8 +524,7 @@ public class DefineStudyEventServlet extends Controller {
 
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions(),
-						getItemSDVService().hasItemsToSDV(cb.getId()));
+				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions());
 				crfArray.add(cb);
 				if (crfNameToEdcMap.get(cb.getName()) == null) {
 					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());

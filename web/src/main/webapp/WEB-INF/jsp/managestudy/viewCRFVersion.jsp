@@ -47,10 +47,6 @@
 	</span>
 </h1>
 
-<form action="ViewCRFVersion" method="post">
-<input type="hidden" id="formWithStateFlag" value=""/>
-<input type="hidden" name="crfId" value="${crf.id}"/>
-<input type="hidden" name="crfVersionId" value="${version.id}"/>
 <c:set var="totalItems" value="0"/>
 <c:set var="itemsCounter" value="0"/>
 <c:forEach var="sectionBean" items="${sections}" >
@@ -249,9 +245,6 @@
 			<td class="table_header_row">
 				<fmt:message key="required" bundle="${resword}" />
 			</td>
-			<td class="table_header_row">
-				<fmt:message key="itemLevelSDVRequired" bundle="${resword}" />
-			</td>
 			<td class="table_header_row">Is shown?</td>
 		</tr>
 
@@ -373,14 +366,6 @@
 					</c:choose>
 				</td>
 
-				<td class="table_cell" style="white-space: nowrap;">
-					<input type="hidden" name="itemId_${itemsCounter}" value="${item.id}"/>
-					<input type="hidden" name="itemFormMetaId_${itemsCounter}" value="${item.itemMeta.id}"/>
-					<c:if test="${hasSCD}"><input type="hidden" name="sdvRequired_${itemsCounter}" value="0"/></c:if>
-					<input type="radio" name="sdvRequired_${itemsCounter}" value="1" ${item.itemMeta.sdvRequired && !hasSCD ? "checked" : ""} ${hasSCD ? "disabled" : ""}><fmt:message key="yes" bundle="${resword}" />
-					<input type="radio" name="sdvRequired_${itemsCounter}" value="0" ${!item.itemMeta.sdvRequired || hasSCD ? "checked" : ""} ${hasSCD ? "disabled" : ""}><fmt:message key="no" bundle="${resword}" />
-				</td>
-
 				<td class="table_cell">
 					<c:choose>
 						<c:when test="${item.itemMeta.showItem==true}">
@@ -405,14 +390,8 @@
 		<td>
 			<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 		</td>
-		<td>
-			<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium medium_submit">
-		</td>
 	</tr>
 </table>
-
-<input type="hidden" name="totalItems" value="${totalItems}"/>
-</form>
 
 <c:choose>
 	<c:when test="${userBean.sysAdmin && module=='admin'}">

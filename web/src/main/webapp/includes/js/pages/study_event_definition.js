@@ -17,6 +17,7 @@ var typeChangeFunction = function() {
         $('input[name="emailUser"]').attr('value','').attr('readonly','');
     }
 };
+
 $(document).ready(function() {
     $(".showHide").css('display', 'none');
     $('select[name="type"]').change(typeChangeFunction);
@@ -44,3 +45,52 @@ $(document).ready(function() {
     typeChangeFunction();
     captureFirstFormState();
 });
+
+
+function updateEventDefinitionAddCRF(){
+	$("input[name=action]").attr("value","addCrfs");
+	$("#updateEventDefinition").submit();
+}
+
+function checkItemLevelSDV(element) {
+	var $configureButton = $(element).parent().find("[class^=bt_edit_edc_sdv_]");
+	if ($configureButton.attr("class")) {
+		if ($(element).val() == "2") {
+			$configureButton.css("display", "inline-block");
+		} else {
+			$configureButton.css("display", "none");
+		}
+	}
+}
+
+function configureItemLevelSDV(edcId) {
+	$("input[name=action]").val("configureItemLevelSDV");
+	$("input[name=edcToConfigure]").val(edcId);
+	$("#updateEventDefinition").submit();
+}
+
+function checkItemLevelSDVChanges(message, button) {
+	var errorsNotExists = validateCustomFields({expectedValues: ['email'], selectors: ['.email_to_check_field'], returnTrue: 'true'});
+
+	if (errorsNotExists) {
+		var itemLevelSDVChanged = false;
+		var $sdvSelects = $("select[name^=sdvOption]");
+
+		$sdvSelects.each(function() {
+			var $select = $(this);
+			var initialValue = $select.attr("initial-value");
+			var value = $select.val();
+			if (initialValue == "2" && value != initialValue) {
+				itemLevelSDVChanged = true;
+			}
+		});
+
+		if (itemLevelSDVChanged) {
+			return confirmSubmit({ message: message, height: 180, width: 500, submit: button });
+		} else {
+			return true;
+		}
+	} else {
+		return false;
+	}
+}

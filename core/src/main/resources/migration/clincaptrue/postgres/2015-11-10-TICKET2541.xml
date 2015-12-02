@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-11-10-TICKET2541-1" dbms="postgresql">
+		<comment>
+			Create procedure to copy item-level sdv
+			from item_form_metadata into edc_item_metadata
+		</comment>
+		<createProcedure>
+			CREATE OR REPLACE FUNCTION move_item_level_sdv_metadata() RETURNS integer AS
+			'DECLARE
+				eventDefCRF event_definition_crf;
+				crfVersion crf_version;
+				itemFormMetadata item_form_metadata;
+				sdvRequired varchar(1);
+			BEGIN
+				FOR eventDefCRF IN (SELECT * FROM event_definition_crf WHERE parent_id IS NULL) LOOP
+					FOR crfVersion IN (SELECT * FROM crf_version WHERE crf_id = eventDefCRF.crf_id) LOOP
+						FOR itemFormMetadata IN (SELECT * FROM item_form_metadata WHERE crf_version_id = crfVersion.crf_version_id) LOOP
+							IF (itemFormMetadata.sdv_required)
+								THEN sdvRequired := ''1'';
+								ELSE sdvRequired := ''0'';
+							END IF;
+								INSERT INTO edc_item_metadata (study_event_definition_id, event_definition_crf_id, crf_version_id, item_id, version, sdv_required)
+								VALUES (eventDefCRF.study_event_definition_id, eventDefCRF.event_definition_crf_id, crfVersion.crf_version_id, itemFormMetadata.item_id, 0, sdvRequired);
+						END LOOP;
+					END LOOP;
+				END LOOP;
+				RETURN 1;
+			END;'
+			LANGUAGE plpgsql;
+		</createProcedure>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-11-10-TICKET2541-2" dbms="postgresql">
+		<comment>
+			Execute and drop procedure move_item_level_sdv_metadata().
+		</comment>
+		<sql splitStatements="false">
+			SELECT move_item_level_sdv_metadata();
+			DROP FUNCTION move_item_level_sdv_metadata();
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

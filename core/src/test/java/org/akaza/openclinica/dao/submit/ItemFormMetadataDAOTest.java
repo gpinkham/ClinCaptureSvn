@@ -16,11 +16,6 @@ public class ItemFormMetadataDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatHasItemsToSDVReturnsCorrectValue() {
-		assertFalse(imfdao.hasItemsToSDV(1));
-	}
-
-	@Test
 	public void testThatFindAllCrfVersionItemMetadataReturnsCorrectNumberOfItems() {
 		assertEquals(27, imfdao.findAllCrfVersionItemMetadata(1).size());
 	}

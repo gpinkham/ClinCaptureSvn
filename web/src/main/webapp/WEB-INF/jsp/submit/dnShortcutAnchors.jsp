@@ -14,7 +14,7 @@
     <c:forEach items="${di.resolutionProposedDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
     <c:forEach items="${di.closedDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
     <c:forEach items="${di.annotationDn}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
-    <c:if test="${di.data ne null && di.metadata ne null && di.data.id > 0 && section.eventCRF.stage.doubleDE_Complete && di.metadata.sdvRequired && (userRole.studyAdministrator || userRole.monitor)}">
+    <c:if test="${di.data ne null && di.metadata ne null && di.data.id > 0 && section.eventCRF.stage.doubleDE_Complete && di.edcItemMetadata.sdvRequired() && (userRole.studyAdministrator || userRole.monitor)}">
         <c:forEach items="${di.itemToSDV}" var="value"><a id="${value}" rel="${itemId}" alt="${rowCount}"></a></c:forEach>
     </c:if>
 </div>

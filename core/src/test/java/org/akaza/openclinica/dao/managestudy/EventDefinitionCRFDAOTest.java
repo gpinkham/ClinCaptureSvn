@@ -24,11 +24,6 @@ import org.junit.Test;
 public class EventDefinitionCRFDAOTest extends DefaultAppContextTest {
 
 	@Test
-	public void testThatUpdateEDCThatHasItemsToSDVReturnsCorrectValue() {
-		assertTrue(eventDefinitionCRFDAO.updateEDCThatHasItemsToSDV(1, SourceDataVerification.AllREQUIRED));
-	}
-
-	@Test
 	public void testThatFindForSiteByEventCrfIdReturnsTheCorrectEventDefinitionCRFBean() {
 		assertEquals(2, eventDefinitionCRFDAO.findForSiteByEventCrfId(13).getId());
 	}

@@ -193,8 +193,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 						}
 					}
 					edcBean.setSelectedVersionIdList(idList);
-					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
-							getItemSDVService().hasItemsToSDV(crf.getId()));
+					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions());
 					defCrfs.add(edcBean);
 				}
 			}

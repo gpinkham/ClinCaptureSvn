@@ -124,16 +124,6 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatUnsdvEventCRFsWhenCRFMetadataWasChangedReturnsTrue() {
-		assertTrue(eventCRFDAO.unsdvEventCRFsWhenCRFMetadataWasChanged(1, ub.getId()));
-	}
-
-	@Test
-	public void sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV() {
-		assertTrue(eventCRFDAO.sdvEventCRFsWhenCRFMetadataWasChangedAndAllItemsAreSDV(1, ub.getId(), true));
-	}
-
-	@Test
 	public void testThatUpdateStatusMethodWorksFine() throws OpenClinicaException {
 		EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(2);
 		assertEquals(eventCRFBean.getStatus(), Status.AVAILABLE);

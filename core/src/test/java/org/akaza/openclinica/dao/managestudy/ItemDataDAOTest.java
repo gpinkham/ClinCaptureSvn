@@ -417,12 +417,7 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetCountOfItemsToSDVReturnsTrue() {
-		assertEquals(itemDataDAO.getCountOfItemsToSDV(1), 0);
-	}
-
-	@Test
-	public void testThatGetListOfItemsToSDVReturnsCorrectSize() {
-		assertEquals(itemDataDAO.getListOfItemsToSDV(1).size(), 0);
+		assertEquals(2, itemDataDAO.getCountOfItemsToSDV(1));
 	}
 
 	@Test
@@ -436,11 +431,6 @@ public class ItemDataDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatSDVCrfItemsReturnsTrue() {
 		assertTrue(itemDataDAO.sdvCrfItems(1, ub.getId(), true));
-	}
-
-	@Test
-	public void testThatUnsdvItemDataWhenCRFMetadataWasChangedReturnsTrue() {
-		assertTrue(itemDataDAO.unsdvItemDataWhenCRFMetadataWasChanged(1));
 	}
 
 	@Test

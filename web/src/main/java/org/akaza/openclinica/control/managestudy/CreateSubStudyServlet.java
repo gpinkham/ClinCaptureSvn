@@ -545,7 +545,6 @@ public class CreateSubStudyServlet extends Controller {
 					String deQuality = fp.getString("deQuality" + order);
 					String electronicSignature = fp.getString("electronicSignature" + order);
 					String hideCRF = fp.getString("hideCRF" + order);
-					int sdvId = fp.getInt("sdvOption" + order);
 					String emailCRFTo = fp.getString("mailTo" + order);
 					String emailOnStep = fp.getString("emailOnStep" + order);
 					ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
@@ -594,9 +593,6 @@ public class CreateSubStudyServlet extends Controller {
 						}
 						edcBean.setSelectedVersionIdList(idList);
 						edcBean.setSelectedVersionIds(selectedVersionIds);
-					}
-					if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
-						edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 					}
 					if (!emailOnStep.equals(edcBean.getEmailStep())) {
 						edcBean.setEmailStep(emailOnStep);
@@ -687,8 +683,7 @@ public class CreateSubStudyServlet extends Controller {
 						}
 					}
 					edcBean.setSelectedVersionIdList(idList);
-					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions(),
-							getItemSDVService().hasItemsToSDV(crf.getId()));
+					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions());
 					defCrfs.add(edcBean);
 				}
 			}

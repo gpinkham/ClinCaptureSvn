@@ -110,6 +110,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			resetSequence(session, "id", "widgets_layout");
 			resetSequence(session, "section_id", "section");
 			resetSequence(session, "subject_id", "subject");
+			resetSequence(session, "id", "edc_item_metadata");
 			resetSequence(session, "id", "scd_item_metadata");
 			resetSequence(session, "id", "coded_item_element");
 			resetSequence(session, "item_data_id", "item_data");

@@ -22,7 +22,6 @@ import java.util.Map;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.exception.OpenClinicaException;
 
 import com.clinovo.util.CrfShortcutsAnalyzer;
 
@@ -46,23 +45,6 @@ public interface ItemSDVService {
 	String ITEM_DATA_ITEMS = "itemDataItems";
 	String TOTAL_ITEMS_TO_SDV = "totalItemsToSDV";
 	String TOTAL_SECTION_ITEMS_TO_SDV = "totalSectionItemsToSDV";
-
-	/**
-	 * Method processes the changed crf version metadata.
-	 *
-	 * @param currentStudy
-	 *            current study
-	 * @param userAccountBean
-	 *            updater
-	 * @param crfVersionId
-	 *            crf version id
-	 * @param metadata
-	 *            Map<ItemFormMetadataBean.id, ItemFormMetadataBean.sdvRequired>
-	 * @throws Exception
-	 *             an Exception
-	 */
-	void processChangedCrfVersionMetadata(StudyBean currentStudy, UserAccountBean userAccountBean, int crfVersionId,
-			Map<Integer, Boolean> metadata) throws Exception;
 
 	/**
 	 * Method that performs item sdv.
@@ -141,27 +123,6 @@ public interface ItemSDVService {
 	 * @return int count of items to SDV
 	 */
 	int getCountOfItemsToSDV(int eventCrfId);
-
-	/**
-	 * Method checks that crf has items to SDV.
-	 *
-	 * @param crfId
-	 *            crf id
-	 * @return boolean flag that equals to true if crf has items to SDV, otherwise it's false
-	 */
-	boolean hasItemsToSDV(int crfId);
-
-	/**
-	 * Method copies settings from previous crf version.
-	 * 
-	 * @param previousCrfVersionId
-	 *            int
-	 * @param newCrfVersionId
-	 *            int
-	 * @throws OpenClinicaException
-	 *             the OpenClinicaException
-	 */
-	void copySettingsFromPreviousVersion(int previousCrfVersionId, int newCrfVersionId) throws OpenClinicaException;
 
 	/**
 	 * Method checks that list of the DisplayItemBeans has SDV Required items.

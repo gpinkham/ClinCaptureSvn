@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.clinovo.model.EDCItemMetadata;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -37,12 +38,12 @@ public class ItemSDVServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetCountOfItemsToSDVReturnsTrue() {
-		assertEquals(itemSDVService.getCountOfItemsToSDV(1), 0);
+		assertEquals(2, itemSDVService.getCountOfItemsToSDV(1));
 	}
 
 	@Test
 	public void testThatGetListOfItemsToSDVReturnsCorrectSize() {
-		assertEquals(itemSDVService.getListOfItemsToSDV(1).size(), 0);
+		assertEquals(itemSDVService.getListOfItemsToSDV(1).size(), 2);
 	}
 
 	@Test
@@ -65,40 +66,17 @@ public class ItemSDVServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatHasItemsToSDVReturnsFalse() throws Exception {
-		assertFalse(itemSDVService.hasItemsToSDV(1));
-	}
-
-	@Test
 	public void testThatResetSDVForItemsDoesNotThrowAnException() throws Exception {
 		itemSDVService.resetSDVForItems(new ArrayList<DisplayItemBean>(), ub);
-	}
-
-	@Test
-	public void testThatProcessChangedCrfVersionMetadataDoesNotThrowAnException() throws Exception {
-		itemSDVService.processChangedCrfVersionMetadata(study, ub, 1, metadata);
-	}
-
-	@Test
-	public void testThatCopySettingsFromPreviousVersionMovesItemLevelSDVSettingsCorrectly() throws Exception {
-		ItemFormMetadataBean imfBean = imfdao.findByItemIdAndCRFVersionId(25, 1);
-		imfBean.setSdvRequired(true);
-		imfdao.update(imfBean);
-		imfBean = imfdao.findByItemIdAndCRFVersionId(33, 2);
-		imfBean.setSdvRequired(false);
-		imfdao.update(imfBean);
-		itemSDVService.copySettingsFromPreviousVersion(1, 2);
-		imfBean = imfdao.findByItemIdAndCRFVersionId(33, 2);
-		assertTrue(imfBean.isSdvRequired());
 	}
 
 	@Test
 	public void testThatHasChangedSDVRequiredItemsReturnsCorrectValue() {
 		List<DisplayItemBean> list = new ArrayList<DisplayItemBean>();
 		DisplayItemBean displayItemBean = new DisplayItemBean();
-		ItemFormMetadataBean itemFormMetadataBean = new ItemFormMetadataBean();
-		itemFormMetadataBean.setSdvRequired(true);
-		displayItemBean.setMetadata(itemFormMetadataBean);
+		EDCItemMetadata edcItemMetadata = new EDCItemMetadata();
+		edcItemMetadata.setSdvRequired("1");
+		displayItemBean.setEdcItemMetadata(edcItemMetadata);
 		list.add(displayItemBean);
 		assertTrue(itemSDVService.hasChangedSDVRequiredItems(list));
 	}

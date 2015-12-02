@@ -128,16 +128,11 @@ public enum SourceDataVerification implements CodedEnum {
 	 * 
 	 * @param sdvOptions
 	 *            ArrayList<SourceDataVerification>
-	 * @param hasItemsToSDV
-	 *            boolean
 	 */
-	public static void fillSDVStatuses(ArrayList<SourceDataVerification> sdvOptions, boolean hasItemsToSDV) {
+	public static void fillSDVStatuses(ArrayList<SourceDataVerification> sdvOptions) {
 		sdvOptions.clear();
-		if (!hasItemsToSDV) {
-			sdvOptions.add(SourceDataVerification.AllREQUIRED);
-			sdvOptions.add(SourceDataVerification.NOTREQUIRED);
-		} else {
-			sdvOptions.add(SourceDataVerification.PARTIALREQUIRED);
-		}
+		sdvOptions.add(SourceDataVerification.AllREQUIRED);
+		sdvOptions.add(SourceDataVerification.NOTREQUIRED);
+		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED);
 	}
 }

@@ -1104,4 +1104,10 @@
 	<item_render_metadata id="1" crf_version_id="1" item_id="1" width="0" left_item_text_width="50" version="0"/>
 	<item_render_metadata id="2" crf_version_id="1" item_id="2" width="350" left_item_text_width="50" version="0"/>
 	<item_render_metadata id="3" crf_version_id="1" item_id="3" width="350" left_item_text_width="0" version="0"/>
+
+	<edc_item_metadata id="1" version="0" event_definition_crf_id="1" item_id="1" crf_version_id="1" sdv_required="1" study_event_definition_id="1"/>
+	<edc_item_metadata id="2" version="0" event_definition_crf_id="1" item_id="2" crf_version_id="1" sdv_required="1" study_event_definition_id="1"/>
+	<edc_item_metadata id="3" version="0" event_definition_crf_id="1" item_id="3" crf_version_id="1" sdv_required="0" study_event_definition_id="1"/>
+	<edc_item_metadata id="4" version="0" event_definition_crf_id="1" item_id="4" crf_version_id="1" sdv_required="0" study_event_definition_id="1"/>
+	<edc_item_metadata id="5" version="0" event_definition_crf_id="2" item_id="3" crf_version_id="2" sdv_required="0" study_event_definition_id="1"/>
 </dataset>
