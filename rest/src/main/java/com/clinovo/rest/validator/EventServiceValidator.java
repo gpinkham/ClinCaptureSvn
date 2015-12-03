@@ -114,7 +114,10 @@ public final class EventServiceValidator {
 		Locale locale = LocaleResolver.getLocale();
 		if (!(studyEventDefinitionBean.getId() > 0)) {
 			throw new RestException(messageSource.getMessage("rest.event.isNotFound", new Object[]{id}, locale));
-		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
+		} else
+			if ((!currentStudy.isSite() && studyEventDefinitionBean.getStudyId() != currentStudy.getId())
+					|| (currentStudy.isSite()
+							&& studyEventDefinitionBean.getStudyId() != currentStudy.getParentStudyId())) {
 			throw new RestException(
 					messageSource.getMessage("rest.event.studyEventDefinitionDoesNotBelongToCurrentScope",
 							new Object[]{id, currentStudy.getId()}, locale));

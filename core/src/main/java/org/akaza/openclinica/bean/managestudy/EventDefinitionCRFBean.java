@@ -45,8 +45,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonPropertyOrder({"id", "eventname", "crfname", "status", "defaultversion", "hidecrf", "required", "parentid",
-		"passwordrequired", "acceptnewcrfversions", "evaluatedcrf", "doubledataentry", "sourcedataverification",
-		"tabbingmode", "ordinal", "studyid", "emailwhen", "email"})
+		"availableversionids", "passwordrequired", "acceptnewcrfversions", "evaluatedcrf", "doubledataentry",
+		"sourcedataverification", "tabbingmode", "ordinal", "studyid", "emailwhen", "email"})
 @SuppressWarnings({"serial", "rawtypes", "unchecked"})
 public class EventDefinitionCRFBean extends AuditableEntityBean implements Comparable {
 
@@ -142,8 +142,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private int defaultVersionId = 0;
 
-	@JsonIgnore
-	@XmlTransient
+	@JsonProperty("availableversionids")
+	@XmlElement(name = "AvailableVersionIds", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String selectedVersionIds = "";
 
 	@JsonIgnore

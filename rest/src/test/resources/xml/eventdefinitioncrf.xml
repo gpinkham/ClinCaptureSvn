@@ -11,7 +11,6 @@
             <Required>true</Required>
             <PasswordRequired>false</PasswordRequired>
             <AcceptNewCrfVersions>false</AcceptNewCrfVersions>
-            <EvaluatedCrf>false</EvaluatedCrf>
             <DoubleDataEntry>false</DoubleDataEntry>
             <SourceDataVerification>specificItems</SourceDataVerification>
             <TabbingMode>leftToRight</TabbingMode>
@@ -20,6 +19,7 @@
             <EmailWhen />
             <Email />
             <ParentId>0</ParentId>
+            <AvailableVersionIds>Var. 1, Ver. 2</AvailableVersionIds>
         </EventDefinitionCrf>
     </RestData>
 </ODM>

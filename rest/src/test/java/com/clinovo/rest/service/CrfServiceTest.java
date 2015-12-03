@@ -166,23 +166,7 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatItIsImpossibleToCallImportCrfVServiceOnSiteLevel() throws Exception {
-		createNewSite(studyBean.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsondata", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsImpossibleToCallImportCrfVersionServiceOnSiteLevel() throws Exception {
-		createNewSite(studyBean.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsondata", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatStudyMonitorIsNotAbleToCallCrftAPI() throws Exception {
+	public void testThatStudyMonitorIsNotAbleToCallCRFAPI() throws Exception {
 		ResultMatcher expectStatus = status().isForbidden();
 		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_MONITOR, newUser.getPasswd(), studyBean.getName());
@@ -193,7 +177,7 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatStudyEvaluatorIsNotAbleToCallCrftAPI() throws Exception {
+	public void testThatStudyEvaluatorIsNotAbleToCallCRFAPI() throws Exception {
 		ResultMatcher expectStatus = status().isForbidden();
 		createNewUser(UserType.SYSADMIN, Role.STUDY_EVALUATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_EVALUATOR, newUser.getPasswd(), studyBean.getName());
@@ -204,7 +188,7 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatStudyCoderIsNotAbleToCallCrftAPI() throws Exception {
+	public void testThatStudyCoderIsNotAbleToCallCRFAPI() throws Exception {
 		ResultMatcher expectStatus = status().isForbidden();
 		createNewUser(UserType.SYSADMIN, Role.STUDY_CODER);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_CODER, newUser.getPasswd(), studyBean.getName());
@@ -215,7 +199,7 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatStudyAdministratorWithoutAdministrativePrivilegesIsAbleToCallCrftAPI() throws Exception {
+	public void testThatStudyAdministratorWithoutAdministrativePrivilegesIsAbleToCallCRFAPI() throws Exception {
 		ResultMatcher expectStatus = status().isOk();
 		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.USER, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyBean.getName());
@@ -229,7 +213,7 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallCrftAPI() throws Exception {
+	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallCRFAPI() throws Exception {
 		ResultMatcher expectStatus = status().isOk();
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyBean.getName());

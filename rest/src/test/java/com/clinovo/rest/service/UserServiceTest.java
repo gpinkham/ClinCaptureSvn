@@ -50,110 +50,6 @@ public class UserServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatItIsNotPossibleToAssignStudyCoderToSite() throws Exception {
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_CODER.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignStudyEvaluatorToSite() throws Exception {
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_EVALUATOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignStudyMonitorToSite() throws Exception {
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignStudyDirectorToSite() throws Exception {
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_DIRECTOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignStudyAdminToSite() throws Exception {
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignSiteMonitorToStudy() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.SITE_MONITOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignCRCToStudy() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true")
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatItIsNotPossibleToAssignInvestigatorToStudy() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", "new_user_".concat(Long.toString(timestamp)))
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-				.param("displaypassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
 	public void testThatStudyAdministratorWithoutAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
 		ResultMatcher expectStatus = status().isForbidden();
 		createNewStudy();
@@ -332,148 +228,6 @@ public class UserServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatCreatedCrcWithoutAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
-		ResultMatcher expectStatus = status().isForbidden();
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		createNewUser(UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR);
-		login(newUser.getName(), UserType.USER, Role.CLINICAL_RESEARCH_COORDINATOR, newUser.getPasswd(),
-				newSite.getName());
-		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(
-				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
-						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
-						.param("phone", newUser.getPhone()).param("company", newUser.getInstitutionalAffiliation())
-						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-						.param("displaypassword", "true")
-						.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-						.secure(true).session(session))
-				.andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-	}
-
-	@Test
-	public void testThatCreatedCrcWithAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
-		ResultMatcher expectStatus = status().isForbidden();
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		createNewUser(UserType.SYSADMIN, Role.CLINICAL_RESEARCH_COORDINATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.CLINICAL_RESEARCH_COORDINATOR, newUser.getPasswd(),
-				newSite.getName());
-		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(
-				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
-						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
-						.param("phone", newUser.getPhone()).param("company", newUser.getInstitutionalAffiliation())
-						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-						.param("displaypassword", "true")
-						.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-						.secure(true).session(session))
-				.andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-	}
-
-	@Test
-	public void testThatCreatedInvestigatorWithoutAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
-		ResultMatcher expectStatus = status().isForbidden();
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		createNewUser(UserType.USER, Role.INVESTIGATOR);
-		login(newUser.getName(), UserType.USER, Role.INVESTIGATOR, newUser.getPasswd(), newSite.getName());
-		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(
-				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
-						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
-						.param("phone", newUser.getPhone()).param("company", newUser.getInstitutionalAffiliation())
-						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-						.param("displaypassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
-						.accept(mediaType).secure(true).session(session))
-				.andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-	}
-
-	@Test
-	public void testThatCreatedInvestigatorWithAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
-		ResultMatcher expectStatus = status().isForbidden();
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		createNewUser(UserType.SYSADMIN, Role.INVESTIGATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.INVESTIGATOR, newUser.getPasswd(), newSite.getName());
-		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(
-				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
-						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
-						.param("phone", newUser.getPhone()).param("company", newUser.getInstitutionalAffiliation())
-						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-						.param("displaypassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
-						.accept(mediaType).secure(true).session(session))
-				.andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-	}
-
-	@Test
-	public void testThatCreatedSiteMonitorWithoutAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
-		ResultMatcher expectStatus = status().isForbidden();
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		createNewUser(UserType.USER, Role.SITE_MONITOR);
-		login(newUser.getName(), UserType.USER, Role.SITE_MONITOR, newUser.getPasswd(), newSite.getName());
-		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(
-				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
-						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
-						.param("phone", newUser.getPhone()).param("company", newUser.getInstitutionalAffiliation())
-						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-						.param("displaypassword", "true").param("role", Integer.toString(Role.SITE_MONITOR.getId()))
-						.accept(mediaType).secure(true).session(session))
-				.andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-	}
-
-	@Test
-	public void testThatCreatedSiteMonitorWithAdministrativePrivilegesIsNotAbleToCallUserAPI() throws Exception {
-		ResultMatcher expectStatus = status().isForbidden();
-		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
-		createNewUser(UserType.SYSADMIN, Role.SITE_MONITOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.SITE_MONITOR, newUser.getPasswd(), newSite.getName());
-		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(
-				post(API_USER_CREATE).param("username", additionalUserName).param("firstname", newUser.getFirstName())
-						.param("lastname", newUser.getLastName()).param("email", newUser.getEmail())
-						.param("phone", newUser.getPhone()).param("company", newUser.getInstitutionalAffiliation())
-						.param("usertype", Integer.toString(UserType.USER.getId())).param("allowsoap", "true")
-						.param("displaypassword", "true").param("role", Integer.toString(Role.SITE_MONITOR.getId()))
-						.accept(mediaType).secure(true).session(session))
-				.andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("username", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-	}
-
-	@Test
 	public void testThatCreateUserRequestReturnsCode500IfUsernameHasBeenTakenAlready() throws Exception {
 		createNewStudy();
 		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
@@ -549,44 +303,6 @@ public class UserServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatNewlyCreatedStudyAdministratorWithAdministrativePrivilegesIsAbleToLoginOnSiteAndHeIsAbleToCreateASiteUser()
-			throws Exception {
-		mailSenderHost = mailSender.getHost();
-		mailSender.setHost("");
-		createNewSite(studyBean.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newSite.getName());
-		String additionalUserName = newUser.getName().concat("_").concat(Long.toString(new Date().getTime()));
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "new_test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId()))
-				.param("role", Integer.toString(Role.INVESTIGATOR.getId())).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void testThatNewlyCreatedStudyMonitorWithAdministrativePrivilegesIsAbleToLoginOnSiteAndHeIsAbleToCreateASiteUser()
-			throws Exception {
-		mailSenderHost = mailSender.getHost();
-		mailSender.setHost("");
-		createNewSite(studyBean.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
-		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_MONITOR, newUser.getPasswd(), newSite.getName());
-		String additionalUserName = newUser.getName().concat("_").concat(Long.toString(new Date().getTime()));
-		this.mockMvc.perform(post(API_USER_CREATE).param("username", additionalUserName)
-				.param("firstname", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastname", "lastname_".concat(Long.toString(timestamp))).param("email", "new_test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("usertype", Integer.toString(UserType.USER.getId()))
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isOk());
-	}
-
-	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
 		this.mockMvc.perform(post(API_USER_REMOVE).secure(true).session(session)).andExpect(status().isBadRequest());
 	}
@@ -637,10 +353,9 @@ public class UserServiceTest extends BaseServiceTest {
 		String additionalUserName = newUser.getName();
 		String additionalUserPassword = newUser.getPasswd();
 		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		timestamp = new Date().getTime() + 1;
-		createNewUser(UserType.USER, Role.INVESTIGATOR);
+		createNewUser(UserType.USER, Role.STUDY_MONITOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword, studyName);
 		this.mockMvc.perform(post(API_USER_REMOVE).param("username", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
@@ -707,10 +422,9 @@ public class UserServiceTest extends BaseServiceTest {
 		String additionalUserName = newUser.getName();
 		String additionalUserPassword = newUser.getPasswd();
 		createNewStudy();
-		createNewSite(newStudy.getId());
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newSite.getName());
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
 		timestamp = new Date().getTime() + 1;
-		createNewUser(UserType.USER, Role.INVESTIGATOR);
+		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword, studyName);
 		this.mockMvc.perform(post(API_USER_RESTORE).param("username", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());

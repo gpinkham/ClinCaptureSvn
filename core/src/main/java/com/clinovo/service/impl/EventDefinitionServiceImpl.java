@@ -1,20 +1,20 @@
 package com.clinovo.service.impl;
 
-import com.clinovo.model.EDCItemMetadata;
-import com.clinovo.service.EventCRFService;
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.EventDefinitionService;
-import com.clinovo.service.StudyEventService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -23,13 +23,14 @@ import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.service.EventCRFService;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.EventDefinitionService;
+import com.clinovo.service.StudyEventService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * EventDefinitionServiceImpl.
@@ -95,17 +96,17 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createStudyEventDefinition(StudyBean studyBean, String emailUser,
-			StudyEventDefinitionBean studyEventDefinitionBean) {
+	public void createStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean owner,
+			StudyBean studyBean) {
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		ArrayList defs = studyEventDefinitionDao.findAllByStudy(studyBean);
 		studyEventDefinitionBean.setOrdinal(defs == null || defs.isEmpty()
 				? 1
 				: ((StudyEventDefinitionBean) defs.get(defs.size() - 1)).getOrdinal() + 1);
-		int userId = getUserAccountDAO().findByUserName(emailUser).getId();
-		studyEventDefinitionBean.setUserEmailId(userId != 0 ? userId : 1);
+		studyEventDefinitionBean.setOwner(owner);
 		studyEventDefinitionBean.setCreatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
+		studyEventDefinitionBean.setStudyId(studyBean.getId());
 		studyEventDefinitionDao.create(studyEventDefinitionBean);
 	}
 
@@ -131,7 +132,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	public void updateAllEventDefinitionCRFs(StudyBean studyBean, UserAccountBean updater,
 			StudyEventDefinitionBean studyEventDefinitionBean, List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate,
 			List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate, List<EventDefinitionCRFBean> oldEDCs,
-			Map<Integer, SignStateRestorer> signStateRestorerMap, HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap) throws Exception {
+			Map<Integer, SignStateRestorer> signStateRestorerMap,
+			HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap) throws Exception {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
 		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCRFsToUpdate) {
@@ -161,7 +163,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefinitionCRFsToUpdate, parentsMap,
 				oldEDCsMap, updater);
 		// Item Level SDV support
-		eventDefinitionCrfService.checkIfEventCRFSDVStatusWasUpdated(parentsMap, oldEDCsMap, edcItemMetadataMap, updater);
+		eventDefinitionCrfService.checkIfEventCRFSDVStatusWasUpdated(parentsMap, oldEDCsMap, edcItemMetadataMap,
+				updater);
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean, updater,
 				new DAOWrapper(dataSource), signStateRestorerMap);
 	}
@@ -170,8 +173,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 * {@inheritDoc}
 	 */
 	public void addEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, StudyBean studyBean,
-			UserAccountBean updater) {
-		eventDefinitionCRFBean.setOwner(updater);
+			UserAccountBean owner) {
+		eventDefinitionCRFBean.setOwner(owner);
 		eventDefinitionCRFBean.setCreatedDate(new Date());
 		eventDefinitionCRFBean.setStatus(Status.AVAILABLE);
 		getEventDefinitionCRFDAO().create(eventDefinitionCRFBean);
@@ -181,10 +184,21 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean) {
+	public void updateChildEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater) {
+		eventDefinitionCRFBean.setUpdater(updater);
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		new EventDefinitionCRFDAO(dataSource).update(eventDefinitionCRFBean);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater) {
 		Map<Integer, SignStateRestorer> signStateRestorerMap = prepareSignStateRestorer(studyEventDefinitionBean);
 		studyEventDefinitionBean.setUpdatedDate(new Date());
 		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
+		studyEventDefinitionBean.setUpdater(updater);
 		getStudyEventDefinitionDAO().update(studyEventDefinitionBean);
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean,
 				studyEventDefinitionBean.getUpdater(), new DAOWrapper(dataSource), signStateRestorerMap);
@@ -316,10 +330,6 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 
 	private StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
-	}
-
-	private UserAccountDAO getUserAccountDAO() {
-		return new UserAccountDAO(dataSource);
 	}
 
 	private StudyEventDAO getStudyEventDAO() {

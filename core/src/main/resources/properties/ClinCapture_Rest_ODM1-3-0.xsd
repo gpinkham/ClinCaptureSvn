@@ -133,6 +133,7 @@
     <xs:element name="StudyId" type="xs:int"/>
     <xs:element name="EmailWhen" type="xs:string"/>
     <xs:element name="ParentId" type="xs:int"/>
+    <xs:element name="AvailableVersionIds" type="xs:string"/>
 
     <xs:complexType name="eventDefinitionCRFBean">
         <xs:sequence>
@@ -154,6 +155,7 @@
             <xs:element ref="EmailWhen" minOccurs="0"/>
             <xs:element ref="Email" minOccurs="0"/>
             <xs:element ref="ParentId" minOccurs="0"/>
+            <xs:element ref="AvailableVersionIds" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

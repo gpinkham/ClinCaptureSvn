@@ -25,8 +25,6 @@ import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
-import com.clinovo.rest.annotation.RestScope;
-import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.security.PermissionChecker;
@@ -123,32 +121,6 @@ public class RequestParametersValidatorTest {
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "dataentryquality", values = "dde,evaluation", valueDescriptions = "dde -> Double Data Entry, evaluation -> CRF data evaluation")})
 	public void testThatRequestParametersValidatorThrowsRestExceptionIfParameterValueWesNotSpecifiedAndTheCanBeNotSpecifiedIsFalse()
-			throws Exception {
-		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
-	}
-
-	@Test(expected = RestException.class)
-	@RestScope(Scope.STUDY)
-	public void testThatRequestParametersValidatorDoesNotThrowRestExceptionIfRestScopeIsincorrect() throws Exception {
-		currentStudy.setId(10);
-		currentStudy.setParentStudyId(1);
-		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
-	}
-
-	@Test
-	@RestScope(Scope.SITE)
-	public void testThatRequestParametersValidatorDoesNotThrowRestExceptionIfRestScopeIsCorrectForSite()
-			throws Exception {
-		currentStudy.setParentStudyId(10);
-		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
-	}
-
-	@Test
-	@RestScope(Scope.STUDY)
-	public void testThatRequestParametersValidatorDoesNotThrowRestExceptionIfRestScopeIsCorrectForStudy()
 			throws Exception {
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
 		RequestParametersValidator.validate(request, dataSource, messageSource, handler);

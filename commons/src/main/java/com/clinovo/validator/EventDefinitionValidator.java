@@ -18,6 +18,7 @@ package com.clinovo.validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -36,10 +37,13 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.context.MessageSource;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.service.EDCItemMetadataService;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.RequestUtil;
 import com.clinovo.util.ValidatorHelper;
@@ -247,8 +251,8 @@ public final class EventDefinitionValidator {
 	}
 
 	private static HashMap validateEDC(MessageSource messageSource, int eventId, String versionName, String crfName,
-			String emailWhen, String email, StudyEventDefinitionBean studyEventDefinitionBean,
-			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+			int sdvCode, String emailWhen, String email, boolean hasSDVRequiredItems, CRFVersionBean crfVersionBean,
+			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) {
 		HashMap errors = new HashMap();
 		Locale locale = LocaleResolver.getLocale();
 
@@ -260,17 +264,30 @@ public final class EventDefinitionValidator {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound",
 					new Object[]{crfName, versionName}, locale));
-			errors.put("crfname", errorMessages);
+			errors.put("defaultversion", errorMessages);
 		} else if (!crfVersionBean.getStatus().equals(Status.AVAILABLE)) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable",
 					new Object[]{crfName, versionName}, locale));
-			errors.put("crfname", errorMessages);
-		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
+			errors.put("defaultversion", errorMessages);
+		} else
+			if ((!currentStudy.isSite() && studyEventDefinitionBean.getStudyId() != currentStudy.getId())
+					|| (currentStudy.isSite()
+							&& studyEventDefinitionBean.getStudyId() != currentStudy.getParentStudyId())) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
 					new Object[]{eventId, currentStudy.getId()}, locale));
 			errors.put("eventid", errorMessages);
+		} else if (!hasSDVRequiredItems && sdvCode == 2) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.crfDoesNotHaveSDVRequiredItemsButSDVCodeIs2",
+					new Object[]{crfVersionBean.getCrfId()}, locale));
+			errors.put("sourcedataverification", errorMessages);
+		} else if (hasSDVRequiredItems && sdvCode != 2) {
+			ArrayList errorMessages = new ArrayList();
+			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItemsButSDVCodeIsNot2",
+					new Object[]{crfVersionBean.getCrfId()}, locale));
+			errors.put("sourcedataverification", errorMessages);
 		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && email.trim().isEmpty()) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.provideEmailAddress", null, locale));
@@ -281,8 +298,8 @@ public final class EventDefinitionValidator {
 			errors.put("email", errorMessages);
 		} else if (!(emailWhen.equals("sign") || emailWhen.equals("complete")) && !email.isEmpty()) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(
-					messageSource.getMessage("rest.eventservice.editstudycrf.emailCanBeSpecifiedOnlyIf", null, locale));
+			errorMessages
+					.add(messageSource.getMessage("rest.eventservice.editEDC.emailCanBeSpecifiedOnlyIf", null, locale));
 			errors.put("email", errorMessages);
 		}
 
@@ -302,25 +319,28 @@ public final class EventDefinitionValidator {
 	 *            String
 	 * @param crfName
 	 *            String
+	 * @param sdvCode
+	 *            int
 	 * @param emailWhen
 	 *            String
 	 * @param email
 	 *            String
 	 * @param studyEventDefinitionBean
 	 *            StudyEventDefinitionBean
-	 * @param crfVersionBean
-	 *            CRFVersionBean
 	 * @param currentStudy
 	 *            StudyBean
 	 * @return HashMap
 	 */
-	public static HashMap validateEDCAdding(MessageSource messageSource, DataSource dataSource, int eventId,
-			String versionName, String crfName, String emailWhen, String email,
-			StudyEventDefinitionBean studyEventDefinitionBean,
-			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+	public static HashMap validateNewEDC(MessageSource messageSource, DataSource dataSource, int eventId,
+			String versionName, String crfName, int sdvCode, String emailWhen, String email,
+			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) {
 		Locale locale = LocaleResolver.getLocale();
-		HashMap errors = validateEDC(messageSource, eventId, versionName, crfName, emailWhen, email,
-				studyEventDefinitionBean, crfVersionBean, currentStudy);
+
+		CRFVersionBean crfVersionBean = (CRFVersionBean) new CRFVersionDAO(dataSource).findByFullName(versionName,
+				crfName);
+
+		HashMap errors = validateEDC(messageSource, eventId, versionName, crfName, sdvCode, emailWhen, email, false,
+				crfVersionBean, studyEventDefinitionBean, currentStudy);
 
 		EventDefinitionCRFBean existingEventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
 				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinitionBean.getId(),
@@ -341,35 +361,60 @@ public final class EventDefinitionValidator {
 	 *
 	 * @param messageSource
 	 *            MessageSource
+	 * @param dataSource
+	 *            DataSource
 	 * @param eventId
 	 *            int
 	 * @param studyEventDefinitionBean
 	 *            StudyEventDefinitionBean
 	 * @param eventDefinitionCRFBean
 	 *            EventDefinitionCRFBean
-	 * @param crfVersionBean
-	 *            CRFVersionBean
 	 * @param currentStudy
 	 *            StudyBean
+	 * @param edcItemMetadataService
+	 *            EDCItemMetadataService
 	 * @return HashMap
 	 */
-	public static HashMap validateStudyEDCEditing(MessageSource messageSource, int eventId,
+	public static HashMap validateStudyEDC(MessageSource messageSource, DataSource dataSource, int eventId,
 			StudyEventDefinitionBean studyEventDefinitionBean, EventDefinitionCRFBean eventDefinitionCRFBean,
-			CRFVersionBean crfVersionBean, StudyBean currentStudy) {
+			StudyBean currentStudy, EDCItemMetadataService edcItemMetadataService) {
 		Locale locale = LocaleResolver.getLocale();
-		HashMap errors = validateEDC(messageSource, eventId, eventDefinitionCRFBean.getDefaultVersionName(),
-				eventDefinitionCRFBean.getCrfName(), eventDefinitionCRFBean.getEmailStep(),
-				eventDefinitionCRFBean.getEmailTo(), studyEventDefinitionBean, crfVersionBean, currentStudy);
 
-		if (errors.isEmpty() && !eventDefinitionCRFBean.getStatus().isAvailable()) {
-			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage(
-					"rest.eventservice.editstudycrf.eventDefinitionCrfIsNotAvailable",
-					new Object[]{eventDefinitionCRFBean.getCrfName(), studyEventDefinitionBean.getName()}, locale));
-			errors.put("eventid", errorMessages);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) new CRFVersionDAO(dataSource)
+				.findByFullName(eventDefinitionCRFBean.getDefaultVersionName(), eventDefinitionCRFBean.getCrfName());
+
+		boolean hasSDVRequiredItems = false;
+		List<EDCItemMetadata> edcItemMetadataList = edcItemMetadataService
+				.findAllByEventDefinitionCRFAndVersion(eventDefinitionCRFBean, crfVersionBean.getId());
+		for (EDCItemMetadata edcItemMetadata : edcItemMetadataList) {
+			if (edcItemMetadata.sdvRequired()) {
+				hasSDVRequiredItems = true;
+				break;
+			}
+		}
+
+		HashMap errors = validateEDC(messageSource, eventId, eventDefinitionCRFBean.getDefaultVersionName(),
+				eventDefinitionCRFBean.getCrfName(), eventDefinitionCRFBean.getSourceDataVerification().getCode(),
+				eventDefinitionCRFBean.getEmailStep(), eventDefinitionCRFBean.getEmailTo(), hasSDVRequiredItems,
+				crfVersionBean, studyEventDefinitionBean, currentStudy);
+
+		if (errors.isEmpty()) {
+			if (!eventDefinitionCRFBean.getStatus().isAvailable()) {
+				ArrayList errorMessages = new ArrayList();
+				errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.eventDefinitionCrfIsNotAvailable",
+						new Object[]{eventDefinitionCRFBean.getCrfName(), studyEventDefinitionBean.getName()}, locale));
+				errors.put("eventid", errorMessages);
+			} else
+				if (eventDefinitionCRFBean.isEvaluatedCRF()
+						&& currentStudy.getStudyParameterConfig().getStudyEvaluator().equalsIgnoreCase("no")) {
+				ArrayList errorMessages = new ArrayList();
+				errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.crfEvaluationIsNotAvailableFor",
+						new Object[]{messageSource.getMessage(currentStudy.isSite() ? "site" : "study", null, locale)},
+						locale));
+				errors.put("dataentryquality", errorMessages);
+			}
 		}
 
 		return errors;
 	}
-
 }

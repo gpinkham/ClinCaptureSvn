@@ -29,29 +29,20 @@ public enum UserRole {
 
 	SYS_ADMIN(Role.SYSTEM_ADMINISTRATOR.getCode(), UserType.SYSADMIN.getCode()),
 
-	STUDY_ADMIN_ADMIN(Role.STUDY_ADMINISTRATOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_ADMIN_USER(
-			Role.STUDY_ADMINISTRATOR.getCode(), UserType.USER.getCode()),
+	STUDY_ADMIN_ADMIN(Role.STUDY_ADMINISTRATOR.getCode(),
+			UserType.SYSADMIN.getCode()), STUDY_ADMIN_USER(Role.STUDY_ADMINISTRATOR.getCode(), UserType.USER.getCode()),
 
-	STUDY_MONITOR_ADMIN(Role.STUDY_MONITOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_MONITOR_USER(
-			Role.STUDY_MONITOR.getCode(), UserType.USER.getCode()),
+	STUDY_MONITOR_ADMIN(Role.STUDY_MONITOR.getCode(),
+			UserType.SYSADMIN.getCode()), STUDY_MONITOR_USER(Role.STUDY_MONITOR.getCode(), UserType.USER.getCode()),
 
-	STUDY_CODER_ADMIN(Role.STUDY_CODER.getCode(), UserType.SYSADMIN.getCode()), STUDY_CODER_USER(Role.STUDY_CODER
-			.getCode(), UserType.USER.getCode()),
+	STUDY_CODER_ADMIN(Role.STUDY_CODER.getCode(),
+			UserType.SYSADMIN.getCode()), STUDY_CODER_USER(Role.STUDY_CODER.getCode(), UserType.USER.getCode()),
 
-	STUDY_EVALUATOR_ADMIN(Role.STUDY_EVALUATOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_EVALUATOR_USER(
-			Role.STUDY_EVALUATOR.getCode(), UserType.USER.getCode()),
+	STUDY_EVALUATOR_ADMIN(Role.STUDY_EVALUATOR.getCode(),
+			UserType.SYSADMIN.getCode()), STUDY_EVALUATOR_USER(Role.STUDY_EVALUATOR.getCode(), UserType.USER.getCode()),
 
-	STUDY_DIRECTOR_ADMIN(Role.STUDY_DIRECTOR.getCode(), UserType.SYSADMIN.getCode()), STUDY_DIRECTOR_USER(
-			Role.STUDY_DIRECTOR.getCode(), UserType.USER.getCode()),
-
-	SITE_MONITOR_ADMIN(Role.SITE_MONITOR.getCode(), UserType.SYSADMIN.getCode()), SITE_MONITOR_USER(Role.SITE_MONITOR
-			.getCode(), UserType.USER.getCode()),
-
-	CRC_ADMIN(Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), UserType.SYSADMIN.getCode()), CRC_USER(
-			Role.CLINICAL_RESEARCH_COORDINATOR.getCode(), UserType.USER.getCode()),
-
-	INVESTIGATOR_ADMIN(Role.INVESTIGATOR.getCode(), UserType.SYSADMIN.getCode()), INVESTIGATOR_USER(Role.INVESTIGATOR
-			.getCode(), UserType.USER.getCode());
+	STUDY_DIRECTOR_ADMIN(Role.STUDY_DIRECTOR.getCode(),
+			UserType.SYSADMIN.getCode()), STUDY_DIRECTOR_USER(Role.STUDY_DIRECTOR.getCode(), UserType.USER.getCode());
 
 	private String roleCode;
 	private String userTypeCode;

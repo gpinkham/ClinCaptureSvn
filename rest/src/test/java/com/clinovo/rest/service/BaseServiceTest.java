@@ -176,6 +176,49 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		assertTrue(newSite.getId() > 0);
 	}
 
+	protected EventDefinitionCRFBean createChildEDCForNewSite(int id, StudyBean site) throws Exception {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(id);
+		eventDefinitionCRFBean.setStudyId(site.getId());
+		eventDefinitionCRFBean.setParentId(eventDefinitionCRFBean.getId());
+		eventDefinitionCRFBean.setSelectedVersionIds(Integer.toString(eventDefinitionCRFBean.getDefaultVersionId()));
+		eventDefinitionCRFBean.setId(0);
+		eventDefinitionCRFDAO.create(eventDefinitionCRFBean);
+		assertTrue(eventDefinitionCRFBean.getId() > 0);
+		return eventDefinitionCRFBean;
+	}
+
+	protected EventDefinitionCRFBean setStatusForEDC(int id, Status status) {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(id);
+		eventDefinitionCRFBean.setUpdater(userBean);
+		eventDefinitionCRFBean.setStatus(status);
+		eventDefinitionCRFBean.setUpdatedDate(new Date());
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(id);
+		assertTrue(eventDefinitionCRFBean.getStatus().equals(status));
+		return eventDefinitionCRFBean;
+	}
+
+	protected StudyEventDefinitionBean setStatusForSED(int id, Status status) {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(id);
+		studyEventDefinitionBean.setStatus(status);
+		studyEventDefinitionBean.setUpdater(userBean);
+		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(id);
+		assertEquals(studyEventDefinitionBean.getStatus(), status);
+		return studyEventDefinitionBean;
+	}
+
+	protected CRFVersionBean setStatusForCrfVersion(int id, Status status) {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(id);
+		crfVersionBean.setUpdater(userBean);
+		crfVersionBean.setStatus(status);
+		crfVersionDao.update(crfVersionBean);
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(id);
+		assertTrue(crfVersionBean.getStatus().equals(status));
+		return crfVersionBean;
+	}
+
 	protected void createNewUser(UserType userType, Role role) throws Exception {
 		String userName = "userName_".concat(Long.toString(timestamp));
 		String firstName = "firstName_".concat(Long.toString(timestamp));

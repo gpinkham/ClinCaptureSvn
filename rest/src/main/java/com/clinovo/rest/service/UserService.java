@@ -43,6 +43,7 @@ import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.service.base.BaseService;
 import com.clinovo.rest.util.ValidatorUtil;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.validator.UserValidator;

@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +37,7 @@ import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
-import com.clinovo.rest.annotation.RestScope;
-import com.clinovo.rest.enums.Scope;
 import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
 
 /**
@@ -62,36 +58,6 @@ public final class RequestParametersValidator {
 	public static final String ACCEPT = "Accept";
 
 	private RequestParametersValidator() {
-	}
-
-	/**
-	 * Method that validates RestScope annotation.
-	 *
-	 * @param request
-	 *            HttpServletRequest
-	 * @param dataSource
-	 *            DataSource
-	 * @param messageSource
-	 *            MessageSource
-	 * @param handler
-	 *            HandlerMethod
-	 * @throws RestException
-	 *             the RestException
-	 */
-	public static void validateRestScope(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
-			HandlerMethod handler) throws RestException {
-		Annotation[] annotationArray = handler.getMethod().getAnnotations();
-		if (annotationArray != null) {
-			for (Annotation annotation : annotationArray) {
-				if (annotation instanceof RestScope && UserDetails.getCurrentUserDetails() != null) {
-					StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-					if ((((RestScope) annotation).value() == Scope.STUDY && studyBean.getParentStudyId() > 0)
-							|| (((RestScope) annotation).value() == Scope.SITE && studyBean.getParentStudyId() == 0)) {
-						throw new RestException(messageSource, "rest.wrongScope");
-					}
-				}
-			}
-		}
 	}
 
 	/**
@@ -231,7 +197,6 @@ public final class RequestParametersValidator {
 		if (ignoreDefaultValues && atLeastOneNotRequiredShouldBeProvided && countOfProvidedNotRequiredParameters == 0) {
 			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
-		validateRestScope(request, dataSource, messageSource, handler);
 		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
 	}
 }

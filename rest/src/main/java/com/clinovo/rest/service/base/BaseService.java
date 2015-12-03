@@ -13,35 +13,25 @@
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
 
-package com.clinovo.rest.service;
+package com.clinovo.rest.service.base;
 
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import com.clinovo.model.EDCItemMetadata;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.json.JSONObject;
 import org.jvnet.ws.wadl.Resource;
 import org.jvnet.ws.wadl.Resources;
@@ -54,10 +44,6 @@ import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.util.ValidatorUtil;
-import com.clinovo.rest.validator.EventServiceValidator;
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.EventDefinitionService;
-import com.clinovo.util.SignStateRestorer;
 
 /**
  * BaseService.
@@ -72,12 +58,6 @@ public abstract class BaseService {
 
 	@Autowired
 	private CrfBuilderFactory crfBuilderFactory;
-
-	@Autowired
-	private EventDefinitionService eventDefinitionService;
-
-	@Autowired
-	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	@Autowired
 	private MessageSource messageSource;
@@ -193,66 +173,5 @@ public abstract class BaseService {
 				userAccountBean.hasUserType(UserType.SYSADMIN) ? UserType.SYSADMIN.getCode() : UserType.USER.getCode());
 		userAccountBean.setPasswd("");
 		return userAccountBean;
-	}
-
-	protected void updateEventDefinitionCRFForStudy(StudyEventDefinitionBean studyEventDefinitionBean,
-			EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-
-		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionService
-				.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
-		List<EventDefinitionCRFBean> eventDefinitionCRFs = eventDefinitionService
-				.getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
-		Map<Integer, SignStateRestorer> signStateRestorerMap = eventDefinitionService
-				.prepareSignStateRestorer(studyEventDefinitionBean);
-		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs);
-
-		for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
-			if (edc.getId() == eventDefinitionCRFBean.getId()) {
-				eventDefinitionCRFs.set(eventDefinitionCRFs.indexOf(edc), eventDefinitionCRFBean);
-			}
-		}
-
-		HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap = new HashMap<Integer, ArrayList<EDCItemMetadata>>();
-		eventDefinitionService.updateAllEventDefinitionCRFs(currentStudy, updater, studyEventDefinitionBean,
-				eventDefinitionCRFs, childEventDefinitionCRFs, oldEventDefinitionCRFs, signStateRestorerMap, edcItemMetadataMap);
-	}
-
-	protected StudyEventDefinitionBean getStudyEventDefinition(int id) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
-				dataSource).findByPK(id);
-
-		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
-
-		return studyEventDefinitionBean;
-	}
-
-	protected EventDefinitionCRFBean getEventDefinitionCrfForCurrentScope(int eventId, String crfName)
-			throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-
-		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
-				dataSource).findByPK(eventId);
-
-		if (studyEventDefinitionBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.event.isNotFound", new Object[]{eventId},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
-			throw new RestException(messageSource, "rest.event.cannotPerformOperationOnEDCBecauseTheSEDIsNotAvailable");
-		}
-
-		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
-				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventId, crfBean.getId(), currentStudy.getId());
-
-		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, eventId, crfName,
-				crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, currentStudy);
-
-		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCRFBean, studyEventDefinitionBean);
-
-		return eventDefinitionCRFBean;
 	}
 }

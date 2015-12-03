@@ -40,7 +40,7 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		studyEventDefinitionBean.setType("scheduled");
 		studyEventDefinitionBean.setOwner(userBean);
 		studyEventDefinitionBean.setStudyId(studyBean.getId());
-		eventDefinitionService.createStudyEventDefinition(studyBean, "root", studyEventDefinitionBean);
+		eventDefinitionService.createStudyEventDefinition(studyEventDefinitionBean, userBean, studyBean);
 		assertTrue(studyEventDefinitionBean.getId() > 0);
 	}
 
@@ -49,7 +49,7 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		String name = "test_name_".concat(Long.toString(new Date().getTime()));
 		studyEventDefinitionBean.setName(name);
 		studyEventDefinitionBean.setUpdater(userBean);
-		eventDefinitionService.updateOnlyTheStudyEventDefinition(studyEventDefinitionBean);
+		eventDefinitionService.updateOnlyTheStudyEventDefinition(studyEventDefinitionBean, userBean);
 		assertTrue(studyEventDefinitionDAO.findByPK(1).getName().equals(name));
 	}
 
@@ -127,7 +127,7 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		String newName = "new_name".concat(Long.toString(new Date().getTime()));
 		studyEventDefinitionBean.setUpdater(userBean);
 		studyEventDefinitionBean.setName(newName);
-		eventDefinitionService.updateOnlyTheStudyEventDefinition(studyEventDefinitionBean);
+		eventDefinitionService.updateOnlyTheStudyEventDefinition(studyEventDefinitionBean, userBean);
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 		assertTrue(studyEventDefinitionBean.getName().equals(newName));
 		assertTrue(studyEventDefinitionBean.getStatus() == Status.AVAILABLE);

@@ -49,6 +49,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
+import com.clinovo.rest.service.base.BaseService;
 
 /**
  * WadlService.
