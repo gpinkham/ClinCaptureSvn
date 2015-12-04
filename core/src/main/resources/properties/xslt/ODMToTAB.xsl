@@ -536,7 +536,7 @@
     <xsl:param name="subject" />
 
     <xsl:value-of select="$subject/OC:SubjectGroupData
-        [@OC:StudyGroupClassName = current()/@name]" />
+        [@OC:StudyGroupClassName = current()/@name]/@OC:StudyGroupName" />
     <xsl:copy-of select="$TAB" />
   </xsl:template>
 
