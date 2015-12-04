@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,15 +85,18 @@ public class ItemLevelSDVController {
 	 * @param model        Model
 	 * @param edcId        int
 	 * @param crfVersionId int
+	 * @param request      HttpServletRequest
 	 * @return String
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "crfVersionId")
 	public String getPageContentForVersion(Model model, @RequestParam("edcId") int edcId,
-										   @RequestParam("crfVersionId") int crfVersionId) {
+										   @RequestParam("crfVersionId") int crfVersionId, HttpServletRequest request) {
 		String page = "include/itemLevelSDVCrfVersionTable";
 		HashMap<SectionBean, ArrayList<DisplayItemLevelSDVRow>> sdvMetadataBySection
 				= new HashMap<SectionBean, ArrayList<DisplayItemLevelSDVRow>>();
 		SectionDAO sectionDAO = new SectionDAO(dataSource);
+		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(edcId);
 		ArrayList sectionBeans = sectionDAO.findAllByCRFVersionId(crfVersionId);
 		ItemDAO itemDAO = new ItemDAO(dataSource);
 		ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
@@ -106,9 +110,10 @@ public class ItemLevelSDVController {
 				ItemBean itemBean = (ItemBean) itemObject;
 				ItemFormMetadataBean itemFormMetadataBean = itemFormMetadataDAO
 						.findByItemIdAndCRFVersionId(itemBean.getId(), sectionBean.getCRFVersionId());
-				EDCItemMetadata edcItemMetadata = edcItemMetadataService.
-						findByCRFVersionIDEventDefinitionCRFIDAndItemID(sectionBean.getCRFVersionId(),
-								edcId, itemBean.getId());
+
+				EDCItemMetadata edcItemMetadata = getMetadataFromSessionOrDatabase(request.getSession(), edcId,
+						sectionBean.getCRFVersionId(), itemBean.getId(), edcBean.getStudyEventDefinitionId());
+
 				edcItemMetadata = edcItemMetadata == null ? new EDCItemMetadata() : edcItemMetadata;
 				DisplayItemLevelSDVRow row = new DisplayItemLevelSDVRow();
 				row.setItemBean(itemBean);
@@ -197,5 +202,36 @@ public class ItemLevelSDVController {
 			return edcItemMetadataList.indexOf(reverseMetadata);
 		}
 		return -1;
+	}
+
+	@SuppressWarnings("unchecked")
+	private EDCItemMetadata getMetadataFromSessionOrDatabase(HttpSession session, int edcId, int crfVersionId, int itemBeanId, int sedId) {
+
+		EDCItemMetadata metadata = edcItemMetadataService.findByCRFVersionIDEventDefinitionCRFIDAndItemID(crfVersionId, edcId, itemBeanId);
+		if (metadata == null) {
+			metadata = new EDCItemMetadata();
+			metadata.setCrfVersionId(crfVersionId);
+			metadata.setItemId(itemBeanId);
+			metadata.setEventDefinitionCrfId(edcId);
+			metadata.setStudyEventDefinitionId(sedId);
+		}
+
+		HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap = (HashMap<Integer, ArrayList<EDCItemMetadata>>)
+				session.getAttribute("edcItemMetadataMap");
+		if (edcItemMetadataMap == null) {
+			return metadata;
+		}
+
+		ArrayList<EDCItemMetadata> edcItemMetadataList = edcItemMetadataMap.get(edcId);
+		if (edcItemMetadataList == null || edcItemMetadataList.size() == 0) {
+			return metadata;
+		}
+
+		int index = getIndexOfMetadataInArray(metadata, edcItemMetadataList);
+		if (index > -1) {
+			return edcItemMetadataList.get(index);
+		} else {
+			return metadata;
+		}
 	}
 }
