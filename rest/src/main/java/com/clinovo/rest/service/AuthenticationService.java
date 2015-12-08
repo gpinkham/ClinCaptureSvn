@@ -18,6 +18,7 @@ package com.clinovo.rest.service;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -94,18 +95,29 @@ public class AuthenticationService extends BaseService {
 							surBean = userAccountDao.findRoleByUserNameAndStudyId(userName, studyBean.getId());
 						}
 						if (surBean != null && surBean.getId() > 0) {
-							userDetails = new UserDetails();
-							userDetails.setUserId(userAccountBean.getId());
-							userDetails.setUserName(userName);
-							userDetails.setPassword(password);
-							userDetails.setUserStatus(userAccountBean.getStatus().getCode());
-							userDetails.setStudyName(studyName);
-							userDetails.setStudyStatus(studyBean.getStatus().getCode());
-							userDetails.setStudyOid(studyBean.getOid());
-							userDetails.setRoleCode(surBean.getRole().getCode());
-							userDetails.setUserTypeCode(userAccountBean.hasUserType(UserType.USER)
-									? UserType.USER.getCode()
-									: UserType.SYSADMIN.getCode());
+							if (surBean.getRole().getId() == Role.STUDY_ADMINISTRATOR.getId()
+									|| surBean.getRole().getId() == Role.SYSTEM_ADMINISTRATOR.getId()) {
+								if (userAccountBean.hasUserType(UserType.SYSADMIN)) {
+									userDetails = new UserDetails();
+									userDetails.setUserId(userAccountBean.getId());
+									userDetails.setUserName(userName);
+									userDetails.setPassword(password);
+									userDetails.setUserStatus(userAccountBean.getStatus().getCode());
+									userDetails.setStudyName(studyName);
+									userDetails.setStudyStatus(studyBean.getStatus().getCode());
+									userDetails.setStudyOid(studyBean.getOid());
+									userDetails.setRoleCode(surBean.getRole().getCode());
+									userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
+								} else {
+									throw new RestException(messageSource,
+											"rest.authentication.onlyUsersWithTypeAdministratorCanBeAuthenticated",
+											HttpServletResponse.SC_UNAUTHORIZED);
+								}
+							} else {
+								throw new RestException(messageSource,
+										"rest.authentication.onlyRootOrStudyAdministratorCanBeAuthenticated",
+										HttpServletResponse.SC_UNAUTHORIZED);
+							}
 						} else {
 							throw new RestException(messageSource, "rest.authentication.userIsNotAssignedToStudy",
 									HttpServletResponse.SC_UNAUTHORIZED);

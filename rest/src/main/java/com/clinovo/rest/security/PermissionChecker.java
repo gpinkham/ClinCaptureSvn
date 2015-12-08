@@ -15,15 +15,10 @@
 
 package com.clinovo.rest.security;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +28,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.AuthenticationService;
@@ -62,7 +55,8 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 	private ApplicationContext applicationContext;
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		LocaleResolver.resolveRestApiLocale();
 		if (!request.isSecure()) {
 			throw new RestException(messageSource, "rest.authentication.onlyTheHttpsIsSupported",
@@ -75,43 +69,14 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 						|| ((HandlerMethod) handler).getBean() instanceof WadlService
 						|| ((HandlerMethod) handler).getBean() instanceof OdmService;
 				if (!proceed) {
-					UserDetails userDetails = (UserDetails) request.getSession().getAttribute(
-							API_AUTHENTICATED_USER_DETAILS);
-					if (userDetails != null) {
-						if (userDetails.getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
-							proceed = true;
-						} else {
-							RestAccess accessAnnotation = ((HandlerMethod) handler).getMethod().getAnnotation(
-									RestAccess.class);
-							if (accessAnnotation != null && accessAnnotation.value() != null) {
-								List<UserRole> methodUserRoles = Arrays.asList(accessAnnotation.value());
-								if (methodUserRoles.contains(UserRole.ANY_USER)) {
-									proceed = true;
-								} else if (methodUserRoles.contains(UserRole.ANY_ADMIN)) {
-									proceed = userDetails.getUserTypeCode().equals(UserType.SYSADMIN.getCode());
-								}
-								if (!proceed) {
-									for (UserRole methodUserRole : methodUserRoles) {
-										if (methodUserRole != UserRole.ANY_USER
-												&& methodUserRole != UserRole.ANY_ADMIN
-												&& methodUserRole.getRoleCode().equals(userDetails.getRoleCode())
-												&& methodUserRole.getUserTypeCode().equals(
-														userDetails.getUserTypeCode())) {
-											proceed = true;
-											break;
-										}
-									}
-								}
-							}
-						}
-					} else {
+					UserDetails userDetails = (UserDetails) request.getSession()
+							.getAttribute(API_AUTHENTICATED_USER_DETAILS);
+					if (userDetails == null) {
 						throw new RestException(messageSource, "rest.authentication.userShouldBeAuthenticated",
 								HttpServletResponse.SC_UNAUTHORIZED);
+					} else {
+						proceed = true;
 					}
-				}
-				if (!proceed) {
-					throw new RestException(messageSource, "rest.authentication.authorisedUserDoesNotHaveAccess",
-							HttpServletResponse.SC_FORBIDDEN);
 				}
 			}
 			return proceed;

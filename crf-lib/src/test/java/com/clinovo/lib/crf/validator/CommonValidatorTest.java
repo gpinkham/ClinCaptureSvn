@@ -1,25 +1,18 @@
 package com.clinovo.lib.crf.validator;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Locale;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.exception.CRFReadingException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.DefaultResourceLoader;
 
 import com.clinovo.lib.crf.builder.impl.ExcelCrfBuilder;
 import com.clinovo.lib.crf.builder.impl.JsonCrfBuilder;
@@ -51,45 +44,6 @@ public class CommonValidatorTest extends DefaultAppContextTest {
 	@Override
 	protected void restoreDb() throws Exception {
 		// do not restore db
-	}
-
-	private String getJsonData(String fileName) throws Exception {
-		InputStream inputStream = null;
-		try {
-			inputStream = new DefaultResourceLoader().getResource("data/json/".concat(fileName)).getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-			StringBuilder out = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				out.append(line);
-			}
-			return out.toString();
-		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			} catch (Exception ex) {
-				//
-			}
-		}
-	}
-
-	private Workbook getWorkbook(String fileName) throws Exception {
-		InputStream inputStream = null;
-		boolean isXlsx = fileName.toLowerCase().endsWith(".xlsx");
-		try {
-			inputStream = new DefaultResourceLoader().getResource("data/excel/".concat(fileName)).getInputStream();
-			return !isXlsx ? new HSSFWorkbook(new POIFSFileSystem(inputStream)) : new XSSFWorkbook(inputStream);
-		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			} catch (Exception ex) {
-				//
-			}
-		}
 	}
 
 	private String generateString(int length) {

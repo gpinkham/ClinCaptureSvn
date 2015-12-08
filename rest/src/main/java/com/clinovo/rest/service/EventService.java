@@ -34,12 +34,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
-import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.base.BaseEventService;
@@ -105,7 +103,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -172,7 +169,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "sourcedataverification", values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
 			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataentryquality.valueDescription"),
@@ -247,7 +243,6 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RestIgnoreDefaultValues
 	@RestProvideAtLeastOneNotRequired
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "sourcedataverification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
 			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataentryquality.withNone.valueDescription"),
@@ -297,7 +292,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(method = RequestMethod.GET)
 	public StudyEventDefinitionBean getInfo(@RequestParam(value = "id") int id) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
@@ -340,7 +334,6 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RestIgnoreDefaultValues
 	@RestProvideAtLeastOneNotRequired
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
@@ -382,7 +375,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int id) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
@@ -401,7 +393,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int id) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
@@ -422,7 +413,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/removeCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
@@ -444,7 +434,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/restoreCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {

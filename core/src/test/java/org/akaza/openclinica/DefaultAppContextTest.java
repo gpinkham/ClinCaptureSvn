@@ -1,5 +1,8 @@
 package org.akaza.openclinica;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,8 +40,13 @@ import org.akaza.openclinica.service.EventService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.classic.Session;
 import org.junit.Before;
+import org.springframework.core.io.DefaultResourceLoader;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -152,10 +160,48 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			max = (Integer) session.createSQLQuery("SELECT max(".concat(idField).concat(") from ").concat(tableName))
 					.uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE ".concat(sequenceName)).executeUpdate();
-			session.createSQLQuery(
-					"CREATE SEQUENCE ".concat(sequenceName).concat(
-							" START WITH " + ((max == null ? 0 : max) + 1)
-									+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20")).executeUpdate();
+			session.createSQLQuery("CREATE SEQUENCE ".concat(sequenceName).concat(
+					" START WITH " + ((max == null ? 0 : max) + 1) + " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20"))
+					.executeUpdate();
+		}
+	}
+
+	protected Workbook getWorkbook(String fileName) throws Exception {
+		InputStream inputStream = null;
+		boolean isXlsx = fileName.toLowerCase().endsWith(".xlsx");
+		try {
+			inputStream = new DefaultResourceLoader().getResource("data/excel/".concat(fileName)).getInputStream();
+			return !isXlsx ? new HSSFWorkbook(new POIFSFileSystem(inputStream)) : new XSSFWorkbook(inputStream);
+		} finally {
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+			} catch (Exception ex) {
+				//
+			}
+		}
+	}
+
+	protected String getJsonData(String fileName) throws Exception {
+		InputStream inputStream = null;
+		try {
+			inputStream = new DefaultResourceLoader().getResource("data/json/".concat(fileName)).getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+			StringBuilder out = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				out.append(line);
+			}
+			return out.toString();
+		} finally {
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+			} catch (Exception ex) {
+				//
+			}
 		}
 	}
 }

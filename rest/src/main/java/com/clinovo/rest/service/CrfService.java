@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.annotation.RestAccess;
-import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.service.base.BaseService;
 
 /**
@@ -43,7 +41,6 @@ public class CrfService extends BaseService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/json/importCrf", method = RequestMethod.POST)
 	public CRFVersionBean importCrf(@RequestParam("jsondata") String jsonData) throws Exception {
 		return processRequest(jsonData, false);
@@ -59,7 +56,6 @@ public class CrfService extends BaseService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_USER, UserRole.STUDY_ADMIN_ADMIN})
 	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
 	public CRFVersionBean importCrfVersion(@RequestParam("jsondata") String jsonData) throws Exception {
 		return processRequest(jsonData, true);

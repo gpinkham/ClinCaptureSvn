@@ -37,10 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.annotation.RestAccess;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
-import com.clinovo.rest.enums.UserRole;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.service.base.BaseService;
@@ -103,7 +101,6 @@ public class UserService extends BaseService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "usertype", values = "1,2", valueDescriptions = "rest.usertype.valueDescription"),
 			@RestParameterPossibleValues(name = "role", values = "1,2,6,7,8,4,5,9", valueDescriptions = "rest.role.valueDescription")})
@@ -162,7 +159,6 @@ public class UserService extends BaseService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public UserAccountBean removeUser(@RequestParam("username") String userName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
@@ -181,7 +177,6 @@ public class UserService extends BaseService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestAccess({UserRole.SYS_ADMIN, UserRole.STUDY_ADMIN_ADMIN, UserRole.STUDY_MONITOR_ADMIN})
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public UserAccountBean restoreUser(@RequestParam("username") String userName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);

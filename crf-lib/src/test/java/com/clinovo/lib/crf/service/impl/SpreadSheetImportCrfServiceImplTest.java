@@ -1,6 +1,5 @@
 package com.clinovo.lib.crf.service.impl;
 
-import java.io.InputStream;
 import java.util.Locale;
 
 import org.akaza.openclinica.DefaultAppContextTest;
@@ -8,17 +7,12 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.DefaultResourceLoader;
 
 import com.clinovo.lib.crf.builder.CrfBuilder;
 import com.clinovo.lib.crf.enums.CRFSource;
@@ -53,23 +47,6 @@ public class SpreadSheetImportCrfServiceImplTest extends DefaultAppContextTest {
 	public void after() {
 		if (crfBuilder != null && crfBuilder.getCrfBean() != null && crfBuilder.getCrfBean().getId() > 0) {
 			deleteCrfService.deleteCrf(crfBuilder.getCrfBean().getId());
-		}
-	}
-
-	private Workbook getWorkbook(String fileName) throws Exception {
-		InputStream inputStream = null;
-		boolean isXlsx = fileName.toLowerCase().endsWith(".xlsx");
-		try {
-			inputStream = new DefaultResourceLoader().getResource("data/excel/".concat(fileName)).getInputStream();
-			return !isXlsx ? new HSSFWorkbook(new POIFSFileSystem(inputStream)) : new XSSFWorkbook(inputStream);
-		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			} catch (Exception ex) {
-				//
-			}
 		}
 	}
 
