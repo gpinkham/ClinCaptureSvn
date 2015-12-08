@@ -85,7 +85,7 @@
 		<td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
-		<c:if test="${study.studyParameterConfig.studyEvaluator == 'yes' || crf.evaluatedCRF == true}">
+		<c:if test="${study.studyParameterConfig.studyEvaluator == 'yes'}">
 			<td class="table_header_row"><fmt:message key="crf_evaluation" bundle="${resword}"/></td>
 		</c:if>
 		<td class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>

@@ -395,7 +395,8 @@
       <!-- Event Statuses -->
       <xsl:for-each select="$ext-map/event">
         <xsl:variable name="event" select="$this/ODM:StudyEventData
-            [@StudyEventOID = current()/@id]" />
+            [@StudyEventOID = current()/@id and (current()/@repeat != 'true'
+            or @StudyEventRepeatKey = current()/@rep)]" />
         <xsl:text></xsl:text>
         <xsl:copy-of select="$TAB" />
         <xsl:value-of select="$event/@OC:Status" />
