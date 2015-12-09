@@ -1915,4 +1915,157 @@ public class EventServiceTest extends BaseServiceTest {
 						.param("acceptnewcrfversions", "true").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
+
+	@Test
+	public void testThatHttpGetIsNotSupportedForDeleteCrfMethod() throws Exception {
+		this.mockMvc.perform(get(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Test CRF")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodDeletesEventDefinitionCrfSuccessfully() throws Exception {
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(7);
+		eventDefinitionCRFBean.setId(0);
+		eventDefinitionCRFBean.setCrfId(6);
+		eventDefinitionCRFBean.setDefaultVersionId(8);
+		eventDefinitionCRFBean.setDefaultVersionName("v1.0");
+		eventDefinitionCRFDAO.create(eventDefinitionCRFBean);
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Case Completion")
+						.accept(mediaType).requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isOk());
+		assertTrue(eventDefinitionCRFDAO.findByPK(eventDefinitionCRFBean.getId()).getId() == 0);
+	}
+
+	@Test
+	public void testThatDelteCrfMethodThrowsExceptionIfThereAreCRFsWithRules() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "1").param("crfname", "Agent Administration")
+						.accept(mediaType).requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfThereAreCRFsWithData() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "1").param("crfname", "Concomitant Medications AG")
+						.accept(mediaType).requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfCrfNameParameterIsEmpty() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfCrfNameParameterIsMissing() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfCrfNameParameterIsInWrongCase() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfName", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfEventIdParameterIsEmpty() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "").param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfEventIdParameterIsMissing() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfEventIdParameterIsInWrongCase() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventId", "9").param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(
+				post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Test CRF").param("XP", "bla")
+						.accept(mediaType).requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfCrfDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "XXXXCRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfEDCDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Concomitant Medications AG")
+						.accept(mediaType).requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfOfStudyEventDefinitionThatDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "11119").param("crfname", "Test CRF")
+						.accept(mediaType).requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfOfStudyEventDefinitionIfEDCIsLocked() throws Exception {
+		setStatusForEDC(7, Status.LOCKED);
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfOfStudyEventDefinitionIfEDCIsDeleted() throws Exception {
+		setStatusForEDC(7, Status.DELETED);
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfOfStudyEventDefinitionThatIsLocked() throws Exception {
+		setStatusForSED(9, Status.LOCKED);
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfOfStudyEventDefinitionThatIsDeleted() throws Exception {
+		setStatusForSED(9, Status.DELETED);
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE_CRF).param("eventid", "9").param("crfname", "Test CRF").accept(mediaType)
+						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
 }

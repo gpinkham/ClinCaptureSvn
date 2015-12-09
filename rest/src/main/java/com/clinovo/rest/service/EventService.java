@@ -417,7 +417,7 @@ public class EventService extends BaseEventService {
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getStudyEventDefinitionCRF(eventId, crfName);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName);
 		eventDefinitionCrfService.removeParentEventDefinitionCrf(eventDefinitionCRFBean, updater);
 		return eventDefinitionCRFBean;
 	}
@@ -438,8 +438,27 @@ public class EventService extends BaseEventService {
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventid") int eventId,
 			@RequestParam("crfname") String crfName) throws Exception {
 		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getStudyEventDefinitionCRF(eventId, crfName);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName);
 		eventDefinitionCrfService.restoreParentEventDefinitionCrf(eventDefinitionCRFBean, updater);
 		return eventDefinitionCRFBean;
+	}
+
+	/**
+	 * Method deletes the event definition crf.
+	 *
+	 * @param eventId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @return String status
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deleteCrf", method = RequestMethod.POST)
+	public String deleteCrf(@RequestParam("eventid") int eventId, @RequestParam("crfname") String crfName)
+			throws Exception {
+		deleteEventDefinitionCRF(eventId, crfName);
+		return STATUS_OK;
 	}
 }

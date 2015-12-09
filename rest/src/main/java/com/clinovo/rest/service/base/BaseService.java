@@ -54,6 +54,7 @@ public abstract class BaseService {
 	public static final String NAME = "name";
 	public static final String UTF_8 = "UTF-8";
 	public static final int PROPAGATE_CHANGE_NO = 3;
+	public static final String STATUS_OK = "Status=OK";
 	public static final String XS_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
 
 	@Autowired

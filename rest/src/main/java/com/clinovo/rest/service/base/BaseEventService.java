@@ -40,12 +40,14 @@ import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.validator.EventServiceValidator;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
+import com.clinovo.util.RuleSetServiceUtil;
 import com.clinovo.util.SignStateRestorer;
 import com.clinovo.validator.EventDefinitionValidator;
 
@@ -115,7 +117,7 @@ public abstract class BaseEventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
-	protected EventDefinitionCRFBean getStudyEventDefinitionCRF(int eventId, String crfName) throws Exception {
+	protected EventDefinitionCRFBean getEventDefinitionCRF(int eventId, String crfName) throws Exception {
 		return getEventDefinitionCRF(eventId, crfName, UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource));
 	}
 
@@ -161,7 +163,7 @@ public abstract class BaseEventService extends BaseService {
 			Boolean required, Boolean passwordRequired, Boolean hide, Integer sourceDataVerification,
 			String dataEntryQuality, String emailWhen, String email, String tabbing, Boolean acceptNewCrfVersions,
 			Integer propagateChange) throws Exception {
-		EventDefinitionCRFBean eventDefinitionCRFBean = getStudyEventDefinitionCRF(eventId, crfName);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName);
 		return prepareEventDefinitionCRF(eventDefinitionCRFBean, crfName, defaultVersion, required, passwordRequired,
 				hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing, acceptNewCrfVersions,
 				propagateChange, null);
@@ -255,5 +257,18 @@ public abstract class BaseEventService extends BaseService {
 		if (eventDefinitionCRFBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.addCrf.operationFailed");
 		}
+	}
+
+	protected void deleteEventDefinitionCRF(int eventId, String crfName) throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(eventId);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName);
+		if (!eventDefinitionCRFBean.getStatus().isAvailable()) {
+			throw new RestException(messageSource, "rest.eventservice.editEDC.eventDefinitionCrfIsNotAvailable",
+					new Object[]{eventDefinitionCRFBean.getCrfName(), studyEventDefinitionBean.getName()},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		eventDefinitionCrfService.deleteEventDefinitionCRF(RuleSetServiceUtil.getRuleSetService(),
+				studyEventDefinitionBean, eventDefinitionCRFBean, LocaleResolver.getLocale());
 	}
 }

@@ -3,6 +3,7 @@ package com.clinovo.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
@@ -12,8 +13,10 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * EventDefinitionCrfServiceTest.
@@ -21,10 +24,12 @@ import org.junit.Test;
 public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 
 	private UserAccountBean userBean;
+	private StudyEventDefinitionBean studyEventDefinitionBean;
 
 	@Before
 	public void before() {
 		userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 	}
 
 	@Test
@@ -255,13 +260,15 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 	public void testThatExceptionIsThrownIfStartedEventCRFsExistsWhileDeletion() throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
 		eventDefinitionCRFBean.setId(1);
-		eventDefinitionCrfService.deleteEventDefinitionCrf(eventDefinitionCRFBean);
+		eventDefinitionCrfService.deleteEventDefinitionCRF(Mockito.mock(RuleSetService.class), studyEventDefinitionBean,
+				eventDefinitionCRFBean, Locale.ENGLISH);
 	}
 
 	@Test
 	public void testThatExceptionIsNotThrownIfStartedEventCRFsNotExistsWhileDeletion() throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
 		eventDefinitionCRFBean.setId(11);
-		eventDefinitionCrfService.deleteEventDefinitionCrf(eventDefinitionCRFBean);
+		eventDefinitionCrfService.deleteEventDefinitionCRF(Mockito.mock(RuleSetService.class), studyEventDefinitionBean,
+				eventDefinitionCRFBean, Locale.ENGLISH);
 	}
 }

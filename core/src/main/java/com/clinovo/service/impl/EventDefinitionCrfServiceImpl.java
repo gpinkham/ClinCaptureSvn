@@ -14,13 +14,19 @@
  *******************************************************************************/
 package com.clinovo.service.impl;
 
-import com.clinovo.model.EDCItemMetadata;
-import com.clinovo.service.EDCItemMetadataService;
-import com.clinovo.service.EventCRFService;
-import com.clinovo.service.EventDefinitionCrfService;
-import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Status;
@@ -39,19 +45,19 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.service.EDCItemMetadataService;
+import com.clinovo.service.EventCRFService;
+import com.clinovo.service.EventDefinitionCrfService;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * EventDefinitionCrfServiceImpl.
@@ -61,16 +67,18 @@ import java.util.regex.Pattern;
 public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService {
 
 	public static final String ARRAY_TO_STRING_PATTERN = "\\]|\\[| ";
-	public static final String STARTED_EVENT_CRF_FOUND = "started_event_crf_found";
 
 	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
-	private EventCRFService eventCRFService;
+	private MessageSource messageSource;
 
 	@Autowired
 	private ItemSDVService itemSDVService;
+
+	@Autowired
+	private EventCRFService eventCRFService;
 
 	@Autowired
 	private EDCItemMetadataService edcItemMetadataService;
@@ -96,7 +104,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void disableEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater,
-										   Status status) throws Exception {
+			Status status) throws Exception {
 		eventDefinitionCRFBean.setStatus(status);
 		eventDefinitionCRFBean.setUpdater(updater);
 		eventDefinitionCRFBean.setUpdatedDate(new Date());
@@ -112,7 +120,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void disableParentEventDefinitionCRF(EventDefinitionCRFBean parentEventDefinitionCRFBean,
-												 UserAccountBean updater, Status status) throws Exception {
+			UserAccountBean updater, Status status) throws Exception {
 		disableEventDefinitionCrf(parentEventDefinitionCRFBean, updater, status);
 		disableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater, status);
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
@@ -124,7 +132,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void enableParentEventDefinitionCRF(EventDefinitionCRFBean parentEventDefinitionCRFBean,
-												UserAccountBean updater) throws Exception {
+			UserAccountBean updater) throws Exception {
 		enableEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
 		enableChildEventDefinitionCRFs(parentEventDefinitionCRFBean, updater);
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
@@ -136,7 +144,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void disableChildEventDefinitionCRFs(EventDefinitionCRFBean parentEventDefinitionCRFBean,
-												 UserAccountBean updater, Status status) throws Exception {
+			UserAccountBean updater, Status status) throws Exception {
 		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = getEventDefinitionCRFDAO()
 				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
 		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
@@ -147,7 +155,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void enableChildEventDefinitionCRFs(EventDefinitionCRFBean parentEventDefinitionCRFBean,
-												UserAccountBean updater) throws Exception {
+			UserAccountBean updater) throws Exception {
 		List<EventDefinitionCRFBean> childEventDefinitionCRFBeanList = getEventDefinitionCRFDAO()
 				.findAllChildrenByParentId(parentEventDefinitionCRFBean.getId());
 		for (EventDefinitionCRFBean childEventDefinitionCRFBean : childEventDefinitionCRFBeanList) {
@@ -162,7 +170,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void disableParentEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean,
-												  UserAccountBean updater, Status status) throws Exception {
+			UserAccountBean updater, Status status) throws Exception {
 		List<EventDefinitionCRFBean> parentEventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
 				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
 		for (EventDefinitionCRFBean parentEventDefinitionCRFBean : parentEventDefinitionCRFBeanList) {
@@ -174,7 +182,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void enableParentEventDefinitionCRFs(StudyEventDefinitionBean studyEventDefinitionBean,
-												 UserAccountBean updater) throws Exception {
+			UserAccountBean updater) throws Exception {
 		List<EventDefinitionCRFBean> parentEventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
 				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
 		for (EventDefinitionCRFBean parentEventDefinitionCRFBean : parentEventDefinitionCRFBeanList) {
@@ -264,7 +272,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	}
 
 	private void updateDefaultVersionOfEventDefinitionCRF(EventDefinitionCRFBean edcBean,
-														  List<CRFVersionBean> versionList, UserAccountBean updater) {
+			List<CRFVersionBean> versionList, UserAccountBean updater) {
 		ArrayList<Integer> idList = new ArrayList<Integer>();
 		if (!StringUtil.isBlank(edcBean.getSelectedVersionIds())) {
 			String sversionIds = edcBean.getSelectedVersionIds();
@@ -310,7 +318,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
-											   UserAccountBean updater) throws Exception {
+			UserAccountBean updater) throws Exception {
 		disableParentEventDefinitionCRF(parentEventDefinitionCRFBean, updater, Status.DELETED);
 	}
 
@@ -318,7 +326,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
-												UserAccountBean updater) throws Exception {
+			UserAccountBean updater) throws Exception {
 		enableParentEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
 	}
 
@@ -394,8 +402,8 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void updateChildEventDefinitionCRFs(List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate,
-											   Map<Integer, EventDefinitionCRFBean> parentsMap,
-											   Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap, UserAccountBean updater) {
+			Map<Integer, EventDefinitionCRFBean> parentsMap,
+			Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap, UserAccountBean updater) {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
 		for (EventDefinitionCRFBean childEdc : childEventDefinitionCRFsToUpdate) {
 			StudyBean childEdcStudyBean = (StudyBean) getStudyDAO().findByPK(childEdc.getStudyId());
@@ -465,7 +473,7 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void fillEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean,
-									   StudyEventDefinitionBean studyEventDefinitionBean) {
+			StudyEventDefinitionBean studyEventDefinitionBean) {
 		CRFDAO crfDao = getCRFDAO();
 		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
 		CRFVersionBean crfBeanVersion = (CRFVersionBean) crfVersionDao
@@ -498,17 +506,29 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void deleteEventDefinitionCrf(EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception {
+	public void deleteEventDefinitionCRF(RuleSetService ruleSetService,
+			StudyEventDefinitionBean studyEventDefinitionBean, EventDefinitionCRFBean eventDefinitionCRFBean,
+			Locale locale) throws Exception {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+
+		List<RuleSetRuleBean> ruleSetRuleBeans = ruleSetService.findAllRulesForEventDefinitionCRF(
+				studyEventDefinitionBean.getOid(), eventDefinitionCRFBean.getCrfId());
+
+		List<EventCRFBean> eventCRFs = eventCRFDAO.findAllByEventDefinitionCRFId(eventDefinitionCRFBean.getId());
+		List<EventCRFBean> startedEventCRFs = eventCRFService.getAllStartedEventCRFsWithStudyAndEventName(eventCRFs);
+
+		if (ruleSetRuleBeans.size() != 0) {
+			throw new Exception(messageSource.getMessage("rules_are_present_for_crfs", null, locale));
+		} else if (startedEventCRFs.size() != 0) {
+			throw new Exception(messageSource.getMessage("data_is_present_for_crfs", null, locale));
+		}
+
 		List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByEventDefinitionCRFId(eventDefinitionCRFBean.getId());
 		for (EventCRFBean eventCRFBean : eventCRFBeans) {
-			if (!eventCRFBean.isNotStarted()) {
-				throw new Exception(STARTED_EVENT_CRF_FOUND);
-			} else {
-				eventCRFDAO.delete(eventCRFBean.getId());
-			}
+			eventCRFDAO.delete(eventCRFBean.getId());
 		}
-		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+
 		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionCRFDAO
 				.findAllChildrenByParentId(eventDefinitionCRFBean.getId());
 		for (EventDefinitionCRFBean child : childEventDefinitionCRFs) {
@@ -521,8 +541,8 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	 * {@inheritDoc}
 	 */
 	public void checkIfEventCRFSDVStatusWasUpdated(Map<Integer, EventDefinitionCRFBean> parentsMap,
-												   Map<Integer, EventDefinitionCRFBean> oldEDCsMap,
-												   HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap, UserAccountBean updater) {
+			Map<Integer, EventDefinitionCRFBean> oldEDCsMap,
+			HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap, UserAccountBean updater) {
 		for (Map.Entry<Integer, EventDefinitionCRFBean> entry : parentsMap.entrySet()) {
 			int key = entry.getKey();
 			EventDefinitionCRFBean edcBean = entry.getValue();
@@ -532,8 +552,10 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				continue;
 			}
 			boolean newItemsAddedToSDV = false;
-			if (edcBean.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED && edcItemMetadataMap != null) {
-				newItemsAddedToSDV = saveEDCItemMetadataMapToDatabaseAndCheckIfNewItemsWereAdded(edcItemMetadataMap, edcBean);
+			if (edcBean.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED
+					&& edcItemMetadataMap != null) {
+				newItemsAddedToSDV = saveEDCItemMetadataMapToDatabaseAndCheckIfNewItemsWereAdded(edcItemMetadataMap,
+						edcBean);
 			}
 
 			if ((oldEdcBean.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED
@@ -544,8 +566,9 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				if (!newItemsAddedToSDV) {
 					edcItemMetadataService.updateSDVRequiredByEventDefinitionCRF(edcBean, false);
 				}
-			} else if (oldEdcBean.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
-					&& edcBean.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
+			} else
+				if (oldEdcBean.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
+						&& edcBean.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
 				resetSDVForEventCRFs(edcBean, updater, true, true);
 			}
 		}
@@ -554,8 +577,8 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean saveEDCItemMetadataMapToDatabaseAndCheckIfNewItemsWereAdded(HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap,
-																			   EventDefinitionCRFBean edcBean) {
+	public boolean saveEDCItemMetadataMapToDatabaseAndCheckIfNewItemsWereAdded(
+			HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap, EventDefinitionCRFBean edcBean) {
 
 		ArrayList<EDCItemMetadata> edcItemMetadataArrayList = edcItemMetadataMap.get(edcBean.getId());
 		boolean newSdvItemsWereAdded = false;
@@ -581,13 +604,17 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	/**
 	 * Change SDVed flag to false for all event CRFs and item data for this EDC.
 	 *
-	 * @param edcBean        EventDefinitionCRFBean
-	 * @param updater        UserAccountBean
-	 * @param sdvStatusToSet boolean
-	 * @param updateItemData should ItemData be updated
+	 * @param edcBean
+	 *            EventDefinitionCRFBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @param sdvStatusToSet
+	 *            boolean
+	 * @param updateItemData
+	 *            should ItemData be updated
 	 */
-	private void resetSDVForEventCRFs(EventDefinitionCRFBean edcBean, UserAccountBean updater,
-									  boolean sdvStatusToSet, boolean updateItemData) {
+	private void resetSDVForEventCRFs(EventDefinitionCRFBean edcBean, UserAccountBean updater, boolean sdvStatusToSet,
+			boolean updateItemData) {
 		int edcId = edcBean.getParentId() != 0 ? edcBean.getParentId() : edcBean.getId();
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
