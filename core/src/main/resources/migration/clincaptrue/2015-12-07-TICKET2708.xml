@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-12-07-TICKET2708-0">
+		<comment>
+			Update item_data status_id if there are some active rows for removed crf_versions.
+		</comment>
+		<sql splitStatements="false">
+			UPDATE item_data id SET status_id = 5
+			WHERE id.status_id = 1
+			AND event_crf_id IN (
+				SELECT event_crf_id  FROM event_crf ec INNER JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id
+				WHERE cv.status_id = 5 OR ec.status_id = 5 OR ec.status_id = 7
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-12-07-TICKET2708-1">
+		<comment>
+			Update event_crf status_id if there are some active rows for removed crf_versions.
+		</comment>
+		<sql splitStatements="false">
+			UPDATE event_crf SET status_id = 5
+			WHERE status_id = 1
+			AND crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE status_id = 5);
+		</sql>
+	</changeSet>
+</databaseChangeLog>
