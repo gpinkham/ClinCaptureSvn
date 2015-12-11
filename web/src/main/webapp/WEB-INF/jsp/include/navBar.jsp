@@ -197,7 +197,12 @@
                                                     </c:if>
                                                     <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:when>
-
+												<c:when test="${userRole.studySponsor}">
+                                                    <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                </c:when>
                                             </c:choose>
 
                                             <li id="nav_Tasks" style="position: relative; z-index: 3;">
@@ -285,12 +290,19 @@
             <c:when test="${userRole.studyEvaluator}">
                 <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
             </c:when>
+			
             <c:when test="${userRole.siteMonitor}">
                 <c:import url="/WEB-INF/jsp/include/navBarMonitorAndManageData.jsp"/>
                 <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
                 <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
             </c:when>
 
+			<c:when test="${userRole.studySponsor}">
+                <c:import url="/WEB-INF/jsp/include/navBarSubmitData.jsp"/>
+                <c:import url="/WEB-INF/jsp/include/navBarExtractData.jsp"/>
+                <c:if test="${userBean.sysAdmin}"><c:import url="/WEB-INF/jsp/include/navBarAdministration.jsp"/></c:if>
+            </c:when>
+			
         </c:choose>
 
         <c:import url="/WEB-INF/jsp/include/navBarOther.jsp"/>

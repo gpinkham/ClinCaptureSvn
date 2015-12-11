@@ -36,7 +36,7 @@ public class PrivilegeTest {
 	public static final int FOUR = 4;
 	public static final int FIVE = 5;
 	public static final int EIGHT = 8;
-	public static final int NINE = 9;
+	public static final int TEN = 10;
 
 	private Privilege privilege;
 	private ResourceBundle resterm;
@@ -98,7 +98,7 @@ public class PrivilegeTest {
 		assertNull(Privilege.get(-1));
 		assertNull(Privilege.get(0));
 		assertNotNull(Privilege.get(2));
-		assertNull(Privilege.get(NINE));
+		assertNull(Privilege.get(TEN));
 	}
 
 	@Test
@@ -106,6 +106,6 @@ public class PrivilegeTest {
 		assertFalse(Privilege.contains(-1));
 		assertFalse(Privilege.contains(0));
 		assertTrue(Privilege.contains(2));
-		assertFalse(Privilege.contains(NINE));
+		assertFalse(Privilege.contains(TEN));
 	}
 }

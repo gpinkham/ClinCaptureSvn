@@ -957,7 +957,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 			return url.toString();
 		}
-
 	}
 
 	private class ActionsCellEditor implements CellEditor {
@@ -1370,14 +1369,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	 *            StudyBean
 	 * @param sed
 	 *            StudyEventDefinitionBean
+	 * @param role 
 	 * @return boolean
 	 */
-	public static boolean skipScheduling(StudyBean studyBean, StudyEventDefinitionBean sed) {
+	public static boolean skipScheduling(StudyBean studyBean, StudyEventDefinitionBean sed, StudyUserRoleBean role) {
 		boolean result = false;
 		try {
-			result = sed.getType().equalsIgnoreCase(COMMON) || sed.getType().equalsIgnoreCase(UNSCHEDULED)
+			result = (sed.getType().equalsIgnoreCase(COMMON) || sed.getType().equalsIgnoreCase(UNSCHEDULED)
 					|| (sed.getType().equalsIgnoreCase(SCHEDULED) && studyBean.getStudyParameterConfig()
-							.getStartDateTimeRequired().equalsIgnoreCase(NOT_USED));
+							.getStartDateTimeRequired().equalsIgnoreCase(NOT_USED)) || role.isStudySponsor());
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
@@ -1472,7 +1472,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				String href1 = "?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId();
 				eventDiv.div()
-						.id((skipScheduling(getStudyBean(), sed) ? "crfListWrapper_" : "eventScheduleWrapper_")
+						.id((skipScheduling(getStudyBean(), sed, currentRole) ? "crfListWrapper_" : "eventScheduleWrapper_")
 								+ studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
 						.rel(href1).styleClass(WRAPPER).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
@@ -1730,18 +1730,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		if (studyBean.getStatus() == Status.AVAILABLE
 				&& !(studySubjectBean.getStatus() == Status.DELETED
 						|| studySubjectBean.getStatus() == Status.AUTO_DELETED)
-				&& currentRole.getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
-				&& !Role.isMonitor(currentRole.getRole())) {
-
+				&& !currentRole.isClinicalResearchCoordinator()
+				&& !Role.isMonitor(currentRole.getRole())
+				&& !currentRole.isStudySponsor()) {
 			if (studySubjectBean.getStatus() != Status.SIGNED) {
 				url.append(removeStudySubjectLinkBuilder(studyBeanMap, studySubjectBean, resword));
 			} else {
 				url.append(transparentButton);
 			}
-
 		}
 		if (studyBean.getStatus() == Status.AVAILABLE && !Role.isMonitor(currentRole.getRole())
-				&& currentRole.getRole() != Role.CLINICAL_RESEARCH_COORDINATOR && !subjectBean.getStatus().isDeleted()
+				&& !currentRole.isClinicalResearchCoordinator() && !currentRole.isStudySponsor() && !subjectBean.getStatus().isDeleted()
 				&& (studySubjectBean.getStatus() == Status.DELETED
 						|| studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
 			url.append(restoreStudySubjectLinkBuilder(studyBeanMap, studySubjectBean, resword, currentRole));
@@ -1749,8 +1748,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		url.append(sdvStudySubjectLinkBuilder(request, studySubjectBean, flagColour));
 
-		if (studyBean.getStatus() == Status.AVAILABLE && currentRole.getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
-				&& currentRole.getRole() != Role.INVESTIGATOR && !Role.isMonitor(currentRole.getRole())
+		if (studyBean.getStatus() == Status.AVAILABLE && !currentRole.isClinicalResearchCoordinator()
+				&& !currentRole.isInvestigator() && !Role.isMonitor(currentRole.getRole()) && !currentRole.isStudySponsor()
 				&& studySubjectBean.getStatus() == Status.AVAILABLE) {
 			url.append(reAssignStudySubjectLinkBuilder(studySubjectBean, resword));
 		} else
@@ -1758,18 +1757,19 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					&& (studySubjectBean.getStatus() != Status.DELETED
 							|| studySubjectBean.getStatus() != Status.AUTO_DELETED)
 					&& !Role.isMonitor(currentRole.getRole())
-					&& currentRole.getRole().getId() != Role.CLINICAL_RESEARCH_COORDINATOR.getId()
-					&& currentRole.getRole().getId() != Role.INVESTIGATOR.getId()) {
+					&& !currentRole.isClinicalResearchCoordinator()
+					&& !currentRole.isInvestigator()
+					&& !currentRole.isStudySponsor()) {
 			url.append(transparentButton);
 		}
-		if (currentRole.getRole() == Role.INVESTIGATOR
+		if (currentRole.isInvestigator()
 				&& (studyBean.getStatus() == Status.AVAILABLE || studyBean.getStatus() == Status.FROZEN)
 				&& studySubjectBean.getStatus() != Status.DELETED) {
 			url.append(signStudySubjectLinkBuilder(studySubjectBean, isSignable, resword, daoWrapper.getSedao(),
 					currentRole));
 		}
 
-		if (currentRole.getRole() == Role.STUDY_ADMINISTRATOR || currentRole.getRole() == Role.SYSTEM_ADMINISTRATOR) {
+		if (currentRole.isStudyAdministrator() || currentRole.isSysAdmin()) {
 			url.append(studySubjectLockLinkBuilder(studyBeanMap, studySubjectBean, resword, daoWrapper.getSedao()));
 		}
 

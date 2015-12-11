@@ -1176,7 +1176,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				String href1 = "?studySubjectId=" + eventDivBuilderWrapper.studySubject.getId()
 						+ "&studyEventDefinition=" + eventDivBuilderWrapper.sed.getId();
 				eventDiv.div()
-						.id((ListStudySubjectTableFactory.skipScheduling(getStudyBean(), eventDivBuilderWrapper.sed)
+						.id((ListStudySubjectTableFactory.skipScheduling(getStudyBean(), eventDivBuilderWrapper.sed, currentRole)
 								? "crfListWrapper_"
 								: "eventScheduleWrapper_") + studySubjectLabel
 								+ "_"

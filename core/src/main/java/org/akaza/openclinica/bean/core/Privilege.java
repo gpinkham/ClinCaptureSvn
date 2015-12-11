@@ -39,9 +39,10 @@ public final class Privilege extends Term {
 	public static final Privilege STUDY_CODER = new Privilege(6, "study_coder");
 	public static final Privilege STUDY_EVALUATOR = new Privilege(7, "study_evaluator");
 	public static final Privilege SITE_MONITOR = new Privilege(8, "site_monitor");
+	public static final Privilege STUDY_SPONSOR = new Privilege(9, "study_sponsor");
 
 	private static final Privilege[] MEMBERS = { SYSTEM_ADMINISTRATOR, STUDY_DIRECTOR, INVESTIGATOR,
-			CLINICAL_RESEARCH_COORDINATOR, STUDY_MONITOR, STUDY_CODER, STUDY_EVALUATOR, SITE_MONITOR };
+			CLINICAL_RESEARCH_COORDINATOR, STUDY_MONITOR, STUDY_CODER, STUDY_EVALUATOR, SITE_MONITOR, STUDY_SPONSOR };
 	public static final List MEMBERS_LIST = Arrays.asList(MEMBERS);
 
 	private Privilege(int id, String name) {

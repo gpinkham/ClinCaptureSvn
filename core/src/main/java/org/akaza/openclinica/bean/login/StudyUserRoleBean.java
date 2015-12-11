@@ -246,6 +246,10 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	public boolean isStudyCoder() {
 		return this.role.equals(Role.STUDY_CODER);
 	}
+	
+	public boolean isStudySponsor() {
+		return this.role.equals(Role.STUDY_SPONSOR);
+	}
 
 	public boolean isCanCode() {
 		return canCode;

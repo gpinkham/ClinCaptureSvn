@@ -39,7 +39,8 @@
         <c:set var="inclRoleCode1" value="2"/>
         <c:set var="inclRoleCode2" value="6"/>
         <c:set var="inclRoleCode3" value="7"/>
-        <c:set var="inclRoleCode_evaluator" value="8"/>
+        <c:set var="inclRoleCode_4" value="8"/>
+        <c:set var="inclRoleCode_5" value="10"/>
     </c:when>
     <c:otherwise>
         <c:set var="inclRoleCode1" value="4"/>
@@ -96,7 +97,7 @@
                                                                         <select name="role" class="formfieldM" onchange="javascript:changeIcon();">
                                                                             <option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
                                                                             <c:forEach var="role" items="${roles}">
-                                                                                <c:if test="${role.key == inclRoleCode1 || role.key == inclRoleCode2 || role.key == inclRoleCode3 || role.key == inclRoleCode_evaluator}">
+                                                                                <c:if test="${role.key == inclRoleCode1 || role.key == inclRoleCode2 || role.key == inclRoleCode3 || role.key == inclRoleCode_4 || role.key == inclRoleCode_5}">
                                                                                     <option value="<c:out value="${role.key}"/>" <c:if test="${chosenRoleId == role.key}">selected</c:if> >
                                                                                         <c:out value="${role.value}"/>
                                                                                     </option>

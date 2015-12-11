@@ -46,9 +46,10 @@ public final class Role extends Term {
 	public static final Role STUDY_CODER = new Role(7, "study_coder", "study_coder");
 	public static final Role STUDY_EVALUATOR = new Role(8, "study_evaluator", "study_evaluator");
 	public static final Role SITE_MONITOR = new Role(9, "site_monitor", "site_monitor");
+	public static final Role STUDY_SPONSOR = new Role(10, "study_sponsor", "study_sponsor");
 
 	private static final Role[] MEMBERS = { SYSTEM_ADMINISTRATOR, STUDY_ADMINISTRATOR, STUDY_DIRECTOR, STUDY_MONITOR,
-			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR, STUDY_CODER, STUDY_EVALUATOR, SITE_MONITOR };
+			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR, STUDY_CODER, STUDY_EVALUATOR, SITE_MONITOR, STUDY_SPONSOR };
 	public static final List MEMBERS_LIST = Arrays.asList(MEMBERS);
 
 	public static final Map ROLE_MAP = new LinkedHashMap();
@@ -64,7 +65,8 @@ public final class Role extends Term {
 		ROLE_MAP.put(index++, "Study_Monitor");
 		ROLE_MAP.put(index++, "study_coder");
 		ROLE_MAP.put(index++, "study_evaluator");
-		ROLE_MAP.put(index, "site_monitor");
+		ROLE_MAP.put(index++, "site_monitor");
+		ROLE_MAP.put(index, "study_sponsor");
 	}
 
 	static {
@@ -77,7 +79,8 @@ public final class Role extends Term {
 		ROLE_MAP_WITH_DESCRIPTION.put(index++, "Study_Monitor");
 		ROLE_MAP_WITH_DESCRIPTION.put(index++, "study_coder");
 		ROLE_MAP_WITH_DESCRIPTION.put(index++, "study_evaluator");
-		ROLE_MAP_WITH_DESCRIPTION.put(index, "site_monitor");
+		ROLE_MAP_WITH_DESCRIPTION.put(index++, "site_monitor");
+		ROLE_MAP_WITH_DESCRIPTION.put(index, "study_sponsor");
 	}
 
 	private Role(int id, String name, String description) {
@@ -85,7 +88,7 @@ public final class Role extends Term {
 	}
 
 	/**
-	 * Prepare role description for user role localisation.
+	 * Prepare role description for user role localization.
 	 * 
 	 * @param resterm
 	 *            Res term dictionary.
@@ -154,7 +157,7 @@ public final class Role extends Term {
 	 *            the first role for comparing.
 	 * @param r2
 	 *            the second role for comparing.
-	 * @return maximum prioritised role.
+	 * @return maximum prioritized role.
 	 */
 	public static Role max(Role r1, Role r2) {
 		if (r1 == null) {

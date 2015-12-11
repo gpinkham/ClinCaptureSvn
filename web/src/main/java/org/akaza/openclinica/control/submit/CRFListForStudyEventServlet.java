@@ -195,7 +195,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		StudyDAO studydao = getStudyDAO();
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
 		request.setAttribute("viewModeOnly", study.getStatus().isDeleted() || study.getStatus().isLocked()
-				|| studySubjectBean.getStatus().isDeleted() || studySubjectBean.getStatus().isLocked());
+				|| studySubjectBean.getStatus().isDeleted() || studySubjectBean.getStatus().isLocked() || ub.getRoleByStudy(study.isSite()? study.getParentStudyId() : studyId).isStudySponsor());
 
 		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
 		boolean isParentStudy = study.getParentStudyId() < 1;

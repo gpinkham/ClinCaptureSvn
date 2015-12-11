@@ -91,7 +91,7 @@ public class StudyAuditLogServlet extends RememberLastPage {
 		}
 
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || Role.isMonitor(r)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || r.equals(Role.STUDY_SPONSOR) || Role.isMonitor(r)) {
 			return;
 		}
 

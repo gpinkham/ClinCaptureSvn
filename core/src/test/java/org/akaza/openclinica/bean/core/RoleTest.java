@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 public class RoleTest {
 
 	public static final int EIGHT = 8;
-	public static final int NINE = 9;
+	public static final int TEN = 10;
 	public static final int THREE = 3;
 	public static final int SIX = 6;
 	private Map role = null;
@@ -46,12 +46,12 @@ public class RoleTest {
 
 	@Test
 	public void testThatRoleMapContainsValidNumberOfRoles() {
-		assertEquals(NINE, role.size());
+		assertEquals(TEN, role.size());
 	}
 
 	@Test
 	public void testThatRoleMapWithDescriptionContainsValidNumberOfRoles() {
-		assertEquals(NINE, roleWithDescription.size());
+		assertEquals(TEN, roleWithDescription.size());
 	}
 
 	@Test
@@ -77,6 +77,7 @@ public class RoleTest {
 	public void testThatGetByNameReturnsCorrectRole() {
 		assertEquals(Role.STUDY_CODER.getName(), Role.getByName("study_coder").getName());
 		assertEquals(Role.INVALID.getName(), Role.getByName("unknown").getName());
+		assertEquals(Role.STUDY_SPONSOR.getName(), Role.getByName("study_sponsor").getName());
 	}
 
 	@Test

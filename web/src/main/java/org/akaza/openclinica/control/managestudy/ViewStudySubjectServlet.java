@@ -174,7 +174,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
 			request.setAttribute("viewModeOnly", study.getStatus().isDeleted() || study.getStatus().isLocked()
-					|| studySub.getStatus().isDeleted() || studySub.getStatus().isLocked());
+					|| studySub.getStatus().isDeleted() || studySub.getStatus().isLocked() || currentRole.isStudySponsor());
 
 			StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
 			String studyEventDefinitionsString = "";
@@ -303,20 +303,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			request.setAttribute("subject", subject);
 
-			if (subject.getFatherId() > 0) {
-				SubjectBean father = (SubjectBean) sdao.findByPK(subject.getFatherId());
-				request.setAttribute("father", father);
-			} else {
-				request.setAttribute("father", new SubjectBean());
-			}
-
-			if (subject.getMotherId() > 0) {
-				SubjectBean mother = (SubjectBean) sdao.findByPK(subject.getMotherId());
-				request.setAttribute("mother", mother);
-			} else {
-				request.setAttribute("mother", new SubjectBean());
-			}
-
 			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 			study.getStudyParameterConfig()
 					.setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
@@ -330,10 +316,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			} else {
 				request.setAttribute("parentStudy", new StudyBean());
 			}
-
-			ArrayList children = (ArrayList) sdao.findAllChildrenByPK(subjectId);
-
-			request.setAttribute("children", children);
 
 			// find study events
 

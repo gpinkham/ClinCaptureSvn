@@ -407,7 +407,7 @@
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
-                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and !studySubject.status.deleted && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and !studySubject.status.deleted && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9 and userRole.id ne 10}">
                                             <c:set var="hideCol1" value="false"/>
                                             <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                                         </c:when>
@@ -478,7 +478,7 @@
                             <td class="table_cell_left" style="vertical-align: middle;">
                                 <div class="<c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
 
-                                <c:set var="allowDataEntry" value="${(study.status.available && dec.continueInitialDataEntryPermitted) || (study.status.available && (dec.startDoubleDataEntryPermitted || dec.continueDoubleDataEntryPermitted)) || ((study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted)}" />
+                                <c:set var="allowDataEntry" value="${((study.status.available && dec.continueInitialDataEntryPermitted) || (study.status.available && (dec.startDoubleDataEntryPermitted || dec.continueDoubleDataEntryPermitted)) || ((study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted)) && (userRole.id ne 10)}" />
 
                                 <c:set var="crfSpacersCount" value="0"/>
                                 <c:choose>
@@ -488,7 +488,7 @@
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
 										<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_Print${rowCount}"/>
 
-                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (!studySubject.status.deleted) && (study.status.available)}">
+                                        <c:if test="${userRole.id ne 4 && userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and userRole.role.id ne 10 and(!studySubject.status.deleted) && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>

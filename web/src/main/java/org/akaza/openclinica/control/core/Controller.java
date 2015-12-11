@@ -181,7 +181,7 @@ public abstract class Controller extends BaseController {
 			if (r != null && (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
 					|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
 					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
-					|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r))) {
+					|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r)) || r.equals(Role.STUDY_SPONSOR)) {
 				return true;
 			}
 		}
