@@ -28,6 +28,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.model.AuditLogRandomization;
+import com.clinovo.service.AuditLogRandomizationService;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -53,6 +55,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,6 +64,9 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ViewStudySubjectAuditLogServlet extends Controller {
+
+	@Autowired
+	private AuditLogRandomizationService auditLogRandomizationService;
 
 	public static final int AUDIT_EVENT_TYPE_3 = 3;
 
@@ -215,11 +221,14 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 				}
 			}
 
+			List<AuditLogRandomization> randomizationLogs = auditLogRandomizationService.findAllByStudySubjectId(studySubId);
+
 			request.setAttribute("events", events);
 			request.setAttribute("eventCRFAudits", eventCRFAudits);
 			request.setAttribute("studyEventAudits", studyEventAudits);
 			request.setAttribute("allDeletedEventCRFs", allDeletedEventCRFs);
 			request.setAttribute("attachedFilePath", attachedFilePath);
+			request.setAttribute("randomizationAudits", randomizationLogs);
 
 			forwardPage(Page.VIEW_STUDY_SUBJECT_AUDIT, request, response);
 

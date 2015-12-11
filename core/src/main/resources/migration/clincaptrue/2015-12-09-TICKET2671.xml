@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2015-12-09-TICKET2671-0">
+		<comment>
+			Add new entity audit_log_randomization.
+		</comment>
+		<createTable tableName="audit_log_randomization">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="version" type="int"/>
+			<column name="study_id" type="int"/>
+			<column name="site_name" type="text"/>
+			<column name="study_subject_id" type="int"/>
+			<column name="event_crf_id" type="int"/>
+			<column name="user_id" type="int"/>
+			<column name="audit_date" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="authentication_url" type="text"/>
+			<column name="randomization_url" type="text"/>
+			<column name="trial_id" type="text"/>
+			<column name="strata_variables" type="text"/>
+			<column name="response" type="text"/>
+			<column name="user_name" type="text"/>
+			<column name="success" type="int"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="denis" id="2015-12-09-TICKET2671-1">
+		<comment>
+			Add constrains for audit_log_randomization table.
+		</comment>
+		<addForeignKeyConstraint constraintName="fk_study_subject_id"
+								 baseColumnNames="study_subject_id"
+								 baseTableName="audit_log_randomization"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_subject_id"
+								 referencedTableName="study_subject"/>
+		<addForeignKeyConstraint constraintName="fk_study_id"
+								 baseColumnNames="study_id"
+								 baseTableName="audit_log_randomization"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_id"
+								 referencedTableName="study"/>
+		<addForeignKeyConstraint constraintName="fk_user_id"
+								 baseColumnNames="user_id"
+								 baseTableName="user_account"
+								 onDelete="CASCADE"
+								 referencedColumnNames="user_id"
+								 referencedTableName="user_account"/>
+	</changeSet>
+
+</databaseChangeLog>

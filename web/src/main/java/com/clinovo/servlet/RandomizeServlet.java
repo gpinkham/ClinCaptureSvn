@@ -18,9 +18,11 @@ import com.clinovo.context.SubmissionContext;
 import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.AuditLogRandomization;
 import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
+import com.clinovo.service.AuditLogRandomizationService;
 import com.clinovo.util.RandomizationUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -36,6 +38,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +58,9 @@ import java.util.HashMap;
 public class RandomizeServlet extends Controller {
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
+
+	@Autowired
+	private AuditLogRandomizationService auditLogRandomizationService;
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -87,7 +93,8 @@ public class RandomizeServlet extends Controller {
 		StudySubjectBean subject = RandomizationUtil.getStudySubjectBean(request);
 
 		PrintWriter writer = response.getWriter();
-
+		Exception exception = null;
+		RandomizationResult result = null;
 		try {
 			String eligibility = request.getParameter("eligibility");
 
@@ -95,22 +102,90 @@ public class RandomizeServlet extends Controller {
 				if (!eligibility.equals("null")) {
 					// YES
 					if ("0".equals(eligibility)) {
-						randomize(request, writer);
+						result = randomize(request, writer);
 					} else if ("1".equals(eligibility)) {
 						throw new RandomizationException(
 								resexception.getString("subject_has_not_completed_ie_criteria"));
 					}
 				} else {
-					randomize(request, writer);
+					result = randomize(request, writer);
 				}
 
 			} else {
 				throw new RandomizationException(resexception.getString("subject_label_and_id_not_equals"));
 			}
 		} catch (Exception ex) {
+			exception = ex;
 			log.error("Randomization Error: {0}", ex.getMessage());
 			writer.write("Exception: " + ex.getMessage());
 			writer.flush();
+		} finally {
+			saveRandomizationAuditLog(request, result, exception);
+		}
+	}
+
+	private void saveRandomizationAuditLog(HttpServletRequest request, RandomizationResult result, Exception exception) {
+		String eventCrfIdString = request.getParameter("eventCrfId");
+		String studySubjectIdString = request.getParameter("subjectId");
+		StudyBean studyBean = getCurrentStudy(request);
+		UserAccountBean userAccountBean = getUserAccountBean(request);
+		int eventCRFId;
+		int studySubjectId;
+
+		try {
+			eventCRFId = Integer.parseInt(eventCrfIdString);
+			studySubjectId = Integer.parseInt(studySubjectIdString);
+		} catch (Exception e) {
+			logger.error("Unable to write randomization audit log: " + e.getMessage());
+			return;
+		}
+		AuditLogRandomization auditLogRandomization = new AuditLogRandomization();
+		auditLogRandomization.setStudyId(studyBean.getId());
+		auditLogRandomization.setStudySubjectId(studySubjectId);
+		auditLogRandomization.setEventCrfId(eventCRFId);
+		auditLogRandomization.setUserId(userAccountBean.getId());
+		auditLogRandomization.setSiteName(studyBean.getIdentifier());
+		auditLogRandomization.setAuditDate(new Date());
+		auditLogRandomization.setUserName(userAccountBean.getName());
+
+		String crfConfiguredTrialId = request.getParameter("trialId");
+		String configuredTrialId = studyBean.getStudyParameterConfig().getRandomizationTrialId();
+		if (crfConfiguredTrialId != null && !configuredTrialId.equals("")) {
+			auditLogRandomization.setTrialId(configuredTrialId);
+		} else if (configuredTrialId != null && !configuredTrialId.equals("")) {
+			auditLogRandomization.setTrialId(configuredTrialId);
+		}
+
+		String randomizationUrl = CoreResources.getField("randomizationUrl");
+		String authenticationUrl = CoreResources.getField("randomizationAuthenticationUrl");
+		auditLogRandomization.setAuthenticationUrl(authenticationUrl);
+		auditLogRandomization.setRandomizationUrl(randomizationUrl);
+
+		String strataItems = request.getParameter("strataLevel");
+		if (!strataItems.equals("null")) {
+			strataItems = strataItems.replace("[", "").replace("]", "");
+			if (strataItems.contains("},")) {
+				strataItems = strataItems.replace("},", "<br/>");
+			}
+			strataItems = strataItems.replace("{", "").replace("}", "");
+			auditLogRandomization.setStrataVariables(strataItems);
+		}
+		if (exception != null) {
+			String message = exception.getMessage();
+			message = message.replace("javax.xml.ws.WebServiceException:", "");
+			if (message.contains("\"Code\":400")) {
+				message = message.replace("{\"Code\":400,\"Error\":\"", "").replace("\"}", "");
+			}
+			auditLogRandomization.setResponse(message);
+			auditLogRandomization.setSuccess(0);
+		} else if (result != null) {
+			auditLogRandomization.setResponse(result.getRandomizationResult());
+			auditLogRandomization.setSuccess(1);
+		}
+		try {
+			auditLogRandomizationService.saveOrUpdate(auditLogRandomization);
+		} catch (Exception e) {
+			logger.error("Unable to write randomization audit log: " + e.getMessage());
 		}
 	}
 
@@ -127,7 +202,7 @@ public class RandomizeServlet extends Controller {
 		return result;
 	}
 
-	private void randomize(HttpServletRequest request, PrintWriter writer) throws Exception {
+	private RandomizationResult randomize(HttpServletRequest request, PrintWriter writer) throws Exception {
 
 		// Set expected context
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -163,6 +238,7 @@ public class RandomizeServlet extends Controller {
 
 		writer.write(randomizationResult.toString());
 		writer.flush();
+		return result;
 	}
 
 	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {

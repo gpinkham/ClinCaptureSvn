@@ -353,33 +353,30 @@ public class RandomizationUtil {
 		JSONArray strataIds = new JSONArray(strataItems);
 		JSONArray array = new JSONArray(strataLevel);
 
-		if (array != null) {
+		if (array.length() != strataIds.length()) {
+			throw new RandomizationException("Error occured during the saving of the stratification variables.");
+		} else {
+			for (int i = 0; i < array.length(); i++) {
 
-			if (array.length() != strataIds.length()) {
-				throw new RandomizationException("Error occured during the saving of the stratification variables.");
-			} else {
-				for (int i = 0; i < array.length(); i++) {
+				String strataField = Arrays.asList(array.get(i).toString().split(",")).get(1);
+				String strataValue = Arrays.asList(strataField.toString().split(":")).get(1).replace("\"", "")
+						.replace("}", "");
+				int itemId = Integer.parseInt(strataIds.get(i).toString());
 
-					String strataField = Arrays.asList(array.get(i).toString().split(",")).get(1);
-					String strataValue = Arrays.asList(strataField.toString().split(":")).get(1).replace("\"", "")
-							.replace("}", "");
-					int itemId = Integer.parseInt(strataIds.get(i).toString());
+				ItemDataBean item = itemDataDAO.findByItemIdAndEventCRFId(itemId, eventCRFId);
 
-					ItemDataBean item = itemDataDAO.findByItemIdAndEventCRFId(itemId, eventCRFId);
+				item.setValue(strataValue);
 
-					item.setValue(strataValue);
+				if (item.getEventCRFId() == 0) {
+					setAllFieldsForNewItem(item, itemId, request);
 
-					if (item.getEventCRFId() == 0) {
-						setAllFieldsForNewItem(item, itemId, request);
+					itemDataDAO.create(item);
+					checQuerySuccessfull(itemDataDAO);
+				} else {
+					setAllFieldsForUpdatedItem(item, request);
 
-						itemDataDAO.create(item);
-						checQuerySuccessfull(itemDataDAO);
-					} else {
-						setAllFieldsForUpdatedItem(item, request);
-
-						itemDataDAO.update(item);
-						checQuerySuccessfull(itemDataDAO);
-					}
+					itemDataDAO.update(item);
+					checQuerySuccessfull(itemDataDAO);
 				}
 			}
 		}
