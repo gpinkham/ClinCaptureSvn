@@ -238,7 +238,7 @@
 								<tr class="innerTable">
 									<td>
 										<c:choose>
-											<c:when test="${!dedc.status.locked && !currRow.bean.studyEvent.subjectEventStatus.locked && !currRow.bean.studyEvent.subjectEventStatus.skipped && !currRow.bean.studyEvent.subjectEventStatus.stopped && !studySub.status.deleted && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+											<c:when test="${!dedc.status.locked && !currRow.bean.studyEvent.subjectEventStatus.locked && !currRow.bean.studyEvent.subjectEventStatus.skipped && !currRow.bean.studyEvent.subjectEventStatus.stopped && !studySub.status.deleted && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9 && userRole.role.id ne 10}">
 												<ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${currRow.bean.studyEvent.id}${dedc.edc.crf.id}" onClickFunction="setAccessedObjectWithRowspans(this); checkCRFLockedInitial"  imgAlign="right" imgHSpace="6"/>
 											</c:when>
 											<c:otherwise>
@@ -298,7 +298,7 @@
 							<tr valign="top" class="innerTable <c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
 								<td>
 									<c:choose>
-										<c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 && userRole.role.id ne 9}">
+										<c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6 && userRole.role.id ne 9 && userRole.role.id ne 10}">
 											<ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}&exitTo=ViewStudySubject?id=${studySub.id}" imgAlign="left" imgHSpace="6" onClickFunction="setAccessedObjectWithRowspans(this); checkCRFLocked"/>
 											<!-- locked status here -->
 											<c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
@@ -322,7 +322,6 @@
 
 								<c:choose>
 									<c:when test="${!dec.eventCRF.status.deleted}">
-
 										<c:if test="${allowDataEntry and userRole.manageStudy && study.status.available && (!dec.locked) && (!dec.stage.locked)}">
 											<td>
 												<ui:removeEventCRFLink object="${dec}" subjectId="${studySub.id}" onClick="setAccessedObjectWithRowspans(this)" hspace="6"/>
@@ -330,7 +329,7 @@
 										</c:if>
 									</c:when>
 									<c:otherwise>
-										<c:if test="${(!dec.locked) && (!dec.stage.locked) && userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 && (!studySub.status.deleted) && (study.status.available)}">
+										<c:if test="${(!dec.locked) && (!dec.stage.locked) && userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and userRole.id ne 10 && (!studySub.status.deleted) && (study.status.available)}">
 											<td>
 												<ui:restoreEventCRFLink object="${dec}" subjectId="${studySub.id}" hspace="6" onClick="setAccessedObjectWithRowspans(this)"/>
 											</td>
@@ -347,7 +346,7 @@
 										<img src="images/bt_Transparent.gif" border="0" hspace="6">
 									</td>
 								</c:if>
-								<c:if test="${allowDataEntry and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and (!studySub.status.deleted) && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
+								<c:if test="${allowDataEntry and userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.id ne 9 and userRole.id ne 10 and (!studySub.status.deleted) && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
 									<td>
 										<ui:deleteEventCRFLink object="${dec}" subjectId="${studySub.id}" onClick="setAccessedObjectWithRowspans(this)"/>
 									</td>

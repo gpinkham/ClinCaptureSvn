@@ -18,6 +18,12 @@
 					title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 				</a>
 			</c:when>
+			<c:when test="${userRole.id eq 10}">
+				<img id="flag_gender" name="flag_gender"
+					src="images/icon_noNote.gif" border="0"
+					alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+					title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+			</c:when>
 			<c:otherwise>
 				<a href="#"
 					onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender', '', event); return false;">

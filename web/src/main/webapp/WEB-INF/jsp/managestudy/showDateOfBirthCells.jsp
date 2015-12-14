@@ -8,7 +8,6 @@
 		<td class="${headerClass }"><fmt:message key="date_of_birth"
 				bundle="${resword}" /> <%-- DN for DOB goes here --%> <c:if
 				test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-				<c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}" />
 				<c:choose>
 					<c:when test="${hasDOBNote eq 'yes'}">
 						<a href="#"
@@ -18,6 +17,12 @@
 							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
 							title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 						</a>
+					</c:when>
+					<c:when test="${userRole.id eq 10}">
+						<img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif"
+							border="0"
+							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+							title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 					</c:when>
 					<c:otherwise>
 						<a href="#"
@@ -40,7 +45,6 @@
 		<td class="${headerClass }"><fmt:message key="date_of_birth"
 				bundle="${resword}" /> <%-- DN for DOB goes here --%> <c:if
 				test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-				<c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}" />
 				<c:choose>
 					<c:when test="${hasDOBNote eq 'yes'}">
 						<a href="#"
@@ -50,6 +54,12 @@
 							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
 							title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 						</a>
+					</c:when>
+					<c:when test="${userRole.id eq 10}">
+						<img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif"
+							border="0"
+							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+							title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 					</c:when>
 					<c:otherwise>
 						<a href="#"
@@ -71,7 +81,6 @@
 		<td class="${headerClass }"><fmt:message key="year_of_birth"
 				bundle="${resword}" /> <%-- DN for DOB goes here --%> <c:if
 				test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-				<c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}" />
 				<c:choose>
 					<c:when test="${hasDOBNote eq 'yes'}">
 						<a href="#"
@@ -81,6 +90,12 @@
 							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
 							title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 						</a>
+					</c:when>
+					<c:when test="${userRole.id eq 10}">
+						<img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif"
+							border="0"
+							alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+							title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 					</c:when>
 					<c:otherwise>
 						<a href="#"

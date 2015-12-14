@@ -144,6 +144,12 @@
                                     </a>
                                   </span>
                                 </c:when>
+								<c:when test="${userRole.role.id eq 10}">
+									<span style="float:right">
+										<img id="flag_location" name="flag_location"
+                                        src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+									</span>
+								</c:when>
                                 <c:otherwise>
                                   <span style="float:right">
                                     <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location', '', event); return false;">
@@ -177,6 +183,12 @@
 										</a>
 									</span>
 								</c:when>
+								<c:when test="${userRole.role.id eq 10}">
+									<span style="float:right">
+										<img id="flag_date_start" name="flag_date_start" 
+												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+									</span>
+								</c:when>
 								<c:otherwise>
 									<span style="float:right">
 										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg=','spanAlert-date_start', '', event); return false;">
@@ -204,6 +216,12 @@
 											<img id="flag_date_end" name="flag_date_end" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 										</a>
+									</span>
+								</c:when>
+								<c:when test="${userRole.role.id eq 10}">
+									<span style="float:right">
+										<img id="flag_date_end" name="flag_date_end" 
+												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
 									</span>
 								</c:when>
 								<c:otherwise>
@@ -385,7 +403,7 @@
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4"/>
                 </c:when>
 
-                <c:when test="${!studySubject.status.deleted && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+                <c:when test="${!studySubject.status.deleted && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9 and userRole.id ne 10}">
                     <ui:dataEntryLink object="${dedc}" rowCount="${rowCount}" actionQueryTail="${studyEvent.id}${dedc.edc.crf.id}" onClickFunction="checkCRFLockedInitial"/>
                 </c:when>
 
@@ -445,7 +463,7 @@
 
 			<ui:printEventCRFLink studyOid="${parentStudyOid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
 
-            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and (!studySubject.status.deleted) && (study.status.available)}">
+            <c:if test="${userRole.id ne 4 and userRole.id ne 5 and userRole.id ne 6 and userRole.role.id ne 9 and userRole.id ne 10 and (!studySubject.status.deleted) && (study.status.available)}">
                 <ui:restoreEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
 				<ui:deleteEventCRFLink object="${dec}" subjectId="${studySubject.id}" hspace="4"/>
             </c:if>
@@ -459,7 +477,7 @@
         </c:when>
         <c:otherwise>
 			<c:choose>
-            <c:when test="${!studySubject.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9}">
+            <c:when test="${!studySubject.status.deleted && userRole.role.id ne 6 and userRole.role.id ne 9 and userRole.id ne 10}">
                 <ui:dataEntryLink object="${dec}" actionQueryTail="?eventCRFId=${dec.eventCRF.id}"/>
                 <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
 				    <img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
@@ -473,11 +491,11 @@
 			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_View${rowCount}"/>
 			<ui:printEventCRFLink studyOid="${parentStudyOid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
 
-            <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
+            <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available) && userRole.id ne 10}">
 				<ui:removeEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
             </c:if>
 
-            <c:if test="${userBean.sysAdmin && (study.status.available)}">
+            <c:if test="${userBean.sysAdmin && (study.status.available) && userRole.id ne 10}">
                 <ui:deleteEventCRFLink object="${dec}" subjectId="${studySubject.id}" hspace="4"/>
             </c:if>
 
@@ -508,7 +526,7 @@
     <input type="hidden" name="id" value="<c:out value="${studySubject.id}"/>" />
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
     <input type="button" name="BTN_BackToSV" id="GoToSV" value="<fmt:message key="view_subject_record2" bundle="${resword}"/>" class="button_long" onClick="window.location.href = 'ViewStudySubject?id=${studySubject.id}';"/>
-    <c:if test="${userRole.id ne 6 and userRole.id ne 9}">
+    <c:if test="${userRole.id ne 6 and userRole.id ne 9 and userRole.id ne 10}">
     	<input type="button" name="BTN_Schedule" id="ScheduleEvent" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_long" onClick="javascript: window.location.href=('CreateNewStudyEvent?studySubjectId=<c:out value="${studySubject.id}"/>&studyEventDefinition=<c:out value="${studyEvent.studyEventDefinition.id}"/>');">
     </c:if>
 </form>

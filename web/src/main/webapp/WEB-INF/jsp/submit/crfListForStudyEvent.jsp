@@ -128,12 +128,12 @@
             </c:choose>
 
 			<c:choose>
-             	<c:when test="${not viewModeOnly and subjectFlagColor eq 'yellow'}">
+             	<c:when test="${(not viewModeOnly || userRole.id eq 10) and subjectFlagColor eq 'yellow'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
                  		   <img src="images/icon_flagYellow.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             	</c:when>
-            	<c:when test="${not viewModeOnly and subjectFlagColor eq 'red'}">
+            	<c:when test="${(not viewModeOnly || userRole.id eq 10) and subjectFlagColor eq 'red'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=New">
                  		   <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
@@ -259,12 +259,12 @@
 
             <!-- View DNs icons -->
             <c:choose>
-             	<c:when test="${not viewModeOnly and eventFlagColor eq 'yellow'}">
+             	<c:when test="${(not viewModeOnly || userRole.id eq 10) and eventFlagColor eq 'yellow'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_eventName=${studyEventName}&listNotes_f_studySubject.label=${studySubject.label}">
                  		   <img src="images/icon_flagYellow.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             	</c:when>
-            	<c:when test="${not viewModeOnly and eventFlagColor eq 'red'}">
+            	<c:when test="${(not viewModeOnly || userRole.id eq 10) and eventFlagColor eq 'red'}">
                     <c:set var="hideCol8" value="false"/>
                		<a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=New&listNotes_f_eventName=${studyEventName}&listNotes_f_studySubject.label=${studySubject.label}">
                  		   <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
