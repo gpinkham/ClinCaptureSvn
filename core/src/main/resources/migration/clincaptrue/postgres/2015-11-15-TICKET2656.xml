@@ -3,8 +3,39 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="skirpichenok" id="2015-11-15-TICKET2656-01" dbms="postgresql">
-        <comment>Update stored functions</comment>
+    <changeSet author="skirpichenok" id="2015-11-15-TICKET2656-10" dbms="postgresql">
+        <comment>drop stored functions</comment>
+        <sql splitStatements="false">
+            DROP FUNCTION IF EXISTS disable_event_crf(ec_id integer,u_id integer,pos integer,s_id integer);
+            DROP FUNCTION IF EXISTS disable_event_crfs_by_crf_version(cv_id integer,u_id integer,pos integer,s_id integer);
+            DROP FUNCTION IF EXISTS disable_event_crfs_by_study_event(se_id integer,u_id integer,pos integer,s_id integer);
+            DROP FUNCTION IF EXISTS disable_event_crfs_by_study_event_and_crf_oid(se_id integer,oid text,u_id integer,pos integer,s_id integer);
+            DROP FUNCTION IF EXISTS enable_event_crf(ec_id integer,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS enable_event_crfs_by_crf_version(cv_id integer,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS enable_event_crfs_by_study_event(se_id integer,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS enable_event_crfs_by_study_event_and_crf_oid(se_id integer,oid text,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS get_from_states(states text,curr_id integer,pos integer,id integer);
+            DROP FUNCTION IF EXISTS revert_from_states(states text,old_id integer,dt_completed timestamp with time zone,pos integer,id integer);
+            DROP FUNCTION IF EXISTS update_states(states text,pos integer,id integer);
+
+            DROP FUNCTION IF EXISTS disable_event_crf(ec_id integer,u_id integer,pos integer,state integer);
+            DROP FUNCTION IF EXISTS disable_event_crfs_by_crf_version(cv_id integer,u_id integer,pos integer,state integer);
+            DROP FUNCTION IF EXISTS disable_event_crfs_by_study_event(se_id integer,u_id integer,pos integer,state integer);
+            DROP FUNCTION IF EXISTS disable_event_crfs_by_study_event_and_crf_oid(se_id integer,oid text,u_id integer,pos integer,state integer);
+            DROP FUNCTION IF EXISTS enable_event_crf(ec_id integer,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS enable_event_crfs_by_crf_version(cv_id integer,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS enable_event_crfs_by_study_event(se_id integer,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS enable_event_crfs_by_study_event_and_crf_oid(se_id integer,oid text,u_id integer,pos integer);
+            DROP FUNCTION IF EXISTS get_from_states(states text,current_status integer,pos integer,status integer);
+            DROP FUNCTION IF EXISTS enable_item_data(old_status integer,ev_status integer);
+            DROP FUNCTION IF EXISTS revert_from_states(states text,old_status integer,dt_completed timestamp with time zone,pos integer);
+            DROP FUNCTION IF EXISTS update_states(states text,pos integer,status integer);
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="skirpichenok" id="2015-11-15-TICKET2656-11" dbms="postgresql">
+        <comment>Create stored functions</comment>
         <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION disable_event_crf(
             ec_id integer,
