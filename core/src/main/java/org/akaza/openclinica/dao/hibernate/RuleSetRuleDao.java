@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,15 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 		q.setParameter("ruleSetBean", ruleSetBean);
 		q.setParameter("ruleBean", ruleBean);
 		return (ArrayList<RuleSetRuleBean>) q.list();
+	}
+
+	/**
+	 * Delete all unused Rule Set Rule Beans, where rule_id is not in the list of rules.
+	 */
+	public void deleteAllUnused() {
+		org.hibernate.Query q = getCurrentSession().createSQLQuery("DELETE FROM rule_set_rule WHERE rule_id NOT IN " +
+				"(SELECT id FROM rule)");
+		q.executeUpdate();
 	}
 
 	/**
