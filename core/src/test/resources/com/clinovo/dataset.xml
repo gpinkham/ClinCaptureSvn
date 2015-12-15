@@ -1110,4 +1110,16 @@
 	<edc_item_metadata id="3" version="0" event_definition_crf_id="1" item_id="3" crf_version_id="1" sdv_required="0" study_event_definition_id="1"/>
 	<edc_item_metadata id="4" version="0" event_definition_crf_id="1" item_id="4" crf_version_id="1" sdv_required="0" study_event_definition_id="1"/>
 	<edc_item_metadata id="5" version="0" event_definition_crf_id="2" item_id="3" crf_version_id="2" sdv_required="0" study_event_definition_id="1"/>
+
+	<audit_log_randomization id="1" version="0" study_id="1" site_name="s01" study_subject_id="1" event_crf_id="1" user_id="1" audit_date="2015-12-10"
+							 authentication_url="https://www.randomize.net/api/RandomizeAPIService/Authenticate"
+							 randomization_url="https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated"
+							 trial_id="1223" strata_variables="'StratificationID':1" response="Invalid Strata."
+							 user_name="root" success="0"/>
+
+	<audit_log_randomization id="2" version="0" study_id="1" site_name="s01" study_subject_id="1" event_crf_id="1" user_id="1" audit_date="2015-12-10"
+							 authentication_url="https://www.randomize.net/api/RandomizeAPIService/Authenticate"
+							 randomization_url="https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated"
+							 trial_id="1223" strata_variables="'StratificationID':1" response="Surgery"
+							 user_name="root" success="1"/>
 </dataset>

@@ -5,12 +5,16 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.clinovo.model.RandomizationResult;
+import com.clinovo.util.RandomizationUtil;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -21,27 +25,29 @@ import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rule.ext.HttpTransportProtocol;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({RandomizeServlet.class, HttpTransportProtocol.class})
+@PrepareForTest({RandomizeServlet.class, HttpTransportProtocol.class, RandomizationUtil.class})
 public class RandomizeServletTest {
 
 	private RandomizeServlet randomizeServlet;
-
-	private JSONSubmissionContext jsonSubmissionContext;
+	private RandomizeServlet spy = PowerMockito.spy(new RandomizeServlet());
 
 	private MockHttpServletRequest request;
-
-	private HttpTransportProtocol httpTransportProtocol;
+	private MockHttpServletResponse response;
 
 	private StudyBean study;
 
 	@Before
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
+		response = new MockHttpServletResponse();
+		RandomizationUtil randomizationUtil = PowerMockito.mock(RandomizationUtil.class);
+		PowerMockito.mockStatic(RandomizationUtil.class);
 		randomizeServlet = PowerMockito.mock(RandomizeServlet.class);
-		jsonSubmissionContext = PowerMockito.mock(JSONSubmissionContext.class);
-		httpTransportProtocol = PowerMockito.mock(HttpTransportProtocol.class);
+		JSONSubmissionContext jsonSubmissionContext = PowerMockito.mock(JSONSubmissionContext.class);
+		HttpTransportProtocol httpTransportProtocol = PowerMockito.mock(HttpTransportProtocol.class);
 
 		study = new StudyBean();
 		study.setId(1);
@@ -54,6 +60,22 @@ public class RandomizeServletTest {
 				.when(randomizeServlet,
 						PowerMockito.method(RandomizeServlet.class, "initiateRandomizationCall",
 								HttpServletRequest.class)).withArguments(request).thenCallRealMethod();
+		PowerMockito
+				.when(randomizationUtil,
+						PowerMockito.method(RandomizationUtil.class, "getStudySubjectBean",
+								HttpServletRequest.class)).withArguments(request).thenReturn(new StudySubjectBean());
+		PowerMockito
+				.when(randomizationUtil,
+						PowerMockito.method(RandomizationUtil.class, "isCRFSpecifiedTrialIdValid",
+								String.class)).withArguments(Mockito.anyString()).thenCallRealMethod();
+		PowerMockito
+				.when(randomizationUtil,
+						PowerMockito.method(RandomizationUtil.class, "isConfiguredTrialIdValid",
+								String.class)).withArguments(Mockito.anyString()).thenCallRealMethod();
+		PowerMockito
+				.when(randomizationUtil,
+						PowerMockito.method(RandomizationUtil.class, "isTrialIdDoubleConfigured",
+								String.class, String.class)).withArguments(Mockito.anyString(), Mockito.anyString()).thenCallRealMethod();
 		PowerMockito.whenNew(JSONSubmissionContext.class).withNoArguments().thenReturn(jsonSubmissionContext);
 		PowerMockito.whenNew(HttpTransportProtocol.class).withNoArguments().thenReturn(httpTransportProtocol);
 
@@ -70,6 +92,17 @@ public class RandomizeServletTest {
 		request.setParameter("trialId", "123");
 		Whitebox.invokeMethod(randomizeServlet, "initiateRandomizationCall", request);
 	}
+
+	@Test
+	public void testThatAuditLogWillBeWrittenIfExceptionWasThrownWhileRandomization() throws Exception{
+		request.setParameter("trialId", "");
+		try {
+			spy.processRequest(request, response);
+		} finally {
+			Mockito.verify(spy, Mockito.times(1)).saveRandomizationAuditLog(Mockito.any(HttpServletRequest.class), Mockito.any(RandomizationResult.class), Mockito.any(Exception.class));
+		}
+	}
+
 	@Test(expected = RandomizationException.class)
 	public void testThatExceptionWillBeThrownIfTrialIdIsNotConfigured() throws Exception {
 		study.getStudyParameterConfig().setRandomizationTrialId("");

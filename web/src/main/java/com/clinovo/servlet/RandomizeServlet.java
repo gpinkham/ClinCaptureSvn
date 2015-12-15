@@ -85,7 +85,7 @@ public class RandomizeServlet extends Controller {
 	}
 
 	@Override
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.info("Processing randomize request");
 
 		// Set expected context
@@ -124,7 +124,7 @@ public class RandomizeServlet extends Controller {
 		}
 	}
 
-	private void saveRandomizationAuditLog(HttpServletRequest request, RandomizationResult result, Exception exception) {
+	public void saveRandomizationAuditLog(HttpServletRequest request, RandomizationResult result, Exception exception) {
 		String eventCrfIdString = request.getParameter("eventCrfId");
 		String studySubjectIdString = request.getParameter("subjectId");
 		StudyBean studyBean = getCurrentStudy(request);
