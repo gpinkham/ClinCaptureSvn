@@ -23,6 +23,7 @@ package org.akaza.openclinica.dao.extract;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -305,12 +306,15 @@ public class DatasetDAO extends AuditableEntityDAO {
 	}
 
 	private String addSedIdAndCRFIdIfUnique(String sedIdAndCrfIdPairs, String key) {
-		String[] arguments = key.split("_");
+		String [] arguments = key.split("_");
 		String sedAndCrfId = arguments[0] + "_" + arguments[1];
-		if (!sedIdAndCrfIdPairs.contains(sedAndCrfId)) {
-			sedIdAndCrfIdPairs += (sedIdAndCrfIdPairs.isEmpty() ? "" : ",") + sedAndCrfId;
+
+		List<String> pairsList = Arrays.asList(sedIdAndCrfIdPairs.split(","));
+		if (pairsList.contains(sedAndCrfId)) {
+			return sedIdAndCrfIdPairs + (sedIdAndCrfIdPairs.isEmpty() ? "" : ",") + sedAndCrfId;
+		} else {
+			return sedIdAndCrfIdPairs;
 		}
-		return sedIdAndCrfIdPairs;
 	}
 
 	/**
