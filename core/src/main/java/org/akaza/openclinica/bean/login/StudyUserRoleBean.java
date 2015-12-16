@@ -278,7 +278,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	public boolean isStudyLevelRole() {
 		return this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER || this.role == Role.STUDY_EVALUATOR
-				|| this.role == Role.STUDY_DIRECTOR;
+				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.STUDY_SPONSOR;
 	}
 
 	public boolean isCanGenerateDCF() {
