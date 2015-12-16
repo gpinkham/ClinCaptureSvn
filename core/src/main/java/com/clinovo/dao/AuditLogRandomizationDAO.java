@@ -1,6 +1,7 @@
 package com.clinovo.dao;
 
 import com.clinovo.model.AuditLogRandomization;
+
 import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.List;
  * Audit Log Randomization DAO.
  */
 @Repository
+@SuppressWarnings("unchecked")
 public class AuditLogRandomizationDAO extends AbstractDomainDao<AuditLogRandomization> {
 
 	@Override
