@@ -233,7 +233,7 @@
 <!-- Thread Heading -->
 <c:forEach var="note" items="${discrepancyNotes}">
 
-    <c:if test="${note.value.saved==false}">
+    <c:if test="${note.value.saved==false || userRole.id eq 10}">
     	<c:set var="disableBeginNewThread" value="${true}"/>
     </c:if>   
     
@@ -321,7 +321,7 @@
                                 <c:if test="${!study.status.locked}">
                                     <tr>
                                         <td class="table_cell_left" colspan="4" align="right">
-                                            <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4)}">
+                                            <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4) && (userRole.id ne 10)}">
                                                 <c:set var="sindex" value="0"/>
                                                 <c:forEach var="status" items="${resolutionStatuses}">
                                                     <c:choose>

@@ -22,6 +22,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
@@ -49,12 +50,14 @@ import com.clinovo.util.DateUtil;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractTableFactory {
-
+	
 	protected Locale locale;
 
 	protected Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private UserAccountBean currentUser;
+	
+	private StudyUserRoleBean userRole;
 
 	private HttpServletRequest request;
 
@@ -354,6 +357,14 @@ public abstract class AbstractTableFactory {
 			tableFacade.setStateAttr("restore");
 			logger.debug("getTableName() returned null, so tableFacade.setStateAttr = restore");
 		}
+	}
+
+	public StudyUserRoleBean getUserRole() {
+		return userRole;
+	}
+
+	public void setUserRole(StudyUserRoleBean userRole) {
+		this.userRole = userRole;
 	}
 
 	protected class DateEditor extends AbstractCellEditor {

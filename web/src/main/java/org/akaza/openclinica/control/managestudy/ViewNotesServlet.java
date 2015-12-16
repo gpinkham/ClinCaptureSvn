@@ -227,6 +227,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		factory.setEnableDcf(allowDcf);
 		factory.setDataSource(getDataSource());
 		factory.setCurrentUser(ub);
+		factory.setUserRole(getCurrentRole(request));;
 		TableFacade tf = factory.createTable(request, response);
 		if ("yes".equalsIgnoreCase(print)) {
 			request.setAttribute("allNotes", factory.getNotesForPrintPop(tf.getLimit(), ub));

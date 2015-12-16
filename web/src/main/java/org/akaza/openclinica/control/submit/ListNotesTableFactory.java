@@ -24,15 +24,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import com.clinovo.util.DateUtil;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
@@ -863,8 +866,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view"))
 					.title(resword.getString("view")).align("left").append("hspace=\"6\"").close();
 			builder.aEnd();
-			if (!getCurrentStudy().getStatus().isLocked()) {
-				if (!dnb.getEntityType().equals("eventCrf")) {
+			
+			if (!getCurrentStudy().getStatus().isLocked() && !getUserRole().isStudySponsor()) {
+				if (!dnb.getEntityType().equals("eventCrf") || dnb.getStageId() == CRF_STAGE_COMPLETE) {
 					builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
 					builder.append("onClick=\"setAccessedObjected(this);\"");
 					builder.close();
@@ -873,17 +877,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 							.title(resword.getString("view_within_record")).align("left").append("hspace=\"6\"")
 							.close();
 					builder.aEnd();
-				} else {
-					if (dnb.getStageId() == CRF_STAGE_COMPLETE) {
-						builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
-						builder.append("onClick=\"setAccessedObjected(this);\"");
-						builder.close();
-						builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0")
-								.alt(resword.getString("view_within_record"))
-								.title(resword.getString("view_within_record")).align("left").append("hspace=\"6\"")
-								.close();
-						builder.aEnd();
-					}
 				}
 			}
 
@@ -1207,7 +1200,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public void setEnableDcf(boolean enableDcf) {
 		this.enableDcf = enableDcf;
 	}
-
+	
 	/**
 	 * Returns list of discrepancy notes with fields for print.
 	 * 
