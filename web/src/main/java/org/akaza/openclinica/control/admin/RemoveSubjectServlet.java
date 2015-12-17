@@ -51,7 +51,7 @@ public class RemoveSubjectServlet extends Controller {
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 
-		if (ub.isSysAdmin()) {
+		if (ub.isSysAdmin() ) {
 			return;
 		}
 

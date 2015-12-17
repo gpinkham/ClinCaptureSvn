@@ -78,7 +78,7 @@ public class UpdateSubjectServlet extends Controller {
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 
-		if (ub.isSysAdmin()) {
+		if (ub.isSysAdmin() && !getCurrentRole(request).isStudySponsor()) {
 			return;
 		}
 

@@ -60,7 +60,7 @@ public class RestoreSubjectServlet extends Controller {
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 
-		if (ub.isSysAdmin()) {
+		if (ub.isSysAdmin() && !getCurrentRole(request).isStudySponsor()) {
 			return;
 		}
 

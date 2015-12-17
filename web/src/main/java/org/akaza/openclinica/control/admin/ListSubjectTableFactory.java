@@ -302,11 +302,13 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 			Integer subjectId = subjectBean.getId();
 			if (subjectBean != null) {
 				value += viewSubjectLink(subjectId);
-				if (subjectBean.getStatus() != Status.DELETED) {
-					value += updateSubjectLink(subjectId);
-					value += removeSubjectLink(subjectId);
-				} else {
-					value += restoreSubjectLink(subjectId);
+				if (!getUserRole().isStudySponsor()) {
+					if (subjectBean.getStatus() != Status.DELETED) {
+						value += updateSubjectLink(subjectId);
+						value += removeSubjectLink(subjectId);
+					} else {
+						value += restoreSubjectLink(subjectId);
+					}
 				}
 			}
 			return value;
