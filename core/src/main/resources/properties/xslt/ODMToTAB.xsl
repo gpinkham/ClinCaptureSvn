@@ -5,7 +5,8 @@
   xmlns:OC="http://www.openclinica.org/ns/odm_ext_v130/v3.1" 
   xmlns:O="http://www.cdisc.org/ns/odm/v1.3" 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance">
+  xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
+  exclude-result-prefixes="O OC ODM xs xsi">
 
   <xsl:output method="text" encoding="utf-8" />
 
@@ -36,6 +37,26 @@
           OC:SubjectGroupData" group-by="@OC:StudyGroupClassName">
         <group name="{current-grouping-key()}" />
       </xsl:for-each-group>
+    </xsl:for-each>
+  </xsl:variable>
+
+  <!-- evt-map: a list of extra fields for events. -->
+  <xsl:variable name="evt-map">
+    <xsl:for-each select="/ODM:ODM/ODM:ClinicalData">
+      <event-status />
+      <xsl:if test="ODM:SubjectData/ODM:StudyEventData/
+          @OC:StudyEventLocation">
+        <location />
+      </xsl:if>
+       <xsl:if test="ODM:SubjectData/ODM:StudyEventData/@OC:StartDate">
+        <start-date />
+      </xsl:if>
+       <xsl:if test="ODM:SubjectData/ODM:StudyEventData/@OC:EndDate">
+        <end-date />
+      </xsl:if>
+       <xsl:if test="ODM:SubjectData/ODM:StudyEventData/@OC:SubjectAgeAtEvent">
+        <subject-age />
+      </xsl:if>
     </xsl:for-each>
   </xsl:variable>
 
@@ -76,6 +97,15 @@
           </xsl:if>
           <form id="{$fi}" name="{$fd/@Name}"
               no="{count($fd/preceding-sibling::ODM:FormDef) + 1}">
+            <xsl:if test="$fg/@OC:InterviewerName">
+              <field name="Interviewer Name" code="InterviewerName" />
+            </xsl:if>
+            <xsl:if test="$fg/@OC:InterviewDate">
+              <field name="Interview Date" code="InterviewDate" />
+            </xsl:if>
+            <xsl:if test="$fg/@OC:Status">
+              <field name="Status" code="Status" />
+            </xsl:if>
             <xsl:for-each-group select="$fg/ODM:ItemGroupData" 
                 group-by="@ItemGroupOID">
               <xsl:variable name="gg" select="current-group()" />
@@ -126,7 +156,7 @@
         <xsl:for-each select="form">
           <xsl:sort select="@no" data-type="number" />
           <xsl:copy>
-            <xsl:copy-of select="@*" />
+            <xsl:copy-of select="@* | field" />
             <xsl:for-each select="group">
               <xsl:sort select="@no" data-type="number" />
               <xsl:copy>
@@ -163,6 +193,7 @@
                 <xsl:copy-of select="@*" />
                 <xsl:attribute name="global-no"
                     select="count(preceding::form) + 1" />
+                <xsl:copy-of select="field" />
                 <xsl:for-each select="group">
                   <xsl:variable name="gd" select="." />
                   <xsl:variable name="gr" select="@repeat = 'true'" />
@@ -296,14 +327,24 @@
     <xsl:text>Event (Occurrence)</xsl:text>
     <!-- Event names. -->
     <xsl:for-each select="$ext-map/event">
-      <xsl:copy-of select="$TAB" />
-      <xsl:call-template name="event-name" />
+      <xsl:variable name="event" select="." />
+      <xsl:for-each select="$evt-map/*">
+        <xsl:copy-of select="$TAB" />
+        <xsl:for-each select="$event">
+          <xsl:call-template name="event-name" />
+        </xsl:for-each>
+      </xsl:for-each>
     </xsl:for-each>
     <!-- Extended event headers for items. -->
-    <xsl:for-each select="$ext-map/event/form/group/item">
-      <xsl:for-each select="ancestor::event">
+    <xsl:for-each select="$ext-map/event">
+      <xsl:variable name="event-name">
         <xsl:copy-of select="$TAB" />
         <xsl:call-template name="event-name"/>
+      </xsl:variable>
+      <xsl:for-each select="form">
+        <xsl:for-each select="field | group/item">
+          <xsl:copy-of select="$event-name" />
+        </xsl:for-each>
       </xsl:for-each>
     </xsl:for-each>
     <xsl:copy-of select="$LF" />
@@ -313,14 +354,21 @@
     <xsl:text>CRF - Version</xsl:text>
     <!-- Empty cells under event names. -->
     <xsl:for-each select="$ext-map/event">
-      <xsl:text></xsl:text>
-      <xsl:copy-of select="$TAB" />
+      <xsl:for-each select="$evt-map/*">
+        <xsl:text></xsl:text>
+        <xsl:copy-of select="$TAB" />
+      </xsl:for-each>
     </xsl:for-each>
     <!-- Extended form headers for items. -->
-    <xsl:for-each select="$ext-map/event/form/group/item">
-      <xsl:text></xsl:text>
-      <xsl:copy-of select="$TAB" />
-      <xsl:value-of select="ancestor::form/@name" />
+    <xsl:for-each select="$ext-map/event/form">
+      <xsl:variable name="form-name">
+        <xsl:text></xsl:text>
+        <xsl:copy-of select="$TAB" />
+        <xsl:value-of select="@name" />
+      </xsl:variable>
+      <xsl:for-each select="field | group/item">
+        <xsl:copy-of select="$form-name" />
+      </xsl:for-each>
     </xsl:for-each>
     <xsl:copy-of select="$LF" />
 
@@ -329,19 +377,31 @@
     <xsl:text>Item Description (Occurrence)</xsl:text>
     <!-- Empty cells under event names. -->
     <xsl:for-each select="$ext-map/event">
-      <xsl:text></xsl:text>
-      <xsl:copy-of select="$TAB" />
+      <xsl:for-each select="$evt-map/*">
+        <xsl:text></xsl:text>
+        <xsl:copy-of select="$TAB" />
+      </xsl:for-each>
     </xsl:for-each>
-    <!-- Human-readable item names. -->
-    <xsl:for-each select="$ext-map/event/form/group/item">
-      <xsl:text></xsl:text>
-      <xsl:copy-of select="$TAB" />
-      <xsl:value-of select="@name" />
-      <xsl:if test="parent::group/@repeat = 'true'">
-        <xsl:text> (</xsl:text>
-        <xsl:value-of select="parent::group/@rep" />
-        <xsl:text>)</xsl:text>
-      </xsl:if>
+    <!-- Human-readable form fields and item names. -->
+    <xsl:for-each select="$ext-map/event/form">
+      <xsl:for-each select="field">
+        <xsl:copy-of select="$TAB" />
+        <xsl:value-of select="@name" />
+      </xsl:for-each>
+      <xsl:for-each select="group">
+        <xsl:variable name="group-suffix">
+          <xsl:if test="@repeat = 'true'">
+            <xsl:text> (</xsl:text>
+            <xsl:value-of select="@rep" />
+            <xsl:text>)</xsl:text>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:for-each select="item">
+          <xsl:copy-of select="$TAB" />
+          <xsl:value-of select="@name" />
+          <xsl:copy-of select="$group-suffix" />
+        </xsl:for-each>
+      </xsl:for-each>
     </xsl:for-each>
     <xsl:copy-of select="$LF" />
 
@@ -355,24 +415,45 @@
     <xsl:text>Item Name</xsl:text>
     <!-- Event status codes. -->
     <xsl:for-each select="$ext-map/event">
-      <xsl:copy-of select="$TAB" />
-      <xsl:text>Event Status_</xsl:text>
-      <xsl:call-template name="event-code" />
+      <xsl:apply-templates mode="head" select="$evt-map/*">
+        <xsl:with-param name="event" select="." />
+      </xsl:apply-templates>
     </xsl:for-each>
-    <!-- Item status codes. -->
-    <xsl:for-each select="$ext-map/event/form/group/item">
-      <xsl:copy-of select="$TAB" />
-      <xsl:value-of select="@code" />
-      <xsl:text>_</xsl:text>
-      <xsl:for-each select="ancestor::event">
-        <xsl:call-template name="event-code" />
-      </xsl:for-each>
-      <xsl:text>_C</xsl:text>
-      <xsl:value-of select="ancestor::form/@global-no" />
-      <xsl:if test="parent::group/@repeat = 'true'">
+    <!-- Field and item codes. -->
+    <xsl:for-each select="$ext-map/event">
+      <xsl:variable name="event-code">
         <xsl:text>_</xsl:text>
-        <xsl:value-of select="parent::group/@rep" />
-      </xsl:if>
+        <xsl:call-template name="event-code" />
+      </xsl:variable>
+      <xsl:for-each select="form">
+        <xsl:variable name="form-code">
+          <xsl:text>_C</xsl:text>
+          <xsl:value-of select="@global-no" />
+        </xsl:variable>
+        <xsl:for-each select="field">
+          <xsl:text></xsl:text>
+          <xsl:copy-of select="$TAB" />
+          <xsl:value-of select="@code" />
+          <xsl:copy-of select="$event-code" />
+          <xsl:copy-of select="$form-code" />
+        </xsl:for-each>
+        <xsl:for-each select="group">
+          <xsl:variable name="group-code">
+            <xsl:if test="@repeat = 'true'">
+              <xsl:text>_</xsl:text>
+              <xsl:value-of select="@rep" />
+            </xsl:if>
+          </xsl:variable>
+          <xsl:for-each select="item">
+            <xsl:text></xsl:text>
+            <xsl:copy-of select="$TAB" />
+            <xsl:value-of select="@code" />
+            <xsl:copy-of select="$event-code" />
+            <xsl:copy-of select="$form-code" />
+            <xsl:copy-of select="$group-code" />
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:for-each>
     </xsl:for-each>
     <xsl:copy-of select="$LF" />
 
@@ -397,9 +478,9 @@
         <xsl:variable name="event" select="$this/ODM:StudyEventData
             [@StudyEventOID = current()/@id and (current()/@repeat != 'true'
             or @StudyEventRepeatKey = current()/@rep)]" />
-        <xsl:text></xsl:text>
-        <xsl:copy-of select="$TAB" />
-        <xsl:value-of select="$event/@OC:Status" />
+        <xsl:apply-templates mode="body" select="$evt-map/*">
+          <xsl:with-param name="event" select="$event" />
+        </xsl:apply-templates>
       </xsl:for-each>
       <!-- Primary data -->
       <xsl:for-each select="$ext-map/event">
@@ -410,6 +491,9 @@
         <xsl:for-each select="form">
           <xsl:variable name="form" select="$event/ODM:FormData
               [@FormOID = current()/@id]" />
+          <xsl:apply-templates mode="body" select="field">
+            <xsl:with-param name="form" select="$form" />
+          </xsl:apply-templates>
           <xsl:text></xsl:text>
           <xsl:for-each select="group">
             <xsl:variable name="group" select="$form/ODM:ItemGroupData
@@ -495,6 +579,55 @@
     <xsl:copy-of select="$TAB" />
   </xsl:template>
 
+  <xsl:template mode="head" match="event-status">
+    <xsl:param name="event" />
+
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="'Event Status_'" />
+    <xsl:for-each select="$event">
+      <xsl:call-template name="event-code" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template mode="head" match="location">
+    <xsl:param name="event" />
+
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="'Location_'" />
+    <xsl:for-each select="$event">
+      <xsl:call-template name="event-code" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template mode="head" match="start-date">
+    <xsl:param name="event" />
+
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="'Start Date_'" />
+    <xsl:for-each select="$event">
+      <xsl:call-template name="event-code" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template mode="head" match="end-date">
+    <xsl:param name="event" />
+
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="'End Date_'" />
+    <xsl:for-each select="$event">
+      <xsl:call-template name="event-code" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template mode="head" match="subject-age">
+    <xsl:param name="event" />
+
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="'Subject Age at Event_'" />
+    <xsl:for-each select="$event">
+      <xsl:call-template name="event-code" />
+    </xsl:for-each>
+  </xsl:template>
 
   <!-- [body] -->
 
@@ -539,6 +672,61 @@
     <xsl:value-of select="$subject/OC:SubjectGroupData
         [@OC:StudyGroupClassName = current()/@name]/@OC:StudyGroupName" />
     <xsl:copy-of select="$TAB" />
+  </xsl:template>
+
+  <!-- [body] end-date -->
+  <xsl:template mode="body" match="end-date">
+    <xsl:param name="event" />
+
+    <xsl:text></xsl:text>
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="$event/@OC:EndDate" />
+  </xsl:template>
+
+  <!-- [body] event-status -->
+  <xsl:template mode="body" match="event-status">
+    <xsl:param name="event" />
+
+    <xsl:text></xsl:text>
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="$event/@OC:Status" />
+  </xsl:template>
+
+  <!-- [body] location -->
+  <xsl:template mode="body" match="location">
+    <xsl:param name="event" />
+
+    <xsl:text></xsl:text>
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="$event/@OC:StudyEventLocation" />
+  </xsl:template>
+
+  <!-- [body] start-date -->
+  <xsl:template mode="body" match="start-date">
+    <xsl:param name="event" />
+
+    <xsl:text></xsl:text>
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="$event/@OC:StartDate" />
+  </xsl:template>
+
+  <!-- [body] subject-age -->
+  <xsl:template mode="body" match="subject-age">
+    <xsl:param name="event" />
+
+    <xsl:text></xsl:text>
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="$event/@OC:SubjectAgeAtEvent" />
+  </xsl:template>
+
+  <!-- [body] form/field -->
+
+  <xsl:template mode="body" match="form/field">
+    <xsl:param name="form" />
+
+    <xsl:text></xsl:text>
+    <xsl:copy-of select="$TAB" />
+    <xsl:value-of select="$form/@OC:*[local-name() = current()/@code]" />
   </xsl:template>
 
 
