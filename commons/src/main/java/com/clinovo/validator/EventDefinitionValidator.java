@@ -270,10 +270,7 @@ public final class EventDefinitionValidator {
 			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable",
 					new Object[]{crfName, versionName}, locale));
 			errors.put("defaultversion", errorMessages);
-		} else
-			if ((!currentStudy.isSite() && studyEventDefinitionBean.getStudyId() != currentStudy.getId())
-					|| (currentStudy.isSite()
-							&& studyEventDefinitionBean.getStudyId() != currentStudy.getParentStudyId())) {
+		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
 					new Object[]{eventId, currentStudy.getId()}, locale));
@@ -375,7 +372,7 @@ public final class EventDefinitionValidator {
 	 *            EDCItemMetadataService
 	 * @return HashMap
 	 */
-	public static HashMap validateStudyEDC(MessageSource messageSource, DataSource dataSource, int eventId,
+	public static HashMap validateEDC(MessageSource messageSource, DataSource dataSource, int eventId,
 			StudyEventDefinitionBean studyEventDefinitionBean, EventDefinitionCRFBean eventDefinitionCRFBean,
 			StudyBean currentStudy, EDCItemMetadataService edcItemMetadataService) {
 		Locale locale = LocaleResolver.getLocale();
@@ -408,13 +405,80 @@ public final class EventDefinitionValidator {
 				if (eventDefinitionCRFBean.isEvaluatedCRF()
 						&& currentStudy.getStudyParameterConfig().getStudyEvaluator().equalsIgnoreCase("no")) {
 				ArrayList errorMessages = new ArrayList();
-				errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.crfEvaluationIsNotAvailableFor",
-						new Object[]{messageSource.getMessage(currentStudy.isSite() ? "site" : "study", null, locale)},
-						locale));
+				errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.crfEvaluationIsNotAvailable",
+						null, locale));
 				errors.put("dataentryquality", errorMessages);
 			}
 		}
 
+		return errors;
+	}
+
+	/**
+	 * Method perform validation.
+	 *
+	 * @param messageSource
+	 *            MessageSource
+	 * @param dataSource
+	 *            DataSource
+	 * @param eventId
+	 *            int
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param eventDefinitionCRFBean
+	 *            EventDefinitionCRFBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param edcItemMetadataService
+	 *            EDCItemMetadataService
+	 * @return HashMap
+	 */
+	public static HashMap validateSiteEDC(MessageSource messageSource, DataSource dataSource, int eventId,
+			StudyEventDefinitionBean studyEventDefinitionBean, EventDefinitionCRFBean eventDefinitionCRFBean,
+			StudyBean currentStudy, EDCItemMetadataService edcItemMetadataService) {
+		Locale locale = LocaleResolver.getLocale();
+
+		HashMap errors = validateEDC(messageSource, dataSource, eventId, studyEventDefinitionBean,
+				eventDefinitionCRFBean, currentStudy, edcItemMetadataService);
+
+		if (errors.isEmpty()) {
+			if (eventDefinitionCRFBean.getSelectedVersionNames().trim().isEmpty()) {
+				ArrayList errorMessages = new ArrayList();
+				errorMessages.add(
+						messageSource.getMessage("rest.eventservice.editEDC.availableVersionsIsEmpty", null, locale));
+				errors.put("availableversions", errorMessages);
+			} else {
+				String selectedVersionIds = "";
+				boolean defaultVersionIsPresent = false;
+				CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
+				for (String versionName : eventDefinitionCRFBean.getSelectedVersionNames().split(",")) {
+					versionName = versionName.trim();
+					defaultVersionIsPresent = !defaultVersionIsPresent
+							&& versionName.equals(eventDefinitionCRFBean.getDefaultVersionName())
+							|| defaultVersionIsPresent;
+					CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(versionName,
+							eventDefinitionCRFBean.getCrfName());
+					if (crfVersionBean.getId() == 0) {
+						ArrayList errorMessages = new ArrayList();
+						errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.crfDoesNotHaveVersion",
+								new Object[]{eventDefinitionCRFBean.getCrfName(), versionName}, locale));
+						errors.put("availableversions", errorMessages);
+						return errors;
+					} else {
+						selectedVersionIds = selectedVersionIds.concat(selectedVersionIds.isEmpty() ? "" : ",")
+								.concat(Integer.toString(crfVersionBean.getId()));
+					}
+				}
+				eventDefinitionCRFBean.setSelectedVersionIds(selectedVersionIds);
+				if (!defaultVersionIsPresent) {
+					ArrayList errorMessages = new ArrayList();
+					errorMessages.add(messageSource.getMessage(
+							"rest.eventservice.editEDC.defaultVersionShouldBePresentInTheAvailableVersions", null,
+							locale));
+					errors.put("availableversions", errorMessages);
+				}
+			}
+		}
 		return errors;
 	}
 }

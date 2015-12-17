@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 
+import com.clinovo.lib.crf.bean.ItemBeanExt;
 import com.clinovo.lib.crf.builder.CrfBuilder;
 import com.clinovo.lib.crf.enums.CRFSource;
 import com.clinovo.lib.crf.enums.Dictionary;
@@ -222,11 +223,27 @@ public class FormStudioImportCrfServiceImplTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatCrfBuilderProcessesTheTestCrfAndSavesItemRenderMetadataWithCorrectLeftTextWidth() throws Exception {
+	public void testThatCrfBuilderProcessesTheTestCrfAndSavesItemRenderMetadataWithCorrectLeftTextWidth()
+			throws Exception {
 		String jsonData = IOUtils
 				.toString(new DefaultResourceLoader().getResource("data/json/testCrf.json").getInputStream(), "UTF-8");
 		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
 		crfBuilder.build();
 		assertEquals(50, crfBuilder.getItems().get(0).getItemRenderMetadata().getLeftItemTextWidth());
+	}
+
+	@Test
+	public void testThatCrfBuilderProcessesTheTestCrfOptionsWithCommasCorrectly() throws Exception {
+		String jsonData = IOUtils.toString(
+				new DefaultResourceLoader().getResource("data/json/testCrfOptionsWithCommas.json").getInputStream(),
+				"UTF-8");
+		crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, studyBean, owner, Locale.ENGLISH, messageSource);
+		crfBuilder.build();
+		assertEquals(((ItemBeanExt) crfBuilder.getItems().get(0)).getResponseSet().getOptionsText(),
+				"option with \\, comma 1,option with \\, comma 2");
+		assertEquals(((ItemBeanExt) crfBuilder.getItems().get(0)).getResponseSet().getOptionsValues(), "0,1");
+		assertEquals(((ItemBeanExt) crfBuilder.getItems().get(1)).getResponseSet().getOptionsText(),
+				"option \\, comma 1,option \\, comma 2,option \\, comma 3");
+		assertEquals(((ItemBeanExt) crfBuilder.getItems().get(1)).getResponseSet().getOptionsValues(), "0,1,2");
 	}
 }

@@ -55,7 +55,7 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFillEventDefinitionCrfsMethodFillsEventDefinitionCrfsCorrectly() {
-		eventDefinitionService.fillEventDefinitionCrfs(studyBean, studyEventDefinitionBean);
+		eventDefinitionService.fillEventDefinitionCrfs(studyEventDefinitionBean, studyBean);
 		assertEquals(studyEventDefinitionBean.getEventDefinitionCrfs().size(), 3);
 	}
 
@@ -83,13 +83,13 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		eventDefinitionCrfBean.setTabbingMode("leftToRight");
 		eventDefinitionCrfBean.setOwner(userBean);
 		eventDefinitionService.addEventDefinitionCRF(eventDefinitionCrfBean, studyBean, userBean);
-		eventDefinitionService.fillEventDefinitionCrfs(studyBean, studyEventDefinitionBean);
+		eventDefinitionService.fillEventDefinitionCrfs(studyEventDefinitionBean, studyBean);
 		assertEquals(studyEventDefinitionBean.getEventDefinitionCrfs().size(), 4);
 	}
 
 	@Test
 	public void testThatFillEventDefinitionCrfsMethodWorksCorrectly() {
-		eventDefinitionService.fillEventDefinitionCrfs(studyBean, studyEventDefinitionBean);
+		eventDefinitionService.fillEventDefinitionCrfs(studyEventDefinitionBean, studyBean);
 		assertTrue(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getEventName()
 				.equals(studyEventDefinitionBean.getName()));
 		assertTrue(studyEventDefinitionBean.getEventDefinitionCrfs().get(0).getCrfName().equals(

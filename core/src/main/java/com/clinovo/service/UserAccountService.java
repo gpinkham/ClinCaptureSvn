@@ -226,8 +226,11 @@ public interface UserAccountService {
 	 *            UserAccountBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return UserAccountBean
+	 * @throws Exception
+	 *             an Exception
 	 */
-	void removeUser(UserAccountBean userAccountBean, UserAccountBean updater);
+	UserAccountBean removeUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores user.
@@ -236,10 +239,11 @@ public interface UserAccountService {
 	 *            UserAccountBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception;
+	UserAccountBean restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores user.
@@ -250,9 +254,10 @@ public interface UserAccountService {
 	 *            UserAccountBean
 	 * @param userDetails
 	 *            UserDetails
+	 * @return UserAccountBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater, UserDetails userDetails)
+	UserAccountBean restoreUser(UserAccountBean userAccountBean, UserAccountBean updater, UserDetails userDetails)
 			throws Exception;
 }

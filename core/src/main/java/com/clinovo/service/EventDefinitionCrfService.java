@@ -68,11 +68,12 @@ public interface EventDefinitionCrfService {
 	 *            EventDefinitionCRFBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return EventDefinitionCRFBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean, UserAccountBean updater)
-			throws Exception;
+	EventDefinitionCRFBean removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater) throws Exception;
 
 	/**
 	 * Method that restores parent event definition crf.
@@ -81,11 +82,12 @@ public interface EventDefinitionCrfService {
 	 *            EventDefinitionCRFBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return EventDefinitionCRFBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean, UserAccountBean updater)
-			throws Exception;
+	EventDefinitionCRFBean restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+			UserAccountBean updater) throws Exception;
 
 	/**
 	 * Method that removes parent event definition crfs.

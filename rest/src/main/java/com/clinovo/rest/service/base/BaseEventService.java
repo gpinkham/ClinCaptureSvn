@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -43,7 +44,6 @@ import org.springframework.context.MessageSource;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.validator.EventServiceValidator;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
@@ -68,11 +68,26 @@ public abstract class BaseEventService extends BaseService {
 	@Autowired
 	private DataSource dataSource;
 
-	protected StudyEventDefinitionBean getStudyEventDefinition(int id) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
-				dataSource).findByPK(id);
-		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy);
+	protected StudyBean getSite(String siteName) throws Exception {
+		StudyBean site = (StudyBean) new StudyDAO(dataSource).findByName(siteName);
+		if (site.getId() == 0) {
+			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteIsNotFound",
+					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (site.getParentStudyId() != getCurrentStudy().getId()) {
+			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteDoesNotBelongToCurrentScope",
+					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		return site;
+	}
+
+	protected StudyEventDefinitionBean getStudyEventDefinition(int eventId) throws Exception {
+		return (StudyEventDefinitionBean) new StudyEventDefinitionDAO(dataSource).findByPK(eventId);
+	}
+
+	protected StudyEventDefinitionBean getValidatedStudyEventDefinition(int eventId) throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
+		EventServiceValidator.validateStudyEventDefinition(messageSource, eventId, studyEventDefinitionBean,
+				getCurrentStudy(), new UserAccountDAO(dataSource), false);
 		return studyEventDefinitionBean;
 	}
 
@@ -83,13 +98,13 @@ public abstract class BaseEventService extends BaseService {
 				isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 	}
 
-	protected StudyEventDefinitionBean prepareStudyEventDefinition(StudyBean study, int id, String name, String type,
-			String description, Boolean repeating, String category, Boolean isReference, Integer schDay, Integer dayMax,
-			Integer dayMin, Integer emailDay, String emailUser) throws Exception {
+	protected StudyEventDefinitionBean prepareStudyEventDefinition(int id, String name, String type, String description,
+			Boolean repeating, String category, Boolean isReference, Integer schDay, Integer dayMax, Integer dayMin,
+			Integer emailDay, String emailUser) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
 				dataSource).findByPK(id);
-		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, study,
-				new UserAccountDAO(dataSource), true);
+		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean,
+				getCurrentStudy(), new UserAccountDAO(dataSource), true);
 		return prepareStudyEventDefinition(studyEventDefinitionBean, name, type, description, repeating, category,
 				isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 	}
@@ -117,17 +132,20 @@ public abstract class BaseEventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
-	protected EventDefinitionCRFBean getEventDefinitionCRF(int eventId, String crfName) throws Exception {
-		return getEventDefinitionCRF(eventId, crfName, UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource));
-	}
-
 	protected EventDefinitionCRFBean getEventDefinitionCRF(int eventId, String crfName, StudyBean studyBean)
 			throws Exception {
-		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
-				dataSource).findByPK(eventId);
+		return getEventDefinitionCRF(eventId, crfName, studyBean, true);
+	}
 
-		if (studyEventDefinitionBean.getId() == 0) {
+	protected EventDefinitionCRFBean getEventDefinitionCRF(int eventId, String crfName, StudyBean studyBean,
+			boolean checkAvailability) throws Exception {
+		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
+		StudyEventDefinitionBean studyEventDefinitionBean = getValidatedStudyEventDefinition(eventId);
+
+		if (crfBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.event.crfNameIsNotFound", new Object[]{crfName},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (studyEventDefinitionBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.event.isNotFound", new Object[]{eventId},
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} else if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
@@ -137,8 +155,18 @@ public abstract class BaseEventService extends BaseService {
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(dataSource)
 				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventId, crfBean.getId(), studyBean.getId());
 
-		EventServiceValidator.validateStudyEventDefinitionAndEventDefinitionCrf(messageSource, eventId, crfName,
-				crfBean, eventDefinitionCRFBean, studyEventDefinitionBean, studyBean);
+		if (eventDefinitionCRFBean.getId() == 0) {
+			throw new RestException(messageSource,
+					studyBean.isSite()
+							? "rest.event.eventDefinitionCrfIsNotFoundInSite"
+							: "rest.event.eventDefinitionCrfIsNotFoundInStudy",
+					new Object[]{crfName, studyEventDefinitionBean.getName(), studyBean.getName()},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (checkAvailability && !eventDefinitionCRFBean.getStatus().isAvailable()) {
+			throw new RestException(messageSource, "rest.eventservice.editEDC.eventDefinitionCrfIsNotAvailable",
+					new Object[]{crfName, studyEventDefinitionBean.getName()},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 
 		eventDefinitionCrfService.fillEventDefinitionCrf(eventDefinitionCRFBean, studyEventDefinitionBean);
 
@@ -146,35 +174,46 @@ public abstract class BaseEventService extends BaseService {
 	}
 
 	protected EventDefinitionCRFBean prepareNewEventDefinitionCRF(StudyEventDefinitionBean studyEventDefinitionBean,
-			UserAccountBean owner, StudyBean study, String crfName, String defaultVersion, Boolean required,
-			Boolean passwordRequired, Boolean hide, Integer sourceDataVerification, String dataEntryQuality,
-			String emailWhen, String email, String tabbing, Boolean acceptNewCrfVersions) throws Exception {
+			UserAccountBean owner, String crfName, String defaultVersion, Boolean required, Boolean passwordRequired,
+			Boolean hide, Integer sourceDataVerification, String dataEntryQuality, String emailWhen, String email,
+			String tabbing, Boolean acceptNewCrfVersions) throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFBean();
 		eventDefinitionCRFBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
 		eventDefinitionCRFBean.setEventName(studyEventDefinitionBean.getName());
-		eventDefinitionCRFBean.setStudyId(study.getId());
+		eventDefinitionCRFBean.setStudyId(getCurrentStudy().getId());
 		eventDefinitionCRFBean.setOwner(owner);
-		return prepareEventDefinitionCRF(eventDefinitionCRFBean, crfName, defaultVersion, required, passwordRequired,
-				hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing, acceptNewCrfVersions, null,
-				null);
+		return prepareEventDefinitionCRF(getCurrentStudy(), eventDefinitionCRFBean, crfName, defaultVersion, required,
+				passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing,
+				acceptNewCrfVersions, null, null);
 	}
 
 	protected EventDefinitionCRFBean prepareStudyEventDefinitionCRF(int eventId, String crfName, String defaultVersion,
 			Boolean required, Boolean passwordRequired, Boolean hide, Integer sourceDataVerification,
 			String dataEntryQuality, String emailWhen, String email, String tabbing, Boolean acceptNewCrfVersions,
 			Integer propagateChange) throws Exception {
-		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName);
-		return prepareEventDefinitionCRF(eventDefinitionCRFBean, crfName, defaultVersion, required, passwordRequired,
-				hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing, acceptNewCrfVersions,
-				propagateChange, null);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, getCurrentStudy());
+		return prepareEventDefinitionCRF(getCurrentStudy(), eventDefinitionCRFBean, crfName, defaultVersion, required,
+				passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing,
+				acceptNewCrfVersions, propagateChange, null);
 	}
 
-	private EventDefinitionCRFBean prepareEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean,
-			String crfName, String defaultVersion, Boolean required, Boolean passwordRequired, Boolean hide,
+	protected EventDefinitionCRFBean prepareSiteEventDefinitionCRF(int eventId, String crfName, String siteName,
+			String defaultVersion, Boolean required, Boolean passwordRequired, Boolean hide,
 			Integer sourceDataVerification, String dataEntryQuality, String emailWhen, String email, String tabbing,
-			Boolean acceptNewCrfVersions, Integer propagateChange, String availableVersions) throws Exception {
+			String availableVersions) throws Exception {
+		StudyBean site = getSite(siteName);
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, site);
+		return prepareEventDefinitionCRF(site, eventDefinitionCRFBean, crfName, defaultVersion, required,
+				passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing, null, null,
+				availableVersions);
+	}
+
+	private EventDefinitionCRFBean prepareEventDefinitionCRF(StudyBean studyBean,
+			EventDefinitionCRFBean eventDefinitionCRFBean, String crfName, String defaultVersion, Boolean required,
+			Boolean passwordRequired, Boolean hide, Integer sourceDataVerification, String dataEntryQuality,
+			String emailWhen, String email, String tabbing, Boolean acceptNewCrfVersions, Integer propagateChange,
+			String availableVersions) throws Exception {
 		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 
 		eventDefinitionCRFBean.setCrfName(crfName);
 		eventDefinitionCRFBean.setDefaultVersionName(
@@ -203,7 +242,7 @@ public abstract class BaseEventService extends BaseService {
 				acceptNewCrfVersions != null ? acceptNewCrfVersions : eventDefinitionCRFBean.isAcceptNewCrfVersions());
 		eventDefinitionCRFBean.setPropagateChange(propagateChange != null ? propagateChange : PROPAGATE_CHANGE_NO);
 
-		if (currentStudy.isSite()) {
+		if (studyBean.isSite()) {
 			if (availableVersions == null) {
 				String selectedVersionNames = "";
 				for (String versionId : eventDefinitionCRFBean.getSelectedVersionIds().split(",")) {
@@ -226,11 +265,8 @@ public abstract class BaseEventService extends BaseService {
 		return eventDefinitionCRFBean;
 	}
 
-	protected void updateEventDefinitionCRFForStudy(StudyEventDefinitionBean studyEventDefinitionBean,
+	protected EventDefinitionCRFBean updateParentEventDefinitionCRF(StudyEventDefinitionBean studyEventDefinitionBean,
 			EventDefinitionCRFBean eventDefinitionCRFBean) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-
 		List<EventDefinitionCRFBean> childEventDefinitionCRFs = eventDefinitionService
 				.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
 		List<EventDefinitionCRFBean> eventDefinitionCRFs = eventDefinitionService
@@ -246,29 +282,35 @@ public abstract class BaseEventService extends BaseService {
 		}
 
 		HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap = new HashMap<Integer, ArrayList<EDCItemMetadata>>();
-		eventDefinitionService.updateAllEventDefinitionCRFs(currentStudy, updater, studyEventDefinitionBean,
-				eventDefinitionCRFs, childEventDefinitionCRFs, oldEventDefinitionCRFs, signStateRestorerMap,
-				edcItemMetadataMap);
+		eventDefinitionService.updateAllEventDefinitionCRFs(getCurrentStudy(), getCurrentUser(),
+				studyEventDefinitionBean, eventDefinitionCRFs, childEventDefinitionCRFs, oldEventDefinitionCRFs,
+				signStateRestorerMap, edcItemMetadataMap);
+		return eventDefinitionCRFBean;
 	}
 
-	protected void addEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, StudyBean studyBean,
-			UserAccountBean owner) {
-		eventDefinitionService.addEventDefinitionCRF(eventDefinitionCRFBean, studyBean, owner);
+	protected EventDefinitionCRFBean addEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean) {
+		eventDefinitionService.addEventDefinitionCRF(eventDefinitionCRFBean, getCurrentStudy(), getCurrentUser());
 		if (eventDefinitionCRFBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.addCrf.operationFailed");
 		}
+		return eventDefinitionCRFBean;
 	}
 
-	protected void deleteEventDefinitionCRF(int eventId, String crfName) throws Exception {
+	protected StudyEventDefinitionBean createStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean) {
+		eventDefinitionService.createStudyEventDefinition(studyEventDefinitionBean, getCurrentUser(),
+				getCurrentStudy());
+		if (studyEventDefinitionBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.createEvent.operationFailed");
+		}
+		return studyEventDefinitionBean;
+	}
+
+	protected String deleteEventDefinitionCRF(int eventId, String crfName) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
 				dataSource).findByPK(eventId);
-		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName);
-		if (!eventDefinitionCRFBean.getStatus().isAvailable()) {
-			throw new RestException(messageSource, "rest.eventservice.editEDC.eventDefinitionCrfIsNotAvailable",
-					new Object[]{eventDefinitionCRFBean.getCrfName(), studyEventDefinitionBean.getName()},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
+		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, getCurrentStudy());
 		eventDefinitionCrfService.deleteEventDefinitionCRF(RuleSetServiceUtil.getRuleSetService(),
 				studyEventDefinitionBean, eventDefinitionCRFBean, LocaleResolver.getLocale());
+		return STATUS_OK;
 	}
 }

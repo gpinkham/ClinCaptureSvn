@@ -43,7 +43,7 @@ public class CrfService extends BaseService {
 	@ResponseBody
 	@RequestMapping(value = "/json/importCrf", method = RequestMethod.POST)
 	public CRFVersionBean importCrf(@RequestParam("jsondata") String jsonData) throws Exception {
-		return processRequest(jsonData, false);
+		return importCrf(jsonData, false);
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class CrfService extends BaseService {
 	@ResponseBody
 	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
 	public CRFVersionBean importCrfVersion(@RequestParam("jsondata") String jsonData) throws Exception {
-		return processRequest(jsonData, true);
+		return importCrf(jsonData, true);
 	}
 }

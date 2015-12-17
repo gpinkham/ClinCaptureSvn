@@ -108,26 +108,34 @@ public interface EventDefinitionService {
 	 *            EventDefinitionCRFBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return EventDefinitionCRFBean
 	 */
-	void updateChildEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater);
+	EventDefinitionCRFBean updateChildEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean,
+			UserAccountBean updater);
 
 	/**
 	 * Method that updates only the study event definition without its event definition crfs.
 	 *
 	 * @param studyEventDefinitionBean
 	 *            StudyEventDefinitionBean
+	 * @param updater
+	 *            UserAccountBean
+	 * @return StudyEventDefinitionBean
 	 */
-	void updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater);
+	StudyEventDefinitionBean updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater);
 
 	/**
 	 * Fills info for EventDefinitionCRFBeans.
 	 *
-	 * @param currentStudy
-	 *            StudyBean
 	 * @param studyEventDefinitionBean
 	 *            StudyEventDefinitionBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return StudyEventDefinitionBean
 	 */
-	void fillEventDefinitionCrfs(StudyBean currentStudy, StudyEventDefinitionBean studyEventDefinitionBean);
+	StudyEventDefinitionBean fillEventDefinitionCrfs(StudyEventDefinitionBean studyEventDefinitionBean,
+			StudyBean currentStudy);
 
 	/**
 	 * Method prepares the SignStateRestorer.
@@ -181,11 +189,12 @@ public interface EventDefinitionService {
 	 *            StudyEventDefinitionBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return StudyEventDefinitionBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
-			throws Exception;
+	StudyEventDefinitionBean removeStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater) throws Exception;
 
 	/**
 	 * Method that restores study event definition.
@@ -194,11 +203,12 @@ public interface EventDefinitionService {
 	 *            StudyEventDefinitionBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return StudyEventDefinitionBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
-			throws Exception;
+	StudyEventDefinitionBean restoreStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater) throws Exception;
 
 	/**
 	 * Removes study event definitions.

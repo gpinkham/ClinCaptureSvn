@@ -317,17 +317,19 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+	public EventDefinitionCRFBean removeParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
 			UserAccountBean updater) throws Exception {
 		disableParentEventDefinitionCRF(parentEventDefinitionCRFBean, updater, Status.DELETED);
+		return parentEventDefinitionCRFBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
+	public EventDefinitionCRFBean restoreParentEventDefinitionCrf(EventDefinitionCRFBean parentEventDefinitionCRFBean,
 			UserAccountBean updater) throws Exception {
 		enableParentEventDefinitionCRF(parentEventDefinitionCRFBean, updater);
+		return parentEventDefinitionCRFBean;
 	}
 
 	/**

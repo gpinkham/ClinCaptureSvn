@@ -20,7 +20,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.clinovo.model.ItemRenderMetadata;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -47,6 +46,7 @@ import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.enums.RealValueKey;
 import com.clinovo.lib.crf.service.ImportCrfService;
 import com.clinovo.lib.crf.validator.CommonValidator;
+import com.clinovo.model.ItemRenderMetadata;
 import com.clinovo.util.CodingFieldsUtil;
 
 /**
@@ -133,6 +133,10 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		return result;
 	}
 
+	private String escapeCommas(String value) throws Exception {
+		return value.replaceAll("(?<!\\\\),", "\\\\,");
+	}
+
 	private int getInt(JSONObject jsonObject, String key) throws Exception {
 		int result = 0;
 		try {
@@ -153,7 +157,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		return result;
 	}
 
-	private int getIntFromFloat(JSONObject jsonObject, String key)  throws Exception {
+	private int getIntFromFloat(JSONObject jsonObject, String key) throws Exception {
 		int result = 0;
 		try {
 			result = Math.round(getFloat(jsonObject, key));
@@ -161,6 +165,38 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 			LOGGER.error("Error has occurred.", ex);
 		}
 		return result;
+	}
+
+	private String prepareOptionText(JSONArray jsonArray) throws Exception {
+		String optionsText = EMPTY;
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
+			String value = escapeCommas(getString(jsonObjectOption, NAME));
+			optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA).concat(value);
+		}
+		return optionsText;
+	}
+
+	private String prepareOptionsValues(JSONArray jsonArray) throws Exception {
+		String optionsValues = EMPTY;
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
+			String value = escapeCommas(getString(jsonObjectOption, ImportCrfService.VALUE));
+			optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA).concat(value);
+		}
+		return optionsValues;
+	}
+
+	private String prepareDefaultValue(JSONArray jsonArray) throws Exception {
+		String defaultValue = EMPTY;
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
+			String value = escapeCommas(getString(jsonObjectOption, ImportCrfService.VALUE));
+			if (getBoolean(jsonObjectOption, DEFAULT)) {
+				defaultValue = value;
+			}
+		}
+		return defaultValue;
 	}
 
 	private ItemGroupBean createItemGroup(String groupName, JsonCrfBuilder crfBuilder) {
@@ -275,7 +311,8 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private void createItemRenderMetadata(JSONObject jsonObj, JsonCrfBuilder crfBuilder) throws Exception {
-		crfBuilder.getCurrentItem().getItemRenderMetadata().setLeftItemTextWidth(getIntFromFloat(jsonObj, LEFT_TEXT_WIDTH));
+		crfBuilder.getCurrentItem().getItemRenderMetadata()
+				.setLeftItemTextWidth(getIntFromFloat(jsonObj, LEFT_TEXT_WIDTH));
 		crfBuilder.getCurrentItem().getItemRenderMetadata().setWidth(getIntFromFloat(jsonObj, WIDTH));
 	}
 
@@ -338,21 +375,12 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 				responseType = ResponseType.FILE;
 				break;
 			case LIST :
-				optionsText = EMPTY;
-				optionsValues = EMPTY;
 				label = getString(jsonObj, RESPONSE_LABEL);
 				jsonArray = getJSONArray(jsonObj, OPTIONS);
 				responseType = getBoolean(jsonObj, MULTI_SELECT) ? ResponseType.SELECTMULTI : ResponseType.SELECT;
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
-					String optionValue = getString(jsonObjectOption, ImportCrfService.VALUE);
-					optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA)
-							.concat(getString(jsonObjectOption, NAME));
-					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA).concat(optionValue);
-					if (getBoolean(jsonObjectOption, DEFAULT)) {
-						defaultValue = optionValue;
-					}
-				}
+				optionsText = prepareOptionText(jsonArray);
+				defaultValue = prepareDefaultValue(jsonArray);
+				optionsValues = prepareOptionsValues(jsonArray);
 				if (getString(jsonObj, DEFAULT_VALUE).isEmpty()) {
 					optionsText = COMMA.concat(optionsText);
 					optionsValues = COMMA.concat(optionsValues);
@@ -360,35 +388,19 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 				break;
 			case RADIO :
 			case CODING_RADIO :
-				optionsText = EMPTY;
-				optionsValues = EMPTY;
 				responseType = ResponseType.RADIO;
 				label = getString(jsonObj, RESPONSE_LABEL);
 				jsonArray = getJSONArray(jsonObj, OPTIONS);
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
-					optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA)
-							.concat(getString(jsonObjectOption, NAME));
-					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA)
-							.concat(getString(jsonObjectOption, ImportCrfService.VALUE));
-				}
+				optionsText = prepareOptionText(jsonArray);
+				optionsValues = prepareOptionsValues(jsonArray);
 				break;
 			case CHECKBOX :
-				optionsText = EMPTY;
-				optionsValues = EMPTY;
 				responseType = ResponseType.CHECKBOX;
 				label = getString(jsonObj, RESPONSE_LABEL);
 				jsonArray = getJSONArray(jsonObj, OPTIONS);
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObject jsonObjectOption = jsonArray.getJSONObject(i);
-					String optionValue = getString(jsonObjectOption, ImportCrfService.VALUE);
-					optionsText = optionsText.concat(optionsText.isEmpty() ? EMPTY : COMMA)
-							.concat(getString(jsonObjectOption, NAME));
-					optionsValues = optionsValues.concat(optionsValues.isEmpty() ? EMPTY : COMMA).concat(optionValue);
-					if (getBoolean(jsonObjectOption, DEFAULT)) {
-						defaultValue = optionValue;
-					}
-				}
+				optionsText = prepareOptionText(jsonArray);
+				defaultValue = prepareDefaultValue(jsonArray);
+				optionsValues = prepareOptionsValues(jsonArray);
 				break;
 			default :
 				label = TEXT;

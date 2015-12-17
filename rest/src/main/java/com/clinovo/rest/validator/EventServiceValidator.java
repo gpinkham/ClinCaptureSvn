@@ -17,8 +17,6 @@ package com.clinovo.rest.validator;
 
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -35,59 +33,6 @@ import com.clinovo.util.RequestUtil;
 public final class EventServiceValidator {
 
 	private EventServiceValidator() {
-	}
-
-	/**
-	 * Validates StudyEventDefinitionBean and EventDefinitionCrfBean.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param eventId
-	 *            int
-	 * @param crfName
-	 *            String
-	 * @param crfBean
-	 *            CRFBean
-	 * @param eventDefinitionCRFBean
-	 *            EventDefinitionCRFBean
-	 * @param studyEventDefinitionBean
-	 *            StudyEventDefinitionBean
-	 * @param currentStudy
-	 *            StudyBean
-	 * @throws RestException
-	 *             the RestException
-	 */
-	public static void validateStudyEventDefinitionAndEventDefinitionCrf(MessageSource messageSource, int eventId,
-			String crfName, CRFBean crfBean, EventDefinitionCRFBean eventDefinitionCRFBean,
-			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) throws RestException {
-		validateStudyEventDefinition(messageSource, eventId, studyEventDefinitionBean, currentStudy, null, false);
-		Locale locale = LocaleResolver.getLocale();
-		if (crfBean.getId() == 0) {
-			throw new RestException(
-					messageSource.getMessage("rest.event.crfNameIsNotFound", new Object[]{crfName}, locale));
-		} else if (eventDefinitionCRFBean.getId() == 0) {
-			throw new RestException(messageSource.getMessage("rest.event.eventDefinitionCrfIsNotFound",
-					new Object[]{crfName, studyEventDefinitionBean.getName(), currentStudy.getName()}, locale));
-		}
-	}
-
-	/**
-	 * Validates StudyEventDefinitionBean.
-	 *
-	 * @param messageSource
-	 *            MessageSource
-	 * @param id
-	 *            int
-	 * @param studyEventDefinitionBean
-	 *            StudyEventDefinitionBean
-	 * @param currentStudy
-	 *            StudyBean
-	 * @throws RestException
-	 *             the RestException
-	 */
-	public static void validateStudyEventDefinition(MessageSource messageSource, int id,
-			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) throws RestException {
-		validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, currentStudy, null, false);
 	}
 
 	/**
@@ -114,10 +59,7 @@ public final class EventServiceValidator {
 		Locale locale = LocaleResolver.getLocale();
 		if (!(studyEventDefinitionBean.getId() > 0)) {
 			throw new RestException(messageSource.getMessage("rest.event.isNotFound", new Object[]{id}, locale));
-		} else
-			if ((!currentStudy.isSite() && studyEventDefinitionBean.getStudyId() != currentStudy.getId())
-					|| (currentStudy.isSite()
-							&& studyEventDefinitionBean.getStudyId() != currentStudy.getParentStudyId())) {
+		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			throw new RestException(
 					messageSource.getMessage("rest.event.studyEventDefinitionDoesNotBelongToCurrentScope",
 							new Object[]{id, currentStudy.getId()}, locale));

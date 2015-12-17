@@ -26,9 +26,9 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import com.clinovo.service.ItemRenderMetadataService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
@@ -58,6 +58,7 @@ import com.clinovo.lib.crf.builder.CrfBuilder;
 import com.clinovo.lib.crf.enums.OperationType;
 import com.clinovo.lib.crf.producer.ErrorMessageProducer;
 import com.clinovo.lib.crf.service.ImportCrfService;
+import com.clinovo.service.ItemRenderMetadataService;
 
 /**
  * BaseCrfBuilder.
@@ -155,7 +156,8 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	 *            MessageSource
 	 * @param importCrfService
 	 *            ImportCrfService
-	 * @param metadataService ItemRenderMetadataService
+	 * @param metadataService
+	 *            ItemRenderMetadataService
 	 */
 	public BaseCrfBuilder(UserAccountBean owner, StudyBean studyBean, DataSource dataSource, Locale locale,
 			MessageSource messageSource, ImportCrfService importCrfService, ItemRenderMetadataService metadataService) {
@@ -170,6 +172,18 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		sheetContainer = new SheetValidationContainer();
 		instantValidator = new OnChangeSheetValidator(sheetContainer, ResourceBundleProvider.getPageMessagesBundle());
 	}
+
+	/**
+	 * Sets crf source.
+	 */
+	protected abstract void setCrfSource();
+
+	/**
+	 * Returns ErrorMessageProducer.
+	 *
+	 * @return ErrorMessageProducer
+	 */
+	public abstract ErrorMessageProducer getErrorMessageProducer();
 
 	/**
 	 * Reformats strings correctly considering the \\, and \,.
@@ -497,13 +511,6 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	}
 
 	/**
-	 * Returns ErrorMessageProducer.
-	 *
-	 * @return ErrorMessageProducer
-	 */
-	public abstract ErrorMessageProducer getErrorMessageProducer();
-
-	/**
 	 * Prepares itemGroupCrfRecords collection.
 	 */
 	public void prepareItemGroupCrfRecords() {
@@ -561,12 +568,30 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		return existingItemsMap;
 	}
 
+	private void createItemRenderMeta() {
+		try {
+			for (ItemBean item : items) {
+				ItemBeanExt itemBean = (ItemBeanExt) item;
+				// create item render meta
+				if (itemBean.getItemRenderMetadata() != null && (itemBean.getItemRenderMetadata().getWidth() != 0
+						|| itemBean.getItemRenderMetadata().getLeftItemTextWidth() != 0)) {
+					itemBean.getItemRenderMetadata().setItemId(itemBean.getId());
+					itemBean.getItemRenderMetadata().setCrfVersionId(crfVersionBean.getId());
+					itemRenderMetadataService.save(itemBean.getItemRenderMetadata());
+				}
+			}
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public CRFVersionBean save() {
 		Connection connection = null;
 		boolean operationSuccessful = false;
+		SasNameValidator sasNameValidator = new SasNameValidator();
 		try {
 			List<String> itemOidList = new ArrayList<String>();
 			List<String> itemGroupOidList = new ArrayList<String>();
@@ -623,6 +648,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 				ItemBeanExt itemBean = (ItemBeanExt) item;
 				// create or update item
 				if (!existingItemsMap.keySet().contains(itemBean.getName())) {
+					itemBean.setSasName(sasNameValidator.getValidName(itemBean.getName()));
 					itemBean.setOid(itemDao.getValidOid(itemBean, crfBean.getName(), itemBean.getName(),
 							(ArrayList) itemOidList));
 					itemDao.create(itemBean, connection);
@@ -715,29 +741,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 				LOGGER.error("Error has occurred.", ex);
 			}
 		}
-
 		// create item render meta
 		if (operationSuccessful) {
-			try {
-				for (ItemBean item : items) {
-					ItemBeanExt itemBean = (ItemBeanExt) item;
-					// create item render meta
-					if (itemBean.getItemRenderMetadata() != null && (itemBean.getItemRenderMetadata().getWidth() != 0
-							|| itemBean.getItemRenderMetadata().getLeftItemTextWidth() != 0)) {
-						itemBean.getItemRenderMetadata().setItemId(itemBean.getId());
-						itemBean.getItemRenderMetadata().setCrfVersionId(crfVersionBean.getId());
-						itemRenderMetadataService.save(itemBean.getItemRenderMetadata());
-					}
-				}
-			} catch (Exception ex) {
-				LOGGER.error("Error has occurred.", ex);
-			}
+			createItemRenderMeta();
 		}
 		return crfVersionBean;
 	}
-
-	/**
-	 * Sets crf source.
-	 */
-	protected abstract void setCrfSource();
 }

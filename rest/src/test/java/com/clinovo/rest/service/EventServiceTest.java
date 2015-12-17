@@ -1369,6 +1369,8 @@ public class EventServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatSystemAdministratorIsAbleToCallStudyEventAPI() throws Exception {
+		createNewSite(studyBean.getId());
+		createChildEDCForNewSite(7, newSite);
 		ResultMatcher expectStatus = status().isOk();
 		this.mockMvc.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
 				.param("description", "test description").param("category", "test category").accept(mediaType)
@@ -1397,6 +1399,8 @@ public class EventServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallStudyEventAPI() throws Exception {
+		createNewSite(studyBean.getId());
+		createChildEDCForNewSite(7, newSite);
 		ResultMatcher expectStatus = status().isOk();
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyName);

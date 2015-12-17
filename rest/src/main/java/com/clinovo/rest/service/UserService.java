@@ -113,9 +113,10 @@ public class UserService extends BaseService {
 			@RequestParam(value = "displaypassword", defaultValue = "false", required = false) boolean displayPassword,
 			@RequestParam("role") int role, @RequestParam(value = "timezone", required = false) String timeZone)
 					throws Exception {
+		StudyBean studyBean = getCurrentStudy();
+
 		StudyDAO studyDao = new StudyDAO(dataSource);
 		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-		StudyBean studyBean = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 
 		HashMap errors = UserValidator.validateUserCreate(configurationDao, userAccountDao, studyBean, true);
 		ValidatorUtil.checkForErrors(errors);
@@ -161,10 +162,7 @@ public class UserService extends BaseService {
 	@ResponseBody
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public UserAccountBean removeUser(@RequestParam("username") String userName) throws Exception {
-		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		UserAccountBean userAccountBean = getUserAccountBean(userName);
-		userAccountService.removeUser(userAccountBean, updater);
-		return userAccountBean;
+		return userAccountService.removeUser(getUserAccountBean(userName), getCurrentUser());
 	}
 
 	/**
@@ -179,9 +177,6 @@ public class UserService extends BaseService {
 	@ResponseBody
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public UserAccountBean restoreUser(@RequestParam("username") String userName) throws Exception {
-		UserAccountBean updater = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		UserAccountBean userAccountBean = getUserAccountBean(userName);
-		userAccountService.restoreUser(userAccountBean, updater);
-		return userAccountBean;
+		return userAccountService.restoreUser(getUserAccountBean(userName), getCurrentUser());
 	}
 }

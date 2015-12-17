@@ -184,16 +184,18 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void updateChildEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean, UserAccountBean updater) {
+	public EventDefinitionCRFBean updateChildEventDefinitionCRF(EventDefinitionCRFBean eventDefinitionCRFBean,
+			UserAccountBean updater) {
 		eventDefinitionCRFBean.setUpdater(updater);
 		eventDefinitionCRFBean.setUpdatedDate(new Date());
 		new EventDefinitionCRFDAO(dataSource).update(eventDefinitionCRFBean);
+		return eventDefinitionCRFBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+	public StudyEventDefinitionBean updateOnlyTheStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
 			UserAccountBean updater) {
 		Map<Integer, SignStateRestorer> signStateRestorerMap = prepareSignStateRestorer(studyEventDefinitionBean);
 		studyEventDefinitionBean.setUpdatedDate(new Date());
@@ -202,16 +204,19 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		getStudyEventDefinitionDAO().update(studyEventDefinitionBean);
 		SubjectEventStatusUtil.determineSubjectEventStates(studyEventDefinitionBean,
 				studyEventDefinitionBean.getUpdater(), new DAOWrapper(dataSource), signStateRestorerMap);
+		return studyEventDefinitionBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void fillEventDefinitionCrfs(StudyBean currentStudy, StudyEventDefinitionBean studyEventDefinitionBean) {
+	public StudyEventDefinitionBean fillEventDefinitionCrfs(StudyEventDefinitionBean studyEventDefinitionBean,
+			StudyBean currentStudy) {
 		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
 				.findAllActiveByEventDefinitionId(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		studyEventDefinitionBean.setEventDefinitionCrfs(eventDefinitionCrfs);
+		return studyEventDefinitionBean;
 	}
 
 	/**
@@ -281,17 +286,19 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
-			throws Exception {
+	public StudyEventDefinitionBean removeStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater) throws Exception {
 		disableStudyEventDefinition(studyEventDefinitionBean, updater, Status.DELETED);
+		return studyEventDefinitionBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, UserAccountBean updater)
-			throws Exception {
+	public StudyEventDefinitionBean restoreStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean,
+			UserAccountBean updater) throws Exception {
 		enableStudyEventDefinition(studyEventDefinitionBean, updater);
+		return studyEventDefinitionBean;
 	}
 
 	/**

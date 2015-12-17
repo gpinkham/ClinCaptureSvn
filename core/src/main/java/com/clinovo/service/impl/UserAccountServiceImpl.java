@@ -476,26 +476,27 @@ public class UserAccountServiceImpl implements UserAccountService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeUser(UserAccountBean userAccountBean, UserAccountBean updater) {
+	public UserAccountBean removeUser(UserAccountBean userAccountBean, UserAccountBean updater) {
 		UserAccountDAO userAccountDao = getUserAccountDAO();
 		userAccountBean.setUpdater(updater);
 		userAccountBean.setStatus(Status.DELETED);
 		userAccountDao.delete(userAccountBean);
 		userAccountBean.setActive(userAccountDao.isQuerySuccessful());
+		return userAccountBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception {
-		restoreUser(userAccountBean, updater, null);
+	public UserAccountBean restoreUser(UserAccountBean userAccountBean, UserAccountBean updater) throws Exception {
+		return restoreUser(userAccountBean, updater, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreUser(UserAccountBean userAccountBean, UserAccountBean updater, UserDetails userDetails)
-			throws Exception {
+	public UserAccountBean restoreUser(UserAccountBean userAccountBean, UserAccountBean updater,
+			UserDetails userDetails) throws Exception {
 		UserAccountDAO userAccountDao = getUserAccountDAO();
 		userAccountBean.setRealPassword(securityManager.genPassword());
 		userAccountBean.setPasswd(securityManager.encryptPassword(userAccountBean.getRealPassword(), userDetails));
@@ -504,5 +505,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 		userAccountBean.setStatus(Status.AVAILABLE);
 		userAccountDao.restore(userAccountBean);
 		userAccountBean.setActive(userAccountDao.isQuerySuccessful());
+		return userAccountBean;
 	}
 }

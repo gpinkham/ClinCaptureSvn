@@ -66,6 +66,14 @@ public abstract class BaseService {
 	@Autowired
 	private DataSource dataSource;
 
+	protected StudyBean getCurrentStudy() {
+		return UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+	}
+
+	protected UserAccountBean getCurrentUser() {
+		return UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
+	}
+
 	protected QName convertJavaToXMLType(Class<?> type) {
 		QName nm = new QName("");
 		String className = type.toString();
@@ -105,7 +113,7 @@ public abstract class BaseService {
 		return value;
 	}
 
-	protected CRFVersionBean processRequest(String jsonData, boolean importCrfVersion) throws Exception {
+	protected CRFVersionBean importCrf(String jsonData, boolean importCrfVersion) throws Exception {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 		UserAccountBean owner = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, currentStudy, owner,
