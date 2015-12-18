@@ -3657,6 +3657,12 @@ public abstract class DataEntryServlet extends Controller {
 				DisplayItemBean displayItem = diwgb.getSingleItem();
 				inputName = DataEntryUtil.getInputName(displayItem);
 				dnCreatingParameters.put(inputName, calculateDNParametersForOneItem(displayItem, inputName, request));
+
+				ArrayList<DisplayItemBean> childItems = displayItem.getChildren();
+				for (DisplayItemBean child : childItems) {
+					inputName = DataEntryUtil.getInputName(child);
+					dnCreatingParameters.put(inputName, calculateDNParametersForOneItem(child, inputName, request));
+				}
 			}
 
 		}
