@@ -56,6 +56,6 @@ public class RestAdvice {
 			RequestUtil.getRequest().getSession().removeAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 		}
 		response.setStatus(code);
-		return new Error(ex, code);
+		return new Error(ex, String.valueOf(code));
 	}
 }

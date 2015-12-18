@@ -35,6 +35,7 @@ import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
+import com.clinovo.rest.model.Response;
 import com.clinovo.rest.service.base.BaseEventService;
 import com.clinovo.rest.util.ValidatorUtil;
 import com.clinovo.service.EDCItemMetadataService;
@@ -409,13 +410,13 @@ public class EventService extends BaseEventService {
 	 *            int
 	 * @param crfName
 	 *            String
-	 * @return String status
+	 * @return Response response
 	 * @throws Exception
 	 *             an Exception
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteCrf", method = RequestMethod.POST)
-	public String deleteCrf(@RequestParam("eventid") int eventId, @RequestParam("crfname") String crfName)
+	public Response deleteCrf(@RequestParam("eventid") int eventId, @RequestParam("crfname") String crfName)
 			throws Exception {
 		return deleteEventDefinitionCRF(eventId, crfName);
 	}

@@ -20,17 +20,25 @@
             <xs:element ref="UserAccount" minOccurs="0"/>
             <xs:element ref="UserDetails" minOccurs="0"/>
             <xs:element ref="Error" minOccurs="0"/>
+            <xs:element ref="Response" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="Response" type="response"/>
+
+    <xs:complexType name="response">
+        <xs:sequence>
+            <xs:element ref="Status" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:element name="Error" type="error"/>
 
-    <xs:element name="Code" type="xs:int"/>
     <xs:element name="Message" type="xs:string"/>
 
     <xs:complexType name="error">
         <xs:sequence>
-            <xs:element ref="Code" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
             <xs:element ref="Message" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>

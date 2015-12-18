@@ -44,6 +44,7 @@ import org.springframework.context.MessageSource;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.Response;
 import com.clinovo.rest.validator.EventServiceValidator;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
@@ -305,12 +306,12 @@ public abstract class BaseEventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
-	protected String deleteEventDefinitionCRF(int eventId, String crfName) throws Exception {
+	protected Response deleteEventDefinitionCRF(int eventId, String crfName) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
 				dataSource).findByPK(eventId);
 		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, getCurrentStudy());
 		eventDefinitionCrfService.deleteEventDefinitionCRF(RuleSetServiceUtil.getRuleSetService(),
 				studyEventDefinitionBean, eventDefinitionCRFBean, LocaleResolver.getLocale());
-		return STATUS_OK;
+		return new Response(String.valueOf(HttpServletResponse.SC_OK));
 	}
 }

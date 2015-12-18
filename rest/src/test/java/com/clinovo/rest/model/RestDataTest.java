@@ -10,6 +10,7 @@ public class RestDataTest {
 	public void testThatDefaultConstructorSetsCorrectValuesForFields() throws Exception {
 		RestData restData = new RestData();
 		assertNull(restData.getError());
+		assertNull(restData.getResponse());
 		assertNull(restData.getUserAccountBean());
 		assertNull(restData.getUserDetails());
 		assertNull(restData.getStudyEventDefinitionBean());

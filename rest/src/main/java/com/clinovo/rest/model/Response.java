@@ -24,38 +24,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * Error.
+ * Response.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "Error", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"status", "message"})
-public class Error {
+@XmlRootElement(name = "Response", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"status"})
+public class Response {
 
 	@JsonProperty("status")
 	@XmlElement(name = "Status", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String status;
 
-	@JsonProperty("message")
-	@XmlElement(name = "Message", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private String message;
-
 	/**
-	 * Error default constructor.
+	 * Response default constructor.
 	 */
-	public Error() {
+	public Response() {
 	}
 
 	/**
-	 * Error constructor.
+	 * Response constructor.
 	 *
-	 * @param ex
-	 *            Exception
 	 * @param status
 	 *            String
 	 */
-	public Error(Exception ex, String status) {
+	public Response(String status) {
 		this.status = status;
-		this.message = ex.getMessage();
 	}
 
 	public String getStatus() {
@@ -64,13 +57,5 @@ public class Error {
 
 	public void setStatus(String code) {
 		this.status = status;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 }

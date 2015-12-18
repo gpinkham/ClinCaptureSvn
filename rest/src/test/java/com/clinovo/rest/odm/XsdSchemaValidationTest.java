@@ -120,8 +120,17 @@ public class XsdSchemaValidationTest {
 		RestOdmContainer restOdmContainer = unmarshal(
 				new FileSystemResourceLoader().getResource("classpath:xml/error.xml"));
 		assertNotNull(restOdmContainer.getRestData().getError());
-		assertEquals(restOdmContainer.getRestData().getError().getCode(), 401);
+		assertEquals(restOdmContainer.getRestData().getError().getStatus(), "401");
 		marshal(restOdmContainer.getRestData().getError());
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheResponse() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/response.xml"));
+		assertNotNull(restOdmContainer.getRestData().getResponse());
+		assertEquals(restOdmContainer.getRestData().getResponse().getStatus(), "401");
+		marshal(restOdmContainer.getRestData().getResponse());
 	}
 
 	@Test

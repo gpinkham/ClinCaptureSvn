@@ -35,6 +35,9 @@ public class RestData {
 	@XmlElement(name = "Error", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private Error error;
 
+	@XmlElement(name = "Response", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private Response response;
+
 	@XmlElement(name = "UserDetails", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private UserDetails userDetails;
 
@@ -56,6 +59,14 @@ public class RestData {
 
 	public void setError(Error error) {
 		this.error = error;
+	}
+
+	public Response getResponse() {
+		return response;
+	}
+
+	public void setResponse(Response response) {
+		this.response = response;
 	}
 
 	public UserDetails getUserDetails() {
