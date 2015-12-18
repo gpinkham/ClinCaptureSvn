@@ -44,7 +44,7 @@ public final class Navigation {
 			"/pages/managestudy/changeCRFVersion", "/CreateCRFVersion", "/RemoveCRF", "/RemoveCRFVersion",
 			"/RestoreCRF", "/RestoreCRFVersion", "/pages/deleteCRFVersion", "/LockCRFVersion", "/UnlockCRFVersion",
 			"/CreateSubStudy", "/RemoveCRFFromDefinition", "/RestoreCRFFromDefinition", "/AddCRFToDefinition",
-			"/InitialDataEntry", "/AdministrativeEditing", "/pages/completeCRFDelete", "/pages/configureItemLevelSDV"));
+			"/AdministrativeEditing", "/pages/completeCRFDelete", "/pages/configureItemLevelSDV"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
@@ -60,7 +60,8 @@ public final class Navigation {
 			"/pages/generateCasebook"));
 	// set of pages with special processing
 	private static Set<String> specialURLs = new HashSet<String>(Arrays.asList("/ListEventsForSubjects",
-			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation"));
+			"/ListStudySubjects", "/EnterDataForStudyEvent", "/ViewSectionDataEntry", "/pages/crfEvaluation", 
+			"/InitialDataEntry"));
 	private static String defaultShortURL = "/MainMenu";
 	private static Set<String> queryParameterRequiredURLs = new HashSet<String>(Arrays.asList("/ViewStudySubject"));
 
@@ -154,12 +155,19 @@ public final class Navigation {
 			return;
 		}
 
-		if (!visitedURLs.isEmpty() && "/ViewStudySubject".equals(requestShortURI) && requestShortURL.contains("ref=sm")) {
+		if ("/ViewStudySubject".equals(requestShortURI) && !visitedURLs.isEmpty()) {
 			// remove subject matrix url
-			if (visitedURLs.peek().contains("&fromSearch=true")) {
-				visitedURLs.pop();
+			if (requestShortURL.contains("ref=sm")) {
+				if (visitedURLs.peek().contains("&fromSearch=true")) {
+					visitedURLs.pop();
+				}
+				visitedURLs.push(requestShortURL);
+				return;
 			}
-			visitedURLs.push(requestShortURL);
+			
+			if (!visitedURLs.peek().equals(requestShortURL)) {
+				visitedURLs.push(requestShortURL);
+			}
 			return;
 		}
 
@@ -169,6 +177,19 @@ public final class Navigation {
 			}
 		}
 
+		if ("/InitialDataEntry".equals(requestShortURI)) {
+			if (!visitedURLs.isEmpty() && visitedURLs.peek().contains("/AddNewSubject")) {
+				visitedURLs.pop();
+				if (visitedURLs.isEmpty() || !(visitedURLs.peek().contains("/ListStudySubjects") 
+						|| visitedURLs.peek().contains("/ListEventsForSubjects"))) {
+					visitedURLs.push("/ListStudySubjects");
+				} 
+				return;
+			}
+			visitedURLs.push("skip!");
+			return;
+		}
+		
 		if ("/ViewSectionDataEntry".equals(requestShortURI)) {
 			if (requestShortURL.contains("cw=1")) {
 				// popup on SDV-page
@@ -184,12 +205,7 @@ public final class Navigation {
 			return;
 		}
 
-		if ("/ViewStudySubject".equals(requestShortURI)) {
-			if (!visitedURLs.peek().equals(requestShortURL)) {
-				visitedURLs.push(requestShortURL);
-			}
-			return;
-		}
+		
 
 		if (requestShortURI.indexOf("/print/") == 0) {
 			return;
