@@ -70,13 +70,13 @@ public final class EventServiceValidator {
 			prepareForValidation("repeating", studyEventDefinitionBean.isRepeating());
 			prepareForValidation("category", studyEventDefinitionBean.getCategory());
 			if (prepareForValidation("type", studyEventDefinitionBean.getType()).equalsIgnoreCase("calendared_visit")) {
-				boolean isRreference = prepareForValidation("isreference", studyEventDefinitionBean.getReferenceVisit())
+				boolean isRreference = prepareForValidation("isReference", studyEventDefinitionBean.getReferenceVisit())
 						.equalsIgnoreCase("true");
-				prepareForValidation("schday", !isRreference ? studyEventDefinitionBean.getScheduleDay() : 0);
-				prepareForValidation("maxday", !isRreference ? studyEventDefinitionBean.getMaxDay() : 0);
-				prepareForValidation("minday", !isRreference ? studyEventDefinitionBean.getMinDay() : 0);
-				prepareForValidation("emailday", !isRreference ? studyEventDefinitionBean.getEmailDay() : 0);
-				prepareForValidation("emailuser", !isRreference
+				prepareForValidation("schDay", !isRreference ? studyEventDefinitionBean.getScheduleDay() : 0);
+				prepareForValidation("maxDay", !isRreference ? studyEventDefinitionBean.getMaxDay() : 0);
+				prepareForValidation("minDay", !isRreference ? studyEventDefinitionBean.getMinDay() : 0);
+				prepareForValidation("emailDay", !isRreference ? studyEventDefinitionBean.getEmailDay() : 0);
+				prepareForValidation("emailUser", !isRreference
 						? userAccountDao.findByPK(studyEventDefinitionBean.getUserEmailId()).getName()
 						: "");
 			}

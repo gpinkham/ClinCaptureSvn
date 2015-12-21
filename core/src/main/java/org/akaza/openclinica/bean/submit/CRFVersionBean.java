@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "crfid", "crfname", "version", "status"})
+@JsonPropertyOrder({"id", "crfId", "crfName", "version", "status"})
 @SuppressWarnings("serial")
 public class CRFVersionBean extends AuditableEntityBean {
 
@@ -47,11 +47,11 @@ public class CRFVersionBean extends AuditableEntityBean {
 	@XmlTransient
 	private String description = "";
 
-	@JsonProperty("crfid")
+	@JsonProperty("crfId")
 	@XmlElement(name = "CrfId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int crfId = 0;
 
-	@JsonProperty("crfname")
+	@JsonProperty("crfName")
 	@XmlElement(name = "CrfName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String crfName = "";
 
@@ -245,8 +245,7 @@ public class CRFVersionBean extends AuditableEntityBean {
 	}
 
 	public boolean isAvailable() {
-		return this.getStatus() != Status.DELETED
-				&& this.getStatus() != Status.LOCKED
+		return this.getStatus() != Status.DELETED && this.getStatus() != Status.LOCKED
 				&& this.getStatus() != Status.AUTO_DELETED;
 	}
 }

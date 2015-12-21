@@ -48,48 +48,44 @@ import com.clinovo.util.ValidatorHelper;
 @SuppressWarnings("rawtypes")
 public final class UserValidator {
 
-	public static final String INPUT_USERNAME = "userName";
-	public static final String INPUT_FIRST_NAME = "firstName";
-	public static final String INPUT_LAST_NAME = "lastName";
-	public static final String INPUT_EMAIL = "email";
-	public static final String INPUT_PHONE = "phone";
-	public static final String INPUT_COMPANY = "company";
-	public static final String INPUT_ACTIVE_STUDY = "activeStudy";
-	public static final String INPUT_ROLE = "role";
 	public static final int FIFTY = 50;
 	public static final int NAMES_LENGTH = 50;
 	public static final int EMAIL_LENGTH = 120;
 	public static final int USERNAME_LENGTH = 64;
 	public static final int INPUT_COMPANY_LENGTH = 255;
-	public static final String INPUT_OLD_PASSWD = "oldPasswd";
+
+	public static final String ROLE = "role";
+
+	public static final String INPUT_ROLE = "role";
+	public static final String INPUT_EMAIL = "email";
+	public static final String INPUT_PHONE = "phone";
 	public static final String INPUT_PASSWD = "passwd";
+	public static final String INPUT_COMPANY = "company";
 	public static final String INPUT_PASSWD_1 = "passwd1";
-	public static final String INPUT_PASSWD_CHALLENGE_QUESTION = "passwdChallengeQuestion";
+	public static final String INPUT_USERNAME = "userName";
+	public static final String INPUT_LAST_NAME = "lastName";
+	public static final String INPUT_OLD_PASSWD = "oldPasswd";
+	public static final String INPUT_FIRST_NAME = "firstName";
+	public static final String INPUT_ACTIVE_STUDY = "activeStudy";
 	public static final String INPUT_PASSWD_CHALLENGE_ANSWER = "passwdChallengeAnswer";
+	public static final String INPUT_PASSWD_CHALLENGE_QUESTION = "passwdChallengeQuestion";
 
 	private UserValidator() {
 	}
 
-	private static String name(String name, boolean lowerCaseParameterNames) {
-		return lowerCaseParameterNames && name != null ? name.toLowerCase() : name;
-	}
-
-	private static void checkRoleConsistency(Role role, StudyBean studyBean, boolean lowerCaseParameterNames,
-			HashMap errors) {
+	private static void checkRoleConsistency(Role role, StudyBean studyBean, HashMap errors) {
 		ResourceBundle exceptionsBundle = ResourceBundleProvider.getExceptionsBundle(LocaleResolver.getLocale());
 		if (studyBean.getParentStudyId() == 0 && (role.getCode().equals(Role.CLINICAL_RESEARCH_COORDINATOR.getCode())
 				|| role.getCode().equals(Role.INVESTIGATOR.getCode())
 				|| role.getCode().equals(Role.SITE_MONITOR.getCode()))) {
-			Validator.addError(errors, name("role", lowerCaseParameterNames),
-					exceptionsBundle.getString("itsForbiddenToAssignSiteLevelRoleToStudy"));
+			Validator.addError(errors, ROLE, exceptionsBundle.getString("itsForbiddenToAssignSiteLevelRoleToStudy"));
 		} else
 			if (studyBean.getParentStudyId() > 0 && (role.getCode().equals(Role.STUDY_ADMINISTRATOR.getCode())
 					|| role.getCode().equals(Role.STUDY_DIRECTOR.getCode())
 					|| role.getCode().equals(Role.STUDY_MONITOR.getCode())
 					|| role.getCode().equals(Role.STUDY_CODER.getCode())
 					|| role.getCode().equals(Role.STUDY_EVALUATOR.getCode()))) {
-			Validator.addError(errors, name("role", lowerCaseParameterNames),
-					exceptionsBundle.getString("itsForbiddenToAssignStudyLevelRoleToSite"));
+			Validator.addError(errors, ROLE, exceptionsBundle.getString("itsForbiddenToAssignStudyLevelRoleToSite"));
 		}
 	}
 
@@ -102,13 +98,11 @@ public final class UserValidator {
 	 *            UserAccountDAO
 	 * @param studyBean
 	 *            StudyBean
-	 * @param lowerCaseParameterNames
-	 *            boolean
 	 * @return HashMap
 	 */
 	public static HashMap validateUserCreate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
-			StudyBean studyBean, boolean lowerCaseParameterNames) {
-		return validateUserCreate(configurationDao, userAccountDao, null, studyBean, lowerCaseParameterNames);
+			StudyBean studyBean) {
+		return validateUserCreate(configurationDao, userAccountDao, null, studyBean);
 	}
 
 	/**
@@ -126,64 +120,42 @@ public final class UserValidator {
 	 */
 	public static HashMap validateUserCreate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
 			StudyDAO studyDao, StudyBean studyBean) {
-		return validateUserCreate(configurationDao, userAccountDao, studyDao, studyBean, false);
-	}
-
-	/**
-	 * Method perform validation for user create.
-	 *
-	 * @param configurationDao
-	 *            ConfigurationDao
-	 * @param userAccountDao
-	 *            UserAccountDAO
-	 * @param studyDao
-	 *            StudyDAO
-	 * @param studyBean
-	 *            StudyBean
-	 * @param lowerCaseParameterNames
-	 *            boolean
-	 * @return HashMap
-	 */
-	public static HashMap validateUserCreate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
-			StudyDAO studyDao, StudyBean studyBean, boolean lowerCaseParameterNames) {
 		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);
 
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
 
-		validator.addValidation(name(INPUT_USERNAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_USERNAME, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_USERNAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_USERNAME, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, USERNAME_LENGTH);
-		validator.addValidation(name(INPUT_USERNAME, lowerCaseParameterNames), Validator.IS_A_USERNAME);
-		validator.addValidation(name(INPUT_USERNAME, lowerCaseParameterNames), Validator.USERNAME_UNIQUE,
-				userAccountDao);
-		validator.addValidation(name(INPUT_FIRST_NAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_FIRST_NAME, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_USERNAME, Validator.IS_A_USERNAME);
+		validator.addValidation(INPUT_USERNAME, Validator.USERNAME_UNIQUE, userAccountDao);
+		validator.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
-		validator.addValidation(name(INPUT_LAST_NAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_LAST_NAME, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, NAMES_LENGTH);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.IS_A_EMAIL);
-		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
+		validator.addValidation(INPUT_COMPANY, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_COMPANY, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_COMPANY_LENGTH);
 		if (studyDao != null) {
-			validator.addValidation(name(INPUT_ACTIVE_STUDY, lowerCaseParameterNames), Validator.ENTITY_EXISTS,
-					studyDao);
+			validator.addValidation(INPUT_ACTIVE_STUDY, Validator.ENTITY_EXISTS, studyDao);
 		}
-		validator.addValidation(name(INPUT_ROLE, lowerCaseParameterNames), Validator.IS_VALID_TERM, TermType.ROLE);
-		String phone = fp.getString(name(INPUT_PHONE, lowerCaseParameterNames));
+		validator.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
+		String phone = fp.getString(INPUT_PHONE);
 		if (!phone.isEmpty()) {
-			validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+			validator.addValidation(INPUT_PHONE, Validator.IS_A_PHONE_NUMBER);
 		}
 
 		HashMap errors = validator.validate();
 
 		if (errors.isEmpty()) {
-			checkRoleConsistency(Role.get(fp.getInt(INPUT_ROLE)), studyBean, lowerCaseParameterNames, errors);
+			checkRoleConsistency(Role.get(fp.getInt(INPUT_ROLE)), studyBean, errors);
 		}
 
 		return errors;
@@ -197,40 +169,27 @@ public final class UserValidator {
 	 * @return HashMap
 	 */
 	public static HashMap validateUserEdit(ConfigurationDao configurationDao) {
-		return validateUserEdit(configurationDao, false);
-	}
-
-	/**
-	 * Method perform validation for user edit.
-	 *
-	 * @param configurationDao
-	 *            ConfigurationDao
-	 * @param lowerCaseParameterNames
-	 *            boolean
-	 * @return HashMap
-	 */
-	public static HashMap validateUserEdit(ConfigurationDao configurationDao, boolean lowerCaseParameterNames) {
 		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);
 
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
 
-		validator.addValidation(name(INPUT_FIRST_NAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_LAST_NAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_FIRST_NAME, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_FIRST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, FIFTY);
-		validator.addValidation(name(INPUT_LAST_NAME, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, FIFTY);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, EMAIL_LENGTH);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.IS_A_EMAIL);
-		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_COMPANY, lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
+		validator.addValidation(INPUT_COMPANY, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_COMPANY, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INPUT_COMPANY_LENGTH);
-		String phone = fp.getString(name(INPUT_PHONE, lowerCaseParameterNames));
+		String phone = fp.getString(INPUT_PHONE);
 		if (!phone.isEmpty()) {
-			validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+			validator.addValidation(INPUT_PHONE, Validator.IS_A_PHONE_NUMBER);
 		}
 
 		return validator.validate();
@@ -258,61 +217,31 @@ public final class UserValidator {
 	public static HashMap validateUpdateProfile(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
 			String newDigestPass, UserAccountBean userAccountBean, UserDetails userDetails,
 			org.akaza.openclinica.core.SecurityManager securityManager) throws Exception {
-		return validateUpdateProfile(configurationDao, userAccountDao, newDigestPass, userAccountBean, userDetails,
-				securityManager, false);
-	}
-
-	/**
-	 * Method perform validation for update profile.
-	 *
-	 * @param configurationDao
-	 *            ConfigurationDao
-	 * @param userAccountDao
-	 *            UserAccountDAO
-	 * @param newDigestPass
-	 *            String
-	 * @param userAccountBean
-	 *            UserAccountBean
-	 * @param userDetails
-	 *            UserDetails
-	 * @param securityManager
-	 *            org.akaza.openclinica.core.SecurityManager
-	 * @param lowerCaseParameterNames
-	 *            boolean
-	 * @throws Exception
-	 *             an Exception
-	 * @return HashMap
-	 */
-	public static HashMap validateUpdateProfile(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
-			String newDigestPass, UserAccountBean userAccountBean, UserDetails userDetails,
-			org.akaza.openclinica.core.SecurityManager securityManager, boolean lowerCaseParameterNames)
-					throws Exception {
 		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);
 
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
 
-		validator.addValidation(name(INPUT_FIRST_NAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_LAST_NAME, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_EMAIL, lowerCaseParameterNames), Validator.IS_A_EMAIL);
-		validator.addValidation(name(INPUT_PASSWD_CHALLENGE_QUESTION, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_PASSWD_CHALLENGE_ANSWER, lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name(INPUT_OLD_PASSWD, lowerCaseParameterNames), Validator.NO_BLANKS); // old password
-		String phone = fp.getString(name(INPUT_PHONE, lowerCaseParameterNames));
+		validator.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_EMAIL, Validator.IS_A_EMAIL);
+		validator.addValidation(INPUT_PASSWD_CHALLENGE_QUESTION, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_PASSWD_CHALLENGE_ANSWER, Validator.NO_BLANKS);
+		validator.addValidation(INPUT_OLD_PASSWD, Validator.NO_BLANKS); // old password
+		String phone = fp.getString(INPUT_PHONE);
 		if (!phone.isEmpty()) {
-			validator.addValidation(name(INPUT_PHONE, lowerCaseParameterNames), Validator.IS_A_PHONE_NUMBER);
+			validator.addValidation(INPUT_PHONE, Validator.IS_A_PHONE_NUMBER);
 		}
 
-		String password = fp.getString(name(INPUT_PASSWD, lowerCaseParameterNames)).trim();
-		String oldPass = fp.getString(name(INPUT_OLD_PASSWD, lowerCaseParameterNames)).trim();
+		String password = fp.getString(INPUT_PASSWD).trim();
+		String oldPass = fp.getString(INPUT_OLD_PASSWD).trim();
 
 		List<String> pwdErrors = new ArrayList<String>();
 
 		if (!StringUtils.isBlank(password)) {
-			validator.addValidation(name(INPUT_PASSWD, lowerCaseParameterNames), Validator.IS_A_PASSWORD); // new
-																											// password
-			validator.addValidation(name(INPUT_PASSWD_1, lowerCaseParameterNames), Validator.CHECK_SAME,
-					name(INPUT_PASSWD, lowerCaseParameterNames)); // confirm password
+			validator.addValidation(INPUT_PASSWD, Validator.IS_A_PASSWORD); // new
+																			// password
+			validator.addValidation(INPUT_PASSWD_1, Validator.CHECK_SAME, INPUT_PASSWD); // confirm password
 
 			Locale locale = LocaleResolver.getLocale(request);
 			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
@@ -324,11 +253,11 @@ public final class UserValidator {
 
 		HashMap errors = validator.validate();
 		for (String err : pwdErrors) {
-			Validator.addError(errors, name(INPUT_PASSWD, lowerCaseParameterNames), err);
+			Validator.addError(errors, INPUT_PASSWD, err);
 		}
 
 		if (errors.isEmpty() && !securityManager.isPasswordValid(userAccountBean.getPasswd(), oldPass, userDetails)) {
-			Validator.addError(errors, name(INPUT_OLD_PASSWD, lowerCaseParameterNames),
+			Validator.addError(errors, INPUT_OLD_PASSWD,
 					ResourceBundleProvider.getExceptionsBundle().getString("wrong_old_password"));
 		}
 

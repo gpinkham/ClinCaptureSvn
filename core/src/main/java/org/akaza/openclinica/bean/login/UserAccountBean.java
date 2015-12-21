@@ -49,22 +49,22 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "UserAccount", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "username", "firstname", "lastname", "email", "phone", "timezone", "scope", "password",
-		"company", "allowsoap", "role", "usertype", "status"})
+@JsonPropertyOrder({"id", "userName", "firstName", "lastName", "email", "phone", "timeZone", "scope", "password",
+		"company", "allowSoap", "role", "userType", "status"})
 public class UserAccountBean extends AuditableEntityBean {
 
 	private static final long serialVersionUID = -7373737639499260727L;
 
 	public static final String ROOT = "root";
 
-	@JsonProperty("username")
+	@JsonProperty("userName")
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String name = "";
 	@JsonProperty("role")
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String roleCode;
-	@JsonProperty("usertype")
+	@JsonProperty("userType")
 	@XmlElement(name = "UserType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userTypeCode;
 
@@ -72,10 +72,10 @@ public class UserAccountBean extends AuditableEntityBean {
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	@XmlElement(name = "Password", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String passwd;
-	@JsonProperty("firstname")
+	@JsonProperty("firstName")
 	@XmlElement(name = "FirstName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String firstName;
-	@JsonProperty("lastname")
+	@JsonProperty("lastName")
 	@XmlElement(name = "LastName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String lastName;
 	@JsonProperty("email")
@@ -108,7 +108,7 @@ public class UserAccountBean extends AuditableEntityBean {
 	@JsonIgnore
 	@XmlTransient
 	private Integer lockCounter;
-	@JsonProperty("allowsoap")
+	@JsonProperty("allowSoap")
 	@XmlElement(name = "AllowSoap", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private Boolean runWebservices;
 	@JsonIgnore
@@ -117,7 +117,7 @@ public class UserAccountBean extends AuditableEntityBean {
 	@JsonIgnore
 	@XmlTransient
 	private Date pentahoTokenDate;
-	@JsonProperty("timezone")
+	@JsonProperty("timeZone")
 	@XmlElement(name = "TimeZone", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userTimeZoneId;
 

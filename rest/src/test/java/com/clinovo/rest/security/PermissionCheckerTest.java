@@ -45,10 +45,10 @@ public class PermissionCheckerTest extends BaseServiceTest {
 	public void testThatPermissionCheckerReturnsUnauthorizedIfUserIsNotAuthenticated() throws Exception {
 		session.clearAttributes();
 		this.mockMvc
-				.perform(post(API_USER_CREATE).param("username", userName).param("firstname", "firstname")
-						.param("lastname", "lastname").param("email", "user@gmail.com").param("phone", "+375232345678")
-						.param("company", "company").param("usertype", "1").param("allowsoap", "false")
-						.param("displaypassword", "true").param("role", "2").secure(true).session(session))
+				.perform(post(API_USER_CREATE).param("userName", userName).param("firstName", "firstname")
+						.param("lastName", "lastname").param("email", "user@gmail.com").param("phone", "+375232345678")
+						.param("company", "company").param("userType", "1").param("allowSoap", "false")
+						.param("displayPassword", "true").param("role", "2").secure(true).session(session))
 				.andExpect(status().isUnauthorized());
 	}
 }

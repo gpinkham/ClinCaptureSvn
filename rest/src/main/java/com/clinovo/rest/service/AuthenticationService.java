@@ -75,8 +75,8 @@ public class AuthenticationService extends BaseService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/authentication", method = RequestMethod.POST)
-	public UserDetails authenticate(@RequestParam("username") String userName,
-			@RequestParam("password") String password, @RequestParam("studyname") String studyName)
+	public UserDetails authenticate(@RequestParam("userName") String userName,
+			@RequestParam("password") String password, @RequestParam("studyName") String studyName)
 					throws RestException {
 		UserDetails userDetails;
 		StudyDAO studyDao = new StudyDAO(dataSource);

@@ -62,7 +62,7 @@ public class Error {
 		return status;
 	}
 
-	public void setStatus(String code) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

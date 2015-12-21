@@ -13,13 +13,9 @@
 
 package org.akaza.openclinica.bean.managestudy;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.oid.OidGenerator;
-import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,21 +23,27 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * StudyEventDefinitionBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "oid", "eventname", "type", "repeating", "description", "category", "isreference", "minday",
-		"maxday", "schday", "emailday", "useremailid", "status", "eventdefinitioncrfs"})
+@JsonPropertyOrder({"id", "oid", "eventName", "type", "repeating", "description", "category", "isReference", "minDay",
+		"maxDay", "schDay", "emailDay", "userEmailId", "status", "eventDefinitionCrfs"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventDefinitionBean extends AuditableEntityBean implements Comparable {
 
-	@JsonProperty("eventname")
+	@JsonProperty("eventName")
 	@XmlElement(name = "EventName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String name;
 
@@ -103,26 +105,26 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	@XmlTransient
 	private OidGenerator oidGenerator;
 	// Clinovo #62 start
-	@JsonProperty("minday")
+	@JsonProperty("minDay")
 	@XmlElement(name = "MinDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int minDay = 0;
-	@JsonProperty("maxday")
+	@JsonProperty("maxDay")
 	@XmlElement(name = "MaxDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int maxDay = 0;
-	@JsonProperty("emailday")
+	@JsonProperty("emailDay")
 	@XmlElement(name = "EmailDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int emailDay = 0;
-	@JsonProperty("schday")
+	@JsonProperty("schDay")
 	@XmlElement(name = "SchDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int scheduleDay = 0;
-	@JsonProperty("useremailid")
+	@JsonProperty("userEmailId")
 	@XmlElement(name = "UserEmailId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int userEmailId = 0;
-	@JsonProperty("isreference")
+	@JsonProperty("isReference")
 	@XmlElement(name = "IsReference", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean referenceVisit = false;
 
-	@JsonProperty("eventdefinitioncrfs")
+	@JsonProperty("eventDefinitionCrfs")
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private List<EventDefinitionCRFBean> eventDefinitionCrfs = new ArrayList<EventDefinitionCRFBean>();

@@ -122,17 +122,17 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "description", defaultValue = "", required = false) String description,
 			@RequestParam(value = "repeating", defaultValue = "false", required = false) boolean repeating,
 			@RequestParam(value = "category", defaultValue = "", required = false) String category,
-			@RequestParam(value = "isreference", defaultValue = "false", required = false) boolean isReference,
-			@RequestParam(value = "schday", defaultValue = "0", required = false) int schDay,
-			@RequestParam(value = "maxday", defaultValue = "0", required = false) int dayMax,
-			@RequestParam(value = "minday", defaultValue = "0", required = false) int dayMin,
-			@RequestParam(value = "emailday", defaultValue = "0", required = false) int emailDay,
-			@RequestParam(value = "emailuser", defaultValue = "", required = false) String emailUser) throws Exception {
+			@RequestParam(value = "isReference", defaultValue = "false", required = false) boolean isReference,
+			@RequestParam(value = "schDay", defaultValue = "0", required = false) int schDay,
+			@RequestParam(value = "maxDay", defaultValue = "0", required = false) int dayMax,
+			@RequestParam(value = "minDay", defaultValue = "0", required = false) int dayMin,
+			@RequestParam(value = "emailDay", defaultValue = "0", required = false) int emailDay,
+			@RequestParam(value = "emailUser", defaultValue = "", required = false) String emailUser) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = prepareNewStudyEventDefinition(name, type, description,
 				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 
 		HashMap errors = EventDefinitionValidator.validate(configurationDao, new UserAccountDAO(dataSource),
-				getCurrentStudy(), true);
+				getCurrentStudy());
 
 		ValidatorUtil.checkForErrors(errors);
 
@@ -182,17 +182,17 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "description", required = false) String description,
 			@RequestParam(value = "repeating", required = false) Boolean repeating,
 			@RequestParam(value = "category", required = false) String category,
-			@RequestParam(value = "isreference", required = false) Boolean isReference,
-			@RequestParam(value = "schday", required = false) Integer schDay,
-			@RequestParam(value = "maxday", required = false) Integer dayMax,
-			@RequestParam(value = "minday", required = false) Integer dayMin,
-			@RequestParam(value = "emailday", required = false) Integer emailDay,
-			@RequestParam(value = "emailuser", required = false) String emailUser) throws Exception {
+			@RequestParam(value = "isReference", required = false) Boolean isReference,
+			@RequestParam(value = "schDay", required = false) Integer schDay,
+			@RequestParam(value = "maxDay", required = false) Integer dayMax,
+			@RequestParam(value = "minDay", required = false) Integer dayMin,
+			@RequestParam(value = "emailDay", required = false) Integer emailDay,
+			@RequestParam(value = "emailUser", required = false) String emailUser) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = prepareStudyEventDefinition(id, name, type, description,
 				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 
 		HashMap errors = EventDefinitionValidator.validate(configurationDao, new UserAccountDAO(dataSource),
-				getCurrentStudy(), true);
+				getCurrentStudy());
 
 		ValidatorUtil.checkForErrors(errors);
 
@@ -264,22 +264,22 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourcedataverification", values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataentryquality.valueDescription"),
-			@RestParameterPossibleValues(name = "emailwhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailwhen.valueDescription"),
+			@RestParameterPossibleValues(name = "sourceDataVerification", values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataentryquality.valueDescription"),
+			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailwhen.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
 	@RequestMapping(value = "/addCrf", method = RequestMethod.POST)
-	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventid") int eventId,
-			@RequestParam("crfname") String crfName, @RequestParam("defaultversion") String defaultVersion,
+	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventId") int eventId,
+			@RequestParam("crfName") String crfName, @RequestParam("defaultVersion") String defaultVersion,
 			@RequestParam(value = "required", defaultValue = "true", required = false) boolean required,
-			@RequestParam(value = "passwordrequired", defaultValue = "false", required = false) boolean passwordRequired,
+			@RequestParam(value = "passwordRequired", defaultValue = "false", required = false) boolean passwordRequired,
 			@RequestParam(value = "hide", defaultValue = "false", required = false) boolean hide,
-			@RequestParam(value = "sourcedataverification", defaultValue = "3", required = false) int sourceDataVerification,
-			@RequestParam(value = "dataentryquality", defaultValue = "", required = false) String dataEntryQuality,
-			@RequestParam(value = "emailwhen", defaultValue = "", required = false) String emailWhen,
+			@RequestParam(value = "sourceDataVerification", defaultValue = "3", required = false) int sourceDataVerification,
+			@RequestParam(value = "dataEntryQuality", defaultValue = "", required = false) String dataEntryQuality,
+			@RequestParam(value = "emailWhen", defaultValue = "", required = false) String emailWhen,
 			@RequestParam(value = "email", defaultValue = "", required = false) String email,
 			@RequestParam(value = "tabbing", defaultValue = "leftToRight", required = false) String tabbing,
-			@RequestParam(value = "acceptnewcrfversions", defaultValue = "false", required = false) boolean acceptNewCrfVersions)
+			@RequestParam(value = "acceptNewCrfVersions", defaultValue = "false", required = false) boolean acceptNewCrfVersions)
 					throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
 
@@ -332,25 +332,25 @@ public class EventService extends BaseEventService {
 	@RestIgnoreDefaultValues
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourcedataverification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataentryquality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataentryquality.withNone.valueDescription"),
-			@RestParameterPossibleValues(name = "emailwhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailwhen.withNone.valueDescription"),
+			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataentryquality.withNone.valueDescription"),
+			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailwhen.withNone.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom"),
-			@RestParameterPossibleValues(name = "propagatechange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagatechange.valueDescription")})
+			@RestParameterPossibleValues(name = "propagateChange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagatechange.valueDescription")})
 	@RequestMapping(value = "/editStudyCrf", method = RequestMethod.POST)
-	public EventDefinitionCRFBean editStudyCrf(@RequestParam(value = "eventid") int eventId,
-			@RequestParam("crfname") String crfName,
-			@RequestParam(value = "defaultversion", required = false) String defaultVersion,
+	public EventDefinitionCRFBean editStudyCrf(@RequestParam(value = "eventId") int eventId,
+			@RequestParam("crfName") String crfName,
+			@RequestParam(value = "defaultVersion", required = false) String defaultVersion,
 			@RequestParam(value = "required", required = false) Boolean required,
-			@RequestParam(value = "passwordrequired", required = false) Boolean passwordRequired,
+			@RequestParam(value = "passwordRequired", required = false) Boolean passwordRequired,
 			@RequestParam(value = "hide", required = false) Boolean hide,
-			@RequestParam(value = "sourcedataverification", required = false) Integer sourceDataVerification,
-			@RequestParam(value = "dataentryquality", required = false) String dataEntryQuality,
-			@RequestParam(value = "emailwhen", required = false) String emailWhen,
+			@RequestParam(value = "sourceDataVerification", required = false) Integer sourceDataVerification,
+			@RequestParam(value = "dataEntryQuality", required = false) String dataEntryQuality,
+			@RequestParam(value = "emailWhen", required = false) String emailWhen,
 			@RequestParam(value = "email", required = false) String email,
 			@RequestParam(value = "tabbing", required = false) String tabbing,
-			@RequestParam(value = "acceptnewcrfversions", required = false) Boolean acceptNewCrfVersions,
-			@RequestParam(value = "propagatechange", required = false) Integer propagateChange) throws Exception {
+			@RequestParam(value = "acceptNewCrfVersions", required = false) Boolean acceptNewCrfVersions,
+			@RequestParam(value = "propagateChange", required = false) Integer propagateChange) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
 
 		EventDefinitionCRFBean eventDefinitionCRFBean = prepareStudyEventDefinitionCRF(eventId, crfName, defaultVersion,
@@ -378,8 +378,8 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/removeCrf", method = RequestMethod.POST)
-	public EventDefinitionCRFBean removeCrf(@RequestParam("eventid") int eventId,
-			@RequestParam("crfname") String crfName) throws Exception {
+	public EventDefinitionCRFBean removeCrf(@RequestParam("eventId") int eventId,
+			@RequestParam("crfName") String crfName) throws Exception {
 		return eventDefinitionCrfService.removeParentEventDefinitionCrf(
 				getEventDefinitionCRF(eventId, crfName, getCurrentStudy(), false), getCurrentUser());
 	}
@@ -397,8 +397,8 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/restoreCrf", method = RequestMethod.POST)
-	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventid") int eventId,
-			@RequestParam("crfname") String crfName) throws Exception {
+	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventId") int eventId,
+			@RequestParam("crfName") String crfName) throws Exception {
 		return eventDefinitionCrfService.restoreParentEventDefinitionCrf(
 				getEventDefinitionCRF(eventId, crfName, getCurrentStudy(), false), getCurrentUser());
 	}
@@ -410,13 +410,13 @@ public class EventService extends BaseEventService {
 	 *            int
 	 * @param crfName
 	 *            String
-	 * @return Response response
+	 * @return Response
 	 * @throws Exception
 	 *             an Exception
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteCrf", method = RequestMethod.POST)
-	public Response deleteCrf(@RequestParam("eventid") int eventId, @RequestParam("crfname") String crfName)
+	public Response deleteCrf(@RequestParam("eventId") int eventId, @RequestParam("crfName") String crfName)
 			throws Exception {
 		return deleteEventDefinitionCRF(eventId, crfName);
 	}

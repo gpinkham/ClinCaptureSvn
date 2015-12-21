@@ -65,26 +65,6 @@ public final class EventDefinitionValidator {
 	private EventDefinitionValidator() {
 	}
 
-	private static String name(String name, boolean lowerCaseParameterNames) {
-		return lowerCaseParameterNames && name != null ? name.toLowerCase() : name;
-	}
-
-	/**
-	 * Method perform validation.
-	 *
-	 * @param configurationDao
-	 *            ConfigurationDao
-	 * @param userAccountDao
-	 *            UserAccountDAO
-	 * @param currentStudy
-	 *            StudyBean
-	 * @return HashMap
-	 */
-	public static HashMap validate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
-			StudyBean currentStudy) {
-		return validate(configurationDao, userAccountDao, currentStudy, false);
-	}
-
 	private static ArrayList getErrorMessages(String code) {
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 		ArrayList errorMessages = new ArrayList();
@@ -101,12 +81,10 @@ public final class EventDefinitionValidator {
 	 *            UserAccountDAO
 	 * @param currentStudy
 	 *            StudyBean
-	 * @param lowerCaseParameterNames
-	 *            boolean
 	 * @return HashMap
 	 */
 	public static HashMap validate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
-			StudyBean currentStudy, boolean lowerCaseParameterNames) {
+			StudyBean currentStudy) {
 		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
@@ -115,96 +93,95 @@ public final class EventDefinitionValidator {
 
 		Validator validator = new Validator(new ValidatorHelper(request, configurationDao));
 
-		validator.addValidation(name("name", lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name("type", lowerCaseParameterNames), Validator.NO_BLANKS);
-		validator.addValidation(name("name", lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation("name", Validator.NO_BLANKS);
+		validator.addValidation("type", Validator.NO_BLANKS);
+		validator.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
-		validator.addValidation(name("description", lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
-		validator.addValidation(name("category", lowerCaseParameterNames), Validator.LENGTH_NUMERIC_COMPARISON,
+		validator.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
 
-		String isReference = fp.getString(name("isReference", lowerCaseParameterNames));
-		String repeating = fp.getString(name("repeating", lowerCaseParameterNames));
-		String type = fp.getString(name("type", lowerCaseParameterNames));
+		String isReference = fp.getString("isReference");
+		String repeating = fp.getString("repeating");
+		String type = fp.getString("type");
 
 		if (CALENDARED_VISIT.equals(type)) {
-			validator.addValidation(name("maxDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
-			validator.addValidation(name("maxDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
-			validator.addValidation(name("minDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
-			validator.addValidation(name("minDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
-			validator.addValidation(name("schDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
-			validator.addValidation(name("schDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
-			validator.addValidation(name("emailDay", lowerCaseParameterNames), Validator.IS_REQUIRED);
-			validator.addValidation(name("emailDay", lowerCaseParameterNames), Validator.IS_A_FLOAT,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_3);
+			validator.addValidation("maxDay", Validator.IS_REQUIRED);
+			validator.addValidation("maxDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+					INT_3);
+			validator.addValidation("minDay", Validator.IS_REQUIRED);
+			validator.addValidation("minDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+					INT_3);
+			validator.addValidation("schDay", Validator.IS_REQUIRED);
+			validator.addValidation("schDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+					INT_3);
+			validator.addValidation("emailDay", Validator.IS_REQUIRED);
+			validator.addValidation("emailDay", Validator.IS_A_FLOAT, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+					INT_3);
 
 			if (!isReference.equalsIgnoreCase("true")) {
-				validator.addValidation(name("emailUser", lowerCaseParameterNames), Validator.NO_BLANKS);
+				validator.addValidation("emailUser", Validator.NO_BLANKS);
 			}
 
 			request.getSession().setAttribute("changedReference", "true".equalsIgnoreCase(isReference));
 			request.getSession().setAttribute("showCalendaredVisitBox", true);
-			request.getSession().setAttribute("maxDay", fp.getString(name("maxDay", lowerCaseParameterNames)));
-			request.getSession().setAttribute("minDay", fp.getString(name("minDay", lowerCaseParameterNames)));
-			request.getSession().setAttribute("schDay", fp.getString(name("schDay", lowerCaseParameterNames)));
-			request.getSession().setAttribute("emailUser", fp.getString(name("emailUser", lowerCaseParameterNames)));
-			request.getSession().setAttribute("emailDay", fp.getString(name("emailDay", lowerCaseParameterNames)));
+			request.getSession().setAttribute("maxDay", fp.getString("maxDay"));
+			request.getSession().setAttribute("minDay", fp.getString("minDay"));
+			request.getSession().setAttribute("schDay", fp.getString("schDay"));
+			request.getSession().setAttribute("emailUser", fp.getString("emailUser"));
+			request.getSession().setAttribute("emailDay", fp.getString("emailDay"));
 			request.getSession().setAttribute("isReference", isReference);
 		}
 
 		HashMap errors = validator.validate();
 
 		if (errors.isEmpty() && !Arrays.asList(SCHEDULED, UNSCHEDULED, COMMON, CALENDARED_VISIT).contains(type)) {
-			errors.put(name("type", lowerCaseParameterNames), getErrorMessages("rest.studyEventDefinition.wrongType"));
+			errors.put("type", getErrorMessages("rest.studyEventDefinition.wrongType"));
 			return errors;
 		} else if (errors.isEmpty() && repeating.equals("true") && type.equals(CALENDARED_VISIT)) {
-			errors.put(name("repeating", lowerCaseParameterNames),
-					getErrorMessages("rest.studyEventDefinition.calendaredVisitCanNotBeRepeating"));
+			errors.put("repeating", getErrorMessages("rest.studyEventDefinition.calendaredVisitCanNotBeRepeating"));
 			return errors;
 		} else if (errors.isEmpty() && !type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true")) {
-			errors.put(name("isReference", lowerCaseParameterNames),
+			errors.put("isReference",
 					getErrorMessages("rest.studyEventDefinition.onlyCalendaredEventsCanBeReferenced"));
 			return errors;
 		}
 
-		int maxDay = fp.getInt(name("maxDay", lowerCaseParameterNames));
-		int minDay = fp.getInt(name("minDay", lowerCaseParameterNames));
-		int schDay = fp.getInt(name("schDay", lowerCaseParameterNames));
-		int emailDay = fp.getInt(name("emailDay", lowerCaseParameterNames));
-		String emailUser = fp.getString(name("emailUser", lowerCaseParameterNames));
+		int maxDay = fp.getInt("maxDay");
+		int minDay = fp.getInt("minDay");
+		int schDay = fp.getInt("schDay");
+		int emailDay = fp.getInt("emailDay");
+		String emailUser = fp.getString("emailUser");
 
 		if (errors.isEmpty() && ((type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true"))
 				|| !type.equals(CALENDARED_VISIT))) {
 			if (maxDay != 0) {
-				errors.put(name("maxDay", lowerCaseParameterNames),
+				errors.put("maxDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
 								? "rest.studyEventDefinition.dayMaxIsNotUsedForReferenceEvent"
 								: "rest.studyEventDefinition.dayMaxIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (minDay != 0) {
-				errors.put(name("minDay", lowerCaseParameterNames),
+				errors.put("minDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
 								? "rest.studyEventDefinition.dayMinIsNotUsedForReferenceEvent"
 								: "rest.studyEventDefinition.dayMinIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (schDay != 0) {
-				errors.put(name("schDay", lowerCaseParameterNames),
+				errors.put("schDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
 								? "rest.studyEventDefinition.dayScheduleIsNotUsedForReferenceEvent"
 								: "rest.studyEventDefinition.dayScheduleIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (emailDay != 0) {
-				errors.put(name("emailDay", lowerCaseParameterNames),
+				errors.put("emailDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
 								? "rest.studyEventDefinition.dayEmailIsNotUsedForReferenceEvent"
 								: "rest.studyEventDefinition.dayEmailIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (!emailUser.isEmpty()) {
-				errors.put(name("emailUser", lowerCaseParameterNames),
+				errors.put("emailUser",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
 								? "rest.studyEventDefinition.userNameIsNotUsedForReferenceEvent"
 								: "rest.studyEventDefinition.userNameIsUsedForCalendaredEventsOnly"));
@@ -213,25 +190,20 @@ public final class EventDefinitionValidator {
 		}
 
 		if (!(maxDay >= schDay)) {
-			Validator.addError(errors, name("maxDay", lowerCaseParameterNames),
-					resexception.getString("daymax_greate_or_equal_dayschedule"));
+			Validator.addError(errors, "maxDay", resexception.getString("daymax_greate_or_equal_dayschedule"));
 		}
 		if (!(minDay <= schDay)) {
-			Validator.addError(errors, name("minDay", lowerCaseParameterNames),
-					resexception.getString("daymin_less_or_equal_dayschedule"));
+			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_dayschedule"));
 		}
 		if (!(minDay <= maxDay)) {
-			Validator.addError(errors, name("minDay", lowerCaseParameterNames),
-					resexception.getString("daymin_less_or_equal_daymax"));
+			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_daymax"));
 		}
 		if (!(emailDay <= schDay)) {
-			Validator.addError(errors, name("emailDay", lowerCaseParameterNames),
-					resexception.getString("dayemail_less_or_equal_dayschedule"));
+			Validator.addError(errors, "emailDay", resexception.getString("dayemail_less_or_equal_dayschedule"));
 		}
 		if (!emailUser.equals("root") && !checkUserName(studyUserRoleBeanList, emailUser)
 				&& CALENDARED_VISIT.equals(type) && !"true".equalsIgnoreCase(isReference)) {
-			Validator.addError(errors, name("emailUser", lowerCaseParameterNames),
-					resexception.getString("this_user_name_does_not_exist"));
+			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
 		}
 
 		return errors;

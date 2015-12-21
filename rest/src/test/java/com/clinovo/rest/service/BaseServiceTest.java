@@ -227,10 +227,10 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		String email = "email@gmail.com";
 		String phone = "+375232345678";
 		String company = "home";
-		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE).accept(mediaType).param("username", userName)
-				.param("firstname", firstName).param("lastname", lastName).param("email", email).param("phone", phone)
-				.param("company", company).param("usertype", Integer.toString(userType.getId()))
-				.param("allowsoap", "true").param("displaypassword", "true")
+		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE).accept(mediaType).param("userName", userName)
+				.param("firstName", firstName).param("lastName", lastName).param("email", email).param("phone", phone)
+				.param("company", company).param("userType", Integer.toString(userType.getId()))
+				.param("allowSoap", "true").param("displayPassword", "true")
 				.param("role", Integer.toString(role.getId())).secure(true).session(session)).andExpect(status().isOk())
 				.andReturn();
 		String password = mediaType.equals(MediaType.APPLICATION_JSON)
@@ -272,8 +272,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		userBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		session.clearAttributes();
 		this.mockMvc
-				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("username", userName)
-						.param("password", password).param("studyname", studyName).session(session))
+				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("userName", userName)
+						.param("password", password).param("studyName", studyName).session(session))
 				.andExpect(status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.request()
@@ -281,11 +281,11 @@ public class BaseServiceTest extends DefaultAppContextTest {
 										IsInstanceOf
 												.any(UserDetails.class)))
 				.andExpect(content().string(mediaType.equals(MediaType.APPLICATION_JSON)
-						? StringContains.containsString("{\"username\":\"".concat(userName)
-								.concat("\",\"userstatus\":\"").concat(userBean.getStatus().getName())
-								.concat("\",\"studyname\":\"").concat(studyName).concat("\",\"studystatus\":\"")
+						? StringContains.containsString("{\"userName\":\"".concat(userName)
+								.concat("\",\"userStatus\":\"").concat(userBean.getStatus().getName())
+								.concat("\",\"studyName\":\"").concat(studyName).concat("\",\"studyStatus\":\"")
 								.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"").concat(role.getCode())
-								.concat("\",\"usertype\":\"").concat(userType.getCode()).concat("\"}"))
+								.concat("\",\"userType\":\"").concat(userType.getCode()).concat("\"}"))
 						: StringContains.containsString("<ODM Description=\"REST Data\"")));
 	}
 

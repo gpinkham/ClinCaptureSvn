@@ -15,28 +15,28 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatRestAPIReturns404IfRequestIsNotMapped() throws Exception {
 		this.mockMvc.perform(post(API_WRONG_MAPPING).accept(MediaType.APPLICATION_XML).secure(true).session(session)
-				.param("username", userName.concat(Long.toString(timestamp))).param("password", password)
-				.param("studyname", studyName)).andExpect(status().isNotFound());
+				.param("userName", userName.concat(Long.toString(timestamp))).param("password", password)
+				.param("studyName", studyName)).andExpect(status().isNotFound());
 	}
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfUsernameIsWrong() throws Exception {
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", userName.concat(Long.toString(timestamp))).param("password", password)
-				.param("studyname", studyName)).andExpect(status().isUnauthorized());
+				.param("userName", userName.concat(Long.toString(timestamp))).param("password", password)
+				.param("studyName", studyName)).andExpect(status().isUnauthorized());
 	}
 
 	@Test
 	public void testThatAuthenticationServiceReturnsBadRequestIfUsernameIsEmpty() throws Exception {
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", "").param("password", password).param("studyname", studyName))
+				.param("userName", "").param("password", password).param("studyName", studyName))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfPasswordIsWrong() throws Exception {
 		this.mockMvc.perform(
-				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("username", userName)
-						.param("password", password.concat(Long.toString(timestamp))).param("studyname", studyName))
+				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("userName", userName)
+						.param("password", password.concat(Long.toString(timestamp))).param("studyName", studyName))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -44,7 +44,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationServiceReturnsBadRequestIfPasswordIsEmpty() throws Exception {
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-						.param("username", userName).param("password", "").param("studyname", studyName))
+						.param("userName", userName).param("password", "").param("studyName", studyName))
 				.andExpect(status().isBadRequest());
 	}
 
@@ -52,8 +52,8 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfStudyNameIsWrong() throws Exception {
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-						.param("username", userName).param("password", password)
-						.param("studyname", studyName.concat(Long.toString(timestamp))))
+						.param("userName", userName).param("password", password)
+						.param("studyName", studyName.concat(Long.toString(timestamp))))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -61,7 +61,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationServiceReturnsBadRequestIfStudyNameIsEmpty() throws Exception {
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-						.param("username", userName).param("password", password).param("studyname", ""))
+						.param("userName", userName).param("password", password).param("studyName", ""))
 				.andExpect(status().isBadRequest());
 	}
 
@@ -69,8 +69,8 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationServiceReturnsUnauthorizedForUserThatIsNotAssignedToAnyStudy() throws Exception {
 		createUserWithoutRole(UserType.SYSADMIN, studyBean.getId());
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", newUser.getName()).param("password", newUser.getPasswd())
-				.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+				.param("studyName", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -78,8 +78,8 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewSite(studyBean.getId());
 		createUserWithoutRole(UserType.SYSADMIN, newSite.getId());
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", newUser.getName()).param("password", newUser.getPasswd())
-				.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+				.param("studyName", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -88,18 +88,18 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		this.mockMvc
 				.perform(
 						post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-								.param("username", newUser.getName()).param("password", newUser.getPasswd())
-								.param("studyname",
+								.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+								.param("studyName",
 										studyBean
 												.getName()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(mediaType.equals(MediaType.APPLICATION_JSON)
-						? StringContains.containsString("{\"username\":\"".concat(newUser.getName())
-								.concat("\",\"userstatus\":\"").concat(newUser.getStatus().getName())
-								.concat("\",\"studyname\":\"").concat(studyBean.getName())
-								.concat("\",\"studystatus\":\"").concat(studyBean.getStatus().getName())
+						? StringContains.containsString("{\"userName\":\"".concat(newUser.getName())
+								.concat("\",\"userStatus\":\"").concat(newUser.getStatus().getName())
+								.concat("\",\"studyName\":\"").concat(studyBean.getName())
+								.concat("\",\"studyStatus\":\"").concat(studyBean.getStatus().getName())
 								.concat("\",\"role\":\"").concat(Role.STUDY_ADMINISTRATOR.getCode())
-								.concat("\",\"usertype\":\"").concat(UserType.SYSADMIN.getCode()).concat("\"}"))
+								.concat("\",\"userType\":\"").concat(UserType.SYSADMIN.getCode()).concat("\"}"))
 						: StringContains.containsString("<ODM Description=\"REST Data\"")));
 	}
 
@@ -107,32 +107,32 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatStudyAdministratorWithoutAdministrativePrivilegesCannotBeAuthenticated() throws Exception {
 		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", newUser.getName()).param("password", newUser.getPasswd())
-				.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+				.param("studyName", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
 	public void testThatAuthenticationIsNotAllowedForStudyMonitor() throws Exception {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_MONITOR);
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", newUser.getName()).param("password", newUser.getPasswd())
-				.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+				.param("studyName", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
 	public void testThatAuthenticationIsNotAllowedForStudyEvaluator() throws Exception {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_EVALUATOR);
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", newUser.getName()).param("password", newUser.getPasswd())
-				.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+				.param("studyName", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
 	public void testThatAuthenticationIsNotAllowedForStudyCoder() throws Exception {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_CODER);
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-				.param("username", newUser.getName()).param("password", newUser.getPasswd())
-				.param("studyname", studyBean.getName())).andExpect(status().isUnauthorized());
+				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
+				.param("studyName", studyBean.getName())).andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 		createNewSite(studyBean.getId());
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
-						.param("username", userName).param("password", password).param("studyname", newSite.getName()))
+						.param("userName", userName).param("password", password).param("studyName", newSite.getName()))
 				.andExpect(status().isUnauthorized());
 	}
 }

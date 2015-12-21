@@ -44,25 +44,25 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"id", "eventname", "crfname", "status", "defaultversion", "hidecrf", "required", "parentid",
-		"availableversionids", "passwordrequired", "acceptnewcrfversions", "evaluatedcrf", "doubledataentry",
-		"sourcedataverification", "tabbingmode", "ordinal", "studyid", "emailwhen", "email"})
+@JsonPropertyOrder({"id", "eventName", "crfName", "status", "defaultVersion", "hideCrf", "required", "parentId",
+		"availableVersionIds", "passwordRequired", "acceptNewCrfVersions", "evaluatedCrf", "doubleDataEntry",
+		"sourceDataVerification", "tabbingMode", "ordinal", "studyId", "emailWhen", "email"})
 @SuppressWarnings({"serial", "rawtypes", "unchecked"})
 public class EventDefinitionCRFBean extends AuditableEntityBean implements Comparable {
 
-	@JsonProperty("eventname")
+	@JsonProperty("eventName")
 	@XmlElement(name = "EventName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String eventName;
 
-	@JsonProperty("crfname")
+	@JsonProperty("crfName")
 	@XmlElement(name = "CrfName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String crfName = ""; // not in DB
 
-	@JsonProperty("defaultversion")
+	@JsonProperty("defaultVersion")
 	@XmlElement(name = "DefaultVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String defaultVersionName = ""; // not in DB
 
-	@JsonProperty("hidecrf")
+	@JsonProperty("hideCrf")
 	@XmlElement(name = "HideCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean hideCrf = false;
 
@@ -74,23 +74,23 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlElement(name = "Required", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean requiredCRF = true;
 
-	@JsonProperty("passwordrequired")
+	@JsonProperty("passwordRequired")
 	@XmlElement(name = "PasswordRequired", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean electronicSignature = false;
 
-	@JsonProperty("acceptnewcrfversions")
+	@JsonProperty("acceptNewCrfVersions")
 	@XmlElement(name = "AcceptNewCrfVersions", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean acceptNewCrfVersions;
 
-	@JsonProperty("evaluatedcrf")
+	@JsonProperty("evaluatedCrf")
 	@XmlElement(name = "EvaluatedCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean evaluatedCRF = false;
 
-	@JsonProperty("doubledataentry")
+	@JsonProperty("doubleDataEntry")
 	@XmlElement(name = "DoubleDataEntry", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean doubleEntry = false;
 
-	@JsonProperty("sourcedataverification")
+	@JsonProperty("sourceDataVerification")
 	@XmlElement(name = "SourceDataVerification", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String sdvCode = "";
 
@@ -98,7 +98,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private SourceDataVerification sourceDataVerification = null;
 
-	@JsonProperty("tabbingmode")
+	@JsonProperty("tabbingMode")
 	@XmlElement(name = "TabbingMode", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String tabbingMode;
 
@@ -106,7 +106,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlElement(name = "Ordinal", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int ordinal = 1;
 
-	@JsonProperty("studyid")
+	@JsonProperty("studyId")
 	@XmlElement(name = "StudyId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int studyId = 0;
 
@@ -122,7 +122,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private int studyEventDefinitionId = 0;
 
-	@JsonProperty("emailwhen")
+	@JsonProperty("emailWhen")
 	@XmlElement(name = "EmailWhen", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String emailStep = "";
 
@@ -134,7 +134,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private int crfId = 0;
 
-	@JsonProperty("parentid")
+	@JsonProperty("parentId")
 	@XmlElement(name = "ParentId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int parentId = 0;
 
@@ -142,7 +142,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlTransient
 	private int defaultVersionId = 0;
 
-	@JsonProperty("availableversionids")
+	@JsonProperty("availableVersionIds")
 	@XmlElement(name = "AvailableVersionIds", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String selectedVersionIds = "";
 

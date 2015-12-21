@@ -38,14 +38,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "UserDetails", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"username", "userstatus", "studyname", "studystatus", "role", "usertype"})
+@JsonPropertyOrder({"userName", "userStatus", "studyName", "studyStatus", "role", "userType"})
 public class UserDetails {
 
 	@JsonIgnore
 	@XmlTransient
 	private int userId;
 
-	@JsonProperty("username")
+	@JsonProperty("userName")
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userName;
 
@@ -53,15 +53,15 @@ public class UserDetails {
 	@XmlTransient
 	private String password;
 
-	@JsonProperty("userstatus")
+	@JsonProperty("userStatus")
 	@XmlElement(name = "UserStatus", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userStatus;
 
-	@JsonProperty("studyname")
+	@JsonProperty("studyName")
 	@XmlElement(name = "StudyName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String studyName;
 
-	@JsonProperty("studystatus")
+	@JsonProperty("studyStatus")
 	@XmlElement(name = "StudyStatus", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String studyStatus;
 
@@ -73,7 +73,7 @@ public class UserDetails {
 	@XmlElement(name = "Role", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String roleCode;
 
-	@JsonProperty("usertype")
+	@JsonProperty("userType")
 	@XmlElement(name = "UserType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userTypeCode;
 

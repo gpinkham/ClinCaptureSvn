@@ -102,23 +102,23 @@ public class UserService extends BaseService {
 	 */
 	@ResponseBody
 	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "usertype", values = "1,2", valueDescriptions = "rest.usertype.valueDescription"),
+			@RestParameterPossibleValues(name = "userType", values = "1,2", valueDescriptions = "rest.usertype.valueDescription"),
 			@RestParameterPossibleValues(name = "role", values = "1,2,6,7,8,4,5,9", valueDescriptions = "rest.role.valueDescription")})
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public UserAccountBean createUser(@RequestParam("username") String userName,
-			@RequestParam("firstname") String firstName, @RequestParam("lastname") String lastName,
+	public UserAccountBean createUser(@RequestParam("userName") String userName,
+			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName,
 			@RequestParam("email") String email, @RequestParam(value = "phone", required = false) String phone,
-			@RequestParam("company") String company, @RequestParam(value = "usertype") int userType,
-			@RequestParam(value = "allowsoap", defaultValue = "false", required = false) boolean allowSoap,
-			@RequestParam(value = "displaypassword", defaultValue = "false", required = false) boolean displayPassword,
-			@RequestParam("role") int role, @RequestParam(value = "timezone", required = false) String timeZone)
+			@RequestParam("company") String company, @RequestParam(value = "userType") int userType,
+			@RequestParam(value = "allowSoap", defaultValue = "false", required = false) boolean allowSoap,
+			@RequestParam(value = "displayPassword", defaultValue = "false", required = false) boolean displayPassword,
+			@RequestParam("role") int role, @RequestParam(value = "timeZone", required = false) String timeZone)
 					throws Exception {
 		StudyBean studyBean = getCurrentStudy();
 
 		StudyDAO studyDao = new StudyDAO(dataSource);
 		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
 
-		HashMap errors = UserValidator.validateUserCreate(configurationDao, userAccountDao, studyBean, true);
+		HashMap errors = UserValidator.validateUserCreate(configurationDao, userAccountDao, studyBean);
 		ValidatorUtil.checkForErrors(errors);
 
 		Role userAccountRole = Role.get(role);
@@ -161,7 +161,7 @@ public class UserService extends BaseService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
-	public UserAccountBean removeUser(@RequestParam("username") String userName) throws Exception {
+	public UserAccountBean removeUser(@RequestParam("userName") String userName) throws Exception {
 		return userAccountService.removeUser(getUserAccountBean(userName), getCurrentUser());
 	}
 
@@ -176,7 +176,7 @@ public class UserService extends BaseService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
-	public UserAccountBean restoreUser(@RequestParam("username") String userName) throws Exception {
+	public UserAccountBean restoreUser(@RequestParam("userName") String userName) throws Exception {
 		return userAccountService.restoreUser(getUserAccountBean(userName), getCurrentUser());
 	}
 }

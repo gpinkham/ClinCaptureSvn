@@ -146,10 +146,10 @@ public final class RequestParametersValidator {
 							String parameterName = ((RequestParam) annotation).value();
 							if (parameterName != null) {
 								declaredFields.add(parameterName);
-								if (declaredParams.keySet().contains(parameterName)
-										&& !declaredParams.get(parameterName).equals(parameterName)) {
-									throw new RestException(messageSource, "rest.parameterShouldBeInLowercase",
-											new Object[]{declaredParams.get(parameterName)},
+								if (declaredParams.keySet().contains(parameterName.toLowerCase())
+										&& !declaredParams.values().contains(parameterName)) {
+									throw new RestException(messageSource, "rest.thereIsTypoInTheParameter",
+											new Object[]{declaredParams.get(parameterName.toLowerCase())},
 											HttpServletResponse.SC_BAD_REQUEST);
 								}
 								if (((RequestParam) annotation).required()) {
@@ -187,10 +187,10 @@ public final class RequestParametersValidator {
 			}
 		}
 		if (declaredFields.size() > 0) {
-			for (String parameterName : declaredParams.keySet()) {
+			for (String parameterName : declaredParams.values()) {
 				if (!declaredFields.contains(parameterName)) {
-					throw new RestException(messageSource, "rest.parameterIsNotSupported",
-							new Object[]{declaredParams.get(parameterName)}, HttpServletResponse.SC_BAD_REQUEST);
+					throw new RestException(messageSource, "rest.parameterIsNotSupported", new Object[]{parameterName},
+							HttpServletResponse.SC_BAD_REQUEST);
 				}
 			}
 		}
