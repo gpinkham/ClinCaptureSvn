@@ -13,19 +13,19 @@
 
 package org.akaza.openclinica.controller.helper;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * An "interceptor" class that sets up a UserAccount and stores it in the Session, before another class is initialized
@@ -43,7 +43,7 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)
 			throws Exception {
 
-		Locale locale = ResourceBundleProvider.localeMap.get(Thread.currentThread());
+		Locale locale = ResourceBundleProvider.getLocale();
 		if (locale == null) {
 			ResourceBundleProvider.updateLocale(httpServletRequest.getLocale());
 		}

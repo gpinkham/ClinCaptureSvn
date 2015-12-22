@@ -26,8 +26,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 public class ClinCaptureResourceBundleMessageSource extends ResourceBundleMessageSource {
 
 	protected ResourceBundle getResourceBundle(String basename, Locale locale) {
-		ResourceBundleProvider.updateLocale(locale);
-		return ResourceBundleProvider.getResBundle(basename, locale);
+		return ResourceBundleProvider.getResBundleForMessageSource(basename, locale);
 	}
 
 	protected String getDefaultMessage(String code) {

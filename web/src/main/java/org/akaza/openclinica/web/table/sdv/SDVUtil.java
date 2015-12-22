@@ -13,12 +13,26 @@
 
 package org.akaza.openclinica.web.table.sdv;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.CRFMaskingService;
-import com.clinovo.service.ItemSDVService;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -71,24 +85,12 @@ import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.CRFMaskingService;
+import com.clinovo.service.ItemSDVService;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
@@ -690,11 +692,7 @@ public class SDVUtil {
 	 *            HttpServletRequest
 	 */
 	public void formatColumns(HtmlTable table, String[] columnNames, HttpServletRequest request) {
-
-		Locale locale = ResourceBundleProvider.localeMap.get(Thread.currentThread());
-		if (locale == null) {
-			ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
-		}
+		LocaleResolver.resolveLocale();
 		ResourceBundle bundle = ResourceBundleProvider.getFormatBundle();
 		String format = bundle.getString("date_time_format_string");
 		HtmlRow row = table.getRow();

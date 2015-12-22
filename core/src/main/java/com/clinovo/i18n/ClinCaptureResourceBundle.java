@@ -12,19 +12,12 @@
  ******************************************************************************/
 package com.clinovo.i18n;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Properties;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import org.springframework.context.support.ResourceBundleMessageSource;
 
 /**
  * ClinCaptureResourceBundle.
@@ -32,85 +25,68 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 public class ClinCaptureResourceBundle extends ResourceBundle {
 
 	public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+
 	public static final String QQQ = "???";
 
-	private static final int START_INDEX = 5;
+	private ResourceBundle resourceBundle;
+	private ResourceBundle defaultResourceBundle;
 
-	private Set<String> keys;
-	private Properties properties;
-
-	private class UTF8Control extends Control {
-		public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
-				boolean reload) throws IllegalAccessException, InstantiationException, IOException {
-			ResourceBundle bundle = null;
-			String bundleName = toBundleName(baseName, locale);
-			String resourceName = toResourceName(bundleName, "properties");
-			InputStream stream = loader.getResourceAsStream(resourceName);
-			if (stream != null) {
-				try {
-					bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
-				} finally {
-					stream.close();
-				}
-			}
-			return bundle;
-		}
-	}
-
-	private boolean wasCalledFromResourceBundleMessageSource() {
-		boolean found = false;
-		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-		if (stackTraceElements.length >= START_INDEX) {
-			StackTraceElement stackTraceElement = stackTraceElements[START_INDEX];
-			if (stackTraceElement.getClassName().equals(ResourceBundleMessageSource.class.getName())) {
-				found = true;
-			}
-		}
-		return found;
-	}
+	private boolean useDefaultMessageMethod;
 
 	/**
 	 * Constructor.
-	 * 
+	 *
+	 * @param clinCaptureResourceBundleLoader
+	 *            ClinCaptureResourceBundleLoader
+	 * @param useDefaultMessageMethod
+	 *            boolean
 	 * @param baseName
 	 *            String
 	 * @param locale
 	 *            Locale
 	 */
-	public ClinCaptureResourceBundle(String baseName, Locale locale) {
-		keys = new HashSet<String>();
-		properties = new Properties();
-		Enumeration<String> enumeration;
-		ResourceBundle resourceBundle = ResourceBundle.getBundle(baseName, locale, new UTF8Control());
-		if (resourceBundle.getLocale().equals(locale)) {
-			enumeration = resourceBundle.getKeys();
-			while (enumeration.hasMoreElements()) {
-				String key = enumeration.nextElement();
-				keys.add(key);
-				properties.setProperty(key, resourceBundle.getString(key));
-			}
-		}
-		ResourceBundle defaultResourceBundle = ResourceBundle.getBundle(baseName, DEFAULT_LOCALE, new UTF8Control());
-		enumeration = defaultResourceBundle.getKeys();
-		while (enumeration.hasMoreElements()) {
-			String key = enumeration.nextElement();
-			if (!properties.containsKey(key)) {
-				keys.add(key);
-				properties.setProperty(key, defaultResourceBundle.getString(key));
-			}
-		}
+	public ClinCaptureResourceBundle(ClinCaptureResourceBundleLoader clinCaptureResourceBundleLoader,
+			boolean useDefaultMessageMethod, String baseName, Locale locale) {
+		this(clinCaptureResourceBundleLoader, baseName, locale);
+		this.useDefaultMessageMethod = useDefaultMessageMethod;
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param clinCaptureResourceBundleLoader
+	 *            ClinCaptureResourceBundleLoader
+	 * @param baseName
+	 *            String
+	 * @param locale
+	 *            Locale
+	 */
+	public ClinCaptureResourceBundle(ClinCaptureResourceBundleLoader clinCaptureResourceBundleLoader, String baseName,
+			Locale locale) {
+		resourceBundle = clinCaptureResourceBundleLoader.getResourceBundle(baseName, locale);
+		defaultResourceBundle = clinCaptureResourceBundleLoader.getResourceBundle(baseName, DEFAULT_LOCALE);
 	}
 
 	@Override
 	protected Object handleGetObject(String key) {
-		Object value = properties.get(key);
-		return value != null
-				? value
-				: (wasCalledFromResourceBundleMessageSource() ? null : QQQ.concat(key).concat(QQQ));
+		Object value = useDefaultMessageMethod ? null : QQQ.concat(key).concat(QQQ);
+		if (resourceBundle != null && resourceBundle.containsKey(key)) {
+			value = resourceBundle.getObject(key);
+		} else if (defaultResourceBundle != null && defaultResourceBundle.containsKey(key)) {
+			value = defaultResourceBundle.getObject(key);
+		}
+		return value;
 	}
 
 	@Override
 	public Enumeration<String> getKeys() {
+		Set<String> keys = new HashSet<String>();
+		if (resourceBundle != null) {
+			keys.addAll(resourceBundle.keySet());
+		}
+		if (defaultResourceBundle != null) {
+			keys.addAll(defaultResourceBundle.keySet());
+		}
 		return Collections.enumeration(keys);
 	}
 }
