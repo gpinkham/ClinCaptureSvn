@@ -62,7 +62,7 @@ public class InitUpdateStudyServlet extends Controller {
 		String idString = request.getParameter("id");
 		logger.info("study id:" + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_study_to_edit"), request);
+			addPageMessage(getResPage().getString("please_choose_a_study_to_edit"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			int studyId = Integer.valueOf(idString.trim());
@@ -74,7 +74,7 @@ public class InitUpdateStudyServlet extends Controller {
 			logger.info("protocol Type:" + study.getProtocolType());
 
 			request.getSession().setAttribute("newStudy", study);
-			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toActiveArrayList());
 
 			StudyInfoPanel panel = getStudyInfoPanel(request);

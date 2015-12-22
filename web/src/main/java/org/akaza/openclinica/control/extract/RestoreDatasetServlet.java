@@ -60,12 +60,12 @@ public class RestoreDatasetServlet extends Controller {
 		DatasetBean dataset = (DatasetBean) dsDAO.findByPK(dsId);
 
 		String action = request.getParameter("action");
-		if (resword.getString("submit").equalsIgnoreCase(action)) {
+		if (getResWord().getString("submit").equalsIgnoreCase(action)) {
 			getDatasetService().restoreDataset(dataset, currentUser);
-			addPageMessage(respage.getString("dataset_has_been_succesfully_reinstated"), request);
+			addPageMessage(getResPage().getString("dataset_has_been_succesfully_reinstated"), request);
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
-		} else if (resword.getString("back").equalsIgnoreCase(action)) {
+		} else if (getResWord().getString("back").equalsIgnoreCase(action)) {
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 		} else {
@@ -75,17 +75,17 @@ public class RestoreDatasetServlet extends Controller {
 			StudyBean study = (StudyBean) sdao.findByPK(dataset.getStudyId());
 			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 			if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"), request);
+				addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_active_study_or_contact"), request);
 				throw new InsufficientPermissionException(Page.MENU,
-						resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+						getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 			}
 
 			if (!ub.isSysAdmin() && (dataset.getOwnerId() != ub.getId())) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"), request);
+				addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_active_study_or_contact"), request);
 				throw new InsufficientPermissionException(Page.MENU,
-						resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+						getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 			}
 			request.setAttribute("dataset", dataset);
 			forwardPage(Page.RESTORE_DATASET, request, response);
@@ -106,10 +106,10 @@ public class RestoreDatasetServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_restore_dataset"), "1");
+				getResException().getString("not_allowed_access_restore_dataset"), "1");
 
 	}
 
@@ -123,13 +123,13 @@ public class RestoreDatasetServlet extends Controller {
 
 		ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
 
-		String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
-				resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-				resword.getString("actions")};
+		String[] columns = { getResWord().getString("dataset_name"), getResWord().getString("description"),
+				getResWord().getString("created_by"), getResWord().getString("created_date"), getResWord().getString("status"),
+				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
-		table.addLink(resword.getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
-		table.addLink(resword.getString("create_dataset"), "CreateDataset");
+		table.addLink(getResWord().getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
+		table.addLink(getResWord().getString("create_dataset"), "CreateDataset");
 		table.setQuery("ViewDatasets", new HashMap());
 		table.setRows(datasetRows);
 		table.computeDisplay();

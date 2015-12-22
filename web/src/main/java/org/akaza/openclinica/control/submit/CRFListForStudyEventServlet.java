@@ -155,9 +155,9 @@ public class CRFListForStudyEventServlet extends Controller {
 		AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
 		if (!aeb.isActive()) {
-			addPageMessage(respage.getString("study_event_to_enter_data_not_belong_study"), request);
+			addPageMessage(getResPage().getString("study_event_to_enter_data_not_belong_study"), request);
 			throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("study_event_not_belong_study"), "1");
+					getResException().getString("study_event_not_belong_study"), "1");
 		}
 
 		StudyEventBean seb = (StudyEventBean) aeb;
@@ -405,8 +405,8 @@ public class CRFListForStudyEventServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		String exceptionName = resexception.getString("no_permission_to_submit_data");
-		String noAccessMessage = respage.getString("may_not_enter_data_for_this_study");
+		String exceptionName = getResException().getString("no_permission_to_submit_data");
+		String noAccessMessage = getResPage().getString("may_not_enter_data_for_this_study");
 
 		if (mayViewData(ub, currentRole)) {
 			return;

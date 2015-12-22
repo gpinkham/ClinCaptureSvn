@@ -51,10 +51,10 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 
 		if (!ub.isSysAdmin()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+					getResPage().getString("no_have_correct_privilege_current_study")
+							+ getResPage().getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -80,13 +80,13 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 			int minChars = fp.getInt("pwd.chars.min");
 			int maxChars = fp.getInt("pwd.chars.max");
 			if (minChars > 0 && maxChars > 0 && maxChars < minChars) {
-				Validator.addError(errors, "pwd.chars.min", resexception.getString("pwd_min_greater_than_max"));
+				Validator.addError(errors, "pwd.chars.min", getResException().getString("pwd_min_greater_than_max"));
 			}
 			if (minChars > 0 && passwordMustsGreaterThanMinLength(fp)) {
-				Validator.addError(errors, "pwd.chars.min", resexception.getString("pwd_min_less_than_must_chars"));
+				Validator.addError(errors, "pwd.chars.min", getResException().getString("pwd_min_less_than_must_chars"));
 			}
 			if (passwordMustsGreaterThanMaxLength(fp)) {
-				Validator.addError(errors, "pwd.chars.max", resexception.getString("pwd_max_less_than_must_chars"));
+				Validator.addError(errors, "pwd.chars.max", getResException().getString("pwd_max_less_than_must_chars"));
 			}
 			if (errors.isEmpty()) {
 				passwordRequirementsDao.setHasLower(Boolean.valueOf(fp.getString("pwd.chars.case.lower")));
@@ -104,7 +104,7 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 				SQLInitServlet.setField("pwd.expiration.days", fp.getString("pwd.expiration.days"));
 				SQLInitServlet.setField("pwd.change.required", fp.getString("pwd.change.required"));
 
-				addPageMessage(respage.getString("password_req_changes_have_been_saved"), request);
+				addPageMessage(getResPage().getString("password_req_changes_have_been_saved"), request);
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 			} else {
 				setPresetValues(submittedValues(passwordRequirementsDao, fp), request);

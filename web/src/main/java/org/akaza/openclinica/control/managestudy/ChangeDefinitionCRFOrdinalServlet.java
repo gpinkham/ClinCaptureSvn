@@ -60,7 +60,7 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 		if (!isEventDefCRFValid(request)
 				|| (!action.equalsIgnoreCase(ACTION_MOVE_UP) && !action.equalsIgnoreCase(ACTION_MOVE_DOWN))) {
 
-			addPageMessage(respage.getString("invalid_http_request_parameters"), request);
+			addPageMessage(getResPage().getString("invalid_http_request_parameters"), request);
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 
 		} else {

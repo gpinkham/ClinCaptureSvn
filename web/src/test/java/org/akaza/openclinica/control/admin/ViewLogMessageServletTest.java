@@ -1,6 +1,9 @@
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.i18n.LocaleResolver;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -23,10 +26,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
-import javax.sql.DataSource;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
+import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ResourceBundleProvider.class)
@@ -58,8 +58,6 @@ public class ViewLogMessageServletTest {
 		Locale locale = Locale.ENGLISH;
 		LocaleResolver.updateLocale(session, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		Whitebox.setInternalState(viewLogMessageServlet, "respage", ResourceBundleProvider.getPageMessagesBundle());
-		Whitebox.setInternalState(viewLogMessageServlet, "resexception", ResourceBundleProvider.getExceptionsBundle());
 		PowerMockito.doReturn(userAccountBean).when(viewLogMessageServlet).getUserAccountBean(request);
 		PowerMockito.doReturn(studyUserRoleBean).when(viewLogMessageServlet).getCurrentRole(request);
 		PowerMockito.doReturn(studyBean).when(viewLogMessageServlet).getCurrentStudy(request);
@@ -73,7 +71,8 @@ public class ViewLogMessageServletTest {
 		ResourceBundle restext = ResourceBundleProvider.getTextsBundle();
 		userAccountBean.addUserType(UserType.USER);
 		viewLogMessageServlet.processRequest(request, response);
-		Mockito.verify(viewLogMessageServlet).addPageMessage(restext.getString("problem_reading_file"), request, logger);
+		Mockito.verify(viewLogMessageServlet).addPageMessage(restext.getString("problem_reading_file"), request,
+				logger);
 	}
 
 	@Test(expected = InsufficientPermissionException.class)

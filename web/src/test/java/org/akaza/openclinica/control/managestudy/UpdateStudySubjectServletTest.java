@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -12,7 +11,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
@@ -30,9 +28,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -42,7 +37,6 @@ import org.springframework.mock.web.MockServletContext;
 import com.clinovo.i18n.LocaleResolver;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(ResourceBundleProvider.class)
 @SuppressWarnings("unused")
 public class UpdateStudySubjectServletTest {
 
@@ -78,23 +72,14 @@ public class UpdateStudySubjectServletTest {
 		// first obtaining all the required Resource Bundle instances for tests,
 		// then stubbing all the static methods of the ResourceBundleProvider class
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle resWorkflow = ResourceBundleProvider.getWorkflowBundle(locale);
-		ResourceBundle resExceptions = ResourceBundleProvider.getExceptionsBundle(locale);
-		ResourceBundle resPage = ResourceBundleProvider.getPageMessagesBundle();
-		ResourceBundle resFormat = ResourceBundleProvider.getFormatBundle();
-
-		PowerMockito.mockStatic(ResourceBundleProvider.class);
-		PowerMockito.when(ResourceBundleProvider.getWorkflowBundle(Mockito.any(Locale.class))).thenReturn(resWorkflow);
-		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
-		PowerMockito.when(ResourceBundleProvider.getExceptionsBundle(Mockito.any(Locale.class))).thenReturn(
-				resExceptions);
 
 		request = new MockHttpServletRequest();
 		LocaleResolver.updateLocale(request, locale);
 
 		subjectToUpdate = new StudySubjectBean();
 
-		dateFormat = new SimpleDateFormat(resFormat.getString("date_format_string"), locale);
+		dateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_format_string"),
+				locale);
 
 		// current system user
 		UserAccountBean currentUser = new UserAccountBean();
@@ -109,28 +94,22 @@ public class UpdateStudySubjectServletTest {
 		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
 
 		// setting up Servlet Context mock
-		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(
-				mockedRequestDispatcher);
+		Mockito.when(mockedServletContext.getRequestDispatcher(Mockito.any(String.class)))
+				.thenReturn(mockedRequestDispatcher);
 
 		// setting up DAO mocks
 		StudySubjectBean emptySubjectBean = new StudySubjectBean();
 		Mockito.when(mockedStudySubjectDAO.findByPK(Mockito.any(Integer.class))).thenReturn(subjectToUpdate);
-		Mockito.when(
-				mockedStudySubjectDAO.findAnotherBySameLabel(Mockito.any(String.class), Mockito.any(Integer.class),
-						Mockito.any(Integer.class))).thenReturn(emptySubjectBean);
-		Mockito.when(
-				mockedStudySubjectDAO.findAnotherBySameLabelInSites(Mockito.any(String.class),
-						Mockito.any(Integer.class), Mockito.any(Integer.class))).thenReturn(emptySubjectBean);
-		Mockito.when(
-				mockedDiscrepancyNoteDAO.findAllByEntityAndColumnAndStudy(Mockito.any(StudyBean.class),
-						Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(String.class))).thenReturn(
-				null);
-		Mockito.when(mockedSubjectGroupMapDAO.findAllByStudySubject(Mockito.any(Integer.class))).thenReturn(
-				new ArrayList<SubjectGroupMapBean>());
+		Mockito.when(mockedStudySubjectDAO.findAnotherBySameLabel(Mockito.any(String.class), Mockito.any(Integer.class),
+				Mockito.any(Integer.class))).thenReturn(emptySubjectBean);
+		Mockito.when(mockedStudySubjectDAO.findAnotherBySameLabelInSites(Mockito.any(String.class),
+				Mockito.any(Integer.class), Mockito.any(Integer.class))).thenReturn(emptySubjectBean);
+		Mockito.when(mockedDiscrepancyNoteDAO.findAllByEntityAndColumnAndStudy(Mockito.any(StudyBean.class),
+				Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(String.class))).thenReturn(null);
+		Mockito.when(mockedSubjectGroupMapDAO.findAllByStudySubject(Mockito.any(Integer.class)))
+				.thenReturn(new ArrayList<SubjectGroupMapBean>());
 
 		// setting up spied UpdateStudySubjectServlet
-		Whitebox.setInternalState(spiedUpdateStudySubjectServlet, "respage", resPage);
-		Whitebox.setInternalState(spiedUpdateStudySubjectServlet, "resformat", resFormat);
 		Mockito.doReturn(mockedServletContext).when(spiedUpdateStudySubjectServlet).getServletContext();
 		Mockito.doReturn(currentUser).when(spiedUpdateStudySubjectServlet).getUserAccountBean(request);
 		Mockito.doReturn(currentStudy).when(spiedUpdateStudySubjectServlet).getCurrentStudy(request);
@@ -140,14 +119,12 @@ public class UpdateStudySubjectServletTest {
 		Mockito.doReturn(mockedSubjectGroupMapDAO).when(spiedUpdateStudySubjectServlet).getSubjectGroupMapDAO();
 		Mockito.doReturn(mockedStudyGroupClassDAO).when(spiedUpdateStudySubjectServlet).getStudyGroupClassDAO();
 		Mockito.doReturn(mockedStudyParameterValueDAO).when(spiedUpdateStudySubjectServlet).getStudyParameterValueDAO();
-		Mockito.doNothing()
-				.when(spiedUpdateStudySubjectServlet)
-				.checkStudyLocked(Mockito.any(Page.class), Mockito.any(String.class),
-						Mockito.any(MockHttpServletRequest.class), Mockito.any(MockHttpServletResponse.class));
-		Mockito.doNothing()
-				.when(spiedUpdateStudySubjectServlet)
-				.checkStudyFrozen(Mockito.any(Page.class), Mockito.any(String.class),
-						Mockito.any(MockHttpServletRequest.class), Mockito.any(MockHttpServletResponse.class));
+		Mockito.doNothing().when(spiedUpdateStudySubjectServlet).checkStudyLocked(Mockito.any(Page.class),
+				Mockito.any(String.class), Mockito.any(MockHttpServletRequest.class),
+				Mockito.any(MockHttpServletResponse.class));
+		Mockito.doNothing().when(spiedUpdateStudySubjectServlet).checkStudyFrozen(Mockito.any(Page.class),
+				Mockito.any(String.class), Mockito.any(MockHttpServletRequest.class),
+				Mockito.any(MockHttpServletResponse.class));
 	}
 
 	@Test

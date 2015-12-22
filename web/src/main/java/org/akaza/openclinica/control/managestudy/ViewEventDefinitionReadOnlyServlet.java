@@ -57,7 +57,7 @@ public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServl
 		int defId = fp.getInt("id", true);
 
 		if (defId == 0) {
-			addPageMessage(respage.getString("please_choose_a_definition_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_definition_to_view"), request);
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			// definition id

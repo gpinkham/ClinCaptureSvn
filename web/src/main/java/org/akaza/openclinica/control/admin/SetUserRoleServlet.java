@@ -58,9 +58,9 @@ public class SetUserRoleServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, resexception.getString("not_admin"),
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, getResException().getString("not_admin"),
 				"1");
 	}
 
@@ -85,7 +85,7 @@ public class SetUserRoleServlet extends Controller {
 		}
 
 		if (userId == 0) {
-			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"), request);
+			addPageMessage(getResPage().getString("please_choose_a_user_to_set_role_for"), request);
 			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 		} else {
 			String action = request.getParameter("action");
@@ -200,10 +200,10 @@ public class SetUserRoleServlet extends Controller {
 					}
 					addPageMessage(
 							sb.append(user.getFirstName()).append(" ").append(user.getLastName()).append(" (")
-									.append(resword.getString("username")).append(": ").append(user.getName())
-									.append(") ").append(respage.getString("has_been_granted_the_role")).append(" \"")
+									.append(getResWord().getString("username")).append(": ").append(user.getName())
+									.append(") ").append(getResPage().getString("has_been_granted_the_role")).append(" \"")
 									.append(sur.getRole().getDescription()).append("\" ")
-									.append(respage.getString("in_the_study_site")).append(" ")
+									.append(getResPage().getString("in_the_study_site")).append(" ")
 									.append(userStudy.getName()).append(".").toString(), request);
 				}
 

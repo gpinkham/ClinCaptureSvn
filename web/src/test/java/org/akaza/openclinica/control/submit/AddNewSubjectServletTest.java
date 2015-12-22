@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -51,7 +50,6 @@ public class AddNewSubjectServletTest {
 		Locale locale = Locale.ENGLISH;
 		LocaleResolver.updateLocale(session, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		Whitebox.setInternalState(addNewSubjectServlet, "restext", ResourceBundleProvider.getTextsBundle());
 		PowerMockito.doReturn(userAccountBean).when(addNewSubjectServlet).getUserAccountBean(request);
 		PowerMockito.doReturn(studyUserRoleBean).when(addNewSubjectServlet).getCurrentRole(request);
 		PowerMockito.doReturn(studyBean).when(addNewSubjectServlet).getCurrentStudy(request);

@@ -68,16 +68,16 @@ public class InitUpdateSubStudyServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.SITE_LIST_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 		String idString = request.getParameter("id");
 		logger.info("study id:" + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_study_to_edit"), request);
+			addPageMessage(getResPage().getString("please_choose_a_study_to_edit"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			int studyId = Integer.valueOf(idString.trim());
@@ -136,7 +136,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 			request.setAttribute("parentStudy", parent);
 			request.getSession().setAttribute("parentName", parentStudyName);
 			request.getSession().setAttribute("newStudy", study);
-			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 
 			FormProcessor fp = new FormProcessor(request);

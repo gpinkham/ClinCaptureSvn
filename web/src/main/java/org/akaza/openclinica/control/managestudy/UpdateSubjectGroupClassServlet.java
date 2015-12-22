@@ -59,9 +59,9 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"), request,
+		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, getResPage().getString("current_study_locked"), request,
 				response);
-		checkStudyFrozen(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_frozen"), request,
+		checkStudyFrozen(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, getResPage().getString("current_study_frozen"), request,
 				response);
 
 		if (ub.isSysAdmin()) {
@@ -71,10 +71,10 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + "\n"
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study") + "\n"
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 		String action = request.getParameter("action");
 
 		if (classId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_edit"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_group_class_to_edit"), request);
 			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 		} else {
 			if (StringUtil.isBlank(action)) {
@@ -279,17 +279,17 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 					studyGroups.add(sGroup);
 					if (name.length() > 255) {
 						Validator.addError(errors, "studyGroupError",
-								respage.getString("group_name_cannot_be_more_255"));
+								getResPage().getString("group_name_cannot_be_more_255"));
 					}
 					if (!setOfNames.add(name)) {
 						rowsWithDuplicateNames.append(",").append(studyGroups.size());
 						Validator.addError(errors, "studyGroupError",
-								respage.getString("please_correct_the_duplicate_name_found_in_row") + " "
+								getResPage().getString("please_correct_the_duplicate_name_found_in_row") + " "
 										+ rowsWithDuplicateNames.substring(1));
 					}
 					if (description.length() > 1000) {
 						Validator.addError(errors, "studyGroupError",
-								respage.getString("group_description_cannot_be_more_100"));
+								getResPage().getString("group_description_cannot_be_more_100"));
 					}
 				}
 			}
@@ -299,15 +299,15 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 		for (StudyGroupClassBean thisBean : allStudyGroupClasses) {
 			if ((fp.getString("name").trim().equals(thisBean.getName().trim()))
 					&& (!fp.getString("name").trim().equals(oldGroup.getName().trim()))) {
-				Validator.addError(errors, "name", resexception.getString("group_class_name_used_choose_unique"));
+				Validator.addError(errors, "name", getResException().getString("group_class_name_used_choose_unique"));
 			}
 		}
 		if (fp.getInt("groupClassTypeId") == 0) {
-			Validator.addError(errors, "groupClassTypeId", resexception.getString("group_class_type_is_required"));
+			Validator.addError(errors, "groupClassTypeId", getResException().getString("group_class_type_is_required"));
 		}
 		if (!atLeastOneEventDefSelected) {
 			Validator.addError(errors, "dynamicEvents",
-					resexception.getString("at_least_one_element_should_be_selected"));
+					getResException().getString("at_least_one_element_should_be_selected"));
 		}
 
 		if (errors.isEmpty()) {
@@ -347,7 +347,7 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 		group = (StudyGroupClassBean) sgcdao.update(group);
 
 		if (!group.isActive()) {
-			addPageMessage(respage.getString("the_subject_group_class_no_updated_database"), request);
+			addPageMessage(getResPage().getString("the_subject_group_class_no_updated_database"), request);
 		} else {
 			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
 				ArrayList<StudyEventDefinitionBean> listOfDefinitions = (ArrayList) request.getSession().getAttribute(
@@ -407,7 +407,7 @@ public class UpdateSubjectGroupClassServlet extends Controller {
 					}
 				}
 			}
-			addPageMessage(respage.getString("the_subject_group_class_updated_succesfully"), request);
+			addPageMessage(getResPage().getString("the_subject_group_class_updated_succesfully"), request);
 		}
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 		request.setAttribute("pageMessages", pageMessages);

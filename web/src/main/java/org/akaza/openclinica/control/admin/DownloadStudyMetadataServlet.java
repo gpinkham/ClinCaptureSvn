@@ -61,9 +61,9 @@ public class DownloadStudyMetadataServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_admin"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 

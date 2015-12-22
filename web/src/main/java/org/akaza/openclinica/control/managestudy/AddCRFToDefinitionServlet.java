@@ -80,9 +80,9 @@ public class AddCRFToDefinitionServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_permission_to_update_study_event_definition")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_permission_to_update_study_event_definition")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -216,7 +216,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 
 		if (crfArray.size() == 0) {
 			// no crf seleted
-			addPageMessage(respage.getString("no_new_CRF_added"), request);
+			addPageMessage(getResPage().getString("no_new_CRF_added"), request);
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 			sed.setCrfs(new ArrayList());
 			request.getSession().setAttribute("definition", sed);
@@ -245,7 +245,7 @@ public class AddCRFToDefinitionServlet extends Controller {
 				edcs.add(edcBean);
 			}
 			request.getSession().setAttribute("eventDefinitionCRFs", edcs);
-			addPageMessage(respage.getString("has_have_been_added_need_confirmation"), request);
+			addPageMessage(getResPage().getString("has_have_been_added_need_confirmation"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 	}
@@ -253,9 +253,9 @@ public class AddCRFToDefinitionServlet extends Controller {
 	private EntityBeanTable createTable(HttpServletRequest request, ArrayList crfs) throws Exception {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
-		String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
-				resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-				resword.getString("selected")};
+		String[] columns = { getResWord().getString("CRF_name"), getResWord().getString("date_created"),
+				getResWord().getString("owner"), getResWord().getString("date_updated"), getResWord().getString("last_updated_by"),
+				getResWord().getString("selected")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(FIVE);
 		HashMap args = new HashMap();

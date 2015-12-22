@@ -66,9 +66,9 @@ public class RestoreCRFVersionServlet extends Controller {
 		if (userCanRestoreCRFVersion(request)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, getResException().getString("not_admin"), "1");
 	}
 
 	private boolean userCanRestoreCRFVersion(HttpServletRequest request) {
@@ -105,8 +105,8 @@ public class RestoreCRFVersionServlet extends Controller {
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 				if (!userCanRestoreCRFVersion(request)) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
@@ -123,15 +123,15 @@ public class RestoreCRFVersionServlet extends Controller {
 				getCrfVersionService().restoreCrfVersion(version, currentUser);
 
 				addPageMessage(
-						new StringBuilder("").append(respage.getString("the_CRF_version")).append(version.getName())
-								.append(" ").append(respage.getString("has_been_restored_succesfully")).toString(),
+						new StringBuilder("").append(getResPage().getString("the_CRF_version")).append(version.getName())
+								.append(" ").append(getResPage().getString("has_been_restored_succesfully")).toString(),
 						request);
 
 			} else {
-				addPageMessage(respage.getString("invalid_http_request_parameters"), request);
+				addPageMessage(getResPage().getString("invalid_http_request_parameters"), request);
 			}
 		} else {
-			addPageMessage(respage.getString("invalid_http_request_parameters"), request);
+			addPageMessage(getResPage().getString("invalid_http_request_parameters"), request);
 		}
 
 		if (keyValue != null) {

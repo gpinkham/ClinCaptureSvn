@@ -81,9 +81,9 @@ public class DownloadRuleSetXmlServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -152,7 +152,7 @@ public class DownloadRuleSetXmlServlet extends Controller {
 			);
 			handleLoadCastor(charOutput, prepareRulesPostImportRuleSetRuleContainer(ruleSetRuleIds));
 		} catch (FileNotFoundException e) {
-			addPageMessage(resword.getString("file_path_is_invalid"), request);
+			addPageMessage(getResWord().getString("file_path_is_invalid"), request);
 			forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 			return;
 		}

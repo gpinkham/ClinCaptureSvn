@@ -78,23 +78,23 @@ public class DefineStudyEventServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("SED_may_only_added_top_level")
-					+ respage.getString("please_contact_sysadmin_questions"), request);
+			addPageMessage(getResPage().getString("SED_may_only_added_top_level")
+					+ getResPage().getString("please_contact_sysadmin_questions"), request);
 			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
-					resexception.getString("not_top_study"), "1");
+					getResException().getString("not_top_study"), "1");
 		}
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_persmission_add_SED_to_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_persmission_add_SED_to_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class DefineStudyEventServlet extends Controller {
 						if (nextAction != null) {
 							if (nextAction == 1) {
 								session.removeAttribute("definition");
-								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"),
+								addPageMessage(getResPage().getString("the_new_event_definition_creation_cancelled"),
 										request);
 								forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 							} else if (nextAction == 2) {
@@ -147,11 +147,11 @@ public class DefineStudyEventServlet extends Controller {
 						}
 					} catch (NumberFormatException e) {
 						logger.error(e.getMessage());
-						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
+						addPageMessage(getResPage().getString("the_new_event_definition_creation_cancelled"), request);
 						forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					} catch (NullPointerException e) {
 						logger.error(e.getMessage());
-						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
+						addPageMessage(getResPage().getString("the_new_event_definition_creation_cancelled"), request);
 						forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					}
 
@@ -286,9 +286,9 @@ public class DefineStudyEventServlet extends Controller {
 
 			EntityBeanTable table = getEntityBeanTable();
 			ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-			String[] columns = {resword.getString("CRF_name"), resword.getString("date_created"),
-					resword.getString("owner"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-					resword.getString("selected")};
+			String[] columns = { getResWord().getString("CRF_name"), getResWord().getString("date_created"),
+					getResWord().getString("owner"), getResWord().getString("date_updated"), getResWord().getString("last_updated_by"),
+					getResWord().getString("selected")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
 			StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
@@ -536,7 +536,7 @@ public class DefineStudyEventServlet extends Controller {
 		request.getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
 		if (crfArray.size() == 0 && !isBack) {
-			addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"), request);
+			addPageMessage(getResPage().getString("no_CRF_selected_for_definition_add_later"), request);
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 			sed.setCrfs(new ArrayList());
 			request.getSession().setAttribute("definition", sed);
@@ -611,7 +611,7 @@ public class DefineStudyEventServlet extends Controller {
 		request.getSession().removeAttribute("crfNameToEdcMap");
 		request.getSession().removeAttribute(DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
 		checkReferenceVisit(request);
-		addPageMessage(respage.getString("the_new_event_definition_created_succesfully"), request);
+		addPageMessage(getResPage().getString("the_new_event_definition_created_succesfully"), request);
 
 	}
 

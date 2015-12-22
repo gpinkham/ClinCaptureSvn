@@ -80,7 +80,7 @@ public class FindStudyEventServlet extends Controller {
 		if (browseBy.equals("")) {
 			forwardPage(Page.FIND_STUDY_EVENTS_STEP1, request, response);
 		} else if (invalidBrowseBy(browseBy)) {
-			addPageMessage(respage.getString("must_browse_study_events_by_subject_or_event_definition"), request);
+			addPageMessage(getResPage().getString("must_browse_study_events_by_subject_or_event_definition"), request);
 			forwardPage(Page.FIND_STUDY_EVENTS_STEP1, request, response);
 		}
 
@@ -151,9 +151,9 @@ public class FindStudyEventServlet extends Controller {
         UserAccountBean ub = getUserAccountBean(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		String exceptionName = resexception.getString("no_permission_to_submit_data");
-		String noAccessMessage = respage.getString("you_may_not_submit_data_for_this_study")
-				+ respage.getString("change_study_contact_sysadmin");
+		String exceptionName = getResException().getString("no_permission_to_submit_data");
+		String noAccessMessage = getResPage().getString("you_may_not_submit_data_for_this_study")
+				+ getResPage().getString("change_study_contact_sysadmin");
 
 		if (maySubmitData(ub, currentRole)) {
 			return;

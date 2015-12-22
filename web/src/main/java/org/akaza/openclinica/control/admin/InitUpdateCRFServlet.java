@@ -57,9 +57,9 @@ public class InitUpdateCRFServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("you_not_have_permission_to_update_a_CRF")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
+				getResPage().getString("you_not_have_permission_to_update_a_CRF")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, getResException().getString("not_study_director"),
 				"1");
 	}
 
@@ -93,28 +93,28 @@ public class InitUpdateCRFServlet extends Controller {
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
+		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
-		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
-		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
+				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
+		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
+				getResPage().getString("br_download_example_CRF_instructions_from"), request);
 
 		FormProcessor fp = new FormProcessor(request);
 
 		int crfId = fp.getInt(CRF_ID);
 		if (crfId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_version_to_update"), request);
+			addPageMessage(getResPage().getString("please_choose_a_CRF_version_to_update"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		} else {
 			CRFDAO cdao = getCRFDAO();
 			CRFBean crf = (CRFBean) cdao.findByPK(crfId);
 			if (!userCanUpdateCRF(request)) {
 				addPageMessage(
-						respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_active_study_or_contact"), request);
+						getResPage().getString("no_have_correct_privilege_current_study") + " "
+								+ getResPage().getString("change_active_study_or_contact"), request);
 				forwardPage(Page.MENU_SERVLET, request, response);
 			} else {
 				request.getSession().setAttribute(CRF, crf);

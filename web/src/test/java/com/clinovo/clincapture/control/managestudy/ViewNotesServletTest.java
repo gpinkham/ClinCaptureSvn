@@ -3,7 +3,6 @@ package com.clinovo.clincapture.control.managestudy;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.akaza.openclinica.DefaultAppContextTest;
@@ -47,11 +46,6 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 	private DcfService dcfService;
 	private StudyBean currentStudy;
 
-	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
-	private ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
-	private ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
-	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
-
 	@Before
 	public void setUp() throws Exception {
 
@@ -94,10 +88,6 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		Mockito.doReturn(idao).when(viewNotesServlet).getItemDAO();
 		Mockito.doReturn(itemGroupMetadataDAO).when(viewNotesServlet).getItemGroupMetadataDAO();
 		Mockito.doReturn(dcfService).when(viewNotesServlet).getDcfService();
-		Whitebox.setInternalState(viewNotesServlet, "respage", respage);
-		Whitebox.setInternalState(viewNotesServlet, "resterm", resterm);
-		Whitebox.setInternalState(viewNotesServlet, "resexception", resexception);
-		Whitebox.setInternalState(viewNotesServlet, "resword", resword);
 		Whitebox.setInternalState(viewNotesServlet, "logger", LoggerFactory.getLogger("ViewNotesServlet"));
 
 	}

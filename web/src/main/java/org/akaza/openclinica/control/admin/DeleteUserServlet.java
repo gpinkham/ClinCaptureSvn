@@ -70,10 +70,10 @@ public class DeleteUserServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+					+ getResPage().getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -92,39 +92,39 @@ public class DeleteUserServlet extends Controller {
 		MessageFormat messageFormat = new MessageFormat("");
 
 		if (!u.isActive()) {
-			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
+			messageFormat.applyPattern(getResPage().getString("the_specified_user_not_exits"));
 			message = messageFormat.format(new Object[]{userId});
 		} else if (!EntityAction.contains(action)) {
-			message = respage.getString("the_specified_action_on_the_user_is_invalid");
+			message = getResPage().getString("the_specified_action_on_the_user_is_invalid");
 		} else
 			if (!EntityAction.get(action).equals(EntityAction.DELETE)
 					&& !EntityAction.get(action).equals(EntityAction.RESTORE)) {
-			message = respage.getString("the_specified_action_is_not_allowed");
+			message = getResPage().getString("the_specified_action_is_not_allowed");
 		} else {
 			EntityAction desiredAction = EntityAction.get(action);
 			if (desiredAction.equals(EntityAction.DELETE)) {
 				getUserAccountService().removeUser(u, updater);
 				if (u.isActive()) {
-					message = respage.getString("the_user_has_been_removed_successfully");
+					message = getResPage().getString("the_user_has_been_removed_successfully");
 					try {
 						sendRestoreEmail(request, u, desiredAction);
 					} catch (Exception e) {
-						message += respage.getString("however_was_error_sending_user_email_regarding");
+						message += getResPage().getString("however_was_error_sending_user_email_regarding");
 					}
 				} else {
-					message = respage.getString("the_user_could_not_be_deleted_due_database_error");
+					message = getResPage().getString("the_user_could_not_be_deleted_due_database_error");
 				}
 			} else {
 				getUserAccountService().restoreUser(u, updater, getUserDetails());
 				if (u.isActive()) {
-					message = respage.getString("the_user_has_been_restored");
+					message = getResPage().getString("the_user_has_been_restored");
 					try {
 						sendRestoreEmail(request, u, desiredAction);
 					} catch (Exception e) {
-						message += respage.getString("however_was_error_sending_user_email_regarding");
+						message += getResPage().getString("however_was_error_sending_user_email_regarding");
 					}
 				} else {
-					message = respage.getString("the_user_could_not_be_restored_due_database_error");
+					message = getResPage().getString("the_user_could_not_be_restored_due_database_error");
 				}
 			}
 		}
@@ -151,13 +151,13 @@ public class DeleteUserServlet extends Controller {
 
 		if (desiredAction.equals(EntityAction.DELETE)) {
 			logger.info("Sending remove account notification to " + u.getName());
-			subject = restext.getString("your_clin_capture_account_has_been_removed");
-			msg.applyPattern(restext.getString("your_account_has_been_removed_email_message_html"));
+			subject = getResText().getString("your_clin_capture_account_has_been_removed");
+			msg.applyPattern(getResText().getString("your_account_has_been_removed_email_message_html"));
 			arguments = new Object[]{u.getFirstName() + " " + u.getLastName(), u.getName(), emailParentStudy.getName()};
 		} else if (desiredAction.equals(EntityAction.RESTORE)) {
 			logger.info("Sending restore and password reset notification to " + u.getName());
-			subject = restext.getString("your_new_openclinica_account_has_been_restored");
-			msg.applyPattern(restext.getString("your_account_has_been_restored_and_password_reset_email_message_html"));
+			subject = getResText().getString("your_new_openclinica_account_has_been_restored");
+			msg.applyPattern(getResText().getString("your_account_has_been_restored_and_password_reset_email_message_html"));
 			arguments = new Object[]{u.getFirstName() + " " + u.getLastName(), u.getName(), u.getRealPassword(),
 					SQLInitServlet.getSystemURL(), emailParentStudy.getName()};
 		}

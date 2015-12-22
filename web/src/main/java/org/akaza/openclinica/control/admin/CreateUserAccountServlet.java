@@ -80,7 +80,7 @@ public class CreateUserAccountServlet extends Controller {
 
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -99,7 +99,7 @@ public class CreateUserAccountServlet extends Controller {
 			finalList.addAll(sdao.findAllByParentAndActive(sb.getId()));
 		}
 
-		addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"),
+		addEntityList("studies", finalList, getResPage().getString("a_user_cannot_be_created_no_study_as_active"),
 				Page.ADMIN_SYSTEM, request, response);
 
 		String pageIsChanged = request.getParameter("pageIsChanged");
@@ -112,7 +112,7 @@ public class CreateUserAccountServlet extends Controller {
 		ArrayList types = UserType.toArrayList();
 		types.remove(UserType.INVALID);
 		types.remove(UserType.TECHADMIN);
-		addEntityList("types", types, respage.getString("a_user_cannot_be_created_no_user_types_for"),
+		addEntityList("types", types, getResPage().getString("a_user_cannot_be_created_no_user_types_for"),
 				Page.ADMIN_SYSTEM, request, response);
 
 		Boolean changeRoles = request.getParameter("changeRoles") != null
@@ -168,8 +168,8 @@ public class CreateUserAccountServlet extends Controller {
 						getUserDetails());
 
 				if (createdUserAccountBean.isActive()) {
-					addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName()
-							+ "\"" + respage.getString("was_created_succesfully"), request);
+					addPageMessage(getResPage().getString("the_user_account") + "\"" + createdUserAccountBean.getName()
+							+ "\"" + getResPage().getString("was_created_succesfully"), request);
 					if (!"true".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PASSWORD))) {
 						try {
 							StudyBean emailParentStudy;
@@ -180,18 +180,18 @@ public class CreateUserAccountServlet extends Controller {
 							}
 							sendNewAccountEmail(request, createdUserAccountBean, emailParentStudy.getName());
 						} catch (Exception e) {
-							addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"),
+							addPageMessage(getResPage().getString("there_was_an_error_sending_account_creating_mail"),
 									request);
 						}
 					} else {
 						addPageMessage(
-								respage.getString("user_password") + "<br/>" + createdUserAccountBean.getRealPassword()
-										+ "<br/> " + respage.getString("please_write_down_the_password_and_provide"),
+								getResPage().getString("user_password") + "<br/>" + createdUserAccountBean.getRealPassword()
+										+ "<br/> " + getResPage().getString("please_write_down_the_password_and_provide"),
 								request);
 					}
 				} else {
-					addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName()
-							+ "\"" + respage.getString("could_not_created_due_database_error"), request);
+					addPageMessage(getResPage().getString("the_user_account") + "\"" + createdUserAccountBean.getName()
+							+ "\"" + getResPage().getString("could_not_created_due_database_error"), request);
 				}
 				if (createdUserAccountBean.isActive()) {
 					request.setAttribute(ViewUserAccountServlet.ARG_USER_ID,
@@ -213,8 +213,8 @@ public class CreateUserAccountServlet extends Controller {
 				setPresetValues(presetValues, request);
 
 				setInputMessages(errors, request);
-				addPageMessage(respage.getString("there_were_some_errors_submission")
-						+ respage.getString("see_below_for_details"), request);
+				addPageMessage(getResPage().getString("there_were_some_errors_submission")
+						+ getResPage().getString("see_below_for_details"), request);
 
 				request.setAttribute(TIME_ZONE_IDS_SORTED_REQUEST_ATR, DateUtil.getAvailableTimeZoneIDsSorted());
 				forwardPage(Page.CREATE_ACCOUNT, request, response);
@@ -265,18 +265,18 @@ public class CreateUserAccountServlet extends Controller {
 			String studyName) throws Exception {
 		StringBuilder sb = new StringBuilder("");
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
-		String body = sb.append(EmailUtil.getEmailBodyStart()).append(resword.getString("dear")).append(" ")
+		String body = sb.append(EmailUtil.getEmailBodyStart()).append(getResWord().getString("dear")).append(" ")
 				.append(createdUserAccountBean.getFirstName()).append(" ").append(createdUserAccountBean.getLastName())
-				.append(",<br><br>").append(restext.getString("a_new_user_account_has_been_created_for_you"))
-				.append("<br><br>").append(resword.getString("user_name")).append(": ")
-				.append(createdUserAccountBean.getName()).append("<br>").append(resword.getString("password"))
+				.append(",<br><br>").append(getResText().getString("a_new_user_account_has_been_created_for_you"))
+				.append("<br><br>").append(getResWord().getString("user_name")).append(": ")
+				.append(createdUserAccountBean.getName()).append("<br>").append(getResWord().getString("password"))
 				.append(": ").append(createdUserAccountBean.getRealPassword()).append("<br><br>")
-				.append(restext.getString("please_test_your_login_information_and_let")).append("<br>")
+				.append(getResText().getString("please_test_your_login_information_and_let")).append("<br>")
 				.append(SQLInitServlet.getSystemURL()).append(" . <br><br> ")
-				.append(respage.getString("best_system_administrator").replace("{0}", studyName))
+				.append(getResPage().getString("best_system_administrator").replace("{0}", studyName))
 				.append(EmailUtil.getEmailBodyEnd()).append(EmailUtil.getEmailFooter(CoreResources.getSystemLocale()))
 				.toString();
-		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
+		sendEmail(createdUserAccountBean.getEmail().trim(), getResText().getString("your_new_openclinica_account"), body,
 				false, request);
 	}
 

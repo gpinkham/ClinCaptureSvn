@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -61,8 +60,8 @@ import com.clinovo.util.SubjectEventStatusUtil;
 
 @SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SubjectEventStatusUtil.class, ResourceBundleProvider.class, EventDefinitionServiceImpl.class,
-		EventDefinitionCrfServiceImpl.class, RequestContextHolder.class, EventDefinitionCRFDAO.class})
+@PrepareForTest({SubjectEventStatusUtil.class, EventDefinitionServiceImpl.class, EventDefinitionCrfServiceImpl.class,
+		RequestContextHolder.class, EventDefinitionCRFDAO.class})
 public class UpdateEventDefinitionServletTest {
 
 	@Spy
@@ -106,8 +105,6 @@ public class UpdateEventDefinitionServletTest {
 
 	private StudyEventDefinitionBean testStudyEventDefinition;
 
-	private ResourceBundle resPage;
-
 	@Before
 	public void beforeTestCaseRun() throws Exception {
 		PowerMockito.whenNew(EventDefinitionCRFDAO.class).withAnyArguments().thenReturn(mockedEventDefinitionCRFDAO);
@@ -146,13 +143,6 @@ public class UpdateEventDefinitionServletTest {
 		// then stubbing all the static methods of the ResourceBundleProvider class
 		Locale locale = new Locale("en");
 		ResourceBundleProvider.updateLocale(locale);
-		resPage = ResourceBundleProvider.getPageMessagesBundle();
-		ResourceBundle workflowBundle = ResourceBundleProvider.getWorkflowBundle(locale);
-		ResourceBundle resFormat = ResourceBundleProvider.getFormatBundle();
-		PowerMockito.mockStatic(ResourceBundleProvider.class);
-		PowerMockito.when(ResourceBundleProvider.getWorkflowBundle(Mockito.any(Locale.class)))
-				.thenReturn(workflowBundle);
-		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 
 		PowerMockito.mockStatic(SubjectEventStatusUtil.class);
 
@@ -165,7 +155,6 @@ public class UpdateEventDefinitionServletTest {
 				.thenReturn(new ArrayList<StudyEventDefinitionBean>());
 
 		// setting up spied UpdateEventDefinitionServlet
-		Whitebox.setInternalState(spyUpdateEventDefinitionServlet, "respage", resPage);
 		Whitebox.setInternalState(mockedEventDefinitionService, "eventCRFService", mockedEventCRFService);
 		Mockito.doReturn(mockedServletContext).when(spyUpdateEventDefinitionServlet).getServletContext();
 		Mockito.doReturn(currentUser).when(spyUpdateEventDefinitionServlet).getUserAccountBean(request);
@@ -237,7 +226,8 @@ public class UpdateEventDefinitionServletTest {
 				Mockito.any(UserAccountBean.class), Mockito.any(DAOWrapper.class), Mockito.any(Map.class));
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
-		Assert.assertTrue(pageMessages.contains(resPage.getString("the_ED_has_been_updated_succesfully")));
+		Assert.assertTrue(pageMessages.contains(
+				ResourceBundleProvider.getPageMessagesBundle().getString("the_ED_has_been_updated_succesfully")));
 
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.LIST_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, response);
@@ -296,7 +286,8 @@ public class UpdateEventDefinitionServletTest {
 				Mockito.any(UserAccountBean.class), Mockito.any(DAOWrapper.class), Mockito.any(Map.class));
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
-		Assert.assertTrue(pageMessages.contains(resPage.getString("the_ED_has_been_updated_succesfully")));
+		Assert.assertTrue(pageMessages.contains(
+				ResourceBundleProvider.getPageMessagesBundle().getString("the_ED_has_been_updated_succesfully")));
 
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.LIST_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, response);

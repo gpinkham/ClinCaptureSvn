@@ -52,9 +52,9 @@ public class RestoreStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -70,7 +70,7 @@ public class RestoreStudyServlet extends Controller {
 
 		String action = request.getParameter("action");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_restore"), request);
+			addPageMessage(getResPage().getString("please_choose_a_study_to_restore"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -85,7 +85,7 @@ public class RestoreStudyServlet extends Controller {
 
 				getStudyService().restoreStudy(study, currentUser);
 
-				addPageMessage(respage.getString("this_study_has_been_restored_succesfully"), request);
+				addPageMessage(getResPage().getString("this_study_has_been_restored_succesfully"), request);
 				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 
 			}

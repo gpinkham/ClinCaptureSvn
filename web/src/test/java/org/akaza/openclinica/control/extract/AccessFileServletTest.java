@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -15,7 +14,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -47,10 +45,6 @@ public class AccessFileServletTest {
 		Locale locale = new Locale("en");
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		Whitebox.setInternalState(accessFileServlet, "respage", respage);
-		Whitebox.setInternalState(accessFileServlet, "resexception", resexception);
 	}
 
 	@Test

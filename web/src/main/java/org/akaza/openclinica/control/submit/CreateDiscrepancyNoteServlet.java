@@ -159,11 +159,11 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.MENU_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
-		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
-				+ respage.getString("change_study_contact_sysadmin");
+		String exceptionName = getResException().getString("no_permission_to_create_discrepancy_note");
+		String noAccessMessage = getResPage().getString("you_may_not_create_discrepancy_note")
+				+ getResPage().getString("change_study_contact_sysadmin");
 
 		if (mayViewData(ub, currentRole) && !currentRole.isStudySponsor()) {
 			return;
@@ -189,7 +189,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		request.setAttribute(DIS_TYPES, types);
 		request.setAttribute(RES_STATUSES, ResolutionStatus.toArrayList());
 
-		String popupMessage = respage.getString("this_note_is_associated_with_data_in_the_CRF");
+		String popupMessage = getResPage().getString("this_note_is_associated_with_data_in_the_CRF");
 
 		String field = fp.getString(ENTITY_FIELD);
 
@@ -284,7 +284,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				ssub = (StudySubjectBean) getStudySubjectDAO().findByPK(entityId);
 				SubjectBean sub = (SubjectBean) getSubjectDAO().findByPK(ssub.getSubjectId());
 				preUserId = ssub.getOwnerId();
-				popupMessage = respage.getString("this_note_is_associated_with_data_for_the_Study_Subject");
+				popupMessage = getResPage().getString("this_note_is_associated_with_data_for_the_Study_Subject");
 
 				if (!StringUtil.isBlank(column)) {
 					if ("enrollment_date".equalsIgnoreCase(column)) {
@@ -292,102 +292,102 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 							request.setAttribute("entityValue", DateUtil.printDate(ssub.getEnrollmentDate(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
-							request.setAttribute("entityValue", resword.getString("N/A"));
+							request.setAttribute("entityValue", getResWord().getString("N/A"));
 						}
-						request.setAttribute("entityName", resword.getString("enrollment_date"));
+						request.setAttribute("entityName", getResWord().getString("enrollment_date"));
 					} else if ("gender".equalsIgnoreCase(column)) {
-						String genderToDisplay = resword.getString("not_specified");
+						String genderToDisplay = getResWord().getString("not_specified");
 						if ('m' == sub.getGender()) {
-							genderToDisplay = resword.getString("male");
+							genderToDisplay = getResWord().getString("male");
 						} else if ('f' == sub.getGender()) {
-							genderToDisplay = resword.getString("female");
+							genderToDisplay = getResWord().getString("female");
 						}
 						request.setAttribute("entityValue", genderToDisplay);
-						request.setAttribute("entityName", resword.getString("gender"));
+						request.setAttribute("entityName", getResWord().getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(sub.getDateOfBirth(),
 									DateUtil.DatePattern.DATE, getLocale()));
 						} else {
-							request.setAttribute("entityValue", resword.getString("N/A"));
+							request.setAttribute("entityValue", getResWord().getString("N/A"));
 						}
-						request.setAttribute("entityName", resword.getString("date_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("date_of_birth"));
 					} else if ("year_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							GregorianCalendar cal = new GregorianCalendar();
 							cal.setTime(sub.getDateOfBirth());
 							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
 						} else {
-							request.setAttribute("entityValue", resword.getString("N/A"));
+							request.setAttribute("entityValue", getResWord().getString("N/A"));
 						}
-						request.setAttribute("entityName", resword.getString("year_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						if (sub.getUniqueIdentifier() != null) {
 							request.setAttribute("entityValue", sub.getUniqueIdentifier());
 						}
-						request.setAttribute("entityName", resword.getString("unique_identifier"));
+						request.setAttribute("entityName", getResWord().getString("unique_identifier"));
 					}
 				}
 			} else if ("subject".equalsIgnoreCase(entityType)) {
 				SubjectBean sub = (SubjectBean) getSubjectDAO().findByPK(entityId);
 				preUserId = sub.getOwnerId();
-				popupMessage = respage.getString("this_note_is_associated_with_data_for_the_Subject");
+				popupMessage = getResPage().getString("this_note_is_associated_with_data_for_the_Subject");
 
 				if (!StringUtil.isBlank(column)) {
 					if ("gender".equalsIgnoreCase(column)) {
-						String genderToDisplay = resword.getString("not_specified");
+						String genderToDisplay = getResWord().getString("not_specified");
 						if ('m' == sub.getGender()) {
-							genderToDisplay = resword.getString("male");
+							genderToDisplay = getResWord().getString("male");
 						} else if ('f' == sub.getGender()) {
-							genderToDisplay = resword.getString("female");
+							genderToDisplay = getResWord().getString("female");
 						}
 						request.setAttribute("entityValue", genderToDisplay);
-						request.setAttribute("entityName", resword.getString("gender"));
+						request.setAttribute("entityName", getResWord().getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(sub.getDateOfBirth(),
 									DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("date_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("date_of_birth"));
 					} else if ("year_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							GregorianCalendar cal = new GregorianCalendar();
 							cal.setTime(sub.getDateOfBirth());
 							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
 						}
-						request.setAttribute("entityName", resword.getString("year_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", sub.getUniqueIdentifier());
-						request.setAttribute("entityName", resword.getString("unique_identifier"));
+						request.setAttribute("entityName", getResWord().getString("unique_identifier"));
 					}
 				}
 			} else if ("studyEvent".equalsIgnoreCase(entityType)) {
 				StudyEventBean se = (StudyEventBean) getStudyEventDAO().findByPK(entityId);
 				preUserId = se.getOwnerId();
-				popupMessage = respage.getString("this_note_is_associated_with_data_for_the_Study_Event");
+				popupMessage = getResPage().getString("this_note_is_associated_with_data_for_the_Study_Event");
 
 				if (!StringUtil.isBlank(column)) {
 					if ("location".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", (se.getLocation().equals("") || se.getLocation() == null)
-								? resword.getString("N/A")
+								? getResWord().getString("N/A")
 								: se.getLocation());
-						request.setAttribute("entityName", resword.getString("location"));
+						request.setAttribute("entityName", getResWord().getString("location"));
 					} else if ("date_start".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(se.getDateStarted(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
-							request.setAttribute("entityValue", resword.getString("N/A"));
+							request.setAttribute("entityValue", getResWord().getString("N/A"));
 						}
-						request.setAttribute("entityName", resword.getString("start_date"));
+						request.setAttribute("entityName", getResWord().getString("start_date"));
 					} else if ("date_end".equalsIgnoreCase(column)) {
 						if (se.getDateEnded() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(se.getDateEnded(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
-							request.setAttribute("entityValue", resword.getString("N/A"));
+							request.setAttribute("entityValue", getResWord().getString("N/A"));
 						}
-						request.setAttribute("entityName", resword.getString("end_date"));
+						request.setAttribute("entityName", getResWord().getString("end_date"));
 					}
 				}
 			} else if ("eventCrf".equalsIgnoreCase(entityType)) {
@@ -400,12 +400,12 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 							request.setAttribute("entityValue", DateUtil.printDate(ecb.getDateInterviewed(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						} else {
-							request.setAttribute("entityValue", resword.getString("N/A"));
+							request.setAttribute("entityValue", getResWord().getString("N/A"));
 						}
-						request.setAttribute("entityName", resword.getString("date_interviewed"));
+						request.setAttribute("entityName", getResWord().getString("date_interviewed"));
 					} else if ("interviewer_name".equals(column)) {
 						request.setAttribute("entityValue", ecb.getInterviewerName());
-						request.setAttribute("entityName", resword.getString("interviewer_name"));
+						request.setAttribute("entityName", getResWord().getString("interviewer_name"));
 					}
 				}
 			}
@@ -513,7 +513,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			}
 			dnb.setOwnerId(parent.getOwnerId());
 			String detailedDes = fp.getString("strErrMsg");
-			if (detailedDes != null && !detailedDes.contains(respage.getString("reason_for_change_error"))) {
+			if (detailedDes != null && !detailedDes.contains(getResPage().getString("reason_for_change_error"))) {
 				dnb.setDetailedNotes(detailedDes);
 				logger.debug("found strErrMsg: " + fp.getString("strErrMsg"));
 			}
@@ -644,7 +644,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 			if (DiscrepancyNoteType.QUERY.getId() == note.getDiscrepancyNoteTypeId()) {
 				if (ResolutionStatus.NOT_APPLICABLE.getId() == note.getResolutionStatusId()) {
-					Validator.addError(errors, RES_STATUS_ID, restext.getString("not_valid_res_status"));
+					Validator.addError(errors, RES_STATUS_ID, getResText().getString("not_valid_res_status"));
 				}
 			}
 
@@ -794,7 +794,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						logger.debug("did not send email, but did save DN");
 					}
 
-					addPageMessage(respage.getString("note_saved_into_db"), request);
+					addPageMessage(getResPage().getString("note_saved_into_db"), request);
 					saveNoteToSubmittedDNsMap(note, request);
 					request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
 					request.setAttribute("responseMessage", "Save Done");
@@ -1173,13 +1173,13 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(note.getAssignedUserId());
 		String alertEmail = assignedUser.getEmail();
 		message.append(EmailUtil.getEmailBodyStart());
-		message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),
+		message.append(MessageFormat.format(getResPage().getString("mailDNHeader"), assignedUser.getFirstName(),
 				assignedUser.getLastName()));
 		message.append("<A HREF='").append(SQLInitServlet.getSystemURL())
 				.append("ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=").append(assignedUser.getName())
 				.append("&listNotes_f_entityName=").append(note.getEntityName()).append("'>")
 				.append(SQLInitServlet.getField("sysURL")).append("</A><BR/>");
-		message.append(respage.getString("you_received_this_from"));
+		message.append(getResPage().getString("you_received_this_from"));
 		StudyBean study = (StudyBean) studyDAO.findByPK(note.getStudyId());
 		SectionDAO sectionDAO = getSectionDAO();
 
@@ -1191,40 +1191,40 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			}
 		}
 
-		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("disc_note_info"));
-		message.append(respage.getString("email_body_separator"));
-		message.append(MessageFormat.format(respage.getString("mailDNParameters1"), note.getDescription(),
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(getResPage().getString("disc_note_info"));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(MessageFormat.format(getResPage().getString("mailDNParameters1"), note.getDescription(),
 				note.getDetailedNotes(), userName));
-		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("entity_information"));
-		message.append(respage.getString("email_body_separator"));
-		message.append(MessageFormat.format(respage.getString("mailDNParameters2"), study.getName(),
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(getResPage().getString("entity_information"));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(MessageFormat.format(getResPage().getString("mailDNParameters2"), study.getName(),
 				note.getSubjectName()));
 
 		if (!("studySub".equalsIgnoreCase(entityType) || "subject".equalsIgnoreCase(entityType))) {
-			message.append(MessageFormat.format(respage.getString("mailDNParameters3"), note.getEventName()));
+			message.append(MessageFormat.format(getResPage().getString("mailDNParameters3"), note.getEventName()));
 			if (!"studyEvent".equalsIgnoreCase(note.getEntityType())) {
-				message.append(MessageFormat.format(respage.getString("mailDNParameters4"), note.getCrfName()));
+				message.append(MessageFormat.format(getResPage().getString("mailDNParameters4"), note.getCrfName()));
 				if (!"eventCrf".equalsIgnoreCase(note.getEntityType())) {
 					if (sectionId > 0) {
-						message.append(MessageFormat.format(respage.getString("mailDNParameters5"), section.getName()));
+						message.append(MessageFormat.format(getResPage().getString("mailDNParameters5"), section.getName()));
 					}
-					message.append(MessageFormat.format(respage.getString("mailDNParameters6"), item.getName()));
+					message.append(MessageFormat.format(getResPage().getString("mailDNParameters6"), item.getName()));
 				}
 			}
 		}
 
-		message.append(respage.getString("email_body_separator"));
-		message.append(MessageFormat.format(respage.getString("mailDNThanks"), study.getName()));
-		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("disclaimer"));
-		message.append(respage.getString("email_body_separator"));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(MessageFormat.format(getResPage().getString("mailDNThanks"), study.getName()));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(getResPage().getString("disclaimer"));
+		message.append(getResPage().getString("email_body_separator"));
 		message.append(EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(CoreResources.getSystemLocale()));
 
 		String emailBodyString = message.toString();
 		sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(),
-				MessageFormat.format(respage.getString("mailDNSubject"), study.getName(), note.getEntityName()),
+				MessageFormat.format(getResPage().getString("mailDNSubject"), study.getName(), note.getEntityName()),
 				emailBodyString, true, null, null, true, request);
 	}
 
@@ -1254,10 +1254,10 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(ssub.getStudyId());
 		if (ssub.getStudyId() != currentStudy.getId() && currentStudy.getId() != studyBeanSub.getParentStudyId()) {
 			addPageMessage(
-					respage.getString("you_may_not_create_discrepancy_note")
-							+ respage.getString("change_study_contact_sysadmin"), request, aLogger);
+					getResPage().getString("you_may_not_create_discrepancy_note")
+							+ getResPage().getString("change_study_contact_sysadmin"), request, aLogger);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString(NO_PERMISSION_EXCEPTION), "1");
+					getResException().getString(NO_PERMISSION_EXCEPTION), "1");
 		}
 	}
 

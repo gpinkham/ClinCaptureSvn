@@ -76,16 +76,16 @@ public class UpdateSubStudyServlet extends Controller {
 
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.SITE_LIST_SERVLET, getResPage().getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_LIST, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_LIST, getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class UpdateSubStudyServlet extends Controller {
 		String action = request.getParameter("action");
 
 		if (StringUtil.isBlank(action)) {
-			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 			FormProcessor fp = new FormProcessor(request);
 			if (study.getDatePlannedEnd() != null) {
@@ -191,31 +191,31 @@ public class UpdateSubStudyServlet extends Controller {
 		for (StudyBean thisBean : allStudies) {
 			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())
 					&& thisBean.getId() != oldStudy.getId()) {
-				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
+				Validator.addError(errors, "uniqueProId", getResException().getString("unique_protocol_id_existed"));
 			}
 		}
 
 		if (fp.getString("name").trim().length() > 100) {
-			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
+			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
 		}
 		if (fp.getString("uniqueProId").trim().length() > 30) {
-			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
+			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
 		if (fp.getString("description").trim().length() > 2000) {
-			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
+			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
 		}
 		if (fp.getString("prinInvestigator").trim().length() > 255) {
 			Validator.addError(errors, "prinInvestigator",
-					resexception.getString("maximum_lenght_principal_investigator_255"));
+					getResException().getString("maximum_lenght_principal_investigator_255"));
 		}
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
-					respage.getString("expected_total_enrollment_must_be_a_positive_number"));
+					getResPage().getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
 		if (parentStudy.getStatus().equals(Status.LOCKED)) {
 			if (fp.getInt("statusId") != Status.LOCKED.getId()) {
-				Validator.addError(errors, "statusId", respage.getString("study_locked_site_status_locked"));
+				Validator.addError(errors, "statusId", getResPage().getString("study_locked_site_status_locked"));
 			}
 		}
 
@@ -225,7 +225,7 @@ public class UpdateSubStudyServlet extends Controller {
 		if (errors.isEmpty()) {
 			logger.info("no errors");
 			submitStudy(request);
-			addPageMessage(respage.getString("the_site_has_been_updated_succesfully"), request);
+			addPageMessage(getResPage().getString("the_site_has_been_updated_succesfully"), request);
 			String fromListSite = (String) request.getSession().getAttribute("fromListSite");
 			request.getSession().removeAttribute("fromListSite");
 			if (fromListSite != null && fromListSite.equals(YES)) {
@@ -240,7 +240,7 @@ public class UpdateSubStudyServlet extends Controller {
 			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			setPresetValues(fp.getPresetValues(), request);
 			request.setAttribute("formMessages", errors);
-			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		}

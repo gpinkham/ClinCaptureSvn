@@ -2,7 +2,6 @@ package org.akaza.openclinica.control.core;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -12,12 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-import com.clinovo.crfdata.ImportCRFDataService;
-import com.clinovo.service.CrfVersionService;
-import com.clinovo.service.EventCRFSectionService;
-import com.clinovo.service.StudyEventService;
-import com.clinovo.service.StudyService;
-import com.clinovo.service.StudySubjectService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -65,6 +58,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
@@ -80,21 +74,27 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 
+import com.clinovo.crfdata.ImportCRFDataService;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.CrfVersionService;
 import com.clinovo.service.DatasetService;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.DeleteCrfService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.EventCRFService;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.ItemSDVService;
+import com.clinovo.service.StudyEventService;
+import com.clinovo.service.StudyService;
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.StudySubjectService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
@@ -109,15 +109,12 @@ import com.clinovo.util.RuleSetServiceUtil;
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
 	public static final String REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN = "redirectBackToControllerAfterLogin";
-
 	public static final String REFERER = "referer";
-
-	public static final String ACTION_START_INITIAL_DATA_ENTRY = "ide_s";
+	public static final String RESTORE_SESSION_FLAG = "restoreSessionFlag";
 	public static final String ACTION_CONTINUE_INITIAL_DATA_ENTRY = "ide_c";
 	public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
 	public static final String ACTION_CONTINUE_DOUBLE_DATA_ENTRY = "dde_c";
 	public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
-
 	public static final String STUDY = "study";
 	public static final String USER_ROLE = "userRole";
 	public static final String PARENT_STUDY = "parentStudy";
@@ -125,78 +122,66 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String SESSION_MANAGER = "sessionManager";
 	public static final String THEME_COLOR = "newThemeColor";
-
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
-
 	public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
 	public static final String JOB_HOUR = "jobHour";
 	public static final String JOB_MINUTE = "jobMinute";
-
-	public static final String PAGE_MESSAGE = "pageMessages"; // for showing
-	// page
-	// wide message
-
-	public static final String INPUT_MESSAGES = "formMessages"; // for showing
-	// input-specific
-	// messages
-
-	public static final String PRESET_VALUES = "presetValues"; // for setting
-	// preset values
-
+	public static final String PAGE_MESSAGE = "pageMessages";
+	public static final String INPUT_MESSAGES = "formMessages";
+	public static final String PRESET_VALUES = "presetValues";
 	public static final String ADMIN_SERVLET_CODE = "admin";
-
-	public static final String STUDY_INFO_PANEL = "panel"; // for setting the
-	// side panel
-
+	public static final String STUDY_INFO_PANEL = "panel";
 	public static final String POP_UP_URL = "popUpURL";
-
-	// Use this variable as the key for the support url
 	public static final String SUPPORT_URL = "supportURL";
-
-	public static final String MODULE = "module"; // to determine which module
-
+	public static final String MODULE = "module";
 	public static final String NOT_USED = "not_used";
-
 	public static final String DOMAIN_NAME = "domain_name";
 
 	private static final Map<Integer, Integer> UNAVAILABLE_CRF_LIST = new HashMap<Integer, Integer>();
-
-	private static String restoreSessionFlag;
 
 	private static final HashMap<String, HashMap<String, Object>> STORED_SESSION_ATTRIBUTES = new HashMap<String, HashMap<String, Object>>();
 
 	private static final String[] NAMES_OF_ATTRIBUTES_TO_STORE = {"randomizationEnviroment", "panel", "fdnotes",
 			"submittedDNs", "ecb", "dnAdditionalCreatingParameters", "instanceType", "newThemeColor", "visitedURLs"};
 
-	protected static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword,
-			resworkflow;
-
-	protected static HashMap<String, String> facRecruitStatusMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> studyPhaseMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> interPurposeMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> allocationMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> maskingMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> controlMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> assignmentMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> endpointMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
-
-	protected static HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
-
 	private ServletContext servletContext;
+
+	public static ResourceBundle getResAdmin() {
+		return ResourceBundleProvider.getAdminBundle();
+	}
+
+	public static ResourceBundle getResAudit() {
+		return ResourceBundleProvider.getAuditEventsBundle();
+	}
+
+	public static ResourceBundle getResException() {
+		return ResourceBundleProvider.getExceptionsBundle();
+	}
+
+	public static ResourceBundle getResFormat() {
+		return ResourceBundleProvider.getFormatBundle();
+	}
+
+	public static ResourceBundle getResPage() {
+		return ResourceBundleProvider.getPageMessagesBundle();
+	}
+
+	public static ResourceBundle getResTerm() {
+		return ResourceBundleProvider.getTermsBundle();
+	}
+
+	public static ResourceBundle getResText() {
+		return ResourceBundleProvider.getTextsBundle();
+	}
+
+	public static ResourceBundle getResWord() {
+		return ResourceBundleProvider.getWordsBundle();
+	}
+
+	public static ResourceBundle getResWorkflow() {
+		return ResourceBundleProvider.getWorkflowBundle();
+	}
 
 	@Autowired
 	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
@@ -334,18 +319,15 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	}
 
 	public static String getRestoreSessionFlag() {
-		return restoreSessionFlag;
+		return (String) RequestUtil.getRequest().getSession().getAttribute(RESTORE_SESSION_FLAG);
 	}
 
 	public static void setRestoreSessionFlag(String restoreSessionFlag) {
-		BaseController.restoreSessionFlag = restoreSessionFlag;
+		RequestUtil.getRequest().getSession().setAttribute(RESTORE_SESSION_FLAG, restoreSessionFlag);
 	}
 
-	/**
-	 *
-	 */
 	public static void resetRestoreSessionFlag() {
-		restoreSessionFlag = "";
+		RequestUtil.getRequest().getSession().setAttribute(RESTORE_SESSION_FLAG, "");
 	}
 
 	public void setServletContext(ServletContext servletContext) {
@@ -366,7 +348,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	 */
 	@Deprecated
 	public SimpleDateFormat getLocalDf(HttpServletRequest request) {
-		return new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver.getLocale(request));
+		return new SimpleDateFormat(getResFormat().getString("date_format_string"), LocaleResolver.getLocale(request));
 	}
 
 	/**

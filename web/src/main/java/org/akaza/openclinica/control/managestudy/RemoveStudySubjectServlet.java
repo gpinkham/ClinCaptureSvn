@@ -63,9 +63,9 @@ public class RemoveStudySubjectServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request,
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, getResPage().getString("current_study_locked"), request,
 				response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request,
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, getResPage().getString("current_study_frozen"), request,
 				response);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
@@ -73,10 +73,10 @@ public class RemoveStudySubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -96,7 +96,7 @@ public class RemoveStudySubjectServlet extends Controller {
 
 		if (StringUtil.isBlank(studySubIdString) || StringUtil.isBlank(subIdString)
 				|| StringUtil.isBlank(studyIdString)) {
-			addPageMessage(respage.getString("please_choose_a_study_subject_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_study_subject_to_remove"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 		} else {
 			int studyId = Integer.parseInt(studyIdString.trim());
@@ -117,8 +117,8 @@ public class RemoveStudySubjectServlet extends Controller {
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studySub.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_subject_is_not_available_for_this_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(getResPage().getString("this_subject_is_not_available_for_this_study") + " "
+							+ getResPage().getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
 				}
@@ -135,11 +135,11 @@ public class RemoveStudySubjectServlet extends Controller {
 
 				getStudySubjectService().removeStudySubject(studySub, currentUser);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ")
+				String emailBody = new StringBuilder("").append(getResPage().getString("the_subject")).append(" ")
 						.append(studySub.getLabel()).append(" ")
 						.append((study.isSite(study.getParentStudyId())
-								? respage.getString("has_been_removed_from_the_site")
-								: respage.getString("has_been_removed_from_the_study")))
+								? getResPage().getString("has_been_removed_from_the_site")
+								: getResPage().getString("has_been_removed_from_the_study")))
 						.append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);

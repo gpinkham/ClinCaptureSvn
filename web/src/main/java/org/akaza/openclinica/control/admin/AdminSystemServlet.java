@@ -69,18 +69,18 @@ public class AdminSystemServlet extends Controller {
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
 		panel.setOrderedData(true);
-		setToPanel(resword.getString("in_the_application"), "", request);
+		setToPanel(getResWord().getString("in_the_application"), "", request);
 		if (allSubjects.size() > 0) {
-			setToPanel(resword.getString("subjects"), Integer.toString(allSubjects.size()), request);
+			setToPanel(getResWord().getString("subjects"), Integer.toString(allSubjects.size()), request);
 		}
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), Integer.toString(allUsers.size()), request);
+			setToPanel(getResWord().getString("users"), Integer.toString(allUsers.size()), request);
 		}
 		if (allStudies.size() > 0) {
-			setToPanel(resword.getString("studies"), Integer.toString(allStudies.size()), request);
+			setToPanel(getResWord().getString("studies"), Integer.toString(allStudies.size()), request);
 		}
 		if (allCrfs.size() > 0) {
-			setToPanel(resword.getString("CRFs"), Integer.toString(allCrfs.size()), request);
+			setToPanel(getResWord().getString("CRFs"), Integer.toString(allCrfs.size()), request);
 		}
 
 		panel.setStudyInfoShown(false);

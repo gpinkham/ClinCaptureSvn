@@ -95,10 +95,10 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -129,7 +129,7 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 		request.setAttribute("id", studySubId);
 
 		if (studySubId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 		} else {
 			StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
@@ -142,8 +142,8 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 			if (studySubject.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {
 					addPageMessage(
-							respage.getString("no_have_correct_privilege_current_study") + " "
-									+ respage.getString("change_active_study_or_contact"), request);
+							getResPage().getString("no_have_correct_privilege_current_study") + " "
+									+ getResPage().getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				} else {
@@ -151,8 +151,8 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 					Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
 					if (!sites.contains(study.getId())) {
 						addPageMessage(
-								respage.getString("no_have_correct_privilege_current_study") + " "
-										+ respage.getString("change_active_study_or_contact"), request);
+								getResPage().getString("no_have_correct_privilege_current_study") + " "
+										+ getResPage().getString("change_active_study_or_contact"), request);
 						forwardPage(Page.MENU_SERVLET, request, response);
 						return;
 					}

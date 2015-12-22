@@ -87,25 +87,25 @@ public class EditDatasetServlet extends Controller {
 		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 		if (dataset.isContainsMaskedCRFs()) {
-			addPageMessage(resword.getString("this_dataset_contains_items_from_masked_crfs"), request);
+			addPageMessage(getResWord().getString("this_dataset_contains_items_from_masked_crfs"), request);
 		}
 
 		// Checking the dataset belongs to current study or a site of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+					getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 		}
 
 		if ((Role.isMonitor(currentRole.getRole()) || currentRole.getRole() == Role.INVESTIGATOR)
 				&& (dataset.getOwnerId() != ub.getId())) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+					getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 		}
 
 		HashMap events = (LinkedHashMap) request.getSession().getAttribute("eventsForCreateDataset");
@@ -130,7 +130,7 @@ public class EditDatasetServlet extends Controller {
 				}
 			}
 			if (events.isEmpty()) {
-				addPageMessage(respage.getString("not_have_study_definitions_assigned"), request);
+				addPageMessage(getResPage().getString("not_have_study_definitions_assigned"), request);
 				forwardPage(Page.VIEW_DATASETS, request, response);
 			} else {
 				request.setAttribute("eventlist", events);
@@ -158,10 +158,10 @@ public class EditDatasetServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 

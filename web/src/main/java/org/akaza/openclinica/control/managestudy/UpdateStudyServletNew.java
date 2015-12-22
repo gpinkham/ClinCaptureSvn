@@ -20,13 +20,17 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.exception.CodeException;
-import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.model.DiscrepancyDescriptionType;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.ValidatorHelper;
-import com.clinovo.validator.StudyValidator;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -48,15 +52,13 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import com.clinovo.exception.CodeException;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.model.DiscrepancyDescriptionType;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.StudyValidator;
 
 /**
  * Processes request to update study.
@@ -92,9 +94,9 @@ public class UpdateStudyServletNew extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
 	}
 
 	@Override
@@ -120,7 +122,7 @@ public class UpdateStudyServletNew extends Controller {
 
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		if (study.getId() != currentStudy.getId()) {
-			addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"),
+			addPageMessage(getResPage().getString("not_current_study") + getResPage().getString("change_study_contact_sysadmin"),
 					request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
@@ -134,12 +136,12 @@ public class UpdateStudyServletNew extends Controller {
 
 		request.setAttribute("studyToView", study);
 		request.setAttribute("studyId", studyId + "");
-		request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
+		request.setAttribute("studyPhaseMap", getMapsHolder().getStudyPhaseMap());
 		ArrayList statuses = Status.toStudyUpdateMembersList();
 		statuses.add(Status.PENDING);
 		request.setAttribute("statuses", statuses);
 
-		String interventional = resadmin.getString("interventional");
+		String interventional = getResAdmin().getString("interventional");
 		boolean isInterventional = interventional.equalsIgnoreCase(study.getProtocolType());
 
 		request.setAttribute("isInterventional", isInterventional ? "1" : "0");
@@ -197,7 +199,7 @@ public class UpdateStudyServletNew extends Controller {
 				submitStudy(study, dDescriptionsMap, request);
 				study.setStudyParameters(getStudyParameterValueDAO().findParamConfigByStudy(study));
 				updateLastAccessedInstanceType(response, study);
-				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"), request);
+				addPageMessage(getResPage().getString("the_study_has_been_updated_succesfully"), request);
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 				request.getSession().setAttribute("pageMessages", pageMessages);
 				response.sendRedirect(request.getContextPath() + "/pages/studymodule");
@@ -236,51 +238,51 @@ public class UpdateStudyServletNew extends Controller {
 
 		errors.putAll(v.validate());
 
-		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), respage, resexception, study);
+		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(), study);
 
 		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
-			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
+			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
 		}
 		if (fp.getString("uniqueProId").trim().length() > VALIDATION_NUM2) {
-			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
+			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
 		if (fp.getString("description").trim().length() > VALIDATION_NUM8) {
-			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
+			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
 		}
 		if (fp.getString("prinInvestigator").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "prinInvestigator",
-					resexception.getString("maximum_lenght_principal_investigator_255"));
+					getResException().getString("maximum_lenght_principal_investigator_255"));
 		}
 		if (fp.getString("sponsor").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "sponsor", resexception.getString("maximum_lenght_sponsor_255"));
+			Validator.addError(errors, "sponsor", getResException().getString("maximum_lenght_sponsor_255"));
 		}
 		if (fp.getString("officialTitle").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "officialTitle", resexception.getString("maximum_lenght_official_title_255"));
+			Validator.addError(errors, "officialTitle", getResException().getString("maximum_lenght_official_title_255"));
 		}
 
 		if (fp.getString("studySubjectIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "studySubjectIdLabel",
-					resexception.getString("maximum_lenght_studySubjectIdLabel_255"));
+					getResException().getString("maximum_lenght_studySubjectIdLabel_255"));
 		}
 		if (fp.getString("secondaryIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "secondaryIdLabel",
-					resexception.getString("maximum_lenght_secondaryIdLabel_255"));
+					getResException().getString("maximum_lenght_secondaryIdLabel_255"));
 		}
 		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "dateOfEnrollmentForStudyLabel",
-					resexception.getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
+					getResException().getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
 		}
 		if (fp.getString("genderLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "genderLabel", resexception.getString("maximum_lenght_genderLabel_255"));
+			Validator.addError(errors, "genderLabel", getResException().getString("maximum_lenght_genderLabel_255"));
 		}
 
 		if (fp.getString("startDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "startDateTimeLabel",
-					resexception.getString("maximum_lenght_startDateTimeLabel_255"));
+					getResException().getString("maximum_lenght_startDateTimeLabel_255"));
 		}
 		if (fp.getString("endDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "endDateTimeLabel",
-					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
+					getResException().getString("maximum_lenght_endDateTimeLabel_255"));
 		}
 
 		createStudyBean(fp, study);
@@ -311,12 +313,12 @@ public class UpdateStudyServletNew extends Controller {
 			String name = fp.getString("interName" + i);
 			if (!StringUtil.isBlank(type) && StringUtil.isBlank(name)) {
 				v.addValidation("interName", Validator.NO_BLANKS);
-				fp.getRequest().setAttribute("interventionError", respage.getString("name_cannot_be_blank_if_type"));
+				fp.getRequest().setAttribute("interventionError", getResPage().getString("name_cannot_be_blank_if_type"));
 				break;
 			}
 			if (!StringUtil.isBlank(name) && StringUtil.isBlank(type)) {
 				v.addValidation("interType", Validator.NO_BLANKS);
-				fp.getRequest().setAttribute("interventionError", respage.getString("name_cannot_be_blank_if_name"));
+				fp.getRequest().setAttribute("interventionError", getResPage().getString("name_cannot_be_blank_if_name"));
 				break;
 			}
 		}
@@ -335,7 +337,7 @@ public class UpdateStudyServletNew extends Controller {
 		errors.putAll(v.validate());
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
-					respage.getString("expected_total_enrollment_must_be_a_positive_number"));
+					getResPage().getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
 		study.setConditions(fp.getString("conditions"));
@@ -344,14 +346,14 @@ public class UpdateStudyServletNew extends Controller {
 		study.setGender(fp.getString("gender"));
 		final int ageMaxSize = 3;
 		if (fp.getString("ageMax").length() > ageMaxSize) {
-			Validator.addError(errors, "ageMax", respage.getString("condition_eligibility_3"));
+			Validator.addError(errors, "ageMax", getResPage().getString("condition_eligibility_3"));
 		}
 		study.setAgeMax(fp.getString("ageMax"));
 
 		study.setAgeMin(fp.getString("ageMin"));
 		study.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
 		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
-		fp.getRequest().setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+		fp.getRequest().setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 	}
 
 	private void validateStudy5(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
@@ -393,7 +395,7 @@ public class UpdateStudyServletNew extends Controller {
 
 		if (!errors.isEmpty()) {
 			fp.getRequest().setAttribute("formMessages", errors);
-			fp.getRequest().setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+			fp.getRequest().setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 		}
 	}
 
@@ -466,7 +468,7 @@ public class UpdateStudyServletNew extends Controller {
 				DiscrepancyDescription rfcTerm2 = newDescriptions.get(j);
 				if (rfcTerm1.getName().equals(rfcTerm2.getName())) {
 					Validator.addError(errors, descriptionError + i,
-							respage.getString("please_correct_the_duplicate_description_found_in_row") + " " + (j + 1));
+							getResPage().getString("please_correct_the_duplicate_description_found_in_row") + " " + (j + 1));
 				}
 			}
 		}
@@ -609,7 +611,7 @@ public class UpdateStudyServletNew extends Controller {
 		} else {
 			study.setGenetic(false);
 		}
-		String interventional = resadmin.getString("interventional");
+		String interventional = getResAdmin().getString("interventional");
 		return interventional.equalsIgnoreCase(study.getProtocolType());
 	}
 
@@ -671,18 +673,18 @@ public class UpdateStudyServletNew extends Controller {
 
 	private void setMaps(HttpServletRequest request, boolean isInterventional, ArrayList interventionArray) {
 		if (isInterventional) {
-			request.setAttribute("interPurposeMap", CreateStudyServlet.interPurposeMap);
-			request.setAttribute("allocationMap", CreateStudyServlet.allocationMap);
-			request.setAttribute("maskingMap", CreateStudyServlet.maskingMap);
-			request.setAttribute("controlMap", CreateStudyServlet.controlMap);
-			request.setAttribute("assignmentMap", CreateStudyServlet.assignmentMap);
-			request.setAttribute("endpointMap", CreateStudyServlet.endpointMap);
-			request.setAttribute("interTypeMap", CreateStudyServlet.interTypeMap);
+			request.setAttribute("interPurposeMap", getMapsHolder().getInterPurposeMap());
+			request.setAttribute("allocationMap", getMapsHolder().getAllocationMap());
+			request.setAttribute("maskingMap", getMapsHolder().getMaskingMap());
+			request.setAttribute("controlMap", getMapsHolder().getControlMap());
+			request.setAttribute("assignmentMap", getMapsHolder().getAssignmentMap());
+			request.setAttribute("endpointMap", getMapsHolder().getEndpointMap());
+			request.setAttribute("interTypeMap", getMapsHolder().getInterTypeMap());
 			request.getSession().setAttribute("interventions", interventionArray);
 		} else {
-			request.setAttribute("obserPurposeMap", CreateStudyServlet.obserPurposeMap);
-			request.setAttribute("selectionMap", CreateStudyServlet.selectionMap);
-			request.setAttribute("timingMap", CreateStudyServlet.timingMap);
+			request.setAttribute("obserPurposeMap", getMapsHolder().getObserPurposeMap());
+			request.setAttribute("selectionMap", getMapsHolder().getSelectionMap());
+			request.setAttribute("timingMap", getMapsHolder().getTimingMap());
 		}
 	}
 

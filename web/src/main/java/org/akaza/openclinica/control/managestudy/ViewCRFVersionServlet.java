@@ -77,9 +77,9 @@ public class ViewCRFVersionServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_director"), "1");
 
 	}
 
@@ -96,7 +96,7 @@ public class ViewCRFVersionServlet extends Controller {
 		int crfVersionId = fp.getInt("id");
 
 		if (crfVersionId == 0) {
-			addPageMessage(respage.getString("please_choose_a_crf_to_view_details"), request);
+			addPageMessage(getResPage().getString("please_choose_a_crf_to_view_details"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		} else {
 			CRFVersionBean version = (CRFVersionBean) crfVersionDao.findByPK(crfVersionId);

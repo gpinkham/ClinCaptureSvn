@@ -74,9 +74,9 @@ public class ViewEventCRFContentServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("no_permission"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("no_permission"), "1");
 
 	}
 
@@ -96,9 +96,9 @@ public class ViewEventCRFContentServlet extends Controller {
 		AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
 		if (!aeb.isActive()) {
-			addPageMessage(respage.getString("the_SE_you_attempting_enter_data_not_belong"), request);
+			addPageMessage(getResPage().getString("the_SE_you_attempting_enter_data_not_belong"), request);
 			throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("SE_does_not_belong_current_study"), "1");
+					getResException().getString("SE_does_not_belong_current_study"), "1");
 
 			// >> changed tbh, 06/2009
 		}
@@ -118,7 +118,7 @@ public class ViewEventCRFContentServlet extends Controller {
 		int studySubId = fp.getInt("id", true);
 		int eventId = fp.getInt("eventId", true);
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_an_event_CRF_to_view"), request);
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			return;
 		}

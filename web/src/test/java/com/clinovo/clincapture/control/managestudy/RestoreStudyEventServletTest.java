@@ -13,8 +13,6 @@
 
 package com.clinovo.clincapture.control.managestudy;
 
-import java.util.ResourceBundle;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -23,7 +21,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.control.managestudy.RestoreStudyEventServlet;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.junit.Before;
@@ -54,10 +51,6 @@ public class RestoreStudyEventServletTest extends DefaultAppContextTest {
 	@Mock
 	private EventCRFService eventCRFService;
 
-	private ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
-
-	private ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
-
 	@Before
 	public void setUp() throws Exception {
 
@@ -82,8 +75,6 @@ public class RestoreStudyEventServletTest extends DefaultAppContextTest {
 		Mockito.doReturn(eventCRFService).when(restoreStudyEventServlet).getEventCRFService();
 		Mockito.doReturn(studyEventService).when(restoreStudyEventServlet).getStudyEventService();
 
-		Whitebox.setInternalState(restoreStudyEventServlet, "respage", respage);
-		Whitebox.setInternalState(restoreStudyEventServlet, "resexception", resexception);
 		Whitebox.setInternalState(restoreStudyEventServlet, "logger",
 				LoggerFactory.getLogger("RestoreStudyEventServlet"));
 	}

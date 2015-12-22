@@ -59,7 +59,7 @@ public class VerifyImportedRuleServlet extends Controller {
 					"importedData");
 			getRuleSetService().saveImport(rulesContainer);
 			MessageFormat mf = new MessageFormat("");
-			mf.applyPattern(resword.getString("successful_rule_upload"));
+			mf.applyPattern(getResWord().getString("successful_rule_upload"));
 
 			Object[] arguments = {
 					rulesContainer.getValidRuleDefs().size() + rulesContainer.getDuplicateRuleDefs().size(),
@@ -88,8 +88,8 @@ public class VerifyImportedRuleServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
 	}
 }

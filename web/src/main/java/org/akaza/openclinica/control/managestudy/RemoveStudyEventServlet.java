@@ -64,16 +64,16 @@ public class RemoveStudyEventServlet extends Controller {
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 
 		if (getUserAccountBean(request).isSysAdmin() || getCurrentRole(request).isStudyAdministrator()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -91,7 +91,7 @@ public class RemoveStudyEventServlet extends Controller {
 		StudySubjectDAO subdao = getStudySubjectDAO();
 
 		if (studyEventId == 0) {
-			addPageMessage(respage.getString("please_choose_a_SE_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_SE_to_remove"), request);
 			request.setAttribute("id", Integer.toString(studySubId));
 			forwardToViewStudySubjectPage(request, response);
 		} else {
@@ -132,13 +132,13 @@ public class RemoveStudyEventServlet extends Controller {
 
 				getStudyEventService().removeStudyEvent(event, currentUser);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_event")).append(" ")
+				String emailBody = new StringBuilder("").append(getResPage().getString("the_event")).append(" ")
 						.append(event.getStudyEventDefinition().getName()).append(" ")
-						.append(respage.getString("has_been_removed_from_the_subject_record_for")).append(" ")
+						.append(getResPage().getString("has_been_removed_from_the_subject_record_for")).append(" ")
 						.append(studySub.getLabel()).append(" ")
 						.append(study.isSite(study.getParentStudyId())
-								? respage.getString("in_the_site")
-								: respage.getString("in_the_study"))
+								? getResPage().getString("in_the_site")
+								: getResPage().getString("in_the_study"))
 						.append(" ").append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);

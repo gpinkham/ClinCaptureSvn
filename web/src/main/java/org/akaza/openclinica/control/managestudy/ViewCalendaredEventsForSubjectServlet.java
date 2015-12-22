@@ -132,9 +132,9 @@ public class ViewCalendaredEventsForSubjectServlet extends Controller {
 
 	private EntityBeanTable getTable(ArrayList events, int subjectId) {
 		EntityBeanTable table = getEntityBeanTable();
-		String[] columns = {resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
-				resword.getString("schedule_date"), resword.getString("user_email_date"),
-				resword.getString("is_reference_event"), resword.getString("reference_visit_for_event")};
+		String[] columns = { getResWord().getString("calendared_event_name"), getResWord().getString("min_max_date_range"),
+				getResWord().getString("schedule_date"), getResWord().getString("user_email_date"),
+				getResWord().getString("is_reference_event"), getResWord().getString("reference_visit_for_event")};
 		ArrayList rows = CalendarEventRow.generateRowsFromBeans(events);
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		HashMap args = new HashMap();

@@ -3,7 +3,6 @@ package org.akaza.openclinica.control.managestudy;
 import static org.junit.Assert.assertNull;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
@@ -17,8 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -58,18 +55,6 @@ public class SignStudySubjectServletTest {
 		PowerMockito.when(request.getSession()).thenReturn(session);
 		LocaleResolver.updateLocale(session, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle respage = ResourceBundleProvider.getExceptionsBundle(locale);
-		ResourceBundle resexception = ResourceBundleProvider.getPageMessagesBundle();
-		ResourceBundle restext = ResourceBundleProvider.getTextsBundle();
-		PowerMockito.mockStatic(ResourceBundleProvider.class);
-		PowerMockito.when(ResourceBundleProvider.getPageMessagesBundle(Mockito.any(Locale.class))).thenReturn(
-				resexception);
-		PowerMockito.when(ResourceBundleProvider.getExceptionsBundle(Mockito.any(Locale.class))).thenReturn(
-				resexception);
-		PowerMockito.when(ResourceBundleProvider.getTextsBundle(Mockito.any(Locale.class))).thenReturn(restext);
-		Whitebox.setInternalState(signStudySubjectServlet, "respage", respage);
-		Whitebox.setInternalState(signStudySubjectServlet, "resexception", resexception);
-		Whitebox.setInternalState(signStudySubjectServlet, "restext", restext);
 	}
 
 	@Test
@@ -80,8 +65,8 @@ public class SignStudySubjectServletTest {
 		request.addParameter("j_pass", "pass");
 		userAccountBean.setId(ID);
 		userAccountBean.setName("test_pi");
-		PowerMockito.doCallRealMethod().when(signStudySubjectServlet)
-				.authenticateUser(request, response, userAccountBean, mockedStudySubjectDAO, 1, mockedSSBean);
+		PowerMockito.doCallRealMethod().when(signStudySubjectServlet).authenticateUser(request, response,
+				userAccountBean, mockedStudySubjectDAO, 1, mockedSSBean);
 		PowerMockito.doReturn(userAccountBean).when(signStudySubjectServlet).getUserAccountBean(request);
 		PowerMockito.doReturn(dataSource).when(signStudySubjectServlet).getDataSource();
 		PowerMockito.doReturn(securityManager).when(signStudySubjectServlet).getSecurityManager();

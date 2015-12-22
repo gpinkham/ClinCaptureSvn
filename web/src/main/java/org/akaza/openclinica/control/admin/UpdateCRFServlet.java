@@ -67,9 +67,9 @@ public class UpdateCRFServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("you_not_have_permission_update_a_CRF")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
+				getResPage().getString("you_not_have_permission_update_a_CRF")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, getResException().getString("not_study_director"),
 				"1");
 
 	}
@@ -105,13 +105,13 @@ public class UpdateCRFServlet extends Controller {
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
-		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
-		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
+				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
+		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
+				getResPage().getString("br_download_example_CRF_instructions_from"), request);
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -160,7 +160,7 @@ public class UpdateCRFServlet extends Controller {
 			logger.info("crf1:" + crf1.getName() + crf1.getId());
 			if (crf1.getId() > 0) {
 				Validator
-						.addError(errors, "name", resexception.getString("CRF_name_used_by_another_CRF_choose_unique"));
+						.addError(errors, "name", getResException().getString("CRF_name_used_by_another_CRF_choose_unique"));
 			}
 		}
 
@@ -200,7 +200,7 @@ public class UpdateCRFServlet extends Controller {
 		cdao.update(crf);
 
 		request.getSession().removeAttribute(CRF);
-		addPageMessage(respage.getString("the_CRF_has_been_updated_succesfully"), request);
+		addPageMessage(getResPage().getString("the_CRF_has_been_updated_succesfully"), request);
 
 		if (keyValue != null) {
 			Map storedAttributes = new HashMap();

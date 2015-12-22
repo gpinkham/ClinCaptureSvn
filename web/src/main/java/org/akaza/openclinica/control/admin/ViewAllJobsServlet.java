@@ -36,10 +36,10 @@ public class ViewAllJobsServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	@Override

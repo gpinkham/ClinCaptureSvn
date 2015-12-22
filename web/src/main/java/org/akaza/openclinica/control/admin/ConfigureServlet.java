@@ -46,10 +46,10 @@ public class ConfigureServlet extends Controller {
 
 		if (!ub.isSysAdmin()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+					getResPage().getString("no_have_correct_privilege_current_study")
+							+ getResPage().getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -86,7 +86,7 @@ public class ConfigureServlet extends Controller {
 				userLockAllowedFailedConsecutiveLoginAttempts.setValue(fp.getString("lockcount"));
 				getConfigurationDao().saveOrUpdate(userLockSwitch);
 				getConfigurationDao().saveOrUpdate(userLockAllowedFailedConsecutiveLoginAttempts);
-				addPageMessage(respage.getString("lockout_changes_have_been_saved"), request);
+				addPageMessage(getResPage().getString("lockout_changes_have_been_saved"), request);
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 			}
 		}

@@ -1,12 +1,9 @@
 package com.clinovo.servlet;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.clinovo.model.RandomizationResult;
-import com.clinovo.util.RandomizationUtil;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
@@ -20,12 +17,14 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
-import org.springframework.mock.web.MockHttpServletResponse;
+import com.clinovo.util.RandomizationUtil;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RandomizeServlet.class, HttpTransportProtocol.class, RandomizationUtil.class})
@@ -56,34 +55,32 @@ public class RandomizeServletTest {
 		study.setIdentifier("Test Study");
 		PowerMockito.when(randomizeServlet.getCurrentStudy(request)).thenReturn(study);
 		PowerMockito.when(randomizeServlet.getSite(study)).thenReturn("testId");
-		PowerMockito
-				.when(randomizeServlet,
-						PowerMockito.method(RandomizeServlet.class, "initiateRandomizationCall",
-								HttpServletRequest.class)).withArguments(request).thenCallRealMethod();
-		PowerMockito
-				.when(randomizationUtil,
-						PowerMockito.method(RandomizationUtil.class, "getStudySubjectBean",
-								HttpServletRequest.class)).withArguments(request).thenReturn(new StudySubjectBean());
+		PowerMockito.when(randomizeServlet,
+				PowerMockito.method(RandomizeServlet.class, "initiateRandomizationCall", HttpServletRequest.class))
+				.withArguments(request).thenCallRealMethod();
 		PowerMockito
 				.when(randomizationUtil,
-						PowerMockito.method(RandomizationUtil.class, "isCRFSpecifiedTrialIdValid",
-								String.class)).withArguments(Mockito.anyString()).thenCallRealMethod();
+						PowerMockito.method(RandomizationUtil.class, "getStudySubjectBean", HttpServletRequest.class))
+				.withArguments(request).thenReturn(new StudySubjectBean());
 		PowerMockito
 				.when(randomizationUtil,
-						PowerMockito.method(RandomizationUtil.class, "isConfiguredTrialIdValid",
-								String.class)).withArguments(Mockito.anyString()).thenCallRealMethod();
+						PowerMockito.method(RandomizationUtil.class, "isCRFSpecifiedTrialIdValid", String.class))
+				.withArguments(Mockito.anyString()).thenCallRealMethod();
 		PowerMockito
 				.when(randomizationUtil,
-						PowerMockito.method(RandomizationUtil.class, "isTrialIdDoubleConfigured",
-								String.class, String.class)).withArguments(Mockito.anyString(), Mockito.anyString()).thenCallRealMethod();
+						PowerMockito.method(RandomizationUtil.class, "isConfiguredTrialIdValid", String.class))
+				.withArguments(Mockito.anyString()).thenCallRealMethod();
+		PowerMockito
+				.when(randomizationUtil,
+						PowerMockito.method(RandomizationUtil.class, "isTrialIdDoubleConfigured", String.class,
+								String.class))
+				.withArguments(Mockito.anyString(), Mockito.anyString()).thenCallRealMethod();
 		PowerMockito.whenNew(JSONSubmissionContext.class).withNoArguments().thenReturn(jsonSubmissionContext);
 		PowerMockito.whenNew(HttpTransportProtocol.class).withNoArguments().thenReturn(httpTransportProtocol);
 
 		Locale locale = Locale.ENGLISH;
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		org.mockito.internal.util.reflection.Whitebox.setInternalState(randomizeServlet, "resexception", resexception);
 	}
 
 	@Test(expected = RandomizationException.class)
@@ -94,12 +91,13 @@ public class RandomizeServletTest {
 	}
 
 	@Test
-	public void testThatAuditLogWillBeWrittenIfExceptionWasThrownWhileRandomization() throws Exception{
+	public void testThatAuditLogWillBeWrittenIfExceptionWasThrownWhileRandomization() throws Exception {
 		request.setParameter("trialId", "");
 		try {
 			spy.processRequest(request, response);
 		} finally {
-			Mockito.verify(spy, Mockito.times(1)).saveRandomizationAuditLog(Mockito.any(HttpServletRequest.class), Mockito.any(RandomizationResult.class), Mockito.any(Exception.class));
+			Mockito.verify(spy, Mockito.times(1)).saveRandomizationAuditLog(Mockito.any(HttpServletRequest.class),
+					Mockito.any(RandomizationResult.class), Mockito.any(Exception.class));
 		}
 	}
 

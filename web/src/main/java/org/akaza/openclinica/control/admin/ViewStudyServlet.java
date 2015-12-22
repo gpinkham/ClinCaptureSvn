@@ -70,9 +70,9 @@ public class ViewStudyServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_admin"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -86,7 +86,7 @@ public class ViewStudyServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_study_to_view"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {

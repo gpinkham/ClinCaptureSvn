@@ -65,10 +65,10 @@ public class CreateCRFServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("you_not_have_permission_create_CRF")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("you_not_have_permission_create_CRF")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, getResException().getString("not_study_director"),
 				"1");
 
 	}
@@ -94,14 +94,14 @@ public class CreateCRFServlet extends Controller {
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
+		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
-		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
-		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
+				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
+		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
+				getResPage().getString("br_download_example_CRF_instructions_from"), request);
 
 		if (StringUtil.isBlank(action)) {
 			request.getSession().setAttribute("crf", new CRFBean());
@@ -120,10 +120,10 @@ public class CreateCRFServlet extends Controller {
 				request.getSession().setAttribute("crf", crf);
 				HashMap errors = v.validate();
 				if (fp.getString("name").trim().length() > 255) {
-					Validator.addError(errors, "name", resexception.getString("maximum_length_name_255"));
+					Validator.addError(errors, "name", getResException().getString("maximum_length_name_255"));
 				}
 				if (fp.getString("description").trim().length() > 2048) {
-					Validator.addError(errors, "description", resexception.getString("maximum_length_description_255"));
+					Validator.addError(errors, "description", getResException().getString("maximum_length_description_255"));
 				}
 				if (!errors.isEmpty()) {
 					logger.info("has validation errors in the first section");
@@ -134,7 +134,7 @@ public class CreateCRFServlet extends Controller {
 
 					CRFBean crf1 = (CRFBean) cdao.findByName(name.trim());
 					if (crf1.getId() > 0) {
-						Validator.addError(errors, "name", resexception.getString("CRF_name_used_choose_unique_name"));
+						Validator.addError(errors, "name", getResException().getString("CRF_name_used_choose_unique_name"));
 						request.setAttribute("formMessages", errors);
 						forwardPage(Page.CREATE_CRF, request, response);
 					} else {

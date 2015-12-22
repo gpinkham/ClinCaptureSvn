@@ -119,10 +119,10 @@ public class CreateDatasetServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class CreateDatasetServlet extends Controller {
 					}
 				}
 				if (events.isEmpty()) {
-					addPageMessage(respage.getString("not_have_study_definitions_assigned"), request);
+					addPageMessage(getResPage().getString("not_have_study_definitions_assigned"), request);
 					forwardPage(Page.CREATE_DATASET_1, request, response);
 				} else {
 					crfdao = getCRFDAO();
@@ -234,8 +234,8 @@ public class CreateDatasetServlet extends Controller {
 				extractEventIds(dsb);
 				if (!StringUtil.isBlank(saveItems)) {
 					request.setAttribute("eventlist", request.getSession().getAttribute(EVENTS_FOR_CREATE_DATASET));
-					String summary = respage.getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
-							+ respage.getString("items_so_far");
+					String summary = getResPage().getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
+							+ getResPage().getString("items_so_far");
 					summary += genAttMsg(currentStudy, dsb);
 					addPageMessage(summary, request);
 					int crfId = fp.getInt("crfId");
@@ -256,12 +256,12 @@ public class CreateDatasetServlet extends Controller {
 
 						request.setAttribute("allItems", dsb.getItemDefCrf());
 						request.setAttribute("eventlist", request.getSession().getAttribute(EVENTS_FOR_CREATE_DATASET));
-						addPageMessage(respage.getString("should_select_one_item_to_create_dataset"), request);
+						addPageMessage(getResPage().getString("should_select_one_item_to_create_dataset"), request);
 						forwardPage(Page.CREATE_DATASET_2, request, response);
 					} else {
 
-						String summary = respage.getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
-								+ respage.getString("items_totally_for_this_dataset");
+						String summary = getResPage().getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
+								+ getResPage().getString("items_totally_for_this_dataset");
 
 						summary += genAttMsg(currentStudy, dsb);
 						addPageMessage(summary, request);
@@ -288,19 +288,19 @@ public class CreateDatasetServlet extends Controller {
 
 				HashMap errors = new HashMap();
 				if (dsb.getFirstMonth() > 0 && dsb.getFirstYear() == FIRST_YEAR) {
-					Validator.addError(errors, "firstmonth", restext.getString("if_specify_month_also_specify_year"));
+					Validator.addError(errors, "firstmonth", getResText().getString("if_specify_month_also_specify_year"));
 				}
 
 				if (dsb.getLastMonth() > 0 && dsb.getLastYear() == TWO_T_ONE_H) {
-					Validator.addError(errors, "lastmonth", restext.getString("if_specify_month_also_specify_year"));
+					Validator.addError(errors, "lastmonth", getResText().getString("if_specify_month_also_specify_year"));
 				}
 
 				if (dsb.getFirstYear() > FIRST_YEAR && dsb.getFirstMonth() == 0) {
-					Validator.addError(errors, "firstmonth", restext.getString("if_specify_year_also_specify_month"));
+					Validator.addError(errors, "firstmonth", getResText().getString("if_specify_year_also_specify_month"));
 				}
 
 				if (dsb.getLastYear() < TWO_T_ONE_H && dsb.getLastMonth() == 0) {
-					Validator.addError(errors, "lastmonth", restext.getString("if_specify_year_also_specify_month"));
+					Validator.addError(errors, "lastmonth", getResText().getString("if_specify_year_also_specify_month"));
 				}
 				Date dateStart = dsb.getFirstYear() > FIRST_YEAR && dsb.getFirstMonth() > 0
 						? getFirstDayOfMonth(dsb.getFirstYear(), dsb.getFirstMonth()) : null;
@@ -308,18 +308,18 @@ public class CreateDatasetServlet extends Controller {
 						? getLastDayOfMonth(dsb.getLastYear(), dsb.getLastMonth()) : null;
 
 				if (dateEnd != null && dateStart != null && dateEnd.compareTo(dateStart) < 0) {
-					Validator.addError(errors, "firstmonth", restext.getString("the_from_should_be_come_before_to"));
+					Validator.addError(errors, "firstmonth", getResText().getString("the_from_should_be_come_before_to"));
 				}
 				if (!errors.isEmpty()) {
 					setInputMessages(errors, request);
-					addPageMessage(respage.getString("errors_in_submission_see_below"), request);
+					addPageMessage(getResPage().getString("errors_in_submission_see_below"), request);
 					setPresetValues(fp.getPresetValues(), request);
 					forwardPage(Page.CREATE_DATASET_3, request, response);
 				} else {
 					dsb.setDateStart(dateStart);
 					dsb.setDateEnd(dateEnd);
 
-					if (fp.getString("submit").equals(resword.getString("continue_to_apply_filter"))) {
+					if (fp.getString("submit").equals(getResWord().getString("continue_to_apply_filter"))) {
 						forwardPage(Page.MENU, request, response);
 					} else {
 						forwardPage(Page.CREATE_DATASET_4, request, response);
@@ -356,14 +356,14 @@ public class CreateDatasetServlet extends Controller {
 				if (!StringUtil.isBlank(dsName)) {
 
 					if (dsName.contains("/") || dsName.contains("\\")) {
-						Validator.addError(errors, "dsName", restext.getString("slash_not_allowed"));
+						Validator.addError(errors, "dsName", getResText().getString("slash_not_allowed"));
 					}
 
 					Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(dsName);
 					boolean isContainSpecialSymbol = matcher.find();
 					if (isContainSpecialSymbol) {
 						Validator.addError(errors, "dsName",
-								resexception.getString("dataset_should_not_contain_any_special"));
+								getResException().getString("dataset_should_not_contain_any_special"));
 					}
 
 					if (dsb.getId() <= 0) {
@@ -372,14 +372,14 @@ public class CreateDatasetServlet extends Controller {
 						DatasetBean dsBean = (DatasetBean) dsdao.findByNameAndStudy(fp.getString("dsName").trim(), currentStudy);
 						if (dsBean.getId() > 0) {
 							Validator.addError(errors, "dsName",
-									restext.getString("dataset_name_used_by_another_choose_unique"));
+									getResText().getString("dataset_name_used_by_another_choose_unique"));
 						}
 					}
 				}
 
 				if (!errors.isEmpty()) {
 
-					addPageMessage(respage.getString("errors_in_submission_see_below"), request);
+					addPageMessage(getResPage().getString("errors_in_submission_see_below"), request);
 					setInputMessages(errors, request);
 					setPresetValues(fp.getPresetValues(), request);
 					forwardPage(Page.CREATE_DATASET_4, request, response);
@@ -406,7 +406,7 @@ public class CreateDatasetServlet extends Controller {
 
 				String submit = fp.getString("btnSubmit");
 				logger.info("reached confirm all");
-				if (!resword.getString("submit_for_dataset").equalsIgnoreCase(submit)) {
+				if (!getResWord().getString("submit_for_dataset").equalsIgnoreCase(submit)) {
 					forwardPage(Page.CREATE_DATASET_4, request, response);
 				} else {
 
@@ -425,7 +425,7 @@ public class CreateDatasetServlet extends Controller {
 						dsb = (DatasetBean) ddao.create(dsb);
 						logger.info("created dataset bean: " + dsb.getId() + ", name: " + dsb.getName());
 						if (!dsb.isActive()) {
-							addPageMessage(restext.getString("problem_creating_dataset_try_again"), request);
+							addPageMessage(getResText().getString("problem_creating_dataset_try_again"), request);
 							forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 							return;
 						}
@@ -433,13 +433,13 @@ public class CreateDatasetServlet extends Controller {
 
 						dsb = (DatasetBean) ddao.updateAll(dsb);
 						if (!dsb.isActive()) {
-							addPageMessage(restext.getString("problem_creating_dataset_try_again"), request);
+							addPageMessage(getResText().getString("problem_creating_dataset_try_again"), request);
 							forwardPage(Page.EXTRACT_DATASETS_MAIN, request, response);
 						}
 
 						dsb = (DatasetBean) ddao.updateGroupMap(dsb);
 						if (!dsb.isActive()) {
-							addPageMessage(restext.getString("problem_updating_subject_group_class_when_updating_dataset"),
+							addPageMessage(getResText().getString("problem_updating_subject_group_class_when_updating_dataset"),
 									request);
 							forwardPage(Page.EXTRACT_DATASETS_MAIN, request, response);
 						}
@@ -452,7 +452,7 @@ public class CreateDatasetServlet extends Controller {
 				}
 			} else {
 
-				addPageMessage(restext.getString("creating_new_dataset_cancelled"), request);
+				addPageMessage(getResText().getString("creating_new_dataset_cancelled"), request);
 				forwardPage(Page.CREATE_DATASET_1, request, response);
 			}
 		}
@@ -586,18 +586,18 @@ public class CreateDatasetServlet extends Controller {
 
 		ArrayList answer = new ArrayList();
 
-		answer.add(resword.getString("January"));
-		answer.add(resword.getString("February"));
-		answer.add(resword.getString("March"));
-		answer.add(resword.getString("April"));
-		answer.add(resword.getString("May"));
-		answer.add(resword.getString("June"));
-		answer.add(resword.getString("July"));
-		answer.add(resword.getString("August"));
-		answer.add(resword.getString("September"));
-		answer.add(resword.getString("October"));
-		answer.add(resword.getString("November"));
-		answer.add(resword.getString("December"));
+		answer.add(getResWord().getString("January"));
+		answer.add(getResWord().getString("February"));
+		answer.add(getResWord().getString("March"));
+		answer.add(getResWord().getString("April"));
+		answer.add(getResWord().getString("May"));
+		answer.add(getResWord().getString("June"));
+		answer.add(getResWord().getString("July"));
+		answer.add(getResWord().getString("August"));
+		answer.add(getResWord().getString("September"));
+		answer.add(getResWord().getString("October"));
+		answer.add(getResWord().getString("November"));
+		answer.add(getResWord().getString("December"));
 
 		return answer;
 	}
@@ -621,21 +621,21 @@ public class CreateDatasetServlet extends Controller {
 		String summary = "";
 		if (db.isShowEventEnd() || db.isShowEventLocation() || db.isShowEventStart() || db.isShowEventStatus()
 				|| db.isShowSubjectAgeAtEvent()) {
-			summary = summary + respage.getString("you_choose_to_show_event_attributes");
+			summary = summary + getResPage().getString("you_choose_to_show_event_attributes");
 			if (db.isShowEventLocation()) {
-				summary = summary + resword.getString("location") + ", ";
+				summary = summary + getResWord().getString("location") + ", ";
 			}
 			if (db.isShowEventStart()) {
-				summary = summary + resword.getString("start_date") + ", ";
+				summary = summary + getResWord().getString("start_date") + ", ";
 			}
 			if (db.isShowEventEnd()) {
-				summary = summary + resword.getString("end_date") + ", ";
+				summary = summary + getResWord().getString("end_date") + ", ";
 			}
 			if (db.isShowEventStatus()) {
-				summary = summary + resword.getString("status") + ", ";
+				summary = summary + getResWord().getString("status") + ", ";
 			}
 			if (db.isShowSubjectAgeAtEvent()) {
-				summary = summary + " " + resword.getString("age_at_event") + ", ";
+				summary = summary + " " + getResWord().getString("age_at_event") + ", ";
 			}
 		}
 
@@ -644,30 +644,30 @@ public class CreateDatasetServlet extends Controller {
 			summary = summary.trim();
 			summary = summary.endsWith(",") ? summary.substring(0, summary.length() - 1) : summary;
 			summary += summary.length() > 0 ? ". " : " ";
-			summary += respage.getString("you_choose_to_show_subject_attributes");
+			summary += getResPage().getString("you_choose_to_show_subject_attributes");
 			if (db.isShowSubjectDob()) {
-				summary = summary + resword.getString("date_year_of_birth") + ", ";
+				summary = summary + getResWord().getString("date_year_of_birth") + ", ";
 			}
 			if (db.isShowSubjectGender()
 					&& (currentStudy == null
 					|| currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true"))) {
 
 				summary = summary
-						+ (currentStudy == null ? resword.getString("gender")
+						+ (currentStudy == null ? getResWord().getString("gender")
 						: currentStudy.getStudyParameterConfig().getSecondaryIdLabel()) + ", ";
 			}
 			if (db.isShowSubjectStatus()) {
-				summary = summary + " " + resword.getString("status") + ", ";
+				summary = summary + " " + getResWord().getString("status") + ", ";
 			}
 			if (db.isShowSubjectUniqueIdentifier()) {
-				summary = summary + " " + resword.getString("person_ID") + ", ";
+				summary = summary + " " + getResWord().getString("person_ID") + ", ";
 			}
 			if (db.isShowSubjectSecondaryId()
 					&& (currentStudy == null
 					|| !currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used"))) {
 
 				summary = summary + " "
-						+ (currentStudy == null ? resword.getString("secondary_ID")
+						+ (currentStudy == null ? getResWord().getString("secondary_ID")
 						: currentStudy.getStudyParameterConfig().getSecondaryIdLabel()) + ", ";
 			}
 		}
@@ -678,21 +678,21 @@ public class CreateDatasetServlet extends Controller {
 			summary = summary.trim();
 			summary = summary.endsWith(",") ? summary.substring(0, summary.length() - 1) : summary;
 			summary += summary.length() > 0 ? ". " : " ";
-			summary += resword.getString("you_choose_to_show_CRF") + ": ";
+			summary += getResWord().getString("you_choose_to_show_CRF") + ": ";
 			if (db.isShowCRFcompletionDate()) {
-				summary = summary + " " + resword.getString("completion_date") + ", ";
+				summary = summary + " " + getResWord().getString("completion_date") + ", ";
 			}
 			if (db.isShowCRFinterviewerDate()) {
-				summary = summary + " " + resword.getString("interview_date") + ", ";
+				summary = summary + " " + getResWord().getString("interview_date") + ", ";
 			}
 			if (db.isShowCRFinterviewerName()) {
-				summary = summary + " " + resword.getString("interviewer_name") + ", ";
+				summary = summary + " " + getResWord().getString("interviewer_name") + ", ";
 			}
 			if (db.isShowCRFstatus()) {
-				summary = summary + " " + resword.getString("CRF_status") + ", ";
+				summary = summary + " " + getResWord().getString("CRF_status") + ", ";
 			}
 			if (db.isShowCRFversion()) {
-				summary = summary + " " + resword.getString("CRF_version") + ", ";
+				summary = summary + " " + getResWord().getString("CRF_version") + ", ";
 			}
 		}
 		summary = summary.trim();
@@ -700,7 +700,7 @@ public class CreateDatasetServlet extends Controller {
 		summary += summary.length() > 0 ? ". " : " ";
 
 		if (db.isShowSubjectGroupInformation()) {
-			summary += resword.getString("you_choose_to_show_subject_group");
+			summary += getResWord().getString("you_choose_to_show_subject_group");
 		}
 		return summary;
 	}

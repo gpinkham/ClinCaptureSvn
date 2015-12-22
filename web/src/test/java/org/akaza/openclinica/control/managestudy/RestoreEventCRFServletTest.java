@@ -1,7 +1,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -17,7 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -57,12 +55,6 @@ public class RestoreEventCRFServletTest {
 		Locale locale = new Locale("en");
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
-		Whitebox.setInternalState(restoreEventCRFServlet, "respage", respage);
-		Whitebox.setInternalState(restoreEventCRFServlet, "resexception", resexception);
-		Whitebox.setInternalState(restoreEventCRFServlet, "resformat", resformat);
 
 		Mockito.doReturn(currentStudy).when(restoreEventCRFServlet).getCurrentStudy(request);
 		Mockito.doReturn(userAccountBean).when(restoreEventCRFServlet).getUserAccountBean(request);

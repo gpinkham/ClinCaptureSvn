@@ -66,9 +66,9 @@ public class RunRuleSetServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -90,7 +90,7 @@ public class RunRuleSetServlet extends Controller {
 			if (dryRun != null && dryRun.equals("no")) {
 				List<RuleSetBasedViewContainer> resultOfRunningRules = ruleSetService.runRulesInBulk(ruleSets, false,
 						currentStudy, ub);
-				addPageMessage(respage.getString("actions_successfully_taken"), request);
+				addPageMessage(getResPage().getString("actions_successfully_taken"), request);
 				forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 
 			} else {
@@ -99,9 +99,9 @@ public class RunRuleSetServlet extends Controller {
 				request.setAttribute(RULESET, ruleSetBean);
 				request.setAttribute(RULESET_RESULT, resultOfRunningRules);
 				if (resultOfRunningRules.size() > 0) {
-					addPageMessage(resword.getString("view_executed_rules_affected_subjects"), request);
+					addPageMessage(getResWord().getString("view_executed_rules_affected_subjects"), request);
 				} else {
-					addPageMessage(resword.getString("view_executed_rules_no_affected_subjects"), request);
+					addPageMessage(getResWord().getString("view_executed_rules_no_affected_subjects"), request);
 				}
 
 				forwardPage(Page.VIEW_EXECUTED_RULES, request, response);

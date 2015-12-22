@@ -66,10 +66,10 @@ public class ViewSubjectGroupClassServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + "\n"
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study") + "\n"
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -82,7 +82,7 @@ public class ViewSubjectGroupClassServlet extends Controller {
 
 		if (classId == 0) {
 
-			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_group_class_to_view"), request);
 			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 		} else {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(getDataSource());

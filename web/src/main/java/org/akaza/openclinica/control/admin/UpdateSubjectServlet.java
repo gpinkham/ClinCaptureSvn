@@ -83,9 +83,9 @@ public class UpdateSubjectServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, getResException().getString("not_admin"), "1");
 	}
 
 	@Override
@@ -106,13 +106,13 @@ public class UpdateSubjectServlet extends Controller {
 		if (StringUtil.isBlank(fromResolvingNotes)) {
 			request.getSession().removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			request.getSession().removeAttribute(ViewNotesServlet.NOTES_TABLE);
-			checkStudyLocked(Page.LIST_SUBJECT_SERVLET, respage.getString("current_study_locked"), request, response);
-			checkStudyFrozen(Page.LIST_SUBJECT_SERVLET, respage.getString("current_study_frozen"), request, response);
+			checkStudyLocked(Page.LIST_SUBJECT_SERVLET, getResPage().getString("current_study_locked"), request, response);
+			checkStudyFrozen(Page.LIST_SUBJECT_SERVLET, getResPage().getString("current_study_frozen"), request, response);
 		}
 		int subjectId = fp.getInt("id", true);
 
 		if (subjectId == 0) {
-			addPageMessage(respage.getString("please_choose_subject_to_edit"), request);
+			addPageMessage(getResPage().getString("please_choose_subject_to_edit"), request);
 			forwardPage(Page.LIST_SUBJECT_SERVLET, request, response);
 		} else {
 			String action = fp.getString("action", true);
@@ -271,12 +271,12 @@ public class UpdateSubjectServlet extends Controller {
 				dnService.saveFieldNotes(YEAR_DOB, fdn, subject.getId(), "subject", currentStudy);
 				dnService.saveFieldNotes(DATE_DOB, fdn, subject.getId(), "subject", currentStudy);
 
-				addPageMessage(respage.getString("subject_updated_succcesfully"), request);
+				addPageMessage(getResPage().getString("subject_updated_succcesfully"), request);
 				clearSession(request);
 
 				forwardPage(Page.LIST_SUBJECT_SERVLET, request, response);
 			} else {
-				addPageMessage(respage.getString("no_action_specified"), request);
+				addPageMessage(getResPage().getString("no_action_specified"), request);
 				forwardPage(Page.LIST_SUBJECT_SERVLET, request, response);
 			}
 		}
@@ -318,7 +318,7 @@ public class UpdateSubjectServlet extends Controller {
 						+ fp.getString("uniqueIdentifier").trim());
 				if (sub1.getId() > 0) {
 					Validator.addError(errors, "uniqueIdentifier",
-							resexception.getString("person_ID_used_by_another_choose_unique"));
+							getResException().getString("person_ID_used_by_another_choose_unique"));
 				}
 			}
 		}
@@ -348,7 +348,7 @@ public class UpdateSubjectServlet extends Controller {
 				cal.set(Integer.valueOf(fields.get("dateOfBirth")), Calendar.JANUARY, 1);
 			} catch (NumberFormatException pe) {
 				logger.info("Parse exception happened.");
-				Validator.addError(errors, YEAR_DOB, resexception.getString("please_enter_a_valid_year_birth"));
+				Validator.addError(errors, YEAR_DOB, getResException().getString("please_enter_a_valid_year_birth"));
 			}
 		}
 
@@ -357,7 +357,7 @@ public class UpdateSubjectServlet extends Controller {
 			fields.put("gender",
 					fp.getString("gender").equals("") ? "" : String.valueOf(fp.getString("gender").charAt(0)));
 			if ("".equals(fp.getString("gender"))) {
-				Validator.addError(errors, "gender", resexception.getString("please_choose_the_gender_of_the_subject"));
+				Validator.addError(errors, "gender", getResException().getString("please_choose_the_gender_of_the_subject"));
 			}
 		}
 

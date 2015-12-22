@@ -3,7 +3,6 @@ package org.akaza.openclinica.control.admin;
 import static junit.framework.Assert.assertEquals;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
@@ -35,10 +34,6 @@ public class InitCreateCRFVersionServletTest {
 		Locale locale = Locale.ENGLISH;
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
-		Whitebox.setInternalState(initCreateCRFVersionServlet, "respage", respage);
-		Whitebox.setInternalState(initCreateCRFVersionServlet, "resword", resword);
 		Whitebox.setInternalState(initCreateCRFVersionServlet, "logger",
 				LoggerFactory.getLogger("InitCreateCRFVersionServlet"));
 

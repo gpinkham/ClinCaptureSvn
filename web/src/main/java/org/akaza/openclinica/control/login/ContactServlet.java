@@ -115,9 +115,9 @@ public class ContactServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 		logger.info("Sending email...");
 
-		msg.applyPattern(restext.getString("support_email_message_html_full"));
+		msg.applyPattern(getResText().getString("support_email_message_html_full"));
 		emailBody = EmailUtil.getEmailBodyStart() + msg.format(new Object[] { name, role.getName(),
-				currentStudy.getParentStudyId() == 0 ? resword.getString("study") : resword.getString("site"),
+				currentStudy.getParentStudyId() == 0 ? getResWord().getString("study") : getResWord().getString("site"),
 				currentStudy.getName(), request.getRequestURL().toString().replaceFirst(request.getServletPath(), ""),
 				email, subject, message }) + EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(getLocale());
 

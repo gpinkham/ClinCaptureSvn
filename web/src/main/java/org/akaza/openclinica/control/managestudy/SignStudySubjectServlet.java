@@ -88,7 +88,7 @@ public class SignStudySubjectServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
 		mayAccess(request);
 
 		if (ub.isSysAdmin()) {
@@ -101,9 +101,9 @@ public class SignStudySubjectServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 	}
 
 	/**
@@ -209,13 +209,13 @@ public class SignStudySubjectServlet extends Controller {
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
 		if (studySubId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 			return;
 		}
 		StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 		if (!SignUtil.permitSign(studySub, new DAOWrapper(getDataSource()))) {
-			addPageMessage(respage.getString("subject_event_cannot_signed"), request);
+			addPageMessage(getResPage().getString("subject_event_cannot_signed"), request);
 			// for navigation purpose (to avoid double url in stack)
 			request.getSession().setAttribute("skipURL", "true");
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
@@ -273,15 +273,15 @@ public class SignStudySubjectServlet extends Controller {
 		table.setSortingIfNotExplicitlySet(1, false); // sort by start date,
 		// desc
 		ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
-		String[] columns = {resword.getString("event") + " (" + resword.getString("occurrence_number") + ")",
-				resword.getString("start_date1"), resword.getString("location"), resword.getString("status"),
-				resword.getString("actions"), resword.getString("CRFs_atrib")};
+		String[] columns = { getResWord().getString("event") + " (" + getResWord().getString("occurrence_number") + ")",
+				getResWord().getString("start_date1"), getResWord().getString("location"), getResWord().getString("status"),
+				getResWord().getString("actions"), getResWord().getString("CRFs_atrib")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(four);
 		table.hideColumnLink(five);
 		if (!"removed".equalsIgnoreCase(studySub.getStatus().getName())
 				&& !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
-			table.addLink(resword.getString("add_new_event"), "CreateNewStudyEvent?"
+			table.addLink(getResWord().getString("add_new_event"), "CreateNewStudyEvent?"
 					+ CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "=" + studySub.getId());
 		}
 		HashMap args = new HashMap();
@@ -338,15 +338,15 @@ public class SignStudySubjectServlet extends Controller {
 				studySub.setStatus(Status.SIGNED);
 				studySub.setUpdater(ub);
 				subdao.update(studySub);
-				addPageMessage(respage.getString("subject_event_signed"), request);
+				addPageMessage(getResPage().getString("subject_event_signed"), request);
 				return Page.LIST_STUDY_SUBJECTS_SERVLET;
 			} else {
-				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
+				addPageMessage(getResPage().getString("errors_in_submission_see_below"), request);
 				return Page.LIST_STUDY_SUBJECTS;
 			}
 		} else {
 			request.setAttribute("id", Integer.toString(studySubId));
-			addPageMessage(restext.getString("password_match"), request);
+			addPageMessage(getResText().getString("password_match"), request);
 			return null;
 		}
 	}
@@ -546,9 +546,9 @@ public class SignStudySubjectServlet extends Controller {
 
 		if (studySubId > 0) {
 			if (!entityIncluded(studySubId, ub.getName(), subdao)) {
-				addPageMessage(respage.getString("required_study_subject_not_belong"), request);
+				addPageMessage(getResPage().getString("required_study_subject_not_belong"), request);
 				throw new InsufficientPermissionException(Page.MENU,
-						resexception.getString("entity_not_belong_studies"), "1");
+						getResException().getString("entity_not_belong_studies"), "1");
 			}
 		}
 	}

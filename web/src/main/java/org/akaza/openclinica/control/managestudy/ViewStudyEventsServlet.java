@@ -88,9 +88,9 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (!ub.isSysAdmin() && !mayViewData(ub, currentRole)) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"), request);
-			throw new InsufficientPermissionException(Page.MENU_SERVLET, restext.getString("not_correct_role"), "1");
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+					+ getResPage().getString("change_study_contact_sysadmin"), request);
+			throw new InsufficientPermissionException(Page.MENU_SERVLET, getResText().getString("not_correct_role"), "1");
 		}
 	}
 
@@ -270,10 +270,10 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 			final int columnThree = 3;
 			String[] columns = {
 					currentStudy == null
-							? resword.getString("study_subject_ID")
+							? getResWord().getString("study_subject_ID")
 							: currentStudy.getStudyParameterConfig().getStudySubjectIdLabel(),
-					resword.getString("event_date_started"), resword.getString("subject_event_status"),
-					resword.getString("actions")};
+					getResWord().getString("event_date_started"), getResWord().getString("subject_event_status"),
+					getResWord().getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(columnThree);
 			HashMap args = new HashMap();

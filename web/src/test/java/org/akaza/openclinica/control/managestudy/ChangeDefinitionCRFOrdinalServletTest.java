@@ -16,7 +16,6 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -30,9 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -43,7 +39,6 @@ import com.clinovo.i18n.LocaleResolver;
 
 @SuppressWarnings({"unchecked"})
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(ResourceBundleProvider.class)
 public class ChangeDefinitionCRFOrdinalServletTest {
 
 	@Mock
@@ -66,8 +61,6 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 
 	private ArrayList<EventDefinitionCRFBean> siteLevelEventDefCRFBeanList;
 
-	private ResourceBundle resPage;
-
 	@Before
 	public void beforeTestCaseRun() throws Exception {
 
@@ -76,11 +69,6 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		// first obtaining all the required Resource Bundle instances for tests,
 		// then stubbing all the static methods of the ResourceBundleProvider class
 		ResourceBundleProvider.updateLocale(locale);
-		resPage = ResourceBundleProvider.getPageMessagesBundle();
-		ResourceBundle resFormat = ResourceBundleProvider.getFormatBundle();
-
-		PowerMockito.mockStatic(ResourceBundleProvider.class);
-		PowerMockito.when(ResourceBundleProvider.getFormatBundle(Mockito.any(Locale.class))).thenReturn(resFormat);
 
 		request = new MockHttpServletRequest();
 		LocaleResolver.updateLocale(request, locale);
@@ -112,7 +100,6 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 				.thenReturn(siteLevelEventDefCRFBeanList);
 
 		// setting up spied ChangeDefinitionCRFOrdinalServlet
-		Whitebox.setInternalState(spiedChangeDefinitionCRFOrdinalServlet, "respage", resPage);
 		Mockito.doReturn(mockedServletContext).when(spiedChangeDefinitionCRFOrdinalServlet).getServletContext();
 		Mockito.doReturn(currentUser).when(spiedChangeDefinitionCRFOrdinalServlet).getUserAccountBean(request);
 		Mockito.doReturn(currentStudy).when(spiedChangeDefinitionCRFOrdinalServlet).getCurrentStudy(request);
@@ -186,7 +173,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		spiedChangeDefinitionCRFOrdinalServlet.processRequest(request, spiedResponse);
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
-		Assert.assertTrue(pageMessages.contains(resPage.getString("invalid_http_request_parameters")));
+		Assert.assertTrue(pageMessages
+				.contains(ResourceBundleProvider.getPageMessagesBundle().getString("invalid_http_request_parameters")));
 
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.LIST_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, spiedResponse);
@@ -208,7 +196,8 @@ public class ChangeDefinitionCRFOrdinalServletTest {
 		spiedChangeDefinitionCRFOrdinalServlet.processRequest(request, spiedResponse);
 
 		List<String> pageMessages = (List<String>) request.getAttribute("pageMessages");
-		Assert.assertTrue(pageMessages.contains(resPage.getString("invalid_http_request_parameters")));
+		Assert.assertTrue(pageMessages
+				.contains(ResourceBundleProvider.getPageMessagesBundle().getString("invalid_http_request_parameters")));
 
 		Mockito.verify(mockedServletContext).getRequestDispatcher(Page.LIST_DEFINITION_SERVLET.getFileName());
 		Mockito.verify(mockedRequestDispatcher).forward(request, spiedResponse);

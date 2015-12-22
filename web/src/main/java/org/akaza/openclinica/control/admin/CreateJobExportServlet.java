@@ -80,10 +80,10 @@ public class CreateJobExportServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 		// above copied from create dataset servlet, needs to be changed to
 		// allow only admin-level users
 
@@ -149,7 +149,7 @@ public class CreateJobExportServlet extends Controller {
 				CoreResources cr = new CoreResources();
 				int datasetId = fp.getInt(DATASET_ID);
 				if (datasetId == 0) {
-					addPageMessage(resexception.getString("please_choose_a_dataset"), request);
+					addPageMessage(getResException().getString("please_choose_a_dataset"), request);
 					forwardPage(Page.CREATE_JOB_EXPORT, request, response);
 					return;
 				}
@@ -250,13 +250,13 @@ public class CreateJobExportServlet extends Controller {
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					setUpServlet(request);
-					addPageMessage(respage.getString("error_creating_job"), request);
+					addPageMessage(getResPage().getString("error_creating_job"), request);
 					forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 					return;
 				}
 				setUpServlet(request);
-				addPageMessage(respage.getString("you_have_successfully_created_a_new_job") + " " + jobName + " "
-						+ respage.getString("which_is_now_set_to_run"), request);
+				addPageMessage(getResPage().getString("you_have_successfully_created_a_new_job") + " " + jobName + " "
+						+ getResPage().getString("which_is_now_set_to_run"), request);
 				forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 			}
 		} else {
@@ -283,18 +283,18 @@ public class CreateJobExportServlet extends Controller {
 		if (formatId == 0) {
 			// throw an error here, at least one should work
 			// errors.put(TAB, "Error Message - Pick one of the below");
-			Validator.addError(errors, FORMAT_ID, respage.getString("please_pick_at_least_one"));
+			Validator.addError(errors, FORMAT_ID, getResPage().getString("please_pick_at_least_one"));
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
 				Validator.addError(errors, JOB_NAME,
-						respage.getString("a_job_with_that_name_already_exist_please_pick"));
+						getResPage().getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		try {
 			Date jobDate = fp.getDateTimeInput(DATE_START_JOB);
 			if (jobDate.before(new Date())) {
-				Validator.addError(errors, DATE_START_JOB + "Date", respage.getString("this_date_needs_to_be_later"));
+				Validator.addError(errors, DATE_START_JOB + "Date", getResPage().getString("this_date_needs_to_be_later"));
 			}
 		} catch (IllegalArgumentException ex) {
 			//
@@ -302,13 +302,13 @@ public class CreateJobExportServlet extends Controller {
 		String jobDesc = fp.getString(JOB_DESC);
 		if ((null != jobDesc) && (!jobDesc.equals(""))) {
 			if (jobDesc.length() > 250) {
-				Validator.addError(errors, JOB_DESC, respage.getString("a_job_description_cannot_be_more_than"));
+				Validator.addError(errors, JOB_DESC, getResPage().getString("a_job_description_cannot_be_more_than"));
 			}
 		}
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
 		boolean isContainSpecialSymbol = matcher.find();
 		if (isContainSpecialSymbol) {
-			Validator.addError(errors, JOB_NAME, resexception.getString("dataset_should_not_contain_any_special"));
+			Validator.addError(errors, JOB_NAME, getResException().getString("dataset_should_not_contain_any_special"));
 		}
 		return errors;
 	}

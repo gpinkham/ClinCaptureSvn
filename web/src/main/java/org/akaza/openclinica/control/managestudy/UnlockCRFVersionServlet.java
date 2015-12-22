@@ -56,9 +56,9 @@ public class UnlockCRFVersionServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -72,7 +72,7 @@ public class UnlockCRFVersionServlet extends Controller {
 		String action = fp.getString("action");
 
 		if (crfVersionId == 0) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 			return;
 		}
@@ -95,7 +95,7 @@ public class UnlockCRFVersionServlet extends Controller {
 
 			getCrfVersionService().unlockCrfVersion(version, ub);
 
-			addPageMessage(respage.getString("crf_version_unlocked_successfully"), request);
+			addPageMessage(getResPage().getString("crf_version_unlocked_successfully"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
 	}

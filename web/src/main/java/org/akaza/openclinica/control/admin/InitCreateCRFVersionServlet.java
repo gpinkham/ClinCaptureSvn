@@ -60,9 +60,9 @@ public class InitCreateCRFVersionServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -72,14 +72,14 @@ public class InitCreateCRFVersionServlet extends Controller {
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
+		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
-		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
-		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
+				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
+		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
+				getResPage().getString("br_download_example_CRF_instructions_from"), request);
 
 		String idString = request.getParameter("crfId");
 		/*
@@ -90,7 +90,7 @@ public class InitCreateCRFVersionServlet extends Controller {
 		logger.info("*** ^^^ *** crf id:" + idString);
 
 		if (StringUtil.isBlank(idString) || StringUtil.isBlank(name)) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_add_new_version_for"), request);
+			addPageMessage(getResPage().getString("please_choose_a_CRF_to_add_new_version_for"), request);
 			forwardPage(Page.CRF_LIST, request, response);
 		} else {
 			// crf id

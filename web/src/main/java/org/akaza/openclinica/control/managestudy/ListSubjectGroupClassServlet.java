@@ -82,9 +82,9 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -166,10 +166,10 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		boolean isParentStudy = currentStudy.getParentStudyId() <= 0;
 		request.setAttribute("isParentStudy", isParentStudy);
 
-		String[] columns = {resword.getString("subject_group_class"), resword.getString("type"),
-				resword.getString("subject_assignment"), resword.getString("default"), resword.getString("study_name"),
-				resword.getString("subject_groups"), resword.getString("study_events"), resword.getString("status"),
-				resword.getString("actions")};
+		String[] columns = { getResWord().getString("subject_group_class"), getResWord().getString("type"),
+				getResWord().getString("subject_assignment"), getResWord().getString("default"), getResWord().getString("study_name"),
+				getResWord().getString("subject_groups"), getResWord().getString("study_events"), getResWord().getString("status"),
+				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);
 		table.hideColumnLink(5);

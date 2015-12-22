@@ -107,7 +107,7 @@ public class UpdateProfileServlet extends Controller {
 				logger.info("submit");
 				submitProfile(udao, request);
 
-				addPageMessage(respage.getString("profile_updated_succesfully"), request);
+				addPageMessage(getResPage().getString("profile_updated_succesfully"), request);
 				ub.incNumVisitsToMainMenu();
 				forwardPage(Page.MENU_SERVLET, request, response);
 			}

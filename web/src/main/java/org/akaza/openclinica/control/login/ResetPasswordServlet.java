@@ -94,10 +94,10 @@ public class ResetPasswordServlet extends Controller {
 		String passwdChallengeA = fp.getString("passwdChallengeA");
 
 		if ("yes".equalsIgnoreCase(mustChangePwd)) {
-			addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
+			addPageMessage(getResPage().getString("your_password_has_expired_must_change"), request);
 		} else {
-			addPageMessage(respage.getString("password_expired") + " "
-					+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
+			addPageMessage(getResPage().getString("password_expired") + " "
+					+ getResPage().getString("if_you_do_not_want_change_leave_blank"), request);
 		}
 		request.setAttribute("mustChangePass", mustChangePwd);
 
@@ -111,7 +111,7 @@ public class ResetPasswordServlet extends Controller {
 
 		SecurityManager sm = getSecurityManager();
 		if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {
-			Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
+			Validator.addError(errors, "oldPasswd", getResException().getString("wrong_old_password"));
 			request.setAttribute("formMessages", errors);
 
 			forwardPage(Page.RESET_PASSWORD, request, response);
@@ -169,7 +169,7 @@ public class ResetPasswordServlet extends Controller {
 
 				ArrayList<String> pageMessages = new ArrayList<String>();
 				request.setAttribute(PAGE_MESSAGE, pageMessages);
-				addPageMessage(respage.getString("your_expired_password_reset_successfully"), request);
+				addPageMessage(getResPage().getString("your_expired_password_reset_successfully"), request);
 				ub.incNumVisitsToMainMenu();
 				forwardPage(Page.MENU_SERVLET, request, response);
 			}

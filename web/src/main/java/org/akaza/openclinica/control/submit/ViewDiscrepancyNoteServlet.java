@@ -133,9 +133,9 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			return;
 		}
 
-		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
-				+ respage.getString("change_study_contact_sysadmin");
+		String exceptionName = getResException().getString("no_permission_to_create_discrepancy_note");
+		String noAccessMessage = getResPage().getString("you_may_not_create_discrepancy_note")
+				+ getResPage().getString("change_study_contact_sysadmin");
 
 		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
@@ -270,34 +270,34 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 							request.setAttribute("entityValue", DateUtil.printDate(ssub.getEnrollmentDate(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("enrollment_date"));
+						request.setAttribute("entityName", getResWord().getString("enrollment_date"));
 					} else if ("gender".equalsIgnoreCase(column)) {
-						String genderToDisplay = resword.getString("not_specified");
+						String genderToDisplay = getResWord().getString("not_specified");
 						if ('m' == sub.getGender()) {
-							genderToDisplay = resword.getString("male");
+							genderToDisplay = getResWord().getString("male");
 						} else if ('f' == sub.getGender()) {
-							genderToDisplay = resword.getString("female");
+							genderToDisplay = getResWord().getString("female");
 						}
 						request.setAttribute("entityValue", genderToDisplay);
-						request.setAttribute("entityName", resword.getString("gender"));
+						request.setAttribute("entityName", getResWord().getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(sub.getDateOfBirth(),
 									DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("date_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("date_of_birth"));
 					} else if ("year_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							GregorianCalendar cal = new GregorianCalendar();
 							cal.setTime(sub.getDateOfBirth());
 							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
 						}
-						request.setAttribute("entityName", resword.getString("year_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						if (sub.getUniqueIdentifier() != null) {
 							request.setAttribute("entityValue", sub.getUniqueIdentifier());
 						}
-						request.setAttribute("entityName", resword.getString("unique_identifier"));
+						request.setAttribute("entityName", getResWord().getString("unique_identifier"));
 					}
 				}
 				preUserId = ssub.getOwnerId() > 0 ? ssub.getOwnerId() : 0;
@@ -315,30 +315,30 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 
 				if (!StringUtil.isBlank(column)) {
 					if ("gender".equalsIgnoreCase(column)) {
-						String genderToDisplay = resword.getString("not_specified");
+						String genderToDisplay = getResWord().getString("not_specified");
 						if ('m' == sub.getGender()) {
-							genderToDisplay = resword.getString("male");
+							genderToDisplay = getResWord().getString("male");
 						} else if ('f' == sub.getGender()) {
-							genderToDisplay = resword.getString("female");
+							genderToDisplay = getResWord().getString("female");
 						}
 						request.setAttribute("entityValue", genderToDisplay);
-						request.setAttribute("entityName", resword.getString("gender"));
+						request.setAttribute("entityName", getResWord().getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(sub.getDateOfBirth(),
 									DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("date_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("date_of_birth"));
 					} else if ("year_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							GregorianCalendar cal = new GregorianCalendar();
 							cal.setTime(sub.getDateOfBirth());
 							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
 						}
-						request.setAttribute("entityName", resword.getString("year_of_birth"));
+						request.setAttribute("entityName", getResWord().getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", sub.getUniqueIdentifier());
-						request.setAttribute("entityName", resword.getString("unique_identifier"));
+						request.setAttribute("entityName", getResWord().getString("unique_identifier"));
 					}
 				}
 				preUserId = sub.getOwnerId() > 0 ? sub.getOwnerId() : 0;
@@ -359,20 +359,20 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				if (!StringUtil.isBlank(column)) {
 					if ("location".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", se.getLocation());
-						request.setAttribute("entityName", resword.getString("location"));
+						request.setAttribute("entityName", getResWord().getString("location"));
 					} else if ("date_start".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(se.getDateStarted(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("start_date"));
+						request.setAttribute("entityName", getResWord().getString("start_date"));
 
 					} else if ("date_end".equalsIgnoreCase(column)) {
 						if (se.getDateEnded() != null) {
 							request.setAttribute("entityValue", DateUtil.printDate(se.getDateEnded(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("end_date"));
+						request.setAttribute("entityName", getResWord().getString("end_date"));
 					}
 				}
 				preUserId = se.getOwnerId() > 0 ? se.getOwnerId() : 0;
@@ -388,10 +388,10 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 							request.setAttribute("entityValue", DateUtil.printDate(ecb.getDateInterviewed(),
 									getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 						}
-						request.setAttribute("entityName", resword.getString("date_interviewed"));
+						request.setAttribute("entityName", getResWord().getString("date_interviewed"));
 					} else if ("interviewer_name".equals(column)) {
 						request.setAttribute("entityValue", ecb.getInterviewerName());
-						request.setAttribute("entityName", resword.getString("interviewer_name"));
+						request.setAttribute("entityName", getResWord().getString("interviewer_name"));
 					}
 				}
 
@@ -664,7 +664,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
 			forwardPage(Page.VIEW_DISCREPANCY_NOTE, request, response);
 		} else {
-			request.setAttribute("responseMessage", respage.getString("error_in_data"));
+			request.setAttribute("responseMessage", getResPage().getString("error_in_data"));
 			forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 		}
 	}

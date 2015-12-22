@@ -67,9 +67,9 @@ public class RemoveCRFVersionServlet extends Controller {
 		if (userCanRemoveCRFVersion(request)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, getResException().getString("not_admin"), "1");
 	}
 
 	private boolean userCanRemoveCRFVersion(HttpServletRequest request) {
@@ -101,8 +101,8 @@ public class RemoveCRFVersionServlet extends Controller {
 
 			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 				if (!userCanRemoveCRFVersion(request)) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
@@ -117,13 +117,13 @@ public class RemoveCRFVersionServlet extends Controller {
 
 				getCrfVersionService().removeCrfVersion(version, currentUser);
 
-				addPageMessage(respage.getString("the_CRF_version") + version.getName() + " "
-						+ respage.getString("has_been_removed_succesfully"), request);
+				addPageMessage(getResPage().getString("the_CRF_version") + version.getName() + " "
+						+ getResPage().getString("has_been_removed_succesfully"), request);
 			} else {
-				addPageMessage(respage.getString("invalid_http_request_parameters"), request);
+				addPageMessage(getResPage().getString("invalid_http_request_parameters"), request);
 			}
 		} else {
-			addPageMessage(respage.getString("invalid_http_request_parameters"), request);
+			addPageMessage(getResPage().getString("invalid_http_request_parameters"), request);
 		}
 
 		if (keyValue != null) {

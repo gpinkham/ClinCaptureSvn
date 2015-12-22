@@ -150,9 +150,9 @@ public class AddNewSubjectServlet extends Controller {
 		if (!currentRole.getRole().equals(Role.INVESTIGATOR)
 				&& !currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
 				&& !currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
-			addPageMessage(restext.getString("no_have_correct_privilege_to_add_subject"), request);
+			addPageMessage(getResText().getString("no_have_correct_privilege_to_add_subject"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					restext.getString("no_have_correct_privilege_to_add_subject"), "1");
+					getResText().getString("no_have_correct_privilege_to_add_subject"), "1");
 		}
 
 		String dob = "";
@@ -162,8 +162,8 @@ public class AddNewSubjectServlet extends Controller {
 		SubjectBean updateSubject = null;
 		SimpleDateFormat localDf = getLocalDf(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 
 		StudySubjectDAO ssd = getStudySubjectDAO();
 		StudyDAO stdao = getStudyDAO();
@@ -337,8 +337,8 @@ public class AddNewSubjectServlet extends Controller {
 
 				if (subjectWithSameId.isActive()) { // ||
 					Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER,
-							resexception.getString("subject_with_person_ID") + " " + uniqueIdentifier + " "
-									+ resexception.getString("is_already_enrolled_in_this_study"));
+							getResException().getString("subject_with_person_ID") + " " + uniqueIdentifier + " "
+									+ getResException().getString("is_already_enrolled_in_this_study"));
 
 					subjectWithSameIdInCurrentStudyTree = true;
 					logger.info("just added unique id in study tree");
@@ -354,10 +354,10 @@ public class AddNewSubjectServlet extends Controller {
 						Validator.addError(
 								errors,
 								INPUT_UNIQUE_IDENTIFIER,
-								resexception.getString("this_subject_person_ID") + " " + uniqueIdentifier
-										+ resexception.getString("has_already_enrolled_site") + site.getName()
-										+ resexception.getString("of_current_study_need_to_move")
-										+ resexception.getString("please_have_user_manage_privileges"));
+								getResException().getString("this_subject_person_ID") + " " + uniqueIdentifier
+										+ getResException().getString("has_already_enrolled_site") + site.getName()
+										+ getResException().getString("of_current_study_need_to_move")
+										+ getResException().getString("please_have_user_manage_privileges"));
 						subjectWithSameIdInCurrentStudyTree = true;
 					} else {
 						// check whether there is a subject with same id in the
@@ -366,8 +366,8 @@ public class AddNewSubjectServlet extends Controller {
 								currentStudy.getParentStudyId());
 						if (subjectWithSameId.isActive()) {
 							Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER,
-									resexception.getString("this_subject_with_person_ID") + " " + uniqueIdentifier
-											+ resexception.getString("has_already_enrolled_parent_study"));
+									getResException().getString("this_subject_with_person_ID") + " " + uniqueIdentifier
+											+ getResException().getString("has_already_enrolled_parent_study"));
 
 							subjectWithSameIdInCurrentStudyTree = true;
 						} else {
@@ -377,8 +377,8 @@ public class AddNewSubjectServlet extends Controller {
 									currentStudy.getParentStudyId());
 							if (subjectWithSameId.isActive()) {
 								Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER,
-										resexception.getString("this_subject_with_person_ID") + " " + uniqueIdentifier
-												+ resexception.getString("has_already_enrolled_site_study"));
+										getResException().getString("this_subject_with_person_ID") + " " + uniqueIdentifier
+												+ getResException().getString("has_already_enrolled_site_study"));
 
 								subjectWithSameIdInCurrentStudyTree = true;
 							}
@@ -401,7 +401,7 @@ public class AddNewSubjectServlet extends Controller {
 				SubjectBean mother = (SubjectBean) sdao.findByPK(fp.getInt(INPUT_MOTHER));
 				if (mother == null || !mother.isActive() || mother.getGender() != 'f') {
 					Validator.addError(errors, INPUT_MOTHER,
-							resexception.getString("please_choose_valid_female_subject_as_mother"));
+							getResException().getString("please_choose_valid_female_subject_as_mother"));
 				}
 			}
 
@@ -409,7 +409,7 @@ public class AddNewSubjectServlet extends Controller {
 				SubjectBean father = (SubjectBean) sdao.findByPK(fp.getInt(INPUT_FATHER));
 				if (father == null || !father.isActive() || father.getGender() != 'm') {
 					Validator.addError(errors, INPUT_FATHER,
-							resexception.getString("please_choose_valid_male_subject_as_father"));
+							getResException().getString("please_choose_valid_male_subject_as_father"));
 				}
 			}
 
@@ -417,7 +417,7 @@ public class AddNewSubjectServlet extends Controller {
 			// Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
 			// value of "AUTO_LABEL",
 			// then Study Subject ID should be created when db row is inserted.
-			if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
+			if (!label.equalsIgnoreCase(getResWord().getString("id_generated_Save_Add"))) {
 				StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
 				StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
@@ -427,7 +427,7 @@ public class AddNewSubjectServlet extends Controller {
 				}
 				if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
 					Validator.addError(errors, INPUT_LABEL,
-							resexception.getString("another_assigned_this_ID_choose_unique"));
+							getResException().getString("another_assigned_this_ID_choose_unique"));
 				}
 			}
 
@@ -439,10 +439,10 @@ public class AddNewSubjectServlet extends Controller {
 
 					if ("Required".equals(sgc.getSubjectAssignment()) && groupId == 0) {
 						Validator.addError(errors, "studyGroupId" + i,
-								resexception.getString("group_class_is_required"));
+								getResException().getString("group_class_is_required"));
 					}
 					if (notes.trim().length() > INT_255) {
-						Validator.addError(errors, "notes" + i, resexception.getString("notes_cannot_longer_255"));
+						Validator.addError(errors, "notes" + i, getResException().getString("notes_cannot_longer_255"));
 					}
 					sgc.setStudyGroupId(groupId);
 					sgc.setGroupNotes(notes);
@@ -451,9 +451,9 @@ public class AddNewSubjectServlet extends Controller {
 
 			if (!errors.isEmpty()) {
 
-				addPageMessage(respage.getString("there_were_some_errors_submission"), request);
+				addPageMessage(getResPage().getString("there_were_some_errors_submission"), request);
 				if (locationError) {
-					addPageMessage(respage.getString("location_blank_error"), request);
+					addPageMessage(getResPage().getString("location_blank_error"), request);
 				}
 
 				setInputMessages(errors, request);
@@ -516,7 +516,7 @@ public class AddNewSubjectServlet extends Controller {
 					}
 
 					// Shaoyu Su: delay setting INPUT_LABEL field
-					if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
+					if (!label.equalsIgnoreCase(getResWord().getString("id_generated_Save_Add"))) {
 						fp.addPresetValue(INPUT_LABEL, label);
 					}
 					fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
@@ -661,7 +661,7 @@ public class AddNewSubjectServlet extends Controller {
 							subject.setDateOfBirth(fakeDOB);
 						} catch (ParseException pe) {
 							subject.setDateOfBirth(new Date());
-							addPageMessage(respage.getString("problem_happened_saving_year"), request);
+							addPageMessage(getResPage().getString("problem_happened_saving_year"), request);
 						}
 
 					}
@@ -677,7 +677,7 @@ public class AddNewSubjectServlet extends Controller {
 					}
 
 					if (!subject.isActive()) {
-						throw new OpenClinicaException(resexception.getString("could_not_create_subject"), "3");
+						throw new OpenClinicaException(getResException().getString("could_not_create_subject"), "3");
 					}
 					// YW << for showExistingRecord && existingSubShown,
 					// If input value(s) is(are) different from database,
@@ -724,7 +724,7 @@ public class AddNewSubjectServlet extends Controller {
 
 				// Shaoyu Su: prevent same label ("Study Subject ID")
 				synchronized (simpleLockObj) {
-					if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
+					if (label.equalsIgnoreCase(getResWord().getString("id_generated_Save_Add"))) {
 						int nextLabel = ssd.findTheGreatestLabel() + 1;
 						studySubject.setLabel(nextLabel + "");
 						studySubject = ssd.createWithoutGroup(studySubject);
@@ -755,7 +755,7 @@ public class AddNewSubjectServlet extends Controller {
 				}
 
 				if (!studySubject.isActive()) {
-					throw new OpenClinicaException(resexception.getString("could_not_create_study_subject"), "4");
+					throw new OpenClinicaException(getResException().getString("could_not_create_study_subject"), "4");
 				}
 
 				// save discrepancy notes into DB
@@ -775,8 +775,8 @@ public class AddNewSubjectServlet extends Controller {
 				request.setAttribute(FormProcessor.FIELD_SUBMITTED, "0");
 
 				addPageMessage(
-						respage.getString("subject_with_unique_identifier") + studySubject.getLabel()
-								+ respage.getString("X_was_created_succesfully"), request);
+						getResPage().getString("subject_with_unique_identifier") + studySubject.getLabel()
+								+ getResPage().getString("X_was_created_succesfully"), request);
 
 				if (fp.getBoolean("addWithEvent")) {
 					createStudyEvent(fp, studySubject);
@@ -865,12 +865,12 @@ public class AddNewSubjectServlet extends Controller {
 		String location = fp.getString("location");
 		Date startDate = s.getEventStartDate();
 		if (studyEventDefinitionId > 0) {
-			String locationTerm = resword.getString("location");
+			String locationTerm = getResWord().getString("location");
 			// don't allow user to use the default value 'Location' since
 			// location
 			// is a required field
 			if (location.equalsIgnoreCase(locationTerm)) {
-				addPageMessage(restext.getString("not_a_valid_location"), fp.getRequest());
+				addPageMessage(getResText().getString("not_a_valid_location"), fp.getRequest());
 			} else {
 				logger.info("will create event with new subject");
 				StudyEventDAO sedao = getStudyEventDAO();
@@ -891,7 +891,7 @@ public class AddNewSubjectServlet extends Controller {
 			}
 
 		} else {
-			addPageMessage(respage.getString("no_event_sheduled_for_subject"), fp.getRequest());
+			addPageMessage(getResPage().getString("no_event_sheduled_for_subject"), fp.getRequest());
 		}
 		return se;
 	}
@@ -907,9 +907,9 @@ public class AddNewSubjectServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		String exceptionName = resexception.getString("no_permission_to_add_new_subject");
-		String noAccessMessage = respage.getString("may_not_add_new_subject") + " "
-				+ respage.getString("change_study_contact_sysadmin");
+		String exceptionName = getResException().getString("no_permission_to_add_new_subject");
+		String noAccessMessage = getResPage().getString("may_not_add_new_subject") + " "
+				+ getResPage().getString("change_study_contact_sysadmin");
 
 		if (maySubmitData(ub, currentRole)) {
 			return;

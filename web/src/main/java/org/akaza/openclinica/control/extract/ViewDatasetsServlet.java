@@ -83,7 +83,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			return;
 		}
 		if ("ongoing".equals(request.getSession().getAttribute("exportStatus"))) {
-			addPageMessage(respage.getString("extract_is_running"), request);
+			addPageMessage(getResPage().getString("extract_is_running"), request);
 			request.getSession().removeAttribute("exportStatus");
 		}
 		UserAccountBean ub = getUserAccountBean(request);
@@ -117,12 +117,12 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			ArrayList datasets;
 			datasets = dsdao.findAllByStudyId(currentStudy);
 			ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-			String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
-					resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-					resword.getString("actions")};
+			String[] columns = { getResWord().getString("dataset_name"), getResWord().getString("description"),
+					getResWord().getString("created_by"), getResWord().getString("created_date"), getResWord().getString("status"),
+					getResWord().getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
-			table.addLink(resword.getString("show_only_my_datasets"), RequestUtil
+			table.addLink(getResWord().getString("show_only_my_datasets"), RequestUtil
 					.getRelativeWithNewParameters("action=owner", "ownerId=".concat(Integer.toString(ub.getId()))));
 			table.setQuery("ViewDatasets", getOwnerQueryArgs("", ""));
 			table.setRows(datasetRows);
@@ -136,12 +136,12 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				EntityBeanTable table = getEntityBeanTable();
 				ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy);
 				ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-				String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
-						resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-						resword.getString("actions")};
+				String[] columns = { getResWord().getString("dataset_name"), getResWord().getString("description"),
+						getResWord().getString("created_by"), getResWord().getString("created_date"), getResWord().getString("status"),
+						getResWord().getString("actions")};
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.hideColumnLink(FIVE);
-				table.addLink(resword.getString("show_all_datasets"),
+				table.addLink(getResWord().getString("show_all_datasets"),
 						RequestUtil.getRelativeWithNewParameters("action=", "ownerId="));
 				table.setQuery("ViewDatasets", getOwnerQueryArgs(Integer.toString(ub.getId()), "owner"));
 				table.setRows(datasetRows);
@@ -155,8 +155,8 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				StudyDAO sdao = getStudyDAO();
 				StudyBean study = (StudyBean) sdao.findByPK(db.getStudyId());
 				if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
@@ -188,10 +188,10 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 

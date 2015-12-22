@@ -57,10 +57,10 @@ public class ViewSingleJobServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
@@ -136,9 +136,9 @@ public class ViewSingleJobServlet extends Controller {
 				ArrayList allRows = AuditEventRow.generateRowsFromBeans(triggerLogs);
 
 				EntityBeanTable table = getEntityBeanTable();
-				String[] columns = {resword.getString("date_and_time"), resword.getString("action_message"),
-						resword.getString("entity_operation"), resword.getString("changes_and_additions"),
-						resword.getString("actions")};
+				String[] columns = { getResWord().getString("date_and_time"), getResWord().getString("action_message"),
+						getResWord().getString("entity_operation"), getResWord().getString("changes_and_additions"),
+						getResWord().getString("actions")};
 
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.setAscendingSort(false);

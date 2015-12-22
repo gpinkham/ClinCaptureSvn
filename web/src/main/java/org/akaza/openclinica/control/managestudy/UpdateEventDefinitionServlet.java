@@ -68,14 +68,14 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_permission_to_update_study_event_definition") + "<br>"
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				int edcId = fp.getInt("edcToConfigure");
 				response.sendRedirect(fp.getRequest().getContextPath().concat("/pages/configureItemLevelSDV?").concat("edcId=" + edcId));
 			} else {
-				addPageMessage(respage.getString("updating_ED_is_cancelled"), request);
+				addPageMessage(getResPage().getString("updating_ED_is_cancelled"), request);
 				clearSession(request.getSession());
 				forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 			}
@@ -179,7 +179,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				signStateRestorerMap, edcItemMetadataMap);
 
 		clearSession(request.getSession());
-		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
+		addPageMessage(getResPage().getString("the_ED_has_been_updated_succesfully"), request);
 		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 	}
 

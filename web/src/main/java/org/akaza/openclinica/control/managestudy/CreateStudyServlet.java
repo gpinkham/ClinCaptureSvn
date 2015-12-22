@@ -20,10 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.ValidatorHelper;
-import com.clinovo.validator.StudyValidator;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -44,11 +47,10 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.StudyValidator;
 
 /**
  * Processes request to create a new study.
@@ -83,9 +85,9 @@ public class CreateStudyServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -157,55 +159,55 @@ public class CreateStudyServlet extends Controller {
 		addValidatorIfParamPresented(request, "startDateTimeLabel", v, Validator.NO_BLANKS);
 		addValidatorIfParamPresented(request, "endDateTimeLabel", v, Validator.NO_BLANKS);
 		errors.putAll(v.validate());
-		StudyValidator.checkIfStudyFieldsAreUnique(fp,  errors, getStudyDAO(), respage, resexception);
+		StudyValidator.checkIfStudyFieldsAreUnique(fp,  errors, getStudyDAO(), getResPage(), getResException());
 		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
-			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
+			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
 		}
 		if (fp.getString("uniqueProId").trim().length() > VALIDATION_NUM2) {
-			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
+			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
 		if (fp.getString("description").trim().length() > VALIDATION_NUM8) {
-			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
+			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
 		}
 		if (fp.getString("prinInvestigator").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "prinInvestigator",
-					resexception.getString("maximum_lenght_principal_investigator_255"));
+					getResException().getString("maximum_lenght_principal_investigator_255"));
 		}
 		if (fp.getString("sponsor").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "sponsor", resexception.getString("maximum_lenght_sponsor_255"));
+			Validator.addError(errors, "sponsor", getResException().getString("maximum_lenght_sponsor_255"));
 		}
 		if (fp.getString("officialTitle").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "officialTitle", resexception.getString("maximum_lenght_official_title_255"));
+			Validator.addError(errors, "officialTitle", getResException().getString("maximum_lenght_official_title_255"));
 		}
 		if (fp.getString("studySubjectIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "studySubjectIdLabel",
-					resexception.getString("maximum_lenght_studySubjectIdLabel_255"));
+					getResException().getString("maximum_lenght_studySubjectIdLabel_255"));
 		}
 		if (fp.getString("secondaryIdLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "secondaryIdLabel",
-					resexception.getString("maximum_lenght_secondaryIdLabel_255"));
+					getResException().getString("maximum_lenght_secondaryIdLabel_255"));
 		}
 		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "dateOfEnrollmentForStudyLabel",
-					resexception.getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
+					getResException().getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
 		}
 		if (fp.getString("genderLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "genderLabel", resexception.getString("maximum_lenght_genderLabel_255"));
+			Validator.addError(errors, "genderLabel", getResException().getString("maximum_lenght_genderLabel_255"));
 		}
 		if (fp.getString("startDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "startDateTimeLabel",
-					resexception.getString("maximum_lenght_startDateTimeLabel_255"));
+					getResException().getString("maximum_lenght_startDateTimeLabel_255"));
 		}
 		if (fp.getString("endDateTimeLabel").trim().length() > VALIDATION_NUM5) {
 			Validator.addError(errors, "endDateTimeLabel",
-					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
+					getResException().getString("maximum_lenght_endDateTimeLabel_255"));
 		}
 
 		StudyBean studyBean = createStudyBean(request);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");
-			request.setAttribute("studyPhaseMap", studyPhaseMap);
+			request.setAttribute("studyPhaseMap", getMapsHolder().getStudyPhaseMap());
 			request.setAttribute("statuses", Status.toActiveArrayList());
 			logger.info("setting arrays to request, size of list: " + Status.toArrayList().size());
 			if (request.getParameter("Save") != null && request.getParameter("Save").length() > 0) {
@@ -225,7 +227,7 @@ public class CreateStudyServlet extends Controller {
 				}
 				createStudyUserRoleForStudy(selectedUserId, newstudyBean, ub);
 
-				addPageMessage(respage.getString("the_new_study_created_succesfully_current"), request);
+				addPageMessage(getResPage().getString("the_new_study_created_succesfully_current"), request);
 				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 			}
 		} else {
@@ -278,36 +280,36 @@ public class CreateStudyServlet extends Controller {
 		final int dnQueryTypeId = 3;
 
 		// create default update discrepancy descriptions
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("corrected_CRF_data"), "", studyId, "Study and Site", dnFailedValidationCheckTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("CRF_data_was_correctly_entered"), "", studyId, "Study and Site",
 				dnFailedValidationCheckTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("need_additional_clarification"), "", studyId, "Study and Site",
 				dnFailedValidationCheckTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("requested_information_is_provided"), "", studyId, "Study and Site",
 				dnFailedValidationCheckTypeId));
 
 		// create default close discrepancy descriptions
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("query_response_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("CRF_data_change_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("calendared_event_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("failed_edit_check_monitored"), "", studyId, "Study and Site", dnAnnotationTypeId));
 
 		// create default RFC discrepancy descriptions
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("corrected_CRF_data_entry_error"), "", studyId, "Study and Site", dnQueryTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("source_data_was_missing"), "", studyId, "Study and Site", dnQueryTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("source_data_was_incorrect"), "", studyId, "Study and Site", dnQueryTypeId));
-		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(respage
+		dDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(getResPage()
 				.getString("information_was_not_available"), "", studyId, "Study and Site", dnQueryTypeId));
 	}
 

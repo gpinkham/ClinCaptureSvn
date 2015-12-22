@@ -154,12 +154,12 @@ public class RequestPasswordServlet extends Controller {
 					uDAO.update(ubDB);
 					sendPassword(newPass, ubDB, request, response);
 				} else {
-					addPageMessage(respage.getString("your_password_not_verified_try_again"), request);
+					addPageMessage(getResPage().getString("your_password_not_verified_try_again"), request);
 					forwardPage(Page.REQUEST_PWD, request, response);
 				}
 
 			} else {
-				addPageMessage(respage.getString("your_email_address_not_found_try_again"), request);
+				addPageMessage(getResPage().getString("your_email_address_not_found_try_again"), request);
 				forwardPage(Page.REQUEST_PWD, request, response);
 			}
 
@@ -184,17 +184,17 @@ public class RequestPasswordServlet extends Controller {
 			emailParentStudy = sBean;
 		}
 		String emailBody = EmailUtil.getEmailBodyStart() + "Dear " + ubDB.getFirstName() + " " + ubDB.getLastName()
-				+ ", <br><br>" + restext.getString("this_email_is_from_openclinica_admin") + "<br>"
-				+ restext.getString("your_password_has_been_reset_as") + ": " + passwd + "<br><br>"
-				+ restext.getString("you_will_be_required_to_change") + " "
-				+ restext.getString("time_you_login_to_the_system") + " "
-				+ restext.getString("use_the_following_link_to_log") + ":<br>" + SQLInitServlet.getSystemURL()
-				+ "<br><br>" + respage.getString("best_system_administrator") + EmailUtil.getEmailBodyEnd()
+				+ ", <br><br>" + getResText().getString("this_email_is_from_openclinica_admin") + "<br>"
+				+ getResText().getString("your_password_has_been_reset_as") + ": " + passwd + "<br><br>"
+				+ getResText().getString("you_will_be_required_to_change") + " "
+				+ getResText().getString("time_you_login_to_the_system") + " "
+				+ getResText().getString("use_the_following_link_to_log") + ":<br>" + SQLInitServlet.getSystemURL()
+				+ "<br><br>" + getResPage().getString("best_system_administrator") + EmailUtil.getEmailBodyEnd()
 				+ EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		emailBody = emailBody.replace("{0}", emailParentStudy.getName());
-		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"),
-				emailBody, true, respage.getString("your_password_reset_new_password_emailed"),
-				respage.getString("your_password_not_send_due_mail_server_problem"), true, request);
+		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), getResText().getString("your_openclinica_password"),
+				emailBody, true, getResPage().getString("your_password_reset_new_password_emailed"),
+				getResPage().getString("your_password_not_send_due_mail_server_problem"), true, request);
 
 		request.getSession().removeAttribute("challengeQuestions");
 		forwardPage(Page.LOGIN, request, response);

@@ -147,7 +147,7 @@ public class ImportRuleServlet extends Controller {
 				}
 
 				RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
-						getDataSource(), currentStudy, ub, getRuleDao(), getRuleSetDao(), respage);
+						getDataSource(), currentStudy, ub, getRuleDao(), getRuleSetDao(), getResPage());
 				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
 				provideMessage(importedRules, request);
@@ -166,7 +166,7 @@ public class ImportRuleServlet extends Controller {
 				}
 			} catch (OpenClinicaSystemException re) {
 				MessageFormat mf = new MessageFormat("");
-				mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re
+				mf.applyPattern(re.getErrorCode() == null ? getResPage().getString("OCRERR_0016") : getResPage().getString(re
 						.getErrorCode()));
 				Object[] arguments = { re.getMessage() };
 				if (re.getErrorCode() != null) {
@@ -193,20 +193,20 @@ public class ImportRuleServlet extends Controller {
 
 		if (validRuleSetDefs > 0 && duplicateRuleSetDefs == 0 && invalidRuleSetDefs == 0 && duplicateRuleDefs == 0
 				&& invalidRuleDefs == 0) {
-			addPageMessage(respage.getString("rules_Import_message1"), request);
+			addPageMessage(getResPage().getString("rules_Import_message1"), request);
 		}
 		if (duplicateRuleSetDefs > 0 && invalidRuleSetDefs == 0 && duplicateRuleDefs >= 0 && invalidRuleDefs == 0) {
-			addPageMessage(respage.getString("rules_Import_message2"), request);
+			addPageMessage(getResPage().getString("rules_Import_message2"), request);
 		}
 		if (invalidRuleSetDefs > 0 && invalidRuleDefs >= 0) {
-			addPageMessage(respage.getString("rules_Import_message3"), request);
+			addPageMessage(getResPage().getString("rules_Import_message3"), request);
 		}
 	}
 
 	private String getDirToSaveUploadedFileIn() throws OpenClinicaSystemException {
 		String dir = SQLInitServlet.getField("filePath");
 		if (!new File(dir).exists()) {
-			throw new OpenClinicaSystemException(respage.getString("filepath_you_defined_not_seem_valid"));
+			throw new OpenClinicaSystemException(getResPage().getString("filepath_you_defined_not_seem_valid"));
 		}
 		return dir + "rules" + File.separator + "original" + File.separator;
 	}
@@ -274,8 +274,8 @@ public class ImportRuleServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
 	}
 }

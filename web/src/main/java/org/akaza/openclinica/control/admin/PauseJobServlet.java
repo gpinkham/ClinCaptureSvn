@@ -54,10 +54,10 @@ public class PauseJobServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	@Override
@@ -81,20 +81,20 @@ public class PauseJobServlet extends Controller {
 				scheduler.deleteJob(trigger.getJobKey());
 				// set return message here
 				logger.debug("Deleted job: " + triggerName);
-				addPageMessage(respage.getString("the_following_job") + " " + triggerName
-						+ " " + respage.getString("corresponding_trigger_deleted"), request);
+				addPageMessage(getResPage().getString("the_following_job") + " " + triggerName
+						+ " " + getResPage().getString("corresponding_trigger_deleted"), request);
 			} else {
 
 				if (scheduler.getTriggerState(trigger.getKey()) == Trigger.TriggerState.PAUSED) {
 					scheduler.resumeTrigger(trigger.getKey());
 					logger.debug("Resuming trigger! " + triggerName + " " + finalGroupName);
-					addPageMessage(respage.getString("this_trigger") + " " + triggerName
-							+ " " + respage.getString("resumed_and_will_continue"), request);
+					addPageMessage(getResPage().getString("this_trigger") + " " + triggerName
+							+ " " + getResPage().getString("resumed_and_will_continue"), request);
 				} else {
 					scheduler.pauseTrigger(trigger.getKey());
 					logger.debug("Pausing trigger! " + triggerName + " " + finalGroupName);
-					addPageMessage(respage.getString("this_trigger") + " " + triggerName
-							+ " " + respage.getString("has_been_paused"), request);
+					addPageMessage(getResPage().getString("this_trigger") + " " + triggerName
+							+ " " + getResPage().getString("has_been_paused"), request);
 				}
 			}
 		} catch (NullPointerException e) {

@@ -77,10 +77,10 @@ public class UpdateJobExportServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 		// above copied from create dataset servlet, needs to be changed to
 		// allow only admin-level users
 
@@ -234,13 +234,13 @@ public class UpdateJobExportServlet extends Controller {
 					scheduler.deleteJob(updatingTrigger.getJobKey());
 					Date dataStart = scheduler.scheduleJob(jobDetailBean, newTrigger);
 					logger.info("Job started with a start date of " + dataStart.toString());
-					addPageMessage(resword.getString("job_modified_successfully"), request);
+					addPageMessage(getResWord().getString("job_modified_successfully"), request);
 					forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
 					setUpServlet(newTrigger, request);
-					addPageMessage(resexception.getString("unspecified_error_with_job_creation"), request);
+					addPageMessage(getResException().getString("unspecified_error_with_job_creation"), request);
 					forwardPage(Page.UPDATE_JOB_EXPORT, request, response);
 				}
 			}
@@ -262,22 +262,22 @@ public class UpdateJobExportServlet extends Controller {
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
 		boolean isContainSpecialSymbol = matcher.find();
 		if (isContainSpecialSymbol) {
-			Validator.addError(errors, JOB_NAME, resexception.getString("dataset_should_not_contain_any_special"));
+			Validator.addError(errors, JOB_NAME, getResException().getString("dataset_should_not_contain_any_special"));
 		}
 		int formatId = fp.getInt(FORMAT_ID);
 		if (formatId == 0) {
-			Validator.addError(errors, FORMAT_ID, respage.getString("please_pick_at_least_one"));
+			Validator.addError(errors, FORMAT_ID, getResPage().getString("please_pick_at_least_one"));
 		}
 		for (TriggerKey triggerKey : triggerKeys) {
 			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
 				Validator.addError(errors, JOB_NAME,
-						resexception.getString("a_job_with_that_name_already_exist_please_pick"));
+						getResException().getString("a_job_with_that_name_already_exist_please_pick"));
 			}
 		}
 		try {
 			Date jobDate = fp.getDateTimeInput(DATE_START_JOB);
 			if (jobDate.before(new Date())) {
-				Validator.addError(errors, DATE_START_JOB + "Date", resexception.getString("this_date_needs_to_be_later"));
+				Validator.addError(errors, DATE_START_JOB + "Date", getResException().getString("this_date_needs_to_be_later"));
 			}
 		} catch (IllegalArgumentException ex) {
 			//

@@ -14,7 +14,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -30,7 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -64,12 +62,6 @@ public class ReassignStudySubjectServletTest {
 		Locale locale = new Locale("en");
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
-		Whitebox.setInternalState(reassignStudySubjectServlet, "respage", respage);
-		Whitebox.setInternalState(reassignStudySubjectServlet, "resexception", resexception);
-		Whitebox.setInternalState(reassignStudySubjectServlet, "resformat", resformat);
 
 		currentStudy = new StudyBean();
 		currentStudy.setId(1);

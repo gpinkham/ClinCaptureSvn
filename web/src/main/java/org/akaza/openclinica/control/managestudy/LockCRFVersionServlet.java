@@ -58,9 +58,9 @@ public class LockCRFVersionServlet extends Controller {
 		if (userCanLockCRFVersion(request)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -81,7 +81,7 @@ public class LockCRFVersionServlet extends Controller {
 		String action = fp.getString("action");
 
 		if (crfVersionId == 0) {
-			addPageMessage(respage.getString("choose_valid_crf_version"), request);
+			addPageMessage(getResPage().getString("choose_valid_crf_version"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 			return;
 		}
@@ -93,8 +93,8 @@ public class LockCRFVersionServlet extends Controller {
 		CRFBean crf = (CRFBean) cdao.findByPK(version.getCrfId());
 
 		if (!userCanLockCRFVersion(request)) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+					+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -111,7 +111,7 @@ public class LockCRFVersionServlet extends Controller {
 
 			getCrfVersionService().lockCrfVersion(version, ub);
 
-			addPageMessage(respage.getString("crf_version_locked_successfully"), request);
+			addPageMessage(getResPage().getString("crf_version_locked_successfully"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
 	}

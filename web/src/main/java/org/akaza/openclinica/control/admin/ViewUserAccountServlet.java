@@ -53,10 +53,10 @@ public class ViewUserAccountServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+					getResPage().getString("no_have_correct_privilege_current_study")
+							+ getResPage().getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -72,7 +72,7 @@ public class ViewUserAccountServlet extends Controller {
 			request.setAttribute("user", user);
 		} else {
 			throw new InconsistentStateException(Page.ADMIN_SYSTEM,
-					resexception.getString("the_user_attemping_to_view_not_exists"));
+					getResException().getString("the_user_attemping_to_view_not_exists"));
 		}
 		// To provide the view with the correct date format pattern, locale
 		// sensitive

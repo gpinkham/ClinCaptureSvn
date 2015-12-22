@@ -49,15 +49,15 @@ public class RemoveSiteServlet extends Controller {
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.SITE_LIST_SERVLET, getResPage().getString("current_study_locked"), request, response);
 		if (getUserAccountBean(request).isSysAdmin()
 				|| getCurrentRole(request).getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"),
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, getResException().getString("not_study_director"),
 				"1");
 	}
 
@@ -74,15 +74,15 @@ public class RemoveSiteServlet extends Controller {
 		int siteId = Integer.valueOf(idString.trim());
 		StudyBean site = (StudyBean) sdao.findByPK(siteId);
 		if (currentStudy.getId() != site.getParentStudyId()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+					+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_site_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_site_to_remove"), request);
 			forwardPage(Page.SITE_LIST_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -98,7 +98,7 @@ public class RemoveSiteServlet extends Controller {
 
 				getStudyService().removeSite(site, currentUser);
 
-				addPageMessage(respage.getString("this_site_has_been_removed_succesfully"), request);
+				addPageMessage(getResPage().getString("this_site_has_been_removed_succesfully"), request);
 
 				String fromListSite = (String) request.getSession().getAttribute("fromListSite");
 				if (fromListSite != null && fromListSite.equals("yes")) {

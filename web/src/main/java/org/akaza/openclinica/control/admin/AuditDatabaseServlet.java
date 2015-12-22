@@ -54,7 +54,7 @@ public class AuditDatabaseServlet extends Controller {
 
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 

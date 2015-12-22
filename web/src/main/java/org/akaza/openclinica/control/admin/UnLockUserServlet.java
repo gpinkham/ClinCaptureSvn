@@ -73,7 +73,7 @@ public class UnLockUserServlet extends Controller {
 
 		if (!getUserAccountBean(request).isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -93,17 +93,17 @@ public class UnLockUserServlet extends Controller {
 
 		if (!user.isActive()) {
 
-			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
+			messageFormat.applyPattern(getResPage().getString("the_specified_user_not_exits"));
 			message = messageFormat.format(new Object[]{userId});
 
 		} else if (user.getAccountNonLocked()) {
 
-			messageFormat.applyPattern(respage.getString("the_specified_user_not_locked"));
+			messageFormat.applyPattern(getResPage().getString("the_specified_user_not_locked"));
 			message = messageFormat.format(argsForMessage);
 
 		} else if (!getUserAccountService().doesUserHaveAvailableRole(user.getId())) {
 
-			messageFormat.applyPattern(respage.getString("the_user_could_not_be_unlocked_since_no_active_role"));
+			messageFormat.applyPattern(getResPage().getString("the_user_could_not_be_unlocked_since_no_active_role"));
 			message = messageFormat.format(argsForMessage);
 
 		} else {
@@ -128,19 +128,19 @@ public class UnLockUserServlet extends Controller {
 
 			if (udao.isQuerySuccessful()) {
 
-				messageFormat.applyPattern(respage.getString("the_user_has_been_unlocked"));
+				messageFormat.applyPattern(getResPage().getString("the_user_has_been_unlocked"));
 				message = messageFormat.format(argsForMessage);
 
 				try {
 					sendRestoreEmail(user, password, request);
 				} catch (Exception e) {
 					e.printStackTrace();
-					message += respage.getString("however_was_error_sending_user_email_regarding");
+					message += getResPage().getString("however_was_error_sending_user_email_regarding");
 				}
 
 			} else {
 
-				messageFormat.applyPattern(respage.getString("the_user_could_not_be_unlocked_due_database_error"));
+				messageFormat.applyPattern(getResPage().getString("the_user_could_not_be_unlocked_due_database_error"));
 				message = messageFormat.format(argsForMessage);
 
 			}
@@ -155,11 +155,11 @@ public class UnLockUserServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		String body = EmailUtil.getEmailBodyStart();
-		body += resword.getString("dear") + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
-		body += restext.getString("your_account_has_been_unlocked_and_password_reset") + ":<br><br>";
-		body += resword.getString("user_name") + ": " + u.getName() + "<br>";
-		body += resword.getString("password") + ": " + password + "<br><br>";
-		body += restext.getString("please_test_your_login_information_and_let") + "<br>";
+		body += getResWord().getString("dear") + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
+		body += getResText().getString("your_account_has_been_unlocked_and_password_reset") + ":<br><br>";
+		body += getResWord().getString("user_name") + ": " + u.getName() + "<br>";
+		body += getResWord().getString("password") + ": " + password + "<br><br>";
+		body += getResText().getString("please_test_your_login_information_and_let") + "<br>";
 		body += "<A HREF='" + SQLInitServlet.getSystemURL() + "'>";
 		body += SQLInitServlet.getField("sysURL") + "</A> <br><br>";
 		StudyDAO sdao = getStudyDAO();
@@ -169,11 +169,11 @@ public class UnLockUserServlet extends Controller {
 		} else {
 			emailParentStudy = currentStudy;
 		}
-		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
+		body += getResPage().getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		body += EmailUtil.getEmailBodyEnd();
 		body += EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
 		logger.info("Sending email...begin");
-		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body,
+		sendEmail(u.getEmail().trim(), getResText().getString("your_new_openclinica_account_has_been_restored"), body,
 				false, request);
 		logger.info("Sending email...done");
 	}

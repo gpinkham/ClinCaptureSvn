@@ -210,7 +210,7 @@ public class CreateNewStudyEventServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		FormProcessor fp = new FormProcessor(request);
@@ -257,8 +257,8 @@ public class CreateNewStudyEventServlet extends Controller {
 			ssb = (StudySubjectBean) sdao.findByPK(studySubjectId);
 			Status s = ssb.getStatus();
 			if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-				addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
-						+ resterm.getString("added") + "." + respage.getString("study_subject_has_been_deleted"),
+				addPageMessage(getResWord().getString("study_event") + getResTerm().getString("could_not_be")
+						+ getResTerm().getString("added") + "." + getResPage().getString("study_subject_has_been_deleted"),
 						request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
@@ -421,13 +421,13 @@ public class CreateNewStudyEventServlet extends Controller {
 			}
 
 			HashMap errors = v.validate();
-			String location = resword.getString("location");
+			String location = getResWord().getString("location");
 			// don't allow user to use the default value 'Location' since
 			// location
 			// is a required field
 			if (!StringUtil.isBlank(fp.getString(INPUT_LOCATION))
 					&& fp.getString(INPUT_LOCATION).equalsIgnoreCase(location)) {
-				Validator.addError(errors, INPUT_LOCATION, restext.getString("not_a_valid_location"));
+				Validator.addError(errors, INPUT_LOCATION, getResText().getString("not_a_valid_location"));
 			}
 
 			StudyEventDefinitionBean definition = (StudyEventDefinitionBean) seddao
@@ -440,12 +440,12 @@ public class CreateNewStudyEventServlet extends Controller {
 			}
 			if (studySubject.getLabel().equals("")) {
 				Validator.addError(errors, INPUT_STUDY_SUBJECT,
-						respage.getString("must_enter_subject_ID_for_identifying"));
+						getResPage().getString("must_enter_subject_ID_for_identifying"));
 			}
 
 			if (!subjectMayReceiveStudyEvent(getStudyEventDAO(), definition, studySubject)) {
 				Validator.addError(errors, INPUT_STUDY_EVENT_DEFINITION,
-						restext.getString("not_added_since_event_not_repeating"));
+						getResText().getString("not_added_since_event_not_repeating"));
 			}
 
 			ArrayList<StudyEventDefinitionBean> definitionScheduleds = new ArrayList<StudyEventDefinitionBean>();
@@ -459,7 +459,7 @@ public class CreateNewStudyEventServlet extends Controller {
 						scheduledDefinitionIds[i] = pk;
 						if (!subjectMayReceiveStudyEvent(getStudyEventDAO(), sedb, studySubject)) {
 							Validator.addError(errors, INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i],
-									restext.getString("not_added_since_event_not_repeating"));
+									getResText().getString("not_added_since_event_not_repeating"));
 						}
 					} else {
 						definitionScheduleds.add(new StudyEventDefinitionBean());
@@ -480,14 +480,14 @@ public class CreateNewStudyEventServlet extends Controller {
 						.equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
 						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-								resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+								getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
 					}
 				} else {
 					// if in same date, only check when both had time entered
 					if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
 						if (end.before(start) || end.equals(start)) {
 							Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-									resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+									getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
 						}
 					}
 				}
@@ -526,13 +526,13 @@ public class CreateNewStudyEventServlet extends Controller {
 							boolean startTime = fp.timeEntered(prevStartPrefix);
 							if (schStartTime && startTime) {
 								if (startScheduled[i].before(prevStartDate)) {
-									Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i], resexception
+									Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i], getResException()
 											.getString("input_provided_not_occure_after_previous_start_date_time"));
 								}
 							}
 						} else {
 							if (startScheduled[i].before(prevStartDate)) {
-								Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i], resexception
+								Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i], getResException()
 										.getString("input_provided_not_occure_after_previous_start_date_time"));
 							}
 						}
@@ -544,7 +544,7 @@ public class CreateNewStudyEventServlet extends Controller {
 						if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date")
 								.equals(fp.getString(prevEndPrefix + "Date"))) {
 							if (endScheduled[i].before(startScheduled[i])) {
-								Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception
+								Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], getResException()
 										.getString("input_provided_not_occure_after_previous_start_date_time"));
 							}
 						} else {
@@ -554,7 +554,7 @@ public class CreateNewStudyEventServlet extends Controller {
 									&& fp.timeEntered(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
 								if (endScheduled[i].before(startScheduled[i])
 										|| endScheduled[i].equals(startScheduled[i])) {
-									Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception
+									Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], getResException()
 											.getString("input_provided_not_occure_after_previous_start_date_time"));
 								}
 							}
@@ -565,7 +565,7 @@ public class CreateNewStudyEventServlet extends Controller {
 
 			if (!errors.isEmpty()) {
 				logger.info("we have errors; number of this; " + errors.size());
-				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
+				addPageMessage(getResPage().getString("errors_in_submission_see_below"), request);
 				setInputMessages(errors, request);
 				fp.addPresetValue(INPUT_STUDY_EVENT_DEFINITION, definition);
 				fp.addPresetValue(INPUT_STUDY_SUBJECT, studySubject);
@@ -634,11 +634,11 @@ public class CreateNewStudyEventServlet extends Controller {
 				studyEvent = (StudyEventBean) sed.create(studyEvent);
 
 				if (!studyEvent.isActive()) {
-					throw new OpenClinicaException(restext.getString("event_not_created_in_database"), "2");
+					throw new OpenClinicaException(getResText().getString("event_not_created_in_database"), "2");
 				}
-				addPageMessage(restext.getString("X_event_wiht_definition") + definition.getName()
-						+ restext.getString("X_and_subject") + studySubject.getName()
-						+ respage.getString("X_was_created_succesfully"), request);
+				addPageMessage(getResText().getString("X_event_wiht_definition") + definition.getName()
+						+ getResText().getString("X_and_subject") + studySubject.getName()
+						+ getResPage().getString("X_was_created_succesfully"), request);
 
 				// save discrepancy notes into DB
 				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
@@ -707,7 +707,7 @@ public class CreateNewStudyEventServlet extends Controller {
 								studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
 								if (!studyEventScheduled.isActive()) {
 									throw new OpenClinicaException(
-											restext.getString("scheduled_event_not_created_in_database"), "2");
+											getResText().getString("scheduled_event_not_created_in_database"), "2");
 								}
 
 								dnService.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn, studyEventScheduled.getId(),
@@ -737,11 +737,11 @@ public class CreateNewStudyEventServlet extends Controller {
 									processEvents(processEventsWrapper);
 								}
 							} else {
-								String pageMessage = restext.getString("scheduled_event_definition")
-										+ definitionScheduleds.get(i).getName() + restext.getString("X_and_subject")
+								String pageMessage = getResText().getString("scheduled_event_definition")
+										+ definitionScheduleds.get(i).getName() + getResText().getString("X_and_subject")
 										+ studySubject.getName()
-										+ restext.getString("not_created_since_event_not_repeating")
-										+ restext.getString("event_type_already_exists");
+										+ getResText().getString("not_created_since_event_not_repeating")
+										+ getResText().getString("event_type_already_exists");
 								addPageMessage(pageMessage, request);
 								if (popupQuery) {
 									pageMessages.put(pageMessage);
@@ -878,9 +878,9 @@ public class CreateNewStudyEventServlet extends Controller {
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-		String exceptionName = resexception.getString("no_permission_to_add_new_study_event");
-		String noAccessMessage = respage.getString("not_create_new_event") + " "
-				+ respage.getString("change_study_contact_sysadmin");
+		String exceptionName = getResException().getString("no_permission_to_add_new_study_event");
+		String noAccessMessage = getResPage().getString("not_create_new_event") + " "
+				+ getResPage().getString("change_study_contact_sysadmin");
 
 		if (maySubmitData(ub, currentRole)) {
 			return;
@@ -921,7 +921,7 @@ public class CreateNewStudyEventServlet extends Controller {
 	private void setupBeans(HttpServletRequest request, HttpServletResponse response, ArrayList eventDefinitions)
 			throws Exception {
 		addEntityList("eventDefinitions", eventDefinitions,
-				restext.getString("cannot_create_event_because_no_event_definitions"), Page.LIST_STUDY_SUBJECTS_SERVLET,
+				getResText().getString("cannot_create_event_because_no_event_definitions"), Page.LIST_STUDY_SUBJECTS_SERVLET,
 				request, response);
 
 	}

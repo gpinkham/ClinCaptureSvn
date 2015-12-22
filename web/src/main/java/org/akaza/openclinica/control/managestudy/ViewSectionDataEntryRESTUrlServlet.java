@@ -144,9 +144,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		if (eventCRFId == 0 && edcb.getStudyId() != currentStudy.getParentStudyId()
 				&& edcb.getStudyId() != currentStudy.getId()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_study_contact_sysadmin"), request);
-			throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+					getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_study_contact_sysadmin"), request);
+			throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_director"), "1");
 		}
 
 		if (crfId == 0 && eventDefinitionCRFId > 0) {
@@ -166,7 +166,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		String age = "";
 		if (crfVersionId == 0 && eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_CRF_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
@@ -218,7 +218,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
 			try {
-				DateFormat localDf = new SimpleDateFormat(resformat.getString("date_format_string"),
+				DateFormat localDf = new SimpleDateFormat(getResFormat().getString("date_format_string"),
 						LocaleResolver.getLocale());
 				formattedInterviewerDate = localDf.format(tmpDate);
 			} catch (Exception e) {
@@ -239,7 +239,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 				SectionBean firstSec = (SectionBean) sections.get(0);
 				sectionId = firstSec.getId();
 			} else {
-				addPageMessage(respage.getString("there_are_no_sections_ins_this_CRF"), request);
+				addPageMessage(getResPage().getString("there_are_no_sections_ins_this_CRF"), request);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 				return;
 			}
@@ -254,7 +254,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 				SectionBean firstSec = (SectionBean) sections.get(0);
 				sectionId = firstSec.getId();
 			} else {
-				addPageMessage(respage.getString("there_are_no_sections_ins_this_CRF_version"), request);
+				addPageMessage(getResPage().getString("there_are_no_sections_ins_this_CRF_version"), request);
 				if (eventCRFId == 0) {
 					forwardPage(Page.CRF_LIST_SERVLET, request, response);
 				} else {

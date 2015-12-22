@@ -128,10 +128,10 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		request.setAttribute("tableWidth", "125");
 		// end
 		if (studySubId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 		} else {
 			if (!StringUtil.isBlank(from)) {
@@ -233,16 +233,16 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySub.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				} else {
 					// The SubjectStudy is not belong to currentstudy and current study is not a site.
 					Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
 					if (!sites.contains(study.getId())) {
-						addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_active_study_or_contact"), request);
+						addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+								+ getResPage().getString("change_active_study_or_contact"), request);
 						forwardPage(Page.MENU_SERVLET, request, response);
 						return;
 					}
@@ -344,9 +344,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-			String[] columns = {resword.getString("event") + " (" + resword.getString("occurrence_number") + ")",
-					resword.getString("start_date1"), resword.getString("location"), resword.getString("status"),
-					resword.getString("actions"), resword.getString("CRFs_atrib")};
+			String[] columns = { getResWord().getString("event") + " (" + getResWord().getString("occurrence_number") + ")",
+					getResWord().getString("start_date1"), getResWord().getString("location"), getResWord().getString("status"),
+					getResWord().getString("actions"), getResWord().getString("CRFs_atrib")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(INT_4);
 			table.hideColumnLink(INT_5);
@@ -443,9 +443,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 		if (studySubId > 0) {
 			if (!entityIncluded(studySubId, ub.getName(), subdao)) {
-				addPageMessage(respage.getString("required_study_subject_not_belong"), request);
+				addPageMessage(getResPage().getString("required_study_subject_not_belong"), request);
 				throw new InsufficientPermissionException(Page.MENU,
-						resexception.getString("entity_not_belong_studies"), "1");
+						getResException().getString("entity_not_belong_studies"), "1");
 			}
 		}
 	}

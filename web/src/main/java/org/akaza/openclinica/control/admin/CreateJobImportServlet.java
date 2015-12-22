@@ -64,10 +64,10 @@ public class CreateJobImportServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
@@ -91,7 +91,7 @@ public class CreateJobImportServlet extends Controller {
 			}
 		}
 		addEntityList(ImportSpringJob.STUDIES, finalList,
-				respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM, request, response);
+				getResPage().getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM, request, response);
 
 		request.setAttribute(ImportSpringJob.FILE_PATH, directory);
 
@@ -159,20 +159,20 @@ public class CreateJobImportServlet extends Controller {
 					System.out.println("== found job date: " + dateStart.toString());
 					// set a success message here
 					addPageMessage(
-							respage.getString("you_have_successfully_created_a_new_job") + " " + trigger.getName()
-									+ " " + respage.getString("which_is_now_set_to_run"), request);
+							getResPage().getString("you_have_successfully_created_a_new_job") + " " + trigger.getName()
+									+ " " + getResPage().getString("which_is_now_set_to_run"), request);
 
 					if ((currentStudy.isSite() && studyBean.getId() != currentStudy.getId())
 							|| (studyBean.isSite() && !currentStudy.isSite() && studyBean.getParentStudyId() != currentStudy.getId())
 							|| (!studyBean.isSite() && !currentStudy.isSite() && currentStudy.getId() != studyBean.getId())) {
-						addPageMessage(resword.getString("job_view_on_another_study").replace("{0}", studyBean.getName()), request);
+						addPageMessage(getResWord().getString("job_view_on_another_study").replace("{0}", studyBean.getName()), request);
 					}
 					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
 					setUpServlet(request, response);
-					addPageMessage(resexception.getString("there_was_an_unspecified_error"), request);
+					addPageMessage(getResException().getString("there_was_an_unspecified_error"), request);
 					forwardPage(Page.CREATE_JOB_IMPORT, request, response);
 				}
 			}

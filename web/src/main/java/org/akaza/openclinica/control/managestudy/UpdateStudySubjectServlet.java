@@ -89,9 +89,9 @@ public class UpdateStudySubjectServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -105,9 +105,9 @@ public class UpdateStudySubjectServlet extends Controller {
 		if (StringUtil.isBlank(fromResolvingNotes)) {
 			request.getSession().removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			request.getSession().removeAttribute(ViewNotesServlet.NOTES_TABLE);
-			checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request,
+			checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, getResPage().getString("current_study_locked"), request,
 					response);
-			checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request,
+			checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, getResPage().getString("current_study_frozen"), request,
 					response);
 		}
 
@@ -116,7 +116,7 @@ public class UpdateStudySubjectServlet extends Controller {
 		StudySubjectBean subjectToUpdate = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubId);
 
 		if (subjectToUpdate.getId() == 0) {
-			addPageMessage(respage.getString("please_choose_study_subject_to_edit"), request);
+			addPageMessage(getResPage().getString("please_choose_study_subject_to_edit"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 			return;
 		}
@@ -129,7 +129,7 @@ public class UpdateStudySubjectServlet extends Controller {
 		String action = fp.getString("action", true);
 
 		if (StringUtil.isBlank(action)) {
-			addPageMessage(respage.getString("no_action_specified"), request);
+			addPageMessage(getResPage().getString("no_action_specified"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 			return;
 		}
@@ -156,7 +156,7 @@ public class UpdateStudySubjectServlet extends Controller {
 					groupMapsForStudySubjectByGroupClassId);
 			submit(request, response);
 		} else {
-			addPageMessage(respage.getString("no_action_specified"), request);
+			addPageMessage(getResPage().getString("no_action_specified"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 		}
 	}
@@ -287,17 +287,17 @@ public class UpdateStudySubjectServlet extends Controller {
 
 		if (!errors.isEmpty()) {
 			if (StringUtil.isBlank(subjectToUpdate.getLabel())) {
-				addPageMessage(new StringBuilder("").append(respage.getString("must_enter_subject_ID_for_identifying"))
-						.append(respage.getString("this_may_be_external_ID_number"))
-						.append(respage.getString("you_may_enter_study_subject_ID_listed"))
-						.append(respage.getString("study_subject_ID_should_not_contain_protected_information"))
+				addPageMessage(new StringBuilder("").append(getResPage().getString("must_enter_subject_ID_for_identifying"))
+						.append(getResPage().getString("this_may_be_external_ID_number"))
+						.append(getResPage().getString("you_may_enter_study_subject_ID_listed"))
+						.append(getResPage().getString("study_subject_ID_should_not_contain_protected_information"))
 						.toString(), request);
 			} else {
 				StudySubjectDAO subdao = getStudySubjectDAO();
 				StudySubjectBean sub1 = (StudySubjectBean) subdao.findAnotherBySameLabel(subjectToUpdate.getLabel(),
 						subjectToUpdate.getStudyId(), subjectToUpdate.getId());
 				if (sub1.getId() > 0) {
-					addPageMessage(resexception.getString("subject_ID_used_by_another_choose_unique"), request);
+					addPageMessage(getResException().getString("subject_ID_used_by_another_choose_unique"), request);
 				}
 			}
 			request.setAttribute("formMessages", errors);
@@ -322,7 +322,7 @@ public class UpdateStudySubjectServlet extends Controller {
 				SubjectBean subjectBean = (SubjectBean) subjectDAO.findByPK(subjectToUpdate.getSubjectId());
 				SubjectBean subjectBean1 = subjectDAO.findByUniqueIdentifier(fp.getString("label").trim());
 				if (subjectBean1.getId() != subjectBean.getId() && !subjectBean1.getUniqueIdentifier().isEmpty()) {
-					Validator.addError(errors, "personId", resexception.getString("subject_person_ID_used_by_another_choose_unique"));
+					Validator.addError(errors, "personId", getResException().getString("subject_person_ID_used_by_another_choose_unique"));
 				}
 			}
 			StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(),
@@ -332,7 +332,7 @@ public class UpdateStudySubjectServlet extends Controller {
 						currentStudy.getId(), subjectToUpdate.getId());
 			}
 			if (sub1.getId() > 0) {
-				Validator.addError(errors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
+				Validator.addError(errors, "label", getResException().getString("subject_ID_used_by_another_choose_unique"));
 			}
 		}
 		subjectToUpdate.setLabel(fp.getString("label"));
@@ -413,7 +413,7 @@ public class UpdateStudySubjectServlet extends Controller {
 			}
 		}
 
-		addPageMessage(respage.getString("study_subject_updated_succesfully"), request);
+		addPageMessage(getResPage().getString("study_subject_updated_succesfully"), request);
 		clearSession(request);
 
 		String viewStudySubjectRequestURL = new StringBuilder("")

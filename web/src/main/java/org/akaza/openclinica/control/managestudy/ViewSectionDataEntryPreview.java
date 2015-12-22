@@ -96,9 +96,9 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_active_study_or_contact"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+				+ getResPage().getString("change_active_study_or_contact"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_director"), "1");
 
 	}
 
@@ -124,7 +124,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		Map<String, Map> crfMap = (Map) session.getAttribute("preview_crf");
 		if (crfMap == null) {
 			// addPageMessage
-			String msg = respage.getString("preview_data_has_timed_out");
+			String msg = getResPage().getString("preview_data_has_timed_out");
 			this.addPageMessage(msg, request);
 			logger.info("The session attribute \"preview_crf\" has expired or gone out of scope in: "
 					+ this.getClass().getName());

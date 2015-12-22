@@ -68,10 +68,10 @@ public class ViewItemDetailServlet extends Controller {
 		if (mayViewData(ub, currentRole)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
@@ -88,7 +88,7 @@ public class ViewItemDetailServlet extends Controller {
 		SectionDAO sectionDao = getSectionDAO();
 
 		if (itemId == 0 && itemOid == null) {
-			addPageMessage(respage.getString("please_choose_an_item_first"), request);
+			addPageMessage(getResPage().getString("please_choose_an_item_first"), request);
 			forwardPage(Page.ITEM_DETAIL, request, response);
 			return;
 		}

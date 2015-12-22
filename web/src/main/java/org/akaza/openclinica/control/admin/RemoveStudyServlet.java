@@ -52,9 +52,9 @@ public class RemoveStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, getResException().getString("not_admin"), "1");
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class RemoveStudyServlet extends Controller {
 		// it's impossible to remove the current study
 		if ((currentStudy.getParentStudyId() > 0 && currentStudy.getParentStudyId() == studyId)
 				|| (currentStudy.getId() == studyId)) {
-			addPageMessage(resword.getString("you_are_trying_to_remove_the_current_study"), request);
+			addPageMessage(getResWord().getString("you_are_trying_to_remove_the_current_study"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 			return;
 		}
@@ -78,7 +78,7 @@ public class RemoveStudyServlet extends Controller {
 
 		String action = request.getParameter("action");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_study_to_remove"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -93,7 +93,7 @@ public class RemoveStudyServlet extends Controller {
 
 				getStudyService().removeStudy(study, currentUser);
 
-				addPageMessage(resexception.getString("this_study_has_been_removed_succesfully"), request);
+				addPageMessage(getResException().getString("this_study_has_been_removed_succesfully"), request);
 				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 
 			}

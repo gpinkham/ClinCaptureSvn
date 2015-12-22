@@ -83,9 +83,9 @@ public class ViewCRFServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -102,20 +102,20 @@ public class ViewCRFServlet extends Controller {
 		panel.setExtractData(false);
 		panel.setCreateDataset(false);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
-		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
-		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
+				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
+		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
+				getResPage().getString("br_download_example_CRF_instructions_from"), request);
 
 		FormProcessor fp = new FormProcessor(request);
 
 		int crfId = fp.getInt(CRF_ID);
 		List<StudyBean> studyBeans;
 		if (crfId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_CRF_to_view"), request);
 			forwardPage(Page.CRF_LIST, request, response);
 		} else {
 			CRFDAO cdao = getCRFDAO();
@@ -208,13 +208,13 @@ public class ViewCRFServlet extends Controller {
 		sDVUtil.setHtmlCellEditors(tableFacade, colNames, true);
 
 		HtmlColumn firstName = row.getColumn("name");
-		firstName.setTitle(resword.getString("study_name"));
+		firstName.setTitle(getResWord().getString("study_name"));
 
 		HtmlColumn protocol = row.getColumn("uniqueProtocolid");
-		protocol.setTitle(resword.getString("unique_protocol_ID"));
+		protocol.setTitle(getResWord().getString("unique_protocol_ID"));
 
 		HtmlColumn actions = row.getColumn("actions");
-		actions.setTitle(resword.getString("actions"));
+		actions.setTitle(getResWord().getString("actions"));
 
 		return tableFacade.render();
 	}

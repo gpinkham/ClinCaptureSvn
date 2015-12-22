@@ -52,7 +52,7 @@ public class UploadFileServlet extends Controller {
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 		if ("false".equals(request.getSession().getAttribute("mayProcessUploading"))) {
-			addPageMessage(respage.getString("you_not_have_permission_upload_file"), request);
+			addPageMessage(getResPage().getString("you_not_have_permission_upload_file"), request);
 			request.setAttribute("uploadFileStauts", "noPermission");
 		}
 	}
@@ -112,7 +112,7 @@ public class UploadFileServlet extends Controller {
 						newUploadedFiles.put(key, dir + File.separator + fileName);
 					} else {
 						request.setAttribute("uploadFileStatus", "empty");
-						addPageMessage(respage.getString("no_file_uploaded_please_specify_file"), request);
+						addPageMessage(getResPage().getString("no_file_uploaded_please_specify_file"), request);
 					}
 					if (inputName != null && inputName.length() > 0) {
 						request.setAttribute("inputName", inputName);
@@ -123,10 +123,10 @@ public class UploadFileServlet extends Controller {
 					String itemId = (String) request.getAttribute("itemId");
 					request.setAttribute("fileItemId", itemId);
 					MessageFormat mf = new MessageFormat("");
-					mf.applyPattern(respage.getString(e.getErrorCode()));
+					mf.applyPattern(getResPage().getString(e.getErrorCode()));
 					Object[] arguments = e.getErrorParams();
 					addPageMessage(
-							respage.getString("file_uploading_failed_please_check_logs_and_upload_again")
+							getResPage().getString("file_uploading_failed_please_check_logs_and_upload_again")
 									+ mf.format(arguments), request);
 					logger.error("File was not uploaded. E: " + e.getMessage());
 				} finally {

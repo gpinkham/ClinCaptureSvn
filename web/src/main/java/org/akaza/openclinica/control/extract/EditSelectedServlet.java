@@ -73,10 +73,10 @@ public class EditSelectedServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
@@ -121,7 +121,7 @@ public class EditSelectedServlet extends Controller {
 
 			MessageFormat msg = new MessageFormat("");
 			msg.setLocale(LocaleResolver.getLocale(request));
-			msg.applyPattern(respage.getString("choose_include_all_items_dataset"));
+			msg.applyPattern(getResPage().getString("choose_include_all_items_dataset"));
 			Object[] arguments = {db.getItemIds().size()};
 			addPageMessage(msg.format(arguments), request);
 		}

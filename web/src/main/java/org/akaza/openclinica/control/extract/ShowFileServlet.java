@@ -69,8 +69,8 @@ public class ShowFileServlet extends Controller {
 
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
 		EntityBeanTable table = getEntityBeanTable();
-		String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
-				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by")};
+		String[] columns = { getResWord().getString("file_name"), getResWord().getString("run_time"),
+				getResWord().getString("file_size"), getResWord().getString("created_date"), getResWord().getString("created_by")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(0);
@@ -107,10 +107,10 @@ public class ShowFileServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 

@@ -86,11 +86,11 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.MENU_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
-		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
-				+ respage.getString("change_study_contact_sysadmin");
+		String exceptionName = getResException().getString("no_permission_to_create_discrepancy_note");
+		String noAccessMessage = getResPage().getString("you_may_not_create_discrepancy_note")
+				+ getResPage().getString("change_study_contact_sysadmin");
 
 		if (mayViewData(ub, currentRole)) {
 			return;
@@ -120,7 +120,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		int entityId = fp.getInt(ENTITY_ID, true);
 		entityId = entityId > 0 ? entityId : parent.getEntityId();
 		if (entityId == 0) {
-			Validator.addError(errors, "newChildAdded" + parentId, respage.getString("note_cannot_be_saved"));
+			Validator.addError(errors, "newChildAdded" + parentId, getResPage().getString("note_cannot_be_saved"));
 			logger.info("entityId is 0. Note saving can not be started.");
 		}
 		String entityType = fp.getString(ENTITY_TYPE, true);
@@ -187,7 +187,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		if (DiscrepancyNoteType.FAILEDVAL.getId() == dn.getDiscrepancyNoteTypeId()
 				|| DiscrepancyNoteType.QUERY.getId() == dn.getDiscrepancyNoteTypeId()) {
 			if (ResolutionStatus.NOT_APPLICABLE.getId() == dn.getResolutionStatusId()) {
-				Validator.addError(errors, RES_STATUS_ID + parentId, restext.getString("not_valid_res_status"));
+				Validator.addError(errors, RES_STATUS_ID + parentId, getResText().getString("not_valid_res_status"));
 			}
 		}
 
@@ -234,7 +234,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				dndao.createMapping(dn);
 				success = dndao.isQuerySuccessful();
 				if (!success) {
-					mess.add(restext.getString("failed_create_dn_mapping_for_dnId") + dn.getId() + ". ");
+					mess.add(getResText().getString("failed_create_dn_mapping_for_dnId") + dn.getId() + ". ");
 				}
 				noteTree.addNote(field, dn);
 				noteTree.addIdNote(dn.getEntityId(), field);
@@ -249,17 +249,17 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 					if (dn.getId() > 0) {
 						dndao.createMapping(dn);
 						if (!dndao.isQuerySuccessful()) {
-							mess.add(restext.getString("failed_create_dn_mapping_for_dnId") + dn.getId() + ". ");
+							mess.add(getResText().getString("failed_create_dn_mapping_for_dnId") + dn.getId() + ". ");
 						}
 						noteTree.addNote(field, dn);
 						noteTree.addIdNote(dn.getEntityId(), field);
 						request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
 					} else {
-						mess.add(restext.getString("failed_create_child_dn_for_new_parent_dnId") + dn.getId() + ". ");
+						mess.add(getResText().getString("failed_create_child_dn_for_new_parent_dnId") + dn.getId() + ". ");
 					}
 				}
 			} else {
-				mess.add(restext.getString("failed_create_new_dn") + ". ");
+				mess.add(getResText().getString("failed_create_new_dn") + ". ");
 			}
 
 			if (success) {
@@ -303,11 +303,11 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 					return;
 				} else {
 					if (parentId == dn.getParentDnId()) {
-						mess.add(restext.getString("a_new_child_dn_added"));
+						mess.add(getResText().getString("a_new_child_dn_added"));
 						results.put("newChildAdded" + parentId, mess);
 						setInputMessages(results, request);
 					} else {
-						addPageMessage(restext.getString("a_new_dn_thread_added"), request);
+						addPageMessage(getResText().getString("a_new_dn_thread_added"), request);
 					}
 				}
 
@@ -401,13 +401,13 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(dn.getAssignedUserId());
 		String alertEmail = assignedUser.getEmail();
 		message.append(EmailUtil.getEmailBodyStart());
-		message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),
+		message.append(MessageFormat.format(getResPage().getString("mailDNHeader"), assignedUser.getFirstName(),
 				assignedUser.getLastName()));
 		message.append("<A HREF='").append(SQLInitServlet.getSystemURL())
 				.append("ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=").append(assignedUser.getName())
 				.append("&listNotes_f_entityName=").append(dn.getEntityName()).append("'>")
 				.append(SQLInitServlet.getField("sysURL")).append("</A><BR/>");
-		message.append(respage.getString("you_received_this_from"));
+		message.append(getResPage().getString("you_received_this_from"));
 		StudyBean study = (StudyBean) studyDAO.findByPK(dn.getStudyId());
 
 		if ("itemData".equalsIgnoreCase(entityType)) {
@@ -415,32 +415,32 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 			item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
 		}
 
-		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("disc_note_info"));
-		message.append(respage.getString("email_body_separator"));
-		message.append(MessageFormat.format(respage.getString("mailDNParameters1"), dn.getDescription(),
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(getResPage().getString("disc_note_info"));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(MessageFormat.format(getResPage().getString("mailDNParameters1"), dn.getDescription(),
 				dn.getDetailedNotes(), userName));
-		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("entity_information"));
-		message.append(respage.getString("email_body_separator"));
-		message.append(MessageFormat.format(respage.getString("mailDNParameters2"), study.getName(),
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(getResPage().getString("entity_information"));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(MessageFormat.format(getResPage().getString("mailDNParameters2"), study.getName(),
 				dn.getSubjectName()));
 
 		if (!("studySub".equalsIgnoreCase(entityType) || "subject".equalsIgnoreCase(entityType))) {
-			message.append(MessageFormat.format(respage.getString("mailDNParameters3"), dn.getEventName()));
+			message.append(MessageFormat.format(getResPage().getString("mailDNParameters3"), dn.getEventName()));
 			if (!"studyEvent".equalsIgnoreCase(dn.getEntityType())) {
-				message.append(MessageFormat.format(respage.getString("mailDNParameters4"), dn.getCrfName()));
+				message.append(MessageFormat.format(getResPage().getString("mailDNParameters4"), dn.getCrfName()));
 				if (!"eventCrf".equalsIgnoreCase(dn.getEntityType())) {
-					message.append(MessageFormat.format(respage.getString("mailDNParameters6"), item.getName()));
+					message.append(MessageFormat.format(getResPage().getString("mailDNParameters6"), item.getName()));
 				}
 			}
 		}
 
-		message.append(respage.getString("email_body_separator"));
-		message.append(MessageFormat.format(respage.getString("mailDNThanks"), study.getName()));
-		message.append(respage.getString("email_body_separator"));
-		message.append(respage.getString("disclaimer"));
-		message.append(respage.getString("email_body_separator"));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(MessageFormat.format(getResPage().getString("mailDNThanks"), study.getName()));
+		message.append(getResPage().getString("email_body_separator"));
+		message.append(getResPage().getString("disclaimer"));
+		message.append(getResPage().getString("email_body_separator"));
 		message.append(EmailUtil.getEmailBodyEnd());
 		message.append(EmailUtil.getEmailFooter(CoreResources.getSystemLocale()));
 
@@ -454,7 +454,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 
 		String emailBodyString = message.toString();
 		sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(),
-				MessageFormat.format(respage.getString("mailDNSubject"), study.getName(), dn.getEntityName()),
+				MessageFormat.format(getResPage().getString("mailDNSubject"), study.getName(), dn.getEntityName()),
 				emailBodyString, true, null, null, true, request);
 	}
 }

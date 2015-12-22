@@ -13,6 +13,13 @@
 
 package com.clinovo.clincapture.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -28,13 +35,6 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Locale;
 
 public class UpdateSubStudyServletTest {
 
@@ -77,8 +77,6 @@ public class UpdateSubStudyServletTest {
 		Mockito.doCallRealMethod().when(updateSubStudyServlet).submitStudy(request);
 		Mockito.doReturn(userAccountBean).when(updateSubStudyServlet).getUserAccountBean(request);
 		Mockito.doReturn(studyDAO).when(updateSubStudyServlet).getStudyDAO();
-
-		Whitebox.setInternalState(updateSubStudyServlet, "resword", ResourceBundleProvider.getWordsBundle());
 
 		StudyParameterValueBean studyParameterValueBean = new StudyParameterValueBean();
 		studyParameterValueBean.setId(ID);

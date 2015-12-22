@@ -60,9 +60,9 @@ public class ListStudyServlet extends RememberLastPage {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
 	}
 
 	/**
@@ -99,10 +99,10 @@ public class ListStudyServlet extends RememberLastPage {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = DisplayStudyRow.generateRowsFromBeans(displayStudies);
 
-		String[] columns = {resword.getString("name"), resword.getString("unique_identifier"),
-				resword.getString("OID"), resword.getString("principal_investigator"),
-				resword.getString("facility_name"), resword.getString("date_created"), resword.getString("status"),
-				resword.getString("actions")};
+		String[] columns = { getResWord().getString("name"), getResWord().getString("unique_identifier"),
+				getResWord().getString("OID"), getResWord().getString("principal_investigator"),
+				getResWord().getString("facility_name"), getResWord().getString("date_created"), getResWord().getString("status"),
+				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(2);
 		table.hideColumnLink(7);
@@ -117,12 +117,12 @@ public class ListStudyServlet extends RememberLastPage {
 		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
-		setToPanel(resword.getString("in_the_application"), "", request);
+		setToPanel(getResWord().getString("in_the_application"), "", request);
 		if (parents.size() > 0) {
-			setToPanel(resword.getString("studies"), Integer.toString(parents.size()), request);
+			setToPanel(getResWord().getString("studies"), Integer.toString(parents.size()), request);
 		}
 		if (studies.size() > 0) {
-			setToPanel(resword.getString("sites"), Integer.toString(studies.size() - parents.size()), request);
+			setToPanel(getResWord().getString("sites"), Integer.toString(studies.size() - parents.size()), request);
 		}
 		forwardPage(Page.STUDY_LIST, request, response);
 

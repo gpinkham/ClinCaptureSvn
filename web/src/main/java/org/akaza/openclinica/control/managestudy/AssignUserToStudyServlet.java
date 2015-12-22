@@ -72,9 +72,9 @@ public class AssignUserToStudyServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -113,9 +113,9 @@ public class AssignUserToStudyServlet extends Controller {
 				request.getSession().setAttribute("tmpSelectedUsersMap", tmpSelectedUsersMap);
 			}
 
-			String[] columns = {resword.getString("user_name"), resword.getString("first_name"),
-					resword.getString("last_name"), resword.getString("role"), resword.getString("selected"),
-					resword.getString("notes")};
+			String[] columns = { getResWord().getString("user_name"), getResWord().getString("first_name"),
+					getResWord().getString("last_name"), getResWord().getString("role"), getResWord().getString("selected"),
+					getResWord().getString("notes")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(ROLE_COL);
 			table.hideColumnLink(SELECTED_COL);
@@ -229,7 +229,7 @@ public class AssignUserToStudyServlet extends Controller {
 		request.getSession().removeAttribute("tmpSelectedUsersMap");
 
 		if ("".equals(pageMass)) {
-			addPageMessage(respage.getString("no_new_user_assigned_to_study"), request);
+			addPageMessage(getResPage().getString("no_new_user_assigned_to_study"), request);
 		} else {
 			addPageMessage(pageMass, request);
 		}
@@ -292,13 +292,13 @@ public class AssignUserToStudyServlet extends Controller {
 					site = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					study = (StudyBean) sdao.findByPK(site.getParentStudyId());
 					notes = sb.append(notes).append(roleBean.getRole().getDescription())
-							.append(respage.getString("in_site")).append(": ").append(site.getName()).append(",")
-							.append(respage.getString("in_the_study")).append(": ").append(study.getName())
+							.append(getResPage().getString("in_site")).append(": ").append(site.getName()).append(",")
+							.append(getResPage().getString("in_the_study")).append(": ").append(study.getName())
 							.append("; ").toString();
 				} else if (currentStudy.getParentStudyId() == 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					study = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					notes = sb.append(notes).append(roleBean.getRole().getDescription())
-							.append(respage.getString("in_the_study")).append(": ").append(study.getName())
+							.append(getResPage().getString("in_the_study")).append(": ").append(study.getName())
 							.append("; ").toString();
 				}
 
@@ -327,16 +327,16 @@ public class AssignUserToStudyServlet extends Controller {
 		StringBuilder sb = new StringBuilder("");
 		if (currentStudy.getParentStudyId() > 0) {
 			return sb.append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
-					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
-					.append(respage.getString("has_been_assigned_to_the_site")).append(currentStudy.getName())
-					.append(" " + resword.getString("under_the_study") + " ").append(currentStudy.getParentStudyName())
-					.append(" ").append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
+					.append(getResWord().getString("username")).append(": ").append(u.getName()).append(") ")
+					.append(getResPage().getString("has_been_assigned_to_the_site")).append(currentStudy.getName())
+					.append(" " + getResWord().getString("under_the_study") + " ").append(currentStudy.getParentStudyName())
+					.append(" ").append(getResWord().getString("as")).append(" \"").append(sub.getRole().getDescription())
 					.append("\". ").toString();
 		} else {
 			return sb.append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
-					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
-					.append(respage.getString("has_been_assigned_to_the_study")).append(currentStudy.getName())
-					.append(" ").append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
+					.append(getResWord().getString("username")).append(": ").append(u.getName()).append(") ")
+					.append(getResPage().getString("has_been_assigned_to_the_study")).append(currentStudy.getName())
+					.append(" ").append(getResWord().getString("as")).append(" \"").append(sub.getRole().getDescription())
 					.append("\". ").toString();
 		}
 	}

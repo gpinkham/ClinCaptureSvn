@@ -79,10 +79,10 @@ public class DeleteStudyUserRoleServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("you_may_not_perform_administrative_functions"), "1");
+				getResException().getString("you_may_not_perform_administrative_functions"), "1");
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class DeleteStudyUserRoleServlet extends Controller {
 		EntityAction actionSpecified = EntityAction.get(actionId);
 
 		boolean operationSucceeded = getUserAccountService().performActionOnStudyUserRole(userId, studyId, actionId,
-				currentUser, message, respage);
+				currentUser, message, getResPage());
 
 		if (operationSucceeded) {
 
@@ -135,14 +135,14 @@ public class DeleteStudyUserRoleServlet extends Controller {
 		MessageFormat msg = new MessageFormat("");
 
 		if (actionSpecified.equals(EntityAction.DELETE)) {
-			subject = restext.getString("notification_deleting_role");
-			msg.applyPattern(restext.getString("delete_role_email_message_htm"));
+			subject = getResText().getString("notification_deleting_role");
+			msg.applyPattern(getResText().getString("delete_role_email_message_htm"));
 		} else if (actionSpecified.equals(EntityAction.REMOVE)) {
-			subject = restext.getString("notification_removing_role");
-			msg.applyPattern(restext.getString("remove_role_email_message_htm"));
+			subject = getResText().getString("notification_removing_role");
+			msg.applyPattern(getResText().getString("remove_role_email_message_htm"));
 		} else if (actionSpecified.equals(EntityAction.RESTORE)) {
-			subject = restext.getString("notification_restoring_role");
-			msg.applyPattern(restext.getString("restore_role_email_message_htm"));
+			subject = getResText().getString("notification_restoring_role");
+			msg.applyPattern(getResText().getString("restore_role_email_message_htm"));
 		}
 
 		body = EmailUtil.getEmailBodyStart();

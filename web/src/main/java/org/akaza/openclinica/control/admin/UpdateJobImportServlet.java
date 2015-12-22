@@ -63,10 +63,10 @@ public class UpdateJobImportServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
@@ -134,7 +134,7 @@ public class UpdateJobImportServlet extends Controller {
 			}
 		}
 		addEntityList(ImportSpringJob.STUDIES, finalList,
-				respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM, request, response);
+				getResPage().getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM, request, response);
 
 	}
 
@@ -161,7 +161,7 @@ public class UpdateJobImportServlet extends Controller {
 			if (!errors.isEmpty()) {
 				// send back
 				request.setAttribute("formMessages", errors);
-				addPageMessage(resexception.getString("job_modification_error"), request);
+				addPageMessage(getResException().getString("job_modification_error"), request);
 				setUpServlet(null, request, response);
 				forwardPage(Page.UPDATE_JOB_IMPORT, request, response);
 			} else {
@@ -182,13 +182,13 @@ public class UpdateJobImportServlet extends Controller {
 					scheduler.deleteJob(updatingTrigger.getJobKey());
 					Date dateStart = scheduler.scheduleJob(jobDetailBean, newTrigger);
 					logger.info("Job scheduled with a start date of " + dateStart.toString());
-					addPageMessage(resword.getString("job_modified_successfully"), request);
+					addPageMessage(getResWord().getString("job_modified_successfully"), request);
 					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
 					setUpServlet(newTrigger, request, response);
-					addPageMessage(resexception.getString("unspecified_error_with_job_creation"), request);
+					addPageMessage(getResException().getString("unspecified_error_with_job_creation"), request);
 					forwardPage(Page.UPDATE_JOB_IMPORT, request, response);
 				}
 			}

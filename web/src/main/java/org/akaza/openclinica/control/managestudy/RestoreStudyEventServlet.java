@@ -64,16 +64,16 @@ public class RestoreStudyEventServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 
 		if (getUserAccountBean(request).isSysAdmin() || getCurrentRole(request).isStudyAdministrator()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -90,7 +90,7 @@ public class RestoreStudyEventServlet extends Controller {
 		StudySubjectDAO subdao = getStudySubjectDAO();
 
 		if (studyEventId == 0) {
-			addPageMessage(respage.getString("please_choose_a_SE_to_restore"), request);
+			addPageMessage(getResPage().getString("please_choose_a_SE_to_restore"), request);
 			request.setAttribute("id", Integer.toString(studySubId));
 			forwardToViewStudySubjectPage(request, response);
 		} else {
@@ -102,9 +102,9 @@ public class RestoreStudyEventServlet extends Controller {
 			Status s = studySub.getStatus();
 			if (s.isDeleted()) {
 				addPageMessage(
-						new StringBuilder("").append(resword.getString("study_event"))
-								.append(resterm.getString("could_not_be")).append(resterm.getString("restored"))
-								.append(".").append(respage.getString("study_subject_has_been_deleted")).toString(),
+						new StringBuilder("").append(getResWord().getString("study_event"))
+								.append(getResTerm().getString("could_not_be")).append(getResTerm().getString("restored"))
+								.append(".").append(getResPage().getString("study_subject_has_been_deleted")).toString(),
 						request);
 				request.setAttribute("id", Integer.toString(studySubId));
 				forwardToViewStudySubjectPage(request, response);
@@ -127,8 +127,8 @@ public class RestoreStudyEventServlet extends Controller {
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (event.getStatus().equals(Status.AVAILABLE)) {
 					addPageMessage(new StringBuilder("")
-							.append(respage.getString("this_event_is_already_available_for_study")).append(" ")
-							.append(respage.getString("please_contact_sysadmin_for_more_information")).toString(),
+							.append(getResPage().getString("this_event_is_already_available_for_study")).append(" ")
+							.append(getResPage().getString("please_contact_sysadmin_for_more_information")).toString(),
 							request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardToViewStudySubjectPage(request, response);
@@ -155,9 +155,9 @@ public class RestoreStudyEventServlet extends Controller {
 
 				getStudyEventService().restoreStudyEvent(event, currentUser);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_event"))
+				String emailBody = new StringBuilder("").append(getResPage().getString("the_event"))
 						.append(event.getStudyEventDefinition().getName()).append(" ")
-						.append(respage.getString("has_been_restored_to_the_study")).append(" ").append(study.getName())
+						.append(getResPage().getString("has_been_restored_to_the_study")).append(" ").append(study.getName())
 						.append(".").toString();
 
 				addPageMessage(emailBody, request);

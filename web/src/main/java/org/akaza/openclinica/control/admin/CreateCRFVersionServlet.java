@@ -93,9 +93,9 @@ public class CreateCRFVersionServlet extends Controller {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
 				"1");
 	}
 
@@ -136,7 +136,7 @@ public class CreateCRFVersionServlet extends Controller {
 			List excelErr = (ArrayList) request.getSession().getAttribute("excelErrors");
 			logger.info("for overwrite CRF version, excelErr.isEmpty()=" + excelErr.isEmpty());
 			if (excelErr.isEmpty()) {
-				addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"), request);
+				addPageMessage(getResWord().getString("congratulations_your_spreadsheet_no_errors"), request);
 				forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW, request, response);
 			} else {
 				logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
@@ -158,7 +158,7 @@ public class CreateCRFVersionServlet extends Controller {
 				logger.info("but cannot delete previous version");
 				if (request.getSession().getAttribute("itemsHaveData") == null
 						&& request.getSession().getAttribute("eventsForVersion") == null) {
-					addPageMessage(respage.getString("you_are_not_owner_some_items_cannot_delete"), request);
+					addPageMessage(getResPage().getString("you_are_not_owner_some_items_cannot_delete"), request);
 				}
 				if (request.getSession().getAttribute("itemsHaveData") == null) {
 					request.getSession().setAttribute("itemsHaveData", new ArrayList());
@@ -237,7 +237,7 @@ public class CreateCRFVersionServlet extends Controller {
 					copy(f, nf);
 				} catch (IOException ie) {
 					logger.info("==============");
-					addPageMessage(respage.getString("CRF_version_spreadsheet_could_not_saved_contact"), request);
+					addPageMessage(getResPage().getString("CRF_version_spreadsheet_could_not_saved_contact"), request);
 				}
 			}
 			request.getSession().removeAttribute("tempFileName");
@@ -264,7 +264,7 @@ public class CreateCRFVersionServlet extends Controller {
 
 		if (!(new File(dir)).exists()) {
 			logger.info("The filePath in datainfo.properties is invalid " + dir);
-			addPageMessage(resword.getString("the_filepath_you_defined"), request);
+			addPageMessage(getResWord().getString("the_filepath_you_defined"), request);
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
 			return false;
 		}
@@ -314,8 +314,8 @@ public class CreateCRFVersionServlet extends Controller {
 				if (version.getName().equals(version1.getName())) {
 					logger.info("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
 					if (ub.getId() != version1.getOwnerId()) {
-						addPageMessage(respage.getString("CRF_version_try_upload_exists_database")
-								+ version1.getOwner().getName() + respage.getString("please_contact_owner_to_delete"),
+						addPageMessage(getResPage().getString("CRF_version_try_upload_exists_database")
+								+ version1.getOwner().getName() + getResPage().getString("please_contact_owner_to_delete"),
 								request);
 						forwardPage(Page.CREATE_CRF_VERSION, request, response);
 						return false;
@@ -341,7 +341,7 @@ public class CreateCRFVersionServlet extends Controller {
 			logger.info("excelErr.isEmpty()=" + excelErr.isEmpty());
 			if (excelErr.isEmpty()) {
 				if (!action.equals("autoupload")) {
-					addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"), request);
+					addPageMessage(getResWord().getString("congratulations_your_spreadsheet_no_errors"), request);
 					forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW, request, response);
 					return true;
 				}
@@ -380,13 +380,13 @@ public class CreateCRFVersionServlet extends Controller {
 		for (File f : theFiles) {
 			if (f == null) {
 				logger.info("file is empty.");
-				Validator.addError(errors, "excel_file", resword.getString("you_have_to_provide_spreadsheet"));
+				Validator.addError(errors, "excel_file", getResWord().getString("you_have_to_provide_spreadsheet"));
 				request.getSession().setAttribute("version", version);
 				return tempFile;
 			} else if (!f.getName().contains(".xls") && !f.getName().contains(".XLS")) {
 				logger.info("file name:" + f.getName());
 				Validator.addError(errors, "excel_file",
-						respage.getString("file_you_uploaded_not_seem_excel_spreadsheet"));
+						getResPage().getString("file_you_uploaded_not_seem_excel_spreadsheet"));
 				request.getSession().setAttribute("version", version);
 				return tempFile;
 			} else {
@@ -409,7 +409,7 @@ public class CreateCRFVersionServlet extends Controller {
 				} catch (IOException ex) {
 					// opening the stream could throw FileNotFoundException
 					ex.printStackTrace();
-					String message = resword.getString("the_application_encountered_a_problem_uploading_CRF");
+					String message = getResWord().getString("the_application_encountered_a_problem_uploading_CRF");
 					logger.info(message + ": " + ex.getMessage());
 					this.addPageMessage(message, request);
 				} finally {
@@ -431,27 +431,27 @@ public class CreateCRFVersionServlet extends Controller {
 			if (!ibs.isEmpty()) {
 				List<String> warnings = new ArrayList<String>();
 				boolean isOwner = ibs.get(0).getOwner().getId() == ub.getId();
-				warnings.add(resexception.getString("you_may_not_modify_items"));
+				warnings.add(getResException().getString("you_may_not_modify_items"));
 				for (ItemBean ib : ibs) {
 					if (isOwner) {
-						warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-								+ resexception.getString("in_your_spreadsheet_already_exists")
-								+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
+						warnings.add(getResWord().getString("the_item") + " '" + ib.getName() + "' "
+								+ getResException().getString("in_your_spreadsheet_already_exists")
+								+ ib.getDataType().getName() + ") " + getResWord().getString("and_or") + " UNITS("
 								+ ib.getUnits() + ").");
 					} else {
-						warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-								+ resexception.getString("in_your_spreadsheet_already_exists")
-								+ ib.getDataType().getName() + ") " + resword.getString("and_or") + " UNITS("
+						warnings.add(getResWord().getString("the_item") + " '" + ib.getName() + "' "
+								+ getResException().getString("in_your_spreadsheet_already_exists")
+								+ ib.getDataType().getName() + ") " + getResWord().getString("and_or") + " UNITS("
 								+ ib.getUnits() + ").");
 					}
 
 				}
 				if (isOwner) {
-					warnings.add("UNITS " + resword.getString("and") + " DATA_TYPE(PDATE to DATE) "
-							+ resexception.getString("will_not_be_changed_if") + " "
-							+ resexception.getString("if_you_think_you_made_mistake"));
+					warnings.add("UNITS " + getResWord().getString("and") + " DATA_TYPE(PDATE to DATE) "
+							+ getResException().getString("will_not_be_changed_if") + " "
+							+ getResException().getString("if_you_think_you_made_mistake"));
 				} else {
-					warnings.add(resexception.getString("these_field_cannot_be_modified_because_not_owner"));
+					warnings.add(getResException().getString("these_field_cannot_be_modified_because_not_owner"));
 				}
 				request.setAttribute("warnings", warnings);
 			}
@@ -460,8 +460,8 @@ public class CreateCRFVersionServlet extends Controller {
 			ItemBean ib = isResponseValid(crfBuilder.getItems(), version);
 			if (ib != null) {
 
-				crfBuilder.getErrorsList().add(resword.getString("the_item") + ": " + ib.getName() + " "
-						+ resexception.getString("in_your_spreadsheet_already_exits_in_DB"));
+				crfBuilder.getErrorsList().add(getResWord().getString("the_item") + ": " + ib.getName() + " "
+						+ getResException().getString("in_your_spreadsheet_already_exits_in_DB"));
 			}
 
 		}

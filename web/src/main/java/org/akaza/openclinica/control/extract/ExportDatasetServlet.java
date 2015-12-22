@@ -128,7 +128,7 @@ public class ExportDatasetServlet extends Controller {
 		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 		if (db.isContainsMaskedCRFs()) {
-			addPageMessage(resword.getString("this_dataset_contains_items_from_masked_crfs_extract"), request);
+			addPageMessage(getResWord().getString("this_dataset_contains_items_from_masked_crfs_extract"), request);
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 			return;
 		}
@@ -136,8 +136,8 @@ public class ExportDatasetServlet extends Controller {
 		// Checks if the study is current study or child of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -160,14 +160,14 @@ public class ExportDatasetServlet extends Controller {
 			if (adfBean.getId() > 0) {
 				File file = new File(adfBean.getFileReference());
 				if (!file.canWrite()) {
-					addPageMessage(respage.getString("write_protected"), request);
+					addPageMessage(getResPage().getString("write_protected"), request);
 				} else {
 					success = file.delete();
 					if (success) {
 						asdfdao.deleteArchiveDataset(adfBean);
-						addPageMessage(respage.getString("file_removed"), request);
+						addPageMessage(getResPage().getString("file_removed"), request);
 					} else {
-						addPageMessage(respage.getString("error_removing_file"), request);
+						addPageMessage(getResPage().getString("error_removing_file"), request);
 					}
 				}
 				loadList(db, asdfdao, datasetId, fp, eb);
@@ -332,9 +332,9 @@ public class ExportDatasetServlet extends Controller {
 				ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
 				EntityBeanTable table = getEntityBeanTable();
 				table.setSortingIfNotExplicitlySet(3, false);// sort by date
-				String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
-						resword.getString("file_size"), resword.getString("created_date"),
-						resword.getString("created_by")};
+				String[] columns = { getResWord().getString("file_name"), getResWord().getString("run_time"),
+						getResWord().getString("file_size"), getResWord().getString("created_date"),
+						getResWord().getString("created_by")};
 
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.hideColumnLink(0);
@@ -373,10 +373,10 @@ public class ExportDatasetServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
@@ -448,9 +448,9 @@ public class ExportDatasetServlet extends Controller {
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
 		EntityBeanTable table = getEntityBeanTable();
 		table.setSortingIfNotExplicitlySet(3, false);// sort by date
-		String[] columns = {resword.getString("file_name"), resword.getString("run_time"),
-				resword.getString("file_size"), resword.getString("created_date"), resword.getString("created_by"),
-				resword.getString("action")};
+		String[] columns = { getResWord().getString("file_name"), getResWord().getString("run_time"),
+				getResWord().getString("file_size"), getResWord().getString("created_date"), getResWord().getString("created_by"),
+				getResWord().getString("action")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		int index = 0;
 		table.hideColumnLink(index++);
@@ -470,17 +470,17 @@ public class ExportDatasetServlet extends Controller {
 		StudyInfoPanel panel = getStudyInfoPanel(fp.getRequest());
 		panel.reset();
 		panel.setStudyInfoShown(false);
-		setToPanel(resword.getString("study_name"), eb.getStudy().getName(), fp.getRequest());
-		setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier(), fp.getRequest());
-		setToPanel(resword.getString("dataset_name"), db.getName(), fp.getRequest());
+		setToPanel(getResWord().getString("study_name"), eb.getStudy().getName(), fp.getRequest());
+		setToPanel(getResWord().getString("protocol_ID"), eb.getStudy().getIdentifier(), fp.getRequest());
+		setToPanel(getResWord().getString("dataset_name"), db.getName(), fp.getRequest());
 		String createdDate = DateUtil.printDate(db.getCreatedDate(), getUserAccountBean().getUserTimeZoneId(),
 				DateUtil.DatePattern.DATE, getLocale());
-		setToPanel(resword.getString("created_date"), createdDate, fp.getRequest());
-		setToPanel(resword.getString("dataset_owner"), db.getOwner().getName(), fp.getRequest());
+		setToPanel(getResWord().getString("created_date"), createdDate, fp.getRequest());
+		setToPanel(getResWord().getString("dataset_owner"), db.getOwner().getName(), fp.getRequest());
 		try {
 			String dateLastRun = DateUtil.printDate(db.getDateLastRun(), getUserAccountBean().getUserTimeZoneId(),
 					DateUtil.DatePattern.DATE, getLocale());
-			setToPanel(resword.getString("date_last_run"), dateLastRun, fp.getRequest());
+			setToPanel(getResWord().getString("date_last_run"), dateLastRun, fp.getRequest());
 		} catch (NullPointerException npe) {
 			System.out.println("exception: " + npe.getMessage());
 		}

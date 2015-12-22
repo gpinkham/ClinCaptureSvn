@@ -49,15 +49,15 @@ public class RemoveSubjectServlet extends Controller {
 
 		UserAccountBean ub = getUserAccountBean(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
 
 		if (ub.isSysAdmin() ) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -72,7 +72,7 @@ public class RemoveSubjectServlet extends Controller {
 
 		String action = fp.getString("action");
 		if (subjectId == 0 || StringUtil.isBlank(action)) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_remove"), request);
 			forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
 		} else {
 
@@ -95,9 +95,9 @@ public class RemoveSubjectServlet extends Controller {
 
 				getSubjectService().removeSubject(subject, currentUser);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_subject")).append(" ")
+				String emailBody = new StringBuilder("").append(getResPage().getString("the_subject")).append(" ")
 						.append(subject.getUniqueIdentifier()).append(" ")
-						.append(respage.getString("has_been_removed_succesfully")).toString();
+						.append(getResPage().getString("has_been_removed_succesfully")).toString();
 
 				addPageMessage(emailBody, request);
 

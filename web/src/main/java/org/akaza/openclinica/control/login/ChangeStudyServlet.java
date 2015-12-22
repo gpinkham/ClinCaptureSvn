@@ -134,7 +134,7 @@ public class ChangeStudyServlet extends Controller {
 		}
 
 		if (!isStudySelected) {
-			addPageMessage(restext.getString("no_study_selected"), request);
+			addPageMessage(getResText().getString("no_study_selected"), request);
 			forwardPage(Page.CHANGE_STUDY, request, response);
 			return;
 		}
@@ -177,7 +177,7 @@ public class ChangeStudyServlet extends Controller {
 		}
 		if (current.getStatus().equals(Status.DELETED) || current.getStatus().equals(Status.AUTO_DELETED)) {
 			request.getSession().removeAttribute("studyWithRole");
-			addPageMessage(restext.getString("study_choosed_removed_restore_first"), request);
+			addPageMessage(getResText().getString("study_choosed_removed_restore_first"), request);
 		} else {
 			request.getSession().setAttribute(STUDY, current);
 			request.getSession().setAttribute(PARENT_STUDY, parent);
@@ -202,7 +202,7 @@ public class ChangeStudyServlet extends Controller {
 			}
 			request.getSession().setAttribute("userRole", currentRole);
 			request.getSession().removeAttribute("studyWithRole");
-			addPageMessage(restext.getString("current_study_changed_succesfully"), request);
+			addPageMessage(getResText().getString("current_study_changed_succesfully"), request);
 		}
 		ub.incNumVisitsToMainMenu();
 		if (prevStudyId != studyId) {

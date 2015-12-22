@@ -309,9 +309,9 @@ public abstract class DataEntryServlet extends Controller {
 				UserAccountDAO udao = new UserAccountDAO(getDataSource());
 				UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
 				addPageMessage(
-						resword.getString("CRF_unavailable") + " " + ubean.getName() + " "
-								+ resword.getString("Currently_entering_data") + " "
-								+ resword.getString("Leave_the_CRF"), request);
+						getResWord().getString("CRF_unavailable") + " " + ubean.getName() + " "
+								+ getResWord().getString("Currently_entering_data") + " "
+								+ getResWord().getString("Leave_the_CRF"), request);
 
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			} else {
@@ -321,7 +321,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		if (!ecb.isActive()) {
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("event_not_exists"));
+					getResException().getString("event_not_exists"));
 		}
 
 		logMe("Enterting DataEntry Get the status/number of item discrepancy notes" + System.currentTimeMillis());
@@ -356,8 +356,8 @@ public abstract class DataEntryServlet extends Controller {
 		Status s = ssb.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
 			addPageMessage(
-					respage.getString("you_may_not_perform_data_entry_on_a_CRF")
-							+ respage.getString("study_subject_has_been_deleted"), request);
+					getResPage().getString("you_may_not_perform_data_entry_on_a_CRF")
+							+ getResPage().getString("study_subject_has_been_deleted"), request);
 			request.setAttribute("id", new Integer(ecb.getStudySubjectId()).toString());
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		}
@@ -384,12 +384,12 @@ public abstract class DataEntryServlet extends Controller {
 					while (iter.hasNext()) {
 						missed += " " + newUploadedFiles.get(iter.next());
 					}
-					addPageMessage(respage.getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed,
+					addPageMessage(getResPage().getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed,
 							request);
 				}
 			}
 			session.removeAttribute("newUploadedFiles");
-			addPageMessage(respage.getString("exit_without_saving"), request);
+			addPageMessage(getResPage().getString("exit_without_saving"), request);
 			storePageMessages(request);
 			if (autoCloseDataEntryPage) {
 				forwardPage(Page.AUTO_CLOSE_PAGE, request, response);
@@ -573,7 +573,7 @@ public abstract class DataEntryServlet extends Controller {
 					while (iter.hasNext()) {
 						missed += " " + newUploadedFiles.get(iter.next());
 					}
-					addPageMessage(respage.getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed,
+					addPageMessage(getResPage().getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed,
 							request);
 				}
 			}
@@ -956,7 +956,7 @@ public abstract class DataEntryServlet extends Controller {
 			reshuffleErrorGroupNamesKK(errors, allItems, request);
 
 			if (this.isAdminForcedReasonForChange(request) && this.isAdministrativeEditing() && errors.isEmpty()) {
-				String error = respage.getString("reason_for_change_error");
+				String error = getResPage().getString("reason_for_change_error");
 				if (changedItemsMap.size() > 0) {
 					request.setAttribute("Hardrules", true);
 
@@ -1081,7 +1081,7 @@ public abstract class DataEntryServlet extends Controller {
 				request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section, !errors.isEmpty() || !warningMessages.isEmpty()));
 				request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 				setInputMessages(errors, request);
-				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
+				addPageMessage(getResPage().getString("errors_in_submission_see_below"), request);
 				request.setAttribute("hasError", "true");
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 				setUpPanel(request, section);
@@ -1179,8 +1179,8 @@ public abstract class DataEntryServlet extends Controller {
 
 				if ((stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage
 						.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) && edcb.isEvaluatedCRF()) {
-					String noteDescription = resword.getString("crf_eval_rfc_description");
-					String detailedDescription = resword.getString("crf_eval_rfc_detailed_description");
+					String noteDescription = getResWord().getString("crf_eval_rfc_description");
+					String detailedDescription = getResWord().getString("crf_eval_rfc_detailed_description");
 					List<DiscrepancyNoteBean> dbns = new DiscrepancyNoteService(getDataSource())
 							.generateRFCsForChangedFields(changedItemsList, changedItemNamesList, oldItemdata, ub,
 									noteDescription, detailedDescription);
@@ -1426,7 +1426,7 @@ public abstract class DataEntryServlet extends Controller {
 						request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 						request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
 						setInputMessages(errorsPostDryRun, request);
-						addPageMessage(respage.getString("your_answers_activated_hidden_items"), request);
+						addPageMessage(getResPage().getString("your_answers_activated_hidden_items"), request);
 						request.setAttribute("hasError", "true");
 						request.setAttribute("hasShown", "true");
 
@@ -1489,7 +1489,7 @@ public abstract class DataEntryServlet extends Controller {
 								missed += " " + newUploadedFiles.get(iter.next());
 							}
 							addPageMessage(
-									respage.getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed,
+									getResPage().getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed,
 									request);
 						}
 					}
@@ -1501,11 +1501,11 @@ public abstract class DataEntryServlet extends Controller {
 								mess += ss + ", ";
 							}
 							mess = mess.substring(0, mess.length() - 2);
-							addPageMessage(resexception.getString("item_save_failed_because_database_error") + mess,
+							addPageMessage(getResException().getString("item_save_failed_because_database_error") + mess,
 									request);
 						} else {
 
-							addPageMessage(resexception.getString("database_error"), request);
+							addPageMessage(getResException().getString("database_error"), request);
 						}
 						request.setAttribute(BEAN_DISPLAY, getDisplaySectionBeanDependingOnStage(section));
 						session.removeAttribute(GROUP_HAS_DATA);
@@ -1523,7 +1523,7 @@ public abstract class DataEntryServlet extends Controller {
 						}
 					} else {
 						if (markSuccessfully) {
-							addPageMessage(respage.getString("data_saved_CRF_marked_complete"), request);
+							addPageMessage(getResPage().getString("data_saved_CRF_marked_complete"), request);
 							session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 							session.removeAttribute(GROUP_HAS_DATA);
 							session.removeAttribute(HAS_DATA_FLAG);
@@ -1544,7 +1544,7 @@ public abstract class DataEntryServlet extends Controller {
 							}
 						} else {
 							// user clicked 'save'
-							addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
+							addPageMessage(getResPage().getString("data_saved_continue_entering_edit_later"), request);
 							request.setAttribute(INPUT_EVENT_CRF, ecb);
 							request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
 							// forward to the next section if the previous one
@@ -1811,7 +1811,7 @@ public abstract class DataEntryServlet extends Controller {
 			reportCRFService.setUrlPath(urlPath);
 			reportCRFService.setSysPath(sysPath);
 			reportCRFService.setDataPath(dataPath);
-			reportCRFService.setResword(resword);
+			reportCRFService.setResword(getResWord());
 
 			File dataPatchDir = new File(dataPath);
 			if (!dataPatchDir.exists()) {
@@ -1822,9 +1822,9 @@ public abstract class DataEntryServlet extends Controller {
 			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {
 				String body = EmailUtil.getCRFReportMessageBody(currentStudy.getName(), locale);
 				String[] files = {reportFilePath};
-				String succcesMessage = respage.getString("crf_report_was_sent_successfully_message");
-				String errorMessage = respage.getString("crf_report_was_not_sent_successfully_message");
-				String subject = MessageFormat.format(respage.getString("crf_report_message"), ssb.getLabel(),
+				String succcesMessage = getResPage().getString("crf_report_was_sent_successfully_message");
+				String errorMessage = getResPage().getString("crf_report_was_not_sent_successfully_message");
+				String subject = MessageFormat.format(getResPage().getString("crf_report_message"), ssb.getLabel(),
 						crfBean.getName() + " " + crfVersionBean.getName());
 				sendEmailWithAttach(edcb.getEmailTo(), EmailEngine.getAdminEmail(), subject, body.toString(), true,
 						succcesMessage, errorMessage, true, files, request);
@@ -2166,15 +2166,15 @@ public abstract class DataEntryServlet extends Controller {
 		if (ssb.getId() <= 0) {
 			logger.trace("throwing ISE with study subject bean id of " + ssb.getId());
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("begin_data_entry_without_event_but_subject"));
+					getResException().getString("begin_data_entry_without_event_but_subject"));
 		}
 
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 		StudyEventDefinitionBean sedb = seddao.findByEventDefinitionCRFId(eventDefinitionCRFId);
 		if (sedb.getId() <= 0) {
-			addPageMessage(resexception.getString("begin_data_entry_without_event_but_study"), request);
+			addPageMessage(getResException().getString("begin_data_entry_without_event_but_study"), request);
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("begin_data_entry_without_event_but_study"));
+					getResException().getString("begin_data_entry_without_event_but_study"));
 		}
 
 		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
@@ -2182,7 +2182,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		if (eb.getId() <= 0) {
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("begin_data_entry_without_event_but_CRF"));
+					getResException().getString("begin_data_entry_without_event_but_CRF"));
 		}
 
 		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
@@ -2196,9 +2196,9 @@ public abstract class DataEntryServlet extends Controller {
 		AuditableEntityBean aeb = sedao.findByPKAndStudy(studyEventId, studyWithSED);
 
 		if (aeb.getId() <= 0) {
-			addPageMessage(resexception.getString("begin_data_entry_without_event_but_especified_event"), request);
+			addPageMessage(getResException().getString("begin_data_entry_without_event_but_especified_event"), request);
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("begin_data_entry_without_event_but_especified_event"));
+					getResException().getString("begin_data_entry_without_event_but_especified_event"));
 		}
 
 		ecb = new EventCRFBean();
@@ -2255,9 +2255,9 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		if (ecb.getId() <= 0) {
-			addPageMessage(resexception.getString("new_event_CRF_not_created"), request);
+			addPageMessage(getResException().getString("new_event_CRF_not_created"), request);
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("new_event_CRF_not_created"));
+					getResException().getString("new_event_CRF_not_created"));
 		} else {
 			sEvent.setUpdater(ub);
 			sEvent.setUpdatedDate(new Date());
@@ -2888,20 +2888,20 @@ public abstract class DataEntryServlet extends Controller {
 
 		if (stage.equals(DataEntryStage.UNCOMPLETED) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
 				|| stage.equals(DataEntryStage.LOCKED)) {
-			addPageMessage(respage.getString("not_mark_CRF_complete1"), request);
+			addPageMessage(getResPage().getString("not_mark_CRF_complete1"), request);
 			return false;
 		}
 
 		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 
 			if (!(edcb.isDoubleEntry() || edcb.isEvaluatedCRF())) {
-				addPageMessage(respage.getString("not_mark_CRF_complete2"), request);
+				addPageMessage(getResPage().getString("not_mark_CRF_complete2"), request);
 				return false;
 			}
 		}
 
 		if (!isEachRequiredFieldFillout(request)) {
-			addPageMessage(respage.getString("not_mark_CRF_complete4"), request);
+			addPageMessage(getResPage().getString("not_mark_CRF_complete4"), request);
 			return false;
 		}
 
@@ -2941,7 +2941,7 @@ public abstract class DataEntryServlet extends Controller {
 		// create them
 		if (!isEachSectionReviewedOnce(request)) {
 			if (!saveItemsToMarkComplete(newStatus, request)) {
-				addPageMessage(respage.getString("not_mark_CRF_complete3"), request);
+				addPageMessage(getResPage().getString("not_mark_CRF_complete3"), request);
 				return false;
 			}
 		}
@@ -3572,9 +3572,9 @@ public abstract class DataEntryServlet extends Controller {
 
 		if (eventCRFId > 0) {
 			if (!entityIncluded(eventCRFId, ub.getName(), edao)) {
-				addPageMessage(respage.getString("required_event_CRF_belong"), request);
+				addPageMessage(getResPage().getString("required_event_CRF_belong"), request);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET,
-						resexception.getString("entity_not_belong_studies"), "1");
+						getResException().getString("entity_not_belong_studies"), "1");
 			}
 		}
 
@@ -3627,7 +3627,7 @@ public abstract class DataEntryServlet extends Controller {
 		Iterator iter = errors.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry pairs = (Map.Entry) iter.next();
-			if (pairs.getValue().toString().contains(respage.getString("value_you_specified"))) {
+			if (pairs.getValue().toString().contains(getResPage().getString("value_you_specified"))) {
 				return true;
 			}
 		}

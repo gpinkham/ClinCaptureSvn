@@ -49,16 +49,16 @@ public class RemoveEventDefinitionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -73,21 +73,21 @@ public class RemoveEventDefinitionServlet extends Controller {
 				.findByPK(defId);
 
 		if (currentStudy.getId() != studyEventDefinitionBean.getStudyId()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+					+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_SED_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_SED_to_remove"), request);
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_SED_is_not_available_for_this_study")
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(getResPage().getString("this_SED_is_not_available_for_this_study")
+							+ getResPage().getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					return;
 				}
@@ -101,8 +101,8 @@ public class RemoveEventDefinitionServlet extends Controller {
 
 				getEventDefinitionService().removeStudyEventDefinition(studyEventDefinitionBean, updater);
 
-				String emailBody = respage.getString("the_SED").concat(studyEventDefinitionBean.getName()).concat(" ")
-						.concat(respage.getString("has_been_removed_from_the_study")).concat(currentStudy.getName())
+				String emailBody = getResPage().getString("the_SED").concat(studyEventDefinitionBean.getName()).concat(" ")
+						.concat(getResPage().getString("has_been_removed_from_the_study")).concat(currentStudy.getName())
 						.concat(".");
 
 				addPageMessage(emailBody, request);

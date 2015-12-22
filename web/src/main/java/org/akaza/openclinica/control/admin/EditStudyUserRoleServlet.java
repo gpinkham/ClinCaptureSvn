@@ -77,10 +77,10 @@ public class EditStudyUserRoleServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
+					getResPage().getString("no_have_correct_privilege_current_study")
+							+ getResPage().getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -100,7 +100,7 @@ public class EditStudyUserRoleServlet extends Controller {
 			studyUserRole.setStudyName(sb.getName());
 		}
 		if (!studyUserRole.isActive()) {
-			String message = respage.getString("the_user_has_no_role_in_study");
+			String message = getResPage().getString("the_user_has_no_role_in_study");
 			addPageMessage(message, request);
 			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 		} else {
@@ -127,19 +127,19 @@ public class EditStudyUserRoleServlet extends Controller {
 					studyUserRole.setRoleName(r.getCode());
 					studyUserRole.setUpdater(ub);
 					udao.updateStudyUserRole(studyUserRole, uName);
-					addPageMessage(respage.getString("the_user_in_study_has_been_updated"), request);
+					addPageMessage(getResPage().getString("the_user_in_study_has_been_updated"), request);
 					if (ub.getName().equals(studyUserRole.getUserName())) {
 						request.getSession().setAttribute("reloadUserBean", true);
 						if (!ub.isSysAdmin() && !ub.isTechAdmin()
 								&& studyUserRole.getRole() != Role.STUDY_ADMINISTRATOR
 								&& studyUserRole.getRole() != Role.STUDY_DIRECTOR) {
 							forwardTo = Page.MENU_SERVLET;
-							addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
+							addPageMessage(getResPage().getString("you_may_not_perform_administrative_functions"), request);
 						}
 					}
 					forwardPage(forwardTo, request, response);
 				} else {
-					String message = respage.getString("the_role_choosen_was_invalid_choose_another");
+					String message = getResPage().getString("the_role_choosen_was_invalid_choose_another");
 					addPageMessage(message, request);
 
 					request.setAttribute("userName", uName);

@@ -142,37 +142,37 @@ public class MainMenuServlet extends Controller {
 				studies = (ArrayList) sdao.findAllByUser(ub.getName());
 				request.setAttribute("studies", studies);
 				request.getSession().setAttribute("userBean1", ub);
-				addPageMessage(respage.getString("password_expired"), request);
+				addPageMessage(getResPage().getString("password_expired"), request);
 				// Add the feature that if password is expired,
 				// have to go through /ResetPassword page
 				request.getSession().setAttribute("passwordExpired", "yes");
 				if (pwdChangeRequired == 1) {
 					request.setAttribute("mustChangePass", "yes");
-					addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
+					addPageMessage(getResPage().getString("your_password_has_expired_must_change"), request);
 				} else {
 					request.setAttribute("mustChangePass", "no");
 					addPageMessage(
-							respage.getString("password_expired") + " "
-									+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
+							getResPage().getString("password_expired") + " "
+									+ getResPage().getString("if_you_do_not_want_change_leave_blank"), request);
 				}
 				forwardPage(Page.RESET_PASSWORD, request, response);
 			} else {
 
 				if (ub.getNumVisitsToMainMenu() <= 1) {
 					if (ub.getLastVisitDate() != null) {
-						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
-								+ ". " + respage.getString("last_logged") + " "
+						addPageMessage(getResPage().getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
+								+ ". " + getResPage().getString("last_logged") + " "
 								+ DateUtil.printDate(ub.getLastVisitDate(), getUserAccountBean().getUserTimeZoneId(),
 								DateUtil.DatePattern.DATE, getLocale()) + ". ", request);
 					} else {
-						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
+						addPageMessage(getResPage().getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
 								+ ". ", request);
 					}
 
 					if (currentStudy.getStatus().isLocked()) {
-						addPageMessage(respage.getString("current_study_locked"), request);
+						addPageMessage(getResPage().getString("current_study_locked"), request);
 					} else if (currentStudy.getStatus().isFrozen()) {
-						addPageMessage(respage.getString("current_study_frozen"), request);
+						addPageMessage(getResPage().getString("current_study_frozen"), request);
 					}
 				}
 				String casebookMessage = (String) request.getSession().getAttribute("casebook_exception");
@@ -194,7 +194,7 @@ public class MainMenuServlet extends Controller {
 				String idSetting = parentSPV.getValue();
 
 				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-					request.setAttribute("label", resword.getString("id_generated_Save_Add"));
+					request.setAttribute("label", getResWord().getString("id_generated_Save_Add"));
 				}
 
 				boolean displayNewLayout = browserSupportNewLayout(request);
@@ -289,7 +289,7 @@ public class MainMenuServlet extends Controller {
 						if (hasWidgetAccess && !layoutCreated) {
 
 							if (newWidgetMessageTrigger) {
-								addPageMessage(respage.getString("new_widget_added_to_system"), request);
+								addPageMessage(getResPage().getString("new_widget_added_to_system"), request);
 								newWidgetMessageTrigger = false;
 							}
 

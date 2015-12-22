@@ -43,9 +43,9 @@ public class LockSiteServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
 				"1");
 	}
 
@@ -84,10 +84,10 @@ public class LockSiteServlet extends Controller {
 		if (request.getParameter("Submit") != null) {
 			String message = "";
 			if (action.equalsIgnoreCase("lock")) {
-				message = resword.getString("lockSiteStudySubjectsResultMsg");
+				message = getResWord().getString("lockSiteStudySubjectsResultMsg");
 				getStudyService().lockSite(site, ub);
 			} else if (action.equalsIgnoreCase("unlock")) {
-				message = resword.getString("unlockSiteStudySubjectsResultMsg");
+				message = getResWord().getString("unlockSiteStudySubjectsResultMsg");
 				getStudyService().unlockSite(site, ub);
 			}
 			showResultMessage(request, site, message);

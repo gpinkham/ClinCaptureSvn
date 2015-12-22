@@ -60,9 +60,9 @@ public class ViewSubjectServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -73,7 +73,7 @@ public class ViewSubjectServlet extends Controller {
 		int subjectId = fp.getInt("id");
 
 		if (subjectId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_view"), request);
 			forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
 		} else {
 			SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);

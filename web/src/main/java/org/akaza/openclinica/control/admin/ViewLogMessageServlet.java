@@ -68,10 +68,10 @@ public class ViewLogMessageServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class ViewLogMessageServlet extends Controller {
 			forwardPage(Page.VIEW_LOG_MESSAGE, request, response);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			addPageMessage(respage.getString("problem_reading_file"), request);
+			addPageMessage(getResPage().getString("problem_reading_file"), request);
 			forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 		}
 	}

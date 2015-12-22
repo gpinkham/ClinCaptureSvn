@@ -71,15 +71,15 @@ public class ExtractDatasetsMainServlet extends Controller {
 		ArrayList datasets = (ArrayList) dsdao.findTopFive(currentStudy);
 		ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
 
-		String[] columns = {resword.getString("dataset_name"), resword.getString("description"),
-				resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-				resword.getString("actions")};
+		String[] columns = { getResWord().getString("dataset_name"), getResWord().getString("description"),
+				getResWord().getString("created_by"), getResWord().getString("created_date"), getResWord().getString("status"),
+				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
 
-		table.addLink(resword.getString("view_all"), "ViewDatasets");
-		table.addLink(resword.getString("view_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
-		table.addLink(resword.getString("create_dataset"), "CreateDataset");
+		table.addLink(getResWord().getString("view_all"), "ViewDatasets");
+		table.addLink(getResWord().getString("view_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
+		table.addLink(getResWord().getString("create_dataset"), "CreateDataset");
 		table.setQuery("ExtractDatasetsMain", new HashMap());
 		table.setRows(datasetRows);
 		table.computeDisplay();
@@ -108,10 +108,10 @@ public class ExtractDatasetsMainServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 }

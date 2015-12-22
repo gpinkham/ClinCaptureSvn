@@ -65,9 +65,9 @@ public class ListStudyUserServlet extends RememberLastPage {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -105,9 +105,9 @@ public class ListStudyUserServlet extends RememberLastPage {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyUserRows = StudyUserRoleRow.generateRowsFromBeans(users);
 
-		String[] columns = {resword.getString("user_name"), resword.getString("first_name"),
-				resword.getString("last_name"), resword.getString("role"), resword.getString("study_name"),
-				resword.getString("status"), resword.getString("actions")};
+		String[] columns = { getResWord().getString("user_name"), getResWord().getString("first_name"),
+				getResWord().getString("last_name"), getResWord().getString("role"), getResWord().getString("study_name"),
+				getResWord().getString("status"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListStudyUser", new HashMap());

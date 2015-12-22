@@ -85,9 +85,9 @@ public class ListEventDefinitionServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 	}
 
 	/**
@@ -137,10 +137,10 @@ public class ListEventDefinitionServlet extends Controller {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = StudyEventDefinitionRow.generateRowsFromBeans(seds);
 
-		String[] columns = {resword.getString("order"), resword.getString("name"), resword.getString("OID"),
-				resword.getString("repeating"), resword.getString("type"), resword.getString("category"),
-				resword.getString("populated"), resword.getString("date_created"), resword.getString("date_updated"),
-				resword.getString("CRFs"), resword.getString("default_version"), resword.getString("actions")};
+		String[] columns = { getResWord().getString("order"), getResWord().getString("name"), getResWord().getString("OID"),
+				getResWord().getString("repeating"), getResWord().getString("type"), getResWord().getString("category"),
+				getResWord().getString("populated"), getResWord().getString("date_created"), getResWord().getString("date_updated"),
+				getResWord().getString("CRFs"), getResWord().getString("default_version"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		int index = 2;
 		table.hideColumnLink(index++);

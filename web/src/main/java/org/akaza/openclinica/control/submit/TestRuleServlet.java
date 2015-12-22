@@ -129,7 +129,7 @@ public class TestRuleServlet extends Controller {
 		ExpressionService expressionService = new ExpressionService(new ExpressionObjectWrapper(getDataSource(),
 				currentStudy, null, null));
 		if (StringUtil.isBlank(action)) {
-			request.setAttribute("result", resword.getString("test_rule_default_result"));
+			request.setAttribute("result", getResWord().getString("test_rule_default_result"));
 			Integer ruleSetRuleId = fp.getInt("ruleSetRuleId");
 
 			if (ruleSetRuleId != 0) { // If testing an existing ruleSetRule
@@ -165,13 +165,13 @@ public class TestRuleServlet extends Controller {
 				// do not modify
 				Map serialResult = new HashMap(result);
 				if (result.get("ruleValidation").equals("rule_valid")) {
-					addPageMessage(resword.getString("test_rules_message_valid"), request);
+					addPageMessage(getResWord().getString("test_rules_message_valid"), request);
 				} else {
-					addPageMessage(resword.getString("test_rules_message_invalid"), request);
+					addPageMessage(getResWord().getString("test_rules_message_invalid"), request);
 				}
 				request.setAttribute("ruleValidation", result.get("ruleValidation"));
 				request.setAttribute("validate", "on");
-				request.setAttribute("ruleEvaluatesTo", resword.getString("test_rules_validate_message"));
+				request.setAttribute("ruleEvaluatesTo", getResWord().getString("test_rules_validate_message"));
 				request.setAttribute("ruleValidationFailMessage", result.get("ruleValidationFailMessage"));
 				request.setAttribute("action", result.get("ruleValidation").equals("rule_valid") ? "test" : "validate");
 				result.remove("result");
@@ -200,23 +200,23 @@ public class TestRuleServlet extends Controller {
 			if (!errors.isEmpty()) {
 				setInputMessages(errors, request);
 				if (result.get("ruleValidation").equals("rule_valid")) {
-					addPageMessage(resword.getString("test_rules_message_valid"), request);
+					addPageMessage(getResWord().getString("test_rules_message_valid"), request);
 				} else {
-					addPageMessage(resword.getString("test_rules_message_invalid"), request);
+					addPageMessage(getResWord().getString("test_rules_message_invalid"), request);
 				}
 				request.setAttribute("ruleValidation", result.get("ruleValidation"));
 				request.setAttribute("validate", "on");
-				request.setAttribute("ruleEvaluatesTo", resword.getString("test_rules_rule_fail_invalid_data_type")
-						+ " " + resword.getString("test_rules_rule_fail_invalid_data_type_desc"));
+				request.setAttribute("ruleEvaluatesTo", getResWord().getString("test_rules_rule_fail_invalid_data_type")
+						+ " " + getResWord().getString("test_rules_rule_fail_invalid_data_type_desc"));
 				request.setAttribute("ruleValidationFailMessage", result.get("ruleValidationFailMessage"));
 				request.setAttribute("action", "test");
 
 			} else {
 
 				if (result.get("ruleValidation").equals("rule_valid")) {
-					addPageMessage(resword.getString("test_rules_message_valid"), request);
+					addPageMessage(getResWord().getString("test_rules_message_valid"), request);
 				} else {
-					addPageMessage(resword.getString("test_rules_message_invalid"), request);
+					addPageMessage(getResWord().getString("test_rules_message_invalid"), request);
 				}
 				request.setAttribute("action", result.get("ruleValidation").equals("rule_valid") ? "test" : "validate");
 				request.setAttribute("ruleValidation", result.get("ruleValidation"));
@@ -275,7 +275,7 @@ public class TestRuleServlet extends Controller {
 				request.setAttribute(entry.getKey() + "-dib", dib);
 				if (item.getItemDataTypeId() == 9) {
 					try {
-						SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver
+						SimpleDateFormat sdf = new SimpleDateFormat(getResFormat().getString("date_format_string"), LocaleResolver
 								.getLocale());
 						SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
 						if (!entry.getValue().isEmpty()) {
@@ -331,7 +331,7 @@ public class TestRuleServlet extends Controller {
 
 				if (item.getItemDataTypeId() == 9) {
 					try {
-						SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), LocaleResolver.getLocale());
+						SimpleDateFormat sdf = new SimpleDateFormat(getResFormat().getString("date_format_string"), LocaleResolver.getLocale());
 						SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
 						if (!entry.getValue().isEmpty()) {
 							java.util.Date date = sdf.parse(entry.getValue());
@@ -359,7 +359,7 @@ public class TestRuleServlet extends Controller {
 		} catch (OpenClinicaSystemException e) {
 			HashMap<String, String> result = new HashMap<String, String>();
 			MessageFormat mf = new MessageFormat("");
-			mf.applyPattern(respage.getString(e.getErrorCode()));
+			mf.applyPattern(getResPage().getString(e.getErrorCode()));
 			Object[] arguments = e.getErrorParams();
 			result.put("ruleValidation", "target_invalid");
 			result.put("ruleValidationFailMessage", e.getErrorCode() + " : " + mf.format(arguments));
@@ -395,7 +395,7 @@ public class TestRuleServlet extends Controller {
 		expressionService.setExpressionWrapper(new ExpressionObjectWrapper(getDataSource(), study, rule, ruleSet));
 		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(expressionService);
 		ep.setTargetTimeZone(DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId()));
-		ep.setRespage(respage);
+		ep.setRespage(getResPage());
 
 		// Run expression with populated HashMap
 		DateTime start = new DateTime();
@@ -413,7 +413,7 @@ public class TestRuleServlet extends Controller {
 		if (theResult.get("ruleValidation").equals("rule_valid") && result.get("ruleValidation").equals("rule_invalid")) {
 			result.put("ruleValidation", "rule_valid");
 			result.put("ruleEvaluatesTo",
-					resword.getString("test_rules_rule_fail") + " " + result.get("ruleValidationFailMessage"));
+					getResWord().getString("test_rules_rule_fail") + " " + result.get("ruleValidationFailMessage"));
 			result.remove("ruleValidationFailMessage");
 
 		}
@@ -447,8 +447,8 @@ public class TestRuleServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
 	}
 }

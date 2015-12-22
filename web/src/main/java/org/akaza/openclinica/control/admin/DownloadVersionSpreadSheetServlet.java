@@ -69,10 +69,10 @@ public class DownloadVersionSpreadSheetServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -131,7 +131,7 @@ public class DownloadVersionSpreadSheetServlet extends Controller {
 
 		logger.info("looking for : " + (excelFile != null ? excelFile.getName() : null));
 		if (excelFile == null || !excelFile.exists() || excelFile.length() <= 0) {
-			addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"), request);
+			addPageMessage(getResPage().getString("the_excel_is_not_available_on_server_contact"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		} else {
 			response.setHeader("Content-disposition", "attachment; filename=\"" + excelFileName + "\";");

@@ -57,16 +57,16 @@ public class RestoreSubjectServlet extends Controller {
 
 		UserAccountBean ub = getUserAccountBean(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 
 		if (ub.isSysAdmin() && !getCurrentRole(request).isStudySponsor()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -80,7 +80,7 @@ public class RestoreSubjectServlet extends Controller {
 
 		String action = fp.getString("action");
 		if (subjectId == 0 || StringUtil.isBlank(action)) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_restore"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_restore"), request);
 			forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
 		} else {
 
@@ -103,9 +103,9 @@ public class RestoreSubjectServlet extends Controller {
 
 				getSubjectService().restoreSubject(subject, currentUser);
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_subject"))
+				String emailBody = new StringBuilder("").append(getResPage().getString("the_subject"))
 						.append(subject.getName()).append(" ")
-						.append(respage.getString("has_been_restored_succesfully")).toString();
+						.append(getResPage().getString("has_been_restored_succesfully")).toString();
 
 				addPageMessage(emailBody, request);
 

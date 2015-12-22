@@ -74,9 +74,9 @@ public class ListSiteServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -120,9 +120,9 @@ public class ListSiteServlet extends RememberLastPage {
 
 		final int two = 2;
 		final int seven = 7;
-		String[] columns = {resword.getString("name"), resword.getString("unique_identifier"), resword.getString("OID"),
-				resword.getString("principal_investigator"), resword.getString("facility_name"),
-				resword.getString("date_created"), resword.getString("status"), resword.getString("actions")};
+		String[] columns = { getResWord().getString("name"), getResWord().getString("unique_identifier"), getResWord().getString("OID"),
+				getResWord().getString("principal_investigator"), getResWord().getString("facility_name"),
+				getResWord().getString("date_created"), getResWord().getString("status"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(two);
 		table.hideColumnLink(seven);
@@ -166,7 +166,7 @@ public class ListSiteServlet extends RememberLastPage {
 	private void addNewSiteNotificationMessage(HttpServletRequest request) {
 		if (request.getSession().getAttribute("new_site_created") != null) {
 			request.getSession().removeAttribute("new_site_created");
-			addPageMessage(respage.getString("the_new_site_created_succesfully_current"), request);
+			addPageMessage(getResPage().getString("the_new_site_created_succesfully_current"), request);
 		}
 	}
 }

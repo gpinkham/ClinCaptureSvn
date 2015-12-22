@@ -13,8 +13,14 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.ValidatorHelper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -43,12 +49,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * The servlet for creating sub study of user's current active study.
@@ -78,14 +80,14 @@ public class CreateSubStudyServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.SITE_LIST_SERVLET, getResPage().getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + "\n"
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"),
+				getResPage().getString("no_have_correct_privilege_current_study") + "\n"
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, getResException().getString("not_study_director"),
 				"1");
 	}
 
@@ -99,7 +101,7 @@ public class CreateSubStudyServlet extends Controller {
 
 		if (StringUtil.isBlank(action)) {
 			if (currentStudy.getParentStudyId() > 0) {
-				addPageMessage(respage.getString("you_cannot_create_site_itself_site"), request);
+				addPageMessage(getResPage().getString("you_cannot_create_site_itself_site"), request);
 
 				forwardPage(Page.SITE_LIST_SERVLET, request, response);
 			} else {
@@ -173,7 +175,7 @@ public class CreateSubStudyServlet extends Controller {
 				request.getSession().setAttribute("paramsMap", paramsMap);
 				request.getSession().setAttribute("newStudy", newStudy);
 				request.getSession().setAttribute("definitions", this.initDefinitions(newStudy));
-				request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+				request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 				request.setAttribute("statuses", Status.toActiveArrayList());
 				forwardPage(Page.CREATE_SUB_STUDY, request, response);
 			}
@@ -203,7 +205,7 @@ public class CreateSubStudyServlet extends Controller {
 					fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 				}
 				setPresetValues(fp.getPresetValues(), request);
-				request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+				request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 				request.setAttribute("statuses", Status.toActiveArrayList());
 				forwardPage(Page.CREATE_SUB_STUDY, request, response);
 			} else if ("submit".equalsIgnoreCase(action)) {
@@ -274,26 +276,26 @@ public class CreateSubStudyServlet extends Controller {
 		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
 		for (StudyBean thisBean : allStudies) {
 			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())) {
-				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
+				Validator.addError(errors, "uniqueProId", getResException().getString("unique_protocol_id_existed"));
 			}
 		}
 
 		if (fp.getString("name").trim().length() > INT_100) {
-			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
+			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
 		}
 		if (fp.getString("uniqueProId").trim().length() > INT_30) {
-			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
+			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
 		if (fp.getString("description").trim().length() > INT_2000) {
-			Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_2000"));
+			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
 		}
 		if (fp.getString("prinInvestigator").trim().length() > INT_255) {
 			Validator.addError(errors, "prinInvestigator",
-					resexception.getString("maximum_lenght_principal_investigator_255"));
+					getResException().getString("maximum_lenght_principal_investigator_255"));
 		}
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
-					respage.getString("expected_total_enrollment_must_be_a_positive_number"));
+					getResPage().getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
 		StudyBean newSite = this.createStudyBean(request);

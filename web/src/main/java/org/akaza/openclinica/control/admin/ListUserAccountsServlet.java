@@ -64,9 +64,9 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
+			addPageMessage(getResPage().getString("you_may_not_perform_administrative_functions"), request);
 			throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET,
-					respage.getString("you_may_not_perform_administrative_functions"), "1");
+					getResPage().getString("you_may_not_perform_administrative_functions"), "1");
 		}
 	}
 
@@ -118,9 +118,9 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans((ArrayList) allUsers);
 
-		String[] columns = {resword.getString("user_name"), resword.getString("user_type"),
-				resword.getString("first_name"), resword.getString("last_name"), resword.getString("status"),
-				resword.getString("actions")};
+		String[] columns = { getResWord().getString("user_name"), getResWord().getString("user_type"),
+				getResWord().getString("first_name"), getResWord().getString("last_name"), getResWord().getString("status"),
+				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListUserAccounts", new HashMap());
@@ -142,7 +142,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), Integer.toString(allUsers.size()), request);
+			setToPanel(getResWord().getString("users"), Integer.toString(allUsers.size()), request);
 		}
 
 		forwardPage(Page.LIST_USER_ACCOUNTS, request, response);

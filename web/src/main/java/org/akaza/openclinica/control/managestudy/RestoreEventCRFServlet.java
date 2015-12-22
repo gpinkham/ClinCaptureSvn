@@ -74,9 +74,9 @@ public class RestoreEventCRFServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -91,7 +91,7 @@ public class RestoreEventCRFServlet extends Controller {
 		int eventCRFId = fp.getInt("id");
 		// studySubjectId
 		int studySubId = fp.getInt("studySubId");
-		checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"), request,
+		checkStudyLocked("ViewStudySubject?id" + studySubId, getResPage().getString("current_study_locked"), request,
 				response);
 		StudyEventDAO sedao = getStudyEventDAO();
 		StudySubjectDAO subdao = getStudySubjectDAO();
@@ -99,7 +99,7 @@ public class RestoreEventCRFServlet extends Controller {
 		StudyDAO sdao = getStudyDAO();
 
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_restore"), request);
+			addPageMessage(getResPage().getString("please_choose_an_event_CRF_to_restore"), request);
 			request.setAttribute("id", Integer.toString(studySubId));
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {
@@ -110,9 +110,9 @@ public class RestoreEventCRFServlet extends Controller {
 			// subject has been removed
 			if (studySub.getStatus().isDeleted()) {
 				addPageMessage(
-						new StringBuilder("").append(resword.getString("event_CRF"))
-								.append(resterm.getString("could_not_be")).append(resterm.getString("restored"))
-								.append(".").append(respage.getString("study_subject_has_been_deleted")).toString(),
+						new StringBuilder("").append(getResWord().getString("event_CRF"))
+								.append(getResTerm().getString("could_not_be")).append(getResTerm().getString("restored"))
+								.append(".").append(getResPage().getString("study_subject_has_been_deleted")).toString(),
 						request);
 				request.setAttribute("id", Integer.toString(studySubId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
@@ -158,8 +158,8 @@ public class RestoreEventCRFServlet extends Controller {
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!eventCRF.getStatus().isDeleted()) {
-					addPageMessage(respage.getString("this_event_CRF_avilable_for_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(getResPage().getString("this_event_CRF_avilable_for_study") + " "
+							+ getResPage().getString("please_contact_sysadmin_for_more_information"), request);
 					request.setAttribute("id", Integer.toString(studySubId));
 					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 					return;
@@ -173,18 +173,18 @@ public class RestoreEventCRFServlet extends Controller {
 
 				getEventCRFService().restoreEventCRF(eventCRF, currentUser);
 
-				String messageBody = respage.getString("the_event_CRF") + cb.getName() + " "
-						+ respage.getString("has_been_restored_to_the_event") + " "
+				String messageBody = getResPage().getString("the_event_CRF") + cb.getName() + " "
+						+ getResPage().getString("has_been_restored_to_the_event") + " "
 						+ event.getStudyEventDefinition().getName() + ".";
 				addPageMessage(messageBody, request);
 				String emailBody = EmailUtil.getEmailBodyStart() + messageBody + "<br/><ul>"
-						+ resword.getString("job_error_mail.serverUrl") + " " + SQLInitServlet.getSystemURL() + "</li>"
-						+ resword.getString("job_error_mail.studyName") + " " + study.getName() + "</li>" + "<li><b>"
-						+ resword.getString("mail.restored_by") + ":</b> " + currentUser.getName() + "</li>" + "<li><b>"
-						+ resword.getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
+						+ getResWord().getString("job_error_mail.serverUrl") + " " + SQLInitServlet.getSystemURL() + "</li>"
+						+ getResWord().getString("job_error_mail.studyName") + " " + study.getName() + "</li>" + "<li><b>"
+						+ getResWord().getString("mail.restored_by") + ":</b> " + currentUser.getName() + "</li>" + "<li><b>"
+						+ getResWord().getString("subject") + "</b>: " + studySub.getLabel() + "</li></ul>"
 						+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(getLocale());
-				String emailHeader = respage.getString("restore_event_CRF_to_event") + " "
-						+ resword.getString("subject") + ": " + studySub.getLabel();
+				String emailHeader = getResPage().getString("restore_event_CRF_to_event") + " "
+						+ getResWord().getString("subject") + ": " + studySub.getLabel();
 				sendEmail(emailHeader, emailBody, request);
 				storePageMessages(request);
 				response.sendRedirect(request.getContextPath().concat(Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName())

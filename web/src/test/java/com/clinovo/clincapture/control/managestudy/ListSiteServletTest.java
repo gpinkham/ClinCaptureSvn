@@ -36,7 +36,6 @@ import org.akaza.openclinica.web.bean.StudyRow;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -82,7 +81,6 @@ public class ListSiteServletTest {
 		Mockito.doCallRealMethod().when(listSiteServlet).processRequest(request, response);
 
 		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
-		Whitebox.setInternalState(listSiteServlet, "resword", ResourceBundleProvider.getWordsBundle());
 		Mockito.doReturn(table).when(listSiteServlet).getEntityBeanTable();
 
 		listSiteServlet.processRequest(request, response);

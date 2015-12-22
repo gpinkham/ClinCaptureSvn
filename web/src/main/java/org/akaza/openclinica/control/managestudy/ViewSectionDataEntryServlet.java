@@ -120,9 +120,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_director"), "1");
 
 	}
 
@@ -179,9 +179,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			}
 			if (eventCRFId == 0 && !studyIds.contains(edcb.getStudyId())) {
 				addPageMessage(
-						respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_study_contact_sysadmin"), request);
-				throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"),
+						getResPage().getString("no_have_correct_privilege_current_study") + " "
+								+ getResPage().getString("change_study_contact_sysadmin"), request);
+				throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_director"),
 						"1");
 			}
 		}
@@ -197,7 +197,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		session.removeAttribute("presetValues");
 
 		if (sectionId == 0 && crfVersionId == 0 && eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_CRF_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
@@ -283,7 +283,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					sectionId = firstSec.getId();
 				}
 			} else {
-				addPageMessage(respage.getString("there_are_no_sections_ins_this_CRF"), request);
+				addPageMessage(getResPage().getString("there_are_no_sections_ins_this_CRF"), request);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 				return;
 			}
@@ -303,7 +303,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					sectionId = firstSec.getId();
 				}
 			} else {
-				addPageMessage(respage.getString("there_are_no_sections_ins_this_CRF_version"), request);
+				addPageMessage(getResPage().getString("there_are_no_sections_ins_this_CRF_version"), request);
 				if (eventCRFId == 0) {
 					forwardPage(Page.CRF_LIST_SERVLET, request, response);
 				} else {
@@ -448,7 +448,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				}
 			}
 
-			addPageMessage(respage.getString("discrepancy_notes_are_saved_successfully"), request);
+			addPageMessage(getResPage().getString("discrepancy_notes_are_saved_successfully"), request);
 			request.setAttribute("id", studySubjectId + "");
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {

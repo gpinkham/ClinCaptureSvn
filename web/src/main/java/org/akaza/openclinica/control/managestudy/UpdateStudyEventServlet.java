@@ -114,9 +114,9 @@ public class UpdateStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_active_study_or_contact"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+				+ getResPage().getString("change_active_study_or_contact"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -162,14 +162,14 @@ public class UpdateStudyEventServlet extends Controller {
 		if (StringUtil.isBlank(fromResolvingNotes)) {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
-			checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
+			checkStudyLocked(Page.MENU_SERVLET, getResPage().getString("current_study_locked"), request, response);
 			if (currentRole.getRole() != Role.INVESTIGATOR) {
-				checkStudyFrozen(Page.MENU_SERVLET, respage.getString("current_study_frozen"), request, response);
+				checkStudyFrozen(Page.MENU_SERVLET, getResPage().getString("current_study_frozen"), request, response);
 			}
 		}
 
 		if (studyEventId == 0 || studySubjectId == 0) {
-			addPageMessage(respage.getString("choose_a_study_event_to_edit"), request);
+			addPageMessage(getResPage().getString("choose_a_study_event_to_edit"), request);
 			request.setAttribute("id", Integer.toString(studySubjectId));
 			redirectToStudySubjectView(request, response, studySubjectId);
 			return;
@@ -186,8 +186,8 @@ public class UpdateStudyEventServlet extends Controller {
 
 		Status s = ssub.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-			addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
-					+ resterm.getString("updated") + "." + respage.getString("study_subject_has_been_deleted"),
+			addPageMessage(getResWord().getString("study_event") + getResTerm().getString("could_not_be")
+					+ getResTerm().getString("updated") + "." + getResPage().getString("study_subject_has_been_deleted"),
 					request);
 			request.setAttribute("id", Integer.toString(studySubjectId));
 			redirectToStudySubjectView(request, response, studySubjectId);
@@ -334,14 +334,14 @@ public class UpdateStudyEventServlet extends Controller {
 						.equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
 						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-								resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+								getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
 					}
 				} else {
 					// if in same date, only check when both had time entered
 					if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
 						if (end.before(start) || end.equals(start)) {
 							Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-									resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+									getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
 						}
 					}
 				}
@@ -475,7 +475,7 @@ public class UpdateStudyEventServlet extends Controller {
 				dnService.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 				dnService.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, studyEvent.getId(), "studyEvent", currentStudy);
 
-				addPageMessage(respage.getString("study_event_updated"), request);
+				addPageMessage(getResPage().getString("study_event_updated"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
 				request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
@@ -538,7 +538,7 @@ public class UpdateStudyEventServlet extends Controller {
 
 				session.removeAttribute("eventSigned");
 				request.setAttribute("id", Integer.toString(studySubjectId));
-				addPageMessage(respage.getString("study_event_updated"), request);
+				addPageMessage(getResPage().getString("study_event_updated"), request);
 				redirectToStudySubjectView(request, response, studySubjectId);
 			} else {
 				request.setAttribute(STUDY_SUBJECT_ID, Integer.toString(studySubjectId));
@@ -564,7 +564,7 @@ public class UpdateStudyEventServlet extends Controller {
 				request.setAttribute("displayEventCRFs", displayEventCRFs);
 
 				request.setAttribute("studyEvent", session.getAttribute("eventSigned"));
-				addPageMessage(restext.getString("password_match"), request);
+				addPageMessage(getResText().getString("password_match"), request);
 				forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED, request, response);
 			}
 		} else {

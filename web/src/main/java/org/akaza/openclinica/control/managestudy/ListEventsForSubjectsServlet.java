@@ -63,9 +63,9 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
 				"1");
 	}
 
@@ -95,7 +95,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 		int definitionId = fp.getInt("defId");
 		if (definitionId < 0) {
-			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"), request);
+			addPageMessage(getResPage().getString("please_choose_an_ED_ta_to_vies_details"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}

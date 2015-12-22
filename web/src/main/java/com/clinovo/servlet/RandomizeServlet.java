@@ -77,10 +77,10 @@ public class RandomizeServlet extends Controller {
 			return;
 		}
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
-				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
@@ -105,14 +105,14 @@ public class RandomizeServlet extends Controller {
 						result = randomize(request, writer);
 					} else if ("1".equals(eligibility)) {
 						throw new RandomizationException(
-								resexception.getString("subject_has_not_completed_ie_criteria"));
+								getResException().getString("subject_has_not_completed_ie_criteria"));
 					}
 				} else {
 					result = randomize(request, writer);
 				}
 
 			} else {
-				throw new RandomizationException(resexception.getString("subject_label_and_id_not_equals"));
+				throw new RandomizationException(getResException().getString("subject_label_and_id_not_equals"));
 			}
 		} catch (Exception ex) {
 			exception = ex;
@@ -253,7 +253,7 @@ public class RandomizeServlet extends Controller {
 		if (RandomizationUtil.isConfiguredTrialIdValid(configuredTrialId)) {
 			// Trial Id should be configured in one place
 			if (RandomizationUtil.isTrialIdDoubleConfigured(configuredTrialId, crfConfiguredTrialId)) {
-				throw new RandomizationException(resexception.getString("trial_id_not_configured_correctly"));
+				throw new RandomizationException(getResException().getString("trial_id_not_configured_correctly"));
 			} else {
 				trialId = configuredTrialId;
 			}
@@ -261,7 +261,7 @@ public class RandomizeServlet extends Controller {
 			trialId = crfConfiguredTrialId;
 		} else {
 			// Valid Trial Id must be specified at least in one place (CRF or Study properties)
-			throw new RandomizationException(resexception.getString("specify_valid_trial_id"));
+			throw new RandomizationException(getResException().getString("specify_valid_trial_id"));
 		}
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request
 				.getParameter("strataLevel");
@@ -298,7 +298,7 @@ public class RandomizeServlet extends Controller {
 		if (currentStudy.isSite(currentStudy.getId())) {
 			return currentStudy.getIdentifier();
 		} else {
-			throw new RandomizationException(resexception.getString("randomization_can_be_performer_only_at_site"));
+			throw new RandomizationException(getResException().getString("randomization_can_be_performer_only_at_site"));
 		}
 	}
 

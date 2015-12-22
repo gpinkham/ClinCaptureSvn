@@ -70,8 +70,8 @@ public class ReassignStudySubjectServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -81,9 +81,9 @@ public class ReassignStudySubjectServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -109,7 +109,7 @@ public class ReassignStudySubjectServlet extends Controller {
 
 		int studySubId = fp.getInt("id");
 		if (studySubId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_reassign"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_to_reassign"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 		} else {
 			StudySubjectBean studySub = (StudySubjectBean) ssdao.findByPK(studySubId);
@@ -125,7 +125,7 @@ public class ReassignStudySubjectServlet extends Controller {
 			} else {
 				int studyId = fp.getInt("studyId");
 				if (studyId == 0) {
-					addPageMessage(respage.getString("please_choose_a_study_site_to_reassign_the_subject"), request);
+					addPageMessage(getResPage().getString("please_choose_a_study_site_to_reassign_the_subject"), request);
 					forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 					return;
 				}
@@ -135,7 +135,7 @@ public class ReassignStudySubjectServlet extends Controller {
 					StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(studySub.getLabel(),
 							studyId, studySub.getId());
 					if (sub1.getId() > 0) {
-						addPageMessage(respage.getString("the_study_subject_ID_used_by_another_in_study_site"), request);
+						addPageMessage(getResPage().getString("the_study_subject_ID_used_by_another_in_study_site"), request);
 						forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 						return;
 					}
@@ -198,13 +198,13 @@ public class ReassignStudySubjectServlet extends Controller {
 					sgmdao.update(sgm);
 				}
 
-				mf.applyPattern(respage.getString("subject_reassigned"));
+				mf.applyPattern(getResPage().getString("subject_reassigned"));
 				Object[] arguments = { studySub.getLabel(), st.getName() };
 
 				return mf.format(arguments);
 			}
 		}
-		mf.applyPattern(respage.getString("subject_not_reassigned"));
+		mf.applyPattern(getResPage().getString("subject_not_reassigned"));
 		Object[] arguments = { studySub.getLabel() };
 
 		return mf.format(arguments);

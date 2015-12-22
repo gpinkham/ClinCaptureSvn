@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -37,7 +36,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -92,12 +90,6 @@ public class ListStudySubjectsServletTest {
 		Locale locale = new Locale("en");
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
-		Whitebox.setInternalState(listStudySubjectsServlet, "respage", respage);
-		Whitebox.setInternalState(listStudySubjectsServlet, "resexception", resexception);
-		Whitebox.setInternalState(listStudySubjectsServlet, "resformat", resformat);
 
 		currentStudy = new StudyBean();
 		currentStudy.setId(1);

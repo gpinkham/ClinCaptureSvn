@@ -54,18 +54,18 @@ public class TechAdminServlet extends Controller {
 		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
-		setToPanel(resword.getString("in_the_application"), "", request);
+		setToPanel(getResWord().getString("in_the_application"), "", request);
 		if (allSubjects.size() > 0) {
-			setToPanel(resword.getString("subjects"), new Integer(allSubjects.size()).toString(), request);
+			setToPanel(getResWord().getString("subjects"), new Integer(allSubjects.size()).toString(), request);
 		}
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString(), request);
+			setToPanel(getResWord().getString("users"), new Integer(allUsers.size()).toString(), request);
 		}
 		if (allStudies.size() > 0) {
-			setToPanel(resword.getString("studies"), new Integer(allStudies.size()).toString(), request);
+			setToPanel(getResWord().getString("studies"), new Integer(allStudies.size()).toString(), request);
 		}
 		if (allCrfs.size() > 0) {
-			setToPanel(resword.getString("CRFs"), new Integer(allCrfs.size()).toString(), request);
+			setToPanel(getResWord().getString("CRFs"), new Integer(allCrfs.size()).toString(), request);
 		}
 		forwardPage(Page.TECH_ADMIN_SYSTEM, request, response);
 	}
@@ -76,7 +76,7 @@ public class TechAdminServlet extends Controller {
 
 		if (!ub.isTechAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
-					resexception.getString("you_may_not_perform_technical_admin_functions"), "1");
+					getResException().getString("you_may_not_perform_technical_admin_functions"), "1");
 		}
 
 		return;

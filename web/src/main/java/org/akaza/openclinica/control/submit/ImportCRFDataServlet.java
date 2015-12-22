@@ -87,8 +87,8 @@ public class ImportCRFDataServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.MENU_SERVLET, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.MENU_SERVLET, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.MENU_SERVLET, getResPage().getString("current_study_frozen"), request, response);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -100,9 +100,9 @@ public class ImportCRFDataServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
 				"1");
 	}
 
@@ -135,7 +135,7 @@ public class ImportCRFDataServlet extends Controller {
 			String dir = SQLInitServlet.getField("filePath");
 			if (!new File(dir).exists()) {
 				logger.info("The filePath in datainfo.properties is invalid " + dir);
-				addPageMessage(respage.getString("filepath_you_defined_not_seem_valid"), request);
+				addPageMessage(getResPage().getString("filepath_you_defined_not_seem_valid"), request);
 				forwardPage(Page.IMPORT_CRF_DATA, request, response);
 				return;
 			}
@@ -178,11 +178,11 @@ public class ImportCRFDataServlet extends Controller {
 						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
 				logger.debug("found length of subject list: "
 						+ odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
-				addPageMessage(respage.getString("passed_xml_validation"), request);
+				addPageMessage(getResPage().getString("passed_xml_validation"), request);
 			} catch (Exception me1) {
 				me1.printStackTrace();
 				MessageFormat mf = new MessageFormat("");
-				mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
+				mf.applyPattern(getResPage().getString("your_xml_is_not_well_formed"));
 				Object[] arguments = {me1.getMessage()};
 				addPageMessage(mf.format(arguments), request);
 				forwardPage(Page.IMPORT_CRF_DATA, request, response);
@@ -205,8 +205,8 @@ public class ImportCRFDataServlet extends Controller {
 					forwardPage(Page.IMPORT_CRF_DATA, request, response);
 					return;
 				} else {
-					addPageMessage(respage.getString("passed_study_check"), request);
-					addPageMessage(respage.getString("passed_oid_metadata_check"), request);
+					addPageMessage(getResPage().getString("passed_study_check"), request);
+					addPageMessage(getResPage().getString("passed_oid_metadata_check"), request);
 				}
 
 			}
@@ -219,7 +219,7 @@ public class ImportCRFDataServlet extends Controller {
 
 			if (eventCRFBeans == null) {
 				fail = true;
-				addPageMessage(respage.getString("no_event_status_matching"), request);
+				addPageMessage(getResPage().getString("no_event_status_matching"), request);
 			} else {
 				ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
 				logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
@@ -244,10 +244,10 @@ public class ImportCRFDataServlet extends Controller {
 					// so that we don't repeat this following message
 					// did we exclude all the event CRFs? if not, pass, else fail
 					if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
-						addPageMessage(respage.getString("passed_event_crf_status_check"), request);
+						addPageMessage(getResPage().getString("passed_event_crf_status_check"), request);
 					} else {
 						fail = true;
-						addPageMessage(respage.getString("the_event_crf_not_correct_status"), request);
+						addPageMessage(getResPage().getString("the_event_crf_not_correct_status"), request);
 					}
 
 					try {
@@ -263,7 +263,7 @@ public class ImportCRFDataServlet extends Controller {
 						// what if you have 2 event crfs but the third is a fake?
 						fail = true;
 						logger.debug("threw a NPE after calling lookup validation errors");
-						addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"), request);
+						addPageMessage(getResPage().getString("an_error_was_thrown_while_validation_errors"), request);
 					} catch (OpenClinicaException oce1) {
 						fail = true;
 						logger.debug(
@@ -272,14 +272,14 @@ public class ImportCRFDataServlet extends Controller {
 					}
 				} else {
 					fail = true;
-					addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"), request);
+					addPageMessage(getResPage().getString("no_event_crfs_matching_the_xml_metadata"), request);
 				}
 			}
 			if (fail) {
 				logger.debug("failed here - forwarding...");
 				forwardPage(Page.IMPORT_CRF_DATA, request, response);
 			} else {
-				addPageMessage(respage.getString("passing_crf_edit_checks"), request);
+				addPageMessage(getResPage().getString("passing_crf_edit_checks"), request);
 				request.getSession().setAttribute("odmContainer", odmContainer);
 				request.getSession().setAttribute("importedData", displayItemBeanWrappers);
 				request.getSession().setAttribute("validationErrors", totalValidationErrors);
@@ -292,11 +292,11 @@ public class ImportCRFDataServlet extends Controller {
 				request.getSession().setAttribute("subjectData",
 						odmContainer.getCrfDataPostImportContainer().getSubjectData());
 				if (request.getAttribute("hasSkippedItems") != null) {
-					addPageMessage(resword.getString("import_msg_part1") + " "
+					addPageMessage(getResWord().getString("import_msg_part1") + " "
 							+ (currentStudy.getParentStudyId() > 0
-									? resword.getString("site")
-									: resword.getString("study"))
-							+ " " + resword.getString("import_msg_part2"), request);
+									? getResWord().getString("site")
+									: getResWord().getString("study"))
+							+ " " + getResWord().getString("import_msg_part2"), request);
 				}
 				forwardPage(Page.VERIFY_IMPORT_SERVLET, request, response);
 			}
@@ -318,7 +318,7 @@ public class ImportCRFDataServlet extends Controller {
 			} else if (!f.getName().contains(".xml") && !f.getName().contains(".XML")) {
 				logger.info("file name:" + f.getName());
 				// TODO change the message below
-				addPageMessage(respage.getString("file_you_uploaded_not_seem_xml_file"), request);
+				addPageMessage(getResPage().getString("file_you_uploaded_not_seem_xml_file"), request);
 				f = null;
 			}
 		}

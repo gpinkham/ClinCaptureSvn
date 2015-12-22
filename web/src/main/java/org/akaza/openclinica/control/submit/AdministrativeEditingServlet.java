@@ -141,7 +141,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 		if (StringUtil.isBlank(fromResolvingNotes)) {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
-			checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+			checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
 		}
 		request.setAttribute("fromResolvingNotes", fromResolvingNotes);
 		DataEntryStage stage = ecb.getStage();
@@ -150,8 +150,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
 		if (!maySubmitData(ub, currentRole)) {
 			session.setAttribute("mayProcessUploading", "false");
-			String exceptionName = resexception.getString("no_permission_validation");
-			String noAccessMessage = respage.getString("you_may_not_perform_administrative_editing");
+			String exceptionName = getResException().getString("no_permission_validation");
+			String noAccessMessage = getResPage().getString("you_may_not_perform_administrative_editing");
 
 			addPageMessage(noAccessMessage, request);
 			throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
@@ -161,16 +161,16 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 			if (Role.isMonitor(r)) {
 				session.setAttribute("mayProcessUploading", "false");
 				addPageMessage(
-						respage.getString("no_have_correct_privilege_current_study")
-								+ respage.getString("change_study_contact_sysadmin"), request);
+						getResPage().getString("no_have_correct_privilege_current_study")
+								+ getResPage().getString("change_study_contact_sysadmin"), request);
 				throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-						resexception.getString("no_permission_administrative_editing"), "1");
+						getResException().getString("no_permission_administrative_editing"), "1");
 			}
 		} else {
 			session.setAttribute("mayProcessUploading", "false");
-			addPageMessage(respage.getString("you_may_not_perform_administrative_editing"), request);
+			addPageMessage(getResPage().getString("you_may_not_perform_administrative_editing"), request);
 			throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					respage.getString("you_may_not_perform_administrative_editing"), "1");
+					getResPage().getString("you_may_not_perform_administrative_editing"), "1");
 		}
 	}
 

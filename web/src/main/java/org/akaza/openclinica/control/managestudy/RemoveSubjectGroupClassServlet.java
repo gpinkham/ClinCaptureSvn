@@ -65,7 +65,7 @@ public class RemoveSubjectGroupClassServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"), request,
+		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, getResPage().getString("current_study_locked"), request,
 				response);
 		if (ub.isSysAdmin()) {
 			return;
@@ -76,10 +76,10 @@ public class RemoveSubjectGroupClassServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class RemoveSubjectGroupClassServlet extends Controller {
 		int classId = fp.getInt("id");
 
 		if (classId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_subject_group_class_to_remove"), request);
 			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 		} else {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(getDataSource());
@@ -108,7 +108,7 @@ public class RemoveSubjectGroupClassServlet extends Controller {
 				checkRoleByUserAndStudy(request, response, ub, group.getStudyId(), study.getParentStudyId());
 
 				if (group.getStatus().equals(Status.DELETED)) {
-					addPageMessage(respage.getString("this_subject_group_class_has_been_deleted_already"), request);
+					addPageMessage(getResPage().getString("this_subject_group_class_has_been_deleted_already"), request);
 					forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 					return;
 				}
@@ -154,10 +154,10 @@ public class RemoveSubjectGroupClassServlet extends Controller {
 						sgmdao.update(sgmb);
 					}
 				}
-				addPageMessage(respage.getString("this_subject_group_class_was_removed_succesfully"), request);
+				addPageMessage(getResPage().getString("this_subject_group_class_was_removed_succesfully"), request);
 				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 			} else {
-				addPageMessage(respage.getString("no_action_specified"), request);
+				addPageMessage(getResPage().getString("no_action_specified"), request);
 				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 			}
 		}

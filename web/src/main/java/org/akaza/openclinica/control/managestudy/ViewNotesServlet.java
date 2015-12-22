@@ -253,7 +253,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.setAttribute("summaryMap", customStat);
 		request.setAttribute("typeKeys", customTotalMap);
 		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
-		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
+		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(getResTerm()));
 		request.setAttribute("grandTotal", customTotalMap.get("Total"));
 		if (request.getSession().getAttribute(PRINT_DCF) != null) {
 			request.setAttribute(PRINT_DCF, request.getSession().getAttribute(PRINT_DCF));
@@ -318,10 +318,10 @@ public class ViewNotesServlet extends RememberLastPage {
 		}
 
 		addPageMessage(
-				respage.getString("no_permission_to_view_discrepancies")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_permission_to_view_discrepancies")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director_or_study_cordinator"), "1");
+				getResException().getString("not_study_director_or_study_cordinator"), "1");
 	}
 
 	@Override
@@ -361,28 +361,28 @@ public class ViewNotesServlet extends RememberLastPage {
 				getDcfService().updateDiscrepancyNotes(noteAndEntityIds, currentStudy, currentUser);
 				String successMessage;
 				if (selectedRenderTypes.contains("email")) {
-					successMessage = MessageFormat.format(resword.getString("dcf_generated_successfully_emailed"),
+					successMessage = MessageFormat.format(getResWord().getString("dcf_generated_successfully_emailed"),
 							recipientEmail);
 				} else {
-					successMessage = resword.getString("dcf_generated_successfully");
+					successMessage = getResWord().getString("dcf_generated_successfully");
 				}
 				addPageMessage(successMessage, request);
 			} else {
-				addPageMessage(resword.getString("dcf_generation_failed"), request);
+				addPageMessage(getResWord().getString("dcf_generation_failed"), request);
 			}
 		} catch (FileNotFoundException e) {
 			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.getMessage());
 			e.printStackTrace();
-			addPageMessage(MessageFormat.format(resword.getString("dcf_generation_failed_details"), e.getMessage()),
+			addPageMessage(MessageFormat.format(getResWord().getString("dcf_generation_failed_details"), e.getMessage()),
 					request);
 		} catch (MailSendException e) {
 			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.toString());
 			e.printStackTrace();
-			addPageMessage(resword.getString("dcf_generation_email_failed"), request);
+			addPageMessage(getResWord().getString("dcf_generation_email_failed"), request);
 		} catch (Exception e) {
 			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.toString());
 			e.printStackTrace();
-			addPageMessage(resword.getString("dcf_generation_failed"), request);
+			addPageMessage(getResWord().getString("dcf_generation_failed"), request);
 		}
 	}
 
@@ -440,7 +440,7 @@ public class ViewNotesServlet extends RememberLastPage {
 	private DcfRenderType getEmailRenderType(String dcfFile, String recipientEmail, boolean multipleDcfs,
 			StudyBean currentStudy, UserAccountBean currentUser) {
 		String dcfName = dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1).replace(".pdf", "");
-		String dcfEmailSubject = multipleDcfs ? resword.getString("dcf_email_subject_multiple") : resword
+		String dcfEmailSubject = multipleDcfs ? getResWord().getString("dcf_email_subject_multiple") : getResWord()
 				.getString("dcf").concat(": ").concat(dcfName);
 		DcfRenderType emailer = new DcfEmailer.DcfEmailerBuilder().addDcfFilePath(dcfFile).addDcfName(dcfName)
 				.addEmailSubject(dcfEmailSubject).addMailSender(getMailSender()).addRecipientEmail(recipientEmail)

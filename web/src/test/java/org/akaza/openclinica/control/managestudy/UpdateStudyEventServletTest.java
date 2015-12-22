@@ -50,8 +50,8 @@ import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SignUtil;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Status.class, ResourceBundleProvider.class, UpdateStudyEventServlet.class, FormProcessor.class,
-		StudySubjectDAO.class, SignUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class,
+@PrepareForTest({Status.class, UpdateStudyEventServlet.class, FormProcessor.class, StudySubjectDAO.class,
+		SignUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class,
 		StudyEventDefinitionUtil.class})
 public class UpdateStudyEventServletTest {
 
@@ -111,6 +111,7 @@ public class UpdateStudyEventServletTest {
 
 	@Before
 	public void setUp() throws Exception {
+		ResourceBundleProvider.updateLocale(Locale.ENGLISH);
 		PowerMockito.doReturn(discNotes).when(session).getAttribute("fdnotes");
 		PowerMockito.doReturn(1).when(studyBean).getId();
 		PowerMockito.doReturn(0).when(studyBean).getParentStudyId();
@@ -119,9 +120,7 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(Locale.ENGLISH).when(session).getAttribute(LocaleResolver.CURRENT_SESSION_LOCALE);
 		PowerMockito.mockStatic(Status.class);
 		PowerMockito.mockStatic(SignUtil.class);
-		PowerMockito.mockStatic(ResourceBundleProvider.class);
 		PowerMockito.mockStatic(StudyEventDefinitionUtil.class);
-		PowerMockito.when(ResourceBundleProvider.getTermsBundle()).thenReturn(resterm);
 		PowerMockito.doCallRealMethod().when(updateStudyEventServlet).processRequest(request, response);
 		PowerMockito.doReturn(userAccountBean).when(updateStudyEventServlet).getUserAccountBean(request);
 		PowerMockito.doReturn(studyUserRoleBean).when(updateStudyEventServlet).getCurrentRole(request);
@@ -135,7 +134,6 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(configurationDao).when(updateStudyEventServlet).getConfigurationDao();
 		PowerMockito.doReturn(eventDefinitionCRFDAO).when(updateStudyEventServlet).getEventDefinitionCRFDAO();
 		PowerMockito.doReturn(session).when(request).getSession();
-		Whitebox.setInternalState(updateStudyEventServlet, "respage", respage);
 		Whitebox.setInternalState(updateStudyEventServlet, "logger", PowerMockito.mock(Logger.class));
 		PowerMockito.doReturn(currentStudyLocked).when(respage).getString("current_study_locked");
 		PowerMockito.whenNew(FormProcessor.class).withAnyArguments().thenReturn(formProcessor);

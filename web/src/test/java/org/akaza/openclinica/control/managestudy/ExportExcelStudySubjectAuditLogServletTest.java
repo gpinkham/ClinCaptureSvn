@@ -17,7 +17,6 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.Locale;
 
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,8 +75,6 @@ public class ExportExcelStudySubjectAuditLogServletTest {
 
 		Mockito.when(servletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(requestDispatcher);
 		Mockito.doReturn(servletContext).when(exportExcelStudySubjectAuditLogServlet).getServletContext();
-		Whitebox.setInternalState(exportExcelStudySubjectAuditLogServlet, "respage",
-				ResourceBundleProvider.getPageMessagesBundle());
 	}
 
 	@Test

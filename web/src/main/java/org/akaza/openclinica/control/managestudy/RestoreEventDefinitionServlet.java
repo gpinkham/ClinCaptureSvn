@@ -54,16 +54,16 @@ public class RestoreEventDefinitionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -79,13 +79,13 @@ public class RestoreEventDefinitionServlet extends Controller {
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_SED_to_restore"), request);
+			addPageMessage(getResPage().getString("please_choose_a_SED_to_restore"), request);
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studyEventDefinitionBean.getStatus().equals(Status.DELETED)) {
-					addPageMessage(respage.getString("this_SED_cannot_be_restored") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(getResPage().getString("this_SED_cannot_be_restored") + " "
+							+ getResPage().getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					return;
 				}
@@ -99,8 +99,8 @@ public class RestoreEventDefinitionServlet extends Controller {
 
 				getEventDefinitionService().restoreStudyEventDefinition(studyEventDefinitionBean, updater);
 
-				String emailBody = respage.getString("the_SED").concat(" ").concat(studyEventDefinitionBean.getName())
-						.concat("(").concat(respage.getString("and_all_associated_event_data_restored_to_study"))
+				String emailBody = getResPage().getString("the_SED").concat(" ").concat(studyEventDefinitionBean.getName())
+						.concat("(").concat(getResPage().getString("and_all_associated_event_data_restored_to_study"))
 						.concat(currentStudy.getName()).concat(".");
 
 				addPageMessage(emailBody, request);

@@ -171,9 +171,6 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows,
 			HttpServletRequest request) {
 		StudyBean currentStudy = getCurrentStudy(request);
-		Locale l = LocaleResolver.getLocale(request);
-		resword = ResourceBundleProvider.getWordsBundle(l);
-		resformat = ResourceBundleProvider.getFormatBundle(l);
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		StudySubjectDAO studySubjectDAO = getStudySubjectDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -235,15 +232,15 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 					if (!StringUtil.isBlank(column)) {
 						if ("gender".equalsIgnoreCase(column)) {
 							dnb.setEntityValue(sb.getGender() + "");
-							dnb.setEntityName(resword.getString("gender"));
+							dnb.setEntityName(getResWord().getString("gender"));
 						} else if ("date_of_birth".equals(column)) {
 							if (sb.getDateOfBirth() != null) {
 								dnb.setEntityValue(sb.getDateOfBirth().toString());
 
 							}
-							dnb.setEntityName(resword.getString("date_of_birth"));
+							dnb.setEntityName(getResWord().getString("date_of_birth"));
 						} else if ("unique_identifier".equalsIgnoreCase(column)) {
-							dnb.setEntityName(resword.getString("unique_identifier"));
+							dnb.setEntityName(getResWord().getString("unique_identifier"));
 							dnb.setEntityValue(sb.getUniqueIdentifier());
 						}
 					}
@@ -258,7 +255,7 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 								dnb.setEntityValue(ssb.getEnrollmentDate().toString());
 
 							}
-							dnb.setEntityName(resword.getString("enrollment_date"));
+							dnb.setEntityName(getResWord().getString("enrollment_date"));
 
 						}
 					}
@@ -281,11 +278,11 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 					}
 					dnb.setCrfName(cb.getName());
 
-					String crfStatus = resword.getString(ecb.getStage().getNameRaw());
-					if (crfStatus.equals(resword.getString("invalid"))) {
+					String crfStatus = getResWord().getString(ecb.getStage().getNameRaw());
+					if (crfStatus.equals(getResWord().getString("invalid"))) {
 						crfStatus = "";
-					} else if (crfStatus.equals(resword.getString("data_entry_complete"))) {
-						crfStatus = resterm.getString("complete");
+					} else if (crfStatus.equals(getResWord().getString("data_entry_complete"))) {
+						crfStatus = getResTerm().getString("complete");
 					}
 					dnb.setCrfStatus(crfStatus);
 
@@ -296,10 +293,10 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 								dnb.setEntityValue(ecb.getDateInterviewed().toString());
 
 							}
-							dnb.setEntityName(resword.getString("date_interviewed"));
+							dnb.setEntityName(getResWord().getString("date_interviewed"));
 						} else if ("interviewer_name".equals(column)) {
 							dnb.setEntityValue(ecb.getInterviewerName());
-							dnb.setEntityName(resword.getString("interviewer_name"));
+							dnb.setEntityName(getResWord().getString("interviewer_name"));
 						}
 					}
 				} else if (entityType.equalsIgnoreCase("studyEvent")) {
@@ -319,15 +316,15 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 							if (se.getDateStarted() != null) {
 								dnb.setEntityValue(se.getDateStarted().toString());
 							}
-							dnb.setEntityName(resword.getString("start_date"));
+							dnb.setEntityName(getResWord().getString("start_date"));
 						} else if ("date_end".equals(column)) {
 							if (se.getDateEnded() != null) {
 								dnb.setEntityValue(se.getDateEnded().toString());
 							}
-							dnb.setEntityName(resword.getString("end_date"));
+							dnb.setEntityName(getResWord().getString("end_date"));
 						} else if ("location".equals(column)) {
 							dnb.setEntityValue(se.getLocation());
-							dnb.setEntityName(resword.getString("location"));
+							dnb.setEntityName(getResWord().getString("location"));
 						}
 					}
 				} else if (entityType.equalsIgnoreCase("itemData")) {
@@ -356,11 +353,11 @@ public class DiscrepancyNoteOutputServlet extends Controller {
 					dnb.setEventStart(se.getDateStarted());
 					dnb.setEventName(se.getName());
 					dnb.setCrfName(cb.getName());
-					String crfStatus = resword.getString(ec.getStage().getNameRaw());
-					if (crfStatus.equals(resword.getString("invalid"))) {
+					String crfStatus = getResWord().getString(ec.getStage().getNameRaw());
+					if (crfStatus.equals(getResWord().getString("invalid"))) {
 						crfStatus = "";
-					} else if (crfStatus.equals(resword.getString("data_entry_complete"))) {
-						crfStatus = resterm.getString("complete");
+					} else if (crfStatus.equals(getResWord().getString("data_entry_complete"))) {
+						crfStatus = getResTerm().getString("complete");
 					}
 					dnb.setCrfStatus(crfStatus);
 				}

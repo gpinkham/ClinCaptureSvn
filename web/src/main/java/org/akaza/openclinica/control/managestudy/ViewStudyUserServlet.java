@@ -55,10 +55,10 @@ public class ViewStudyUserServlet extends Controller {
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_USER_IN_STUDY_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -69,7 +69,7 @@ public class ViewStudyUserServlet extends Controller {
 		String studyIdString = request.getParameter("studyId");
 
 		if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
-			addPageMessage(respage.getString("please_choose_a_user_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_user_to_view"), request);
 			forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
 		} else {
 			int studyId = Integer.parseInt(studyIdString.trim());

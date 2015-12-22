@@ -69,7 +69,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -83,10 +83,10 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 				return;
 			} else {
-				addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
-						+ respage.getString("please_contact_sysadmin_questions"), request);
+				addPageMessage(getResPage().getString("no_have_permission_to_update_study_event_definition")
+						+ getResPage().getString("please_contact_sysadmin_questions"), request);
 				throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-						resexception.getString("not_study_director"), "1");
+						getResException().getString("not_study_director"), "1");
 
 			}
 		}
@@ -102,9 +102,9 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 				StudyEventBean sb = (StudyEventBean) event;
 				if (!sb.getStatus().equals(Status.DELETED) && !sb.getStatus().equals(Status.AUTO_DELETED)) {
 					logger.info("found one event");
-					addPageMessage(respage.getString("sorry_but_at_this_time_may_not_modufy_SED"), request);
+					addPageMessage(getResPage().getString("sorry_but_at_this_time_may_not_modufy_SED"), request);
 					throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-							resexception.getString("not_unpopulated"), "1");
+							getResException().getString("not_unpopulated"), "1");
 				}
 			}
 		}
@@ -122,7 +122,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		StudyEventDefinitionDAO sdao = getStudyEventDefinitionDAO();
 		logger.info("definition id: " + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_definition_to_edit"), request);
+			addPageMessage(getResPage().getString("please_choose_a_definition_to_edit"), request);
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			// definition id
@@ -130,8 +130,8 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
 			if (currentStudy.getId() != studyEventDefinitionBean.getStudyId()) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"), request);
+				addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_active_study_or_contact"), request);
 				forwardPage(Page.MENU_SERVLET, request, response);
 				return;
 			}
@@ -174,7 +174,7 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		if (userBean.getName() != null) {
 			request.getSession().setAttribute("userNameInsteadEmail", userBean.getName());
 		} else {
-			request.getSession().setAttribute("userNameInsteadEmail", resexception.getString("not_found_in_the_db"));
+			request.getSession().setAttribute("userNameInsteadEmail", getResException().getString("not_found_in_the_db"));
 		}
 	}
 }

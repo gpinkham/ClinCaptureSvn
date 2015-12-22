@@ -57,8 +57,8 @@ public class DeleteStudyEventServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -69,9 +69,9 @@ public class DeleteStudyEventServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -91,7 +91,7 @@ public class DeleteStudyEventServlet extends Controller {
 		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
 
 		if (studyEventId == 0) {
-			addPageMessage(respage.getString("please_choose_a_SE_to_remove"), request);
+			addPageMessage(getResPage().getString("please_choose_a_SE_to_remove"), request);
 			request.setAttribute("id", Integer.toString(studySubId));
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {

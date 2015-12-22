@@ -260,7 +260,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 
 		if (!discrepancyNoteBean.isActive()) {
 			throw new InconsistentStateException(Page.MENU_SERVLET,
-					resexception.getString("you_are_trying_resolve_discrepancy_not_exist"));
+					getResException().getString("you_are_trying_resolve_discrepancy_not_exist"));
 		}
 
 		// check that the note has not already been closed
@@ -329,7 +329,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 
 		if (p == null) {
 			throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET,
-					resexception.getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
+					getResException().getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
 		} else {
 			String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean,
 					ResolutionStatus.CLOSED, true);
@@ -347,7 +347,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 
 		if (!goNext) {
 			setPopUpURL(request, "");
-			addPageMessage(respage.getString("you_may_not_perform_admin_edit_on_CRF_not_completed_by_user"), request);
+			addPageMessage(getResPage().getString("you_may_not_perform_admin_edit_on_CRF_not_completed_by_user"), request);
 			p = Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET;
 		}
 
@@ -375,10 +375,10 @@ public class ResolveDiscrepancyServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_permission_to_resolve_discrepancy")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_permission_to_resolve_discrepancy")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				resexception.getString("not_study_director_or_study_coordinator"), "1");
+				getResException().getString("not_study_director_or_study_coordinator"), "1");
 	}
 
 	/**

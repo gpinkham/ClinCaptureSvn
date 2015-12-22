@@ -13,6 +13,10 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -38,16 +42,10 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 @RunWith(PowerMockRunner.class)
 public class ViewSectionDataEntryServletTest {
@@ -99,8 +97,8 @@ public class ViewSectionDataEntryServletTest {
 
 		Mockito.doReturn(eventDefinitionCRFDAO).when(viewSectionDataEntryServlet).getEventDefinitionCRFDAO();
 		Mockito.doReturn(crfVersionDAO).when(viewSectionDataEntryServlet).getCRFVersionDAO();
-		Mockito.doReturn(displayTableOfContentsBean).when(viewSectionDataEntryServlet).getDisplayBeanByCrfVersionId(
-				Mockito.anyInt());
+		Mockito.doReturn(displayTableOfContentsBean).when(viewSectionDataEntryServlet)
+				.getDisplayBeanByCrfVersionId(Mockito.anyInt());
 		Mockito.doReturn(sectionDAO).when(viewSectionDataEntryServlet).getSectionDAO();
 		Mockito.doReturn(itemGroupDAO).when(viewSectionDataEntryServlet).getItemGroupDAO();
 		Mockito.doReturn(servletContext).when(viewSectionDataEntryServlet).getServletContext();
@@ -115,10 +113,6 @@ public class ViewSectionDataEntryServletTest {
 		Locale locale = new Locale("en");
 		request.setPreferredLocales(Arrays.asList(locale));
 		ResourceBundleProvider.updateLocale(locale);
-		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
-		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-		Whitebox.setInternalState(viewSectionDataEntryServlet, "resformat", resformat);
-		Whitebox.setInternalState(viewSectionDataEntryServlet, "respage", respage);
 	}
 
 	@Test

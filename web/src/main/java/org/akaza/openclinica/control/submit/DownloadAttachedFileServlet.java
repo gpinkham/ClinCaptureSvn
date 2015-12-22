@@ -65,15 +65,15 @@ public class DownloadAttachedFileServlet extends Controller {
 		if (eventCRFId > 0) {
 			if (!entityIncluded(eventCRFId, ub.getName(), edao)) {
 				request.setAttribute("downloadStatus", "false");
-				addPageMessage(respage.getString("you_not_have_permission_download_attached_file"), request);
+				addPageMessage(getResPage().getString("you_not_have_permission_download_attached_file"), request);
 				throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE,
-						resexception.getString("no_permission"), "1");
+						getResException().getString("no_permission"), "1");
 			}
 		} else {
 			request.setAttribute("downloadStatus", "false");
-			addPageMessage(respage.getString("you_not_have_permission_download_attached_file"), request);
+			addPageMessage(getResPage().getString("you_not_have_permission_download_attached_file"), request);
 			throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE,
-					resexception.getString("no_permission"), "1");
+					getResException().getString("no_permission"), "1");
 		}
 
 		if (ub.isSysAdmin()) {
@@ -84,8 +84,8 @@ public class DownloadAttachedFileServlet extends Controller {
 		}
 
 		request.setAttribute("downloadStatus", "false");
-		addPageMessage(respage.getString("you_not_have_permission_download_attached_file"), request);
-		throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE, resexception.getString("no_permission"),
+		addPageMessage(getResPage().getString("you_not_have_permission_download_attached_file"), request);
+		throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE, getResException().getString("no_permission"),
 				"1");
 	}
 
@@ -142,7 +142,7 @@ public class DownloadAttachedFileServlet extends Controller {
 		logger.info("realName = " + realName);
 		if (!file.exists() || file.length() <= 0) {
 			addPageMessage(
-					resterm.getString("file_upper_case") + " " + filePathName + " " + respage.getString("not_exist"),
+					getResTerm().getString("file_upper_case") + " " + filePathName + " " + getResPage().getString("not_exist"),
 					request);
 		} else {
 			// response.setContentType("application/octet-stream");

@@ -78,7 +78,7 @@ public class ViewEventCRFServlet extends Controller {
 		SectionDAO secdao = new SectionDAO(getDataSource());
 
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_an_event_CRF_to_view"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 		} else {
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);

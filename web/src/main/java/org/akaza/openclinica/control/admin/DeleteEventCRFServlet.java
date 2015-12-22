@@ -67,9 +67,9 @@ public class DeleteEventCRFServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, getResException().getString("not_admin"), "1");
 
 	}
 
@@ -96,7 +96,7 @@ public class DeleteEventCRFServlet extends Controller {
 		StudyDAO sdao = getStudyDAO();
 
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_delete"), request);
+			addPageMessage(getResPage().getString("please_choose_an_event_CRF_to_delete"), request);
 			request.setAttribute("id", Integer.toString(studySubId));
 			smartForward(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {
@@ -151,8 +151,8 @@ public class DeleteEventCRFServlet extends Controller {
 
 				getEventCRFService().deleteEventCRF(eventCRF, ub);
 
-				String emailBody = respage.getString("the_event_CRF") + cb.getName()
-						+ respage.getString("has_been_deleted_from_the_event")
+				String emailBody = getResPage().getString("the_event_CRF") + cb.getName()
+						+ getResPage().getString("has_been_deleted_from_the_event")
 						+ event.getStudyEventDefinition().getName() + ".";
 
 				addPageMessage(emailBody, request);

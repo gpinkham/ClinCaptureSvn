@@ -77,6 +77,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.MapsHolder;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
@@ -102,7 +103,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -132,6 +132,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.RequestUtil;
 
 /**
  * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the
@@ -146,24 +147,26 @@ public abstract class Controller extends BaseController {
 	public final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final String CW = "cw";
+	public static final String INPUT_TIME_ZONE = "timeZone";
 	public static final String CC_DATE_FORMAT = "ccDateFormat";
 	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
+	public static final String CURRENT_MAPS_HOLDER = "currentMapHolder";
 	public static final String EVALUATION_ENABLED = "evaluationEnabled";
 	public static final String DATE_FORMAT_STRING = "date_format_string";
 	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
-	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
 	public static final String TIME_ZONE_IDS_SORTED_REQUEST_ATR = "timeZoneIDsSorted";
-	public static final String INPUT_TIME_ZONE = "timeZone";
+	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
 
 	// entity bean list field names
 	public static final String EBL_PAGE = "ebl_page";
-	public static final String EBL_SORT_COLUMN = "ebl_sortColumnInd";
-	public static final String EBL_SORT_ORDER = "ebl_sortAscending";
 	public static final String EBL_FILTERED = "ebl_filtered";
-	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String EBL_PAGINATED = "ebl_paginated";
+	public static final String EBL_SORT_ORDER = "ebl_sortAscending";
+	public static final String EBL_SORT_COLUMN = "ebl_sortColumnInd";
+	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String COOKIE_NAME = "lastAccessedInstanceType";
+
 	public static final int MONTH_IN_SECONDS = 2592000;
 
 	/**
@@ -331,8 +334,8 @@ public abstract class Controller extends BaseController {
 		UserAccountBean ub = getUserAccountBean(request);
 		Date lastChangeDate = ub.getPasswdTimestamp();
 		if (lastChangeDate == null) {
-			addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
-					+ respage.getString("password_set"), request);
+			addPageMessage(getResPage().getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
+					+ getResPage().getString("password_set"), request);
 			int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("pwd.change.required"));
 			if (pwdChangeRequired == 1) {
 				request.setAttribute("mustChangePass", "yes");
@@ -362,8 +365,8 @@ public abstract class Controller extends BaseController {
 						// The extract data job failed with the message:
 						// ERROR: relation "demographics" already exists
 						// More information may be available in the log files.
-						addPageMessage(respage.getString("the_extract_data_job_failed") + failMessage
-								+ respage.getString("more_information_may_be_available"), request);
+						addPageMessage(getResPage().getString("the_extract_data_job_failed") + failMessage
+								+ getResPage().getString("more_information_may_be_available"), request);
 						request.getSession().removeAttribute("jobName");
 						request.getSession().removeAttribute("groupName");
 						request.getSession().removeAttribute("datasetId");
@@ -379,9 +382,9 @@ public abstract class Controller extends BaseController {
 							if (successMsg != null && !successMsg.isEmpty()) {
 								addPageMessage(successMsg, request);
 							} else {
-								addPageMessage(respage.getString("your_extract_is_now_completed")
+								addPageMessage(getResPage().getString("your_extract_is_now_completed")
 										+ " <a href='ExportDataset?datasetId=" + datasetId + "'>"
-										+ resword.getString("here_lower_case") + "</a>.", request);
+										+ getResWord().getString("here_lower_case") + "</a>.", request);
 							}
 							request.getSession().removeAttribute("jobName");
 							request.getSession().removeAttribute("groupName");
@@ -405,7 +408,7 @@ public abstract class Controller extends BaseController {
 		if (fileBeans.size() > 0) {
 			successMsg = successMsg.replace("$linkURL",
 					"<a href=\"" + SQLInitServlet.getSystemURL() + "AccessFile?fileId=" + fileBeans.get(0).getId()
-							+ "\">" + resword.getString("here_lower_case") + "</a>");
+							+ "\">" + getResWord().getString("here_lower_case") + "</a>");
 		}
 		return successMsg;
 	}
@@ -464,18 +467,10 @@ public abstract class Controller extends BaseController {
 
 		// Set current language preferences
 		LocaleResolver.resolveLocale();
-		resadmin = ResourceBundleProvider.getAdminBundle();
-		resaudit = ResourceBundleProvider.getAuditEventsBundle();
-		resexception = ResourceBundleProvider.getExceptionsBundle();
-		resformat = ResourceBundleProvider.getFormatBundle();
-		restext = ResourceBundleProvider.getTextsBundle();
-		resterm = ResourceBundleProvider.getTermsBundle();
-		resword = ResourceBundleProvider.getWordsBundle();
-		respage = ResourceBundleProvider.getPageMessagesBundle();
-		resworkflow = ResourceBundleProvider.getWorkflowBundle();
 
-		response.addCookie(new Cookie(BOOSTRAP_DATE_FORMAT, resformat.getString(BOOTSTRAP_DATAPICKER_DATE_FORMAT)));
-		response.addCookie(new Cookie(CC_DATE_FORMAT, resformat.getString(DATE_FORMAT_STRING)));
+		response.addCookie(
+				new Cookie(BOOSTRAP_DATE_FORMAT, getResFormat().getString(BOOTSTRAP_DATAPICKER_DATE_FORMAT)));
+		response.addCookie(new Cookie(CC_DATE_FORMAT, getResFormat().getString(DATE_FORMAT_STRING)));
 
 		initMaps();
 		getErrorsHolder(request);
@@ -560,7 +555,7 @@ public abstract class Controller extends BaseController {
 					startWith = "";
 					pageMessages = new ArrayList();
 				}
-				String message = resword.getString(STUDY_SHOUD_BE_IN_AVAILABLE_MODE) + BR;
+				String message = getResWord().getString(STUDY_SHOUD_BE_IN_AVAILABLE_MODE) + BR;
 
 				if (!pageMessages.contains(message) && !pageMessages.contains(startWith + message)) {
 					pageMessages.add(startWith + message);
@@ -568,7 +563,7 @@ public abstract class Controller extends BaseController {
 				request.setAttribute(PAGE_MESSAGE, pageMessages);
 			}
 
-			Role.prepareRoleMapWithDescriptions(resterm);
+			Role.prepareRoleMapWithDescriptions(getResTerm());
 
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
@@ -687,82 +682,90 @@ public abstract class Controller extends BaseController {
 		return currentStudy;
 	}
 
+	public MapsHolder getMapsHolder() {
+		return (MapsHolder) RequestUtil.getRequest().getSession().getAttribute(CURRENT_MAPS_HOLDER);
+	}
+
 	private void initMaps() {
-		facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
-		facRecruitStatusMap.put("recruiting", resadmin.getString("recruiting"));
-		facRecruitStatusMap.put("no_longer_recruiting", resadmin.getString("no_longer_recruiting"));
-		facRecruitStatusMap.put("completed", resadmin.getString("completed"));
-		facRecruitStatusMap.put("suspended", resadmin.getString("suspended"));
-		facRecruitStatusMap.put("terminated", resadmin.getString("terminated"));
+		RequestUtil.getRequest().getSession().setAttribute(CURRENT_MAPS_HOLDER, new MapsHolder());
+		getMapsHolder().getFacRecruitStatusMap().put("not_yet_recruiting",
+				getResAdmin().getString("not_yet_recruiting"));
+		getMapsHolder().getFacRecruitStatusMap().put("recruiting", getResAdmin().getString("recruiting"));
+		getMapsHolder().getFacRecruitStatusMap().put("no_longer_recruiting",
+				getResAdmin().getString("no_longer_recruiting"));
+		getMapsHolder().getFacRecruitStatusMap().put("completed", getResAdmin().getString("completed"));
+		getMapsHolder().getFacRecruitStatusMap().put("suspended", getResAdmin().getString("suspended"));
+		getMapsHolder().getFacRecruitStatusMap().put("terminated", getResAdmin().getString("terminated"));
 
-		studyPhaseMap.put("n_a", resadmin.getString("n_a"));
-		studyPhaseMap.put("phaseI", resadmin.getString("phaseI"));
-		studyPhaseMap.put("phaseI_II", resadmin.getString("phaseI_II"));
-		studyPhaseMap.put("phaseII", resadmin.getString("phaseII"));
-		studyPhaseMap.put("phaseII_III", resadmin.getString("phaseII_III"));
-		studyPhaseMap.put("phaseIII", resadmin.getString("phaseIII"));
-		studyPhaseMap.put("phaseIII_IV", resadmin.getString("phaseIII_IV"));
-		studyPhaseMap.put("phaseIV", resadmin.getString("phaseIV"));
+		getMapsHolder().getStudyPhaseMap().put("n_a", getResAdmin().getString("n_a"));
+		getMapsHolder().getStudyPhaseMap().put("phaseI", getResAdmin().getString("phaseI"));
+		getMapsHolder().getStudyPhaseMap().put("phaseI_II", getResAdmin().getString("phaseI_II"));
+		getMapsHolder().getStudyPhaseMap().put("phaseII", getResAdmin().getString("phaseII"));
+		getMapsHolder().getStudyPhaseMap().put("phaseII_III", getResAdmin().getString("phaseII_III"));
+		getMapsHolder().getStudyPhaseMap().put("phaseIII", getResAdmin().getString("phaseIII"));
+		getMapsHolder().getStudyPhaseMap().put("phaseIII_IV", getResAdmin().getString("phaseIII_IV"));
+		getMapsHolder().getStudyPhaseMap().put("phaseIV", getResAdmin().getString("phaseIV"));
 
-		interPurposeMap.put("treatment", resadmin.getString("treatment"));
-		interPurposeMap.put("prevention", resadmin.getString("prevention"));
-		interPurposeMap.put("diagnosis", resadmin.getString("diagnosis"));
-		// interPurposeMap.put("educ_couns_train",
-		// resadmin.getString("educ_couns_train"));
-		interPurposeMap.put("supportive_care", resadmin.getString("supportive_care"));
-		interPurposeMap.put("screening", resadmin.getString("screening"));
-		interPurposeMap.put("health_services_research", resadmin.getString("health_services_research"));
-		interPurposeMap.put("basic_science", resadmin.getString("basic_science"));
-		interPurposeMap.put("other", resadmin.getString("other"));
+		getMapsHolder().getInterPurposeMap().put("treatment", getResAdmin().getString("treatment"));
+		getMapsHolder().getInterPurposeMap().put("prevention", getResAdmin().getString("prevention"));
+		getMapsHolder().getInterPurposeMap().put("diagnosis", getResAdmin().getString("diagnosis"));
+		// getMapsHolder().getInterPurposeMap().put("educ_couns_train", getResAdmin().getString("educ_couns_train"));
+		getMapsHolder().getInterPurposeMap().put("supportive_care", getResAdmin().getString("supportive_care"));
+		getMapsHolder().getInterPurposeMap().put("screening", getResAdmin().getString("screening"));
+		getMapsHolder().getInterPurposeMap().put("health_services_research",
+				getResAdmin().getString("health_services_research"));
+		getMapsHolder().getInterPurposeMap().put("basic_science", getResAdmin().getString("basic_science"));
+		getMapsHolder().getInterPurposeMap().put("other", getResAdmin().getString("other"));
 
-		allocationMap.put("randomized", resadmin.getString("randomized"));
-		allocationMap.put("non_randomized", resadmin.getString("non_randomized"));
-		allocationMap.put("n_a", resadmin.getString("n_a"));
+		getMapsHolder().getAllocationMap().put("randomized", getResAdmin().getString("randomized"));
+		getMapsHolder().getAllocationMap().put("non_randomized", getResAdmin().getString("non_randomized"));
+		getMapsHolder().getAllocationMap().put("n_a", getResAdmin().getString("n_a"));
 
-		maskingMap.put("open", resadmin.getString("open"));
-		maskingMap.put("single_blind", resadmin.getString("single_blind"));
-		maskingMap.put("double_blind", resadmin.getString("double_blind"));
+		getMapsHolder().getMaskingMap().put("open", getResAdmin().getString("open"));
+		getMapsHolder().getMaskingMap().put("single_blind", getResAdmin().getString("single_blind"));
+		getMapsHolder().getMaskingMap().put("double_blind", getResAdmin().getString("double_blind"));
 
-		controlMap.put("placebo", resadmin.getString("placebo"));
-		controlMap.put("active", resadmin.getString("active"));
-		controlMap.put("uncontrolled", resadmin.getString("uncontrolled"));
-		controlMap.put("historical", resadmin.getString("historical"));
-		controlMap.put("dose_comparison", resadmin.getString("dose_comparison"));
+		getMapsHolder().getControlMap().put("placebo", getResAdmin().getString("placebo"));
+		getMapsHolder().getControlMap().put("active", getResAdmin().getString("active"));
+		getMapsHolder().getControlMap().put("uncontrolled", getResAdmin().getString("uncontrolled"));
+		getMapsHolder().getControlMap().put("historical", getResAdmin().getString("historical"));
+		getMapsHolder().getControlMap().put("dose_comparison", getResAdmin().getString("dose_comparison"));
 
-		assignmentMap.put("single_group", resadmin.getString("single_group"));
-		assignmentMap.put("parallel", resadmin.getString("parallel"));
-		assignmentMap.put("cross_over", resadmin.getString("cross_over"));
-		assignmentMap.put("factorial", resadmin.getString("factorial"));
-		assignmentMap.put("expanded_access", resadmin.getString("expanded_access"));
+		getMapsHolder().getAssignmentMap().put("single_group", getResAdmin().getString("single_group"));
+		getMapsHolder().getAssignmentMap().put("parallel", getResAdmin().getString("parallel"));
+		getMapsHolder().getAssignmentMap().put("cross_over", getResAdmin().getString("cross_over"));
+		getMapsHolder().getAssignmentMap().put("factorial", getResAdmin().getString("factorial"));
+		getMapsHolder().getAssignmentMap().put("expanded_access", getResAdmin().getString("expanded_access"));
 
-		endpointMap.put("safety", resadmin.getString("safety"));
-		endpointMap.put("efficacy", resadmin.getString("efficacy"));
-		endpointMap.put("safety_efficacy", resadmin.getString("safety_efficacy"));
-		endpointMap.put("bio_equivalence", resadmin.getString("bio_equivalence"));
-		endpointMap.put("bio_availability", resadmin.getString("bio_availability"));
-		endpointMap.put("pharmacokinetics", resadmin.getString("pharmacokinetics"));
-		endpointMap.put("pharmacodynamics", resadmin.getString("pharmacodynamics"));
-		endpointMap.put("pharmacokinetics_pharmacodynamics", resadmin.getString("pharmacokinetics_pharmacodynamics"));
+		getMapsHolder().getEndpointMap().put("safety", getResAdmin().getString("safety"));
+		getMapsHolder().getEndpointMap().put("efficacy", getResAdmin().getString("efficacy"));
+		getMapsHolder().getEndpointMap().put("safety_efficacy", getResAdmin().getString("safety_efficacy"));
+		getMapsHolder().getEndpointMap().put("bio_equivalence", getResAdmin().getString("bio_equivalence"));
+		getMapsHolder().getEndpointMap().put("bio_availability", getResAdmin().getString("bio_availability"));
+		getMapsHolder().getEndpointMap().put("pharmacokinetics", getResAdmin().getString("pharmacokinetics"));
+		getMapsHolder().getEndpointMap().put("pharmacodynamics", getResAdmin().getString("pharmacodynamics"));
+		getMapsHolder().getEndpointMap().put("pharmacokinetics_pharmacodynamics",
+				getResAdmin().getString("pharmacokinetics_pharmacodynamics"));
 
-		interTypeMap.put("drug", resadmin.getString("drug"));
-		interTypeMap.put("gene_transfer", resadmin.getString("gene_transfer"));
-		interTypeMap.put("vaccine", resadmin.getString("vaccine"));
-		interTypeMap.put("behavior", resadmin.getString("behavior"));
-		interTypeMap.put("device", resadmin.getString("device"));
-		interTypeMap.put("procedure", resadmin.getString("procedure"));
-		interTypeMap.put("other", resadmin.getString("other"));
+		getMapsHolder().getInterTypeMap().put("drug", getResAdmin().getString("drug"));
+		getMapsHolder().getInterTypeMap().put("gene_transfer", getResAdmin().getString("gene_transfer"));
+		getMapsHolder().getInterTypeMap().put("vaccine", getResAdmin().getString("vaccine"));
+		getMapsHolder().getInterTypeMap().put("behavior", getResAdmin().getString("behavior"));
+		getMapsHolder().getInterTypeMap().put("device", getResAdmin().getString("device"));
+		getMapsHolder().getInterTypeMap().put("procedure", getResAdmin().getString("procedure"));
+		getMapsHolder().getInterTypeMap().put("other", getResAdmin().getString("other"));
 
-		obserPurposeMap.put("natural_history", resadmin.getString("natural_history"));
-		obserPurposeMap.put("screening", resadmin.getString("screening"));
-		obserPurposeMap.put("psychosocial", resadmin.getString("psychosocial"));
+		getMapsHolder().getObserPurposeMap().put("natural_history", getResAdmin().getString("natural_history"));
+		getMapsHolder().getObserPurposeMap().put("screening", getResAdmin().getString("screening"));
+		getMapsHolder().getObserPurposeMap().put("psychosocial", getResAdmin().getString("psychosocial"));
 
-		selectionMap.put("convenience_sample", resadmin.getString("convenience_sample"));
-		selectionMap.put("defined_population", resadmin.getString("defined_population"));
-		selectionMap.put("random_sample", resadmin.getString("random_sample"));
-		selectionMap.put("case_control", resadmin.getString("case_control"));
+		getMapsHolder().getSelectionMap().put("convenience_sample", getResAdmin().getString("convenience_sample"));
+		getMapsHolder().getSelectionMap().put("defined_population", getResAdmin().getString("defined_population"));
+		getMapsHolder().getSelectionMap().put("random_sample", getResAdmin().getString("random_sample"));
+		getMapsHolder().getSelectionMap().put("case_control", getResAdmin().getString("case_control"));
 
-		timingMap.put("retrospective", resadmin.getString("retrospective"));
-		timingMap.put("prospective", resadmin.getString("prospective"));
+		getMapsHolder().getTimingMap().put("retrospective", getResAdmin().getString("retrospective"));
+		getMapsHolder().getTimingMap().put("prospective", getResAdmin().getString("prospective"));
 	}
 
 	/**
@@ -876,7 +879,8 @@ public abstract class Controller extends BaseController {
 					}
 					request.getSession().setAttribute("trail", trail);
 					StudyInfoPanel panel = getStudyInfoPanel(request);
-					panel.setData(jspPage, request.getSession(), request, getCRFVersionDAO(), getEventDefinitionCRFDAO());
+					panel.setData(jspPage, request.getSession(), request, getCRFVersionDAO(),
+							getEventDefinitionCRFDAO());
 				}
 				// we are also using checkTrail to update the panel, tbh
 			}
@@ -1229,8 +1233,8 @@ public abstract class Controller extends BaseController {
 	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, Boolean sendMessage,
 			HttpServletRequest request) throws Exception {
 		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
-				respage.getString("your_message_sent_succesfully"), respage.getString("mail_cannot_be_sent_to_admin"),
-				sendMessage, request);
+				getResPage().getString("your_message_sent_succesfully"),
+				getResPage().getString("mail_cannot_be_sent_to_admin"), sendMessage, request);
 	}
 
 	/**
@@ -1253,8 +1257,8 @@ public abstract class Controller extends BaseController {
 	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, HttpServletRequest request)
 			throws Exception {
 		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
-				respage.getString("your_message_sent_succesfully"), respage.getString("mail_cannot_be_sent_to_admin"),
-				true, request);
+				getResPage().getString("your_message_sent_succesfully"),
+				getResPage().getString("mail_cannot_be_sent_to_admin"), true, request);
 	}
 
 	/**
@@ -1278,8 +1282,8 @@ public abstract class Controller extends BaseController {
 	 */
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			HttpServletRequest request) throws Exception {
-		return sendEmail(to, from, subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
-				respage.getString("mail_cannot_be_sent_to_admin"), true, request);
+		return sendEmail(to, from, subject, body, htmlEmail, getResPage().getString("your_message_sent_succesfully"),
+				getResPage().getString("mail_cannot_be_sent_to_admin"), true, request);
 	}
 
 	/**
@@ -1622,8 +1626,8 @@ public abstract class Controller extends BaseController {
 			siteUserRole = ub.getRoleByStudy(siteId);
 		}
 		if (studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+					+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 		}
 	}
@@ -1636,11 +1640,11 @@ public abstract class Controller extends BaseController {
 
 		if (!(h >= 0)) {
 			List<String> messages = new ArrayList<String>();
-			messages.add(respage.getString("select_the_hour_start"));
+			messages.add(getResPage().getString("select_the_hour_start"));
 			errors.put("jobHour", messages);
 		} else if (!(m >= 0)) {
 			List<String> messages = new ArrayList<String>();
-			messages.add(respage.getString("select_the_start_minute"));
+			messages.add(getResPage().getString("select_the_start_minute"));
 			errors.put("jobHour", messages);
 		} else {
 			DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());
@@ -1993,7 +1997,8 @@ public abstract class Controller extends BaseController {
 				}
 				dec.setEventDefinitionCRF(edc);
 				dec.setFlags(ecb, ub, currentRole, edc);
-				dec.getEventCRF().setStudyEventBean((StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId()));
+				dec.getEventCRF()
+						.setStudyEventBean((StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId()));
 
 				ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
 				if (!idata.isEmpty()) {

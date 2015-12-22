@@ -51,16 +51,16 @@ public class RestoreSiteServlet extends Controller {
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.SITE_LIST_SERVLET, getResPage().getString("current_study_locked"), request, response);
 
 		if (getUserAccountBean(request).isSysAdmin()
 				|| getCurrentRole(request).getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, resexception.getString("not_study_director"),
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, getResException().getString("not_study_director"),
 				"1");
 
 	}
@@ -79,7 +79,7 @@ public class RestoreSiteServlet extends Controller {
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_site_to_restore"), request);
+			addPageMessage(getResPage().getString("please_choose_a_site_to_restore"), request);
 			forwardPage(Page.SITE_LIST_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -94,7 +94,7 @@ public class RestoreSiteServlet extends Controller {
 
 				} else {
 					MessageFormat mf = new MessageFormat("");
-					mf.applyPattern(respage.getString("choosen_site_cannot_restored"));
+					mf.applyPattern(getResPage().getString("choosen_site_cannot_restored"));
 					Object[] arguments = {site.getName(), parentstudy.getName()};
 					addPageMessage(mf.format(arguments), request);
 					forwardPage(Page.STUDY_LIST_SERVLET, request, response);
@@ -105,7 +105,7 @@ public class RestoreSiteServlet extends Controller {
 
 				getStudyService().restoreSite(site, currentUser);
 
-				addPageMessage(respage.getString("this_site_has_been_restored_succesfully"), request);
+				addPageMessage(getResPage().getString("this_site_has_been_restored_succesfully"), request);
 				String fromListSite = (String) request.getSession().getAttribute("fromListSite");
 				if (fromListSite != null && fromListSite.equals("yes")) {
 					request.getSession().removeAttribute("fromListSite");

@@ -69,9 +69,9 @@ public class ListCRFServlet extends RememberLastPage {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
+				getResPage().getString("no_have_correct_privilege_current_study")
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -94,7 +94,7 @@ public class ListCRFServlet extends RememberLastPage {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("no_crf_available_study_is_a_site"), request);
+			addPageMessage(getResPage().getString("no_crf_available_study_is_a_site"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -109,8 +109,8 @@ public class ListCRFServlet extends RememberLastPage {
 
 		if (!(ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR))) {
 			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					getResPage().getString("no_have_correct_privilege_current_study") + " "
+							+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -153,18 +153,18 @@ public class ListCRFServlet extends RememberLastPage {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = ListCRFRow.generateRowsFromBeans(crfs);
 
-		String[] columns = {resword.getString("CRF_name"), resword.getString("date_updated"),
-				resword.getString("last_updated_by"), resword.getString("crf_oid"), resword.getString("versions"),
-				resword.getString("version_oid"), resword.getString("date_created"), resword.getString("owner"),
-				resword.getString("status"), resword.getString("download"), resword.getString("actions")};
+		String[] columns = { getResWord().getString("CRF_name"), getResWord().getString("date_updated"),
+				getResWord().getString("last_updated_by"), getResWord().getString("crf_oid"), getResWord().getString("versions"),
+				getResWord().getString("version_oid"), getResWord().getString("date_created"), getResWord().getString("owner"),
+				getResWord().getString("status"), getResWord().getString("download"), getResWord().getString("actions")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);
 		table.hideColumnLink(4); // oid column
 		table.hideColumnLink(8);
 		table.setQuery("ListCRF", new HashMap());
-		table.addLink(resword.getString("blank_CRF_template"), "DownloadVersionSpreadSheet?template=1");
-		table.addLink(resword.getString("randomization_crf_template"), "DownloadVersionSpreadSheet?template=2");
+		table.addLink(getResWord().getString("blank_CRF_template"), "DownloadVersionSpreadSheet?template=1");
+		table.addLink(getResWord().getString("randomization_crf_template"), "DownloadVersionSpreadSheet?template=2");
 		table.setRows(allRows);
 		table.computeDisplay();
 
@@ -182,14 +182,14 @@ public class ListCRFServlet extends RememberLastPage {
 			setToPanel("CRFs", Integer.toString(crfs.size()), request);
 		}
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
+		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
-		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
-		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
+				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
+		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
+				getResPage().getString("br_download_example_CRF_instructions_from"), request);
 		forwardPage(Page.CRF_LIST, request, response);
 	}
 

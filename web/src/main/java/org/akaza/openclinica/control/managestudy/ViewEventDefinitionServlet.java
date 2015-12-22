@@ -66,9 +66,9 @@ public class ViewEventDefinitionServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET, resexception.getString("not_director"),
+				getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET, getResException().getString("not_director"),
 				"1");
 
 	}
@@ -83,7 +83,7 @@ public class ViewEventDefinitionServlet extends Controller {
 		int defId = fp.getInt("id", true);
 
 		if (defId == 0) {
-			addPageMessage(respage.getString("please_choose_a_definition_to_view"), request);
+			addPageMessage(getResPage().getString("please_choose_a_definition_to_view"), request);
 			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			// definition id
@@ -91,8 +91,8 @@ public class ViewEventDefinitionServlet extends Controller {
 
 			if (currentStudy.getId() != sed.getStudyId()) {
 				addPageMessage(
-						respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_active_study_or_contact"), request);
+						getResPage().getString("no_have_correct_privilege_current_study") + " "
+								+ getResPage().getString("change_active_study_or_contact"), request);
 				forwardPage(Page.MENU_SERVLET, request, response);
 				return;
 			}

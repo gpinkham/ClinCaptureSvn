@@ -63,10 +63,10 @@ public class SetStudyUserRoleServlet extends Controller {
 		}
 
 		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				getResPage().getString("no_have_correct_privilege_current_study") + " "
+						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_USER_IN_STUDY_SERVLET,
-				resexception.getString("not_study_director"), "1");
+				getResException().getString("not_study_director"), "1");
 
 	}
 
@@ -80,7 +80,7 @@ public class SetStudyUserRoleServlet extends Controller {
 		String name = request.getParameter("name");
 		String studyIdString = request.getParameter("studyId");
 		if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
-			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"), request);
+			addPageMessage(getResPage().getString("please_choose_a_user_to_set_role_for"), request);
 			forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
 		} else {
 			String action = request.getParameter("action");
@@ -161,8 +161,8 @@ public class SetStudyUserRoleServlet extends Controller {
 							&& sur.getRole() != Role.STUDY_DIRECTOR) {
 						forwardTo = Page.MENU_SERVLET;
 						addPageMessage(
-								restext.getString("no_have_correct_privilege_current_study_to_manage_user_roles")
-										+ respage.getString("change_study_contact_sysadmin"), request);
+								getResText().getString("no_have_correct_privilege_current_study_to_manage_user_roles")
+										+ getResPage().getString("change_study_contact_sysadmin"), request);
 					}
 				}
 				forwardPage(forwardTo, request, response);
@@ -184,9 +184,9 @@ public class SetStudyUserRoleServlet extends Controller {
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
 		logger.info("Sending email...");
-		return u.getFirstName() + " " + u.getLastName() + " (" + resword.getString("username") + ": " + u.getName()
-				+ ") " + respage.getString("has_been_granted_the_role") + " " + sub.getRole().getDescription() + " "
-				+ respage.getString("in_the_study_site") + " " + study.getName() + ".";
+		return u.getFirstName() + " " + u.getLastName() + " (" + getResWord().getString("username") + ": " + u.getName()
+				+ ") " + getResPage().getString("has_been_granted_the_role") + " " + sub.getRole().getDescription() + " "
+				+ getResPage().getString("in_the_study_site") + " " + study.getName() + ".";
 	}
 
 }
