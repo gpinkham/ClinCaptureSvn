@@ -13,12 +13,6 @@ import com.clinovo.rest.service.BaseServiceTest;
 public class PermissionCheckerTest extends BaseServiceTest {
 
 	@Test
-	public void testThatPermissionCheckerReturnsForbiddenIfProtocolIsNotHttps() throws Exception {
-		this.mockMvc.perform(post(API_AUTHENTICATION).param("username", userName).param("password", password)
-				.param("studyname", studyName)).andExpect(status().isForbidden());
-	}
-
-	@Test
 	public void testThatPermissionCheckerReturnsBadRequestIfUsernameIsMissing() throws Exception {
 		this.mockMvc
 				.perform(

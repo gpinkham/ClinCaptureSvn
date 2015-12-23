@@ -18,13 +18,11 @@ package com.clinovo.rest.service;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.core.OpenClinicaPasswordEncoder;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +59,30 @@ public class AuthenticationService extends BaseService {
 	private OpenClinicaPasswordEncoder passwordEncoder;
 
 	/**
+	 * Method changes current scope.
+	 *
+	 * @param studyName
+	 *            String
+	 * @throws RestException
+	 *             the RESTException
+	 * @return String
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/changeScope", method = RequestMethod.POST)
+	public UserDetails changeScope(@RequestParam("studyName") String studyName) throws RestException {
+		UserDetails userDetails = getUserDetails();
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
+		StudyUserRoleBean surBean = getStudyUserRole(studyBean, getCurrentUser(),
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		userDetails.setStudyName(studyName);
+		userDetails.setStudyStatus(studyBean.getStatus().getCode());
+		userDetails.setStudyOid(studyBean.getOid());
+		userDetails.setRoleCode(surBean.getRole().getCode());
+		userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
+		return userDetails;
+	}
+
+	/**
 	 * Method does user authentication.
 	 *
 	 * @param userName
@@ -78,63 +100,19 @@ public class AuthenticationService extends BaseService {
 	public UserDetails authenticate(@RequestParam("userName") String userName,
 			@RequestParam("password") String password, @RequestParam("studyName") String studyName)
 					throws RestException {
-		UserDetails userDetails;
-		StudyDAO studyDao = new StudyDAO(dataSource);
-		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-		UserAccountBean userAccountBean = (UserAccountBean) userAccountDao.findByUserName(userName);
-		if (userAccountBean != null && userAccountBean.getId() > 0) {
-			if (passwordEncoder.isPasswordValid(userAccountBean.getPasswd(), password, null)) {
-				StudyBean studyBean = (StudyBean) studyDao.findByName(studyName);
-				if (studyBean != null && studyBean.getId() > 0) {
-					if (studyBean.getParentStudyId() > 0) {
-						throw new RestException(messageSource, "rest.authentication.authenticationOnSiteIsNotPossible",
-								HttpServletResponse.SC_UNAUTHORIZED);
-					} else {
-						StudyUserRoleBean surBean = userAccountBean.getSysAdminRole();
-						if (surBean == null) {
-							surBean = userAccountDao.findRoleByUserNameAndStudyId(userName, studyBean.getId());
-						}
-						if (surBean != null && surBean.getId() > 0) {
-							if (surBean.getRole().getId() == Role.STUDY_ADMINISTRATOR.getId()
-									|| surBean.getRole().getId() == Role.SYSTEM_ADMINISTRATOR.getId()) {
-								if (userAccountBean.hasUserType(UserType.SYSADMIN)) {
-									userDetails = new UserDetails();
-									userDetails.setUserId(userAccountBean.getId());
-									userDetails.setUserName(userName);
-									userDetails.setPassword(password);
-									userDetails.setUserStatus(userAccountBean.getStatus().getCode());
-									userDetails.setStudyName(studyName);
-									userDetails.setStudyStatus(studyBean.getStatus().getCode());
-									userDetails.setStudyOid(studyBean.getOid());
-									userDetails.setRoleCode(surBean.getRole().getCode());
-									userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
-								} else {
-									throw new RestException(messageSource,
-											"rest.authentication.onlyUsersWithTypeAdministratorCanBeAuthenticated",
-											HttpServletResponse.SC_UNAUTHORIZED);
-								}
-							} else {
-								throw new RestException(messageSource,
-										"rest.authentication.onlyRootOrStudyAdministratorCanBeAuthenticated",
-										HttpServletResponse.SC_UNAUTHORIZED);
-							}
-						} else {
-							throw new RestException(messageSource, "rest.authentication.userIsNotAssignedToStudy",
-									HttpServletResponse.SC_UNAUTHORIZED);
-						}
-					}
-				} else {
-					throw new RestException(messageSource, "rest.authentication.wrongStudyName",
-							HttpServletResponse.SC_UNAUTHORIZED);
-				}
-			} else {
-				throw new RestException(messageSource, "rest.authentication.wrongUserNameOrPassword",
-						HttpServletResponse.SC_UNAUTHORIZED);
-			}
-		} else {
-			throw new RestException(messageSource, "rest.authentication.noUserFound",
-					HttpServletResponse.SC_UNAUTHORIZED);
-		}
+		UserAccountBean userAccountBean = authenticateUser(userName, password, passwordEncoder);
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
+		StudyUserRoleBean surBean = getStudyUserRole(studyBean, userAccountBean, HttpServletResponse.SC_UNAUTHORIZED);
+		UserDetails userDetails = new UserDetails();
+		userDetails.setUserId(userAccountBean.getId());
+		userDetails.setUserName(userName);
+		userDetails.setPassword(password);
+		userDetails.setUserStatus(userAccountBean.getStatus().getCode());
+		userDetails.setStudyName(studyName);
+		userDetails.setStudyStatus(studyBean.getStatus().getCode());
+		userDetails.setStudyOid(studyBean.getOid());
+		userDetails.setRoleCode(surBean.getRole().getCode());
+		userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
 		RequestUtil.getRequest().getSession().setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS,
 				userDetails);
 		return userDetails;

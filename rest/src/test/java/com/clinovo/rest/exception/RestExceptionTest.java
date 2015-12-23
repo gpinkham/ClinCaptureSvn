@@ -18,26 +18,27 @@ public class RestExceptionTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatItIsPossibleToCreateTheRestExceptionWithLocalizedMessage() throws Exception {
-		String msg = messageSource.getMessage("rest.authentication.onlyTheHttpsIsSupported", null,
+		String msg = messageSource.getMessage("rest.atLeastOneNotRequiredParameterShouldBeSpecified", null,
 				CoreResources.getSystemLocale());
-		RestException restException = new RestException(messageSource, "rest.authentication.onlyTheHttpsIsSupported",
-				HttpServletResponse.SC_FORBIDDEN);
+		RestException restException = new RestException(messageSource,
+				"rest.atLeastOneNotRequiredParameterShouldBeSpecified", HttpServletResponse.SC_FORBIDDEN);
 		assertEquals(restException.getMessage(), msg);
 		assertEquals(restException.getCode(), HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	@Test
 	public void testThatItIsPossibleToCreateTheRestExceptionWithLocalizedMessageAndCode() throws Exception {
-		String msg = messageSource.getMessage("rest.authentication.onlyTheHttpsIsSupported", null,
+		String msg = messageSource.getMessage("rest.atLeastOneNotRequiredParameterShouldBeSpecified", null,
 				CoreResources.getSystemLocale());
-		RestException restException = new RestException(messageSource, "rest.authentication.onlyTheHttpsIsSupported",
-				HttpServletResponse.SC_BAD_REQUEST);
+		RestException restException = new RestException(messageSource,
+				"rest.atLeastOneNotRequiredParameterShouldBeSpecified", HttpServletResponse.SC_BAD_REQUEST);
 		assertEquals(restException.getMessage(), msg);
 		assertEquals(restException.getCode(), HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	@Test
-	public void testThatItIsPossibleToCreateTheRestExceptionWithLocalizedMessageWithArgumentsAndCode() throws Exception {
+	public void testThatItIsPossibleToCreateTheRestExceptionWithLocalizedMessageWithArgumentsAndCode()
+			throws Exception {
 		Object[] arguments = new Object[]{"ADMIN"};
 		String msg = messageSource.getMessage("rest.createUser.roleDoesNotExist", arguments,
 				CoreResources.getSystemLocale());

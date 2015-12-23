@@ -43,6 +43,7 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PermissionChecker.class);
 
+	public static final String AUTHENTICATE = "authenticate";
 	public static final String API_AUTHENTICATED_USER_DETAILS = "API_AUTHENTICATED_USER_DETAILS";
 
 	@Autowired
@@ -54,32 +55,41 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 	@Autowired
 	private ApplicationContext applicationContext;
 
+	/**
+	 * Note that we may be ensure that the connection is SSL. Because we don't allow anything else.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @param handler
+	 *            Object
+	 * @return boolean
+	 * @throws Exception
+	 *             an Exception
+	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
+		boolean proceed = false;
 		LocaleResolver.resolveRestApiLocale();
-		if (!request.isSecure()) {
-			throw new RestException(messageSource, "rest.authentication.onlyTheHttpsIsSupported",
-					HttpServletResponse.SC_FORBIDDEN);
-		} else {
-			boolean proceed = false;
-			if (handler instanceof HandlerMethod) {
-				RequestParametersValidator.validate(request, dataSource, messageSource, (HandlerMethod) handler);
-				proceed = ((HandlerMethod) handler).getBean() instanceof AuthenticationService
-						|| ((HandlerMethod) handler).getBean() instanceof WadlService
-						|| ((HandlerMethod) handler).getBean() instanceof OdmService;
-				if (!proceed) {
-					UserDetails userDetails = (UserDetails) request.getSession()
-							.getAttribute(API_AUTHENTICATED_USER_DETAILS);
-					if (userDetails == null) {
-						throw new RestException(messageSource, "rest.authentication.userShouldBeAuthenticated",
-								HttpServletResponse.SC_UNAUTHORIZED);
-					} else {
-						proceed = true;
-					}
+		if (handler instanceof HandlerMethod) {
+			RequestParametersValidator.validate(request, dataSource, messageSource, (HandlerMethod) handler);
+			proceed = (((HandlerMethod) handler).getBean() instanceof AuthenticationService
+					&& ((HandlerMethod) handler).getMethod().getName().equals(AUTHENTICATE))
+					|| ((HandlerMethod) handler).getBean() instanceof WadlService
+					|| ((HandlerMethod) handler).getBean() instanceof OdmService;
+			if (!proceed) {
+				UserDetails userDetails = (UserDetails) request.getSession()
+						.getAttribute(API_AUTHENTICATED_USER_DETAILS);
+				if (userDetails == null) {
+					throw new RestException(messageSource, "rest.authentication.userShouldBeAuthenticated",
+							HttpServletResponse.SC_UNAUTHORIZED);
+				} else {
+					proceed = true;
 				}
 			}
-			return proceed;
 		}
+		return proceed;
 	}
 }

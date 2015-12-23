@@ -85,6 +85,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_USER_REMOVE = "/user/remove";
 	public static final String API_USER_RESTORE = "/user/restore";
 	public static final String API_AUTHENTICATION = "/authentication";
+	public static final String API_CHANGE_SCOPE = "/changeScope";
 	public static final String API_WADL = "/wadl";
 	public static final String API_ODM = "/odm";
 

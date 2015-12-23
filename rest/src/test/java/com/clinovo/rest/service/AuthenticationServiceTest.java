@@ -18,6 +18,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 				.param("userName", userName.concat(Long.toString(timestamp))).param("password", password)
 				.param("studyName", studyName)).andExpect(status().isNotFound());
 	}
+
 	@Test
 	public void testThatAuthenticationServiceReturnsUnauthorizedIfUsernameIsWrong() throws Exception {
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
@@ -26,14 +27,28 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsBadRequestIfUsernameIsEmpty() throws Exception {
+	public void testThatAuthenticationMethodReturnsBadRequestIfUserNameParameterHasATypo() throws Exception {
+		this.mockMvc
+				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+						.param("usErName", userName).param("password", password).param("studyName", studyName))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAuthenticationMethodReturnsBadRequestIfUsernameIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+				.param("password", password).param("studyName", studyName)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAuthenticationMethodReturnsBadRequestIfUsernameIsEmpty() throws Exception {
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 				.param("userName", "").param("password", password).param("studyName", studyName))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsUnauthorizedIfPasswordIsWrong() throws Exception {
+	public void testThatAuthenticationMethodReturnsUnauthorizedIfPasswordIsWrong() throws Exception {
 		this.mockMvc.perform(
 				post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session).param("userName", userName)
 						.param("password", password.concat(Long.toString(timestamp))).param("studyName", studyName))
@@ -41,7 +56,13 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsBadRequestIfPasswordIsEmpty() throws Exception {
+	public void testThatAuthenticationMethodReturnsBadRequestIfPasswordIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+				.param("userName", userName).param("studyName", studyName)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAuthenticationMethodReturnsBadRequestIfPasswordIsEmpty() throws Exception {
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 						.param("userName", userName).param("password", "").param("studyName", studyName))
@@ -49,7 +70,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsUnauthorizedIfStudyNameIsWrong() throws Exception {
+	public void testThatAuthenticationMethodReturnsUnauthorizedIfStudyNameIsWrong() throws Exception {
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 						.param("userName", userName).param("password", password)
@@ -58,7 +79,21 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsBadRequestIfStudyNameIsEmpty() throws Exception {
+	public void testThatAuthenticationMethodReturnsBadRequestIfStudyNameParameterHasATypo() throws Exception {
+		this.mockMvc
+				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+						.param("userName", userName).param("password", password).param("stUdyName", studyName))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAuthenticationMethodReturnsBadRequestIfStudyNameIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
+				.param("userName", userName).param("password", password)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatAuthenticationMethodReturnsBadRequestIfStudyNameIsEmpty() throws Exception {
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 						.param("userName", userName).param("password", password).param("studyName", ""))
@@ -66,7 +101,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsUnauthorizedForUserThatIsNotAssignedToAnyStudy() throws Exception {
+	public void testThatAuthenticationMethodReturnsUnauthorizedForUserThatIsNotAssignedToAnyStudy() throws Exception {
 		createUserWithoutRole(UserType.SYSADMIN, studyBean.getId());
 		this.mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 				.param("userName", newUser.getName()).param("password", newUser.getPasswd())
@@ -83,7 +118,7 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatAuthenticationServiceReturnsOkForNewlyCreatedStudyAdministrator() throws Exception {
+	public void testThatAuthenticationMethodReturnsOkForNewlyCreatedStudyAdministrator() throws Exception {
 		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(
@@ -142,5 +177,48 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).session(session)
 						.param("userName", userName).param("password", password).param("studyName", newSite.getName()))
 				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodReturnsErrorIfStudyNameIsSite() throws Exception {
+		createNewSite(studyBean.getId());
+		this.mockMvc.perform(post(API_CHANGE_SCOPE).accept(mediaType).secure(true).session(session).param("studyName",
+				newSite.getName())).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodReturnsErrorIfUserIsNotAssignedToStudy() throws Exception {
+		createNewStudy();
+		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
+		this.mockMvc.perform(
+				post(API_CHANGE_SCOPE).accept(mediaType).secure(true).session(session).param("studyName", studyName))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodReturnsErrorIfStudyDoesNotExist() throws Exception {
+		this.mockMvc.perform(post(API_CHANGE_SCOPE).accept(mediaType).secure(true).session(session).param("studyName",
+				studyName.concat(Long.toString(timestamp)))).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodReturnsBadRequestIfStudyNameIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_CHANGE_SCOPE).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodReturnsBadRequestIfStudyNameIsEmpty() throws Exception {
+		this.mockMvc
+				.perform(post(API_CHANGE_SCOPE).accept(mediaType).secure(true).session(session).param("studyName", ""))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodReturnsBadRequestIfStudyNameParameterHasATypo() throws Exception {
+		this.mockMvc.perform(post(API_CHANGE_SCOPE).accept(mediaType).secure(true).session(session).param("stuDyName",
+				studyBean.getName())).andExpect(status().isBadRequest());
 	}
 }
