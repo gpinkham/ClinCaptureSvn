@@ -31,10 +31,7 @@ public class MapsHolder {
 	private HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
 	private HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
 	private HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
-
-	public HashMap<String, String> getTimingMap() {
-		return timingMap;
-	}
+	private HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
 
 	public HashMap<String, String> getFacRecruitStatusMap() {
 		return facRecruitStatusMap;
@@ -80,5 +77,7 @@ public class MapsHolder {
 		return selectionMap;
 	}
 
-	private HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
+	public HashMap<String, String> getTimingMap() {
+		return timingMap;
+	}
 }
