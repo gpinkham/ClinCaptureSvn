@@ -35,9 +35,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import com.clinovo.util.DateUtil;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -485,7 +484,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				}
 				if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()
 						|| note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
-					manageReasonForChangeState(request.getSession(), field);
+					CreateDiscrepancyNoteServlet.manageReasonForChangeState(request.getSession(), field);
 				}
 			}
 			for (DiscrepancyNoteBean note : newFieldNotes) {
@@ -738,17 +737,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			noteTree.put(dn.getId(), dn);
 		}
 	}
-
-	private void manageReasonForChangeState(HttpSession session, String itameName) {
-		HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session
-				.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-		if (noteSubmitted == null) {
-			noteSubmitted = new HashMap<String, Boolean>();
-		}
-		noteSubmitted.put(itameName, Boolean.TRUE);
-		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
-	}
-
+	
 	private void manageStatuses(HttpServletRequest request, String field) {
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);

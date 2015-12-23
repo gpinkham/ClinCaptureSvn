@@ -1018,13 +1018,13 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		}
 	}
 
-	private void manageReasonForChangeState(HttpSession session, String field) {
-		HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session
+	static void manageReasonForChangeState(HttpSession session, Object fieldNameOrItemDataBeanId) {
+		HashMap<Object, Boolean> noteSubmitted = (HashMap<Object, Boolean>) session
 				.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
 		if (noteSubmitted == null) {
-			noteSubmitted = new HashMap<String, Boolean>();
+			noteSubmitted = new HashMap<Object, Boolean>();
 		}
-		noteSubmitted.put(field, Boolean.TRUE);
+		noteSubmitted.put(fieldNameOrItemDataBeanId, Boolean.TRUE);
 		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
 	}
 

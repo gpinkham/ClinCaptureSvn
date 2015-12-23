@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -155,7 +153,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 			dn.setDisType(DiscrepancyNoteType.REASON_FOR_CHANGE);
 			description = fp.getString("description" + parentId);
 		} else {
-			if (isInFVCError) {
+			if (isInFVCError && resStatusId != ResolutionStatus.UPDATED.getId() && resStatusId != ResolutionStatus.CLOSED.getId()) {
 				typeId = DiscrepancyNoteType.FAILEDVAL.getId();
 				resStatusId = ResolutionStatus.OPEN.getId();
 			}
@@ -280,9 +278,9 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 					CreateDiscrepancyNoteServlet.turnOffIsDataChangedParamOfDN(field, request);
 					CreateDiscrepancyNoteServlet.turnOffIsInRFCErrorParamOfDN(field, request);
 					CreateDiscrepancyNoteServlet.turnOffIsInErrorParamOfDN(field, request);
-					manageReasonForChangeState(request.getSession(), entityId);
+					CreateDiscrepancyNoteServlet.manageReasonForChangeState(request.getSession(), entityId);
 				} else if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
-					manageReasonForChangeState(request.getSession(), entityId);
+					CreateDiscrepancyNoteServlet.manageReasonForChangeState(request.getSession(), entityId);
 				}
 
 				String email = fp.getString(EMAIL_USER_ACCOUNT + parentId);
@@ -339,16 +337,6 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		DiscrepancyNoteBean dnDuplicate = new DiscrepancyNoteBean(dn);
 		dnDuplicate.setResolutionStatusId(getDiscrepancyNoteResolutionStatus(request, dndao, entityId, notes));
 		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dnDuplicate);
-	}
-
-	private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {
-		HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session
-				.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-		if (noteSubmitted == null) {
-			noteSubmitted = new HashMap<Integer, Boolean>();
-		}
-		noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
-		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
 	}
 
 	private String appendPageFileName(String origin, String parameterName, String parameterValue) {

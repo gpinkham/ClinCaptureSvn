@@ -1972,7 +1972,7 @@ public abstract class DataEntryServlet extends Controller {
 			 * Having existing notes is not enough to let it pass through after changing data. There has to be a
 			 * DiscrepancyNote for the latest changed data
 			 */
-			HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(
+			Map<Object, Boolean> noteSubmitted = (Map<Object, Boolean>) request.getSession().getAttribute(
 					DataEntryServlet.NOTE_SUBMITTED);
 			if ((noteSubmitted == null || noteSubmitted.get(formName) == null || !(Boolean) noteSubmitted.get(formName))
 					&& (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted
