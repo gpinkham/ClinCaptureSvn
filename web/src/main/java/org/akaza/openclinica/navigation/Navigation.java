@@ -186,7 +186,7 @@ public final class Navigation {
 				} 
 				return;
 			}
-			visitedURLs.push("skip!");
+			if (!visitedURLs.isEmpty()) visitedURLs.push("skip!");
 			return;
 		}
 		

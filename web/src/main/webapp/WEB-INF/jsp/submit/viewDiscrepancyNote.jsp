@@ -7,6 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
 
 <html> 
 <head>
@@ -56,7 +57,7 @@
 						showDiv();
 						changeDNFlagIconInParentWindow();
 						window.close();
-					} else if (data.indexOf('Error in data') > -1) {
+					} else if (data.indexOf('<fmt:message bundle="${respage}" key="error_in_data"/>') > -1) {
 						showDiv();
 					} else {
 						alert('No response from server');
