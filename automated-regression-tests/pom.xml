@@ -14,7 +14,7 @@
 
     <properties>
         <thucydides.version>0.9.275</thucydides.version>
-        <selenium.version>2.47.1</selenium.version>
+        <selenium.version>2.48.2</selenium.version>
     </properties>
 
     <dependencies>
