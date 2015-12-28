@@ -148,7 +148,7 @@ function setDNFlag(strImageName,strParentWinImageFullPath, resolutionStatusId) {
 </c:forEach>
 
 <P><span class="alert">* </span><fmt:message key="indicates_required_field" bundle="${resword}"/></P>
-<form action="CreateNewStudyEvent" method="post">
+<form action="CreateNewStudyEvent${formActionTail}" method="post">
 <input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
 <input type="hidden" id="formWithStateFlag" value=""/>
 <jsp:include page="../include/showSubmitted.jsp" />

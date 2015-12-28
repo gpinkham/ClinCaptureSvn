@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +40,6 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -99,6 +97,8 @@ public class CreateNewStudyEventServlet extends Controller {
 	public static final String INPUT_STARTDATE_PREFIX = "start";
 
 	public static final String INPUT_ENDDATE_PREFIX = "end";
+
+	public static final String FORM_ACTION_TAIL = "formActionTail";
 
 	public static final String INPUT_REQUEST_STUDY_SUBJECT = "requestStudySubject";
 
@@ -216,6 +216,8 @@ public class CreateNewStudyEventServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		FormDiscrepancyNotes discNotes;
 		int studySubjectId = fp.getInt(INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT);
+		request.setAttribute(FORM_ACTION_TAIL,
+				studySubjectId > 0 ? "?studySubjectId=".concat(Integer.toString(studySubjectId)) : "");
 		// input from manage subject matrix, user has specified definition id
 		int studyEventDefinitionId = fp.getInt(INPUT_STUDY_EVENT_DEFINITION);
 
@@ -258,8 +260,8 @@ public class CreateNewStudyEventServlet extends Controller {
 			Status s = ssb.getStatus();
 			if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
 				addPageMessage(getResWord().getString("study_event") + getResTerm().getString("could_not_be")
-						+ getResTerm().getString("added") + "." + getResPage().getString("study_subject_has_been_deleted"),
-						request);
+						+ getResTerm().getString("added") + "."
+						+ getResPage().getString("study_subject_has_been_deleted"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
@@ -479,15 +481,15 @@ public class CreateNewStudyEventServlet extends Controller {
 				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date")
 						.equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
-						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-								getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
+						Validator.addError(errors, INPUT_ENDDATE_PREFIX, getResException()
+								.getString("input_provided_not_occure_after_previous_start_date_time"));
 					}
 				} else {
 					// if in same date, only check when both had time entered
 					if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
 						if (end.before(start) || end.equals(start)) {
-							Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-									getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
+							Validator.addError(errors, INPUT_ENDDATE_PREFIX, getResException()
+									.getString("input_provided_not_occure_after_previous_start_date_time"));
 						}
 					}
 				}
@@ -738,8 +740,8 @@ public class CreateNewStudyEventServlet extends Controller {
 								}
 							} else {
 								String pageMessage = getResText().getString("scheduled_event_definition")
-										+ definitionScheduleds.get(i).getName() + getResText().getString("X_and_subject")
-										+ studySubject.getName()
+										+ definitionScheduleds.get(i).getName()
+										+ getResText().getString("X_and_subject") + studySubject.getName()
 										+ getResText().getString("not_created_since_event_not_repeating")
 										+ getResText().getString("event_type_already_exists");
 								addPageMessage(pageMessage, request);
@@ -921,8 +923,8 @@ public class CreateNewStudyEventServlet extends Controller {
 	private void setupBeans(HttpServletRequest request, HttpServletResponse response, ArrayList eventDefinitions)
 			throws Exception {
 		addEntityList("eventDefinitions", eventDefinitions,
-				getResText().getString("cannot_create_event_because_no_event_definitions"), Page.LIST_STUDY_SUBJECTS_SERVLET,
-				request, response);
+				getResText().getString("cannot_create_event_because_no_event_definitions"),
+				Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 
 	}
 
@@ -960,84 +962,5 @@ public class CreateNewStudyEventServlet extends Controller {
 
 	private String getInputEndHalf(FormProcessor fp) {
 		return fp.getString(INPUT_ENDDATE_PREFIX + "Half");
-	}
-
-	/**
-	 * SelectNotStartedOrRepeatingSortedEventDefs method.
-	 * 
-	 * @param ssb
-	 *            StudySubjectBean
-	 * @param parentStudyId
-	 *            int
-	 * @param seddao
-	 *            StudyEventDefinitionDAO
-	 * @param sgcdao
-	 *            StudyGroupClassDAO
-	 * @param sedao
-	 *            StudyEventDAO
-	 * @return ArrayList<StudyEventDefinitionBean>
-	 */
-	public static ArrayList<StudyEventDefinitionBean> selectNotStartedOrRepeatingSortedEventDefs(StudySubjectBean ssb,
-			int parentStudyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao, StudyEventDAO sedao) {
-
-		ArrayList<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
-		Map<Integer, StudyEventBean> studyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
-		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
-		for (StudyEventBean studyEvent : studyEvents) {
-			studyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
-		}
-
-		StudyGroupClassBean defaultStudyGroupClassBean = sgcdao.findDefaultByStudyId(parentStudyId);
-		boolean defaultStudyGroupClassBeanExist = !(defaultStudyGroupClassBean == null
-				|| defaultStudyGroupClassBean.getId() == 0);
-
-		List<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
-		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
-
-		// ordered eventDefs from dynGroups
-		if (defaultStudyGroupClassBeanExist || ssb.getDynamicGroupClassId() != 0) {
-			for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
-				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
-						.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
-				for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
-					if (dynGroup.isDefault() || (ssb.getDynamicGroupClassId() != 0
-							&& dynGroup.getId() == ssb.getDynamicGroupClassId())) {
-						// eventDefs from defDynGroup and subject's dynGroup
-						if (studyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
-							if (studyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
-									.isNotScheduled() || eventDefinition.isRepeating()) {
-								result.add(eventDefinition);
-							}
-						} else {
-							result.add(eventDefinition);
-						}
-					} else {
-						// eventDefs from others dynGroups
-						if (eventDefinition.isRepeating()) {
-							result.add(eventDefinition);
-						}
-					}
-				}
-			}
-		}
-
-		ArrayList eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
-		// sort by study event definition ordinal
-		Collections.sort(eventDefinitionsNotFromDynGroup);
-		// filter notStarted and repeating eventDefs
-		ArrayList notStartedAndRepeatingEventDefinitions = new ArrayList();
-		for (Object anEventDefinitionsNotFromDynGroup : eventDefinitionsNotFromDynGroup) {
-			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) anEventDefinitionsNotFromDynGroup;
-			if (studyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
-				if (studyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
-						.isNotScheduled() || eventDefinition.isRepeating()) {
-					notStartedAndRepeatingEventDefinitions.add(eventDefinition);
-				}
-			} else {
-				notStartedAndRepeatingEventDefinitions.add(eventDefinition);
-			}
-		}
-		result.addAll(notStartedAndRepeatingEventDefinitions);
-		return result;
 	}
 }

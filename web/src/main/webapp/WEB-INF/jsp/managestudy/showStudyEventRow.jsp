@@ -90,7 +90,7 @@
 						</c:otherwise>
 					</c:choose>
 				</c:if>
-				<c:if test="${not viewModeOnly and empty currRow.bean.displayEventCRFs and currRow.bean.studyEvent.subjectEventStatus.scheduled && userRole.manageStudy && study.status.available}">
+				<c:if test="${not viewModeOnly and empty currRow.bean.displayEventCRFs and (currRow.bean.studyEvent.subjectEventStatus.notScheduled or currRow.bean.studyEvent.subjectEventStatus.scheduled) && userRole.manageStudy && study.status.available}">
 					<tr>
 						<td>&nbsp;</td>
 					</tr>

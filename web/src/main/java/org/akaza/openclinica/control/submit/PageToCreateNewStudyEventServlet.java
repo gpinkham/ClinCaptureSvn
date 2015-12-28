@@ -120,10 +120,9 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			ssb = (StudySubjectBean) sdao.findByPK(studySubjectId);
 			Status s = ssb.getStatus();
 			if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-				addPageMessage(
-						getResWord().getString("study_event") + getResTerm().getString("could_not_be")
-								+ getResTerm().getString("added") + "."
-								+ getResPage().getString("study_subject_has_been_deleted"), request);
+				addPageMessage(getResWord().getString("study_event") + getResTerm().getString("could_not_be")
+						+ getResTerm().getString("added") + "."
+						+ getResPage().getString("study_subject_has_been_deleted"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
@@ -141,8 +140,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(getDataSource());
 		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedOrRepeatingSortedEventDefs(ssb,
-				studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
+		ArrayList eventDefinitions = selectNotStartedOrRepeatingSortedEventDefs(ssb, studyWithEventDefinitions.getId(),
+				seddao, sgcdao, sedao);
 
 		if (!fp.isSubmitted()) {
 
@@ -227,8 +226,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			}
 			Date[] endScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
 
-			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
-					AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+			discNotes = (FormDiscrepancyNotes) request.getSession()
+					.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
 				request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
@@ -263,11 +262,12 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 
 			boolean hasScheduledEvent = false;
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-				if (!StringUtil.isBlank(fp
-						.getString(PageToCreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
+				if (!StringUtil.isBlank(
+						fp.getString(PageToCreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
 					v.addValidation(PageToCreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i],
 							Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
-					if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
+					if (currentStudy.getStudyParameterConfig().getEventLocationRequired()
+							.equalsIgnoreCase("required")) {
 						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
 						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON,
 								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_2000);
@@ -296,8 +296,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				Validator.addError(errors, INPUT_LOCATION, getResText().getString("not_a_valid_location"));
 			}
 
-			StudyEventDefinitionBean definition = (StudyEventDefinitionBean) seddao.findByPK(fp
-					.getInt(INPUT_STUDY_EVENT_DEFINITION));
+			StudyEventDefinitionBean definition = (StudyEventDefinitionBean) seddao
+					.findByPK(fp.getInt(INPUT_STUDY_EVENT_DEFINITION));
 
 			StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL),
 					currentStudy);
@@ -323,8 +323,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 					int pk = fp.getInt(INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]);
 					if (pk > 0) {
 						StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(pk);
-						System.out.println("scheduled def:" + pk + " " + INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]
-								+ " " + sedb.getName());
+						System.out.println("scheduled def:" + pk + " " + INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i] + " "
+								+ sedb.getName());
 						definitionScheduleds.add(sedb);
 						scheduledDefinitionIds[i] = pk;
 						if (!subjectMayReceiveStudyEvent(sedao, sedb, studySubject)) {
@@ -340,17 +340,18 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 			if (!"".equals(strEnd) && !errors.containsKey(INPUT_STARTDATE_PREFIX)
 					&& !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
 				end = getInputEndDate(fp);
-				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date").equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
+				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date")
+						.equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
-						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-								getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
+						Validator.addError(errors, INPUT_ENDDATE_PREFIX, getResException()
+								.getString("input_provided_not_occure_after_previous_start_date_time"));
 					}
 				} else {
 					// if in same date, only check when both had time entered
 					if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
 						if (end.before(start) || end.equals(start)) {
-							Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-									getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
+							Validator.addError(errors, INPUT_ENDDATE_PREFIX, getResException()
+									.getString("input_provided_not_occure_after_previous_start_date_time"));
 						}
 					}
 				}
@@ -367,11 +368,12 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 						prevStartPrefix = prevStart == -1
 								? INPUT_STARTDATE_PREFIX
 								: INPUT_STARTDATE_PREFIX_SCHEDULED[prevStart];
-						Date prevStartDate = prevStart == -1 ? this.getInputStartDate(fp) : this
-								.getInputStartDateScheduled(fp,
+						Date prevStartDate = prevStart == -1
+								? this.getInputStartDate(fp)
+								: this.getInputStartDateScheduled(fp,
 										Integer.parseInt(prevStartPrefix.charAt(prevStartPrefix.length() - 1) + ""));
-						if (fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(
-								fp.getString(prevStartPrefix + "Date"))) {
+						if (fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date")
+								.equals(fp.getString(prevStartPrefix + "Date"))) {
 							// if in same day, only check when both have time
 							// inputs.
 							boolean schStartTime = fp.timeEntered(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
@@ -393,8 +395,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 					if (!strEndScheduled[i].equals("")) {
 						endScheduled[i] = fp.getDateTimeInput(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
 						String prevEndPrefix = i > 0 ? INPUT_ENDDATE_PREFIX_SCHEDULED[i - 1] : INPUT_ENDDATE_PREFIX;
-						if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(
-								fp.getString(prevEndPrefix + "Date"))) {
+						if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date")
+								.equals(fp.getString(prevEndPrefix + "Date"))) {
 							if (endScheduled[i].before(startScheduled[i])) {
 								Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], getResException()
 										.getString("input_provided_not_occure_after_previous_start_date_time"));
@@ -483,15 +485,14 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 				if (!studyEvent.isActive()) {
 					throw new OpenClinicaException(getResText().getString("event_not_created_in_database"), "2");
 				}
-				addPageMessage(
-						getResText().getString("X_event_wiht_definition") + definition.getName()
-								+ getResText().getString("X_and_subject") + studySubject.getName()
-								+ getResPage().getString("X_was_created_succesfully"), request);
+				addPageMessage(getResText().getString("X_event_wiht_definition") + definition.getName()
+						+ getResText().getString("X_and_subject") + studySubject.getName()
+						+ getResPage().getString("X_was_created_succesfully"), request);
 
 				// save discrepancy notes into DB
 				DiscrepancyNoteService dnService = new DiscrepancyNoteService(getDataSource());
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
-						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
+						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 				String[] eventFields = {INPUT_LOCATION, INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX};
 				for (String element : eventFields) {
@@ -535,8 +536,8 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 								studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
 								studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
-								studyEventScheduled.setSampleOrdinal(sedao.getMaxSampleOrdinal(
-										definitionScheduleds.get(i), studySubject) + 1);
+								studyEventScheduled.setSampleOrdinal(
+										sedao.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
 								studyEventScheduled = (StudyEventBean) sedao.create(studyEventScheduled);
 								if (!studyEventScheduled.isActive()) {
 									throw new OpenClinicaException(
@@ -550,12 +551,11 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 								dnService.saveFieldNotes(INPUT_ENDDATE_PREFIX_SCHEDULED[i], fdn,
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
 							} else {
-								addPageMessage(
-										getResText().getString("scheduled_event_definition")
-												+ definitionScheduleds.get(i).getName()
-												+ getResText().getString("X_and_subject") + studySubject.getName()
-												+ getResText().getString("not_created_since_event_not_repeating")
-												+ getResText().getString("event_type_already_exists"), request);
+								addPageMessage(getResText().getString("scheduled_event_definition")
+										+ definitionScheduleds.get(i).getName()
+										+ getResText().getString("X_and_subject") + studySubject.getName()
+										+ getResText().getString("not_created_since_event_not_repeating")
+										+ getResText().getString("event_type_already_exists"), request);
 							}
 						}
 					}
@@ -628,7 +628,7 @@ public class PageToCreateNewStudyEventServlet extends Controller {
 		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX);
 	}
 
-	private Date getInputStartDateScheduled(FormProcessor fp, int i)  {
+	private Date getInputStartDateScheduled(FormProcessor fp, int i) {
 		return fp.getDateTimeInput(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
 	}
 

@@ -20,8 +20,17 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.service.CRFMaskingService;
-import com.clinovo.util.SubjectEventStatusUtil;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -59,15 +68,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import com.clinovo.service.CRFMaskingService;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * @author ssachs
@@ -76,19 +78,15 @@ import java.util.List;
 @Component
 public class EnterDataForStudyEventServlet extends Controller {
 
+	public static final String TRUE = "true";
 	public static final String INPUT_EVENT_ID = "eventId";
-
-	public static final String BEAN_STUDY_EVENT = "studyEvent";
-
-	public static final String BEAN_STUDY_SUBJECT = "studySubject";
-
-	public static final String BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS = "uncompletedEventDefinitionCRFs";
-
-	public static final String BEAN_DISPLAY_EVENT_CRFS = "displayEventCRFs";
-
 	public static final String FULL_CRF_LIST = "fullCrfList";
 	public static final String OPEN_FIRST_CRF = "openFirstCrf";
-	public static final String TRUE = "true";
+	public static final String BEAN_STUDY_EVENT = "studyEvent";
+	public static final String BEAN_STUDY_SUBJECT = "studySubject";
+	public static final String BEAN_DISPLAY_EVENT_CRFS = "displayEventCRFs";
+	public static final String HIDE_SCHEDULE_EVENT_BUTTON = "hideScheduleEventButton";
+	public static final String BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS = "uncompletedEventDefinitionCRFs";
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
 
@@ -116,7 +114,8 @@ public class EnterDataForStudyEventServlet extends Controller {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
+		if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
+				&& seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}
 		return seb;
@@ -150,9 +149,14 @@ public class EnterDataForStudyEventServlet extends Controller {
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
 		StudyBean study = (StudyBean) studydao.findByPK(studySubjectBean.getStudyId());
 
+		ArrayList eventDefinitions = selectNotStartedOrRepeatingSortedEventDefs(studySubjectBean,
+				study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId(), getStudyEventDefinitionDAO(),
+				getStudyGroupClassDAO(), getStudyEventDAO());
+		request.setAttribute(HIDE_SCHEDULE_EVENT_BUTTON, eventDefinitions.size() == 0);
+
 		SessionManager sm = getSessionManager(request);
-		List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(
-				studySubjectBean, currentStudy, sm);
+		List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
+				.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
 		setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb, sm, request);
 
 		// prepare to figure out what the display should look like
@@ -233,7 +237,8 @@ public class EnterDataForStudyEventServlet extends Controller {
 		if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
 			try {
 				// Remove all masked CRFs from the list
-				List<Object> fullListWithoutMasked = maskingService.removeMaskedDisplayEventDefinitionAndEventCRFBeans(fullCrfList, ub);
+				List<Object> fullListWithoutMasked = maskingService
+						.removeMaskedDisplayEventDefinitionAndEventCRFBeans(fullCrfList, ub);
 				if (fullListWithoutMasked.size() == 0) {
 					addPageMessage(getResWord().getString("no_crf_available"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
@@ -248,17 +253,10 @@ public class EnterDataForStudyEventServlet extends Controller {
 					}
 				}
 
-				response.sendRedirect(request.getContextPath()
-						+ Page.INITIAL_DATA_ENTRY_SERVLET.getFileName()
-						+ "?studyEventId="
-						+ ecb.getStudyEventId()
-						+ "&eventCRFId=0&subjectId="
-						+ studySubjectBean.getSubjectId()
-						+ "&eventDefinitionCRFId="
-						+ dedcb.getEdc().getId()
-						+ "&crfVersionId="
-						+ defaultCRFVerBean.getId()
-						+ "&action=ide_s&exitTo="
+				response.sendRedirect(request.getContextPath() + Page.INITIAL_DATA_ENTRY_SERVLET.getFileName()
+						+ "?studyEventId=" + ecb.getStudyEventId() + "&eventCRFId=0&subjectId="
+						+ studySubjectBean.getSubjectId() + "&eventDefinitionCRFId=" + dedcb.getEdc().getId()
+						+ "&crfVersionId=" + defaultCRFVerBean.getId() + "&action=ide_s&exitTo="
 						+ URLEncoder.encode(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName().replace("/", "")
 								+ "?eventId=" + ecb.getStudyEventId(), "UTF-8"));
 				return;
@@ -273,18 +271,20 @@ public class EnterDataForStudyEventServlet extends Controller {
 	/**
 	 * prepareCRFVersionForLockedCRFs.
 	 *
-	 * @param fullCrfList List<Object>
-	 * @param crfvdao CRFVersionDAO
-	 * @param logger Logger
+	 * @param fullCrfList
+	 *            List<Object>
+	 * @param crfvdao
+	 *            CRFVersionDAO
+	 * @param logger
+	 *            Logger
 	 */
 	public static void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao, Logger logger) {
 		try {
 			for (Object object : fullCrfList) {
 				if (object instanceof DisplayEventDefinitionCRFBean) {
 					DisplayEventDefinitionCRFBean dedCrfBean = (DisplayEventDefinitionCRFBean) object;
-					if (dedCrfBean.getStatus() == Status.LOCKED
-							&& (dedCrfBean.getEventCRF().getCrfVersion() == null || dedCrfBean.getEventCRF()
-									.getCrfVersion().getId() == 0)) {
+					if (dedCrfBean.getStatus() == Status.LOCKED && (dedCrfBean.getEventCRF().getCrfVersion() == null
+							|| dedCrfBean.getEventCRF().getCrfVersion().getId() == 0)) {
 						dedCrfBean.getEventCRF().setCrfVersion(
 								(CRFVersionBean) crfvdao.findByPK(dedCrfBean.getEdc().getDefaultVersionId()));
 					}
@@ -376,8 +376,10 @@ public class EnterDataForStudyEventServlet extends Controller {
 	/**
 	 * populateUncompletedCRFsWithAnOwner.
 	 *
-	 * @param ds DataSource
-	 * @param displayEventDefinitionCRFBeans List<DisplayEventDefinitionCRFBean>
+	 * @param ds
+	 *            DataSource
+	 * @param displayEventDefinitionCRFBeans
+	 *            List<DisplayEventDefinitionCRFBean>
 	 */
 	public static void populateUncompletedCRFsWithAnOwner(DataSource ds,
 			List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
@@ -412,9 +414,12 @@ public class EnterDataForStudyEventServlet extends Controller {
 	/**
 	 * populateUncompletedCRFsWithCRFAndVersions.
 	 *
-	 * @param ds DataSource
-	 * @param logger Logger
-	 * @param uncompletedEventDefinitionCRFs ArrayList
+	 * @param ds
+	 *            DataSource
+	 * @param logger
+	 *            Logger
+	 * @param uncompletedEventDefinitionCRFs
+	 *            ArrayList
 	 */
 	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, Logger logger,
 			ArrayList uncompletedEventDefinitionCRFs) {
@@ -458,7 +463,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 				} else {
 					versions = theVersions;
 				}
-				
+
 				Collections.sort(versions, versionComparator);
 				dedcrf.getEdc().setVersions(versions);
 				if (versions.size() != 0) {
@@ -490,10 +495,10 @@ public class EnterDataForStudyEventServlet extends Controller {
 				dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);
 				uncompletedEventDefinitionCRFs.set(i, dedcrf);
 			}
-			if (dedcrf.getStatus() == Status.LOCKED
-					&& (dedcrf.getEventCRF().getCrfVersion() == null || dedcrf.getEventCRF().getCrfVersion().getId() == 0)) {
-				dedcrf.getEventCRF().setCrfVersion(
-						(CRFVersionBean) cvdao.findByPK(dedcrf.getEdc().getDefaultVersionId()));
+			if (dedcrf.getStatus() == Status.LOCKED && (dedcrf.getEventCRF().getCrfVersion() == null
+					|| dedcrf.getEventCRF().getCrfVersion().getId() == 0)) {
+				dedcrf.getEventCRF()
+						.setCrfVersion((CRFVersionBean) cvdao.findByPK(dedcrf.getEdc().getDefaultVersionId()));
 			}
 		}
 	}
@@ -502,10 +507,14 @@ public class EnterDataForStudyEventServlet extends Controller {
 	 * If DiscrepancyNoteBeans have a certain column value, then set flags that a JSP will check in the request
 	 * attribute. This is a convenience method called by the processRequest() method.
 	 *
-	 * @param discBeans List<DiscrepancyNoteBean>
-	 * @param seb StudyEventBean
-	 * @param sm SessionManager
-	 * @param request HttpServletRequest
+	 * @param discBeans
+	 *            List<DiscrepancyNoteBean>
+	 * @param seb
+	 *            StudyEventBean
+	 * @param sm
+	 *            SessionManager
+	 * @param request
+	 *            HttpServletRequest
 	 */
 	public static void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb,
 			SessionManager sm, HttpServletRequest request) {
@@ -531,14 +540,13 @@ public class EnterDataForStudyEventServlet extends Controller {
 		request.setAttribute("numberOfDateStartDNotes", dateStartDNotes.size());
 		request.setAttribute("numberOfDateEndDNotes", dateEndDNotes.size());
 
-		request.setAttribute("imageFileNameForLocation", DiscrepancyNoteUtil
-				.getImageFileNameForFlagByResolutionStatusId(DiscrepancyNoteUtil
-						.getDiscrepancyNoteResolutionStatus(locationDNotes)));
-		request.setAttribute("imageFileNameForDateStart", DiscrepancyNoteUtil
-				.getImageFileNameForFlagByResolutionStatusId(DiscrepancyNoteUtil
-						.getDiscrepancyNoteResolutionStatus(dateStartDNotes)));
-		request.setAttribute("imageFileNameForDateEnd", DiscrepancyNoteUtil
-				.getImageFileNameForFlagByResolutionStatusId(DiscrepancyNoteUtil
-						.getDiscrepancyNoteResolutionStatus(dateEndDNotes)));
+		request.setAttribute("imageFileNameForLocation",
+				DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(locationDNotes)));
+		request.setAttribute("imageFileNameForDateStart",
+				DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateStartDNotes)));
+		request.setAttribute("imageFileNameForDateEnd", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateEndDNotes)));
 	}
 }

@@ -2285,6 +2285,84 @@ public abstract class Controller extends BaseController {
 		});
 	}
 
+	/**
+	 * SelectNotStartedOrRepeatingSortedEventDefs method.
+	 *
+	 * @param ssb
+	 *            StudySubjectBean
+	 * @param parentStudyId
+	 *            int
+	 * @param seddao
+	 *            StudyEventDefinitionDAO
+	 * @param sgcdao
+	 *            StudyGroupClassDAO
+	 * @param sedao
+	 *            StudyEventDAO
+	 * @return ArrayList<StudyEventDefinitionBean>
+	 */
+	protected ArrayList<StudyEventDefinitionBean> selectNotStartedOrRepeatingSortedEventDefs(StudySubjectBean ssb,
+			int parentStudyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao, StudyEventDAO sedao) {
+
+		ArrayList<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
+		Map<Integer, StudyEventBean> studyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
+		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
+		for (StudyEventBean studyEvent : studyEvents) {
+			studyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
+		}
+
+		StudyGroupClassBean defaultStudyGroupClassBean = sgcdao.findDefaultByStudyId(parentStudyId);
+		boolean defaultStudyGroupClassBeanExist = !(defaultStudyGroupClassBean == null
+				|| defaultStudyGroupClassBean.getId() == 0);
+
+		List<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
+		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
+
+		// ordered eventDefs from dynGroups
+		if (defaultStudyGroupClassBeanExist || ssb.getDynamicGroupClassId() != 0) {
+			for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
+				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
+						.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
+				for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
+					if (dynGroup.isDefault() || (ssb.getDynamicGroupClassId() != 0
+							&& dynGroup.getId() == ssb.getDynamicGroupClassId())) {
+						// eventDefs from defDynGroup and subject's dynGroup
+						if (studyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
+							if (studyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
+									.isNotScheduled() || eventDefinition.isRepeating()) {
+								result.add(eventDefinition);
+							}
+						} else {
+							result.add(eventDefinition);
+						}
+					} else {
+						// eventDefs from others dynGroups
+						if (eventDefinition.isRepeating()) {
+							result.add(eventDefinition);
+						}
+					}
+				}
+			}
+		}
+
+		ArrayList eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
+		// sort by study event definition ordinal
+		Collections.sort(eventDefinitionsNotFromDynGroup);
+		// filter notStarted and repeating eventDefs
+		ArrayList notStartedAndRepeatingEventDefinitions = new ArrayList();
+		for (Object anEventDefinitionsNotFromDynGroup : eventDefinitionsNotFromDynGroup) {
+			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) anEventDefinitionsNotFromDynGroup;
+			if (studyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
+				if (eventDefinition.isRepeating()) {
+					notStartedAndRepeatingEventDefinitions.add(eventDefinition);
+				}
+			} else {
+				notStartedAndRepeatingEventDefinitions.add(eventDefinition);
+			}
+		}
+		result.addAll(notStartedAndRepeatingEventDefinitions);
+		return result;
+	}
+
 	protected void addDeletedEventCrfs(StudySubjectBean studySubjectBean, StudyEventBean studyEventBean) {
 		AuditDAO auditDao = getAuditDAO();
 		UserAccountDAO userAccountDao = getUserAccountDAO();
@@ -2318,6 +2396,11 @@ public abstract class Controller extends BaseController {
 		return LocaleResolver.getLocale();
 	}
 
+	/**
+	 * Returns EntityBeanTable.
+	 * 
+	 * @return EntityBeanTable
+	 */
 	public EntityBeanTable getEntityBeanTable() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
@@ -2337,7 +2420,7 @@ public abstract class Controller extends BaseController {
 		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
-		String blnFields[] = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
+		String[] blnFields = {EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED};
 
 		for (int i = 0; i < blnFields.length; i++) {
 			String value = fp.getString(blnFields[i]);
