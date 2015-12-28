@@ -29,6 +29,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -115,7 +116,7 @@ public class StudyModuleController {
 
 		int subjectGroupCount = studyGroupClassDao.findAllByStudy(currentStudy).size();
 
-		int ruleCount = RuleSetServiceUtil.getRuleSetService().getCountByStudy(currentStudy);
+		int ruleCount = getCountOfRules(currentStudy);
 
 		int siteCount = studyDao.findOlnySiteIdsByStudy(currentStudy).size();
 		int userCount = userDao.findAllUsersByStudy(currentStudy.getId()).size();
@@ -289,4 +290,10 @@ public class StudyModuleController {
 				|| Role.STUDY_ADMINISTRATOR.equals(r);
 	}
 
+	private int getCountOfRules(StudyBean currentStudy) {
+		ViewRuleAssignmentFilter viewRuleAssignmentFilter = new ViewRuleAssignmentFilter();
+		viewRuleAssignmentFilter.addFilter("studyId", currentStudy.getId());
+		viewRuleAssignmentFilter.addFilter("ignoreWrongRules", true);
+		return RuleSetServiceUtil.getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
+	}
 }
