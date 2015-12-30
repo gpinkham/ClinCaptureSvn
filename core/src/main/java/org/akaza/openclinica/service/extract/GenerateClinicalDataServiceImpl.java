@@ -295,6 +295,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					ExportFormDataBean dataBean = new ExportFormDataBean();
 					dataBean.setItemGroupData(fetchItemData(ecrf));
 					dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
+					dataBean.setShowStatus(true);
 					if (ecrf.getDateInterviewed() != null) {
 						dataBean.setInterviewDate(ecrf.getDateInterviewed());
 					}
