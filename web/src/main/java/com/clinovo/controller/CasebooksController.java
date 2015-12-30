@@ -67,7 +67,7 @@ public class CasebooksController extends Redirection {
     public static final String CRF_CASEBOOK_STORED_URL = "studyCasebooksUrl";
     public static final String JSESSIONID = "JSESSIONID";
     public static final String DIR_NAME = "print" + File.separator + "Casebooks";
-    public static final int WAIT_FOR_JAVA_SCRIPT = 15000;
+    public static final int WAIT_FOR_JAVA_SCRIPT = 5000;
 
     /**
      * Casebook table handler.
@@ -219,12 +219,12 @@ public class CasebooksController extends Redirection {
 
         webClient.getCookieManager().addCookie(new Cookie(request.getServerName(), JSESSIONID, sessionId));
         HtmlPage page = webClient.getPage(getCasebookUrl(request, includeAudit, includeNotes, ssOid, parentStudyBean.getOid()));
-        while (!page.asXml().contains("page-header")) {
-            if (page.asText().isEmpty()) {
-                break;
-            }
-            webClient.waitForBackgroundJavaScript(WAIT_FOR_JAVA_SCRIPT);
-        }
+		while (!page.asXml().contains("document_end")) {
+			if (page.asText().isEmpty()) {
+				break;
+			}
+			webClient.waitForBackgroundJavaScript(WAIT_FOR_JAVA_SCRIPT);
+		}
         String result = page.getBody().asXml();
         webClient.closeAllWindows();
         return result;

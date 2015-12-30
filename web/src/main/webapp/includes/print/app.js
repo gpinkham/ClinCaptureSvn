@@ -105,6 +105,7 @@ function getPrintableContent() {
         $('#loading_msg').hide();
         $('.spinner').hide();
         $('body').html(renderString);
+		$('body').append("<div id=\"document_end\"> </div>")
     });
 }
 
