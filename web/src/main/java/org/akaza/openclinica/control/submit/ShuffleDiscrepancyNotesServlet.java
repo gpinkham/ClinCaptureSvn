@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.view.Page;
@@ -24,7 +25,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({"unchecked", "serial"})
+@SuppressWarnings({"serial"})
 @Component
 public class ShuffleDiscrepancyNotesServlet extends Controller {
 
@@ -65,7 +66,7 @@ public class ShuffleDiscrepancyNotesServlet extends Controller {
 						newNotes.getFieldNotes().remove(k);
 					} else if (ind > index) {
 						String k2 = k.replace("_manual" + ind, "_manual" + (ind - 1));
-						Object note = newNotes.getFieldNotes().remove(k);
+						List<DiscrepancyNoteBean> note = newNotes.getFieldNotes().remove(k);
 						newNotes.getFieldNotes().put(k2, note);
 					}
 				}

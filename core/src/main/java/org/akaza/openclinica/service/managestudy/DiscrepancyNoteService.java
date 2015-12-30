@@ -83,9 +83,8 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 			return;
 		}
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
-		ArrayList<?> fieldNotes = notes.getNotes(field);
-		for (Object fieldNote : fieldNotes) {
-			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNote;
+		List<DiscrepancyNoteBean> fieldNotes = notes.getNotes(field);
+		for (DiscrepancyNoteBean dnb : fieldNotes) {
 			dnb.setEntityId(entityId);
 			dnb.setStudyId(sb.getId());
 			dnb.setEntityType(entityType);

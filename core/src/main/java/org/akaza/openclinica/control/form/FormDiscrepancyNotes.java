@@ -18,25 +18,26 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
  * Provides for DiscrepancyNotes in CRF forms.
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+
 public class FormDiscrepancyNotes {
-	private HashMap fieldNotes;
-	private HashMap numExistingFieldNotes;
-	private HashMap idNotes;
+	private Map<String, List<DiscrepancyNoteBean>> fieldNotes;
+	private Map<String, Integer> numExistingFieldNotes;
+	private Map<Integer, List<String>> idNotes;
 
 	/**
 	 * Initializes FormDiscrepancyNotes object.
 	 */
 	public FormDiscrepancyNotes() {
-		fieldNotes = new HashMap();
-		numExistingFieldNotes = new HashMap();
-		idNotes = new HashMap();
+		fieldNotes = new HashMap<String, List<DiscrepancyNoteBean>>();
+		numExistingFieldNotes = new HashMap<String, Integer>();
+		idNotes = new HashMap<Integer, List<String>>();
 	}
 
 	/**
@@ -48,11 +49,11 @@ public class FormDiscrepancyNotes {
 	 *            DN to add
 	 */
 	public void addNote(String field, DiscrepancyNoteBean note) {
-		ArrayList notes;
+		List<DiscrepancyNoteBean> notes;
 		if (fieldNotes.containsKey(field)) {
-			notes = (ArrayList) fieldNotes.get(field);
+			notes = fieldNotes.get(field);
 		} else {
-			notes = new ArrayList();
+			notes = new ArrayList<DiscrepancyNoteBean>();
 		}
 
 		notes.add(note);
@@ -68,13 +69,12 @@ public class FormDiscrepancyNotes {
 	 *            Field name
 	 */
 	public void addIdNote(int entityId, String field) {
-		ArrayList notes;
+		List<String> notes;
 		if (idNotes.containsKey(entityId)) {
-			notes = (ArrayList) fieldNotes.get(entityId);
+			notes = idNotes.get(entityId);
 		} else {
-			notes = new ArrayList();
+			notes = new ArrayList<String>();
 		}
-		System.out.println("field:" + field);
 		if (notes != null) {
 			notes.add(field);
 		}
@@ -89,9 +89,9 @@ public class FormDiscrepancyNotes {
 	 * @return true if yes, false otherwise
 	 */
 	public boolean hasNote(String field) {
-		ArrayList notes;
+		List<DiscrepancyNoteBean> notes;
 		if (fieldNotes.containsKey(field)) {
-			notes = (ArrayList) fieldNotes.get(field);
+			notes = fieldNotes.get(field);
 			return notes != null && notes.size() > 0;
 		}
 		return false;
@@ -104,12 +104,12 @@ public class FormDiscrepancyNotes {
 	 *            Field to check
 	 * @return List of associated notes
 	 */
-	public ArrayList getNotes(String field) {
-		ArrayList notes;
+	public List<DiscrepancyNoteBean> getNotes(String field) {
+		List<DiscrepancyNoteBean> notes;
 		if (fieldNotes.containsKey(field)) {
-			notes = (ArrayList) fieldNotes.get(field);
+			notes = fieldNotes.get(field);
 		} else {
-			notes = new ArrayList();
+			notes = new ArrayList<DiscrepancyNoteBean>();
 		}
 		return notes;
 	}
@@ -135,7 +135,7 @@ public class FormDiscrepancyNotes {
 	 */
 	public int getNumExistingFieldNotes(String field) {
 		if (numExistingFieldNotes.containsKey(field)) {
-			Integer numInt = (Integer) numExistingFieldNotes.get(field);
+			Integer numInt = numExistingFieldNotes.get(field);
 			if (numInt != null) {
 				return numInt.intValue();
 			}
@@ -146,14 +146,14 @@ public class FormDiscrepancyNotes {
 	/**
 	 * @return Returns the numExistingFieldNotes.
 	 */
-	public HashMap getNumExistingFieldNotes() {
+	public Map<String, Integer>  getNumExistingFieldNotes() {
 		return numExistingFieldNotes;
 	}
 
 	/**
 	 * @return the fieldNotes
 	 */
-	public HashMap getFieldNotes() {
+	public Map<String, List<DiscrepancyNoteBean>> getFieldNotes() {
 		return fieldNotes;
 	}
 
@@ -161,7 +161,7 @@ public class FormDiscrepancyNotes {
 	 * @param fieldNotes
 	 *            the fieldNotes to set
 	 */
-	public void setFieldNotes(HashMap fieldNotes) {
+	public void setFieldNotes(Map<String, List<DiscrepancyNoteBean>>  fieldNotes) {
 		this.fieldNotes = fieldNotes;
 	}
 
@@ -169,14 +169,14 @@ public class FormDiscrepancyNotes {
 	 * @param numExistingFieldNotes
 	 *            the numExistingFieldNotes to set
 	 */
-	public void setNumExistingFieldNotes(HashMap numExistingFieldNotes) {
+	public void setNumExistingFieldNotes(Map<String, Integer>  numExistingFieldNotes) {
 		this.numExistingFieldNotes = numExistingFieldNotes;
 	}
 
 	/**
 	 * @return the idNotes
 	 */
-	public HashMap getIdNotes() {
+	public Map<Integer, List<String>> getIdNotes() {
 		return idNotes;
 	}
 
@@ -184,7 +184,7 @@ public class FormDiscrepancyNotes {
 	 * @param idNotes
 	 *            the idNotes to set
 	 */
-	public void setIdNotes(HashMap idNotes) {
+	public void setIdNotes(Map<Integer, List<String>>  idNotes) {
 		this.idNotes = idNotes;
 	}
 
@@ -207,9 +207,9 @@ public class FormDiscrepancyNotes {
 	}
 
 	private boolean fieldHasRFC(String field) {
-		ArrayList exitingNotes = this.getNotes(field);
-		for (Object note : exitingNotes) {
-			DiscrepancyNoteBean existingNote = (DiscrepancyNoteBean) note;
+		 List<DiscrepancyNoteBean> exitingNotes = this.getNotes(field);
+		for (DiscrepancyNoteBean note : exitingNotes) {
+			DiscrepancyNoteBean existingNote = note;
 			if (existingNote.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 				return true;
 			}

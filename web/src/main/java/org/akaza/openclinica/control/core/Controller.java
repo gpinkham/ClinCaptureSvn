@@ -2202,7 +2202,7 @@ public abstract class Controller extends BaseController {
 
 	/* Determining the resolution status that will be shown in color flag for an item. */
 	protected int getDiscrepancyNoteResolutionStatus(HttpServletRequest request, DiscrepancyNoteDAO dndao,
-			int itemDataId, ArrayList formNotes) {
+			int itemDataId, List<DiscrepancyNoteBean> list) {
 		int resolutionStatus = 0;
 		boolean hasOtherThread = false;
 
@@ -2226,11 +2226,11 @@ public abstract class Controller extends BaseController {
 			}
 		}
 
-		if (formNotes == null || formNotes.isEmpty()) {
+		if (list == null || list.isEmpty()) {
 			return resolutionStatus;
 		}
 
-		for (Object obj : filterNotesByUserRole(formNotes, request)) {
+		for (Object obj : filterNotesByUserRole(list, request)) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
 			if (note.getParentDnId() == 0) {
 				if (hasOtherThread) {

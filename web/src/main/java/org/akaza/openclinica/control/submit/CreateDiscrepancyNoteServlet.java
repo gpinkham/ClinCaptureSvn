@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import com.clinovo.util.DateUtil;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -529,7 +531,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			if (dnb.getCrfName() == null || dnb.getCrfName().equals("")) {
 				dnb.setCrfName(fp.getString("crfName"));
 			}
-			// // #4346 TBH 10/2009
 			request.setAttribute(DIS_NOTE, dnb);
 			request.setAttribute("unlock", "0");
 			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0"); // this should go from UI & here
@@ -722,7 +723,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				} else {
 					// if not creating a new thread(note), update existing notes
 					// if necessary
-					// if ("itemData".equalsIgnoreCase(entityType) && !isNew) {
 					int pdnId = note != null ? note.getParentDnId() : 0;
 					if (pdnId > 0) {
 						logger.debug("Create:find parent note for item data:" + note.getEntityId());
@@ -838,14 +838,20 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				&& note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.FAILEDVAL.getId()) {
 			return;
 		}
-		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
+		Map<String, List<DiscrepancyNoteBean>> submittedDNs = (Map) request.getSession().getAttribute(
 				SUBMITTED_DNS_MAP);
-		if (submittedDNs == null) {
-			submittedDNs = new HashMap<String, DiscrepancyNoteBean>();
+		submittedDNs = submittedDNs == null? new HashMap<String, List<DiscrepancyNoteBean>>() : submittedDNs;
+		
+		List<DiscrepancyNoteBean> notes;
+		if (submittedDNs.containsKey(note.getField())) {
+			notes = submittedDNs.get(note.getField());
+		} else {
+			notes = new ArrayList<DiscrepancyNoteBean>();
 		}
-		if (submittedDNs.get(note.getField()) == null) {
-			submittedDNs.put(note.getField(), note);
-		}
+
+		notes.add(note);
+		submittedDNs.put(note.getField(), notes);
+		
 		request.getSession().setAttribute(SUBMITTED_DNS_MAP, submittedDNs);
 	}
 

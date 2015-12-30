@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.clinovo.service.ItemRenderMetadataService;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -658,6 +659,8 @@ public abstract class DataEntryServlet extends Controller {
 			
 			runSoftEditChecks(allItems, validate, displayItemService, fp, ruleValidator, groupOrdinalPLusItemOid, ecb);
 			
+			// A map from input name to item id.
+			Map<String, Integer> inputNameToItemDataIdMap = new HashMap<String, Integer>();
 			// A map from item name to item bean object.
 			HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
 			HashMap<String, String> scoreItemdata = new HashMap<String, String>();
@@ -665,7 +668,7 @@ public abstract class DataEntryServlet extends Controller {
 			// hold all item names of changed ItemBean in current section
 			TreeSet<String> changedItems = new TreeSet<String>();
 			ArrayList<String> changedItemNamesList = new ArrayList<String>();
-			// holds complete disply item beans for checking against 'request
+			// holds complete display item beans for checking against 'request
 			// for change' restriction
 			ArrayList<DisplayItemBean> changedItemsList = new ArrayList<DisplayItemBean>();
 			// key is repeating item name, value is its display item group bean
@@ -700,6 +703,7 @@ public abstract class DataEntryServlet extends Controller {
 								boolean manual = j != 0;
 								String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, manual);
 								changedItems.add(formName);
+								inputNameToItemDataIdMap.put(formName, displayItem.getData().getId());
 								changedItemsList.add(displayItem);
 								changedItemNamesList.add(formName);
 								changedItemsMap.put(formName, displayGroup);
@@ -753,9 +757,10 @@ public abstract class DataEntryServlet extends Controller {
 								ordinalSet.add(ordinal);
 								itemOrdinals.put(itemId, ordinalSet);
 							}
+							boolean manual = j != 0;
+							String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, manual);
+							inputNameToItemDataIdMap.put(formName, displayItem.getData().getId());
 							if (newRow || isChanged(displayItem, oldItemdata, attachedFilePath)) {
-								boolean manual = j != 0;
-								String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, manual);
 								logger.debug("RESET: formName group-item-input:" + formName);
 								changedItems.add(formName);
 								changedItemsList.add(displayItem);
@@ -780,6 +785,7 @@ public abstract class DataEntryServlet extends Controller {
 					ordinalset.add(1);
 					itemOrdinals.put(itemId, ordinalset);
 					scoreItemdata.put(itemId + "_" + 1, value);
+					inputNameToItemDataIdMap.put(DataEntryUtil.getInputName(dib), dib.getData().getId());
 					if (isChanged(idb, oldItemdata, dib, attachedFilePath)) {
 						changedItems.add(DataEntryUtil.getInputName(dib));
 						changedItemsList.add(dib);
@@ -796,6 +802,7 @@ public abstract class DataEntryServlet extends Controller {
 						cordinalset.add(1);
 						itemOrdinals.put(itemId, cordinalset);
 						scoreItemdata.put(cib.getId() + "_" + 1, child.getData().getValue());
+						inputNameToItemDataIdMap.put(DataEntryUtil.getInputName(dib), dib.getData().getId());
 						if (isChanged(child.getData(), oldItemdata, child, attachedFilePath)) {
 							changedItems.add(DataEntryUtil.getInputName(child));
 							changedItemsList.add(child);
@@ -838,6 +845,7 @@ public abstract class DataEntryServlet extends Controller {
 										displayItem.getData().getOrdinal());
 
 								displayItem.loadFormValue(value);
+								inputNameToItemDataIdMap.put(inputName, displayItem.getData().getId());
 								if (isChanged(displayItem, oldItemdata, attachedFilePath)) {
 									changedItemsList.add(displayItem);
 									changedItems.add(inputName);
@@ -867,6 +875,7 @@ public abstract class DataEntryServlet extends Controller {
 						ResponseOptionBean robBean = (ResponseOptionBean) ifmb.getResponseSet().getOptions().get(0);
 						String value = sc.doCalculation(dib, scoreItems, scoreItemdata, itemOrdinals, err, 1);
 						dib.loadFormValue(value);
+						inputNameToItemDataIdMap.put(DataEntryUtil.getInputName(dib), dib.getData().getId());
 						if (isChanged(dib.getData(), oldItemdata, dib, attachedFilePath)) {
 							changedItems.add(DataEntryUtil.getInputName(dib));
 							changedItemsList.add(dib);
@@ -899,6 +908,7 @@ public abstract class DataEntryServlet extends Controller {
 							String cvalue = "";
 							cvalue = sc.doCalculation(child, scoreItems, scoreItemdata, itemOrdinals, cerr, 1);
 							child.loadFormValue(cvalue);
+							inputNameToItemDataIdMap.put(DataEntryUtil.getInputName(dib), dib.getData().getId());
 							if (isChanged(child.getData(), oldItemdata, child, attachedFilePath)) {
 								changedItems.add(DataEntryUtil.getInputName(child));
 								changedItemsList.add(child);
@@ -945,8 +955,10 @@ public abstract class DataEntryServlet extends Controller {
 								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
 								&& !this.isAdminForcedReasonForChange(request));
 			}
-
-			removeFieldsValidationsForSubmittedDN(v, request);
+			
+			removeFieldsValidationsForDN(v, getListWithFieldsToSkipValidations(changedItems, 
+					(HashMap) request.getSession().getAttribute(CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP), discNotes,
+					dndao.findAllByEventCrfId(ecb.getId()), inputNameToItemDataIdMap));
 
 			// get hard rules, skip soft if errors > 0
 			errors = v.validate();
@@ -1602,6 +1614,37 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
+	private List<String> getListWithFieldsToSkipValidations(Set<String> changedFields, 
+			Map<String, List<DiscrepancyNoteBean>> mapWithSubmittedDNs, FormDiscrepancyNotes formDiscNotes, List<DiscrepancyNoteBean> discrepancyNoteBeanList, 
+			Map<String, Integer> inputNameToItemDataIdMap) {
+		List<String> result = new ArrayList<String>();
+		if (mapWithSubmittedDNs != null && !mapWithSubmittedDNs.isEmpty()) {
+			for (String fieldName : mapWithSubmittedDNs.keySet()) {
+				for (DiscrepancyNoteBean dnb : mapWithSubmittedDNs.get(fieldName)) {
+					if (dnb.isFVC() && !result.contains(fieldName)) result.add(fieldName);
+				}
+			}
+		}
+		
+		Map<String, List<DiscrepancyNoteBean>> fieldNameToExistingDNListMap = new HashMap<String, List<DiscrepancyNoteBean>>();
+		
+		for (String fieldName : formDiscNotes.getNumExistingFieldNotes().keySet()) {
+			if (formDiscNotes.getNumExistingFieldNotes().get(fieldName) > 0 && inputNameToItemDataIdMap.containsKey(fieldName)) {
+				fieldNameToExistingDNListMap.put(fieldName, getItemIdToDNsMap(discrepancyNoteBeanList).get(inputNameToItemDataIdMap.get(fieldName)));
+			}
+		}
+		
+		for (String fieldName : fieldNameToExistingDNListMap.keySet()) {
+			List<DiscrepancyNoteBean> notes = fieldNameToExistingDNListMap.get(fieldName);
+			for (DiscrepancyNoteBean dnb : notes) {
+				// now here only FVC helps to skip validations
+				if (!changedFields.contains(fieldName) && dnb.isFVC() && !result.contains(fieldName)) result.add(fieldName);
+			}
+		}
+		
+		return result;
+	}
+
 	private boolean isValidFormatOfDateToSave(FormProcessor fp, String itemName) {
 		try {
 			fp.getDateInputWithServerTimeOfDay(itemName);
@@ -1835,13 +1878,11 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
-	private void removeFieldsValidationsForSubmittedDN(Validator v, HttpServletRequest request) {
-		if (request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED) != null) {
-			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession().getAttribute(
-					DataEntryServlet.NOTE_SUBMITTED);
-			for (Object fieldName : newNotesMap.keySet()) {
-				if (fieldName instanceof String && !StringUtil.isBlank((String) fieldName)) {
-					v.removeFieldValidations((String) fieldName);
+	private static void removeFieldsValidationsForDN(Validator v, List<String> fieldsToRemoveValidations) {
+		if (fieldsToRemoveValidations != null) {
+			for (String fieldName : fieldsToRemoveValidations) {
+				if (!StringUtil.isBlank(fieldName)) {
+					v.removeFieldValidations(fieldName);
 				}
 			}
 		}
@@ -1859,7 +1900,7 @@ public abstract class DataEntryServlet extends Controller {
 		// we should transform submitted DNs to FVC, close them and turn off
 		// ruleValidator for corresponding fields
 
-		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
+		Map<String, List<DiscrepancyNoteBean>> submittedDNs = (Map) request.getSession().getAttribute(
 				CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		if (submittedDNs == null || submittedDNs.isEmpty()) {
 			return;
@@ -1880,7 +1921,8 @@ public abstract class DataEntryServlet extends Controller {
 		Set<String> transformedUnSavedDNFieldNames = getTransformedUnSavedDNIds(transformedDNs);
 
 		for (String fieldName : fieldNames) {
-			DiscrepancyNoteBean dn = submittedDNs.get(fieldName);
+			List<DiscrepancyNoteBean> dns = submittedDNs.get(fieldName);
+			DiscrepancyNoteBean dn = dns.get(0);
 			// for RFC we need to show validation error-message
 			if (dn.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 				ruleValidator.removeFieldValidations(fieldName);
@@ -2565,9 +2607,21 @@ public abstract class DataEntryServlet extends Controller {
 		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
-
 	}
 
+	private Map<Integer, List<DiscrepancyNoteBean>> getItemIdToDNsMap(List<DiscrepancyNoteBean> discrepancyNoteBeanList) {
+		Map<Integer, List<DiscrepancyNoteBean>> itemIdToDNsMap = new HashMap<Integer, List<DiscrepancyNoteBean>>();
+		for (DiscrepancyNoteBean discrepancyNoteBean : discrepancyNoteBeanList) {
+			List<DiscrepancyNoteBean> dnList = itemIdToDNsMap.get(discrepancyNoteBean.getEntityId());
+			if (dnList == null) {
+				dnList = new ArrayList<DiscrepancyNoteBean>();
+				itemIdToDNsMap.put(discrepancyNoteBean.getEntityId(), dnList);
+			}
+			dnList.add(discrepancyNoteBean);
+		}
+		return itemIdToDNsMap;
+	}
+	
 	/*
 	 * change to explicitly re-set the section bean after reviewing the disc note counts
 	 */
@@ -2633,28 +2687,10 @@ public abstract class DataEntryServlet extends Controller {
 		request.setAttribute("IntrvDateNoteResStatus",
 				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
 
-		Map<Integer, List<DiscrepancyNoteBean>> itemDataDNCache = new HashMap<Integer, List<DiscrepancyNoteBean>>();
-		List<DiscrepancyNoteBean> discrepancyNoteBeanList = dndao.findAllByEventCrfId(ecb.getId());
-		for (DiscrepancyNoteBean discrepancyNoteBean : discrepancyNoteBeanList) {
-			List<DiscrepancyNoteBean> dnList = itemDataDNCache.get(discrepancyNoteBean.getEntityId());
-			if (dnList == null) {
-				dnList = new ArrayList<DiscrepancyNoteBean>();
-				itemDataDNCache.put(discrepancyNoteBean.getEntityId(), dnList);
-			}
-			dnList.add(discrepancyNoteBean);
-		}
+		Map<Integer, List<DiscrepancyNoteBean>> itemDataDNCache = getItemIdToDNsMap(dndao.findAllByEventCrfId(ecb.getId()));
 
-		Map<Integer, List<DiscrepancyNoteBean>> toolTipItemDataDNCache = new HashMap<Integer, List<DiscrepancyNoteBean>>();
-		List<DiscrepancyNoteBean> toolTipDiscrepancyNoteBeanList = dndao.findExistingNotesForToolTipByEventCrfId(ecb
-				.getId());
-		for (DiscrepancyNoteBean discrepancyNoteBean : toolTipDiscrepancyNoteBeanList) {
-			List<DiscrepancyNoteBean> dnList = toolTipItemDataDNCache.get(discrepancyNoteBean.getEntityId());
-			if (dnList == null) {
-				dnList = new ArrayList<DiscrepancyNoteBean>();
-				toolTipItemDataDNCache.put(discrepancyNoteBean.getEntityId(), dnList);
-			}
-			dnList.add(discrepancyNoteBean);
-		}
+		Map<Integer, List<DiscrepancyNoteBean>> toolTipItemDataDNCache = getItemIdToDNsMap(dndao.findExistingNotesForToolTipByEventCrfId(ecb
+				.getId()));
 
 		List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 		logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());
@@ -2682,8 +2718,8 @@ public abstract class DataEntryServlet extends Controller {
 						List<DiscrepancyNoteBean> toolTipDNotes = toolTipItemDataDNCache.get(itemDataId);
 						toolTipDNotes = toolTipDNotes == null ? new ArrayList() : new ArrayList(toolTipDNotes);
 
-						List dbNotes = itemDataDNCache.get(itemDataId);
-						List parentNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
+						List<DiscrepancyNoteBean> dbNotes = itemDataDNCache.get(itemDataId);
+						List<DiscrepancyNoteBean> parentNotes = dbNotes == null ? new ArrayList<DiscrepancyNoteBean>() : new ArrayList<DiscrepancyNoteBean>(dbNotes);
 						dbNotes = dbNotes == null ? new ArrayList() : new ArrayList(dbNotes);
 
 						dbNotes = filterNotesByUserRole(dbNotes, request);
@@ -2803,11 +2839,11 @@ public abstract class DataEntryServlet extends Controller {
 	 * To set the totals of each resolution status on the DisplayItemBean for each item.
 	 *
 	 * @param dib
-	 * @param notes
+	 * @param list
 	 * @param ecbId TODO
 	 */
 	private DisplayItemBean setTotals(DisplayItemBean dib, int itemDataId, List<DiscrepancyNoteBean> toolTipDNotes,
-									  List parentNotes, ArrayList<DiscrepancyNoteBean> notes, int ecbId, HttpServletRequest request) {
+									  List parentNotes, List<DiscrepancyNoteBean> list, int ecbId, HttpServletRequest request) {
 
 		int totNew = 0, totRes = 0, totClosed = 0, totUpdated = 0, totNA = 0;
 		boolean hasOtherThread = false;
@@ -3033,7 +3069,7 @@ public abstract class DataEntryServlet extends Controller {
 			logger.trace("allFilled is not empty");
 			FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
 					.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-			HashMap idNotes = fdn.getIdNotes();
+			Map<Integer, List<String>> idNotes = fdn.getIdNotes();
 			for (int i = 0; i < allFilled.size(); i++) {
 				ItemDataBean idb = (ItemDataBean) allFilled.get(i);
 				int exsitingNotes = dndao.findNumExistingNotesForItem(idb.getId());

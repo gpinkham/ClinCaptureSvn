@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -654,5 +655,21 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
 	public void setItemDataOrdinal(int itemDataOrdinal) {
 		this.itemDataOrdinal = itemDataOrdinal;
+	}
+	
+	public boolean isAnnotation() {
+		return DiscrepancyNoteUtil.hasType(this, DiscrepancyNoteType.ANNOTATION);
+	}
+	
+	public boolean isQuery() {
+		return DiscrepancyNoteUtil.hasType(this, DiscrepancyNoteType.QUERY);
+	}
+
+	public boolean isRFC() {
+		return DiscrepancyNoteUtil.hasType(this, DiscrepancyNoteType.REASON_FOR_CHANGE);
+	}
+	
+	public boolean isFVC() {
+		return DiscrepancyNoteUtil.hasType(this, DiscrepancyNoteType.FAILEDVAL);
 	}
 }

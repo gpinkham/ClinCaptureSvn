@@ -817,4 +817,32 @@ public class DiscrepancyNoteUtil {
 		}
 		return repeatingInfoMap;
 	}
+	
+	/**
+	 * Check if type of DN equals this type.
+	 * @param dnb DiscrepancyNoteBean
+	 * @param dnt DiscrepancyNoteType
+	 * @return boolean
+	 */
+	public static boolean hasType(DiscrepancyNoteBean dnb, DiscrepancyNoteType dnt) {
+		if (dnb.getDisType() != null && dnb.getDisType() == dnt) return true;
+		if (dnb.getDiscrepancyNoteTypeId() == dnt.getId()) return true;
+		return false;
+	}
+	
+	/**
+	 * Filter String to Boolean Map from Object to Boolean Map.
+	 * @param map Map<Object, Boolean> 
+	 * @return Map<String, Boolean>
+	 */
+	public static Map<String, Boolean> getStringToBooleanMap(Map<Object, Boolean> map) {
+		Map<String, Boolean> result = new HashMap<String, Boolean>();
+		if (map == null || map.isEmpty()) return result;
+		for (Object key : map.keySet()) {
+			if (key instanceof String) {
+				result.put((String)key, map.get(key));
+			}
+		}
+		return result;
+	}
 }
