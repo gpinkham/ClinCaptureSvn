@@ -139,7 +139,7 @@ public final class StudyEventDefinitionUtil {
 		for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionCrfList) {
 			StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao
 					.findByPK(eventDefinitionCrfBean.getStudyEventDefinitionId());
-			studyEventDefinition.setStudyName(studyIdName.get(studyEventDefinition.getStudyId()));
+			studyEventDefinition.setStudyName(studyIdName.get(eventDefinitionCrfBean.getStudyId()));
 			studyEventDefinition.setStatus(eventDefinitionCrfBean.getStatus());
 			studyEventDefinitionUpdated.add(studyEventDefinition);
 		}
