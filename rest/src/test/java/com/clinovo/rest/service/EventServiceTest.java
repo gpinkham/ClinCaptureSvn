@@ -277,7 +277,7 @@ public class EventServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatCalendaredStudyEventDefinitionThatIsNotReferenceEventIsCreatedCorrectly() throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		result = this.mockMvc
 				.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -403,7 +403,7 @@ public class EventServiceTest extends BaseServiceTest {
 		this.mockMvc.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 				.param("repeating", "true").param("description", "test description").param("category", "test category")
 				.param("schDay", "4").param("maxDay", "4").param("minDay", "3").param("emailDay", "2")
-				.param("emailUser", userName).accept(mediaType).secure(true).session(session))
+				.param("emailUser", rootUserName).accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -458,7 +458,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfSchDayMoreThenMaxDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -470,7 +470,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -482,7 +482,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenMaxDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -494,7 +494,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfEmailDayMoreThenSchDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -507,9 +507,9 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatItIsImpossibleToCreateCalendaredStudyEventDefinitionThatIsNotReferenceEventIfEmailUserDoesNotHaveScopeRole()
 			throws Exception {
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, defaultStudyName);
 		this.mockMvc
 				.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -684,7 +684,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItImpossibleToAddCrfToStudyEventDefinitionThatDoesNotBelongToCurrentScope() throws Exception {
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		this.mockMvc
 				.perform(post(API_EVENT_ADD_CRF).param("eventId", "1").param("crfName", "Test CRF")
 						.param("defaultVersion", "v1.0").accept(mediaType).secure(true).session(session))
@@ -801,7 +801,7 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatItIsImpossibleToGetInfoAboutExistingStudyEventDefinitionThatDoesNotBelongToCurrentScope()
 			throws Exception {
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		this.mockMvc.perform(get(API_EVENT).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
@@ -865,7 +865,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToEditAStudyEventDefinitionThatDoesNotBelongToCurrentScope() throws Exception {
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		this.mockMvc.perform(post(API_EVENT_EDIT).param("id", "1").param("name", "new name!").accept(mediaType)
 				.secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
@@ -1013,7 +1013,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfSchDayMoreThenMaxDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit")
 						.param("emailUser", "root").accept(mediaType).secure(true).session(session))
@@ -1026,7 +1026,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenSchDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit")
 						.param("emailUser", "root").accept(mediaType).secure(true).session(session))
@@ -1039,7 +1039,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfMinDayMoreThenMaxDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit")
 						.param("emailUser", "root").accept(mediaType).secure(true).session(session))
@@ -1052,7 +1052,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfEmailDayMoreThenSchDay()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		this.mockMvc
 				.perform(post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit")
 						.param("emailUser", "root").accept(mediaType).secure(true).session(session))
@@ -1066,9 +1066,9 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatItIsImpossibleToChangeCalendaredStudyEventDefinitionThatIsNotReferenceEventIfEmailUserDoesNotHaveScopeRole()
 			throws Exception {
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, defaultStudyName);
 		this.mockMvc
 				.perform(post(API_EVENT_EDIT).param("id", "1").param("type", "calendared_visit")
 						.param("emailUser", "root").accept(mediaType).secure(true).session(session))
@@ -1186,7 +1186,7 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatScheduledStudyEventDefinitionIsChangedCorrectlyToTheCalendaredStudyEventDefinitionThatIsNotReferenceEvent()
 			throws Exception {
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		result = this.mockMvc.perform(
 				post(API_EVENT_EDIT).param("id", "1").param("name", "test_event").param("type", "calendared_visit")
 						.param("description", "test description").param("category", "test category")
@@ -1351,7 +1351,7 @@ public class EventServiceTest extends BaseServiceTest {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
 				.findByPK(1);
 		studyEventDefinitionBean.setStatus(Status.DELETED);
-		studyEventDefinitionBean.setUpdater(userBean);
+		studyEventDefinitionBean.setUpdater(rootUser);
 		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.DELETED);
@@ -1363,7 +1363,7 @@ public class EventServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatSystemAdministratorIsAbleToCallStudyEventAPI() throws Exception {
-		createNewSite(studyBean.getId());
+		createNewSite(currentScope.getId());
 		createChildEDCForNewSite(7, newSite);
 		ResultMatcher expectStatus = status().isOk();
 		this.mockMvc.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
@@ -1393,11 +1393,11 @@ public class EventServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallStudyEventAPI() throws Exception {
-		createNewSite(studyBean.getId());
+		createNewSite(currentScope.getId());
 		createChildEDCForNewSite(7, newSite);
 		ResultMatcher expectStatus = status().isOk();
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyName);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
 		this.mockMvc.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduled")
 				.param("description", "test description").param("category", "test category").accept(mediaType)
 				.secure(true).session(session)).andExpect(expectStatus);
@@ -1572,7 +1572,7 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatRestoreCrfMethodWorksFineForExistingEventDefinitionCrf() throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		eventDefinitionCRFBean.setStatus(Status.DELETED);
-		eventDefinitionCRFBean.setUpdater(userBean);
+		eventDefinitionCRFBean.setUpdater(rootUser);
 		eventDefinitionCRFDAO.updateStatus(eventDefinitionCRFBean);
 		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(1);
 		assertEquals(eventDefinitionCRFBean.getStatus(), Status.DELETED);
@@ -1756,7 +1756,7 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatItImpossibleToEditStudyCrfOfStudyEventDefinitionThatDoesNotBelongToCurrentScope()
 			throws Exception {
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		this.mockMvc
 				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventId", "9").param("crfName", "Test CRF")
 						.param("defaultVersion", "v1.0").accept(mediaType).secure(true).session(session))

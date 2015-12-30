@@ -16,20 +16,31 @@ import org.springframework.test.web.servlet.ResultMatcher;
 public class UserServiceTest extends BaseServiceTest {
 
 	@Test
-	public void testThatItIsImpossibleToCreateAUserIfUserTypeParameterHasWrongValue() throws Exception {
+	public void testThatItIsImpossibleToCreateAStudyUserIfRoleIsSiteRole() throws Exception {
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateAStudyUserIfUserTypeParameterHasWrongValue() throws Exception {
 		this.mockMvc
-				.perform(post(API_USER_CREATE).param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
 						.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 						.param("lastName", "lastname_".concat(Long.toString(timestamp)))
 						.param("email", "test@gmail.com").param("phone", "+375232345678").param("company", "clinovo")
 						.param("userType", "123").param("allowSoap", "true").param("displayPassword", "true")
-						.param("role", Integer.toString(3456)).accept(mediaType).secure(true).session(session))
+						.param("role", Integer.toString(2)).accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testThatItIsImpossibleToCreateAUserIfRoleParameterHasWrongValue() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE).param("userName", "new_user_".concat(Long.toString(timestamp)))
+	public void testThatItIsImpossibleToCreateAStudyUserIfRoleParameterHasWrongValue() throws Exception {
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -39,14 +50,77 @@ public class UserServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatItIsNotPossibleToCreateAUserWithRoleThatDoesNotExist() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE).param("userName", "new_user_".concat(Long.toString(timestamp)))
+	public void testThatCreateUserRequestReturnsCode500IfUsernameHasBeenTakenAlready() throws Exception {
+		createNewStudy();
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", newUser.getName())
+				.param("firstName", newUser.getFirstName()).param("lastName", newUser.getLastName())
+				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
+				.param("company", newUser.getInstitutionalAffiliation())
+				.param("userType", Integer.toString(UserType.SYSADMIN.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsNotPossibleToCreateAStudyUserWithIncorrectEmail() throws Exception {
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId()))
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsPossibleToCreateAStudyUserIfAllParametersAreSpecified() throws Exception {
+		String timeZone = "Etc/GMT+11";
+		mailSenderHost = mailSender.getHost();
+		mailSender.setHost("");
+		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
+		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("allowSoap", "true").param("displayPassword", "true")
+				.param("company", "clinovo").param("userType", Integer.toString(UserType.SYSADMIN.getId()))
+				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).param("timeZone", timeZone)
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
+					.equals(UserType.SYSADMIN.getCode()));
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTimeZoneId().equals(timeZone));
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getRunWebservices());
+			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getPasswd().isEmpty());
+			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
+					.equals(UserType.USER.getCode()));
+		}
+	}
+
+	@Test
+	public void testThatItIsPossibleToCreateAStudyUserIfOnlyRequiredParametersAreSpecified() throws Exception {
+		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
+		mailSenderHost = mailSender.getHost();
+		mailSender.setHost("");
+		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(3456)).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("userType", Integer.toString(UserType.USER.getId()))
+				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
+					.equals(UserType.USER.getCode()));
+			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
+					.equals(UserType.SYSADMIN.getCode()));
+			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getRunWebservices());
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getPasswd().isEmpty());
+		}
 	}
 
 	@Test
@@ -55,11 +129,12 @@ public class UserServiceTest extends BaseServiceTest {
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		createNewSite(newStudy.getId());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
 		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("userName", additionalUserName)
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
 				.param("firstName", newUser.getFirstName()).param("lastName", newUser.getLastName())
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
 				.param("company", newUser.getInstitutionalAffiliation())
@@ -73,69 +148,97 @@ public class UserServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatCreateUserRequestReturnsCode500IfUsernameHasBeenTakenAlready() throws Exception {
-		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
-		this.mockMvc.perform(post(API_USER_CREATE).param("userName", newUser.getName())
-				.param("firstName", newUser.getFirstName()).param("lastName", newUser.getLastName())
-				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
-				.param("company", newUser.getInstitutionalAffiliation())
-				.param("userType", Integer.toString(UserType.SYSADMIN.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
+	public void testThatItIsImpossibleToCreateASiteUserIfRoleIsStudyRole() throws Exception {
+		createNewSite(currentScope.getId());
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_CODER.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testThatItIsNotPossibleToCreateAUserWithIncorrectEmail() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE).param("userName", "new_user_".concat(Long.toString(timestamp)))
+	public void testThatItIsImpossibleToCreateASiteUserIfUserTypeParameterHasWrongValue() throws Exception {
+		createNewSite(currentScope.getId());
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo").param("userType", "123")
+				.param("allowSoap", "true").param("displayPassword", "true")
+				.param("role", Integer.toString(Role.INVESTIGATOR.getId())).accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToCreateASiteUserIfRoleParameterHasWrongValue() throws Exception {
+		createNewSite(currentScope.getId());
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true").param("role", "123123").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsNotPossibleToCreateASiteUserWithIncorrectEmail() throws Exception {
+		createNewSite(currentScope.getId());
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId()))
+				.param("displayPassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
 				.secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testThatItIsPossibleToCreateUserIfAllParametersAreSpecified() throws Exception {
+	public void testThatItIsPossibleToCreateASiteUserIfAllParametersAreSpecified() throws Exception {
+		createNewSite(currentScope.getId());
 		String timeZone = "Etc/GMT+11";
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		result = this.mockMvc.perform(post(API_USER_CREATE).param("userName", additionalUserName)
-				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", additionalUserName).param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("allowSoap", "true").param("displayPassword", "true")
 				.param("company", "clinovo").param("timeZone", timeZone)
 				.param("userType", Integer.toString(UserType.SYSADMIN.getId()))
-				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).accept(mediaType).secure(true)
+				.param("role", Integer.toString(Role.SITE_MONITOR.getId())).accept(mediaType).secure(true)
 				.session(session)).andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
-			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getRunWebservices());
-			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getPasswd().isEmpty());
 			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
 					.equals(UserType.USER.getCode()));
 			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
 					.equals(UserType.SYSADMIN.getCode()));
 			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTimeZoneId().equals(timeZone));
+			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getRunWebservices());
+			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getPasswd().isEmpty());
 		}
 	}
 
 	@Test
-	public void testThatItIsPossibleToCreateUserIfOnlyRequiredParametersAreSpecified() throws Exception {
+	public void testThatItIsPossibleToCreateASiteUserIfOnlyRequiredParametersAreSpecified() throws Exception {
+		createNewSite(currentScope.getId());
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
-		result = this.mockMvc.perform(post(API_USER_CREATE).param("userName", additionalUserName)
-				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", additionalUserName).param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId()))
-				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isOk()).andReturn();
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getRunWebservices());
@@ -145,6 +248,59 @@ public class UserServiceTest extends BaseServiceTest {
 			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
 					.equals(UserType.SYSADMIN.getCode()));
 		}
+	}
+
+	@Test
+	public void testThatItIsNotPossibleToCreateASiteUserIfSiteDoesNotBelongToCurrentScope() throws Exception {
+		createNewStudy();
+		createNewSite(newStudy.getId());
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true")
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsNotPossibleToCreateASiteUserIfSiteDoesNotExist() throws Exception {
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", "adsfasdf")
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true")
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsNotPossibleToCreateASiteUserIfSiteNameParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", "")
+				.param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true")
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsNotPossibleToCreateASiteUserIfSiteNameParameterIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo")
+				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true")
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -185,8 +341,8 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveYourself() throws Exception {
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyName);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
 		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
@@ -194,21 +350,22 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveUserThatDoesNotBelongToCurrentScope()
 			throws Exception {
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		String additionalUserName = newUser.getName();
 		String additionalUserPassword = newUser.getPasswd();
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		timestamp = new Date().getTime() + 1;
-		createNewUser(UserType.USER, Role.STUDY_MONITOR);
-		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword, studyName);
+		createNewStudyUser(UserType.USER, Role.STUDY_MONITOR);
+		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
+				defaultStudyName);
 		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodChangesUserStatusCorrectly() throws Exception {
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
 		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
@@ -254,8 +411,8 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreYourself() throws Exception {
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyName);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
 		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
@@ -263,21 +420,22 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreUserThatDoesNotBelongToCurrentScope()
 			throws Exception {
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		String additionalUserName = newUser.getName();
 		String additionalUserPassword = newUser.getPasswd();
 		createNewStudy();
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, newStudy.getName());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		timestamp = new Date().getTime() + 1;
-		createNewUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
-		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword, studyName);
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
+				defaultStudyName);
 		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodChangesUserStatusCorrectly() throws Exception {
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		userAccountBean.setStatus(Status.DELETED);
 		userAccountBean.setUpdater(userAccountBean);

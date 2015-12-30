@@ -28,7 +28,10 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.cdisc.ns.odm.v130.ODM;
 import org.hamcrest.core.IsInstanceOf;
@@ -81,7 +84,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_EVENT_EDIT_STUDY_CRF = "/event/editStudyCrf";
 	public static final String API_EVENT_CREATE = "/event/create";
 	public static final String API_WRONG_MAPPING = "/wrongmapping";
-	public static final String API_USER_CREATE = "/user/create";
+	public static final String API_USER_CREATE_USER = "/user/createUser";
 	public static final String API_USER_REMOVE = "/user/remove";
 	public static final String API_USER_RESTORE = "/user/restore";
 	public static final String API_AUTHENTICATION = "/authentication";
@@ -111,12 +114,13 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	protected MediaType mediaType = MediaType.APPLICATION_JSON;
 
 	protected long timestamp;
-	protected String userName;
-	protected String password;
-	protected String studyName;
+	protected String rootUserName;
+	protected String rootUserPassword;
+	protected String defaultStudyName;
 
-	protected StudyBean studyBean;
-	protected UserAccountBean userBean;
+	protected StudyBean currentScope;
+	protected StudyBean defaultStudy;
+	protected UserAccountBean rootUser;
 
 	protected StudyBean newSite;
 	protected StudyBean newStudy;
@@ -140,15 +144,32 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		InputStream stream = loader.getResourceAsStream(resource);
 		prop.load(stream);
-		userName = prop.getProperty("rest.userName");
-		password = prop.getProperty("rest.password");
-		studyName = prop.getProperty("rest.studyName");
+		rootUserName = prop.getProperty("rest.userName");
+		rootUserPassword = prop.getProperty("rest.password");
+		defaultStudyName = prop.getProperty("rest.studyName");
+	}
+
+	private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
+		StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
+		if (spv1.getId() > 0) {
+			spvdao.update(spv);
+		} else {
+			spvdao.create(spv);
+		}
+	}
+
+	private void setStudyParameter(String parameterName, String value) {
+		StudyParameterValueBean spv = new StudyParameterValueBean();
+		spv.setStudyId(currentScope.getId());
+		spv.setParameter(parameterName);
+		spv.setValue(value);
+		updateParameter(studyParameterValueDAO, spv);
 	}
 
 	private StudyBean createStudy() throws Exception {
 		StudyBean study = new StudyBean();
 		study.setName("study_".concat(Long.toString(timestamp)));
-		study.setOwner(userBean);
+		study.setOwner(rootUser);
 		study.setCreatedDate(new Date());
 		study.setStatus(Status.PENDING);
 		return (StudyBean) studyDAO.create(study);
@@ -158,7 +179,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		StudyBean site = new StudyBean();
 		site.setName("site_".concat(Long.toString(timestamp)));
 		site.setParentStudyId(studyId);
-		site.setOwner(userBean);
+		site.setOwner(rootUser);
 		site.setCreatedDate(new Date());
 		site.setStatus(Status.PENDING);
 		return (StudyBean) studyDAO.create(site);
@@ -170,11 +191,13 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected void createNewStudy() throws Exception {
 		newStudy = createStudy();
+		studyConfigService.setParametersForStudy(newStudy);
 		assertTrue(newStudy.getId() > 0);
 	}
 
 	protected void createNewSite(int studyId) throws Exception {
 		newSite = createSite(studyId);
+		studyConfigService.setParametersForSite(newSite);
 		assertTrue(newSite.getId() > 0);
 	}
 
@@ -191,7 +214,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected EventDefinitionCRFBean setStatusForEDC(int id, Status status) {
 		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(id);
-		eventDefinitionCRFBean.setUpdater(userBean);
+		eventDefinitionCRFBean.setUpdater(rootUser);
 		eventDefinitionCRFBean.setStatus(status);
 		eventDefinitionCRFBean.setUpdatedDate(new Date());
 		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
@@ -204,7 +227,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
 				.findByPK(id);
 		studyEventDefinitionBean.setStatus(status);
-		studyEventDefinitionBean.setUpdater(userBean);
+		studyEventDefinitionBean.setUpdater(rootUser);
 		studyEventDefinitionDAO.updateStatus(studyEventDefinitionBean);
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(id);
 		assertEquals(studyEventDefinitionBean.getStatus(), status);
@@ -213,7 +236,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected CRFVersionBean setStatusForCrfVersion(int id, Status status) {
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(id);
-		crfVersionBean.setUpdater(userBean);
+		crfVersionBean.setUpdater(rootUser);
 		crfVersionBean.setStatus(status);
 		crfVersionDao.update(crfVersionBean);
 		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(id);
@@ -221,14 +244,19 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		return crfVersionBean;
 	}
 
-	protected void createNewUser(UserType userType, Role role) throws Exception {
+	protected void createNewStudyUser(UserType userType, Role role) throws Exception {
+		if (role.equals(Role.STUDY_EVALUATOR)) {
+			setStudyParameter("studyEvaluator", "yes");
+		} else if (role.equals(Role.STUDY_CODER)) {
+			setStudyParameter("medicalCoding", "yes");
+		}
 		String userName = "userName_".concat(Long.toString(timestamp));
 		String firstName = "firstName_".concat(Long.toString(timestamp));
 		String lastName = "lastName_".concat(Long.toString(timestamp));
 		String email = "email@gmail.com";
 		String phone = "+375232345678";
 		String company = "home";
-		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE).accept(mediaType).param("userName", userName)
+		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE_USER).accept(mediaType).param("userName", userName)
 				.param("firstName", firstName).param("lastName", lastName).param("email", email).param("phone", phone)
 				.param("company", company).param("userType", Integer.toString(userType.getId()))
 				.param("allowSoap", "true").param("displayPassword", "true")
@@ -261,7 +289,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		userAccountBean.setStatus(Status.AVAILABLE);
 		userAccountBean.setPasswdChallengeQuestion("");
 		userAccountBean.setPasswdChallengeAnswer("");
-		userAccountBean.setOwner(userBean);
+		userAccountBean.setOwner(rootUser);
 		newUser = (UserAccountBean) userAccountDAO.create(userAccountBean);
 		assertTrue(newUser.getId() > 0);
 		newUser.setPasswd(password);
@@ -269,9 +297,13 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected void login(String userName, UserType userType, Role role, String password, String studyName)
 			throws Exception {
-		studyBean = (StudyBean) studyDAO.findByName(studyName);
-		userBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		session.clearAttributes();
+		currentScope = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
+		if (currentScope.isSite()) {
+			studyConfigService.setParametersForSite(currentScope);
+		} else if (!currentScope.isSite()) {
+			studyConfigService.setParametersForStudy(currentScope);
+		}
 		this.mockMvc
 				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("userName", userName)
 						.param("password", password).param("studyName", studyName).session(session))
@@ -281,13 +313,15 @@ public class BaseServiceTest extends DefaultAppContextTest {
 								.sessionAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS,
 										IsInstanceOf
 												.any(UserDetails.class)))
-				.andExpect(content().string(mediaType.equals(MediaType.APPLICATION_JSON)
-						? StringContains.containsString("{\"userName\":\"".concat(userName)
-								.concat("\",\"userStatus\":\"").concat(userBean.getStatus().getName())
-								.concat("\",\"studyName\":\"").concat(studyName).concat("\",\"studyStatus\":\"")
-								.concat(studyBean.getStatus().getName()).concat("\",\"role\":\"").concat(role.getCode())
-								.concat("\",\"userType\":\"").concat(userType.getCode()).concat("\"}"))
-						: StringContains.containsString("<ODM Description=\"REST Data\"")));
+				.andExpect(
+						content().string(mediaType.equals(MediaType.APPLICATION_JSON)
+								? StringContains.containsString("{\"userName\":\"".concat(userName)
+										.concat("\",\"userStatus\":\"").concat(rootUser.getStatus().getName())
+										.concat("\",\"studyName\":\"").concat(studyName).concat("\",\"studyStatus\":\"")
+										.concat(currentScope.getStatus().getName()).concat("\",\"role\":\"")
+										.concat(role.getCode()).concat("\",\"userType\":\"").concat(userType.getCode())
+										.concat("\"}"))
+								: StringContains.containsString("<ODM Description=\"REST Data\"")));
 	}
 
 	private void backupEntities() {
@@ -380,7 +414,12 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 		timestamp = new Date().getTime();
 
-		login(userName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, password, studyName);
+		defaultStudy = (StudyBean) studyDAO.findByName(defaultStudyName);
+		studyConfigService.setParametersForStudy(defaultStudy);
+
+		rootUser = (UserAccountBean) userAccountDAO.findByUserName(rootUserName);
+
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, defaultStudyName);
 	}
 
 	protected void unmarshalResult() {

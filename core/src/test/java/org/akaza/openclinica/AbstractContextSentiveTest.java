@@ -48,6 +48,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -241,6 +242,8 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected ItemRenderMetadataDAO itemRenderMetadataDAO;
 
 	// Services
+	@Autowired
+	protected StudyConfigService studyConfigService;
 	@Autowired
 	protected EventCRFSectionService eventCRFSectionService;
 	@Autowired

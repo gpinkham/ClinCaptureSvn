@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.service.base.BaseService;
+import com.clinovo.rest.service.base.BaseCrfService;
 
 /**
  * CrfService.
  */
 @Controller("restCrfService")
 @RequestMapping("/crf")
-public class CrfService extends BaseService {
+public class CrfService extends BaseCrfService {
 
 	/**
 	 * Method imports new crf.

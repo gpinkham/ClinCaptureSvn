@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
@@ -52,10 +51,10 @@ import com.clinovo.validator.EventDefinitionValidator;
 public class EventService extends BaseEventService {
 
 	@Autowired
-	private EventDefinitionService eventDefinitionService;
+	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	@Autowired
-	private EventDefinitionCrfService eventDefinitionCrfService;
+	private EventDefinitionService eventDefinitionService;
 
 	@Autowired
 	private EDCItemMetadataService edcItemMetadataService;
@@ -171,7 +170,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestIgnoreDefaultValues
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
@@ -189,7 +187,7 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "emailDay", required = false) Integer emailDay,
 			@RequestParam(value = "emailUser", required = false) String emailUser) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = prepareStudyEventDefinition(id, name, type, description,
-				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
+				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser, true);
 
 		HashMap errors = EventDefinitionValidator.validate(configurationDao, new UserAccountDAO(dataSource),
 				getCurrentStudy());
@@ -329,7 +327,6 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RestIgnoreDefaultValues
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),

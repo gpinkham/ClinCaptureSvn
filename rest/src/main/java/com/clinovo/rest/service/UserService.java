@@ -15,22 +15,8 @@
 
 package com.clinovo.rest.service;
 
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,40 +25,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.service.base.BaseService;
-import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.rest.service.base.BaseUserService;
 import com.clinovo.service.UserAccountService;
-import com.clinovo.validator.UserValidator;
 
 /**
  * UserService.
  */
 @Controller("restUserService")
 @RequestMapping("/user")
-@SuppressWarnings({"unused", "rawtypes"})
-public class UserService extends BaseService {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-
-	@Autowired
-	private DataSource dataSource;
-
-	@Autowired
-	private MessageSource messageSource;
-
-	@Autowired
-	private ConfigurationDao configurationDao;
+public class UserService extends BaseUserService {
 
 	@Autowired
 	private UserAccountService userAccountService;
 
-	@Autowired
-	private org.akaza.openclinica.core.SecurityManager securityManager;
-
 	/**
-	 * Method that creates new user.
+	 * Method that creates new study user.
 	 *
 	 * @param userName
 	 *            String
@@ -94,6 +61,8 @@ public class UserService extends BaseService {
 	 *            boolean
 	 * @param role
 	 *            int
+	 * @param siteName
+	 *            String
 	 * @param timeZone
 	 *            String
 	 * @return UserAccountBean
@@ -103,51 +72,19 @@ public class UserService extends BaseService {
 	@ResponseBody
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "userType", values = "1,2", valueDescriptions = "rest.usertype.valueDescription"),
-			@RestParameterPossibleValues(name = "role", values = "1,2,6,7,8,4,5,9", valueDescriptions = "rest.role.valueDescription")})
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
+			@RestParameterPossibleValues(name = "role", values = "2,4,5,6,7,8,9,10", valueDescriptions = "rest.roles.valueDescription")})
+	@RequestMapping(value = "/createUser", method = RequestMethod.POST)
 	public UserAccountBean createUser(@RequestParam("userName") String userName,
 			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName,
-			@RequestParam("email") String email, @RequestParam(value = "phone", required = false) String phone,
+			@RequestParam("email") String email,
+			@RequestParam(value = "phone", defaultValue = "", required = false) String phone,
 			@RequestParam("company") String company, @RequestParam(value = "userType") int userType,
 			@RequestParam(value = "allowSoap", defaultValue = "false", required = false) boolean allowSoap,
 			@RequestParam(value = "displayPassword", defaultValue = "false", required = false) boolean displayPassword,
-			@RequestParam("role") int role, @RequestParam(value = "timeZone", required = false) String timeZone)
-					throws Exception {
-		StudyBean studyBean = getCurrentStudy();
-
-		StudyDAO studyDao = new StudyDAO(dataSource);
-		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-
-		HashMap errors = UserValidator.validateUserCreate(configurationDao, userAccountDao, studyBean);
-		ValidatorUtil.checkForErrors(errors);
-
-		Role userAccountRole = Role.get(role);
-		UserType userAccountType = UserType.get(userType);
-
-		UserAccountBean userAccountBean = new UserAccountBean();
-		userAccountBean.setName(userName);
-		userAccountBean.setFirstName(firstName);
-		userAccountBean.setLastName(lastName);
-		userAccountBean.setEmail(email);
-		userAccountBean.setPhone(phone);
-		userAccountBean.setActiveStudyId(studyBean.getId());
-		userAccountBean.setRunWebservices(allowSoap);
-		userAccountBean.addUserType(userAccountType);
-		userAccountBean.setInstitutionalAffiliation(company);
-		userAccountBean.setRoleCode(userAccountRole.getCode());
-		userAccountBean.setUserTypeCode(userAccountType.getCode());
-		userAccountBean.setUserTimeZoneId(timeZone);
-
-		userAccountService.createUser(UserDetails.getCurrentUserDetails().getCurrentUser(dataSource), userAccountBean,
-				userAccountRole, !displayPassword);
-
-		if (userAccountBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.createUser.operationFailed",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-
-		userAccountBean.setPasswd(displayPassword ? userAccountBean.getRealPassword() : "");
-		return userAccountBean;
+			@RequestParam("role") int role, @RequestParam(value = "siteName", required = false) String siteName,
+			@RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
+		return createUser(siteName, userName, firstName, lastName, email, phone, company, userType, allowSoap,
+				displayPassword, role, timeZone);
 	}
 
 	/**

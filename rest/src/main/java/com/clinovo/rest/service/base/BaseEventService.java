@@ -12,12 +12,12 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.rest.service.base;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +33,6 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -45,7 +44,6 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.Response;
-import com.clinovo.rest.validator.EventServiceValidator;
 import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.util.RuleSetServiceUtil;
@@ -58,10 +56,10 @@ import com.clinovo.validator.EventDefinitionValidator;
 public abstract class BaseEventService extends BaseService {
 
 	@Autowired
-	private EventDefinitionService eventDefinitionService;
+	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	@Autowired
-	private EventDefinitionCrfService eventDefinitionCrfService;
+	private EventDefinitionService eventDefinitionService;
 
 	@Autowired
 	private MessageSource messageSource;
@@ -69,16 +67,34 @@ public abstract class BaseEventService extends BaseService {
 	@Autowired
 	private DataSource dataSource;
 
-	protected StudyBean getSite(String siteName) throws Exception {
-		StudyBean site = (StudyBean) new StudyDAO(dataSource).findByName(siteName);
-		if (site.getId() == 0) {
-			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteIsNotFound",
-					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (site.getParentStudyId() != getCurrentStudy().getId()) {
-			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteDoesNotBelongToCurrentScope",
-					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	private static void validateStudyEventDefinition(MessageSource messageSource, int id,
+			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy, UserAccountDAO userAccountDao,
+			boolean editMode) throws RestException {
+		Locale locale = LocaleResolver.getLocale();
+		if (!(studyEventDefinitionBean.getId() > 0)) {
+			throw new RestException(messageSource.getMessage("rest.event.isNotFound", new Object[]{id}, locale));
+		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
+			throw new RestException(
+					messageSource.getMessage("rest.event.studyEventDefinitionDoesNotBelongToCurrentScope",
+							new Object[]{id, currentStudy.getId()}, locale));
 		}
-		return site;
+		if (editMode) {
+			prepareForValidation("name", studyEventDefinitionBean.getName());
+			prepareForValidation("description", studyEventDefinitionBean.getDescription());
+			prepareForValidation("repeating", studyEventDefinitionBean.isRepeating());
+			prepareForValidation("category", studyEventDefinitionBean.getCategory());
+			if (prepareForValidation("type", studyEventDefinitionBean.getType()).equalsIgnoreCase("calendared_visit")) {
+				boolean isReference = prepareForValidation("isReference", studyEventDefinitionBean.getReferenceVisit())
+						.equalsIgnoreCase("true");
+				prepareForValidation("schDay", !isReference ? studyEventDefinitionBean.getScheduleDay() : 0);
+				prepareForValidation("maxDay", !isReference ? studyEventDefinitionBean.getMaxDay() : 0);
+				prepareForValidation("minDay", !isReference ? studyEventDefinitionBean.getMinDay() : 0);
+				prepareForValidation("emailDay", !isReference ? studyEventDefinitionBean.getEmailDay() : 0);
+				prepareForValidation("emailUser", !isReference
+						? userAccountDao.findByPK(studyEventDefinitionBean.getUserEmailId()).getName()
+						: "");
+			}
+		}
 	}
 
 	protected StudyEventDefinitionBean getStudyEventDefinition(int eventId) throws Exception {
@@ -87,8 +103,8 @@ public abstract class BaseEventService extends BaseService {
 
 	protected StudyEventDefinitionBean getValidatedStudyEventDefinition(int eventId) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
-		EventServiceValidator.validateStudyEventDefinition(messageSource, eventId, studyEventDefinitionBean,
-				getCurrentStudy(), new UserAccountDAO(dataSource), false);
+		validateStudyEventDefinition(messageSource, eventId, studyEventDefinitionBean, getCurrentStudy(),
+				new UserAccountDAO(dataSource), false);
 		return studyEventDefinitionBean;
 	}
 
@@ -101,11 +117,11 @@ public abstract class BaseEventService extends BaseService {
 
 	protected StudyEventDefinitionBean prepareStudyEventDefinition(int id, String name, String type, String description,
 			Boolean repeating, String category, Boolean isReference, Integer schDay, Integer dayMax, Integer dayMin,
-			Integer emailDay, String emailUser) throws Exception {
+			Integer emailDay, String emailUser, boolean editMode) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
 				dataSource).findByPK(id);
-		EventServiceValidator.validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean,
-				getCurrentStudy(), new UserAccountDAO(dataSource), true);
+		validateStudyEventDefinition(messageSource, id, studyEventDefinitionBean, getCurrentStudy(),
+				new UserAccountDAO(dataSource), editMode);
 		return prepareStudyEventDefinition(studyEventDefinitionBean, name, type, description, repeating, category,
 				isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 	}

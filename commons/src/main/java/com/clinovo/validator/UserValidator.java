@@ -84,25 +84,10 @@ public final class UserValidator {
 					|| role.getCode().equals(Role.STUDY_DIRECTOR.getCode())
 					|| role.getCode().equals(Role.STUDY_MONITOR.getCode())
 					|| role.getCode().equals(Role.STUDY_CODER.getCode())
-					|| role.getCode().equals(Role.STUDY_EVALUATOR.getCode()))) {
+					|| role.getCode().equals(Role.STUDY_EVALUATOR.getCode())
+					|| role.getCode().equals(Role.STUDY_SPONSOR.getCode()))) {
 			Validator.addError(errors, ROLE, exceptionsBundle.getString("itsForbiddenToAssignStudyLevelRoleToSite"));
 		}
-	}
-
-	/**
-	 * Method perform validation for user create (this method skips validation for activeStudy parameter).
-	 *
-	 * @param configurationDao
-	 *            ConfigurationDao
-	 * @param userAccountDao
-	 *            UserAccountDAO
-	 * @param studyBean
-	 *            StudyBean
-	 * @return HashMap
-	 */
-	public static HashMap validateUserCreate(ConfigurationDao configurationDao, UserAccountDAO userAccountDao,
-			StudyBean studyBean) {
-		return validateUserCreate(configurationDao, userAccountDao, null, studyBean);
 	}
 
 	/**

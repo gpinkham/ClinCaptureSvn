@@ -31,13 +31,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.method.HandlerMethod;
 
-import com.clinovo.rest.annotation.RestIgnoreDefaultValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
 import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.security.PermissionChecker;
+import com.clinovo.rest.service.AuthenticationService;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
 
 /**
@@ -127,6 +129,10 @@ public final class RequestParametersValidator {
 	 */
 	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
 			HandlerMethod handler) throws RestException {
+		if (request.getSession().getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS) == null
+				&& !(handler.getBean() instanceof AuthenticationService)) {
+			return;
+		}
 		int countOfProvidedNotRequiredParameters = 0;
 		Set<String> nullParameters = new HashSet<String>();
 		Set<String> declaredFields = new HashSet<String>();
@@ -134,7 +140,6 @@ public final class RequestParametersValidator {
 		Annotation[][] annotationsHolder = handler.getMethod().getParameterAnnotations();
 		boolean atLeastOneNotRequiredShouldBeProvided = handler.getMethod()
 				.getAnnotation(RestProvideAtLeastOneNotRequired.class) != null;
-		boolean ignoreDefaultValues = handler.getMethod().getAnnotation(RestIgnoreDefaultValues.class) != null;
 		for (String paramName : ((Map<String, String>) request.getParameterMap()).keySet()) {
 			declaredParams.put(paramName.toLowerCase(), paramName);
 		}
@@ -171,10 +176,12 @@ public final class RequestParametersValidator {
 												HttpServletResponse.SC_BAD_REQUEST);
 									}
 								} else {
+									boolean notUsed = ((RequestParam) annotation).defaultValue()
+											.equals(ValueConstants.DEFAULT_NONE);
 									String parameterValue = request.getParameter(parameterName);
-									if (ignoreDefaultValues && parameterValue != null) {
+									if (notUsed && parameterValue != null) {
 										countOfProvidedNotRequiredParameters++;
-									} else if (!ignoreDefaultValues && parameterValue == null) {
+									} else if (!notUsed && parameterValue == null) {
 										nullParameters.add(parameterName);
 										String defaultValue = ((RequestParam) annotation).defaultValue();
 										((RestRequestWrapper) request).addParameter(parameterName, defaultValue);
@@ -194,7 +201,7 @@ public final class RequestParametersValidator {
 				}
 			}
 		}
-		if (ignoreDefaultValues && atLeastOneNotRequiredShouldBeProvided && countOfProvidedNotRequiredParameters == 0) {
+		if (atLeastOneNotRequiredShouldBeProvided && countOfProvidedNotRequiredParameters == 0) {
 			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
 		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);

@@ -12,54 +12,37 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.rest.service.base;
 
-import java.net.URLDecoder;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.core.OpenClinicaPasswordEncoder;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.json.JSONObject;
-import org.jvnet.ws.wadl.Resource;
-import org.jvnet.ws.wadl.Resources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.lib.crf.builder.CrfBuilder;
-import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.rest.wrapper.RestRequestWrapper;
+import com.clinovo.util.RequestUtil;
 
 /**
  * BaseService.
  */
-@SuppressWarnings("unchecked")
 public abstract class BaseService {
 
 	public static final int PROPAGATE_CHANGE_NO = 3;
 
+	public static final String YES = "yes";
 	public static final String NAME = "name";
 	public static final String UTF_8 = "UTF-8";
 	public static final String XS_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
 
 	@Autowired
-	private CrfBuilderFactory crfBuilderFactory;
+	private StudyConfigService studyConfigService;
 
 	@Autowired
 	private MessageSource messageSource;
@@ -72,169 +55,41 @@ public abstract class BaseService {
 	}
 
 	protected StudyBean getCurrentStudy() {
-		return UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
+		studyConfigService.setParametersForStudy(currentStudy);
+		return currentStudy;
 	}
 
 	protected UserAccountBean getCurrentUser() {
 		return UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
 	}
 
-	protected QName convertJavaToXMLType(Class<?> type) {
-		QName nm = new QName("");
-		String className = type.toString();
-		if (className.contains("String")) {
-			nm = new QName(XS_NAMESPACE, "string", "xs");
-		} else if (className.contains("Integer")) {
-			nm = new QName(XS_NAMESPACE, "integer", "xs");
-		} else if (className.contains("int")) {
-			nm = new QName(XS_NAMESPACE, "int", "xs");
-		} else if (className.contains("boolean") || className.contains("Boolean")) {
-			nm = new QName(XS_NAMESPACE, "boolean", "xs");
-		}
-		return nm;
+	protected static String prepareForValidation(String parameterName, String objectValue) {
+		RestRequestWrapper requestWrapper = (RestRequestWrapper) RequestUtil.getRequest();
+		String parameterValue = requestWrapper.getParameter(parameterName);
+		parameterValue = parameterValue != null ? parameterValue : objectValue;
+		requestWrapper.addParameter(parameterName, parameterValue);
+		return parameterValue;
 	}
 
-	protected Resource createOrFind(String uri, Resources wadResources) {
-		List<Resource> current = wadResources.getResource();
-		for (Resource resource : current) {
-			if (resource.getPath().equalsIgnoreCase(uri)) {
-				return resource;
-			}
-		}
-		Resource wadlResource = new Resource();
-		current.add(wadlResource);
-		return wadlResource;
+	protected static String prepareForValidation(String parameterName, Boolean objectValue) {
+		return prepareForValidation(parameterName, objectValue.toString());
 	}
 
-	protected String getBaseUrl(HttpServletRequest request) {
-		String requestUri = request.getRequestURI();
-		return request.getScheme().concat("://").concat(request.getServerName()).concat(":")
-				.concat(Integer.toString(request.getServerPort())).concat(requestUri.replaceAll("/wadl.*", ""));
+	protected static String prepareForValidation(String parameterName, Integer objectValue) {
+		return prepareForValidation(parameterName, objectValue.toString());
 	}
 
-	protected String cleanDefault(String value) {
-		value = value.replaceAll("\t", "");
-		value = value.replaceAll("\n", "");
-		return value;
-	}
-
-	protected CRFVersionBean importCrf(String jsonData, boolean importCrfVersion) throws Exception {
-		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
-		UserAccountBean owner = UserDetails.getCurrentUserDetails().getCurrentUser(dataSource);
-		CrfBuilder crfBuilder = crfBuilderFactory.getCrfBuilder(jsonData, currentStudy, owner,
-				LocaleResolver.getLocale(), messageSource);
-		if (importCrfVersion) {
-			crfBuilder.build(getCrfBean(jsonData).getId());
-		} else {
-			crfBuilder.build();
+	protected StudyBean getSite(String siteName) throws Exception {
+		StudyBean site = (StudyBean) new StudyDAO(dataSource).findByName(siteName);
+		if (site.getId() == 0) {
+			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteIsNotFound",
+					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (site.getParentStudyId() != getCurrentStudy().getId()) {
+			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteDoesNotBelongToCurrentScope",
+					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
-		return save(crfBuilder, importCrfVersion);
-	}
-
-	protected CRFBean getCrfBean(String jsonData) throws Exception {
-		JSONObject jsonObject = new JSONObject(jsonData);
-		String crfName = URLDecoder.decode(jsonObject.getString(NAME), UTF_8).trim();
-		if (crfName.isEmpty()) {
-			throw new RestException(messageSource, "rest.crf.crfNameIsEmpty");
-		}
-		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
-		if (crfBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.crf.crfNameDoesNotExist", new Object[]{crfName},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-		return crfBean;
-	}
-
-	protected CRFVersionBean save(CrfBuilder crfBuilder, boolean importCrfVersion) throws Exception {
-		ValidatorUtil.checkForErrors(crfBuilder.getErrorsList());
-		CRFVersionBean crfVersionBean = crfBuilder.save();
-		if (crfVersionBean.getId() == 0) {
-			throw new RestException(messageSource,
-					importCrfVersion ? "rest.importCrfVersion.operationFailed" : "rest.importCrf.operationFailed");
-		}
-		return crfVersionBean;
-	}
-
-	protected UserAccountBean getUserAccountBean(String userName) {
-		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
-		if (userName.equals("root")) {
-			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnRootUser",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (userAccountBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.userAPI.userDoesNotExist",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (userAccountBean.getId() == UserDetails.getCurrentUserDetails().getUserId()) {
-			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnYourself",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
-			boolean allowToProceed = false;
-			List<StudyUserRoleBean> studyUserRoleBeanList = (List<StudyUserRoleBean>) userAccountDAO
-					.findAllRolesByUserName(UserDetails.getCurrentUserDetails().getUserName());
-			for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeanList) {
-				if (userAccountDAO.isUserPresentInStudy(userName, studyUserRoleBean.getStudyId())) {
-					allowToProceed = true;
-					break;
-				}
-			}
-			if (!allowToProceed) {
-				throw new RestException(messageSource,
-						"rest.userAPI.itIsForbiddenToPerformThisOperationOnUserThatDoesNotBelongToCurrentUserScope",
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
-		}
-		userAccountBean.setUserTypeCode(
-				userAccountBean.hasUserType(UserType.SYSADMIN) ? UserType.SYSADMIN.getCode() : UserType.USER.getCode());
-		userAccountBean.setPasswd("");
-		return userAccountBean;
-	}
-
-	protected UserAccountBean authenticateUser(String userName, String password,
-			OpenClinicaPasswordEncoder passwordEncoder) {
-		UserAccountBean userAccountBean = (UserAccountBean) new UserAccountDAO(dataSource).findByUserName(userName);
-		if (userAccountBean != null && userAccountBean.getId() > 0) {
-			if (!passwordEncoder.isPasswordValid(userAccountBean.getPasswd(), password, null)) {
-				throw new RestException(messageSource, "rest.authentication.wrongUserNameOrPassword",
-						HttpServletResponse.SC_UNAUTHORIZED);
-			}
-		} else {
-			throw new RestException(messageSource, "rest.authentication.noUserFound",
-					HttpServletResponse.SC_UNAUTHORIZED);
-		}
-		return userAccountBean;
-	}
-
-	protected StudyUserRoleBean getStudyUserRole(StudyBean studyBean, UserAccountBean userAccountBean, int errorCode) {
-		StudyUserRoleBean result;
-		if (studyBean != null && studyBean.getId() > 0) {
-			if (studyBean.getParentStudyId() > 0) {
-				throw new RestException(messageSource, "rest.authentication.studyMustBeStudy", errorCode);
-			} else {
-				StudyUserRoleBean surBean = userAccountBean.getSysAdminRole();
-				if (surBean == null) {
-					surBean = new UserAccountDAO(dataSource).findRoleByUserNameAndStudyId(userAccountBean.getName(),
-							studyBean.getId());
-				}
-				if (surBean != null && surBean.getId() > 0) {
-					if (surBean.getRole().getId() == Role.STUDY_ADMINISTRATOR.getId()
-							|| surBean.getRole().getId() == Role.SYSTEM_ADMINISTRATOR.getId()) {
-						if (userAccountBean.hasUserType(UserType.SYSADMIN)) {
-							result = surBean;
-						} else {
-							throw new RestException(messageSource,
-									"rest.authentication.onlyUsersWithTypeAdministratorCanBeAuthenticated", errorCode);
-						}
-					} else {
-						throw new RestException(messageSource,
-								"rest.authentication.onlyRootOrStudyAdministratorCanBeAuthenticated", errorCode);
-					}
-				} else {
-					throw new RestException(messageSource, "rest.authentication.userIsNotAssignedToStudy", errorCode);
-				}
-			}
-		} else {
-			throw new RestException(messageSource, "rest.authentication.wrongStudyName", errorCode);
-		}
-		return result;
+		studyConfigService.setParametersForSite(site);
+		return site;
 	}
 }

@@ -141,8 +141,9 @@ public class CrfServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallCRFAPI() throws Exception {
 		ResultMatcher expectStatus = status().isOk();
-		createNewUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
-		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), studyBean.getName());
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(),
+				currentScope.getName());
 		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
 				.accept(mediaType).secure(true).session(session)).andExpect(expectStatus);
 		String newCrfVersion = "v2.0";
