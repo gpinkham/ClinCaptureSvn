@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.clinovo.i18n.LocaleResolver;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -204,7 +205,7 @@ public class RandomizationUtil {
 		}
 		ItemDataBean dateItem = itemsMap.get("dateItem");
 		ItemDataBean resultItem = itemsMap.get("resultItem");
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", LocaleResolver.getLocale());
 		dateItem.setValue(formatter.format(new Date()));
 		resultItem.setValue(randomizationResult.getRandomizationResult());
 
