@@ -100,8 +100,7 @@
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
-            <td align="left">
-
+            <td align="left" width="65%">
                 <c:choose>
                     <c:when test='${study.parentStudyId > 0}'>
                         <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes" title="<c:out value='${study.parentStudyName}'/>" alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.parentStudyName}" /></a>
@@ -114,7 +113,7 @@
                 (<c:out value="${study.identifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
             </td>
-            <td align="right">
+            <td align="right" style="vertical-align: top">
 
                 <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)</a>
                 &nbsp;
