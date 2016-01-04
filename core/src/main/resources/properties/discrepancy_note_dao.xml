@@ -960,9 +960,8 @@
             dn.discrepancy_note_id=dsm.discrepancy_note_id and
             dsm.item_data_id = id.item_data_id
             and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
-            dn_item_data_map dsms,item_data id
+            dn_item_data_map dsms
             where
-            id.event_crf_id = ? AND
             dn2.discrepancy_note_id=dsms.discrepancy_note_id and
             dsms.item_data_id = id.item_data_id
 
@@ -977,9 +976,8 @@
             dn.discrepancy_note_id=dsm.discrepancy_note_id and
             dsm.item_data_id = id.item_data_id
             and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
-            dn_item_data_map dsms,item_data id
+            dn_item_data_map dsms
             where
-            id.event_crf_id = ? AND
             dn2.discrepancy_note_id=dsms.discrepancy_note_id and
             dsms.item_data_id = id.item_data_id
 
@@ -996,7 +994,7 @@
             dn.discrepancy_note_id=dsm.discrepancy_note_id and
             dsm.item_data_id = id.item_data_id
             and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
-            dn_item_data_map dsms,item_data id
+            dn_item_data_map dsms
             where
             dsms.item_data_id= ? AND
             dn2.discrepancy_note_id=dsms.discrepancy_note_id and
@@ -1013,7 +1011,7 @@
             dn.discrepancy_note_id=dsm.discrepancy_note_id and
             dsm.item_data_id = id.item_data_id
             and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
-            dn_item_data_map dsms,item_data id
+            dn_item_data_map dsms
             where
             dsms.item_data_id= ? AND
             dn2.discrepancy_note_id=dsms.discrepancy_note_id and
@@ -1033,7 +1031,7 @@
             dn.discrepancy_note_id=dsm.discrepancy_note_id and
             dsm.item_data_id = id.item_data_id
             and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id) FROM discrepancy_note dn2,
-            dn_item_data_map dsms,item_data id
+            dn_item_data_map dsms
             where
             dsms.item_data_id= ? AND
             dn2.discrepancy_note_id=dsms.discrepancy_note_id and

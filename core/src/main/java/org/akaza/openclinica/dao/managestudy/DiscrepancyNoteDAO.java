@@ -2243,11 +2243,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 */
 	public ArrayList findExistingNotesForToolTipByEventCrfId(int eventCrfId) {
 		this.setTypesExpected();
+		this.setTypeExpected(START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED, TypeNames.INT);
 		ArrayList alist;
 		HashMap variables = new HashMap();
 		int index = 1;
-		variables.put(index++, eventCrfId);
-		variables.put(index++, eventCrfId);
 		variables.put(index++, eventCrfId);
 		variables.put(index, eventCrfId);
 		alist = this.select(digester.getQuery("findExistingNotesForToolTipByEventCrfId"), variables);
