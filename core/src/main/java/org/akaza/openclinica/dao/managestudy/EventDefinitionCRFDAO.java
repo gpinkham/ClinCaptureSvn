@@ -683,7 +683,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList findAllByEventDefinitionId(int eventDefinitionId) {
+	public ArrayList<EventDefinitionCRFBean> findAllByEventDefinitionId(int eventDefinitionId) {
 		int index = 1;
 		HashMap variables = new HashMap();
 		variables.put(index, eventDefinitionId);
@@ -730,7 +730,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public Collection findAllParentsByEventDefinitionId(int definitionId) {
+	public ArrayList<EventDefinitionCRFBean> findAllParentsByEventDefinitionId(int definitionId) {
 		int index = 1;
 		this.setTypesExpected();
 		HashMap variables = new HashMap();

@@ -2982,6 +2982,10 @@ table.footerInnerTable {
 	padding-left: 10px;
 }
 
+.table_shadow_bottom {
+	border: 1px solid #cccccc;
+	box-shadow: 5px 5px 5px #ccc;
+}
 .pl20 {
 	padding-left: 20px;
 }

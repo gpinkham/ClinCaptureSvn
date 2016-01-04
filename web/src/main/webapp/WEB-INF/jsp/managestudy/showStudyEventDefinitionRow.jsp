@@ -143,7 +143,17 @@
         
         </c:if>
         </c:otherwise>
-       </c:choose>     
+       </c:choose>
+		<td>
+			<a href="pages/deleteEventDefinition?id=<c:out value="${currRow.bean.id}"/>"
+					onclick="setAccessedObjected(this);">
+				<img name="bt_Restore3"
+					 src="images/bt_Delete.gif" border="0"
+					 alt="<fmt:message key="delete" bundle="${resword}"/>"
+					 title="<fmt:message key="delete" bundle="${resword}"/>"
+					 align="left" hspace="6">
+			</a>
+		</td>
       </c:if>
     
     </c:if>

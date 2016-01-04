@@ -982,7 +982,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList findAllByStudyAndEventDefinitionId(StudyBean study, int eventDefinitionId) {
+	public ArrayList<StudyEventBean> findAllByStudyAndEventDefinitionId(StudyBean study, int eventDefinitionId) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();

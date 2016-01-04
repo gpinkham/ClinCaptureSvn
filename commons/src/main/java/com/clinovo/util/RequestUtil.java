@@ -20,10 +20,17 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * RequestUtil.
  */
 public final class RequestUtil {
+
+	public static final String PAGE_MESSAGE = "pageMessages";
+	public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
 
 	private RequestUtil() {
 	}
@@ -99,4 +106,20 @@ public final class RequestUtil {
 	public static String getRelativeWithNewParameters(String... pairs) {
 		return getRelativeWithNewParameters(false, pairs);
 	}
+
+	/**
+	 * Save page message to the session.
+	 * @param request HttpServletRequest
+	 * @param message String
+	 */
+	@SuppressWarnings("unchecked")
+	public static void storePageMessage(HttpServletRequest request, String message) {
+		Map<String, Object> storedAttributes = new HashMap<String, Object>();
+		ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute(PAGE_MESSAGE);
+		pageMessages = pageMessages == null ? new ArrayList<String>() : pageMessages;
+		pageMessages.add(message);
+		storedAttributes.put(PAGE_MESSAGE, pageMessages);
+		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+	}
+
 }

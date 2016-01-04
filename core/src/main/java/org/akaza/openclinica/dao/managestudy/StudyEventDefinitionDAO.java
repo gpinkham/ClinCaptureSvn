@@ -537,12 +537,12 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList<StudyEventDefinitionBean> defsFromActiveGroup = new ArrayList();
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
 		if (ssb.getDynamicGroupClassId() == 0) {
-			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(studyId);
+			StudyGroupClassBean sgc = sgcdao.findDefaultByStudyId(studyId);
 			if (sgc.getId() > 0) {
 				defsFromActiveGroup = findAllActiveOrderedByStudyGroupClassId(sgc.getId());
 			}
 		} else {
-			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findByPK(ssb.getDynamicGroupClassId());
+			StudyGroupClassBean sgc = sgcdao.findByPK(ssb.getDynamicGroupClassId());
 			if (sgc.getStatus() == Status.AVAILABLE) {
 				defsFromActiveGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
 			}
@@ -566,7 +566,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList<StudyEventDefinitionBean> defsFromGroup = new ArrayList();
 		if (ssb.getDynamicGroupClassId() == 0) {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
-			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(studyId);
+			StudyGroupClassBean sgc = sgcdao.findDefaultByStudyId(studyId);
 			if (sgc.getId() > 0) {
 				defsFromGroup = findAllActiveOrderedByStudyGroupClassId(sgc.getId());
 			}
@@ -899,6 +899,11 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	/**
+	 * Check if at least one calendared event is present in the study.
+	 * @param parentStudyId int
+	 * @return boolean
+	 */
 	public boolean isAnyCalendaredEventExist(int parentStudyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
@@ -906,5 +911,16 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllActiveCalendaredEventsByStudyId"), variables);
 		
 		return alist.size() > 0;
+	}
+
+	/**
+	 * Delete StudyEventDefinition.
+	 * @param eventId event definition Id
+	 */
+	public void deleteEventDefinition(int eventId) {
+		HashMap variables = new HashMap();
+		variables.put(1, eventId);
+
+		this.execute(digester.getQuery("deleteEventDefinition"), variables);
 	}
 }

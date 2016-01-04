@@ -267,4 +267,11 @@
 			AND sed.type = 'calendared_visit'
 		</sql>
 	</query>
+	<query>
+		<name>deleteEventDefinition</name>
+		<sql>
+			DELETE FROM study_event_definition
+			WHERE study_event_definition_id = ?
+		</sql>
+	</query>
 </queries>
