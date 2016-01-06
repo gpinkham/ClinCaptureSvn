@@ -58,52 +58,33 @@
     <fmt:message key="this_operation_will_permanently_delete_this_crf_version" bundle="${restext}"/>
 </p>
 
-<div style="width:40%">
-    <div class="box_T">
-        <div class="box_L">
-            <div class="box_R">
-                <div class="box_B">
-                    <div class="box_TL">
-                        <div class="box_TR">
-                            <div class="box_BL">
-                                <div class="box_BR">
-                                    <div class="tablebox_center">
-                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                            <tr valign="top">
-                                                <td class="table_header_column_top">
-                                                    <fmt:message key="name" bundle="${resword}"/>:
-                                                </td>
-                                                <td class="table_cell_top">
-                                                    ${crfBean.name} ${fn:toLowerCase(crfVersionTitle)} ${crfVersionBean.name}
-                                                </td>
-                                            </tr>
-                                            <tr valign="top">
-                                                <td class="table_header_column">
-                                                    <fmt:message key="description" bundle="${resword}"/>:
-                                                </td>
-                                                <td class="table_cell">
-                                                    <c:out value="${crfVersionBean.description}"/>
-                                                </td>
-                                            </tr>
-                                            <tr valign="top">
-                                                <td class="table_header_column">
-                                                    <fmt:message key="rule_oid" bundle="${resword}"/>:
-                                                </td>
-                                                <td class="table_cell">
-                                                    <c:out value="${crfVersionBean.oid}"/>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+<table width="500px" class="table_vertical table_shadow_bottom">
+	<tr valign="top">
+		<td class="table_header_column_top">
+			<fmt:message key="name" bundle="${resword}"/>:
+		</td>
+		<td class="table_cell_top">
+			${crfBean.name} ${fn:toLowerCase(crfVersionTitle)} ${crfVersionBean.name}
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="description" bundle="${resword}"/>:
+		</td>
+		<td class="table_cell">
+			<c:out value="${crfVersionBean.description}"/>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="rule_oid" bundle="${resword}"/>:
+		</td>
+		<td class="table_cell">
+			<c:out value="${crfVersionBean.oid}"/>
+		</td>
+	</tr>
+</table>
 
 <br/>
 
@@ -111,58 +92,40 @@
     <fmt:message key="discrepancy_notes_affected" bundle="${resword}"/>
 </span>
 
-    <div class="box_T">
-        <div class="box_L">
-            <div class="box_R">
-                <div class="box_B">
-                    <div class="box_TL">
-                        <div class="box_TR">
-                            <div class="box_BL">
-                                <div class="box_BR">
-                                    <div class="tablebox_center" align="center">
-                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
-                                            <tr valign="top">
-                                                <td class="table_header_row_left">
-                                                    <fmt:message key="study_subject_ID" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="type" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="resolution_status" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="description" bundle="${resword}"/>
-                                                </td>
-                                            </tr>
-                                            <c:if test="${fn:length(crfDiscrepancyNotes) gt 0}">
-                                                <c:forEach var="discrepancyNote" items="${crfDiscrepancyNotes}">
-                                                    <tr>
-                                                        <td class="table_cell">
-                                                            <c:out value="${discrepancyNote.studySub.label}"/>
-                                                        </td>
-                                                        <td class="table_cell">
-                                                            <c:out value="${discrepancyNote.disType.name}"/>
-                                                        </td>
-                                                        <td class="table_cell">
-                                                            <c:out value="${discrepancyNote.resStatus.name}"/>
-                                                        </td>
-                                                        <td class="table_cell">
-                                                            <c:out value="${discrepancyNote.description}"/>
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:if>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<table width="100%" class="table_horizontal table_shadow_bottom">
+	<tr valign="top">
+		<td class="table_header_row_left">
+			<fmt:message key="study_subject_ID" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="type" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="resolution_status" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="description" bundle="${resword}"/>
+		</td>
+	</tr>
+	<c:if test="${fn:length(crfDiscrepancyNotes) gt 0}">
+		<c:forEach var="discrepancyNote" items="${crfDiscrepancyNotes}">
+			<tr>
+				<td class="table_cell">
+					<c:out value="${discrepancyNote.studySub.label}"/>
+				</td>
+				<td class="table_cell">
+					<c:out value="${discrepancyNote.disType.name}"/>
+				</td>
+				<td class="table_cell">
+					<c:out value="${discrepancyNote.resStatus.name}"/>
+				</td>
+				<td class="table_cell">
+					<c:out value="${discrepancyNote.description}"/>
+				</td>
+			</tr>
+		</c:forEach>
+	</c:if>
+</table>
 
 <br/>
 
@@ -170,68 +133,51 @@
     <fmt:message key="rules_affected" bundle="${resword}"/>
 </span>
 
-<div>
-    <div class="box_T">
-        <div class="box_L">
-            <div class="box_R">
-                <div class="box_B">
-                    <div class="box_TL">
-                        <div class="box_TR">
-                            <div class="box_BL">
-                                <div class="box_BR">
-                                    <div class="tablebox_center" align="center">
-                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                            <tr valign="top">
-                                                <td class="table_header_row_left">
-                                                    <fmt:message key="view_rule_assignment_rule_oid" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="name" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="description" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="rule_expression" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="view_rule_assignment_target" bundle="${resword}"/>
-                                                </td>
-                                            </tr>
-                                            <c:if test="${fn:length(ruleSetBeanList) gt 0}">
-                                                <c:forEach var="ruleSetBean" items="${ruleSetBeanList}">
-                                                    <c:forEach var="ruleSetRule" items="${ruleSetBean.ruleSetRules}">
-                                                        <tr>
-                                                            <td class="table_cell">
-                                                                <c:out value="${ruleSetRule.ruleBean.oid}"/>
-                                                            </td>
-                                                            <td class="table_cell">
-                                                                <c:out value="${ruleSetRule.ruleBean.name}"/>
-                                                            </td>
-                                                            <td class="table_cell">
-                                                                <c:out value="${ruleSetRule.ruleBean.description}"/>
-                                                            </td>
-                                                            <td class="table_cell">
-                                                                <c:out value="${ruleSetRule.ruleBean.expression.value}"/>
-                                                            </td>
-                                                            <td class="table_cell">
-                                                                <c:out value="${ruleSetBean.originalTarget.value}"/>
-                                                            </td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </c:forEach>
-                                            </c:if>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<c:if test="${crfVersionsQuantity == 1 && fn:length(ruleSetBeanList) gt 0}">
+	<p class="alert"><fmt:message bundle="${resword}" key="last_version_of_crf_all_crf_rules_should_be_deleted"/></p>
+</c:if>
+<table width="900px" class="table_horizontal table_shadow_bottom">
+	<tr valign="top">
+		<td class="table_header_row_left">
+			<fmt:message key="view_rule_assignment_rule_oid" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="name" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="description" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="rule_expression" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="view_rule_assignment_target" bundle="${resword}"/>
+		</td>
+	</tr>
+	<c:if test="${fn:length(ruleSetBeanList) gt 0}">
+		<c:forEach var="ruleSetBean" items="${ruleSetBeanList}">
+			<c:forEach var="ruleSetRule" items="${ruleSetBean.ruleSetRules}">
+				<tr>
+					<td class="table_cell">
+						<c:out value="${ruleSetRule.ruleBean.oid}"/>
+					</td>
+					<td class="table_cell">
+						<c:out value="${ruleSetRule.ruleBean.name}"/>
+					</td>
+					<td class="table_cell">
+						<c:out value="${ruleSetRule.ruleBean.description}"/>
+					</td>
+					<td class="table_cell">
+						<c:out value="${ruleSetRule.ruleBean.expression.value}"/>
+					</td>
+					<td class="table_cell">
+						<c:out value="${ruleSetBean.originalTarget.value}"/>
+					</td>
+				</tr>
+			</c:forEach>
+		</c:forEach>
+	</c:if>
+</table>
 
 <br/>
 
@@ -239,60 +185,42 @@
     <fmt:message key="crf_data_affected" bundle="${resword}"/>
 </span>
 
-<div style="width:50%">
-    <div class="box_T">
-        <div class="box_L">
-            <div class="box_R">
-                <div class="box_B">
-                    <div class="box_TL">
-                        <div class="box_TR">
-                            <div class="box_BL">
-                                <div class="box_BR">
-                                    <div class="tablebox_center" align="center">
-                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                            <tr valign="top">
-                                                <td class="table_header_row_left">
-                                                    <fmt:message key="study_subject_ID" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="event_name" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="created_date" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_header_row">
-                                                    <fmt:message key="last_updated_date" bundle="${resword}"/>
-                                                </td>
-                                            </tr>
-                                            <c:if test="${fn:length(eventCRFBeanList) gt 0}">
-                                                <c:forEach var="eventCRFBean" items="${eventCRFBeanList}">
-                                                    <tr>
-                                                        <td class="table_cell">
-                                                            <c:out value="${eventCRFBean.studySubjectName}"/>
-                                                        </td>
-                                                        <td class="table_cell">
-                                                            <c:out value="${eventCRFBean.eventName}"/>
-                                                        </td>
-                                                        <td class="table_cell">
-															<cc-fmt:formatDate value="${eventCRFBean.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
-                                                        </td>
-                                                        <td class="table_cell">
-															<cc-fmt:formatDate value="${eventCRFBean.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:if>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<table width="900px" class="table_horizontal table_shadow_bottom">
+	<tr valign="top">
+		<td class="table_header_row_left">
+			<fmt:message key="study_subject_ID" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="event_name" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="created_date" bundle="${resword}"/>
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="last_updated_date" bundle="${resword}"/>
+		</td>
+	</tr>
+	<c:if test="${fn:length(eventCRFBeanList) gt 0}">
+		<c:forEach var="eventCRFBean" items="${eventCRFBeanList}">
+			<tr>
+				<td class="table_cell">
+					<c:out value="${eventCRFBean.studySubjectName}"/>
+				</td>
+				<td class="table_cell">
+					<c:out value="${eventCRFBean.eventName}"/>
+				</td>
+				<td class="table_cell">
+					<cc-fmt:formatDate value="${eventCRFBean.createdDate}" pattern="${dteFormat}"
+									   dateTimeZone="${userBean.userTimeZoneId}"/>
+				</td>
+				<td class="table_cell">
+					<cc-fmt:formatDate value="${eventCRFBean.updatedDate}" pattern="${dteFormat}"
+									   dateTimeZone="${userBean.userTimeZoneId}"/>
+				</td>
+			</tr>
+		</c:forEach>
+	</c:if>
+</table>
 
 <br/>
 
@@ -300,55 +228,39 @@
     <fmt:message key="associated_event_definitions" bundle="${resword}"/>
 </span>
 
-<div style="width:50%">
-    <div class="box_T">
-        <div class="box_L">
-            <div class="box_R">
-                <div class="box_B">
-                    <div class="box_TL">
-                        <div class="box_TR">
-                            <div class="box_BL">
-                                <div class="box_BR">
-                                    <div class="tablebox_center">
-                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                            <tr valign="top">
-                                                <td class="table_header_row_left"><fmt:message key="study_event" bundle="${resword}"/></td>
-                                                <td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
-                                                <td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
-                                                <td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
-                                                <td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
-                                            </tr>
-                                            <c:if test="${fn:length(eventDefinitionListFull) gt 0}">
-                                                <c:forEach var="eventDefinition" items="${eventDefinitionListFull}">
-                                                    <tr valign="top">
-                                                        <td class="table_cell_left"><c:out value="${eventDefinition.name}"/></td>
-                                                        <c:choose>
-                                                            <c:when test="${eventDefinition.status.name eq 'available'}">
-                                                                <td class="table_cell" style="color: #009966"><c:out value="${eventDefinition.status.name}"/></td>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <td class="table_cell" style="color: #ff0000"><c:out value="${eventDefinition.status.name}"/></td>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                        <td class="table_cell"><c:out value="${eventDefinition.studyName}"/></td>
-                                                        <td class="table_cell">
-															<cc-fmt:formatDate value="${eventDefinition.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
-														</td>
-                                                        <td class="table_cell"><c:out value="${eventDefinition.owner.name}"/></td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:if>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<table width="900px" class="table_horizontal table_shadow_bottom">
+	<tr valign="top">
+		<td class="table_header_row_left"><fmt:message key="study_event" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
+	</tr>
+	<c:if test="${fn:length(eventDefinitionListFull) gt 0}">
+		<c:forEach var="eventDefinition" items="${eventDefinitionListFull}">
+			<tr valign="top">
+				<td class="table_cell_left"><c:out value="${eventDefinition.name}"/></td>
+				<c:choose>
+					<c:when test="${eventDefinition.status.name eq 'available'}">
+						<td class="table_cell" style="color: #009966"><c:out
+								value="${eventDefinition.status.name}"/></td>
+					</c:when>
+					<c:otherwise>
+						<td class="table_cell" style="color: #ff0000"><c:out
+								value="${eventDefinition.status.name}"/></td>
+					</c:otherwise>
+				</c:choose>
+				<td class="table_cell"><c:out value="${eventDefinition.studyName}"/></td>
+				<td class="table_cell">
+					<cc-fmt:formatDate value="${eventDefinition.createdDate}" pattern="${dteFormat}"
+									   dateTimeZone="${userBean.userTimeZoneId}"/>
+				</td>
+				<td class="table_cell"><c:out value="${eventDefinition.owner.name}"/></td>
+			</tr>
+		</c:forEach>
+	</c:if>
+</table>
+
 <form:form method="post">
     <table>
         <tr>

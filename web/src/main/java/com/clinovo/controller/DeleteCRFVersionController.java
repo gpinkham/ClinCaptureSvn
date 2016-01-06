@@ -106,7 +106,8 @@ public class DeleteCRFVersionController {
 			CRFBean crfBean = (CRFBean) crfDao.findByPK(crfVersionBean.getCrfId());
 			int crfVersionsQuantity = crfVersionDao.findAllByCRF(crfBean.getId()).size();
 
-			List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfVersionId);
+			List<RuleSetBean> ruleSetBeanList = crfVersionsQuantity > 1 ? ruleSetListFilterForVersion(crfVersionId)
+					:  ruleSetListFilterForCRF(crfVersionBean.getCrfId());
 			List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
 			List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionsQuantity > 1
 					? new ArrayList<StudyEventDefinitionBean>()
@@ -124,6 +125,7 @@ public class DeleteCRFVersionController {
 			model.addAttribute("eventDefinitionListAvailable", eventDefinitionListAvailable);
 			model.addAttribute("eventDefinitionListFull", eventDefinitionListFull);
 			model.addAttribute("eventCRFBeanList", eventCrfBeanList);
+			model.addAttribute("crfVersionsQuantity", crfVersionsQuantity);
 
 			if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
 					|| ruleSetBeanList.size() > 0) {
@@ -168,7 +170,8 @@ public class DeleteCRFVersionController {
 		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfVersionBean.getCrfId());
 		int crfVersionQuantity = crfVersionDao.findAllActiveByCRF(crfBean.getId()).size();
 
-		List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfVersionId);
+		List<RuleSetBean> ruleSetBeanList = crfVersionQuantity > 1 ? ruleSetListFilterForVersion(crfVersionId)
+				: ruleSetListFilterForCRF(crfVersionBean.getCrfId());
 		List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
 		List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionQuantity > 1
 				? new ArrayList<StudyEventDefinitionBean>()
@@ -193,7 +196,7 @@ public class DeleteCRFVersionController {
 		return CRF_LIST;
 	}
 
-	private List<RuleSetBean> ruleSetListFilter(int crfVersionId) {
+	private List<RuleSetBean> ruleSetListFilterForVersion(int crfVersionId) {
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
 
 		List<RuleSetBean> ruleSetBeanList = new ArrayList<RuleSetBean>();
@@ -203,6 +206,20 @@ public class DeleteCRFVersionController {
 		for (RuleSetBean ruleSetRule : studyRuleSetBeanList) {
 			ruleSetBeanList.add(ruleSetRule);
 		}
+		return ruleSetBeanList;
+	}
+
+	private List<RuleSetBean> ruleSetListFilterForCRF(int crfId) {
+		CRFDAO crfDao = new CRFDAO(dataSource);
+
+		List<RuleSetBean> ruleSetBeanList = new ArrayList<RuleSetBean>();
+		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfId);
+
+		List<RuleSetBean> studyRuleSetBeanList = ruleSetDao.findByCrfIdAndCrfOid(crfBean);
+		for (RuleSetBean ruleSetRule : studyRuleSetBeanList) {
+			ruleSetBeanList.add(ruleSetRule);
+		}
+
 		return ruleSetBeanList;
 	}
 }
