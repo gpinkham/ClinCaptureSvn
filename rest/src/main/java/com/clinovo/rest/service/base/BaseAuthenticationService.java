@@ -1,7 +1,6 @@
 package com.clinovo.rest.service.base;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -9,7 +8,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.core.OpenClinicaPasswordEncoder;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
@@ -26,18 +24,16 @@ public abstract class BaseAuthenticationService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	@Autowired
-	private DataSource dataSource;
-
 	protected UserAccountBean authenticateUser(String userName, String password) {
-		UserAccountBean userAccountBean = (UserAccountBean) new UserAccountDAO(dataSource).findByUserName(userName);
+		UserAccountBean userAccountBean = (UserAccountBean) getUserAccountDAO().findByUserName(userName);
 		if (userAccountBean != null && userAccountBean.getId() > 0) {
 			if (!passwordEncoder.isPasswordValid(userAccountBean.getPasswd(), password, null)) {
-				throw new RestException(messageSource, "rest.authentication.wrongUserNameOrPassword",
+				throw new RestException(messageSource,
+						"rest.authenticationservice.authenticate.wrongUserNameOrPassword",
 						HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		} else {
-			throw new RestException(messageSource, "rest.authentication.noUserFound",
+			throw new RestException(messageSource, "rest.authenticationservice.authenticate.noUserFound",
 					HttpServletResponse.SC_UNAUTHORIZED);
 		}
 		return userAccountBean;
@@ -47,11 +43,11 @@ public abstract class BaseAuthenticationService extends BaseService {
 		StudyUserRoleBean result;
 		if (studyBean != null && studyBean.getId() > 0) {
 			if (studyBean.getParentStudyId() > 0) {
-				throw new RestException(messageSource, "rest.authentication.studyMustBeStudy", errorCode);
+				throw new RestException(messageSource, "rest.authenticationservice.studyMustBeStudy", errorCode);
 			} else {
 				StudyUserRoleBean surBean = userAccountBean.getSysAdminRole();
 				if (surBean == null) {
-					surBean = new UserAccountDAO(dataSource).findRoleByUserNameAndStudyId(userAccountBean.getName(),
+					surBean = getUserAccountDAO().findRoleByUserNameAndStudyId(userAccountBean.getName(),
 							studyBean.getId());
 				}
 				if (surBean != null && surBean.getId() > 0) {
@@ -61,18 +57,20 @@ public abstract class BaseAuthenticationService extends BaseService {
 							result = surBean;
 						} else {
 							throw new RestException(messageSource,
-									"rest.authentication.onlyUsersWithTypeAdministratorCanBeAuthenticated", errorCode);
+									"rest.authenticationservice.onlyUsersWithTypeAdministratorCanBeAuthenticated",
+									errorCode);
 						}
 					} else {
 						throw new RestException(messageSource,
-								"rest.authentication.onlyRootOrStudyAdministratorCanBeAuthenticated", errorCode);
+								"rest.authenticationservice.onlyRootOrStudyAdministratorCanBeAuthenticated", errorCode);
 					}
 				} else {
-					throw new RestException(messageSource, "rest.authentication.userIsNotAssignedToStudy", errorCode);
+					throw new RestException(messageSource, "rest.authenticationservice.userIsNotAssignedToStudy",
+							errorCode);
 				}
 			}
 		} else {
-			throw new RestException(messageSource, "rest.authentication.wrongStudyName", errorCode);
+			throw new RestException(messageSource, "rest.authenticationservice.wrongStudyName", errorCode);
 		}
 		return result;
 	}

@@ -17,13 +17,11 @@ package com.clinovo.rest.service.base;
 import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -45,15 +43,13 @@ public abstract class BaseCrfService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	@Autowired
-	private DataSource dataSource;
-
 	private CRFVersionBean save(CrfBuilder crfBuilder, boolean importCrfVersion) throws Exception {
 		ValidatorUtil.checkForErrors(crfBuilder.getErrorsList());
 		CRFVersionBean crfVersionBean = crfBuilder.save();
 		if (crfVersionBean.getId() == 0) {
-			throw new RestException(messageSource,
-					importCrfVersion ? "rest.importCrfVersion.operationFailed" : "rest.importCrf.operationFailed");
+			throw new RestException(messageSource, importCrfVersion
+					? "rest.crfservice.importcrfversion.operationFailed"
+					: "rest.crfservice.importcrf.operationFailed");
 		}
 		return crfVersionBean;
 	}
@@ -62,12 +58,12 @@ public abstract class BaseCrfService extends BaseService {
 		JSONObject jsonObject = new JSONObject(jsonData);
 		String crfName = URLDecoder.decode(jsonObject.getString(NAME), UTF_8).trim();
 		if (crfName.isEmpty()) {
-			throw new RestException(messageSource, "rest.crf.crfNameIsEmpty");
+			throw new RestException(messageSource, "rest.crfservice.importcrf.crfNameIsEmpty");
 		}
-		CRFBean crfBean = (CRFBean) new CRFDAO(dataSource).findByName(crfName);
+		CRFBean crfBean = (CRFBean) getCRFDAO().findByName(crfName);
 		if (crfBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.crf.crfNameDoesNotExist", new Object[]{crfName},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			throw new RestException(messageSource, "rest.crfservice.importcrf.crfNameDoesNotExist",
+					new Object[]{crfName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		return crfBean;
 	}

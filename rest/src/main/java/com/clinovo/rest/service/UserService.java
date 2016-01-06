@@ -71,7 +71,7 @@ public class UserService extends BaseUserService {
 	 */
 	@ResponseBody
 	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "userType", values = "1,2", valueDescriptions = "rest.usertype.valueDescription"),
+			@RestParameterPossibleValues(name = "userType", values = "1,2", valueDescriptions = "rest.userType.valueDescription"),
 			@RestParameterPossibleValues(name = "role", values = "2,4,5,6,7,8,9,10", valueDescriptions = "rest.roles.valueDescription")})
 	@RequestMapping(value = "/createUser", method = RequestMethod.POST)
 	public UserAccountBean createUser(@RequestParam("userName") String userName,

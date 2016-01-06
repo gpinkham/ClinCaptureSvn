@@ -137,14 +137,13 @@ public final class EventDefinitionValidator {
 		HashMap errors = validator.validate();
 
 		if (errors.isEmpty() && !Arrays.asList(SCHEDULED, UNSCHEDULED, COMMON, CALENDARED_VISIT).contains(type)) {
-			errors.put("type", getErrorMessages("rest.studyEventDefinition.wrongType"));
+			errors.put("type", getErrorMessages("eventDefinitionValidator.wrongType"));
 			return errors;
 		} else if (errors.isEmpty() && repeating.equals("true") && type.equals(CALENDARED_VISIT)) {
-			errors.put("repeating", getErrorMessages("rest.studyEventDefinition.calendaredVisitCanNotBeRepeating"));
+			errors.put("repeating", getErrorMessages("eventDefinitionValidator.calendaredVisitCanNotBeRepeating"));
 			return errors;
 		} else if (errors.isEmpty() && !type.equals(CALENDARED_VISIT) && isReference.equalsIgnoreCase("true")) {
-			errors.put("isReference",
-					getErrorMessages("rest.studyEventDefinition.onlyCalendaredEventsCanBeReferenced"));
+			errors.put("isReference", getErrorMessages("eventDefinitionValidator.onlyCalendaredEventsCanBeReferenced"));
 			return errors;
 		}
 
@@ -159,32 +158,32 @@ public final class EventDefinitionValidator {
 			if (maxDay != 0) {
 				errors.put("maxDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
-								? "rest.studyEventDefinition.dayMaxIsNotUsedForReferenceEvent"
-								: "rest.studyEventDefinition.dayMaxIsUsedForCalendaredEventsOnly"));
+								? "eventDefinitionValidator.dayMaxIsNotUsedForReferenceEvent"
+								: "eventDefinitionValidator.dayMaxIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (minDay != 0) {
 				errors.put("minDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
-								? "rest.studyEventDefinition.dayMinIsNotUsedForReferenceEvent"
-								: "rest.studyEventDefinition.dayMinIsUsedForCalendaredEventsOnly"));
+								? "eventDefinitionValidator.dayMinIsNotUsedForReferenceEvent"
+								: "eventDefinitionValidator.dayMinIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (schDay != 0) {
 				errors.put("schDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
-								? "rest.studyEventDefinition.dayScheduleIsNotUsedForReferenceEvent"
-								: "rest.studyEventDefinition.dayScheduleIsUsedForCalendaredEventsOnly"));
+								? "eventDefinitionValidator.dayScheduleIsNotUsedForReferenceEvent"
+								: "eventDefinitionValidator.dayScheduleIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (emailDay != 0) {
 				errors.put("emailDay",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
-								? "rest.studyEventDefinition.dayEmailIsNotUsedForReferenceEvent"
-								: "rest.studyEventDefinition.dayEmailIsUsedForCalendaredEventsOnly"));
+								? "eventDefinitionValidator.dayEmailIsNotUsedForReferenceEvent"
+								: "eventDefinitionValidator.dayEmailIsUsedForCalendaredEventsOnly"));
 				return errors;
 			} else if (!emailUser.isEmpty()) {
 				errors.put("emailUser",
 						getErrorMessages(type.equals(CALENDARED_VISIT)
-								? "rest.studyEventDefinition.userNameIsNotUsedForReferenceEvent"
-								: "rest.studyEventDefinition.userNameIsUsedForCalendaredEventsOnly"));
+								? "eventDefinitionValidator.userNameIsNotUsedForReferenceEvent"
+								: "eventDefinitionValidator.userNameIsUsedForCalendaredEventsOnly"));
 				return errors;
 			}
 		}
@@ -230,45 +229,49 @@ public final class EventDefinitionValidator {
 
 		if (studyEventDefinitionBean.getId() == 0) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.isNotFound", new Object[]{eventId}, locale));
+			errorMessages.add(
+					messageSource.getMessage("eventDefinitionValidator.isNotFound", new Object[]{eventId}, locale));
 			errors.put("eventid", errorMessages);
 		} else if (crfVersionBean.getId() == 0) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotFound",
+			errorMessages.add(messageSource.getMessage("eventDefinitionValidator.crfVersionIsNotFound",
 					new Object[]{crfName, versionName}, locale));
 			errors.put("defaultversion", errorMessages);
 		} else if (!crfVersionBean.getStatus().equals(Status.AVAILABLE)) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.addCrf.crfVersionIsNotAvailable",
+			errorMessages.add(messageSource.getMessage("eventDefinitionValidator.crfVersionIsNotAvailable",
 					new Object[]{crfName, versionName}, locale));
 			errors.put("defaultversion", errorMessages);
 		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.doesNotBelongToCurrentStudy",
-					new Object[]{eventId, currentStudy.getId()}, locale));
+			errorMessages.add(messageSource.getMessage("eventDefinitionValidator.doesNotBelongToCurrentStudy",
+					new Object[]{eventId, currentStudy.getName()}, locale));
 			errors.put("eventid", errorMessages);
 		} else if (!hasSDVRequiredItems && sdvCode == 2) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.crfDoesNotHaveSDVRequiredItemsButSDVCodeIs2",
-					new Object[]{crfVersionBean.getCrfId()}, locale));
+			errorMessages.add(
+					messageSource.getMessage("eventDefinitionValidator.crfDoesNotHaveSDVRequiredItemsButSDVCodeIs2",
+							new Object[]{crfVersionBean.getCrfId()}, locale));
 			errors.put("sourcedataverification", errorMessages);
 		} else if (hasSDVRequiredItems && sdvCode != 2) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.crfHasSDVRequiredItemsButSDVCodeIsNot2",
-					new Object[]{crfVersionBean.getCrfId()}, locale));
+			errorMessages
+					.add(messageSource.getMessage("eventDefinitionValidator.crfHasSDVRequiredItemsButSDVCodeIsNot2",
+							new Object[]{crfVersionBean.getCrfId()}, locale));
 			errors.put("sourcedataverification", errorMessages);
 		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && email.trim().isEmpty()) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.provideEmailAddress", null, locale));
+			errorMessages.add(messageSource.getMessage("eventDefinitionValidator.provideEmailAddress", null, locale));
 			errors.put("email", errorMessages);
 		} else if ((emailWhen.equals("sign") || emailWhen.equals("complete")) && !EmailUtil.isValid(email)) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.emailAddressIsNotValid", null, locale));
+			errorMessages
+					.add(messageSource.getMessage("eventDefinitionValidator.emailAddressIsNotValid", null, locale));
 			errors.put("email", errorMessages);
 		} else if (!(emailWhen.equals("sign") || emailWhen.equals("complete")) && !email.isEmpty()) {
 			ArrayList errorMessages = new ArrayList();
 			errorMessages
-					.add(messageSource.getMessage("rest.eventservice.editEDC.emailCanBeSpecifiedOnlyIf", null, locale));
+					.add(messageSource.getMessage("eventDefinitionValidator.emailCanBeSpecifiedOnlyIf", null, locale));
 			errors.put("email", errorMessages);
 		}
 
@@ -317,7 +320,7 @@ public final class EventDefinitionValidator {
 
 		if (errors.isEmpty() && existingEventDefinitionCRFBean.getId() > 0) {
 			ArrayList errorMessages = new ArrayList();
-			errorMessages.add(messageSource.getMessage("rest.event.eventDefinitionCrfAlreadyExists",
+			errorMessages.add(messageSource.getMessage("eventDefinitionValidator.alreadyExists",
 					new Object[]{crfName, studyEventDefinitionBean.getName()}, locale));
 			errors.put("eventid", errorMessages);
 		}
@@ -370,15 +373,15 @@ public final class EventDefinitionValidator {
 		if (errors.isEmpty()) {
 			if (!eventDefinitionCRFBean.getStatus().isAvailable()) {
 				ArrayList errorMessages = new ArrayList();
-				errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.eventDefinitionCrfIsNotAvailable",
+				errorMessages.add(messageSource.getMessage("eventDefinitionValidator.isNotAvailable",
 						new Object[]{eventDefinitionCRFBean.getCrfName(), studyEventDefinitionBean.getName()}, locale));
 				errors.put("eventid", errorMessages);
 			} else
 				if (eventDefinitionCRFBean.isEvaluatedCRF()
 						&& currentStudy.getStudyParameterConfig().getStudyEvaluator().equalsIgnoreCase("no")) {
 				ArrayList errorMessages = new ArrayList();
-				errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.crfEvaluationIsNotAvailable",
-						null, locale));
+				errorMessages.add(
+						messageSource.getMessage("eventDefinitionValidator.crfEvaluationIsNotAvailable", null, locale));
 				errors.put("dataentryquality", errorMessages);
 			}
 		}
@@ -417,7 +420,7 @@ public final class EventDefinitionValidator {
 			if (eventDefinitionCRFBean.getSelectedVersionNames().trim().isEmpty()) {
 				ArrayList errorMessages = new ArrayList();
 				errorMessages.add(
-						messageSource.getMessage("rest.eventservice.editEDC.availableVersionsIsEmpty", null, locale));
+						messageSource.getMessage("eventDefinitionValidator.availableVersionsIsEmpty", null, locale));
 				errors.put("availableversions", errorMessages);
 			} else {
 				String selectedVersionIds = "";
@@ -432,7 +435,7 @@ public final class EventDefinitionValidator {
 							eventDefinitionCRFBean.getCrfName());
 					if (crfVersionBean.getId() == 0) {
 						ArrayList errorMessages = new ArrayList();
-						errorMessages.add(messageSource.getMessage("rest.eventservice.editEDC.crfDoesNotHaveVersion",
+						errorMessages.add(messageSource.getMessage("eventDefinitionValidator.crfDoesNotHaveVersion",
 								new Object[]{eventDefinitionCRFBean.getCrfName(), versionName}, locale));
 						errors.put("availableversions", errorMessages);
 						return errors;
@@ -445,7 +448,7 @@ public final class EventDefinitionValidator {
 				if (!defaultVersionIsPresent) {
 					ArrayList errorMessages = new ArrayList();
 					errorMessages.add(messageSource.getMessage(
-							"rest.eventservice.editEDC.defaultVersionShouldBePresentInTheAvailableVersions", null,
+							"eventDefinitionValidator.defaultVersionShouldBePresentInTheAvailableVersions", null,
 							locale));
 					errors.put("availableversions", errorMessages);
 				}

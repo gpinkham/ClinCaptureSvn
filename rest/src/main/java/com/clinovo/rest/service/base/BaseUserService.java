@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
@@ -52,20 +51,17 @@ public abstract class BaseUserService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	@Autowired
-	private DataSource dataSource;
-
 	protected UserAccountBean getUserAccountBean(String userName) {
-		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+		UserAccountDAO userAccountDAO = getUserAccountDAO();
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		if (userName.equals("root")) {
-			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnRootUser",
+			throw new RestException(messageSource, "rest.userservice.itIsForbiddenToPerformThisOperationOnRootUser",
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} else if (userAccountBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.userAPI.userDoesNotExist",
+			throw new RestException(messageSource, "rest.userservice.userDoesNotExist",
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} else if (userAccountBean.getId() == getUserDetails().getUserId()) {
-			throw new RestException(messageSource, "rest.userAPI.itIsForbiddenToPerformThisOperationOnYourself",
+			throw new RestException(messageSource, "rest.userservice.itIsForbiddenToPerformThisOperationOnYourself",
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} else if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
 			boolean allowToProceed = false;
@@ -79,7 +75,7 @@ public abstract class BaseUserService extends BaseService {
 			}
 			if (!allowToProceed) {
 				throw new RestException(messageSource,
-						"rest.userAPI.itIsForbiddenToPerformThisOperationOnUserThatDoesNotBelongToCurrentUserScope",
+						"rest.userservice.itIsForbiddenToPerformThisOperationOnUserThatDoesNotBelongToCurrentUserScope",
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -99,7 +95,7 @@ public abstract class BaseUserService extends BaseService {
 		}
 
 		StudyBean studyBean = siteName != null ? getSite(siteName) : getCurrentStudy();
-		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+		UserAccountDAO userAccountDao = getUserAccountDAO();
 
 		HashMap errors = UserValidator.validateUserCreate(configurationDao, userAccountDao, null, studyBean);
 		ValidatorUtil.checkForErrors(errors);
@@ -137,7 +133,7 @@ public abstract class BaseUserService extends BaseService {
 		userAccountService.createUser(getCurrentUser(), userAccountBean, userAccountRole, !displayPassword);
 
 		if (userAccountBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.createUser.operationFailed",
+			throw new RestException(messageSource, "rest.userservice.createuser.operationFailed",
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 

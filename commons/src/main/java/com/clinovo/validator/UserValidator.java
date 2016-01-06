@@ -78,7 +78,8 @@ public final class UserValidator {
 		if (studyBean.getParentStudyId() == 0 && (role.getCode().equals(Role.CLINICAL_RESEARCH_COORDINATOR.getCode())
 				|| role.getCode().equals(Role.INVESTIGATOR.getCode())
 				|| role.getCode().equals(Role.SITE_MONITOR.getCode()))) {
-			Validator.addError(errors, ROLE, exceptionsBundle.getString("itsForbiddenToAssignSiteLevelRoleToStudy"));
+			Validator.addError(errors, ROLE,
+					exceptionsBundle.getString("userValidator.itsForbiddenToAssignSiteLevelRoleToStudy"));
 		} else
 			if (studyBean.getParentStudyId() > 0 && (role.getCode().equals(Role.STUDY_ADMINISTRATOR.getCode())
 					|| role.getCode().equals(Role.STUDY_DIRECTOR.getCode())
@@ -86,7 +87,8 @@ public final class UserValidator {
 					|| role.getCode().equals(Role.STUDY_CODER.getCode())
 					|| role.getCode().equals(Role.STUDY_EVALUATOR.getCode())
 					|| role.getCode().equals(Role.STUDY_SPONSOR.getCode()))) {
-			Validator.addError(errors, ROLE, exceptionsBundle.getString("itsForbiddenToAssignStudyLevelRoleToSite"));
+			Validator.addError(errors, ROLE,
+					exceptionsBundle.getString("userValidator.itsForbiddenToAssignStudyLevelRoleToSite"));
 		}
 	}
 

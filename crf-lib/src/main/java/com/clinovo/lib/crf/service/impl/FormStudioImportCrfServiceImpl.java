@@ -525,7 +525,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		boolean b = false;
 		String itemName = crfBuilder.getCurrentItem().getName().toLowerCase().trim();
 		if (itemName.startsWith(SYSDVR.concat(UNDERLINE)) || itemName.startsWith(SYSLBL.concat(UNDERLINE))) {
-			throw new Exception(crfBuilder.getMessage("crfItemNamesShouldNotStartWith"));
+			throw new Exception(crfBuilder.getMessage("importcrf.crfItemNamesShouldNotStartWith"));
 		}
 	}
 

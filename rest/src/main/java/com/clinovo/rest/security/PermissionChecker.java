@@ -83,7 +83,7 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 				UserDetails userDetails = (UserDetails) request.getSession()
 						.getAttribute(API_AUTHENTICATED_USER_DETAILS);
 				if (userDetails == null) {
-					throw new RestException(messageSource, "rest.authentication.userShouldBeAuthenticated",
+					throw new RestException(messageSource, "rest.userShouldBeAuthenticated",
 							HttpServletResponse.SC_UNAUTHORIZED);
 				} else {
 					proceed = true;

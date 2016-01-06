@@ -19,8 +19,13 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
@@ -81,7 +86,7 @@ public abstract class BaseService {
 	}
 
 	protected StudyBean getSite(String siteName) throws Exception {
-		StudyBean site = (StudyBean) new StudyDAO(dataSource).findByName(siteName);
+		StudyBean site = (StudyBean) getStudyDAO().findByName(siteName);
 		if (site.getId() == 0) {
 			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteIsNotFound",
 					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -91,5 +96,29 @@ public abstract class BaseService {
 		}
 		studyConfigService.setParametersForSite(site);
 		return site;
+	}
+
+	protected CRFDAO getCRFDAO() {
+		return new CRFDAO(dataSource);
+	}
+
+	protected StudyDAO getStudyDAO() {
+		return new StudyDAO(dataSource);
+	}
+
+	protected CRFVersionDAO getCRFVersionDAO() {
+		return new CRFVersionDAO(dataSource);
+	}
+
+	protected UserAccountDAO getUserAccountDAO() {
+		return new UserAccountDAO(dataSource);
+	}
+
+	protected EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
+		return new EventDefinitionCRFDAO(dataSource);
+	}
+
+	protected StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
+		return new StudyEventDefinitionDAO(dataSource);
 	}
 }

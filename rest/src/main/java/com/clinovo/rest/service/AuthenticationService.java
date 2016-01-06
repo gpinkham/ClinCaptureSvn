@@ -16,14 +16,11 @@
 package com.clinovo.rest.service;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,9 +39,6 @@ import com.clinovo.util.RequestUtil;
 @Controller("restAuthenticationService")
 public class AuthenticationService extends BaseAuthenticationService {
 
-	@Autowired
-	private DataSource dataSource;
-
 	/**
 	 * Method changes current scope.
 	 *
@@ -58,7 +52,7 @@ public class AuthenticationService extends BaseAuthenticationService {
 	@RequestMapping(value = "/changeScope", method = RequestMethod.POST)
 	public UserDetails changeScope(@RequestParam("studyName") String studyName) throws RestException {
 		UserDetails userDetails = getUserDetails();
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
+		StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
 		StudyUserRoleBean surBean = getStudyUserRole(studyBean, getCurrentUser(),
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		userDetails.setStudyName(studyName);
@@ -88,7 +82,7 @@ public class AuthenticationService extends BaseAuthenticationService {
 			@RequestParam("password") String password, @RequestParam("studyName") String studyName)
 					throws RestException {
 		UserAccountBean userAccountBean = authenticateUser(userName, password);
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
+		StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
 		StudyUserRoleBean surBean = getStudyUserRole(studyBean, userAccountBean, HttpServletResponse.SC_UNAUTHORIZED);
 		UserDetails userDetails = new UserDetails();
 		userDetails.setUserId(userAccountBean.getId());

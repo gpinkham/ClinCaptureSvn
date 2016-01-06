@@ -11,10 +11,12 @@
            				http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<context:annotation-config />
+
 	<context:component-scan base-package="com.clinovo">
 		<context:exclude-filter type="regex" expression="com.clinovo.rest.*" />
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
+
 	<context:component-scan base-package="org.akaza.openclinica" >
 		<context:exclude-filter type="regex" expression="org.akaza.openclinica.ws.*" />
 	</context:component-scan>
@@ -25,15 +27,11 @@
 	<util:properties id="enterpriseInfo" location="classpath:enterprise.properties" />
 
 	<bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
-
 		<property name="dataInfo" ref="dataInfo" />
-
 		<property name="extractInfo" ref="extractInfo" />
-
 	</bean>
 
-	<bean id="dataInfoProperties" factory-bean="coreResources"
-		factory-method="getDataInfo" />
+	<bean id="dataInfoProperties" factory-bean="coreResources" factory-method="getDataInfo" />
 
 	<!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
 	<bean id="messageSource" class="com.clinovo.i18n.ClinCaptureResourceBundleMessageSource">
@@ -51,18 +49,15 @@
 				<value>org.akaza.openclinica.i18n.workflow</value>
 				<value>org.akaza.openclinica.i18n.ws_messages</value>
 				<value>org.akaza.openclinica.i18n.buildNumber</value>
+				<value>org.akaza.openclinica.i18n.rest</value>
 			</list>
 		</property>
 	</bean>
 
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-
-		p:placeholderPrefix="s[" p:placeholderSuffix="]">
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" p:placeholderPrefix="s[" p:placeholderSuffix="]">
 		<property name="properties">
 			<ref bean="dataInfoProperties" />
 		</property>
-
 	</bean>
 
 </beans>

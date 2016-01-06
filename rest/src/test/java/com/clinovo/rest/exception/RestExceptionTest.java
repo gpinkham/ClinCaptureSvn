@@ -39,10 +39,10 @@ public class RestExceptionTest extends DefaultAppContextTest {
 	@Test
 	public void testThatItIsPossibleToCreateTheRestExceptionWithLocalizedMessageWithArgumentsAndCode()
 			throws Exception {
-		Object[] arguments = new Object[]{"ADMIN"};
-		String msg = messageSource.getMessage("rest.createUser.roleDoesNotExist", arguments,
+		Object[] arguments = new Object[]{"X_PARAMETER"};
+		String msg = messageSource.getMessage("rest.parameterIsNotSupported", arguments,
 				CoreResources.getSystemLocale());
-		RestException restException = new RestException(messageSource, "rest.createUser.roleDoesNotExist", arguments,
+		RestException restException = new RestException(messageSource, "rest.parameterIsNotSupported", arguments,
 				HttpServletResponse.SC_BAD_REQUEST);
 		assertEquals(restException.getMessage(), msg);
 		assertEquals(restException.getCode(), HttpServletResponse.SC_BAD_REQUEST);

@@ -22,7 +22,6 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -80,7 +79,7 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
 	public StudyEventDefinitionBean getInfo(@RequestParam(value = "id") int id) throws Exception {
-		return eventDefinitionService.fillEventDefinitionCrfs(getValidatedStudyEventDefinition(id), getCurrentStudy());
+		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(id), getCurrentStudy());
 	}
 
 	/**
@@ -127,11 +126,10 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "minDay", defaultValue = "0", required = false) int dayMin,
 			@RequestParam(value = "emailDay", defaultValue = "0", required = false) int emailDay,
 			@RequestParam(value = "emailUser", defaultValue = "", required = false) String emailUser) throws Exception {
-		StudyEventDefinitionBean studyEventDefinitionBean = prepareNewStudyEventDefinition(name, type, description,
+		StudyEventDefinitionBean studyEventDefinitionBean = createStudyEventDefinition(name, type, description,
 				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 
-		HashMap errors = EventDefinitionValidator.validate(configurationDao, new UserAccountDAO(dataSource),
-				getCurrentStudy());
+		HashMap errors = EventDefinitionValidator.validate(configurationDao, getUserAccountDAO(), getCurrentStudy());
 
 		ValidatorUtil.checkForErrors(errors);
 
@@ -186,11 +184,10 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "minDay", required = false) Integer dayMin,
 			@RequestParam(value = "emailDay", required = false) Integer emailDay,
 			@RequestParam(value = "emailUser", required = false) String emailUser) throws Exception {
-		StudyEventDefinitionBean studyEventDefinitionBean = prepareStudyEventDefinition(id, name, type, description,
-				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser, true);
+		StudyEventDefinitionBean studyEventDefinitionBean = editStudyEventDefinition(id, name, type, description,
+				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 
-		HashMap errors = EventDefinitionValidator.validate(configurationDao, new UserAccountDAO(dataSource),
-				getCurrentStudy());
+		HashMap errors = EventDefinitionValidator.validate(configurationDao, getUserAccountDAO(), getCurrentStudy());
 
 		ValidatorUtil.checkForErrors(errors);
 
@@ -209,8 +206,7 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int id) throws Exception {
-		return eventDefinitionService.removeStudyEventDefinition(getValidatedStudyEventDefinition(id),
-				getCurrentUser());
+		return eventDefinitionService.removeStudyEventDefinition(getStudyEventDefinition(id), getCurrentUser());
 	}
 
 	/**
@@ -225,8 +221,7 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int id) throws Exception {
-		return eventDefinitionService.restoreStudyEventDefinition(getValidatedStudyEventDefinition(id),
-				getCurrentUser());
+		return eventDefinitionService.restoreStudyEventDefinition(getStudyEventDefinition(id), getCurrentUser());
 	}
 
 	/**
@@ -262,9 +257,9 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourceDataVerification", values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataentryquality.valueDescription"),
-			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailwhen.valueDescription"),
+			@RestParameterPossibleValues(name = "sourceDataVerification", values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataEntryQuality.valueDescription"),
+			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailWhen.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
 	@RequestMapping(value = "/addCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventId") int eventId,
@@ -281,7 +276,7 @@ public class EventService extends BaseEventService {
 					throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
 
-		EventDefinitionCRFBean eventDefinitionCrfBean = prepareNewEventDefinitionCRF(studyEventDefinitionBean,
+		EventDefinitionCRFBean eventDefinitionCrfBean = createEventDefinitionCRF(studyEventDefinitionBean,
 				getCurrentUser(), crfName, defaultVersion, required, passwordRequired, hide, sourceDataVerification,
 				dataEntryQuality, emailWhen, email, tabbing, acceptNewCrfVersions);
 
@@ -329,11 +324,11 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourcedataverification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataentryquality.withNone.valueDescription"),
-			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailwhen.withNone.valueDescription"),
+			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
+			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom"),
-			@RestParameterPossibleValues(name = "propagateChange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagatechange.valueDescription")})
+			@RestParameterPossibleValues(name = "propagateChange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagateChange.valueDescription")})
 	@RequestMapping(value = "/editStudyCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean editStudyCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName,
@@ -350,7 +345,7 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "propagateChange", required = false) Integer propagateChange) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
 
-		EventDefinitionCRFBean eventDefinitionCRFBean = prepareStudyEventDefinitionCRF(eventId, crfName, defaultVersion,
+		EventDefinitionCRFBean eventDefinitionCRFBean = editParentEventDefinitionCRF(eventId, crfName, defaultVersion,
 				required, passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing,
 				acceptNewCrfVersions, propagateChange);
 
