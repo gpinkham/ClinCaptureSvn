@@ -40,23 +40,19 @@ import org.springframework.stereotype.Component;
  * 
  * 
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 @Component
 public class StudyAuditLogServlet extends RememberLastPage {
-
-	public static final String STUDY_AUDIT_LOG_URL = "studyAuditLogUrl";
 
 	public static String getLink(int userId) {
 		return "AuditLogStudy";
 	}
 
-	/*
-	 * TODO: Redo this servlet to run the audits per study subject for the study; need to add a studyId param and then
-	 * use the StudySubjectDAO.findAllByStudyOrderByLabel() method to grab a lot of study subject beans and then return
-	 * them much like in ViewStudySubjectAuditLogServet.process() currentStudy instead of studyId?
-	 */
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO: Redo this servlet to run the audits per study subject for the study; need to add a studyId param and
+		// then use the StudySubjectDAO.findAllByStudyOrderByLabel() method to grab a lot of study subject beans and
+		// then return them much like in ViewStudySubjectAuditLogServet.process() currentStudy instead of studyId?
 
 		if (shouldRedirect(request, response)) {
 			return;
@@ -91,19 +87,14 @@ public class StudyAuditLogServlet extends RememberLastPage {
 		}
 
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || r.equals(Role.STUDY_SPONSOR) || Role.isMonitor(r)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || r.equals(Role.STUDY_SPONSOR)
+				|| Role.isMonitor(r)) {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_director"), "1");
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return STUDY_AUDIT_LOG_URL;
 	}
 
 	@Override

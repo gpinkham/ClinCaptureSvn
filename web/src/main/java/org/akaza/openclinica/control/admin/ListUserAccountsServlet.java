@@ -56,7 +56,6 @@ import org.springframework.stereotype.Component;
 public class ListUserAccountsServlet extends RememberLastPage {
 
 	public static final String ARG_MESSAGE = "message";
-	public static final String SAVED_USER_LIST_URL = "savedUserListUrl";
 	public static final int ACTION_COLUMN_NUM = 5;
 
 	@Override
@@ -82,8 +81,8 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		StudyDAO sdao = getStudyDAO();
 		EntityBeanTable table = getEntityBeanTable();
 		UserAccountBean currentUser = getUserAccountBean(request);
-		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser
-				.getName());
+		List<StudyBean> studyListCurrentUserHasAccessTo = sdao
+				.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
 		List<UserAccountBean> allUsers = getAllUsers(udao);
 		ListIterator<UserAccountBean> iterateUser;
 
@@ -113,14 +112,14 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			userRolesRemovedCountMap.put(uab.getName(), removedRolesCount);
 		}
 
-		StudyBean sb = (StudyBean) sdao.findByPK(((UserAccountBean) (request.getSession().getAttribute("userBean")))
-				.getActiveStudyId());
+		StudyBean sb = (StudyBean) sdao
+				.findByPK(((UserAccountBean) (request.getSession().getAttribute("userBean"))).getActiveStudyId());
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans((ArrayList) allUsers);
 
-		String[] columns = { getResWord().getString("user_name"), getResWord().getString("user_type"),
-				getResWord().getString("first_name"), getResWord().getString("last_name"), getResWord().getString("status"),
-				getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("user_name"), getResWord().getString("user_type"),
+				getResWord().getString("first_name"), getResWord().getString("last_name"),
+				getResWord().getString("status"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListUserAccounts", new HashMap());
@@ -193,11 +192,6 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_USER_LIST_URL;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");
@@ -205,11 +199,11 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
 		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
-				.append("&ebl_page=1&ebl_sortColumnInd=")
-				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
-				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
-				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
-				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+				.append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0"))
+				.append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1"))
+				.append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0"))
+				.append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : ""))
+				.append("&&ebl_paginated=1").toString();
 	}
 
 	@Override

@@ -51,7 +51,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListStudyUserServlet extends RememberLastPage {
 
-	public static final String LIST_STUDY_USER = "listStudyUserUrl";
 	public static final int ACTION_COLUMN_NUM = 6;
 
 	@Override
@@ -64,10 +63,10 @@ public class ListStudyUserServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
@@ -105,9 +104,10 @@ public class ListStudyUserServlet extends RememberLastPage {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyUserRows = StudyUserRoleRow.generateRowsFromBeans(users);
 
-		String[] columns = { getResWord().getString("user_name"), getResWord().getString("first_name"),
-				getResWord().getString("last_name"), getResWord().getString("role"), getResWord().getString("study_name"),
-				getResWord().getString("status"), getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("user_name"), getResWord().getString("first_name"),
+				getResWord().getString("last_name"), getResWord().getString("role"),
+				getResWord().getString("study_name"), getResWord().getString("status"),
+				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(ACTION_COLUMN_NUM);
 		table.setQuery("ListStudyUser", new HashMap());
@@ -123,11 +123,6 @@ public class ListStudyUserServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return LIST_STUDY_USER;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");
@@ -135,11 +130,11 @@ public class ListStudyUserServlet extends RememberLastPage {
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
 		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
-				.append("&ebl_page=1&ebl_sortColumnInd=")
-				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
-				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
-				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
-				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+				.append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0"))
+				.append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1"))
+				.append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0"))
+				.append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : ""))
+				.append("&&ebl_paginated=1").toString();
 	}
 
 	@Override

@@ -15,12 +15,14 @@
 
 package com.clinovo.controller;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
@@ -48,9 +50,9 @@ public class SystemController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
-	public static final String SYSTEM_COMMAND_RESULT = "systemCommandResult";
-	public static final String SYSTEM_COMMAND_ERROR = "systemCommandError";
 	public static final String SYSTEM_COMMAND = "systemCommand";
+	public static final String SYSTEM_COMMAND_ERROR = "systemCommandError";
+	public static final String SYSTEM_COMMAND_RESULT = "systemCommandResult";
 
 	@Autowired
 	private SystemValidator validator;
@@ -129,7 +131,7 @@ public class SystemController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
-	public String confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public String confirm(HttpServletRequest request) throws Exception {
 		String page = "redirect:system";
 		SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute(SYSTEM_COMMAND);
 		request.getSession().removeAttribute(SYSTEM_COMMAND);
@@ -138,9 +140,11 @@ public class SystemController {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
 			try {
+				Locale prevLocale = LocaleResolver.getLocale();
 				systemService.updateSystemProperties(systemCommand);
 				LocaleResolver.updateSession(request, coreResources);
 				SQLInitServlet.updateParams(coreResources.getDataInfo());
+				RememberLastPage.clearLastUrls(prevLocale);
 				request.getSession().setAttribute(SYSTEM_COMMAND_RESULT, "systemCommand.dataWasSuccessfullySaved");
 			} catch (Exception ex) {
 				request.getSession().setAttribute(SYSTEM_COMMAND_ERROR, "error.systemCommand.dataWasNotSaved");

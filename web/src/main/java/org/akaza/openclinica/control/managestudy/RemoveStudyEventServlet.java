@@ -38,6 +38,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -73,7 +74,8 @@ public class RemoveStudyEventServlet extends Controller {
 
 		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
 				+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
@@ -153,7 +155,7 @@ public class RemoveStudyEventServlet extends Controller {
 		storePageMessages(request);
 		String id = (String) request.getAttribute("id");
 		String savedUrl = (String) request.getSession()
-				.getAttribute(ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
+				.getAttribute(RememberLastPage.getUrlKey(ViewStudySubjectServlet.class));
 		if (savedUrl != null && savedUrl.contains("id=" + id)) {
 			response.sendRedirect(savedUrl);
 		} else {

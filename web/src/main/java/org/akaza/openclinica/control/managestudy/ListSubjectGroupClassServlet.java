@@ -57,16 +57,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListSubjectGroupClassServlet extends RememberLastPage {
 
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
-
-	public static final String LIST_SUBJECT_GROUP_CLASS = "listSubjectGroupClassUrl";
-
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -77,14 +67,15 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
@@ -148,9 +139,8 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 			for (StudyGroupClassBean dynamicGroup : availableDynGroups) {
 				if (!dynamicGroup.isDefault()) {
 					int index = Integer.valueOf(request.getParameter("dynamicGroup" + dynamicGroup.getId()));
-					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef.get(defGroupExist
-							? index - 2
-							: index - 1);
+					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef
+							.get(defGroupExist ? index - 2 : index - 1);
 					if (newDynamicOrdinal != dynamicGroup.getDynamicOrdinal()) {
 						sgcdao.updateDynamicOrdinal(newDynamicOrdinal,
 								parentStudyId > 0 ? parentStudyId : currentStudy.getId(), dynamicGroup.getId());
@@ -166,9 +156,10 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		boolean isParentStudy = currentStudy.getParentStudyId() <= 0;
 		request.setAttribute("isParentStudy", isParentStudy);
 
-		String[] columns = { getResWord().getString("subject_group_class"), getResWord().getString("type"),
-				getResWord().getString("subject_assignment"), getResWord().getString("default"), getResWord().getString("study_name"),
-				getResWord().getString("subject_groups"), getResWord().getString("study_events"), getResWord().getString("status"),
+		String[] columns = {getResWord().getString("subject_group_class"), getResWord().getString("type"),
+				getResWord().getString("subject_assignment"), getResWord().getString("default"),
+				getResWord().getString("study_name"), getResWord().getString("subject_groups"),
+				getResWord().getString("study_events"), getResWord().getString("status"),
 				getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);
@@ -193,11 +184,6 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return LIST_SUBJECT_GROUP_CLASS;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");
@@ -205,11 +191,11 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
 		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
-				.append("&ebl_page=1&ebl_sortColumnInd=")
-				.append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")).append("&ebl_sortAscending=")
-				.append((!eblSortAscending.isEmpty() ? eblSortAscending : "1")).append("&ebl_filtered=")
-				.append((!eblFiltered.isEmpty() ? eblFiltered : "0")).append("&ebl_filterKeyword=")
-				.append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "")).append("&&ebl_paginated=1").toString();
+				.append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0"))
+				.append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1"))
+				.append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0"))
+				.append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : ""))
+				.append("&&ebl_paginated=1").toString();
 	}
 
 	@Override

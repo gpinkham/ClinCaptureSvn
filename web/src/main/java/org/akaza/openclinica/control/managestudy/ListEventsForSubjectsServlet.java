@@ -47,8 +47,6 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
-
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -145,18 +143,13 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LIST_EVENTS_FOR_SUBJECTS_URL;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		boolean showMoreLink = fp.getString("showMoreLink").equals("")
 				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 		String newDefId = fp.getString("newDefId");
 		if (!newDefId.trim().isEmpty()) {
-			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
+			request.getSession().removeAttribute(getUrlKey());
 		}
 		StudyBean study = getCurrentStudy();
 		String pageSize = CookiesUtil.getCookie(request,
@@ -172,9 +165,9 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		super.saveUrl(key, value, request);
 		FormProcessor fp = new FormProcessor(request);
 		String pageSize = fp.getString("listEventsForSubject_mr_");
-		String savedUrl = getSavedUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL, request);
+		String savedUrl = getSavedUrl(getUrlKey(ListStudySubjectsServlet.class), request);
 		if (savedUrl != null) {
-			saveUrl(ListStudySubjectsServlet.SAVED_LIST_STUDY_SUBJECTS_URL,
+			saveUrl(getUrlKey(ListStudySubjectsServlet.class),
 					savedUrl.replaceAll("findSubjects_mr_=\\d*", "findSubjects_mr_=".concat(pageSize)));
 		}
 	}

@@ -103,7 +103,7 @@ public class ViewNotesServlet extends RememberLastPage {
 	public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
 	public static final String DISCREPANCY_NOTE_TYPE_PARAM = "listNotes_f_discrepancyNoteBean.disType";
 	public static final String DISCREPANCY_NOTE_STATUS_PARAM = "listNotes_f_discrepancyNoteBean.resolutionStatus";
-	public static final String DN_LIST_URL = "dnListUrl";
+
 	public static final int ALL = -1;
 	public static final int DN_STATUS_NEW = 1;
 	public static final int DN_STATUS_NOT_APPLICABLE = 5;
@@ -149,8 +149,8 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.getSession().setAttribute("subjectId", oneSubjectId);
 		int discNoteTypeId;
 		try {
-			DiscrepancyNoteType discNoteType = DiscrepancyNoteType.getByName(request
-					.getParameter(DISCREPANCY_NOTE_TYPE_PARAM));
+			DiscrepancyNoteType discNoteType = DiscrepancyNoteType
+					.getByName(request.getParameter(DISCREPANCY_NOTE_TYPE_PARAM));
 			discNoteTypeId = discNoteType.getId();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -164,8 +164,8 @@ public class ViewNotesServlet extends RememberLastPage {
 		dndao.setFetchMapping(true);
 		int resolutionStatusId;
 		try {
-			ResolutionStatus resolutionStatus = ResolutionStatus.getByName(request
-					.getParameter(DISCREPANCY_NOTE_STATUS_PARAM));
+			ResolutionStatus resolutionStatus = ResolutionStatus
+					.getByName(request.getParameter(DISCREPANCY_NOTE_STATUS_PARAM));
 			resolutionStatusId = resolutionStatus.getId();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -175,10 +175,8 @@ public class ViewNotesServlet extends RememberLastPage {
 			request.getSession().removeAttribute(WIN_LOCATION);
 			request.getSession().removeAttribute(NOTES_TABLE);
 		}
-		request.getSession().setAttribute(
-				WIN_LOCATION,
-				"ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module
-						+ " &removeSession=1");
+		request.getSession().setAttribute(WIN_LOCATION, "ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId
+				+ "&module=" + module + " &removeSession=1");
 		boolean hasAResolutionStatus = resolutionStatusId >= DN_STATUS_NEW
 				&& resolutionStatusId <= DN_STATUS_NOT_APPLICABLE;
 		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute(RESOLUTION_STATUS);
@@ -317,16 +315,10 @@ public class ViewNotesServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_permission_to_view_discrepancies")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_permission_to_view_discrepancies")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				getResException().getString("not_study_director_or_study_cordinator"), "1");
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return DN_LIST_URL;
 	}
 
 	@Override
@@ -350,9 +342,10 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.getSession().removeAttribute(SAVE_DCF);
 		request.getSession().removeAttribute(DCF_SAVED);
 		try {
-			Map<Integer, Map<Integer, String>> noteAndEntityIds = transformSelectedNoteAndEntityIdsToInt(selectedNoteIds);
-			String dcfFile = getDcfService()
-					.generateDcf(currentStudy, noteAndEntityIds.keySet(), currentUser, getLocale());
+			Map<Integer, Map<Integer, String>> noteAndEntityIds = transformSelectedNoteAndEntityIdsToInt(
+					selectedNoteIds);
+			String dcfFile = getDcfService().generateDcf(currentStudy, noteAndEntityIds.keySet(), currentUser,
+					getLocale());
 			boolean multipleDcfs = noteAndEntityIds.keySet().size() > 1;
 			setRenderTypes(selectedRenderTypes, dcfFile, recipientEmail, multipleDcfs, request, currentStudy,
 					currentUser);
@@ -373,7 +366,8 @@ public class ViewNotesServlet extends RememberLastPage {
 		} catch (FileNotFoundException e) {
 			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.getMessage());
 			e.printStackTrace();
-			addPageMessage(MessageFormat.format(getResWord().getString("dcf_generation_failed_details"), e.getMessage()),
+			addPageMessage(
+					MessageFormat.format(getResWord().getString("dcf_generation_failed_details"), e.getMessage()),
 					request);
 		} catch (MailSendException e) {
 			logger.debug("DCF generation failed on {} due to: {}", new Date(), e.toString());
@@ -405,8 +399,8 @@ public class ViewNotesServlet extends RememberLastPage {
 			if (dcfFile != null) {
 				File pdfFile = new File(dcfFile);
 				response.setContentType("application/pdf");
-				response.addHeader("Content-Disposition",
-						contentDisposition + "; filename=" + dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1));
+				response.addHeader("Content-Disposition", contentDisposition + "; filename="
+						+ dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1));
 				response.setContentLength((int) pdfFile.length());
 				FileInputStream fileInputStream = new FileInputStream(pdfFile);
 				OutputStream responseOutputStream = response.getOutputStream();
@@ -440,8 +434,9 @@ public class ViewNotesServlet extends RememberLastPage {
 	private DcfRenderType getEmailRenderType(String dcfFile, String recipientEmail, boolean multipleDcfs,
 			StudyBean currentStudy, UserAccountBean currentUser) {
 		String dcfName = dcfFile.substring(dcfFile.lastIndexOf(File.separator) + 1).replace(".pdf", "");
-		String dcfEmailSubject = multipleDcfs ? getResWord().getString("dcf_email_subject_multiple") : getResWord()
-				.getString("dcf").concat(": ").concat(dcfName);
+		String dcfEmailSubject = multipleDcfs
+				? getResWord().getString("dcf_email_subject_multiple")
+				: getResWord().getString("dcf").concat(": ").concat(dcfName);
 		DcfRenderType emailer = new DcfEmailer.DcfEmailerBuilder().addDcfFilePath(dcfFile).addDcfName(dcfName)
 				.addEmailSubject(dcfEmailSubject).addMailSender(getMailSender()).addRecipientEmail(recipientEmail)
 				.setMultipleDcfs(multipleDcfs).setCurrentStudy(currentStudy).setCurrentUser(currentUser).build();

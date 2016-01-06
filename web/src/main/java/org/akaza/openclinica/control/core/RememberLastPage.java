@@ -13,26 +13,72 @@
 
 package org.akaza.openclinica.control.core;
 
-import com.clinovo.util.RequestUtil;
-
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.RequestUtil;
 
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public abstract class RememberLastPage extends Controller {
 
-	protected abstract String getUrlKey(HttpServletRequest request);
+	public static final String URL_KEY_POSTFIX = ".rememberLastPage.lastUrl";
+
+	private static final Set<String> URL_KEYS = new HashSet<String>();
 
 	protected abstract String getDefaultUrl(HttpServletRequest request);
 
 	protected abstract boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request);
 
+	/**
+	 * Returns url key.
+	 *
+	 * @return String
+	 */
+	public String getUrlKey() {
+		return getUrlKey(this.getClass());
+	}
+
+	/**
+	 * Returns url key.
+	 *
+	 * @param clazz
+	 *            Class
+	 * @return String
+	 */
+	public static String getUrlKey(Class clazz) {
+		String urlKey = clazz.getSimpleName().toLowerCase().concat(URL_KEY_POSTFIX);
+		if (!URL_KEYS.contains(urlKey)) {
+			URL_KEYS.add(urlKey);
+		}
+		return urlKey;
+	}
+
+	/**
+	 * Clears last urls if current locale is changed.
+	 *
+	 * @param prevLocale
+	 *            Locale
+	 */
+	public static void clearLastUrls(Locale prevLocale) {
+		if (!prevLocale.equals(LocaleResolver.getLocale())) {
+			HttpSession session = RequestUtil.getRequest().getSession();
+			for (String lastUrlKey : URL_KEYS) {
+				session.removeAttribute(lastUrlKey);
+			}
+		}
+	}
+
 	private boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean result = false;
-		String url = getSavedUrl(getUrlKey(request), request);
+		String url = getSavedUrl(getUrlKey(), request);
 		if (url != null) {
 			result = true;
 			storeAttributes(request);
@@ -45,7 +91,7 @@ public abstract class RememberLastPage extends Controller {
 
 	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean result = false;
-		String key = getUrlKey(request);
+		String key = getUrlKey();
 		String defaultUrl = getDefaultUrl(request);
 		String keyValue = getSavedUrl(key, request);
 		if (keyValue == null && defaultUrl != null) {

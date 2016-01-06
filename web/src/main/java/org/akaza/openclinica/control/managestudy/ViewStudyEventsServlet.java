@@ -59,8 +59,6 @@ import com.clinovo.util.ValidatorHelper;
 @Component
 public class ViewStudyEventsServlet extends RememberLastPage {
 
-	public static final String SAVED_VIEW_STUDY_EVENTS_URL = "savedViewStudyEventsUrl";
-
 	public static final String SED_ID = "sedId";
 
 	public static final String INPUT_STARTDATE = "startDate";
@@ -90,7 +88,8 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		if (!ub.isSysAdmin() && !mayViewData(ub, currentRole)) {
 			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
 					+ getResPage().getString("change_study_contact_sysadmin"), request);
-			throw new InsufficientPermissionException(Page.MENU_SERVLET, getResText().getString("not_correct_role"), "1");
+			throw new InsufficientPermissionException(Page.MENU_SERVLET, getResText().getString("not_correct_role"),
+					"1");
 		}
 	}
 
@@ -437,11 +436,6 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_VIEW_STUDY_EVENTS_URL;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 
 		DateTime userDefaultStartDate = new DateTime().withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0)
@@ -483,7 +477,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		boolean localeChanged = locale != null && !LocaleResolver.getLocale(request).equals(locale);
 		request.getSession().setAttribute("viewStudyEventsServletPreviousLocale", LocaleResolver.getLocale(request));
 		if (request.getParameter("refreshPage") != null || localeChanged) {
-			saveUrl(getUrlKey(request), sb.toString(), request);
+			saveUrl(getUrlKey(), sb.toString(), request);
 		}
 		return sb.toString();
 	}

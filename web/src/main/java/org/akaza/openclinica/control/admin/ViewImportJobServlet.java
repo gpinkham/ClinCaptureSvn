@@ -46,7 +46,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ViewImportJobServlet extends RememberLastPage {
 
-	public static final String SAVED_VIEW_IMPORT_JOB_URL = "savedViewImportJobUrl";
 	public static final String IMPORT_TRIGGER = "importTrigger";
 	public static final int DESCRIPTION_COL = 3;
 	public static final int ACTION_COL = 5;
@@ -59,9 +58,8 @@ public class ViewImportJobServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 		// TODO
@@ -113,7 +111,8 @@ public class ViewImportJobServlet extends RememberLastPage {
 				logger.debug("setting active to TRUE for trigger: " + trigger.getKey().getName());
 			}
 			StudyBean jobStudyBean = studyDao.findByOid((String) trigger.getJobDataMap().get("study_oid"));
-			if (jobStudyBean.getId() == currentStudy.getId() || jobStudyBean.getParentStudyId() == currentStudy.getId()) {
+			if (jobStudyBean.getId() == currentStudy.getId()
+					|| jobStudyBean.getParentStudyId() == currentStudy.getId()) {
 				triggerBeans.add(triggerBean);
 			}
 			// our wrapper to show triggers
@@ -123,9 +122,9 @@ public class ViewImportJobServlet extends RememberLastPage {
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
 		EntityBeanTable table = getEntityBeanTable();
-		String[] columns = { getResWord().getString("name"), getResWord().getString("previous_fire_time"),
-				getResWord().getString("next_fire_time"), getResWord().getString("description"), getResWord().getString("study"),
-				getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("name"), getResWord().getString("previous_fire_time"),
+				getResWord().getString("next_fire_time"), getResWord().getString("description"),
+				getResWord().getString("study"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(DESCRIPTION_COL);
 		table.hideColumnLink(ACTION_COL);
@@ -138,11 +137,6 @@ public class ViewImportJobServlet extends RememberLastPage {
 
 		forwardPage(Page.VIEW_IMPORT_JOB, request, response);
 
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_VIEW_IMPORT_JOB_URL;
 	}
 
 	@Override

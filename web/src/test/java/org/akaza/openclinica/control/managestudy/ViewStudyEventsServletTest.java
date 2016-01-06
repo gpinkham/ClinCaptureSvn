@@ -81,7 +81,7 @@ public class ViewStudyEventsServletTest {
 	@Test
 	public void testThatSavedUrlIsChangedIfRequestLocaleWasChanged() {
 
-		String key = viewStudyEventsServlet.getUrlKey(request);
+		String key = viewStudyEventsServlet.getUrlKey();
 		viewStudyEventsServlet.getDefaultUrl(request);
 		String savedUrl = (String) request.getSession().getAttribute(key);
 		LocaleResolver.updateLocale(session, Locale.JAPAN);
@@ -115,7 +115,7 @@ public class ViewStudyEventsServletTest {
 	@Test
 	public void testThatUrlWithPrintParameterOpensCorrectPage() {
 
-		String key = viewStudyEventsServlet.getUrlKey(request);
+		String key = viewStudyEventsServlet.getUrlKey();
 		viewStudyEventsServlet.getDefaultUrl(request);
 		String savedUrl = (String) request.getSession().getAttribute(key);
 		viewStudyEventsServlet.getDefaultUrl(request);

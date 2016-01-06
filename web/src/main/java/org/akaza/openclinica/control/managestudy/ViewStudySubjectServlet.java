@@ -103,13 +103,10 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	public static final String GENDER_NOTE = "genderNote";
 	// request attribute for a discrepancy note
 	public static final String ENROLLMENT_NOTE = "enrollmentNote";
-	public static final String SAVED_VIEW_STUDY_SUBJECT_URL = "savedViewStudySubjectUrl";
+
 	public static final int INT_4 = 4;
 	public static final int INT_5 = 5;
 
-	/**
-	 * Checks whether the user has the right permission to proceed function.
-	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -173,8 +170,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			int studyId = studySub.getStudyId();
 			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
-			request.setAttribute("viewModeOnly", study.getStatus().isDeleted() || study.getStatus().isLocked()
-					|| studySub.getStatus().isDeleted() || studySub.getStatus().isLocked() || currentRole.isStudySponsor());
+			request.setAttribute("viewModeOnly",
+					study.getStatus().isDeleted() || study.getStatus().isLocked() || studySub.getStatus().isDeleted()
+							|| studySub.getStatus().isLocked() || currentRole.isStudySponsor());
 
 			StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
 			String studyEventDefinitionsString = "";
@@ -344,9 +342,11 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-			String[] columns = { getResWord().getString("event") + " (" + getResWord().getString("occurrence_number") + ")",
-					getResWord().getString("start_date1"), getResWord().getString("location"), getResWord().getString("status"),
-					getResWord().getString("actions"), getResWord().getString("CRFs_atrib")};
+			String[] columns = {
+					getResWord().getString("event") + " (" + getResWord().getString("occurrence_number") + ")",
+					getResWord().getString("start_date1"), getResWord().getString("location"),
+					getResWord().getString("status"), getResWord().getString("actions"),
+					getResWord().getString("CRFs_atrib")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(INT_4);
 			table.hideColumnLink(INT_5);
@@ -477,11 +477,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_VIEW_STUDY_SUBJECT_URL;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		return null;
 	}
@@ -491,7 +486,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		boolean result = false;
 		String id = request.getParameter("id");
 		if (request.getQueryString() != null && request.getQueryString().equalsIgnoreCase("id=" + id)) {
-			String savedUrl = (String) request.getSession().getAttribute(getUrlKey(request));
+			String savedUrl = (String) request.getSession().getAttribute(getUrlKey());
 			// Was added in order to prevent situation when id = 1 and saved id = 10, in this case result will be
 			// invalid.
 			if (savedUrl != null && savedUrl.length() != 0) {

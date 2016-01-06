@@ -50,7 +50,6 @@ import com.clinovo.util.CookiesUtil;
 public class ListStudySubjectsServlet extends RememberLastPage {
 
 	public static final String SUBJECT_MATRIX_PAGE_SIZE = "subjectMatrixPageSize";
-	public static final String SAVED_LIST_STUDY_SUBJECTS_URL = "savedListStudySubjectsUrl";
 	public static final String CURRENT_SUBJECT_MATRIX_SERVLET = "currentSubjectMatrixServlet";
 
 	private static final long serialVersionUID = 1L;
@@ -69,8 +68,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
 				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-				|| currentRole.getRole().equals(Role.STUDY_SPONSOR)
-				|| Role.isMonitor(currentRole.getRole()))) {
+				|| currentRole.getRole().equals(Role.STUDY_SPONSOR) || Role.isMonitor(currentRole.getRole()))) {
 			return;
 		}
 
@@ -96,7 +94,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 						+ Integer.toString(studySubject.getId()) + "&ref=sm");
 				return;
 			} else {
-				request.getSession().removeAttribute(getUrlKey(request));
+				request.getSession().removeAttribute(getUrlKey());
 			}
 		}
 
@@ -158,11 +156,6 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LIST_STUDY_SUBJECTS_URL;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		boolean showMoreLink = fp.getString("showMoreLink").equals("")
@@ -183,9 +176,9 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		super.saveUrl(key, value, request);
 		FormProcessor fp = new FormProcessor(request);
 		String pageSize = fp.getString("findSubjects_mr_");
-		String savedUrl = getSavedUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL, request);
+		String savedUrl = getSavedUrl(getUrlKey(ListEventsForSubjectsServlet.class), request);
 		if (savedUrl != null) {
-			saveUrl(ListEventsForSubjectsServlet.SAVED_LIST_EVENTS_FOR_SUBJECTS_URL,
+			saveUrl(getUrlKey(ListEventsForSubjectsServlet.class),
 					savedUrl.replaceAll("listEventsForSubject_mr_=\\d*", "listEventsForSubject_mr_=".concat(pageSize)));
 		}
 	}

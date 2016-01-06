@@ -62,7 +62,6 @@ import com.clinovo.util.RequestUtil;
 @Component
 public class ViewDatasetsServlet extends RememberLastPage {
 
-	public static final String SAVED_VIEW_DATASETS_URL = "savedViewDatasetsUrl";
 	private static final int FIVE = 5;
 
 	/**
@@ -117,9 +116,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			ArrayList datasets;
 			datasets = dsdao.findAllByStudyId(currentStudy);
 			ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-			String[] columns = { getResWord().getString("dataset_name"), getResWord().getString("description"),
-					getResWord().getString("created_by"), getResWord().getString("created_date"), getResWord().getString("status"),
-					getResWord().getString("actions")};
+			String[] columns = {getResWord().getString("dataset_name"), getResWord().getString("description"),
+					getResWord().getString("created_by"), getResWord().getString("created_date"),
+					getResWord().getString("status"), getResWord().getString("actions")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
 			table.addLink(getResWord().getString("show_only_my_datasets"), RequestUtil
@@ -136,9 +135,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				EntityBeanTable table = getEntityBeanTable();
 				ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy);
 				ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
-				String[] columns = { getResWord().getString("dataset_name"), getResWord().getString("description"),
-						getResWord().getString("created_by"), getResWord().getString("created_date"), getResWord().getString("status"),
-						getResWord().getString("actions")};
+				String[] columns = {getResWord().getString("dataset_name"), getResWord().getString("description"),
+						getResWord().getString("created_by"), getResWord().getString("created_date"),
+						getResWord().getString("status"), getResWord().getString("actions")};
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.hideColumnLink(FIVE);
 				table.addLink(getResWord().getString("show_all_datasets"),
@@ -226,11 +225,6 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		db.setAllSelectedGroups(allSelectedGroups);
 
 		return db;
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_VIEW_DATASETS_URL;
 	}
 
 	@Override

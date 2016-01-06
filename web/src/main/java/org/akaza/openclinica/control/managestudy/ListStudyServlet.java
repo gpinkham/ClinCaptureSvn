@@ -44,13 +44,7 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
 public class ListStudyServlet extends RememberLastPage {
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -59,20 +53,12 @@ public class ListStudyServlet extends RememberLastPage {
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
+				"1");
 	}
 
-	/**
-	 * Finds all the studies
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -99,10 +85,10 @@ public class ListStudyServlet extends RememberLastPage {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allStudyRows = DisplayStudyRow.generateRowsFromBeans(displayStudies);
 
-		String[] columns = { getResWord().getString("name"), getResWord().getString("unique_identifier"),
+		String[] columns = {getResWord().getString("name"), getResWord().getString("unique_identifier"),
 				getResWord().getString("OID"), getResWord().getString("principal_investigator"),
-				getResWord().getString("facility_name"), getResWord().getString("date_created"), getResWord().getString("status"),
-				getResWord().getString("actions")};
+				getResWord().getString("facility_name"), getResWord().getString("date_created"),
+				getResWord().getString("status"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(2);
 		table.hideColumnLink(7);
@@ -131,11 +117,6 @@ public class ListStudyServlet extends RememberLastPage {
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
 		return Controller.ADMIN_SERVLET_CODE;
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return "savedStudyListUrl";
 	}
 
 	@Override

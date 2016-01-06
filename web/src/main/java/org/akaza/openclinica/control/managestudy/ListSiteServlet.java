@@ -48,17 +48,6 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class ListSiteServlet extends RememberLastPage {
 
-	public static final String SAVED_LIST_SITES_URL = "savedListSitesUrl";
-
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws InsufficientPermissionException
-	 *             the InsufficientPermissionException
-	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -76,20 +65,11 @@ public class ListSiteServlet extends RememberLastPage {
 
 		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
 				+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
-	/**
-	 * Finds all the studies, processes the request.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws Exception
-	 *             an Exception
-	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (shouldRedirect(request, response)) {
@@ -120,9 +100,10 @@ public class ListSiteServlet extends RememberLastPage {
 
 		final int two = 2;
 		final int seven = 7;
-		String[] columns = { getResWord().getString("name"), getResWord().getString("unique_identifier"), getResWord().getString("OID"),
-				getResWord().getString("principal_investigator"), getResWord().getString("facility_name"),
-				getResWord().getString("date_created"), getResWord().getString("status"), getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("name"), getResWord().getString("unique_identifier"),
+				getResWord().getString("OID"), getResWord().getString("principal_investigator"),
+				getResWord().getString("facility_name"), getResWord().getString("date_created"),
+				getResWord().getString("status"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(two);
 		table.hideColumnLink(seven);
@@ -137,11 +118,6 @@ public class ListSiteServlet extends RememberLastPage {
 		addNewSiteNotificationMessage(request);
 		request.getSession().setAttribute("fromListSite", "yes");
 		forwardPage(Page.SITE_LIST, request, response);
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LIST_SITES_URL;
 	}
 
 	@Override

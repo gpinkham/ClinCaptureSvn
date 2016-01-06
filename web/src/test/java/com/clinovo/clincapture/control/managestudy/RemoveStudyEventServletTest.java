@@ -32,6 +32,9 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.service.EventCRFService;
 
@@ -46,6 +49,9 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 	private StudyUserRoleBean currentRole;
 
 	@Mock
+	private ServletRequestAttributes servletRequestAttributes;
+
+	@Mock
 	private RemoveStudyEventServlet removeStudyEventServlet;
 
 	@Mock
@@ -53,11 +59,15 @@ public class RemoveStudyEventServletTest extends DefaultAppContextTest {
 
 	@Before
 	public void setUp() throws Exception {
-
 		MockitoAnnotations.initMocks(this);
 
 		request = new MockHttpServletRequest();
+		request.setSession(new MockHttpSession());
+
 		response = new MockHttpServletResponse();
+
+		RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+		Whitebox.setInternalState(servletRequestAttributes, "request", request);
 
 		Mockito.doCallRealMethod().when(removeStudyEventServlet).mayProceed(request, response);
 		Mockito.doCallRealMethod().when(removeStudyEventServlet).processRequest(request, response);

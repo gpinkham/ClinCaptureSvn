@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.admin;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.RememberLastPage;
@@ -35,18 +36,10 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 @Component
 public class ListSubjectServlet extends RememberLastPage {
-	public static final String SAVED_LIST_SUBJECTS_URL = "savedListSubjectsUrl";
 
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -56,10 +49,10 @@ public class ListSubjectServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET, getResException().getString("not_admin"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET, getResException().getString("not_admin"),
+				"1");
 
 	}
 
@@ -90,11 +83,6 @@ public class ListSubjectServlet extends RememberLastPage {
 		} else {
 			return "";
 		}
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LIST_SUBJECTS_URL;
 	}
 
 	@Override

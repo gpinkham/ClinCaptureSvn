@@ -36,13 +36,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
 
@@ -60,12 +64,15 @@ public class ListStudySubjectsServletTest {
 	private MockRequestDispatcher requestDispatcher;
 	private StudyBean currentStudy;
 	private StudySubjectDAO studySubjectDAO;
+	private ServletRequestAttributes servletRequestAttributes;
 
 	@Before
 	public void setUp() throws Exception {
-
 		request = new MockHttpServletRequest();
+		request.setSession(new MockHttpSession());
+
 		response = new MockHttpServletResponse();
+
 		servletContext = Mockito.mock(MockServletContext.class);
 		requestDispatcher = Mockito.mock(MockRequestDispatcher.class);
 		studySubjectDAO = Mockito.mock(StudySubjectDAO.class);
@@ -74,6 +81,10 @@ public class ListStudySubjectsServletTest {
 		currentUser.addUserType(UserType.USER);
 		currentRole = new StudyUserRoleBean();
 		currentRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		servletRequestAttributes = Mockito.mock(ServletRequestAttributes.class);
+		RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+		Whitebox.setInternalState(servletRequestAttributes, "request", request);
 
 		String url = "http://localhost:8080/clincapture/";
 		PowerMockito.mockStatic(CoreResources.class);

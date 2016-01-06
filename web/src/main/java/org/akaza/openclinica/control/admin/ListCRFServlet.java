@@ -56,8 +56,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListCRFServlet extends RememberLastPage {
 
-	public static final String SAVED_LIST_CRFS_URL = "savedListCRFsUrl";
-
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -68,21 +66,13 @@ public class ListCRFServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
-	/**
-	 * Finds all the crfs
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (shouldRedirect(request, response)) {
@@ -108,9 +98,8 @@ public class ListCRFServlet extends RememberLastPage {
 		}
 
 		if (!(ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR))) {
-			addPageMessage(
-					getResPage().getString("no_have_correct_privilege_current_study") + " "
-							+ getResPage().getString("change_active_study_or_contact"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
+					+ getResPage().getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -153,10 +142,12 @@ public class ListCRFServlet extends RememberLastPage {
 		EntityBeanTable table = getEntityBeanTable();
 		ArrayList allRows = ListCRFRow.generateRowsFromBeans(crfs);
 
-		String[] columns = { getResWord().getString("CRF_name"), getResWord().getString("date_updated"),
-				getResWord().getString("last_updated_by"), getResWord().getString("crf_oid"), getResWord().getString("versions"),
-				getResWord().getString("version_oid"), getResWord().getString("date_created"), getResWord().getString("owner"),
-				getResWord().getString("status"), getResWord().getString("download"), getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("CRF_name"), getResWord().getString("date_updated"),
+				getResWord().getString("last_updated_by"), getResWord().getString("crf_oid"),
+				getResWord().getString("versions"), getResWord().getString("version_oid"),
+				getResWord().getString("date_created"), getResWord().getString("owner"),
+				getResWord().getString("status"), getResWord().getString("download"),
+				getResWord().getString("actions")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);
@@ -184,8 +175,10 @@ public class ListCRFServlet extends RememberLastPage {
 
 		setToPanel(getResWord().getString("create_CRF"), getResPage().getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"), request);
-		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(getResWord().getString("create_CRF_version"), getResPage().getString("br_create_new_CRF_uploading"),
+				request);
+		setToPanel(getResWord().getString("revise_CRF_version"), getResPage().getString("br_if_you_owner_CRF_version"),
+				request);
 		setToPanel(getResWord().getString("CRF_spreadsheet_template"),
 				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
@@ -201,11 +194,6 @@ public class ListCRFServlet extends RememberLastPage {
 		} else {
 			return "";
 		}
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_LIST_CRFS_URL;
 	}
 
 	@Override

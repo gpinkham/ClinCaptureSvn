@@ -20,6 +20,13 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -39,12 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
@@ -54,7 +55,7 @@ import java.util.LinkedHashMap;
 public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 9116068126651934226L;
-	public static final String RULE_LIST_PAGE = "ruleListUrl";
+
 	protected final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentNewServlet.class);
 
 	@Override
@@ -76,7 +77,7 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void createStudyEventForInfoPanel(HttpServletRequest request) {
 		StudyBean currentStudy = getCurrentStudy(request);
 
@@ -182,15 +183,10 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return RULE_LIST_PAGE;
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
+				"1");
 	}
 
 	@Override
@@ -209,7 +205,8 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null ? savedUrl : savedUrl.replace("&ruleAssignments_e_=pdf", "").replace(
-				"&ruleAssignments_e_=jexcel", "");
+		return savedUrl == null
+				? savedUrl
+				: savedUrl.replace("&ruleAssignments_e_=pdf", "").replace("&ruleAssignments_e_=jexcel", "");
 	}
 }

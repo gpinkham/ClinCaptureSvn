@@ -39,6 +39,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -73,7 +74,8 @@ public class RestoreStudyEventServlet extends Controller {
 
 		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
 				+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
@@ -101,10 +103,9 @@ public class RestoreStudyEventServlet extends Controller {
 			// subject has been removed
 			Status s = studySub.getStatus();
 			if (s.isDeleted()) {
-				addPageMessage(
-						new StringBuilder("").append(getResWord().getString("study_event"))
-								.append(getResTerm().getString("could_not_be")).append(getResTerm().getString("restored"))
-								.append(".").append(getResPage().getString("study_subject_has_been_deleted")).toString(),
+				addPageMessage(new StringBuilder("").append(getResWord().getString("study_event"))
+						.append(getResTerm().getString("could_not_be")).append(getResTerm().getString("restored"))
+						.append(".").append(getResPage().getString("study_subject_has_been_deleted")).toString(),
 						request);
 				request.setAttribute("id", Integer.toString(studySubId));
 				forwardToViewStudySubjectPage(request, response);
@@ -157,8 +158,8 @@ public class RestoreStudyEventServlet extends Controller {
 
 				String emailBody = new StringBuilder("").append(getResPage().getString("the_event"))
 						.append(event.getStudyEventDefinition().getName()).append(" ")
-						.append(getResPage().getString("has_been_restored_to_the_study")).append(" ").append(study.getName())
-						.append(".").toString();
+						.append(getResPage().getString("has_been_restored_to_the_study")).append(" ")
+						.append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 				request.setAttribute("id", Integer.toString(studySubId));
@@ -172,7 +173,7 @@ public class RestoreStudyEventServlet extends Controller {
 		storePageMessages(request);
 		String id = (String) request.getAttribute("id");
 		String savedUrl = (String) request.getSession()
-				.getAttribute(ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
+				.getAttribute(RememberLastPage.getUrlKey(ViewStudySubjectServlet.class));
 		if (savedUrl != null && savedUrl.contains("id=" + id)) {
 			response.sendRedirect(savedUrl);
 		} else {

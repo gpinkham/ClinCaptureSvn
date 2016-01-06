@@ -51,7 +51,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ViewJobServlet extends RememberLastPage {
 
-	public static final String SAVED_VIEW_EXPORT_JOB_URL = "savedViewExportJobUrl";
 	public static final int DESCRIPTION_COL = 3;
 	public static final int ACTION_COL = 7;
 
@@ -63,9 +62,8 @@ public class ViewJobServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
 	}
@@ -78,8 +76,8 @@ public class ViewJobServlet extends RememberLastPage {
 		StudyBean currentStudy = getCurrentStudy(request);
 		// First we must get a reference to a scheduler
 		StdScheduler scheduler = getStdScheduler();
-		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
-				.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
+		Set<TriggerKey> triggerKeys = scheduler
+				.getTriggerKeys(GroupMatcher.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
 
 		ArrayList triggerBeans = new ArrayList();
 		for (TriggerKey triggerKey : triggerKeys) {
@@ -125,7 +123,8 @@ public class ViewJobServlet extends RememberLastPage {
 				logger.debug("setting active to TRUE for trigger: " + trigger.getKey().getName());
 			}
 			StudyBean jobStudyBean = (StudyBean) studyDao.findByPK((Integer) trigger.getJobDataMap().get("studyId"));
-			if (jobStudyBean.getId() == currentStudy.getId() || jobStudyBean.getParentStudyId() == currentStudy.getId()) {
+			if (jobStudyBean.getId() == currentStudy.getId()
+					|| jobStudyBean.getParentStudyId() == currentStudy.getId()) {
 				triggerBeans.add(triggerBean);
 			}
 		}
@@ -133,9 +132,10 @@ public class ViewJobServlet extends RememberLastPage {
 		ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
 		EntityBeanTable table = getEntityBeanTable();
-		String[] columns = { getResWord().getString("name"), getResWord().getString("previous_fire_time"),
-				getResWord().getString("next_fire_time"), getResWord().getString("description"), getResWord().getString("study"),
-				getResWord().getString("period_to_run"), getResWord().getString("dataset"), getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("name"), getResWord().getString("previous_fire_time"),
+				getResWord().getString("next_fire_time"), getResWord().getString("description"),
+				getResWord().getString("study"), getResWord().getString("period_to_run"),
+				getResWord().getString("dataset"), getResWord().getString("actions")};
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(DESCRIPTION_COL);
 		table.hideColumnLink(ACTION_COL);
@@ -146,11 +146,6 @@ public class ViewJobServlet extends RememberLastPage {
 		request.setAttribute("table", table);
 
 		forwardPage(Page.VIEW_JOB, request, response);
-	}
-
-	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return SAVED_VIEW_EXPORT_JOB_URL;
 	}
 
 	@Override

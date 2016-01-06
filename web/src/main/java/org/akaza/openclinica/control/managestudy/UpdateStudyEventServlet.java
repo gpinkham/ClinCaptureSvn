@@ -52,6 +52,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -116,7 +117,8 @@ public class UpdateStudyEventServlet extends Controller {
 
 		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + " "
 				+ getResPage().getString("change_active_study_or_contact"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 
 	}
 
@@ -126,7 +128,7 @@ public class UpdateStudyEventServlet extends Controller {
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
 		String viewStudySubjectUrl = (String) request.getSession()
-				.getAttribute(ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
+				.getAttribute(RememberLastPage.getUrlKey(ViewStudySubjectServlet.class));
 		if (viewStudySubjectUrl != null && viewStudySubjectUrl.contains("id=" + studySubjectId + "&")) {
 			response.sendRedirect(viewStudySubjectUrl);
 		} else {
@@ -187,8 +189,8 @@ public class UpdateStudyEventServlet extends Controller {
 		Status s = ssub.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
 			addPageMessage(getResWord().getString("study_event") + getResTerm().getString("could_not_be")
-					+ getResTerm().getString("updated") + "." + getResPage().getString("study_subject_has_been_deleted"),
-					request);
+					+ getResTerm().getString("updated") + "."
+					+ getResPage().getString("study_subject_has_been_deleted"), request);
 			request.setAttribute("id", Integer.toString(studySubjectId));
 			redirectToStudySubjectView(request, response, studySubjectId);
 		}
@@ -333,15 +335,15 @@ public class UpdateStudyEventServlet extends Controller {
 				if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date")
 						.equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
 					if (end.before(start)) {
-						Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-								getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
+						Validator.addError(errors, INPUT_ENDDATE_PREFIX, getResException()
+								.getString("input_provided_not_occure_after_previous_start_date_time"));
 					}
 				} else {
 					// if in same date, only check when both had time entered
 					if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
 						if (end.before(start) || end.equals(start)) {
-							Validator.addError(errors, INPUT_ENDDATE_PREFIX,
-									getResException().getString("input_provided_not_occure_after_previous_start_date_time"));
+							Validator.addError(errors, INPUT_ENDDATE_PREFIX, getResException()
+									.getString("input_provided_not_occure_after_previous_start_date_time"));
 						}
 					}
 				}

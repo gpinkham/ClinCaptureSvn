@@ -40,8 +40,6 @@ import org.springframework.stereotype.Component;
 public class AuditUserActivityServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;
-	
-	public static final String LIST_USER_AUDIT_LOGS = "listUserAuditLogsUrl"; 
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -49,9 +47,8 @@ public class AuditUserActivityServlet extends RememberLastPage {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(
-					getResPage().getString("no_have_correct_privilege_current_study")
-							+ getResPage().getString("change_study_contact_sysadmin"), request);
+			addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+					+ getResPage().getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
@@ -76,20 +73,14 @@ public class AuditUserActivityServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey(HttpServletRequest request) {
-		return LIST_USER_AUDIT_LOGS;
-	}
-
-	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String module = fp.getString("module") != null ? fp.getString("module") : "admin";
-		return "?module=" + module
-				+ "&crfId=0&maxRows=15&userLogins_tr_=true&userLogins_p_=1&userLogins_mr_=15";
+		return "?module=" + module + "&crfId=0&maxRows=15&userLogins_tr_=true&userLogins_p_=1&userLogins_mr_=15";
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-		return request.getQueryString() == null || !request.getQueryString().contains("&userLogins_p_="); 
+		return request.getQueryString() == null || !request.getQueryString().contains("&userLogins_p_=");
 	}
 }
