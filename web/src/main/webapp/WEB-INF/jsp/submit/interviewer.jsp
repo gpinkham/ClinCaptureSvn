@@ -514,6 +514,8 @@
                                        value="<c:out value="${interviewDate}" />" class="formfieldM">
                             </c:otherwise>
                         </c:choose>
+                		</span>
+						<ui:calendarIcon onClickSelector="'#interviewDate'" />
                     </c:when>
                     <c:otherwise>
                         <span class="formfieldM_BG" style="display:inline-block;height:22px;">
@@ -521,10 +523,9 @@
                                value="<c:out value="${interviewDate}" />" class="formfieldM">
                         <input type="hidden" name="interviewDate"
                                value="<c:out value="${interviewDate}" />">
+                		</span>
                     </c:otherwise>
                 </c:choose>
-                </span>
-				<ui:calendarIcon onClickSelector="'#interviewDate'" />
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                     <c:set var="isNewDNDate" value="${hasDateNote eq 'yes' ? 0 : 1}"/>
                 <c:choose>
