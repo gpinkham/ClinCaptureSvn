@@ -45,7 +45,7 @@ public final class Navigation {
 			"/RestoreCRF", "/RestoreCRFVersion", "/pages/deleteCRFVersion", "/LockCRFVersion", "/UnlockCRFVersion",
 			"/CreateSubStudy", "/RemoveCRFFromDefinition", "/RestoreCRFFromDefinition", "/AddCRFToDefinition",
 			"/AdministrativeEditing", "/pages/completeCRFDelete", "/pages/configureItemLevelSDV",
-			"/pages/deleteEventDefinition"));
+			"/pages/deleteEventDefinition", "/pages/deleteEventDefinitionCRF"));
 	// ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
