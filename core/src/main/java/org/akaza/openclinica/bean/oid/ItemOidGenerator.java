@@ -15,11 +15,16 @@ package org.akaza.openclinica.bean.oid;
 
 import javax.sql.DataSource;
 
+/**
+ * Maximum length of item.oc_oid is 40.
+ */
 public class ItemOidGenerator extends OidGenerator {
 
 	public static final String SEQ_NAME = "item_oid_id_seq";
 
-	private final int argumentLength = 2;
+	public static final int ARGUMENT_LENGTH = 2;
+	public static final int CRF_NAME_CUT_TO = 5;
+	public static final int ITEM_LABEL_CUT_TO = 24;
 
 	private DataSource dataSource;
 
@@ -40,7 +45,7 @@ public class ItemOidGenerator extends OidGenerator {
 
 	@Override
 	void verifyArgumentLength(String... keys) throws Exception {
-		if (keys.length != argumentLength) {
+		if (keys.length != ARGUMENT_LENGTH) {
 			throw new Exception();
 		}
 	}
@@ -54,8 +59,8 @@ public class ItemOidGenerator extends OidGenerator {
 		logger.info(crfName);
 		logger.info(itemLabel);
 
-		crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), 5);
-		itemLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemLabel)), 27);
+		crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), CRF_NAME_CUT_TO);
+		itemLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemLabel)), ITEM_LABEL_CUT_TO);
 
 		oid = oid + crfName + "_" + itemLabel;
 

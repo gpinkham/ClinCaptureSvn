@@ -16,13 +16,14 @@ package org.akaza.openclinica.bean.oid;
 import javax.sql.DataSource;
 
 /**
- * Maximum length of measurement_unit_oid is 40.
+ * Maximum length of measurement_unit.oc_oid is 40.
  */
 public class MeasurementUnitOidGenerator extends OidGenerator {
 
 	public static final String SEQ_NAME = "measurement_unit_oid_id_seq";
 
-	private final int argumentLength = 1;
+	public static final int CUT_TO = 32;
+	public static final int ARGUMENT_LENGTH = 1;
 
 	private DataSource dataSource;
 
@@ -43,14 +44,14 @@ public class MeasurementUnitOidGenerator extends OidGenerator {
 
 	@Override
 	void verifyArgumentLength(String... keys) throws Exception {
-		if (keys.length != argumentLength) {
+		if (keys.length != ARGUMENT_LENGTH) {
 			throw new Exception();
 		}
 	}
 
 	@Override
 	String createOid(String... keys) {
-		String oid = this.truncateToXChars("MU_" + capitalize(stripNonAlphaNumeric(keys[0])), 35);
+		String oid = this.truncateToXChars("MU_" + capitalize(stripNonAlphaNumeric(keys[0])), CUT_TO);
 
 		// If oid is made up of all special characters then
 		if (oid.equals("MU_")) {
@@ -64,11 +65,4 @@ public class MeasurementUnitOidGenerator extends OidGenerator {
 	String stripNonAlphaNumeric(String input) {
 		return input.trim().replaceAll("[^a-zA-Z_0-9]", "");
 	}
-
-	public String generateOidNoValidation(String... keys) throws Exception {
-		verifyArgumentLength(keys);
-		String oid = createOid(keys);
-		return oid;
-	}
-
 }
