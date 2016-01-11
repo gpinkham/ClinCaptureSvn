@@ -78,7 +78,7 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
-	public StudyEventDefinitionBean getInfo(@RequestParam(value = "id") int id) throws Exception {
+	public StudyEventDefinitionBean getEventDefinition(@RequestParam(value = "id") int id) throws Exception {
 		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(id), getCurrentStudy());
 	}
 

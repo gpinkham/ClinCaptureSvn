@@ -1,5 +1,6 @@
 package com.clinovo.rest.service;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -446,5 +447,64 @@ public class UserServiceTest extends BaseServiceTest {
 				.andExpect(status().isOk());
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatGetUserMethodThrowsExceptionIfYouAreTryingToRestoreUserThatDoesNotBelongToCurrentScope()
+			throws Exception {
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		String additionalUserName = newUser.getName();
+		String additionalUserPassword = newUser.getPasswd();
+		createNewStudy();
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		timestamp = new Date().getTime() + 1;
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
+				defaultStudyName);
+		this.mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRootUserCanGetInfoAboutAnyUser() throws Exception {
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		createNewStudy();
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		timestamp = new Date().getTime() + 1;
+		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, defaultStudyName);
+		this.mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatGetUserMethodDoesNotSupportHttpPost() throws Exception {
+		this.mockMvc.perform(post(API_USER).param("userName", rootUserName).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
+		this.mockMvc.perform(get(API_USER).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(get(API_USER).param("userName", "").secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
+		this.mockMvc.perform(get(API_USER).param("uSerName", "").secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatGetUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc
+				.perform(
+						get(API_USER).param("userName", "test_user").param("xparam", "1").secure(true).session(session))
+				.andExpect(status().isBadRequest());
 	}
 }

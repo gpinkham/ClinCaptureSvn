@@ -39,6 +39,21 @@ public class UserService extends BaseUserService {
 	private UserAccountService userAccountService;
 
 	/**
+	 * Method returns info about user.
+	 *
+	 * @param userName
+	 *            String
+	 * @return UserAccountBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.GET)
+	public UserAccountBean getUser(@RequestParam(value = "userName") String userName) throws Exception {
+		return getUserAccountBean(userName, false);
+	}
+
+	/**
 	 * Method that creates new study user.
 	 *
 	 * @param userName
@@ -99,7 +114,7 @@ public class UserService extends BaseUserService {
 	@ResponseBody
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public UserAccountBean removeUser(@RequestParam("userName") String userName) throws Exception {
-		return userAccountService.removeUser(getUserAccountBean(userName), getCurrentUser());
+		return userAccountService.removeUser(getUserAccountBean(userName, true), getCurrentUser());
 	}
 
 	/**
@@ -114,6 +129,6 @@ public class UserService extends BaseUserService {
 	@ResponseBody
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public UserAccountBean restoreUser(@RequestParam("userName") String userName) throws Exception {
-		return userAccountService.restoreUser(getUserAccountBean(userName), getCurrentUser());
+		return userAccountService.restoreUser(getUserAccountBean(userName, true), getCurrentUser());
 	}
 }

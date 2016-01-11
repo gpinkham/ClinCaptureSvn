@@ -42,6 +42,8 @@ import com.clinovo.validator.UserValidator;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class BaseUserService extends BaseService {
 
+	public static final String ROOT = "root";
+
 	@Autowired
 	private UserAccountService userAccountService;
 
@@ -51,19 +53,14 @@ public abstract class BaseUserService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	protected UserAccountBean getUserAccountBean(String userName) {
+	protected UserAccountBean getUserAccountBean(String userName, boolean performAnOperation) {
 		UserAccountDAO userAccountDAO = getUserAccountDAO();
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
-		if (userName.equals("root")) {
-			throw new RestException(messageSource, "rest.userservice.itIsForbiddenToPerformThisOperationOnRootUser",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (userAccountBean.getId() == 0) {
+		if (userAccountBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.userservice.userDoesNotExist",
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (userAccountBean.getId() == getUserDetails().getUserId()) {
-			throw new RestException(messageSource, "rest.userservice.itIsForbiddenToPerformThisOperationOnYourself",
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
+		}
+		if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
 			boolean allowToProceed = false;
 			List<StudyUserRoleBean> studyUserRoleBeanList = (List<StudyUserRoleBean>) userAccountDAO
 					.findAllRolesByUserName(getUserDetails().getUserName());
@@ -76,6 +73,15 @@ public abstract class BaseUserService extends BaseService {
 			if (!allowToProceed) {
 				throw new RestException(messageSource,
 						"rest.userservice.itIsForbiddenToPerformThisOperationOnUserThatDoesNotBelongToCurrentUserScope",
+						new Object[]{userName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+		}
+		if (performAnOperation) {
+			if (userName.equals(ROOT)) {
+				throw new RestException(messageSource, "rest.userservice.itIsForbiddenToPerformThisOperationOnRootUser",
+						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} else if (userAccountBean.getId() == getUserDetails().getUserId()) {
+				throw new RestException(messageSource, "rest.userservice.itIsForbiddenToPerformThisOperationOnYourself",
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
