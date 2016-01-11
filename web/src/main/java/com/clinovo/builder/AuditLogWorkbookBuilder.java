@@ -4,6 +4,7 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.AuditLogRandomization;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.RequestUtil;
+
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -15,6 +16,7 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -23,6 +25,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +34,7 @@ import java.util.List;
 /**
  * Class was created in order to move population of AuditLogWorkbook from servlet main body.
  */
+@SuppressWarnings("rawtypes")
 public class AuditLogWorkbookBuilder {
 
 	private int row;

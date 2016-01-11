@@ -17,7 +17,6 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.Locale;
 
 import com.clinovo.builder.AuditLogWorkbookBuilder;
-import com.clinovo.service.AuditLogRandomizationService;
 import com.clinovo.service.AuditLogService;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.view.Page;
@@ -39,9 +38,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 @SuppressWarnings({})
 @RunWith(PowerMockRunner.class)
