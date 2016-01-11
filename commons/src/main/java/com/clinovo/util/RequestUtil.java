@@ -17,6 +17,7 @@ package com.clinovo.util;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -94,6 +95,14 @@ public final class RequestUtil {
 			}
 		}
 		return url;
+	}
+
+	/**
+	 * Get User Account Bean From Session.
+	 * @return UserAccountBean.
+	 */
+	public static UserAccountBean getUserAccountBean() {
+		return (UserAccountBean) getRequest().getSession().getAttribute("userBean");
 	}
 
 	/**

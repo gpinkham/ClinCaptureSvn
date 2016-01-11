@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.clinovo.model.AuditLogRandomization;
 import com.clinovo.service.AuditLogRandomizationService;
+import com.clinovo.service.AuditLogService;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -42,6 +44,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditDAO;
@@ -186,11 +189,11 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 
 			// Get the list of events
 			List<StudyEventBean> events = sedao.findAllByStudySubject(studySubject);
-			addDeletedStudyEvents(studySubject, events);
+			getAuditLogService(getServletContext()).addDeletedStudyEvents(studySubject, events);
 			for (StudyEventBean studyEvent : events) {
 				// Link event CRFs
 				studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
-				addDeletedEventCrfs(studySubject, studyEvent);
+				getAuditLogService(getServletContext()).addDeletedEventCRFs(studySubject, studyEvent);
 
 				// Find deleted Event CRFs
 				List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
@@ -245,4 +248,7 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 		}
 	}
 
+	private AuditLogService getAuditLogService(ServletContext context) {
+		return (AuditLogService) SpringServletAccess.getApplicationContext(context).getBean("auditLogService");
+	}
 }

@@ -1100,7 +1100,6 @@ public class StudyBean extends AuditableEntityBean {
 	}
 
 	public boolean isSite() {
-
 		return this.parentStudyId > 0;
 	}
 

@@ -16,6 +16,9 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.Locale;
 
+import com.clinovo.builder.AuditLogWorkbookBuilder;
+import com.clinovo.service.AuditLogRandomizationService;
+import com.clinovo.service.AuditLogService;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.view.Page;
 import org.junit.Before;
@@ -37,9 +40,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.clinovo.i18n.LocaleResolver;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 @SuppressWarnings({})
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CoreResources.class, RequestContextHolder.class})
+@PrepareForTest({CoreResources.class, RequestContextHolder.class, AuditLogWorkbookBuilder.class})
 public class ExportExcelStudySubjectAuditLogServletTest {
 
 	@Mock
@@ -55,12 +61,11 @@ public class ExportExcelStudySubjectAuditLogServletTest {
 
 	private ExportExcelStudySubjectAuditLogServlet exportExcelStudySubjectAuditLogServlet;
 
-	private MockHttpSession session;
-
 	@Before
 	public void setUp() throws Exception {
 		exportExcelStudySubjectAuditLogServlet = PowerMockito.spy(new ExportExcelStudySubjectAuditLogServlet());
-		session = new MockHttpSession();
+		MockHttpSession session = new MockHttpSession();
+		AuditLogService mockedService = PowerMockito.mock(AuditLogService.class);
 		Mockito.when(request.getSession()).thenReturn(session);
 
 		Locale locale = Locale.ENGLISH;
@@ -75,6 +80,7 @@ public class ExportExcelStudySubjectAuditLogServletTest {
 
 		Mockito.when(servletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(requestDispatcher);
 		Mockito.doReturn(servletContext).when(exportExcelStudySubjectAuditLogServlet).getServletContext();
+		Mockito.doReturn(mockedService).when(exportExcelStudySubjectAuditLogServlet).getAuditLogService(servletContext);
 	}
 
 	@Test
