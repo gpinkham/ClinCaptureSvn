@@ -190,7 +190,7 @@ Scenario: 11.2 "Root" uploads CRFs
 
 Given User logs in as "Root"
 And User goes to Administer CRFs page
-When User uploads CRFs: 
+When User uploads CRFs:
 |filepath                                                |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_2.xls|
 |.\\src\\test\\resources\\eCRFs\\CRF_w_basic_fields_3.xls|
@@ -213,7 +213,7 @@ And User fills in data to create study event definition:
 |<Name>|<Description>|<Type>|<Category>|<Repeating>|<Reference Event>|<Day Schedule>|<Day Max>|<Day Min>|<Day Email>|<User Name>|
 And User clicks 'Continue' button
 And User is on Define Study Event - Select CRF(s) page
-And User selects CRFs on Define Study Event page: 
+And User selects CRFs on Define Study Event page:
 | eCRFs |
 |<eCRFs>|
 And User clicks 'Continue' button
@@ -249,7 +249,7 @@ Scenario: 13.1 "CRC" creates subject
 Given User logs in as "CRC"
 And User goes to Add Subject page
 And User fills in data on Add Subject page to create subject:
-| Study Subject ID | Person ID | Secondary ID | Date of Enrollment for Study | Gender | Date of Birth | Dynamic Group | 
+| Study Subject ID | Person ID | Secondary ID | Date of Enrollment for Study | Gender | Date of Birth | Dynamic Group |
 |<Study Subject ID>|<Person ID>|<Secondary ID>|<Date of Enrollment for Study>|<Gender>|<Date of Birth>|<Dynamic Group>|
 When User clicks 'Submit' button on Add Subject page
 Then User is on SM page
@@ -265,7 +265,7 @@ Scenario: 13.2 "CRC" creates subjects
 Given User logs in as "CRC"
 And User goes to Add Subject page
 When User creates subjects:
-|Study Subject ID|Person ID|Secondary ID|Date of Enrollment for Study|Gender|Date of Birth|Dynamic Group| 
+|Study Subject ID|Person ID|Secondary ID|Date of Enrollment for Study|Gender|Date of Birth|Dynamic Group|
 |StSubj_2        |ss_2     |            |                            |Female|04-Jul-1987  |             |
 |StSubj_3        |ss_3     |            |                            |Male  |16-Mar-1983  |             |
 |StSubj_4        |ss_4     |            |                            |Female|06-Apr-1982  |             |
@@ -334,7 +334,7 @@ Scenario: 16.2 "CRC" enters data into CRF and completes it for some subjects
 
 Given User logs in as "CRC"
 And User goes to SM page
-When User fills in, completes and saves CRF: 
+When User fills in, completes and saves CRF:
 |Study Subject ID|Event Name|CRF Name            |Mark Complete|input1(T)  |input2(T)|input3(R)|input4(T)|input5(R)|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|yes          |24-Apr-2015|17:45    |1        |some text|0        |
 |StSubj_3        |Event B   |CRF_w_basic_fields_1|yes          |21-Apr-2014|12:00    |0        |         |1        |
@@ -348,7 +348,7 @@ Scenario: 16.3 "CRC" enters data into CRFs and completes it for some subjects
 
 Given User logs in as "CRC"
 And User goes to SM page
-When User fills in, completes and saves CRF: 
+When User fills in, completes and saves CRF:
 |Study Subject ID|Event Name|CRF Name            |Mark Complete|item1                                          |item2                                          |item3           |item4                 |item5        |
 |StSubj_1        |Event B   |CRF_w_group_1       |yes          |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 21|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 22|                |                      |             |
 |StSubj_2        |Event B   |CRF_w_group_1       |yes          |IG_CRF_W_CONCOMITANTMEDICATIONS_0input35(T): 14|IG_CRF_W_CONCOMITANTMEDICATIONS_0input36(T): 15|                |                      |             |
@@ -365,21 +365,21 @@ Then User is on SM page
 
 
 Scenario: 17. "Study Monitor" performs SDV on SDV page
- 
+
 Given User logs in as "Study Monitor"
 And User goes to SDV page
-When User filters SDV table and performs SDV: 
+When User filters SDV table and performs SDV:
 |Study Subject ID|Event Name|CRF Name                                  |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1, CRF_w_group_1       |
 |StSubj_1        |Event B   |CRF_w_basic_fields_1, CRF_w_group_1       |
 |StSubj_5        |Event F   |CRF_w_group_1                             |
 |StSubj_4        |Event E   |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
- 
+
 Then CRFs are SDVed
 
 
 Scenario: 18.1 "PI" signs event
- 
+
 Given User logs in as "PI"
 And User goes to SM page
 And User calls a popup for "StSubj_2", "Event B"
@@ -391,14 +391,14 @@ Then User is on View Subject Record page
 
 
 Scenario: 18.2 "PI" signs events
- 
+
 Given User logs in as "PI"
 And User goes to SM page
-When User filters SM table and signs events: 
+When User filters SM table and signs events:
 |Study Subject ID|Event Name|
 |StSubj_1        |Event B   |
 |StSubj_4        |Event E   |
- 
+
 Then Events are signed
 
 
@@ -425,7 +425,7 @@ Scenario: 20.1 "Study Admin" creates DN in CRF
 
 Given User logs in as "Study Admin"
 And User goes to SM page
-When User creates DNs for the items from CRF: 
+When User creates DNs for the items from CRF:
 |Study Subject ID|Event Name|CRF Name            |Item  |Type      |Description|Detailed Note   |Assign to User|Email Assigned User|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|Annotation|test DN 1  |peace of text...|              |                   |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input2|Query     |test DN 2  |peace of text...|demo_pi       |                   |
@@ -438,7 +438,7 @@ Scenario: 20.2 "Study Admin" begins new thread DN in CRF
 
 Given User logs in as "Study Admin"
 And User goes to SM page
-When User creates DNs for the items from CRF: 
+When User creates DNs for the items from CRF:
 |Study Subject ID|Event Name|CRF Name            |Item  |Type      |Description         |Detailed Note   |Assign to User|Email Assigned User|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|Annotation|test new thread DN 1|peace of text...|              |                   |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|Query     |test new thread DN 2|peace of text...|demo_crc      |                   |
@@ -450,7 +450,7 @@ Scenario: 20.3 "Study Admin" updates Queries
 
 Given User logs in as "Study Admin"
 And User goes to SM page
-When User updates Query DNs for the items from CRF: 
+When User updates Query DNs for the items from CRF:
 |Study Subject ID|Event Name|CRF Name            |Item  |Parent ID|Parent Description  |Parent Detailed Note|Description                  |Detailed Note   |Resolution Status|Assign to User|Email Assigned User|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|9        |test new thread DN 2|peace of text...    |Other                        |peace of text...|Updated          |demo_crc      |                   |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input3|5        |test DN 3           |peace of text...    |Need additional clarification|peace of text...|Updated          |demo_pi       |                   |
@@ -462,7 +462,7 @@ Scenario: 20.4 "Study Admin" closes Queries
 
 Given User logs in as "Study Admin"
 And User goes to SM page
-When User closes Query DNs for the items from CRF: 
+When User closes Query DNs for the items from CRF:
 |Study Subject ID|Event Name|CRF Name            |Item  |Parent ID|Parent Description  |Parent Detailed Note|Description              |Detailed Note   |Resolution Status|Assign to User|Email Assigned User|
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input1|9        |test new thread DN 2|peace of text...    |Other                    |peace of text...|Closed           |demo_crc      |                   |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|input2|3        |test DN 2           |peace of text...    |CRF data change monitored|peace of text...|Closed           |demo_pi       |                   |
@@ -474,11 +474,11 @@ Scenario: 20.5 "CRC" enters data into completed CRF and creates RFC DN
 
 Given User logs in as "CRC"
 And User goes to SM page
-And User fills in CRF: 
+And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input1(T)  |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|27-Apr-2015|
 
-And User creates DNs in CRF: 
+And User creates DNs in CRF:
 |Item  |Type|Description            |Detailed Note   |
 |input1|RFC |Source data was missing|peace of text...|
 
@@ -491,12 +491,12 @@ Scenario: 20.6 "CRC" enters data into completed CRF, clicks 'Save' button and cr
 
 Given User logs in as "CRC"
 And User goes to SM page
-And User fills in CRF: 
+And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input2(T)  |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|13:15      |
 
 And User clicks 'Save' button
-And User creates DNs in CRF: 
+And User creates DNs in CRF:
 |Item  |Type|Description                  |Detailed Note   |
 |input2|RFC |Information was not available|peace of text...|
 
@@ -509,12 +509,12 @@ Scenario: 20.7 "CRC" enters data into CRF, clicks 'Save' button and creates FVC 
 
 Given User logs in as "CRC"
 And User goes to SM page
-And User fills in CRF: 
+And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input6(R)|input7(T)  |input8(T)|input9(R)|input11(R)|
 |StSubj_1        |Event E   |CRF_w_basic_fields_2|1        |05-Feb-2014|00:00    |1        |0         |
 
 And User clicks 'Save' button
-And User creates DNs in CRF: 
+And User creates DNs in CRF:
 |Item  |Type|Description                  |Detailed Note   |
 |input8|FVC |Information was not available|peace of text...|
 
@@ -527,7 +527,7 @@ Scenario: 20.8 "CRC" enters wrong data into CRF, clicks 'Save' button twice and 
 
 Given User logs in as "CRC"
 And User goes to SM page
-And User fills in CRF: 
+And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input6(R)|input7(T)  |input8(T)|input9(R)|input11(R)|
 |StSubj_5        |Event D   |CRF_w_basic_fields_2|1        |20-Apr-2015|00:00    |2        |0         |
 
@@ -543,12 +543,12 @@ Scenario: 20.9 "CRC" enters data into completed CRF, clicks 'Save' button and cr
 
 Given User logs in as "CRC"
 And User goes to SM page
-And User fills in CRF: 
+And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input8(T)|
 |StSubj_5        |Event E   |CRF_w_basic_fields_2|00:00    |
 
 And User clicks 'Save' button
-And User creates DNs in CRF: 
+And User creates DNs in CRF:
 |Study Subject ID|Item  |Type|Description            |Detailed Note    |
 |StSubj_5        |input8|RFC |Source data was missing|Scenario 20.9 ...|
 
@@ -557,9 +557,9 @@ Then User is on SM page
 And DNs are created
 
 
-Scenario: 20.10 "Study Admin" creates DNs for Study Event Definition 
+Scenario: 20.10 "Study Admin" creates DNs for Study Event Definition
 
-GivenStories: com.clinovo.stories/preconditions/PreconditionScenarios#{0}
+GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{0}
 
 Given User goes to SM page
 When User creates DNs for Events using popup:
@@ -570,13 +570,13 @@ When User creates DNs for Events using popup:
 |StSubj_3        |Event C   |Query     |event_dn_1 |Scenario 20.10...|Start Date |
 
 Then DNs are created
- 
+
 Examples:
 |<Collect Event Location>|<Collect Start Date>|<Collect Stop Date>|<Collect Interviewer Name>|<Collect Interview Date>|<Use autotabbing>|
 |optional                |no                  |no                 |                          |                        |                 |
 
 
-Scenario: 20.11 "Study Admin" creates DNs for Study Subject 
+Scenario: 20.11 "Study Admin" creates DNs for Study Subject
 
 Given User logs in as "Study Admin"
 And User goes to SM page
@@ -609,7 +609,7 @@ Scenario: 20.13 "Study Admin" opens, updates and closes DN on N&Ds page
 
 Given User logs in as "Study Admin"
 And User goes to N&Ds page
-When User works with DNs on NDs page: 
+When User works with DNs on NDs page:
 |Action|Study Subject ID|Event Name|CRF Name            |Entity Name  |Parent Description           |Parent Detailed Note|Description                  |Detailed Note    |Resolution Status|Assign to User|Email Assigned User|
 |View  |StSubj_3        |          |                    |Date of Birth|                             |                    |subj_dn_3                    |peace of text... |                 |              |                   |
 |Update|StSubj_1        |Event E   |CRF_w_basic_fields_2|             |Information was not available|peace of text...    |Need additional clarification|time to update...|Updated          |demo_crc      |                   |

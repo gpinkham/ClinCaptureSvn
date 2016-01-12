@@ -49,6 +49,10 @@
             <artifactId>thucydides-core</artifactId>
             <version>${thucydides.version}</version>
         </dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.jbehave</groupId>
             <artifactId>jbehave-core</artifactId>
@@ -64,6 +68,10 @@
             <artifactId>thucydides-jbehave-plugin</artifactId>
             <version>${thucydides.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>dbcp</artifactId>
+		</dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -90,6 +98,10 @@
             <version>${junit.version}</version>
             <scope>compile</scope>
         </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
     </dependencies>
 
     <build>
@@ -112,6 +124,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+					<systemProperties>
+						<property>
+							<name>testSuite</name>
+							<value>${testSuite}</value>
+						</property>
+					</systemProperties>
                     <skip>true</skip>
                 </configuration>
             </plugin>

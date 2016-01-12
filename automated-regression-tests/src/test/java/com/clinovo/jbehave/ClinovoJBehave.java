@@ -44,7 +44,7 @@ import org.jbehave.core.steps.Parameters;
 /**
  * Created by Anton on 17.07.2014.
  */
-public class ClinovoJBehave extends BaseJBehave {
+public class ClinovoJBehave {
     
     @Steps
     CommonSteps commonSteps;
