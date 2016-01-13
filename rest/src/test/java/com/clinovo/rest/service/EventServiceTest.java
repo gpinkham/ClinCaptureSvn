@@ -2066,4 +2066,72 @@ public class EventServiceTest extends BaseServiceTest {
 						.requestAttr("ruleSetService", ruleSetService).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
+
+	@Test
+	public void testThatHttpGetIsNotSupportedForDeleteSEDMethod() throws Exception {
+		this.mockMvc.perform(get(API_EVENT_DELETE).param("id", "9").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteSEDMethodDeletesStudyEventDefinitionCrfSuccessfully() throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(9);
+		studyEventDefinitionBean.setId(0);
+		studyEventDefinitionDAO.create(studyEventDefinitionBean);
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", Integer.toString(studyEventDefinitionBean.getId()))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		assertTrue(studyEventDefinitionDAO.findByPK(studyEventDefinitionBean.getId()).getId() == 0);
+	}
+
+	@Test
+	public void testThatDeleteSEDMethodThrowsExceptionIfThereAreCRFsWithData() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", "1").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteSEDIfIdParameterIsEmpty() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", "").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteSEDIfIdParameterIsMissing() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_DELETE).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteSEDIfIdParameterHasATypo() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("Id", "9").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteSEDMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", "9").param("XP", "bla").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteSEDThatDoesNotExist() throws Exception {
+		this.mockMvc
+				.perform(post(API_EVENT_DELETE).param("id", "11119").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteSEDThatIsLocked() throws Exception {
+		setStatusForSED(9, Status.LOCKED);
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", "9").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteSEDThatIsDeleted() throws Exception {
+		setStatusForSED(9, Status.DELETED);
+		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", "9").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
 }

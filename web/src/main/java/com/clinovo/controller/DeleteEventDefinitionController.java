@@ -1,7 +1,11 @@
 package com.clinovo.controller;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.RequestUtil;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -21,10 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.EventDefinitionService;
+import com.clinovo.util.RequestUtil;
 
 /**
  * Delete event definition controller.
@@ -39,11 +42,18 @@ public class DeleteEventDefinitionController {
 	@Autowired
 	private MessageSource messageSource;
 
+	@Autowired
+	private EventDefinitionService eventDefinitionService;
+
 	/**
 	 * Main get method that will open Delete Event Definition page.
-	 * @param eventId int
-	 * @param model Model
-	 * @param request HttpServletRequest
+	 * 
+	 * @param eventId
+	 *            int
+	 * @param model
+	 *            Model
+	 * @param request
+	 *            HttpServletRequest
 	 * @return String page name
 	 */
 	@RequestMapping(method = RequestMethod.GET)
@@ -57,13 +67,19 @@ public class DeleteEventDefinitionController {
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		CRFDAO crfdao = new CRFDAO(dataSource);
 
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(eventId);
-		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = eventDefinitionCRFDAO.findAllParentsByEventDefinitionId(eventId);
-		eventDefinitionCRFs = eventDefinitionCRFs == null ? new ArrayList<EventDefinitionCRFBean>() : eventDefinitionCRFs;
-		ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudyAndEventDefinitionId(studyBean, eventId);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(eventId);
+		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = eventDefinitionCRFDAO
+				.findAllParentsByEventDefinitionId(eventId);
+		eventDefinitionCRFs = eventDefinitionCRFs == null
+				? new ArrayList<EventDefinitionCRFBean>()
+				: eventDefinitionCRFs;
+		ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudyAndEventDefinitionId(studyBean,
+				eventId);
 
 		for (StudyEventBean studyEvent : studyEventBeans) {
-			StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(studyEvent.getStudySubjectId());
+			StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO
+					.findByPK(studyEvent.getStudySubjectId());
 			studyEvent.setStudySubject(studySubjectBean);
 		}
 
@@ -82,39 +98,27 @@ public class DeleteEventDefinitionController {
 
 	/**
 	 * Delete event definition.
-	 * @param eventId int
-	 * @param request HttpServletRequest
+	 * 
+	 * @param eventId
+	 *            int
+	 * @param request
+	 *            HttpServletRequest
 	 * @return page name
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
-	public String confirmDeleteEventDefinition(@RequestParam("id") int eventId, HttpServletRequest request)  {
-		String page = "redirect:/ListEventDefinition";
+	public String confirmDeleteEventDefinition(@RequestParam("id") int eventId, HttpServletRequest request) {
+		Locale locale = LocaleResolver.getLocale(request);
 		StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
-		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-		List<EventDefinitionCRFBean> eventDefinitionCRFs = eventDefinitionCRFDAO.findAllByEventDefinitionId(eventId);
-
-		if (eventDefinitionCRFs != null && eventDefinitionCRFs.size() != 0) {
-			String message = messageSource.getMessage("you_are_trying_to_delete_event_with_crfs", null, LocaleResolver.getLocale(request));
-			RequestUtil.storePageMessage(request, message);
-			return page;
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) new StudyEventDefinitionDAO(
+				dataSource).findByPK(eventId);
+		String message = messageSource.getMessage("study_event_definition_was_successfully_deleted",
+				new String[]{studyEventDefinitionBean.getName()}, locale);
+		try {
+			eventDefinitionService.deleteStudyEventDefinition(studyEventDefinitionBean, studyBean, locale);
+		} catch (Exception e) {
+			message = e.getMessage();
 		}
-
-		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-		ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudyAndEventDefinitionId(studyBean, eventId);
-
-		if (studyEventBeans != null && studyEventBeans.size() != 0) {
-			String message = messageSource.getMessage("you_are_trying_to_delete_event_definition_but_study_events_are_present",
-					null, LocaleResolver.getLocale(request));
-			RequestUtil.storePageMessage(request, message);
-			return page;
-		}
-
-		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(eventId);
-		studyEventDefinitionDAO.deleteEventDefinition(eventId);
-		String successMessage = messageSource.getMessage("study_event_definition_was_successfully_deleted", new String[]{studyEventDefinitionBean.getName()}, LocaleResolver.getLocale(request));
-		RequestUtil.storePageMessage(request, successMessage);
-
-		return page;
+		RequestUtil.storePageMessage(request, message);
+		return "redirect:/ListEventDefinition";
 	}
 }

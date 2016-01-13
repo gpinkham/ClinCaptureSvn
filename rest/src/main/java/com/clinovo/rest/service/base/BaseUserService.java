@@ -59,8 +59,7 @@ public abstract class BaseUserService extends BaseService {
 		if (userAccountBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.userservice.userDoesNotExist",
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-		if (!UserDetails.getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode())) {
+		} else if (!UserDetails.isSystemAdministrator()) {
 			boolean allowToProceed = false;
 			List<StudyUserRoleBean> studyUserRoleBeanList = (List<StudyUserRoleBean>) userAccountDAO
 					.findAllRolesByUserName(getUserDetails().getUserName());

@@ -3,6 +3,7 @@ package com.clinovo.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -233,4 +234,19 @@ public interface EventDefinitionService {
 	 *             an Exception
 	 */
 	void restoreStudyEventDefinitions(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Delete study event definition.
+	 *
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param studyBean
+	 *            StudyBean
+	 * @param locale
+	 *            Locale
+	 * @throws Exception
+	 *             an Exception.
+	 */
+	void deleteStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, StudyBean studyBean,
+			Locale locale) throws Exception;
 }

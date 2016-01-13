@@ -60,16 +60,17 @@ public abstract class BaseEventService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	private static void validateStudyEventDefinition(MessageSource messageSource, int id,
+	private static void validateStudyEventDefinition(MessageSource messageSource, int eventId,
 			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy, UserAccountDAO userAccountDao,
 			boolean editMode) throws RestException {
 		Locale locale = LocaleResolver.getLocale();
 		if (!(studyEventDefinitionBean.getId() > 0)) {
-			throw new RestException(messageSource.getMessage("rest.eventservice.isNotFound", new Object[]{id}, locale));
+			throw new RestException(
+					messageSource.getMessage("rest.eventservice.isNotFound", new Object[]{eventId}, locale));
 		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			throw new RestException(
 					messageSource.getMessage("rest.eventservice.studyEventDefinitionDoesNotBelongToCurrentScope",
-							new Object[]{id, currentStudy.getId()}, locale));
+							new Object[]{eventId, currentStudy.getId()}, locale));
 		}
 		if (editMode) {
 			prepareForValidation("name", studyEventDefinitionBean.getName());
@@ -109,10 +110,10 @@ public abstract class BaseEventService extends BaseService {
 				isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 	}
 
-	protected StudyEventDefinitionBean editStudyEventDefinition(int id, String name, String type, String description,
-			Boolean repeating, String category, Boolean isReference, Integer schDay, Integer dayMax, Integer dayMin,
-			Integer emailDay, String emailUser) throws Exception {
-		return prepareStudyEventDefinition(getStudyEventDefinition(id, true), name, type, description, repeating,
+	protected StudyEventDefinitionBean editStudyEventDefinition(int eventId, String name, String type,
+			String description, Boolean repeating, String category, Boolean isReference, Integer schDay, Integer dayMax,
+			Integer dayMin, Integer emailDay, String emailUser) throws Exception {
+		return prepareStudyEventDefinition(getStudyEventDefinition(eventId, true), name, type, description, repeating,
 				category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 	}
 
@@ -139,6 +140,17 @@ public abstract class BaseEventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
+	protected Response deleteStudyEventDefinition(int eventId) throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
+		if (!studyEventDefinitionBean.getStatus().isAvailable()) {
+			throw new RestException(messageSource,
+					"rest.eventservice.cannotPerformOperationOnSEDBecauseTheSEDIsNotAvailable");
+		}
+		eventDefinitionService.deleteStudyEventDefinition(studyEventDefinitionBean, getCurrentStudy(),
+				LocaleResolver.getLocale());
+		return new Response(String.valueOf(HttpServletResponse.SC_OK));
+	}
+
 	protected EventDefinitionCRFBean getEventDefinitionCRF(int eventId, String crfName, StudyBean studyBean)
 			throws Exception {
 		return getEventDefinitionCRF(eventId, crfName, studyBean, true);
@@ -148,7 +160,6 @@ public abstract class BaseEventService extends BaseService {
 			boolean checkAvailability) throws Exception {
 		CRFBean crfBean = (CRFBean) getCRFDAO().findByName(crfName);
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
-
 		if (crfBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.eventservice.crfNameIsNotFound", new Object[]{crfName},
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -159,10 +170,8 @@ public abstract class BaseEventService extends BaseService {
 			throw new RestException(messageSource,
 					"rest.eventservice.cannotPerformOperationOnEDCBecauseTheSEDIsNotAvailable");
 		}
-
 		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRFDAO()
 				.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventId, crfBean.getId(), studyBean.getId());
-
 		if (eventDefinitionCRFBean.getId() == 0) {
 			throw new RestException(messageSource,
 					studyBean.isSite()

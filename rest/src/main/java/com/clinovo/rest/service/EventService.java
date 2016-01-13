@@ -70,7 +70,7 @@ public class EventService extends BaseEventService {
 	/**
 	 * Method returns info about study event definition.
 	 *
-	 * @param id
+	 * @param eventId
 	 *            int
 	 * @return StudyEventDefinitionBean
 	 * @throws Exception
@@ -78,8 +78,8 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
-	public StudyEventDefinitionBean getEventDefinition(@RequestParam(value = "id") int id) throws Exception {
-		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(id), getCurrentStudy());
+	public StudyEventDefinitionBean getEventDefinition(@RequestParam(value = "id") int eventId) throws Exception {
+		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(eventId), getCurrentStudy());
 	}
 
 	/**
@@ -172,7 +172,7 @@ public class EventService extends BaseEventService {
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
-	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int id,
+	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int eventId,
 			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "type", required = false) String type,
 			@RequestParam(value = "description", required = false) String description,
@@ -184,7 +184,7 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "minDay", required = false) Integer dayMin,
 			@RequestParam(value = "emailDay", required = false) Integer emailDay,
 			@RequestParam(value = "emailUser", required = false) String emailUser) throws Exception {
-		StudyEventDefinitionBean studyEventDefinitionBean = editStudyEventDefinition(id, name, type, description,
+		StudyEventDefinitionBean studyEventDefinitionBean = editStudyEventDefinition(eventId, name, type, description,
 				repeating, category, isReference, schDay, dayMax, dayMin, emailDay, emailUser);
 
 		HashMap errors = EventDefinitionValidator.validate(configurationDao, getUserAccountDAO(), getCurrentStudy());
@@ -197,7 +197,7 @@ public class EventService extends BaseEventService {
 	/**
 	 * Method removes the study event definition.
 	 *
-	 * @param id
+	 * @param eventId
 	 *            int
 	 * @return StudyEventDefinitionBean
 	 * @throws Exception
@@ -205,14 +205,14 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
-	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int id) throws Exception {
-		return eventDefinitionService.removeStudyEventDefinition(getStudyEventDefinition(id), getCurrentUser());
+	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int eventId) throws Exception {
+		return eventDefinitionService.removeStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
 	}
 
 	/**
 	 * Method restores the study event definition.
 	 *
-	 * @param id
+	 * @param eventId
 	 *            int
 	 * @return StudyEventDefinitionBean
 	 * @throws Exception
@@ -220,8 +220,23 @@ public class EventService extends BaseEventService {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
-	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int id) throws Exception {
-		return eventDefinitionService.restoreStudyEventDefinition(getStudyEventDefinition(id), getCurrentUser());
+	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int eventId) throws Exception {
+		return eventDefinitionService.restoreStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
+	}
+
+	/**
+	 * Method deletes the study event definition.
+	 *
+	 * @param eventId
+	 *            int
+	 * @return Response
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public Response delete(@RequestParam("id") int eventId) throws Exception {
+		return deleteStudyEventDefinition(eventId);
 	}
 
 	/**

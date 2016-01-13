@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -157,6 +158,15 @@ public class UserDetails {
 	public static UserDetails getCurrentUserDetails() {
 		return (UserDetails) RequestUtil.getRequest().getSession()
 				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
+	}
+
+	/**
+	 * Method that returns true if current user is system administrator / root.
+	 *
+	 * @return boolean
+	 */
+	public static boolean isSystemAdministrator() {
+		return getCurrentUserDetails().getRoleCode().equals(Role.SYSTEM_ADMINISTRATOR.getCode());
 	}
 
 	/**

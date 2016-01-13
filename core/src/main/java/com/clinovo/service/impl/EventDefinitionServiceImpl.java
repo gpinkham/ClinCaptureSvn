@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -21,6 +22,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.model.EDCItemMetadata;
@@ -41,6 +43,9 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 
 	@Autowired
 	private DataSource dataSource;
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@Autowired
 	private EventCRFService eventCRFService;
@@ -315,6 +320,25 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		enableStudyEventDefinitions(studyBean, updater);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, StudyBean studyBean,
+			Locale locale) throws Exception {
+		List<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionCRFDAO()
+				.findAllByEventDefinitionId(studyEventDefinitionBean.getId());
+		if (eventDefinitionCRFs != null && eventDefinitionCRFs.size() != 0) {
+			throw new Exception(messageSource.getMessage("you_are_trying_to_delete_event_with_crfs", null, locale));
+		}
+		ArrayList<StudyEventBean> studyEventBeans = getStudyEventDAO().findAllByStudyAndEventDefinitionId(studyBean,
+				studyEventDefinitionBean.getId());
+		if (studyEventBeans != null && studyEventBeans.size() != 0) {
+			throw new Exception(messageSource.getMessage(
+					"you_are_trying_to_delete_event_definition_but_study_events_are_present", null, locale));
+		}
+		getStudyEventDefinitionDAO().deleteEventDefinition(studyEventDefinitionBean.getId());
+	}
+
 	private void fillEventDefinitionCrfs(StudyEventDefinitionBean studyEventDefinitionBean,
 			List<EventDefinitionCRFBean> eventDefinitionCrfs) {
 		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefinitionCrfs) {
@@ -343,11 +367,11 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		return new StudyEventDAO(dataSource);
 	}
 
-	private StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
-		return new StudyEventDefinitionDAO(dataSource);
-	}
-
 	private EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
 		return new EventDefinitionCRFDAO(dataSource);
+	}
+
+	private StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
+		return new StudyEventDefinitionDAO(dataSource);
 	}
 }
