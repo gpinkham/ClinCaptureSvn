@@ -78,6 +78,8 @@ public class CreateUserAccountServlet extends Controller {
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 
+		checkIfStudySponsor(request);
+		
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
 					getResException().getString("you_may_not_perform_administrative_functions"), "1");

@@ -71,30 +71,36 @@
 					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
+<c:if test="${userRole.id ne 10}">
 <td>
 	<c:set var="createUserBTNCaption"><fmt:message key="create_user" bundle="${resword}"/></c:set>
 	<input id="CreateUser" type="button" name="BTN_Create" value="${createUserBTNCaption}"
 		   class="${ui:getHtmlButtonCssClass(createUserBTNCaption, "")}"
 		   onclick="window.location.href=('CreateUserAccount');"/>
 </td>
+</c:if> 
 <td>
 	<c:set var="auditLoginsBTNCaption"><fmt:message key="audit_logins" bundle="${resword}"/></c:set>
 	<input id="AuditLogins" type="button" name="BTN_Audit" value="${auditLoginsBTNCaption}"
 		   class="${ui:getHtmlButtonCssClass(auditLoginsBTNCaption, "")}"
 		   onclick="window.location.href=('AuditUserActivity?restore=true');"/>
 </td>
+<c:if test="${userRole.id ne 10}">
 <td>
 	<c:set var="loginLockoutBTNCaption"><fmt:message key="login_lockout" bundle="${resword}"/></c:set>
 	<input id="LoginLockout" type="button" name="BTN_Login" value="${loginLockoutBTNCaption}"
 		   class="${ui:getHtmlButtonCssClass(loginLockoutBTNCaption, "")}"
 		   onclick="window.location.href=('Configure');"/>
 </td>
+</c:if>
+<c:if test="${userRole.id ne 10}">
 <td>
 	<c:set var="passwordPoliciesBTNCaption"><fmt:message key="password_policies" bundle="${resword}"/></c:set>
 	<input id="PasswordPolicies" type="button" name="BTN_Password" value="${passwordPoliciesBTNCaption}"
 		   class="${ui:getHtmlButtonCssClass(passwordPoliciesBTNCaption, "")}"
 		   onclick="window.location.href=('ConfigurePasswordRequirements');"/>
 </td>
+</c:if>
 </table>
 
 <script>$("#contentTable td.table_header_row:last").css("width", "200px");</script>

@@ -53,7 +53,7 @@
 			</c:when>
 			<c:otherwise>
 				<c:choose>
-				<c:when test='${currRow.bean.status.deleted}'>
+				<c:when test='${currRow.bean.status.deleted && (userRole.id ne 10)}'>
                     <c:set var="confirmQuestion">
 					  <fmt:message key="are_you_sure_you_want_to_restore" bundle="${resword}">
 					    <fmt:param value="${currRow.bean.name}"/>
@@ -70,8 +70,14 @@
 				    data-cc-userId="${currRow.bean.id}"
 				    data-cc-rowCount="${totalRoles}">	<img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
 				   	</td>
-			</c:when>
-			<c:otherwise>
+				</c:when>
+				<c:when test='${userRole.id eq 10}'>
+                    <td><a href="ViewUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
+					onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+					onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+					onclick="setAccessedObjectWithMultipleRows(this)"><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+				</c:when>
+				<c:otherwise>
 				<td><a href="ViewUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
 					onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 					onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
@@ -186,7 +192,7 @@
 				<td class="table_cell">
 					<c:if test='${!sur.status.deleted}'>
                         <c:choose>
-                            <c:when test="${sur.role.id eq 1}">
+                            <c:when test="${sur.role.id eq 1 || userRole.id eq 10}">
                                 <img name="spaceIcon" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
                                 <img name="spaceIcon" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
                             </c:when>
@@ -200,7 +206,7 @@
                             </c:otherwise>
                         </c:choose>
 					</c:if>
-					<c:if test="${not currRow.bean.status.deleted and not ((currRow.bean.name eq userBean.name) and (sur.studyId eq studyId || sur.studyId eq parentStudyId))}">
+					<c:if test="${not currRow.bean.status.deleted and not ((currRow.bean.name eq userBean.name) and (sur.studyId eq studyId || sur.studyId eq parentStudyId)) and userRole.id ne 10}">
 					<div><c:out value="${currentStudy.id}"/></div>
 						<c:choose>
 							<c:when test='${sur.status.deleted}'>
@@ -223,7 +229,6 @@
 							</c:otherwise>
 						</c:choose>
 						<c:if test="${(sur.status.deleted or (totalRoles - userRolesRemovedCountMap[currRow.bean.name]) > 1) and userBean.sysAdmin and not (sur.role.id eq 1)}">
-					
 							<c:set var="actionName">
 								<fmt:message key="delete" bundle="${resword}"/>
 							</c:set>
@@ -240,7 +245,6 @@
                         		onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                            		onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');">
                             	<img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
-                   
                     	</c:if>
                     </c:if>
 				</td>

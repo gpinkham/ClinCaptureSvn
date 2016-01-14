@@ -44,6 +44,7 @@ public class ConfigureServlet extends Controller {
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 
+		checkIfStudySponsor(request);
 		if (!ub.isSysAdmin()) {
 			addPageMessage(
 					getResPage().getString("no_have_correct_privilege_current_study")
