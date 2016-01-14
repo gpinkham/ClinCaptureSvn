@@ -16,6 +16,7 @@ import com.clinovo.pages.beans.StudyEventDefinition;
 import com.clinovo.pages.beans.StudySubject;
 import com.clinovo.pages.beans.SystemProperties;
 import com.clinovo.pages.beans.User;
+import com.clinovo.utils.Common;
 
 import net.thucydides.core.Thucydides;
 import net.thucydides.core.annotations.Step;
@@ -503,6 +504,12 @@ public class CommonSteps extends ScenarioSteps {
 		crfPage.fillInCRF(crf);
 	}
 
+	@Step
+	public void check_data_in_crf(CRF crf) {
+		assertThat(Common.checkAllTrue(crfPage.checkDataInCRF(crf))).isTrue();
+		crfPage.clickExit();
+	}
+	
 	@Step
 	public void click_save_button() {
 		crfPage.clickSaveButton();

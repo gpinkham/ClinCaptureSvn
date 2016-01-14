@@ -10,7 +10,7 @@ Lifecycle:
 After:
 Outcome: ANY
 Given User logs out
- 
+
 
 
 Scenario: 1. "Root" logs in first time
@@ -197,6 +197,7 @@ When User uploads CRFs:
 |.\\src\\test\\resources\\eCRFs\\CRF_w_file_1.xls        |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_group_1.xlsx      |
 |.\\src\\test\\resources\\eCRFs\\CRF_w_sections_1.xls    |
+|.\\src\\test\\resources\\eCRFs\\CRF_w_group_2.xls       |
 
 Then CRFs are uploaded
 
@@ -225,7 +226,7 @@ Then User is on Create Study Event Definition page
 
 Examples:
 {scope=Scenario}
-|<Name> |<Description>|<Type>     |<Category>|<Repeating>|<eCRFs>                           |
+|<Name> |<Description>|<Type>   |<Category>|<Repeating>|<eCRFs>                           |
 |Event A|             |Scheduled|          |No         |CRF_w_basic_fields_1, CRF_w_file_1|
 
 
@@ -234,12 +235,12 @@ Scenario: 12.2 "Root" creates Study Event Definitions
 Given User logs in as "Root"
 And User goes to Create Study Event Definition page
 When User creates study event definitions:
-|Name   |Description|Type     |Category|Repeating|Reference Event|Day Schedule|Day Max|Day Min|Day Email|User Name|eCRFs                                     |
-|Event B|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_1, CRF_w_group_1       |
-|Event C|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_file_1               |
-|Event D|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_sections_1    |
-|Event E|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_basic_fields_3|
-|Event F|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_sections_1           |
+|Name   |Description|Type     |Category|Repeating|Reference Event|Day Schedule|Day Max|Day Min|Day Email|User Name|eCRFs                                         |
+|Event B|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_1, CRF_w_group_1           |
+|Event C|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_file_1, CRF_w_group_2    |
+|Event D|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_sections_1        |
+|Event E|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_basic_fields_2, CRF_w_basic_fields_3    |
+|Event F|           |Scheduled|        |No       |               |            |       |       |         |         |CRF_w_group_1, CRF_w_sections_1, CRF_w_group_2|
 
 Then Study event definitions are created
 
@@ -362,6 +363,19 @@ When User fills in, completes and saves CRF:
 |StSubj_5        |Event E   |CRF_w_basic_fields_3|yes          |input31(T): 28-May-2013                        |input32(T): 11:24                              |input33(T): 23  |                      |             |
 
 Then User is on SM page
+
+
+Scenario: 16.4 "CRC" enters data into CRFs, completes it for some subjects and check all entered data
+
+Given User logs in as "CRC"
+And User goes to SM page
+When User fills in, completes and saves CRF: 
+|Study Subject ID|Event Name|CRF Name     |Section Name|Mark Complete|Add Rows|item1                           |item2                                    |item3                            |item4                            |item5                             |item6                          |item7                              |item8                           |item9                          |item10                       |item11                              |
+|StSubj_1        |Event C   |CRF_w_group_2|            |yes          |3       |IG_CRF_W_CMGROUP_0input68(T): 21|IG_CRF_W_CMGROUP_0input69(T): 21-Jan-2016|IG_CRF_W_CMGROUP_0input70(T): 100|IG_CRF_W_CMGROUP_0input71(T): 169|IG_CRF_W_CMGROUP_0input72(T): text|IG_CRF_W_CMGROUP_0input73(R): 3|IG_CRF_W_CMGROUP_0input74(C): 3,4,5|IG_CRF_W_CMGROUP_0input75(Sv): 2|IG_CRF_W_CMGROUP_0input76(C): 1|IG_CRF_W_CMGROUP_0input77(F):|IG_CRF_W_CMGROUP_0input78(Mv): 1,2,4|
+|                |          |             |            |             |        |IG_CRF_W_CMGROUP_1input68(T): 25|IG_CRF_W_CMGROUP_1input69(T): 14-Feb-2016|IG_CRF_W_CMGROUP_1input70(T): 102|IG_CRF_W_CMGROUP_1input71(T): 4  |IG_CRF_W_CMGROUP_1input72(T): ddsd|IG_CRF_W_CMGROUP_1input73(R): 2|IG_CRF_W_CMGROUP_1input74(C): 1,2,4|IG_CRF_W_CMGROUP_1input75(Sv): 3|IG_CRF_W_CMGROUP_1input76(C):  |IG_CRF_W_CMGROUP_1input77(F):|IG_CRF_W_CMGROUP_1input78(Mv): 1,3  |
+|                |          |             |            |             |        |input79(T): 11                  |input80(T): 23-Feb-2016                  |input81(T): abc                  |input82(T): 11                   |input83(T): 23-Feb-2016           |input84(R): 5                  |input85(C): 2,3,6                  |input86(Sv): 4                  |input87(C): 1                  |input88(F):                  |input89(Mv): 2,4                    |
+
+Then CRF data is saved correctly
 
 
 Scenario: 17. "Study Monitor" performs SDV on SDV page

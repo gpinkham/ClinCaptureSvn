@@ -1,5 +1,7 @@
 package com.clinovo.utils;
 
+import java.util.Map;
+
 public class Common {
 
 	public static String removeType(String str) {
@@ -9,7 +11,7 @@ public class Common {
 	
 	public static String removeOrderAndType(String str) {
 		// (1)input1(R) --> input1
-		return str.replaceAll("\\(\\d+\\)|\\(\\w\\)", "");
+		return str.replaceAll("\\(\\d+\\)|\\(\\w+\\)", "");
     }
 	
 	public static String getType(String str) {
@@ -48,5 +50,14 @@ public class Common {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static boolean checkAllTrue(Map<String, Boolean> map) {
+		boolean result = true;
+		for (String key: map.keySet()) {
+			result = result && map.get(key);
+		}
+		
+		return result;
 	}
 }

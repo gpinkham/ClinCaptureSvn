@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.clinovo.pages.AddSubjectPage;
 import com.clinovo.pages.AdministerCRFsPage;
 import com.clinovo.pages.BuildStudyPage;
@@ -609,21 +608,87 @@ public class ClinovoJBehave {
     }
     
     private void userFillsInCRFAndSavesIfNeed(ExamplesTable table, boolean saveCRF) {
-    	boolean replaceNamedParameters = true;
-    	Parameters rowParams;
-    	for (int i = 0; i < table.getRowCount(); i++) {
-    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
-    		userCallsPopupOnSM(rowParams.values().get("Study Subject ID"), rowParams.values().get("Event Name"));
-    		userClicksEnterDataButtonInPopup(rowParams.values().get("CRF Name"));
-    		rowParams.values().remove("Study Subject ID");
-    		rowParams.values().remove("Event Name");
-    		rowParams.values().remove("CRF Name");
-        	commonSteps.fill_in_crf(CRF.fillCRFFromTableRow(rowParams.values()));
-    		if (saveCRF) userClicksSaveButton();
+    	List<CRF> listWithCRFs = new ArrayList<CRF>();
+    	for (Map<String, String> map : getCorrectMapWithCRFItems(table)) {
+    		CRF crf = CRF.fillCRFFromTableRow(map);
+    		userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
+    		userClicksEnterDataButtonInPopup(crf.getCrfName());
+        	commonSteps.fill_in_crf(crf);
+    		if (saveCRF) {
+    			userClicksSaveButton();
+    			CRF.transformItemsNameFromRepeatingGroup(crf);
+    		}
+    		listWithCRFs.add(crf);
     	}
+    	Thucydides.getCurrentSession().put(CRF.CRFs_TO_CHECK_SAVED_DATA, listWithCRFs);
     }
     
-    @When("User browses file on Import Rule Data page: <filepath>")
+    @SuppressWarnings("unchecked")
+	@Then("CRF data is saved correctly")
+	public void crfDataIsSavedCorrectly() {
+    	List<CRF> crfs = (List<CRF>) Thucydides.getCurrentSession().get(CRF.CRFs_TO_CHECK_SAVED_DATA);
+    	for (CRF crf : crfs) {
+    		userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
+    		userClicksEnterDataButtonInPopup(crf.getCrfName());
+    		commonSteps.check_data_in_crf(crf);
+    	}
+    	Thucydides.getCurrentSession().remove(CRF.CRFs_TO_CHECK_SAVED_DATA);
+    }
+    
+    private List<Map<String, String>> getCorrectMapWithCRFItems(ExamplesTable table) {
+    	boolean replaceNamedParameters = true;
+    	Parameters rowParams;
+    	List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+    	Map<String, String> map = new HashMap<String, String>();
+    	String studySubjectId = "", eventName = "", crfName = "", sectionName = "";
+    	for (int i = 0; i < table.getRowCount(); i++) {
+    		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
+    		Map<String, String> values = rowParams.values();
+    		boolean next = false;
+    		if (values.containsKey("Study Subject ID") && !values.get("Study Subject ID").isEmpty()) {
+    			studySubjectId = values.get("Study Subject ID");
+    			next = true;
+    		} else {
+    			values.put("Study Subject ID", studySubjectId);
+    		}
+    		if (values.containsKey("Event Name") && !values.get("Event Name").isEmpty()) {
+    			eventName = values.get("Event Name");
+    			next = true;
+    		} else {
+    			values.put("Event Name", eventName);
+    		}
+    		if (values.containsKey("CRF Name") && !values.get("CRF Name").isEmpty()) {
+    			crfName = values.get("CRF Name");
+    			next = true;
+    		} else {
+    			values.put("CRF Name", crfName);
+    		}
+    		if (values.containsKey("Section Name") && !values.get("Section Name").isEmpty()) {
+    			sectionName = values.get("Section Name");
+    			next = true;
+    		} else {
+    			values.put("Section Name", sectionName);
+    		}
+    		if (next) {
+    			if (!map.isEmpty()) {
+    				result.add(map);
+    				map = new HashMap<String, String>(values);
+    			} else {
+    				map.putAll(values);
+    			}
+    		} else {
+    			CRF.removeValuesFromMap(values, CRF.ARRAY_OF_PARAMETERS_TO_SKIP);
+    			map.putAll(CRF.changeKeysForCRFItems(map, values));
+    		}
+    		if (i == table.getRowCount() - 1) {
+    			result.add(map);
+    		}
+    	}
+    	
+		return result;
+    }
+
+	@When("User browses file on Import Rule Data page: <filepath>")
     @Given("User browses file on Import Rule Data page: <filepath>")
 	public void userBrowsesRuleFile(@Named("filepath") String filepath) {
     	commonSteps.browse_file_with_rule(filepath);

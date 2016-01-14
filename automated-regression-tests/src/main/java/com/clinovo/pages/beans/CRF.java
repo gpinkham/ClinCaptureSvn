@@ -9,13 +9,19 @@ import java.util.regex.Pattern;
 public class CRF{
 	
 	public static final String CRFS_TO_CHECK_SDV_STATUS = "CRFs to check SDV tatus";
-
-	public static final Object CRFS_TO_CHECK_EXIST = "CRFs to check for existence";
+	public static final String CRFS_TO_CHECK_EXIST = "CRFs to check for existence";
+	public static final String CRFs_TO_CHECK_SAVED_DATA = "CRFs to check saved data";
 
 	public static ComparatorForItemOIDs comparatorForItemOIDs = new ComparatorForItemOIDs();
+	public static final String[] ARRAY_OF_PARAMETERS_TO_SKIP = new String[] {"Mark Complete", "Study Subject ID", "Event Name", "CRF Name", "Section Name", "Add Rows"};
 	
 	private String version = "";
 	private String name = "";
+	private String studySubjectID = "";
+	private String eventName = "";
+	private String crfName = "";
+	private String currentSectionName = "";
+	private String addRows = "";
 	private Map<String, String> fieldNameToValueMap;
 	private String markComplete = "no";
 
@@ -29,16 +35,31 @@ public class CRF{
 
 	public static CRF fillCRFFromTableRow(Map<String, String> values) {
 		CRF crf = new CRF();
-		if (values.containsKey("Mark Complete")) {
-			crf.setMarkComplete(values.get("Mark Complete"));
-			values.remove("Mark Complete");
-		}
+		if (values.containsKey("Mark Complete")) crf.setMarkComplete(values.get("Mark Complete"));
+	
+		if (values.containsKey("Study Subject ID")) crf.setStudySubjectID(values.get("Study Subject ID"));
+		
+		if (values.containsKey("Event Name")) crf.setEventName(values.get("Event Name"));
+		
+		if (values.containsKey("CRF Name")) crf.setCrfName(values.get("CRF Name"));
+		
+		if (values.containsKey("Section Name")) crf.setCurrentSectionName(values.get("Section Name"));
+		
+		if (values.containsKey("Add Rows")) crf.setAddRows(values.get("Add Rows"));
+		
+		removeValuesFromMap(values, ARRAY_OF_PARAMETERS_TO_SKIP);
 		
 		crf.setFieldNameToValueMap(getFieldToValueMap(values));
 		
 		return crf;
 	}
 
+	public static void removeValuesFromMap(Map<String, String> map, String[] values) {
+		for (String key: values) {
+			map.remove(key);
+		}
+	}
+	
 	private static Map<String, String> getFieldToValueMap(Map<String, String> values) {
 		if (values.containsKey("item1")) {
 			Map<String, String> parsedValues = new HashMap<String, String>();
@@ -49,8 +70,8 @@ public class CRF{
 			for (String key: values.keySet()) {
 				value = values.get(key);
 				if (value.isEmpty()) continue;
-				number = key.replace("item", "");
-				parsedValue = value.replaceFirst(".*input(\\d+)\\(\\w\\):", "").trim();
+				number = key.replaceFirst(".*item", "");
+				parsedValue = value.replaceFirst(".*input(\\d+)\\(\\w+\\):", "").trim();
 				parsedKey = value.replaceFirst(": "+parsedValue, "").trim();
 				
 				parsedValues.put("("+number+")"+parsedKey, parsedValue);
@@ -85,13 +106,91 @@ public class CRF{
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public String getStudySubjectID() {
+		return studySubjectID;
+	}
+
+	public void setStudySubjectID(String studySubjectID) {
+		this.studySubjectID = studySubjectID;
+	}
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
+	public String getCrfName() {
+		return crfName;
+	}
+
+	public void setCrfName(String crfName) {
+		this.crfName = crfName;
+	}
+
+	public String getCurrentSectionName() {
+		return currentSectionName;
+	}
+
+	public void setCurrentSectionName(String currentSectionName) {
+		this.currentSectionName = currentSectionName;
+	}
+
+	public String getAddRows() {
+		return addRows;
+	}
+
+	public void setAddRows(String addRows) {
+		this.addRows = addRows;
+	}
+
+	public static void transformItemsNameFromRepeatingGroup(CRF crf) {
+		Map<String, String> map = new HashMap<>(crf.getFieldNameToValueMap());
+		String value = "";
+		Pattern p = Pattern.compile(".+_(\\d+)input.+");
+		int b = 0;
+		for (String key: crf.getFieldNameToValueMap().keySet()) {
+			value = map.get(key);
+			Matcher m = p.matcher(key);
+			b = m.matches()? Integer.parseInt(m.group(1)) : 0;
+			if (b > 0) {
+				map.put(key.replace("_" + b + "input", "_manual" + b + "input"), value);
+				map.remove(key);
+			}
+		}
+		crf.setFieldNameToValueMap(map);
+	}
+	
+	public static Map<String, String> changeKeysForCRFItems(Map<String, String> map, Map<String, String> values) {
+    	Map<String, String> result = new HashMap<String, String>();
+    	int max = 0;
+    	Pattern p = Pattern.compile(".*item(\\d+)");
+    	for (String key: map.keySet()) {
+    		Matcher m = p.matcher(key);
+    		if (m.matches()) {
+    			int itemNumber = Integer.parseInt(m.group(1));
+    			max = max > itemNumber? max : itemNumber;
+    		}
+    	}
+    	for (String key: values.keySet()) {
+    		Matcher m = p.matcher(key);
+    		if (m.matches()) {
+    			int itemNumber = max + Integer.parseInt(m.group(1));
+    			result.put("item" + itemNumber, values.get(key));
+    		}
+    	}
+		return result;
+	}
 }
 
 class ComparatorForItemOIDs implements Comparator<String> {
 	public int compare(String str1, String str2) {
 		
 		//str = ({a})GROUP_NAME_{b}input{c}(T)
-		int a1, b1, c1, a2, b2, c2;
+		int a1, b1, c1, d1, a2, b2, c2, d2;
 		
 		Pattern p = Pattern.compile("\\((\\d+)\\).+");
 		Matcher m1 = p.matcher(str1);
@@ -105,11 +204,17 @@ class ComparatorForItemOIDs implements Comparator<String> {
 		b1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;
 		b2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
 		
-		p = Pattern.compile(".*input(\\d+).*");
+		p = Pattern.compile(".+_manual(\\d+)input.+");
 		m1 = p.matcher(str1);
 		m2 = p.matcher(str2);
 		c1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;
 		c2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
+		
+		p = Pattern.compile(".*input(\\d+).*");
+		m1 = p.matcher(str1);
+		m2 = p.matcher(str2);
+		d1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;
+		d2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
 		
 		if (a1 > a2) return 1;
 		if (a2 > a1) return -1;
@@ -117,6 +222,8 @@ class ComparatorForItemOIDs implements Comparator<String> {
 		if (b2 > b1) return -1;
 		if (c1 > c2) return 1;
 		if (c2 > c1) return -1;
+		if (d1 > d2) return 1;
+		if (d2 > d1) return -1;
 		
 		return 0;
 	}
