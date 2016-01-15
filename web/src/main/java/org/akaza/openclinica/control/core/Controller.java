@@ -2369,10 +2369,7 @@ public abstract class Controller extends BaseController {
 		return answer;
 	}
 	
-	protected void checkIfStudySponsor(HttpServletRequest request)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-
+	protected void checkIfStudySponsor(HttpServletRequest request) throws InsufficientPermissionException {
 		if (getCurrentRole(request).isStudySponsor()) {
 			throw new InsufficientPermissionException(Page.MENU,
 					getResException().getString("you_may_not_perform_administrative_functions"), "1");
