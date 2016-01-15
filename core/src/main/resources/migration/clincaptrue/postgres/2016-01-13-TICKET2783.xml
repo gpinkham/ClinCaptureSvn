@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-01" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="i_crfs_masking_study_id"/>
+            </not>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE INDEX i_crfs_masking_study_id ON crfs_masking (study_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-02" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="i_crfs_masking_study_event_definition_id"/>
+            </not>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE INDEX i_crfs_masking_study_event_definition_id ON crfs_masking (study_event_definition_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-03" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="i_crfs_masking_event_definition_crf_id"/>
+            </not>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE INDEX i_crfs_masking_event_definition_crf_id ON crfs_masking (event_definition_crf_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-04" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="i_crfs_masking_user_id"/>
+            </not>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE INDEX i_crfs_masking_user_id ON crfs_masking (user_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-05" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="i_crfs_masking_study_user_role_id"/>
+            </not>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE INDEX i_crfs_masking_study_user_role_id ON crfs_masking (study_user_role_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-06" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="i_crfs_masking_status_id"/>
+            </not>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE INDEX i_crfs_masking_status_id ON crfs_masking (status_id);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
