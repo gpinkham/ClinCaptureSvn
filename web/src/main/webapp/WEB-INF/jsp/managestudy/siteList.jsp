@@ -68,10 +68,11 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium medium_back"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+<c:if test="${userRole.id ne 10}">
 <input type="button" name="BTN_Create_Site"
 					value="<fmt:message key="create_site" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="window.location.href=('CreateSubStudy');"/>
- 
+</c:if> 
  <input id="accessAttributeName" type="hidden" value="data-cc-siteId">
 <jsp:include page="../include/footer.jsp"/>

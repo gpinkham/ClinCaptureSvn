@@ -42,7 +42,7 @@
 			onclick="setAccessedObjected(this);"><img 
 			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		</td>
-	  <c:if test="${ readOnly != 'true' }">	       
+	  <c:if test="${readOnly != 'true' && userRoleId ne 10}">	       
       <c:choose>
        <c:when test="${!currRow.bean.status.deleted and !currRow.bean.status.locked}">
           <c:if test="${!study.status.locked}">
@@ -102,4 +102,3 @@
       </table>
       </td>
    </tr>
-   
