@@ -65,7 +65,7 @@ public class ViewStudyUserServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
-		String name = request.getParameter("name");
+		String name = request.getParameter("name") == null? "" : request.getParameter("name").trim();
 		String studyIdString = request.getParameter("studyId");
 
 		if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
