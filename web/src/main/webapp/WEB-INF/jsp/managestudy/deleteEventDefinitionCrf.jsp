@@ -112,7 +112,7 @@
 			</td>
 			<c:if test="${canBeDeleted}">
 				<td>
-					<input type="submit" name="submit" id="submit" class="button_long long_submit"
+					<input type="submit" name="submit_button" id="submit_button" class="button_long long_submit"
 						   value="<fmt:message key="submit" bundle="${resword}"/>"
 						   onclick="return confirmSubmit({message:'<fmt:message bundle="${resword}" key="confirm_delete_crf_from_definition"/>',
 						   width: 500, height: 150, submit: this})">
