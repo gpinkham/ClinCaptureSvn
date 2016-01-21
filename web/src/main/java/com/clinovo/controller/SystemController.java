@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,9 @@ public class SystemController {
 
 	@Autowired
 	private MessageSource messageSource;
+
+	@Autowired
+	private OpenClinicaSchedulerFactoryBean schedulerFactoryBean;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String mainGet(HttpServletRequest request, Model model) throws Exception {
@@ -141,7 +145,7 @@ public class SystemController {
 		} else {
 			try {
 				Locale prevLocale = LocaleResolver.getLocale();
-				systemService.updateSystemProperties(systemCommand);
+				systemService.updateSystemProperties(systemCommand, schedulerFactoryBean);
 				LocaleResolver.updateSession(request, coreResources);
 				SQLInitServlet.updateParams(coreResources.getDataInfo());
 				RememberLastPage.clearLastUrls(prevLocale);

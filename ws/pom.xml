@@ -13,6 +13,7 @@
     
     <properties>
     	<main.basedir>${project.parent.basedir}</main.basedir>
+		<clincapture.ws.file.name>ClinCapture-ws-${project.version}</clincapture.ws.file.name>
     </properties>
     
     <dependencies>
@@ -194,7 +195,7 @@
 		</dependency>
 	</dependencies>
     <build>
-    	<finalName>ClinCapture-ws-${project.version}</finalName>
+    	<finalName>${clincapture.ws.file.name}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -208,6 +209,35 @@
 			</testResource>
 		</testResources>
         <plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>truezip-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>remove-applicationContext-core-scheduler.xml-from-core-jar</id>
+						<goals>
+							<goal>remove</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>target/${clincapture.ws.file.name}/WEB-INF/lib/core-${project.version}.jar/org/akaza/openclinica/</directory>
+									<includes>
+										<include>applicationContext-core-scheduler.xml</include>
+									</includes>
+								</fileset>
+								<fileset>
+									<directory>target/${clincapture.ws.file.name}.war/WEB-INF/lib/core-${project.version}.jar/org/akaza/openclinica/</directory>
+									<includes>
+										<include>applicationContext-core-scheduler.xml</include>
+									</includes>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>

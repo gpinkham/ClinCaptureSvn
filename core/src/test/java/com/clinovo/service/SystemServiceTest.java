@@ -1,15 +1,18 @@
 package com.clinovo.service;
 
-import com.clinovo.command.SystemCommand;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import com.clinovo.command.SystemCommand;
 
 public class SystemServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatUpdateSystemPropertiesWorksFine() throws Exception {
-		systemService.updateSystemProperties(new SystemCommand());
+		systemService.updateSystemProperties(new SystemCommand(), Mockito.mock(OpenClinicaSchedulerFactoryBean.class));
 	}
 
 	@Test

@@ -22,6 +22,7 @@ import com.clinovo.command.SystemCommand;
 import com.clinovo.command.SystemGroupHolder;
 import com.clinovo.model.System;
 import com.clinovo.model.SystemGroup;
+import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 
 public interface SystemService {
 
@@ -71,6 +72,9 @@ public interface SystemService {
 	 * 
 	 * @param systemCommand
 	 *            SystemCommand
+	 * @param schedulerFactoryBean
+	 *            OpenClinicaSchedulerFactoryBean
 	 */
-	void updateSystemProperties(SystemCommand systemCommand) throws Exception;
+	void updateSystemProperties(SystemCommand systemCommand, OpenClinicaSchedulerFactoryBean schedulerFactoryBean)
+			throws Exception;
 }

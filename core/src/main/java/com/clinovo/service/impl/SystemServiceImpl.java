@@ -45,17 +45,15 @@ public class SystemServiceImpl implements SystemService {
 
 	@Autowired
 	private SystemDAO systemDAO;
-	@Autowired
-	private OpenClinicaSchedulerFactoryBean schedulerFactoryBean;
 
 	@Autowired
-	private JavaMailSenderImpl mailSender;
+	private DataSource datasource;
 
 	@Autowired
 	private CoreResources coreResources;
 
 	@Autowired
-	private DataSource datasource;
+	private JavaMailSenderImpl mailSender;
 
 	public List<System> findAll() {
 		return systemDAO.findAll();
@@ -103,7 +101,7 @@ public class SystemServiceImpl implements SystemService {
 		groupHolder.setSystemProperties(systemDAO.getAllProperties(groupHolder.getGroup().getId(), role));
 		processDynamicProperties(groupHolder.getSystemProperties());
 		addGroup = !addGroup && groupHolder.getSystemProperties().size() > 0 || addGroup;
-		
+
 		return addGroup;
 	}
 
@@ -117,7 +115,8 @@ public class SystemServiceImpl implements SystemService {
 		}
 	}
 
-	public void updateSystemProperties(SystemCommand systemCommand) throws Exception {
+	public void updateSystemProperties(SystemCommand systemCommand,
+			OpenClinicaSchedulerFactoryBean schedulerFactoryBean) throws Exception {
 		FileUtil.changeLogo(systemCommand);
 
 		for (SystemGroupHolder systemGroupHolder : systemCommand.getSystemPropertyGroups()) {
@@ -126,7 +125,7 @@ public class SystemServiceImpl implements SystemService {
 					updateSystemProperty(systemCommand, systemProperty);
 				}
 			}
-			
+
 			for (com.clinovo.model.System systemProperty : systemGroupHolder.getSystemProperties()) {
 				updateSystemProperty(systemCommand, systemProperty);
 			}
