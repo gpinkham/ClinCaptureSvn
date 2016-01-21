@@ -5,6 +5,7 @@ ws/target/
 ws/.project
 ws/.settings/
 ws/.classpath
+.recommenders
 commons/.classpath
 commons/.project
 commons/.settings/
