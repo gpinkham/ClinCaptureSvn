@@ -133,7 +133,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if (shouldRedirect(request, response)) {
+		if (userViewedSameSubjectBefore(request) && shouldRedirect(request, response)) {
 			return;
 		}
 
@@ -500,5 +500,16 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			result = request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 		}
 		return result;
+	}
+
+	private boolean userViewedSameSubjectBefore(HttpServletRequest request) {
+		String id = request.getParameter("id");
+		String searchString = "?id=";
+		String savedUrl = getSavedUrl(getUrlKey(), request);
+		if (savedUrl != null && savedUrl.contains("?id=")) {
+			String savedIdString = savedUrl.substring(savedUrl.indexOf("?id=") + searchString.length());
+			return savedIdString.equals(id);
+		}
+		return true;
 	}
 }
