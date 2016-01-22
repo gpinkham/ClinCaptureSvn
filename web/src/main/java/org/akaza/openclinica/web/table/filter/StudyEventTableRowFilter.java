@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.clinovo.enums.StudyEventTableFilterMethod;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -24,6 +25,8 @@ public class StudyEventTableRowFilter extends DroplistFilterEditor {
 	private StudyBean study;
 	private DataSource dataSource;
 	private UserAccountBean user;
+	private StudyEventTableFilterMethod filterMethod;
+
 
 	private Logger log = LoggerFactory.getLogger(StudyEventTableRowFilter.class);
 
@@ -44,10 +47,29 @@ public class StudyEventTableRowFilter extends DroplistFilterEditor {
 		this.user = user;
 	}
 
+	/**
+	 * Constructor with additional filtering method.
+	 * @param dataSource DataBase connection object
+	 * @param currentStudy The current study the user is working with.
+	 * @param user The current user
+	 * @param filterMethod Additional results filtering method
+	 */
+	public StudyEventTableRowFilter(DataSource dataSource, StudyBean currentStudy, UserAccountBean user, StudyEventTableFilterMethod filterMethod) {
+		this.filterMethod = filterMethod;
+		this.dataSource = dataSource;
+		this.study = currentStudy;
+		this.user = user;
+	}
+
 	@Override
 	protected List<Option> getOptions() {
 		List<Option> options = new ArrayList<Option>();
-		List<StudyEventDefinitionBean> studyEvents = getStudyEvents();
+		List<StudyEventDefinitionBean> studyEvents;
+		if (filterMethod != null && filterMethod == StudyEventTableFilterMethod.EVALUATION) {
+			studyEvents = getStudyEventsForEvaluation();
+		} else {
+			studyEvents = getStudyEvents();
+		}
 		for (StudyEventDefinitionBean studyEvent : studyEvents) {
 			options.add(new Option(studyEvent.getName() + "", studyEvent.getName()));
 		}
@@ -67,5 +89,10 @@ public class StudyEventTableRowFilter extends DroplistFilterEditor {
 			studyEvents = studyEventDAO.findAllAvailableByStudy(study);
 		}
 		return studyEvents;
+	}
+
+	public List<StudyEventDefinitionBean> getStudyEventsForEvaluation() {
+		StudyEventDefinitionDAO studyEventDAO = new StudyEventDefinitionDAO(dataSource);
+		return studyEventDAO.findAllAvailableWithEvaluableCRFByStudy(study);
 	}
 }

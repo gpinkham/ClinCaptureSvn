@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.enums.StudyEventTableFilterMethod;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -189,7 +190,8 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 					true);
 			configureColumn(row.getColumn(EVENT_NAME),
 					messageSource.getMessage(CRF_EVALUATION_TABLE_EVENT_NAME, null, locale), null,
-					new StudyEventTableRowFilter(dataSource, currentStudy, getCurrentUserAccount()), true, false);
+					new StudyEventTableRowFilter(dataSource, currentStudy, getCurrentUserAccount()
+							, StudyEventTableFilterMethod.EVALUATION), true, false);
 		}
 		configureColumn(row.getColumn(CRF_STATUS),
 				messageSource.getMessage(CRF_EVALUATION_TABLE_CRF_STATUS, null, locale), new CRFStatusCellEditor(),
