@@ -18,7 +18,7 @@
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 		<div class="sidebar_tab_content">
-			<fmt:message key="choose_crf_instruction_key"  bundle="${resword}"/>
+			<fmt:message key="confirm_deletion_of_study_event_definition_header"  bundle="${resword}"/>.
 		</div>
 	</td>
 </tr>
@@ -33,9 +33,11 @@
 
 <h1>
 	<span class="first_level_header">
-		<fmt:message key="delete_event" bundle="${resword}"/>
+		<fmt:message key="confirm_deletion_of_study_event_definition_header" bundle="${resword}"/>
 	</span>
 </h1>
+
+<p class="alert"><fmt:message key="confirm_deletion_of_study_event_definition_sub_header" bundle="${resword}"/><br/><br/></p>
 
 <table class="table_vertical table_shadow_bottom">
 	<tr>
@@ -56,11 +58,17 @@
 	</tr>
 </table>
 
+<c:if test="${fn:length(eventDefinitionCRFs) != 0 and fn:length(studyEventBeans) == 0}">
+	<p class="alert"><br/><fmt:message bundle="${resword}" key="confirm_deletion_of_study_event_definition_msg1"/></p>
+</c:if>
+<c:if test="${fn:length(eventDefinitionCRFs) != 0 and fn:length(studyEventBeans) != 0}">
+	<p class="alert"><br/><fmt:message bundle="${resword}" key="confirm_deletion_of_study_event_definition_msg2"/></p>
+</c:if>
+
 <c:if test="${fn:length(eventDefinitionCRFs) != 0}">
 	<h1>
-		<fmt:message bundle="${resword}" key="event_CRFs"/>
+		<fmt:message bundle="${resword}" key="associated_event_definition_crfs"/>
 	</h1>
-	<p class="alert"><fmt:message bundle="${resword}" key="please_delete_all_event_crfs"/></p>
 	<table class="table_horizontal table_shadow_bottom">
 		<tr>
 			<td width="500px"><fmt:message bundle="${resword}" key="CRF_name"/></td>
@@ -89,9 +97,8 @@
 
 <c:if test="${fn:length(studyEventBeans) != 0}">
 	<h1>
-		<fmt:message bundle="${resword}" key="study_events"/>
+		<fmt:message bundle="${resword}" key="associated_subjects_study_events"/>
 	</h1>
-	<p class="alert"><fmt:message bundle="${resword}" key="please_delete_all_study_events"/></p>
 	<table class="table_horizontal table_shadow_bottom">
 		<tr>
 			<td width="500px"><fmt:message bundle="${resword}" key="subject"/></td>
@@ -133,10 +140,11 @@
 			</td>
 			<c:if test="${fn:length(eventDefinitionCRFs) == 0 && fn:length(studyEventBeans) == 0}">
 				<td>
-					<input type="submit" name="Submit"
-						   id="SubmitAndContinue" value="<fmt:message key="submit" bundle="${resword}"/>"
+					<input type="submit" name="submit_button"
+						   id="submit_button" value="<fmt:message key="submit" bundle="${resword}"/>"
 						   class="button_medium medium_submit"
-						   onClick=""/>
+						   onClick="return confirmSubmit({message:'<fmt:message bundle="${resword}" key="confirm_delete_study_event_definition"/>',
+								   width: 500, height: 150, submit: this})"/>
 				</td>
 			</c:if>
 		</tr>

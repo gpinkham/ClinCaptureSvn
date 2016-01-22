@@ -78,7 +78,8 @@ public class DefineStudyEventServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request, response);
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, getResPage().getString("current_study_locked"), request,
+				response);
 
 		if (currentStudy.getParentStudyId() > 0) {
 			addPageMessage(getResPage().getString("SED_may_only_added_top_level")
@@ -134,8 +135,6 @@ public class DefineStudyEventServlet extends Controller {
 								forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 							} else if (nextAction == 2) {
 								submitDefinition(request);
-								ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-								session.setAttribute("pageMessages", pageMessages);
 								forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 							} else {
 								submitDefinition(request);
@@ -286,9 +285,9 @@ public class DefineStudyEventServlet extends Controller {
 
 			EntityBeanTable table = getEntityBeanTable();
 			ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-			String[] columns = { getResWord().getString("CRF_name"), getResWord().getString("date_created"),
-					getResWord().getString("owner"), getResWord().getString("date_updated"), getResWord().getString("last_updated_by"),
-					getResWord().getString("selected")};
+			String[] columns = {getResWord().getString("CRF_name"), getResWord().getString("date_created"),
+					getResWord().getString("owner"), getResWord().getString("date_updated"),
+					getResWord().getString("last_updated_by"), getResWord().getString("selected")};
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(FIVE);
 			StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()

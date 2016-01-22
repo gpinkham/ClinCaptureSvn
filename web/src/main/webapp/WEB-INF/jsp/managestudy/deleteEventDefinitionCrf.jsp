@@ -21,7 +21,7 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-			<fmt:message key="choose_crf_instruction_key" bundle="${resword}"/>
+			<fmt:message key="confirm_delete_crf_from_event_definition_header" bundle="${resword}"/>.
 		</div>
 	</td>
 </tr>
@@ -36,7 +36,7 @@
 
 <h1>
 	<span class="first_level_header">
-		<fmt:message bundle="${resword}" key="delete_crf_from_definition"/>
+		<fmt:message key="confirm_delete_crf_from_event_definition_header" bundle="${resword}"/>
 	</span>
 </h1>
 
@@ -114,7 +114,7 @@
 				<td>
 					<input type="submit" name="submit_button" id="submit_button" class="button_long long_submit"
 						   value="<fmt:message key="submit" bundle="${resword}"/>"
-						   onclick="return confirmSubmit({message:'<fmt:message bundle="${resword}" key="confirm_delete_crf_from_definition"/>',
+						   onclick="return confirmSubmit({message:'<fmt:message bundle="${resword}" key="confirm_delete_crf_from_event_definition"/>',
 						   width: 500, height: 150, submit: this})">
 				</td>
 			</c:if>
