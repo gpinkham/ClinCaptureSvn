@@ -184,6 +184,10 @@
 </c:forEach>
 <!-- *JSP* submit/interviewer.jsp -->
 
+<c:if test="${study.studyParameterConfig.interviewDateRequired == 'yes' and study.studyParameterConfig.interviewDateEditable != 'true' and empty interviewDate}">
+    <c:set var="interviewDate"><cc-fmt:formatDate value="${studyEvent != null and studyEvent.dateStarted != null ? studyEvent.dateStarted : currentDated}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></c:set>
+</c:if>
+
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
 
 <c:choose>
@@ -193,7 +197,7 @@
         <div class="moreCrfInfoBlock">
             <div class="crfInfoBlock">
                 <div class="table_title_Admin">
-                    <fmt:message key="event" bundle="${resword}"/>: </b><c:out value="${toc.studyEventDefinition.name}" />
+                    <fmt:message key="event" bundle="${resword}"/>: <c:out value="${toc.studyEventDefinition.name}" />
                     (<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
                     &emsp;
 	                <c:if test="${not empty siteTitle}">
@@ -243,7 +247,7 @@
         <div class="moreCrfInfoBlock">
             <div class="crfInfoBlock">
                 <div class="table_title_Admin">
-                    <fmt:message key="event" bundle="${resword}"/>: </b><c:out value="${toc.studyEventDefinition.name}" />
+                    <fmt:message key="event" bundle="${resword}"/>: <c:out value="${toc.studyEventDefinition.name}" />
                     (<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
                     &emsp;
 	                <c:if test="${not empty siteTitle}">

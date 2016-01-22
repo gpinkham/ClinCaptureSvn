@@ -144,6 +144,7 @@ public abstract class Controller extends BaseController {
 	public final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final String CW = "cw";
+	public static final String CURRENT_DATE = "currentDate";
 	public static final String INPUT_TIME_ZONE = "timeZone";
 	public static final String CC_DATE_FORMAT = "ccDateFormat";
 	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
@@ -434,6 +435,7 @@ public abstract class Controller extends BaseController {
 	private void process(HttpServletRequest request, HttpServletResponse response)
 			throws OpenClinicaException, UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
+		request.setAttribute(CURRENT_DATE, new Date());
 		HttpSession session = request.getSession();
 		reloadUserBean(session, getUserAccountDAO());
 		String newThemeColor = CoreResources.getField("themeColor");
@@ -2368,7 +2370,7 @@ public abstract class Controller extends BaseController {
 
 		return answer;
 	}
-	
+
 	protected void checkIfStudySponsor(HttpServletRequest request) throws InsufficientPermissionException {
 		if (getCurrentRole(request).isStudySponsor()) {
 			throw new InsufficientPermissionException(Page.MENU,
