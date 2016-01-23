@@ -1603,7 +1603,7 @@ function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, re
         refreshSdvPage();
         objImage = MM_findObjInParentWin(strParentWinImageName);
         if (objImage != null) {
-            objImage.src = strParentWinImageFullPath;
+            $(objImage).attr("src", strParentWinImageFullPath);
         }
         if (window.opener.updateCRFHeader != undefined) {
             var v = strParentWinImageName.match(/_(\d*)input\d*/) || strParentWinImageName.match(/_manual(\d*)input\d*/);
