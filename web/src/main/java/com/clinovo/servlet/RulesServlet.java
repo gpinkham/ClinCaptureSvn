@@ -445,7 +445,7 @@ public class RulesServlet extends HttpServlet {
 			Pattern pattern = Pattern.compile("(\\d+)");
 			Matcher matcher = pattern.matcher(oid);
 			if (matcher.find()) {
-				oid = oid.substring(0, oid.length() - 1) + (Integer.valueOf(matcher.group(0)) + 1);
+				oid = oid.substring(0, oid.length() - matcher.group(0).length()) + (Integer.valueOf(matcher.group(0)) + 1);
 				return checkOIDAvailability(oid, oids);
 			}
 		}
