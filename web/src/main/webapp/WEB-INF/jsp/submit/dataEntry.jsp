@@ -108,6 +108,7 @@
 	<c:import url="interviewer.jsp">
 		<c:param name="hasNameNote" value="${hasNameNote}"/>
 		<c:param name="hasDateNote" value="${hasDateNote}"/>
+		<c:param name="originJSP" value="${originJSP}"/>
 	</c:import>
 	<br />
 
