@@ -1876,8 +1876,13 @@ public abstract class DataEntryServlet extends Controller {
 				String errorMessage = getResPage().getString("crf_report_was_not_sent_successfully_message");
 				String subject = MessageFormat.format(getResPage().getString("crf_report_message"), ssb.getLabel(),
 						crfBean.getName() + " " + crfVersionBean.getName());
-				sendEmailWithAttach(edcb.getEmailTo(), EmailEngine.getAdminEmail(), subject, body.toString(), true,
+				boolean emailSent = sendEmailWithAttach(edcb.getEmailTo(), EmailEngine.getAdminEmail(), subject, body.toString(), true,
 						succcesMessage, errorMessage, true, files, request);
+				if (emailSent) {
+					logger.info("Email about completion of CRF \"" + crfBean.getName() + "\" for the Subejct \""
+							+ ssb.getLabel() + "\" from the Study \"" + currentStudy.getName()
+								+ "\" has been send to \"" + edcb.getEmailTo() + "\".");
+				}
 			}
 		} catch (Exception e) {
 			logger.error("Error occurs while creating a CRF-report");
