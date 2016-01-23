@@ -238,6 +238,14 @@ public class UpdateStudySubjectServlet extends Controller {
 				discNotes);
 		v.addValidation("label", Validator.NO_BLANKS);
 
+		if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equals("yes")) {
+			v.addValidation("secondaryLabel", Validator.NO_BLANKS);
+		}
+
+		if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equals("yes")) {
+			v.addValidation("enrollmentDate", Validator.NO_BLANKS);
+		}
+
 		String eDateString = fp.getString(INPUT_ENROLLMENT_DATE);
 		if (!StringUtil.isBlank(eDateString)) {
 			v.addValidation(INPUT_ENROLLMENT_DATE, Validator.IS_A_DATE);

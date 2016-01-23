@@ -83,6 +83,7 @@
 	<c:if test="${study ne null}">
 		<c:set var="secondaryIdShow" value="${!(study.studyParameterConfig.secondaryIdRequired == 'not_used')}" />
 		<c:set var="secondaryIdLabel" value="${study.studyParameterConfig.secondaryIdLabel}" />
+		<c:set var="secondaryIdRequired" value="${study.studyParameterConfig.secondaryIdRequired == 'yes'}" />
 	</c:if>
 
 	<c:set var="enrollmentDateShow" value="${true}" />
@@ -90,6 +91,7 @@
 	<c:if test="${study ne null}">
 		<c:set var="enrollmentDateShow" value="${!(study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used')}" />
 		<c:set var="enrollmentDateLabel" value="${study.studyParameterConfig.dateOfEnrollmentForStudyLabel}" />
+		<c:set var="enrollmentDateRequired" value="${study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}" />
 	</c:if>
 
 	<form action="UpdateStudySubject" method="post">
@@ -147,6 +149,14 @@
 																					onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 																		</div>
 																	</td>
+																	<c:if test="${secondaryIdRequired}">
+																		<td>
+																			<span class="formlabel alert">*</span>
+											                            </td>
+											                        </c:if>
+																</tr>
+																<tr>
+																	<td></td><td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
 																</tr>
 															</c:if>
 
@@ -167,6 +177,9 @@
 																	</td>
 																	
 																	<td valign="top">
+																		<c:if test="${enrollmentDateRequired}">
+											                                <span class="formlabel alert">*</span>
+											                            </c:if>
 																		<ui:calendarIcon onClickSelector="'#enrollmentDateField'"/>
 																		<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 																			<c:choose>
