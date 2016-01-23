@@ -185,7 +185,7 @@
 <!-- *JSP* submit/interviewer.jsp -->
 
 <c:if test="${study.studyParameterConfig.interviewDateRequired == 'yes' and study.studyParameterConfig.interviewDateEditable != 'true' and empty interviewDate}">
-    <c:set var="interviewDate"><cc-fmt:formatDate value="${studyEvent != null and studyEvent.dateStarted != null ? studyEvent.dateStarted : currentDated}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></c:set>
+`    <c:set var="interviewDate"><cc-fmt:formatDate value="${studyEvent != null and studyEvent.dateStarted != null ? studyEvent.dateStarted : currentDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/></c:set>
 </c:if>
 
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
