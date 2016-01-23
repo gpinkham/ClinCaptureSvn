@@ -1188,7 +1188,12 @@
 	$(window).load(function() {
 		$("table > tbody  button").attr("disabled", "true");
 		$("table > tbody  input").attr("disabled", "disabled");
-		$("table > tbody a").not('[tabindex]').not('.crfShortcut').not('.closeLink').removeAttr("onclick");
+		$("table > tbody a").not('[tabindex]').not('.crfShortcut').not('.closeLink').each(function() {
+			var clickFunction = $(this).attr("onclick") + "";
+			if (clickFunction != undefined && clickFunction != "" && clickFunction.indexOf("Discrepancy") < 0) {
+				$(this).removeAttr("onclick");
+			}
+		});
 		$("table > tbody .tablebox_center select").attr("disabled", "disabled");
 		$("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
 		$("table > tbody .tablebox_center button").attr("disabled", "disabled");
