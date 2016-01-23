@@ -17,7 +17,7 @@
 			</c:if>
 			<input type="button" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
 				"button_medium medium_submit" onclick="submitCrfForm(this);"/></td>
-		<c:if test="${!dataEntryStage.isAdmin_Editing() and section.lastSection and hideSaveAndNextButton eq null }">
+		<c:if test="${!dataEntryStage.isAdmin_Editing() and section.lastSection and hideSaveAndNextButton eq null and not fromResolveDiscrepancyPage}">
 			<td>
 				<input type="button" id="snl" name="saveAndNext" value="${save_and_next_button_caption}"
 					   class="${ui:getHtmlButtonCssClass(save_and_next_button_caption, submitClassType)}" onclick="submitCrfForm(this);"/>

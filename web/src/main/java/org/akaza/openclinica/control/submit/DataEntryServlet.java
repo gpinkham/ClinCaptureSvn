@@ -20,30 +20,25 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.enums.CurrentDataEntryStage;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.EventCRFSectionBean;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DisplayItemService;
+import com.clinovo.service.EventCRFSectionService;
 import com.clinovo.service.ItemRenderMetadataService;
-
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.CrfShortcutsAnalyzer;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DataEntryRenderUtil;
+import com.clinovo.util.DataEntryUtil;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
+import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validation.DisplayItemBeanValidator;
+import com.clinovo.validator.CodedTermValidator;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -90,6 +85,7 @@ import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.control.managestudy.ResolveDiscrepancyServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
@@ -137,24 +133,26 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 
-import com.clinovo.enums.CurrentDataEntryStage;
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.EventCRFSectionBean;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.DisplayItemService;
-import com.clinovo.service.EventCRFSectionService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.util.CrfShortcutsAnalyzer;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.DataEntryRenderUtil;
-import com.clinovo.util.DataEntryUtil;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.util.ValidatorHelper;
-import com.clinovo.validation.DisplayItemBeanValidator;
-import com.clinovo.validator.CodedTermValidator;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Data Entry Servlet.
@@ -268,6 +266,7 @@ public abstract class DataEntryServlet extends Controller {
 					new FormDiscrepancyNotes());
 		}
 
+		checkIfPageIsOpenedFromResolveDiscrepancy(request);
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
 				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
 		ValidatorHelper validatorHelper = new ValidatorHelper(request, configurationDao);
@@ -1611,6 +1610,14 @@ public abstract class DataEntryServlet extends Controller {
 
 				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, ub, new DAOWrapper(getDataSource()));
 			}
+		}
+	}
+
+	private void checkIfPageIsOpenedFromResolveDiscrepancy(HttpServletRequest request) {
+		String fromResolveDiscrepancy = (String) request.getSession().getAttribute(ResolveDiscrepancyServlet.FROM_RESOLVE_DISCREPANCY_ATTR);
+		if (fromResolveDiscrepancy != null && !fromResolveDiscrepancy.isEmpty()) {
+			request.setAttribute(ResolveDiscrepancyServlet.FROM_RESOLVE_DISCREPANCY_ATTR, fromResolveDiscrepancy);
+			request.getSession().removeAttribute(ResolveDiscrepancyServlet.FROM_RESOLVE_DISCREPANCY_ATTR);
 		}
 	}
 

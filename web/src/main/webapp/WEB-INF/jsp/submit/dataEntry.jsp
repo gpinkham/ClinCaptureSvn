@@ -83,6 +83,7 @@
 
 <c:set var="save_and_next_button_caption" scope="request"><fmt:message key='save_and_next' bundle='${resword}'/></c:set>
 <c:set var="submitClassType" value="submit" scope="request"/>
+<c:set var="fromResolveDiscrepancyPage" value="${fromResolveDiscrepancy ne null and fromResolveDiscrepancy eq 'true'}" scope="request"/>
 
 
 <table width="75%">

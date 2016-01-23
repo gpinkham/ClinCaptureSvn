@@ -22,16 +22,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.util.CrfShortcutsAnalyzer;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -70,7 +61,14 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.CrfShortcutsAnalyzer;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ResolveDiscrepancyServlet that handles request when user click on "view within record"-button on "Notes &
@@ -86,6 +84,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 	public static final String TAB_ID = "tabId";
 	public static final String SECTION_ID = "sectionId";
 	public static final String FIELD = "field";
+	public static final String FROM_RESOLVE_DISCREPANCY_ATTR = "fromResolveDiscrepancy";
 
 	/**
 	 * Returns Page for forwarding.
@@ -144,6 +143,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 							|| activeStudyRole.equals(Role.INVESTIGATOR)
 							|| activeStudyRole.equals(Role.STUDY_ADMINISTRATOR) || activeStudyRole
 								.equals(Role.STUDY_EVALUATOR))) {
+				request.getSession().setAttribute(FROM_RESOLVE_DISCREPANCY_ATTR, "true");
 				if (dec.isContinueInitialDataEntryPermitted()) {
 					return Page.INITIAL_DATA_ENTRY_SERVLET;
 				} else if (dec.isStartDoubleDataEntryPermitted()) {
