@@ -860,4 +860,15 @@
             {call enable_event_crfs_by_study_event_and_crf_oid(?,?,?,?)}
         </sql>
     </query>
+    <query>
+        <name>getCRFGroupOrdinalItemsMap</name>
+        <sql>
+            SELECT igm.item_group_id AS group_id, id.ordinal AS ordinal, count(id.item_id) AS items FROM item_data id
+            LEFT JOIN event_crf ec ON ec.event_crf_id = id.event_crf_id
+            LEFT JOIN item_group_metadata igm ON igm.item_id = id.item_id AND igm.crf_version_id = ec.crf_version_id
+            WHERE id.event_crf_id = ?
+            GROUP BY igm.item_group_id, id.ordinal
+            ORDER BY igm.item_group_id, id.ordinal
+        </sql>
+    </query>
 </queries>

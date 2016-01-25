@@ -14,7 +14,10 @@
  *******************************************************************************/
 package com.clinovo.service;
 
-import com.clinovo.enums.CurrentDataEntryStage;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -24,8 +27,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.view.Page;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
+import com.clinovo.enums.CurrentDataEntryStage;
 
 /**
  * DataEntryService interface.
@@ -34,21 +36,29 @@ public interface DataEntryService {
 
 	/**
 	 * Get DisplaySectionBean.
-	 * @param hasGroup boolean
-	 * @param isSubmitted boolean
-	 * @param servletPage Page
-	 * @param request HttpServletRequest
+	 * 
+	 * @param hasGroup
+	 *            boolean
+	 * @param isSubmitted
+	 *            boolean
+	 * @param servletPage
+	 *            Page
+	 * @param request
+	 *            HttpServletRequest
 	 * @return DisplaySectionBean
-	 * @throws Exception in case if some data is corrupted.
+	 * @throws Exception
+	 *             in case if some data is corrupted.
 	 */
-	DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted,
-			Page servletPage, HttpServletRequest request) throws Exception;
+	DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted, Page servletPage,
+			HttpServletRequest request) throws Exception;
 
 	/**
 	 * Method that checks that values should be loaded from DB.
 	 *
-	 * @param dib DisplayItemBean
-	 * @param servletPage Page
+	 * @param dib
+	 *            DisplayItemBean
+	 * @param servletPage
+	 *            Page
 	 * @return boolean
 	 */
 	boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage);
@@ -56,8 +66,10 @@ public interface DataEntryService {
 	/**
 	 * Method that checks that values should be loaded from DB.
 	 *
-	 * @param dib DisplayItemBean
-	 * @param dataEntryStage DataEntryStage
+	 * @param dib
+	 *            DisplayItemBean
+	 * @param dataEntryStage
+	 *            DataEntryStage
 	 * @return boolean
 	 */
 	boolean shouldLoadDBValues(DisplayItemBean dib, CurrentDataEntryStage dataEntryStage);
@@ -65,23 +77,34 @@ public interface DataEntryService {
 	/**
 	 * Method returns list of DisplaySectionBean.
 	 *
-	 * @param allSectionBeans ArrayList<SectionBean>
-	 * @param ecb EventCRFBean
-	 * @param study StudyBean
-	 * @param servletPage Page
+	 * @param allSectionBeans
+	 *            ArrayList<SectionBean>
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param study
+	 *            StudyBean
+	 * @param servletPage
+	 *            Page
 	 * @return ArrayList<DisplaySectionBean>
-	 * @throws Exception an Exception
+	 * @throws Exception
+	 *             an Exception
 	 */
 	ArrayList<DisplaySectionBean> getAllDisplayBeans(ArrayList<SectionBean> allSectionBeans, EventCRFBean ecb,
 			StudyBean study, Page servletPage) throws Exception;
 
 	/**
-	 * Create empty Item Data for all items for which data was not saved yet.
-	 * This method is needed to create data for items in the sections that were not saved before.
-	 * @param sectionId int
-	 * @param status Status
-	 * @param user UserAccountBean
-	 * @param eventCrf EventCRFBean
+	 * Creates item data.
+	 * 
+	 * @param itemId
+	 *            int
+	 * @param ordinal
+	 *            int
+	 * @param status
+	 *            Status
+	 * @param eventCrf
+	 *            EventCRFBean
+	 * @param ub
+	 *            UserAccountBean
 	 */
-	void saveItemsWithoutItemData(int sectionId, Status status, UserAccountBean user, EventCRFBean eventCrf);
+	void createItemData(int itemId, int ordinal, Status status, EventCRFBean eventCrf, UserAccountBean ub);
 }

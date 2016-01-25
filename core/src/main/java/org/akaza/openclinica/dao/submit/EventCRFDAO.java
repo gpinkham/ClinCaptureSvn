@@ -2264,4 +2264,36 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		}
 		return al;
 	}
+
+	/**
+	 * Returns group -> ordinal -> items map for event_crf about its item data.
+	 * 
+	 * @param eventCRFId
+	 *            int
+	 * @return Map
+	 */
+	public Map<Integer, Map<Integer, Integer>> getCRFGroupOrdinalItemsMap(int eventCRFId) {
+		int index = 1;
+		unsetTypeExpected();
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index, TypeNames.INT);
+		Map<Integer, Map<Integer, Integer>> resultMap = new HashMap<Integer, Map<Integer, Integer>>();
+		HashMap variables = new HashMap();
+		variables.put(1, eventCRFId);
+		String sql = digester.getQuery("getCRFGroupOrdinalItemsMap");
+		List<Map> mapList = this.select(sql, variables);
+		for (Map map : mapList) {
+			int groupId = (Integer) map.get("group_id");
+			int ordinal = (Integer) map.get("ordinal");
+			int items = (Integer) map.get("items");
+			Map<Integer, Integer> ordinalVsItemsMap = resultMap.get(groupId);
+			if (ordinalVsItemsMap == null) {
+				ordinalVsItemsMap = new HashMap<Integer, Integer>();
+				resultMap.put(groupId, ordinalVsItemsMap);
+			}
+			ordinalVsItemsMap.put(ordinal, items);
+		}
+		return resultMap;
+	}
 }

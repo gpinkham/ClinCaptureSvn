@@ -23,7 +23,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import com.clinovo.enums.CurrentDataEntryStage;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -39,7 +38,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
@@ -51,7 +49,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -60,13 +57,14 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.clinovo.enums.CurrentDataEntryStage;
 import com.clinovo.service.DataEntryService;
 
 /**
  * Data Entry service.
  */
 @Service("dataEntryService")
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DataEntryServiceImpl implements DataEntryService {
 
 	public static final String INPUT_EVENT_CRF = "event";
@@ -84,8 +82,8 @@ public class DataEntryServiceImpl implements DataEntryService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted,
-			Page servletPage, HttpServletRequest request) throws Exception {
+	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted, Page servletPage,
+			HttpServletRequest request) throws Exception {
 
 		DisplaySectionBean section = new DisplaySectionBean();
 		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
@@ -144,8 +142,10 @@ public class DataEntryServiceImpl implements DataEntryService {
 	/**
 	 * Method that checks that DB data should be displayed.
 	 * 
-	 * @param dib DisplayItemBean
-	 * @param servletPage Page
+	 * @param dib
+	 *            DisplayItemBean
+	 * @param servletPage
+	 *            Page
 	 * @return boolean
 	 */
 	public boolean shouldLoadDBValues(DisplayItemBean dib, Page servletPage) {
@@ -329,36 +329,14 @@ public class DataEntryServiceImpl implements DataEntryService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void saveItemsWithoutItemData(int sectionId, Status status, UserAccountBean ub, EventCRFBean eventCrf) {
-		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
-		ItemDAO itemDAO = new ItemDAO(dataSource);
-		ArrayList<ItemBean> items = itemDAO.findAllBySectionId(sectionId);
-		ItemGroupMetadataDAO metadataDAO = new ItemGroupMetadataDAO(dataSource);
-		for (ItemBean item : items) {
-			ArrayList<ItemDataBean> itemData = itemDataDAO.findAllByEventCRFIdAndItemIdNoStatus(eventCrf.getId(),
-					item.getId());
-			if (itemData.size() == 0) {
-				ItemGroupMetadataBean metadata = (ItemGroupMetadataBean) metadataDAO
-						.findByItemAndCrfVersion(item.getId(), eventCrf.getCRFVersionId());
-				if (metadata.isRepeatingGroup() && metadata.getRepeatNum() > 1) {
-					for (int i = 1; i <= metadata.getRepeatNum(); i++) {
-						createItemData(i, status, item.getId(), eventCrf.getId(), ub);
-					}
-				} else  {
-					createItemData(1, status, item.getId(), eventCrf.getId(), ub);
-				}
-			}
-		}
-	}
-
-	private void createItemData(int ordinal, Status status, int itemId, int eventCRFId, UserAccountBean owner) {
+	public void createItemData(int itemId, int ordinal, Status status, EventCRFBean eventCrf, UserAccountBean ub) {
 		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
 		ItemDataBean idb = new ItemDataBean();
 		idb.setItemId(itemId);
-		idb.setEventCRFId(eventCRFId);
+		idb.setEventCRFId(eventCrf.getId());
 		idb.setCreatedDate(new Date());
 		idb.setOrdinal(ordinal);
-		idb.setOwner(owner);
+		idb.setOwner(ub);
 		if (status != null) {
 			idb.setStatus(status);
 		} else {
@@ -370,7 +348,8 @@ public class DataEntryServiceImpl implements DataEntryService {
 
 	private DynamicsMetadataService getDynamicsMetadataService() {
 		if (dynamicsMetadataService == null) {
-			dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao, dynamicsItemGroupMetadataDao, dataSource);
+			dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,
+					dynamicsItemGroupMetadataDao, dataSource);
 		}
 		return dynamicsMetadataService;
 	}
@@ -381,16 +360,17 @@ public class DataEntryServiceImpl implements DataEntryService {
 		EventDefinitionCRFDAO definitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		StudySubjectBean subject = (StudySubjectBean) subjectDAO.findByPK(eventCRFBean.getStudySubjectId());
 		StudyBean subjectStudy = (StudyBean) studydao.findByPK((subject).getStudyId());
-		return definitionCRFDAO.findByStudyEventIdAndCRFVersionId(subjectStudy, eventCRFBean.getStudyEventId(), eventCRFBean.getCRFVersionId());
+		return definitionCRFDAO.findByStudyEventIdAndCRFVersionId(subjectStudy, eventCRFBean.getStudyEventId(),
+				eventCRFBean.getCRFVersionId());
 	}
 
 	private CRFVersionBean getCRFVersionFromEventCRF(EventCRFBean eventCRFBean) {
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
-		return  (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
+		return (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
 	}
 
 	private CRFBean getCrfFromCrfVersion(CRFVersionBean crfVersionBean) {
 		CRFDAO crfdao = new CRFDAO(dataSource);
-		return  (CRFBean) crfdao.findByPK(crfVersionBean.getCrfId());
+		return (CRFBean) crfdao.findByPK(crfVersionBean.getCrfId());
 	}
 }

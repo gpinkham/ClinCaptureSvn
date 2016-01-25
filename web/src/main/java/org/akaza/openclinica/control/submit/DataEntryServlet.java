@@ -20,25 +20,28 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.enums.CurrentDataEntryStage;
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.EventCRFSectionBean;
-import com.clinovo.service.DataEntryService;
-import com.clinovo.service.DisplayItemService;
-import com.clinovo.service.EventCRFSectionService;
-import com.clinovo.service.ItemRenderMetadataService;
-import com.clinovo.service.ReportCRFService;
-import com.clinovo.util.CrfShortcutsAnalyzer;
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.DataEntryRenderUtil;
-import com.clinovo.util.DataEntryUtil;
-import com.clinovo.util.DateUtil;
-import com.clinovo.util.EmailUtil;
-import com.clinovo.util.SubjectEventStatusUtil;
-import com.clinovo.util.ValidatorHelper;
-import com.clinovo.validation.DisplayItemBeanValidator;
-import com.clinovo.validator.CodedTermValidator;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -71,6 +74,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
@@ -133,26 +137,25 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import com.clinovo.enums.CurrentDataEntryStage;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.EventCRFSectionBean;
+import com.clinovo.service.DataEntryService;
+import com.clinovo.service.DisplayItemService;
+import com.clinovo.service.EventCRFSectionService;
+import com.clinovo.service.ItemRenderMetadataService;
+import com.clinovo.service.ReportCRFService;
+import com.clinovo.util.CrfShortcutsAnalyzer;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.DataEntryRenderUtil;
+import com.clinovo.util.DataEntryUtil;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
+import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validation.DisplayItemBeanValidator;
+import com.clinovo.validator.CodedTermValidator;
 
 /**
  * Data Entry Servlet.
@@ -1456,7 +1459,6 @@ public abstract class DataEntryServlet extends Controller {
 					
 					boolean markSuccessfully = false; // if the CRF was marked
 
-
 					if (markComplete && section.isLastSection()) {
 						logger.debug("need to mark CRF as complete");
 						markSuccessfully = markCRFComplete(request);
@@ -1469,6 +1471,8 @@ public abstract class DataEntryServlet extends Controller {
 							return;
 						}
 					}
+
+					saveItemsWithoutItemDataForCompletedCRF(ecb, ub);
 
 					// send email with CRF-report
 					if (markSuccessfully && "complete".equals(edcb.getEmailStep())) {
@@ -2985,14 +2989,6 @@ public abstract class DataEntryServlet extends Controller {
 			ide = false;
 		}
 
-		// for the non-reviewed sections, no item data in DB yet, need to
-		// create them
-		if (!isEachSectionReviewedOnce(request)) {
-			if (!saveItemsToMarkComplete(newStatus, request)) {
-				addPageMessage(getResPage().getString("not_mark_CRF_complete3"), request);
-				return false;
-			}
-		}
 		ecb.setStatus(newStatus);
 		/*
 		 * Marking the data entry as signed if the corresponding EventDefinitionCRF is being enabled for electronic
@@ -3105,105 +3101,47 @@ public abstract class DataEntryServlet extends Controller {
 		return true;
 	}
 
-	/**
-	 * 06/13/2007- jxu Since we don't require users to review each section before mark a CRF as complete, we need to
-	 * create item data in the database because items will not be created unless the section which contains the items is
-	 * reviewed by users.
-	 *
-	 * @param completeStatus Status
-	 * @param request        HttpServletRequest
-	 * @return boolean
-	 */
-	private boolean saveItemsToMarkComplete(Status completeStatus, HttpServletRequest request) throws Exception {
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-		for (int i = 0; i < sections.size(); i++) {
-			SectionBean sb = (SectionBean) sections.get(i);
-			if (!isCreateItemReqd(sb, request)) {
-				getDataEntryService(getServletContext()).saveItemsWithoutItemData(sb.getId(), completeStatus, ub, ecb);
-			}
-		}
-		return true;
-	}
-
-	protected boolean isCreateItemReqd(SectionBean sb, HttpServletRequest request) {
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		DataEntryStage stage = ecb.getStage();
-
-		HashMap numItemsHM = sdao.getNumItemsBySectionId();
-		HashMap numItemsPendingHM = sdao.getNumItemsPendingBySectionId(ecb);
-		HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySection(ecb);
-		HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
-
-		Integer key = new Integer(sb.getId());
-
-		int numItems = getIntById(numItemsHM, key);
-		int numItemsPending = getIntById(numItemsPendingHM, key);
-		int numItemsCompleted = getIntById(numItemsCompletedHM, key);
-		int numItemsBlank = getIntById(numItemsBlankHM, key);
-		System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank
-				+ " num items pending " + numItemsPending + " completed " + numItemsCompleted);
-
-		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
-			if (numItemsPending == 0 && numItems > 0) {
-				System.out.println("returns false on ide loop " + key);
-				return false;
-			}
-		} else {
-			if (numItemsCompleted < numItems) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Checks if all the sections in an event crf are reviewed once tbh updated to prevent duplicates, 03/2011.
-	 *
-	 * @param request HttpServletRequest
-	 * @return boolean
-	 */
-	protected boolean isEachSectionReviewedOnce(HttpServletRequest request) {
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		DataEntryStage stage = ecb.getStage();
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-
-		ArrayList<SectionBean> sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-
-		HashMap numItemsHM = sdao.getNumItemsBySectionId();
-		HashMap numItemsPendingHM = sdao.getNumItemsPendingBySectionId(ecb);
-		HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySectionId(ecb);
-
-		for (int i = 0; i < sections.size(); i++) {
-			SectionBean sb = sections.get(i);
-			Integer key = new Integer(sb.getId());
-
-			int numItems = getIntById(numItemsHM, key);
-			int numItemsPending = getIntById(numItemsPendingHM, key);
-			int numItemsCompleted = getIntById(numItemsCompletedHM, key);
-
-			if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
-				if (numItemsPending == 0 && numItems > 0) {
-					return false;
+	private void saveItemsWithoutItemDataForCompletedCRF(EventCRFBean ecb, UserAccountBean ub) throws Exception {
+		if (ecb.getStatus().isUnavailable() && ecb.getDateCompleted() != null) {
+			Set<Integer> itemIdsInGroup;
+			ItemDataDAO itemDataDAO = getItemDataDAO();
+			Map<Integer, Set<Integer>> groupIdToItemIdsMap = new HashMap<Integer, Set<Integer>>();
+			List<ItemGroupMetadataBean> itemGroupMetadataList = getItemGroupMetadataDAO()
+					.findByCrfVersion(ecb.getCRFVersionId());
+			for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataList) {
+				itemIdsInGroup = groupIdToItemIdsMap.get(itemGroupMetadataBean.getItemGroupId());
+				if (itemIdsInGroup == null) {
+					itemIdsInGroup = new HashSet<Integer>();
+					groupIdToItemIdsMap.put(itemGroupMetadataBean.getItemGroupId(), itemIdsInGroup);
 				}
-
-			} else {
-				if (numItemsCompleted == 0 && numItems > 0) {
-					return false;
-				} else if (numItemsCompleted < numItems) {
-					return false;
+				itemIdsInGroup.add(itemGroupMetadataBean.getItemId());
+			}
+			Map<Integer, Map<Integer, Integer>> groupToOrdinalVsItemsMap = getEventCRFDAO()
+					.getCRFGroupOrdinalItemsMap(ecb.getId());
+			for (int groupId : groupIdToItemIdsMap.keySet()) {
+				itemIdsInGroup = groupIdToItemIdsMap.get(groupId);
+				if (groupToOrdinalVsItemsMap.containsKey(groupId)) {
+					Map<Integer, Integer> ordinalVsItemsMap = groupToOrdinalVsItemsMap.get(groupId);
+					for (int ordinal : ordinalVsItemsMap.keySet()) {
+						int savedCountOfItems = ordinalVsItemsMap.get(ordinal);
+						if (savedCountOfItems < itemIdsInGroup.size()) {
+							for (int itemId : itemIdsInGroup) {
+								ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(itemId,
+										ecb.getId(), ordinal);
+								if (itemDataBean.getId() == 0) {
+									getDataEntryService(getServletContext()).createItemData(itemId, ordinal,
+											Status.UNAVAILABLE, ecb, ub);
+								}
+							}
+						}
+					}
+				} else {
+					for (int itemId : itemIdsInGroup) {
+						getDataEntryService(getServletContext()).createItemData(itemId, 1, Status.UNAVAILABLE, ecb, ub);
+					}
 				}
 			}
 		}
-
-		return true;
-		// if we get this far, all sections are checked and we return a true
-		// return true;
 	}
 
 	protected void getEventDefinitionCRFBean(HttpServletRequest request) {

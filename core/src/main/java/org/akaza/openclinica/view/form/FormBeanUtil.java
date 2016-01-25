@@ -249,8 +249,9 @@ public class FormBeanUtil {
 				ordinal = itemDataBeanList.size();
 			}
 			ItemDataBean itemDataBean = itemDataBeanList == null || itemDataBeanList.size() == 0
-					? new ItemDataBean()
-					: itemDataBeanList.get(ordinal - 1).copy();
+					|| itemDataBeanList.size() < ordinal
+							? new ItemDataBean()
+							: itemDataBeanList.get(ordinal - 1).copy();
 
 			if (meta.getSectionId() == sectionId) {
 				displayBean.setItem(iBean);
