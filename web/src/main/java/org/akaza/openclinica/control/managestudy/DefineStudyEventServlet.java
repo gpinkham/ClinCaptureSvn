@@ -103,9 +103,6 @@ public class DefineStudyEventServlet extends Controller {
 
 		HttpSession session = request.getSession();
 		StudyBean currentStudy = getCurrentStudy(request);
-		FormProcessor fpr = new FormProcessor(request);
-		logger.trace("actionName*******" + fpr.getString("actionName"));
-		logger.trace("pageNum*******" + fpr.getString("pageNum"));
 		checkReferenceVisit(request);
 		String actionName = request.getParameter("actionName");
 		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");

@@ -75,7 +75,7 @@ public class ViewEventDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(getDataSource());
@@ -97,15 +97,13 @@ public class ViewEventDefinitionServlet extends Controller {
 				return;
 			}
 
-			checkRoleByUserAndStudy(request, response, ub, sed.getStudyId(), 0);
-
+			checkRoleByUserAndStudy(request, response, getUserAccountBean(request), sed.getStudyId(), 0);
 			EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(getDataSource());
-			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList<EventDefinitionCRFBean>) edao
-					.findAllByDefinition(currentStudy, defId);
+			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList<EventDefinitionCRFBean>) edao.findAllByDefinition(currentStudy, defId);
 
 			CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
 			CRFDAO cdao = new CRFDAO(getDataSource());
-
+			this.resetAddedEvents(request.getSession());
 			for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 				ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
 				edc.setVersions(versions);
@@ -122,10 +120,8 @@ public class ViewEventDefinitionServlet extends Controller {
 			}
 
 			request.setAttribute("definition", sed);
-			request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
 			request.setAttribute("defSize", eventDefinitionCRFs.size());
-			// request.setAttribute("eventDefinitionCRFs", new
-			// ArrayList(tm.values()));
+			request.setAttribute(EVENT_DEFINITION_CRFS_LABEL, eventDefinitionCRFs);
 			forwardPage(Page.VIEW_EVENT_DEFINITION, request, response);
 		}
 

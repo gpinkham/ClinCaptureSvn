@@ -103,8 +103,7 @@ public class DeleteEventDefinitionCRFController {
 	 * @return name of the page.
 	 */
 	@RequestMapping(method = RequestMethod.GET, params = "submit")
-	public String submitDeletion(HttpServletRequest request, @RequestParam("id") int edcId,
-			@RequestParam("edId") int eventDefinitionId) {
+	public String submitDeletion(HttpServletRequest request, @RequestParam("id") int edcId, @RequestParam("edId") int eventDefinitionId) {
 		String page = "redirect:/InitUpdateEventDefinition?id=" + eventDefinitionId;
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(edcId);

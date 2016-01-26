@@ -20,7 +20,14 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.SignStateRestorer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -38,12 +45,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.util.SignStateRestorer;
 
 /**
  * Prepares to update study event definition.
@@ -51,8 +53,8 @@ import java.util.Map;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "serial"})
 @Component
+@SuppressWarnings({"rawtypes", "serial"})
 public class InitUpdateEventDefinitionServlet extends Controller {
 
 	/**
@@ -113,9 +115,10 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		HttpSession session = request.getSession();
 		String idString = request.getParameter("id");
 		if (request.getParameter("init") != null || idString != null) {
-			UpdateEventDefinitionServlet.clearSession(request.getSession());
+			UpdateEventDefinitionServlet.clearSession(session);
 		}
 		StudyBean currentStudy = getCurrentStudy(request);
 		setUserNameInsteadEmail(request);
@@ -136,31 +139,19 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 				return;
 			}
 
-			List<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionService()
-					.getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
+			Map<Integer, SignStateRestorer> signStateRestorerMap = getEventDefinitionService().prepareSignStateRestorer(studyEventDefinitionBean);
+			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService().getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
+			List<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionService().getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
 
-			// Get list of child EventDefinitionCRFs for cascading actions
-			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService()
-					.getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
-			HashMap<Integer, Integer> edcSDVMap = EventDefinitionCRFUtil.getEDCSDVMap(eventDefinitionCRFs);
-
-			Map<Integer, SignStateRestorer> signStateRestorerMap = getEventDefinitionService()
-					.prepareSignStateRestorer(studyEventDefinitionBean);
-
-			request.getSession().setAttribute("definition", studyEventDefinitionBean);
-			request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-			request.getSession().setAttribute("oldEventDefinitionCRFs",
-					EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
-			request.getSession().setAttribute("edcSDVMap", edcSDVMap);
-			// store child list to session
-			request.getSession().setAttribute("childEventDefCRFs", childEventDefCRFs);
-			// changed above to new list because static, in-place updating is updating all EDCs
-
-			request.getSession().setAttribute("signStateRestorerMap", signStateRestorerMap);
+			session.setAttribute("definition", studyEventDefinitionBean);
+			session.setAttribute("childEventDefCRFs", childEventDefCRFs);
+			session.setAttribute("signStateRestorerMap", signStateRestorerMap);
+			session.setAttribute("edcSDVMap", EventDefinitionCRFUtil.getEDCSDVMap(eventDefinitionCRFs));
+			session.setAttribute("oldEventDefinitionCRFs", EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
+			session.setAttribute(EVENT_DEFINITION_CRFS_LABEL, mergeEventDefinitions(session, eventDefinitionCRFs));
 
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
-
 	}
 
 	private void setUserNameInsteadEmail(HttpServletRequest request) {
@@ -171,10 +162,10 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 		int userId = sedBean.getUserEmailId();
 		UserAccountDAO uadao = getUserAccountDAO();
 		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(userId);
-		if (userBean.getName() != null) {
-			request.getSession().setAttribute("userNameInsteadEmail", userBean.getName());
-		} else {
-			request.getSession().setAttribute("userNameInsteadEmail", getResException().getString("not_found_in_the_db"));
-		}
+		request.getSession().setAttribute("userNameInsteadEmail", setUserEmail(userBean));
+	}
+
+	private String setUserEmail(UserAccountBean userBean) {
+		return userBean.getName() != null ? userBean.getName() : getResException().getString("not_found_in_the_db");
 	}
 }

@@ -144,6 +144,7 @@ public abstract class Controller extends BaseController {
 	public final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final String CW = "cw";
+	public static final int MONTH_IN_SECONDS = 2592000;
 	public static final String CURRENT_DATE = "currentDate";
 	public static final String INPUT_TIME_ZONE = "timeZone";
 	public static final String CC_DATE_FORMAT = "ccDateFormat";
@@ -165,7 +166,8 @@ public abstract class Controller extends BaseController {
 	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String COOKIE_NAME = "lastAccessedInstanceType";
 
-	public static final int MONTH_IN_SECONDS = 2592000;
+	protected final static String EVENT_DEFINITION_CRFS_LABEL = "eventDefinitionCRFs";
+	protected static final String ADDED_EVENT_DEFINITION_CRFS_LABEL = "addedEventDefinitionCRFs";
 
 	/**
 	 * Check if user have access for data review.
@@ -2376,5 +2378,50 @@ public abstract class Controller extends BaseController {
 			throw new InsufficientPermissionException(Page.MENU,
 					getResException().getString("you_may_not_perform_administrative_functions"), "1");
 		}
+	}
+
+	protected boolean existsInList(List<EventDefinitionCRFBean> crfs, EventDefinitionCRFBean crf) {
+		for (EventDefinitionCRFBean existingCRF : crfs) {
+			if (existingCRF.getCrfName().equals(crf.getCrfName()))
+				return true;
+		}
+		return false;
+	}
+
+	protected void resetAddedEvents(HttpSession session) {
+		session.setAttribute(ADDED_EVENT_DEFINITION_CRFS_LABEL, new ArrayList<EventDefinitionCRFBean>());
+	}
+
+	protected ArrayList<EventDefinitionCRFBean> getAddedEventDefinitionCRFs(HttpSession session) {
+		ArrayList<EventDefinitionCRFBean> eventCRFs = (ArrayList<EventDefinitionCRFBean>) session.getAttribute(ADDED_EVENT_DEFINITION_CRFS_LABEL);
+		if (eventCRFs == null)
+			eventCRFs = new ArrayList<EventDefinitionCRFBean>();
+		return eventCRFs;
+	}
+
+	protected ArrayList<EventDefinitionCRFBean> getExistingEventDefinitionCRFs(HttpSession session) {
+		ArrayList<EventDefinitionCRFBean> eventCRFs = (ArrayList<EventDefinitionCRFBean>) session.getAttribute(EVENT_DEFINITION_CRFS_LABEL);
+		if (eventCRFs == null)
+			eventCRFs = new ArrayList<EventDefinitionCRFBean>();
+		return eventCRFs;
+	}
+
+	protected List<EventDefinitionCRFBean> mergeEventDefinitions(HttpSession session, List<EventDefinitionCRFBean> crfs) {
+		if (this.getAddedEventDefinitionCRFs(session).size() > 0) {
+			List<EventDefinitionCRFBean> addedCrfs = getAddedEventDefinitionCRFs(session);
+			for (EventDefinitionCRFBean crf : addedCrfs) {
+				if (!existsInList(crfs, crf))
+					crfs.add(crf);
+			}
+			session.setAttribute(EVENT_DEFINITION_CRFS_LABEL, crfs);
+		}
+		return crfs;
+	}
+
+	protected ArrayList<EventDefinitionCRFBean> processEventDefinitionCRFs(HttpSession session, EventDefinitionCRFBean crf) {
+		ArrayList<EventDefinitionCRFBean> crfs = getAddedEventDefinitionCRFs(session);
+		if (existsInList(crfs, crf))
+			crfs.remove(crf);
+		return crfs;
 	}
 }

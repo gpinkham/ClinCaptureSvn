@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -71,33 +72,31 @@ public class RemoveCRFFromDefinitionServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) request.getSession()
-				.getAttribute("eventDefinitionCRFs");
-		ArrayList<EventDefinitionCRFBean> childEdcs = (ArrayList<EventDefinitionCRFBean>) request.getSession()
-				.getAttribute("childEventDefCRFs");
-		ArrayList updatedEdcs = new ArrayList();
+		HttpSession session = request.getSession();
 		String idString = request.getParameter("id");
-		logger.info("crf id:" + idString);
+		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = getExistingEventDefinitionCRFs(session);
+		ArrayList<EventDefinitionCRFBean> updateEventDefinitionCRFs = new ArrayList<EventDefinitionCRFBean>();
+		ArrayList<EventDefinitionCRFBean> childEdcs = (ArrayList<EventDefinitionCRFBean>) session.getAttribute("childEventDefCRFs");
 		if (StringUtil.isBlank(idString)) {
 			addPageMessage(getResPage().getString("please_choose_a_crf_to_remove"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		} else {
 			// crf id
 			int id = Integer.valueOf(idString.trim());
-			for (EventDefinitionCRFBean edc : edcs) {
+			for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 				// Set edc status to deleted. Also make sure its child rows are also updated
 				if (edc.getCrfId() == id) {
 					edc.setStatus(Status.DELETED);
 					// Update children if any
 					setChildEdcsToRemoved(childEdcs, edc);
+					this.processEventDefinitionCRFs(session, edc);
 				}
 				if (edc.getId() > 0 || !edc.getStatus().equals(Status.DELETED)) {
-					updatedEdcs.add(edc);
-					logger.info("\nversion:" + edc.getDefaultVersionId());
+					updateEventDefinitionCRFs.add(edc);
 				}
 			}
-			request.getSession().setAttribute("eventDefinitionCRFs", updatedEdcs);
-			request.getSession().setAttribute("childEventDefCRFs", childEdcs);
+			session.setAttribute("childEventDefCRFs", childEdcs);
+			session.setAttribute(EVENT_DEFINITION_CRFS_LABEL, mergeEventDefinitions(session, updateEventDefinitionCRFs));
 			addPageMessage(getResPage().getString("has_been_removed_need_confirmation"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}

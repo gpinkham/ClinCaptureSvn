@@ -52,7 +52,7 @@ import org.akaza.openclinica.web.bean.StudyEventDefinitionRow;
 import org.springframework.stereotype.Component;
 
 /**
- * Processes user reuqest to generate study event definition list.
+ * Processes user request to generate study event definition list.
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 @Component
@@ -67,8 +67,7 @@ public class ListEventDefinitionServlet extends Controller {
 	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -100,16 +99,16 @@ public class ListEventDefinitionServlet extends Controller {
 	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		StudyBean currentStudy = getCurrentStudy(request);
-
-		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
-		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-		CRFDAO crfDao = getCRFDAO();
-		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
-		ArrayList seds = edao.findAllByStudy(currentStudy);
 		
+		CRFDAO crfDao = getCRFDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
-		for (Object sed1 : seds) {
+		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
+		StudyBean currentStudy = getCurrentStudy(request);
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
+		ArrayList studyEventDefinitions = edao.findAllByStudy(currentStudy);
+		this.resetAddedEvents(request.getSession());
+		for (Object sed1 : studyEventDefinitions) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
 			Collection eventDefinitionCRFlist = edcdao.findAllParentsByDefinition(sed.getId());
 			Map crfWithDefaultVersion = new LinkedHashMap();
@@ -135,7 +134,7 @@ public class ListEventDefinitionServlet extends Controller {
 		}
 
 		EntityBeanTable table = getEntityBeanTable();
-		ArrayList allStudyRows = StudyEventDefinitionRow.generateRowsFromBeans(seds);
+		ArrayList allStudyRows = StudyEventDefinitionRow.generateRowsFromBeans(studyEventDefinitions);
 
 		String[] columns = { getResWord().getString("order"), getResWord().getString("name"), getResWord().getString("OID"),
 				getResWord().getString("repeating"), getResWord().getString("type"), getResWord().getString("category"),
@@ -163,7 +162,7 @@ public class ListEventDefinitionServlet extends Controller {
 
 		request.setAttribute("isAnyCalendaredEventExist", edao.isAnyCalendaredEventExist(currentStudy.getId()));
 		request.setAttribute("table", table);
-		request.setAttribute("defSize", seds.size());
+		request.setAttribute("defSize", studyEventDefinitions.size());
 
 		if (request.getParameter("read") != null && request.getParameter("read").equals("true")) {
 			request.setAttribute("readOnly", true);

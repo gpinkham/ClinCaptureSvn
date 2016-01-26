@@ -20,10 +20,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.model.EDCItemMetadata;
-import com.clinovo.util.RequestUtil;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.validator.EventDefinitionValidator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -42,13 +47,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.clinovo.model.EDCItemMetadata;
+import com.clinovo.util.RequestUtil;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.validator.EventDefinitionValidator;
 
 /**
  * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
@@ -59,8 +61,8 @@ import java.util.Map;
 @Component
 public class UpdateEventDefinitionServlet extends Controller {
 
-	public static final int VALIDATION_MAX_CHARACTERS_NUMBER = 2000;
 	public static final int VALIDATION_MAX_DIGIT_NUMBER = 3;
+	public static final int VALIDATION_MAX_CHARACTERS_NUMBER = 2000;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -160,23 +162,20 @@ public class UpdateEventDefinitionServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean updater = getUserAccountBean(request);
 		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request.getSession()
-				.getAttribute("eventDefinitionCRFs");
+				.getAttribute(EVENT_DEFINITION_CRFS_LABEL);
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request
 				.getSession().getAttribute("childEventDefCRFs");
 		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = (List<EventDefinitionCRFBean>) request.getSession()
 				.getAttribute("oldEventDefinitionCRFs");
 
-		Map<Integer, SignStateRestorer> signStateRestorerMap = (Map<Integer, SignStateRestorer>) request.getSession()
-				.getAttribute("signStateRestorerMap");
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) request.getSession()
-				.getAttribute("definition");
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+		Map<Integer, SignStateRestorer> signStateRestorerMap = (Map<Integer, SignStateRestorer>) request.getSession().getAttribute("signStateRestorerMap");
 
 		HashMap<Integer, ArrayList<EDCItemMetadata>>  edcItemMetadataMap = (HashMap<Integer, ArrayList<EDCItemMetadata>>)
 				request.getSession().getAttribute("edcItemMetadataMap");
 
 		getEventDefinitionService().updateTheWholeStudyEventDefinition(currentStudy, updater, studyEventDefinitionBean,
-				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, oldEventDefinitionCRFs,
-				signStateRestorerMap, edcItemMetadataMap);
+				eventDefinitionCRFsToUpdate, childEventDefinitionCRFsToUpdate, oldEventDefinitionCRFs, signStateRestorerMap, edcItemMetadataMap);
 
 		clearSession(request.getSession());
 		addPageMessage(getResPage().getString("the_ED_has_been_updated_succesfully"), request);
@@ -197,18 +196,17 @@ public class UpdateEventDefinitionServlet extends Controller {
 	}
 
 	private int getIdByUserName(String userName) {
-
 		UserAccountBean userBean = (UserAccountBean) getUserAccountDAO().findByUserName(userName);
 		return userBean.getId();
 	}
 
 	private void saveEventDefinitionCRFsToSession(FormProcessor fp) {
 
-		ArrayList edcs = (ArrayList) fp.getRequest().getSession().getAttribute("eventDefinitionCRFs");
 		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+		ArrayList eventDefinitionCRFs = (ArrayList) fp.getRequest().getSession().getAttribute(EVENT_DEFINITION_CRFS_LABEL);
 
-		for (int i = 0; i < edcs.size(); i++) {
-			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
+		for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
+			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
 			if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
 				int defaultVersionId = fp.getInt("defaultVersionId" + i);
 				edcBean.setDefaultVersionId(defaultVersionId);
@@ -295,51 +293,50 @@ public class UpdateEventDefinitionServlet extends Controller {
 			}
 
 		}
-		fp.getRequest().getSession().setAttribute("eventDefinitionCRFs", edcs);
+		fp.getRequest().getSession().setAttribute(EVENT_DEFINITION_CRFS_LABEL, eventDefinitionCRFs);
 	}
 
 	private void saveEventDefinitionToSession(StudyEventDefinitionBean sed, FormProcessor fp) {
-
-		sed.setName(fp.getString("name"));
-		sed.setRepeating("true".equalsIgnoreCase(fp.getString("repeating")));
-		sed.setCategory(fp.getString("category"));
-		sed.setDescription(fp.getString("description"));
-		sed.setType(fp.getString("type"));
-		sed.setMaxDay(fp.getInt("maxDay"));
-		sed.setMinDay(fp.getInt("minDay"));
-		sed.setScheduleDay(fp.getInt("schDay"));
-		fp.getRequest().getSession().setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
-		int userId = getIdByUserName(fp.getString("emailUser"));
-		sed.setUserEmailId(userId != 0 ? userId : 1);
-		sed.setEmailDay(fp.getInt("emailDay"));
-		sed.setReferenceVisit("true".equalsIgnoreCase(fp.getString("isReference")));
-		fp.getRequest().getSession().setAttribute("definition", sed);
+		if (sed != null) {
+			int userId = getIdByUserName(fp.getString("emailUser"));
+			sed.setName(fp.getString("name"));
+			sed.setType(fp.getString("type"));
+			sed.setMaxDay(fp.getInt("maxDay"));
+			sed.setMinDay(fp.getInt("minDay"));
+			sed.setEmailDay(fp.getInt("emailDay"));
+			sed.setScheduleDay(fp.getInt("schDay"));
+			sed.setCategory(fp.getString("category"));
+			sed.setUserEmailId(userId != 0 ? userId : 1);
+			sed.setDescription(fp.getString("description"));
+			fp.getRequest().getSession().setAttribute("definition", sed);
+			sed.setRepeating("true".equalsIgnoreCase(fp.getString("repeating")));
+			sed.setReferenceVisit("true".equalsIgnoreCase(fp.getString("isReference")));
+			fp.getRequest().getSession().setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
+		}
 	}
 
 	/**
 	 * Clears session bean after study event definition bean update is finished.
 	 *
-	 * @param session
-	 *            HttpSession current user session bean.
+	 * @param session HttpSession current user session bean.
+	 *
 	 */
 	public static void clearSession(HttpSession session) {
-
 		session.removeAttribute("definition");
-		session.removeAttribute("eventDefinitionCRFs");
-		session.removeAttribute("oldEventDefinitionCRFs");
-		session.removeAttribute("childEventDefCRFs");
-		session.removeAttribute("tmpCRFIdMap");
-		session.removeAttribute("crfsWithVersion");
-		session.removeAttribute("showCalendaredVisitBox");
-		session.removeAttribute("changedReference");
-		session.removeAttribute("userNameInsteadEmail");
-		session.removeAttribute("sdvOptions");
-		session.removeAttribute("crfNameToEdcMap");
-		session.removeAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
-		session.removeAttribute("userNameInsteadEmail");
-		session.removeAttribute("edcItemMetadataMap");
 		session.removeAttribute("edcSDVMap");
+		session.removeAttribute("sdvOptions");
+		session.removeAttribute("tmpCRFIdMap");
+		session.removeAttribute("crfNameToEdcMap");
+		session.removeAttribute("crfsWithVersion");
+		session.removeAttribute("changedReference");
+		session.removeAttribute("childEventDefCRFs");
+		session.removeAttribute("edcItemMetadataMap");
+		session.removeAttribute("userNameInsteadEmail");
+		session.removeAttribute("userNameInsteadEmail");
+		session.removeAttribute("oldEventDefinitionCRFs");
+		session.removeAttribute("showCalendaredVisitBox");
+		session.removeAttribute(EVENT_DEFINITION_CRFS_LABEL);
 		RequestUtil.getRequest().removeAttribute("formWithStateFlag");
+		session.removeAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
 	}
-
 }

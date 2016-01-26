@@ -99,24 +99,20 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		if (fp.getString(PRINT).isEmpty() && shouldRedirect(request, response)) {
 			return;
 		}
-
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		// checks which module requests are from
-		String module = fp.getString(MODULE);
-		request.setAttribute(MODULE, module);
-
 		int sedId = fp.getInt(SED_ID);
 		int statusId = fp.getInt(INPUT_STATUS_ID);
 		int definitionId = fp.getInt(INPUT_DEF_ID);
+		request.setAttribute(MODULE, fp.getString(MODULE));
 		String startDateString = fp.getString(INPUT_STARTDATE);
 		String endDateString = fp.getString(INPUT_ENDDATE);
-
+		this.resetAddedEvents(request.getSession());
 		request.setAttribute(SED_ID, sedId);
 		request.setAttribute(INPUT_STATUS_ID, statusId);
 		request.setAttribute(INPUT_DEF_ID, definitionId);
-		request.setAttribute(INPUT_STARTDATE, startDateString);
 		request.setAttribute(INPUT_ENDDATE, endDateString);
+		request.setAttribute(INPUT_STARTDATE, startDateString);
 
 		request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
