@@ -756,39 +756,13 @@ function clearInputElementValues(trElement) {
                                inputs[j].getAttribute("id") == "rm"+myId) {
 	                               rm = j;
                            }
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("hidden") != -1 &&
-                               inputs[j].getAttribute("id") == "hidft"+myId) {
-		                           inputs[j].setAttribute("id", "ft"+myId);
-		                           try {
-			                           inputs[j].setAttribute("type", "text");
-	                               } catch (e) {
-		                               var newElement = null;
-		                               var nameStr = inputs[j].getAttribute("name");
-		                               try {
-			                           		newElement = document.createElement("<input type=\"text\" id=\"ft" + myId 
-			                           		+ "\" name=\"" + nameStr + "\" disabled=\"disabled\">");
-		                               }catch(e){}
-		                               inputs[j].parentNode.replaceChild(newElement,inputs[j]);
-	                           	   }
+                           if(inputs[j].getAttribute("id") == "hidft"+myId) {
+                               inputs[j].setAttribute("id", "ft"+myId);
+                               $(inputs[j]).removeClass("hidden");
                            }
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("hidden") != -1 &&
-                               inputs[j].getAttribute("id") == "hidup"+myId) {
-	                               inputs[j].setAttribute("id", "up"+myId);
-	                               try {
-	                               		inputs[j].setAttribute("type", "button");
-                               	   } catch (e) {
-	                               	   var newElement = null;
-	                               	   var nameStr = inputs[j].getAttribute("name");
-	                               	   var valueStr = inputs[j].getAttribute("value");
-		                               try {
-			                           		newElement = document.createElement("<input type=\"button\" id=\"up\"" + myId 
-			                           		+ "\" name=\"" + nameStr + "\" value=\"" + valueStr + "\">");
-			                           		newElement.onclick = inputs[j].onclick;
-		                               }catch(e){}
-		                               inputs[j].parentNode.replaceChild(newElement,inputs[j]);
-                               	   }
+                           if(inputs[j].getAttribute("id") == "hidup"+myId) {
+                               inputs[j].setAttribute("id", "up"+myId);
+                               $(inputs[j]).removeClass("hidden");
                            }
                         }
                     }
