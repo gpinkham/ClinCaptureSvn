@@ -122,8 +122,15 @@ public class ResolveDiscrepancyServlet extends Controller {
 				return Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET;
 			}
 		} else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
-			ItemDataBean idb = (ItemDataBean) getItemDataDAO().findByPK(note.getEntityId());
-			EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(idb.getEventCRFId());
+
+			int eventCRFID;
+			if ("itemdata".equalsIgnoreCase(entityType)) {
+				ItemDataBean idb = (ItemDataBean) getItemDataDAO().findByPK(note.getEntityId());
+				eventCRFID = idb.getEventCRFId();
+			} else {
+				eventCRFID = note.getEntityId();
+			}
+			EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(eventCRFID);
 			StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId());
 			CRFVersionBean crfvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
 			StudyEventBean seb = (StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId());
