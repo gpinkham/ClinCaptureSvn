@@ -98,16 +98,30 @@ function getPrintableContent() {
             setRenderMode();
             app_odmRenderer = new ODMRenderer(data);
             renderString = app_odmRenderer.renderPrintableStudy(renderMode);
+			renderString = removeJS(renderString);
         }
         catch (error) {
             alert(app_error_print_CRF_Message_at_Loading + "   " + error.message);
         }
         $('#loading_msg').hide();
         $('.spinner').hide();
-        $('body').html(renderString);
+		try {
+			$('body').html(renderString);
+		} catch (error) {
+			console.log(app_error_print_CRF_Message_at_Loading + "   " + error.message);
+		}
 		$('body').append("<div id=\"document_end\"> </div>")
-    });
+	});
 }
+
+function removeJS(textNode) {
+	var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+	while (SCRIPT_REGEX.test(textNode)) {
+		textNode = textNode.replace(SCRIPT_REGEX, "");
+	}
+	return textNode;
+}
+
 
 function setRenderMode() {
     renderMode = 'UNPOPULATED_FORM_CRF';
