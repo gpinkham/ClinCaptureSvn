@@ -923,11 +923,10 @@ function isCheckedRadioOrCheckbox(inputObject){
 
 function checkCheckboxes(checkboxObjectName, isChecked){
     var checkboxObjects = document.getElementsByName(checkboxObjectName);
-	if(checkboxObjects[0]){
-        checkboxObjects[0].checked=isChecked;
-    }
-    if(checkboxObjects[1]){
-        checkboxObjects[1].checked=isChecked;
+	for (var i = 0; i < checkboxObjects.length; i++) {
+		if(checkboxObjects[i]) {
+	        checkboxObjects[i].checked = isChecked;
+	    }
     }
 }
 
@@ -1862,6 +1861,7 @@ function createRequestObject(){
 var http = createRequestObject();
 
 var checkboxObject;
+var psCheckboxName;
 function sendRequest(method, url){
     if(method == 'get' || method == 'GET'){
         http.open(method,url);
@@ -1873,20 +1873,24 @@ function handleResponse(){
     if(http.readyState == 4 && http.status == 200){
         var response = http.responseText;
         if(response == null || response != 'true') {
-            checkboxObject.checked=false; 
-            alertDialog({ message: 'Your password did not match. Please try again.', height: 150, width: 400 });
+			markCRFCompleteCancel(checkboxObject.name);
+			alertDialog({ message: 'Your password did not match. Please try again.', height: 150, width: 400 });
+        } else {
+			changeImage('markComplete');
+			markCRFCompleteOk(checkboxObject.name, psCheckboxName);
         }
     }
 }
 
-function requestSignatureFromCheckbox(password, checkbox){
+function requestSignatureFromCheckbox(password, checkbox, psCheckboxesName){
 	checkboxObject = checkbox;
-	if (password==null || password==''){
+	psCheckboxName = psCheckboxesName
+	if (!password) {
 		alertDialog({ message: 'Your password did not match. Please try again.', height: 150, width: 400 });
-		checkbox.checked=false;
+		markCRFCompleteCancel(checkboxObject.name);
 		return;
 	}
-	if(checkbox != null && checkbox.checked){
+	if(checkbox && checkbox.checked) {
 		sendRequest("GET", "MatchPassword?password=" + password);
 	}
 }
@@ -4003,7 +4007,8 @@ function alertDialog(params){
 
 function crfCompleteAuthorize(params){
 	
-	if(params.checkbox.checked == false){
+	if(!params.checkbox.checked) {
+		markCRFCompleteCancel(params.checkbox.name);
 		return true;
 	}
 	$("<div id='crfPasswordDialog' title='Authorization'>" +
@@ -4024,7 +4029,7 @@ function crfCompleteAuthorize(params){
         buttons:{ 
         	'Ok': function() {
         		params.checkbox.checked = true;
-        		requestSignatureFromCheckbox(document.getElementById('passwordIdNew').value, params.checkbox);
+				requestSignatureFromCheckbox(document.getElementById('passwordIdNew').value, params.checkbox, params.psCheckboxesName);
             	$("#crfPasswordDialog").remove();
         	}, 
         	'Cancel': function() {
@@ -4043,7 +4048,6 @@ function crfCompleteAuthorize(params){
         }
     });
     return false;
-	
 }
 
 function confirmDialog(params){

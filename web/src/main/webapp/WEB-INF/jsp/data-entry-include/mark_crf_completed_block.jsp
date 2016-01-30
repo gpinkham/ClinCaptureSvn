@@ -15,8 +15,10 @@
 	<c:when test="${!dataEntryStage.isAdmin_Editing() && section.lastSection}">
 		<c:choose>
 			<c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
-				<td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-				<c:if test="${markComplete=='Yes'}"> checked </c:if> ${disabled} onchange="changeImage('markComplete');" onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this });">
+				<td valign="bottom">
+					<input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
+						<c:if test="${markComplete=='Yes'}"> checked </c:if> ${disabled} onchange="changeImage('markComplete');" 
+						onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this, psCheckboxesName: 'markPartialSaved' });">
 				</td>
 				<td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
 			</c:when>
