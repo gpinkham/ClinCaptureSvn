@@ -2678,16 +2678,15 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService());
-
-		ArrayList notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEWER));
-		notes.addAll(existingNameNotes);
-		noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
+		ArrayList notes = new ArrayList();
+		
+		existingNameNotes.addAll(discNotes.getNotes(INPUT_INTERVIEWER));
+		noteThreads = dNoteUtil.createThreadsOfParents(existingNameNotes, currentStudy, null, -1);
 		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(crfShortcutsAnalyzer.getInterviewerDisplayItemBean(),
 				noteThreads, false);
 
-		notes = new ArrayList(discNotes.getNotes(INPUT_INTERVIEW_DATE));
-		notes.addAll(existingIntrvDateNotes);
-		noteThreads = dNoteUtil.createThreadsOfParents(notes, currentStudy, null, -1);
+		existingIntrvDateNotes.addAll(discNotes.getNotes(INPUT_INTERVIEW_DATE));
+		noteThreads = dNoteUtil.createThreadsOfParents(existingIntrvDateNotes, currentStudy, null, -1);
 		crfShortcutsAnalyzer.prepareCrfShortcutAnchors(crfShortcutsAnalyzer.getInterviewDateDisplayItemBean(),
 				noteThreads, false);
 
