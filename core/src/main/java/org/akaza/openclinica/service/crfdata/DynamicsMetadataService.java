@@ -782,6 +782,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			if (!destinationItemDataBean.getValue().equals(valueToInsert)) {
 				isAllowedToInsertDataIntoDestinationEventCRF = true;
 				destinationItemDataBean.setValue(valueToInsert);
+				if (DataEntryStage.DOUBLE_DATA_ENTRY.equals(destinationEventCrfBean.getStage())
+						|| DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.equals(destinationEventCrfBean.getStage())) {
+					destinationItemDataBean.setStatus(Status.UNAVAILABLE);
+				}
 				getItemDataDAO().updateValue(destinationItemDataBean, "yyyy-MM-dd", con);
 				if (createReasonForChangeIfNeeded) {
 					generateRFCsForDestinationItemDataBean(destinationItemBean, destinationItemDataBean, ub,
