@@ -162,7 +162,7 @@
 	var removeMessage = '<fmt:message key="remove" bundle="${resword}"/>';
 	var cancelRemoveMessage = '<fmt:message key="cancel_remove" bundle="${resword}"/>';
 
-	function replaceSwitch(eventCRFId, itemId, filename, filePathName, status, isRepeating) {
+	function replaceSwitch(element, eventCRFId, itemId, filename, status, isRepeating) {
 		var id = 'rp'
 		var rp = document.getElementById(id + itemId);
 		var div = document.getElementById('div' + itemId);
@@ -171,7 +171,7 @@
 		var up = document.getElementById('up' + itemId);
 		<%-- uploadLink is different from showItemInput.jsp --%>
 		var uploadLink = 'UploadFile?submitted=no&' + (isRepeating ? 'inputName=' : 'itemId=') + itemId;
-		var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + filePathName;
+		var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + $(element).attr("filePathName");
 
 		if (rp.getAttribute('value') == replaceMessage) {
 			if (a) {
@@ -212,6 +212,7 @@
 					var new_a = document.createElement('a');
 					new_a.href = downloadLink;
 					new_a.setAttribute("id", "a" + itemId);
+					new_a.setAttribute("style", "color: " + theme.mainColor);
 					new_a.appendChild(document.createTextNode(filename));
 					div.appendChild(new_a);
 				} else if (status == 'notFound') {
@@ -229,7 +230,7 @@
 		switchValue(itemId, id, replaceMessage, cancelReplaceMessage);
 	}
 
-	function removeSwitch(eventCRFId, itemId, filename, filePathName, status) {
+	function removeSwitch(element, eventCRFId, itemId, filename, status) {
 		var id = 'rm';
 		var rm = document.getElementById(id + itemId);
 		var div = document.getElementById('div' + itemId);
@@ -241,7 +242,7 @@
 		if (!input) {
 			input = document.getElementById('input' + itemId);
 		}
-		var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + filePathName;
+		var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + $(element).attr("filePathName");
 		if (rm.getAttribute('value') == removeMessage) {
 			input.setAttribute("value", "");
 			if (a) {
@@ -275,6 +276,7 @@
 					var new_a = document.createElement('a');
 					new_a.href = downloadLink;
 					new_a.setAttribute("id", "a" + itemId);
+					new_a.setAttribute("style", "color: " + theme.mainColor);
 					new_a.appendChild(document.createTextNode(filename));
 					div.appendChild(new_a);
 				} else if (status == 'notFound') {

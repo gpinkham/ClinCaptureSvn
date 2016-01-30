@@ -156,8 +156,8 @@ function changeImage(name) {
 			<input type="button" id="hidup<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>"
 				   onClick="javascript:openFileWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')" class="hidden">
 		</div><br>
-		<input id="rp<c:out value="${inputName}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('${section.eventCRF.id}', '${inputName}', '${inputTxtValue}','${fn:replace(pathAndName,'+','%2B')}', 'notFound', true); changeImage('${inputName}');">
-		<input id="rm<c:out value="${inputName}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('${section.eventCRF.id}','${inputName}', '${inputTxtValue}','${fn:replace(pathAndName,'+','%2B')}','notFound'); changeImage('${inputName}');">
+		<input id="rp<c:out value="${inputName}"/>" filePathName="${fn:replace(pathAndName,'+','%2B')}" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch(this, '${section.eventCRF.id}', '${inputName}', '${inputTxtValue}', 'notFound', true); changeImage('${inputName}');">
+		<input id="rm<c:out value="${inputName}"/>" filePathName="${fn:replace(pathAndName,'+','%2B')}" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch(this, '${section.eventCRF.id}','${inputName}', '${inputTxtValue}', 'notFound'); changeImage('${inputName}');">
 		</c:when>
 		<c:otherwise>
 			<c:set var="prefilename" value="${displayItem.data.value}"/>
@@ -166,8 +166,8 @@ function changeImage(name) {
 			<input type="button" id="hidup<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>"
 				   onClick="javascript:openFileWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')" class="hidden">
 		</div><br>
-		<input id="rp<c:out value="${inputName}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('${section.eventCRF.id}','${inputName}', '${inputTxtValue}','${fn:replace(pathAndName,'+','%2B')}','found', true); changeImage('${inputName}');">
-		<input id="rm<c:out value="${inputName}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('${section.eventCRF.id}','${inputName}', '${inputTxtValue}','${fn:replace(pathAndName,'+','%2B')}','found'); changeImage('${inputName}');">
+		<input id="rp<c:out value="${inputName}"/>" filePathName="${fn:replace(pathAndName,'+','%2B')}" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch(this, '${section.eventCRF.id}','${inputName}', '${inputTxtValue}', 'found', true); changeImage('${inputName}');">
+		<input id="rm<c:out value="${inputName}"/>" filePathName="${fn:replace(pathAndName,'+','%2B')}" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch(this, '${section.eventCRF.id}','${inputName}', '${inputTxtValue}', 'found'); changeImage('${inputName}');">
 		</c:otherwise>
 		</c:choose>
 		<input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
