@@ -65,6 +65,9 @@
 		<tr align="left">
 			<td>
 				<div class="popup_legend_medium"><p></p></div>
+				<div class="removed sign"></div> - <fmt:message bundle="${resword}" key="removed" /></td>
+			<td>
+				<div class="popup_legend_medium"><p></p></div>
 				<div class="not_scheduled sign"></div> - <fmt:message bundle="${resword}" key="notScheduled" /></td>
 		</tr>
 	</table>

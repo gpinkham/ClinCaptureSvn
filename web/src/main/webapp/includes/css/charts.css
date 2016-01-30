@@ -419,6 +419,10 @@ form#actionForSave input {
 	background-color: #ff0000;
 }
 
+.widget .events_completion .removed {
+	background-color: #B22222;
+}
+
 .widget .available {
 	background-color: #12d2ff;
 }

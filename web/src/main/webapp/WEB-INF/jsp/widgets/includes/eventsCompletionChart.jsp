@@ -37,6 +37,7 @@
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='skipped' />" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='stopped' />" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='locked' />" />
+	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='removed' />" />
 	<input type="hidden" class="status" value="<fmt:message bundle='${resterm}' key='not_scheduled' />" />
 	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='scheduled' />" />
 	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='data_entry_started' />" />
@@ -46,6 +47,7 @@
 	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='skipped' />" />
 	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='stopped' />" />
 	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='SDV_complete' />" />
+	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='removed' />" />
 	<input type="hidden" class="pop_up_status" value="<fmt:message bundle='${resword}' key='notScheduled' />" />
 </form>
 

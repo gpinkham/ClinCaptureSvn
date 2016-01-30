@@ -118,7 +118,7 @@ function activateEventCompletionLegend() {
 	var startDate = startEndDates[0];
 	var endDate = startEndDates[1];
 	var urlPrefix = "ViewStudyEvents?startDate=";
-	var statuses = [ 1, 3, 4, 8, 7, 6, 5, 9, 0 ];
+	var statuses = [ 1, 3, 4, 8, 7, 6, 5, 9, 10, 0 ];
 	$(".events_completion .pop-up-visible").css('display', '');
 	$(".events_completion .signs td").each(function(index) {
 		$(this).click(function() {

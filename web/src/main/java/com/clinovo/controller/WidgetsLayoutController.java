@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +48,6 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
@@ -90,7 +90,7 @@ import com.clinovo.service.WidgetsLayoutService;
  * This controller was created to gather data from database and send it to widgets.
  */
 @Controller
-@SuppressWarnings({"unused", "rawtypes", "unchecked"})
+@SuppressWarnings({"unused", "unchecked"})
 public class WidgetsLayoutController {
 
 	private static final int FILTER_START = 0;
@@ -329,54 +329,14 @@ public class WidgetsLayoutController {
 		if (action.equals("goBack")) {
 			displayFrom -= maxDisplayNumber;
 		}
-
 		if (action.equals("goForward")) {
 			displayFrom += maxDisplayNumber;
 		}
-
-		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
-				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
-				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
-				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED, SubjectEventStatus.NOT_SCHEDULED};
-
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
-		DynamicEventDao dedao = new DynamicEventDao(datasource);
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(datasource);
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
-
-		List<WidgetsRowWithName> eventCompletionRows = new ArrayList<WidgetsRowWithName>();
-
-		for (int i = displayFrom; i < studyEventDefinitions.size() && i < displayFrom + maxDisplayNumber; i++) {
-			WidgetsRowWithName currentRow = new WidgetsRowWithName();
-
-			LinkedHashMap<String, Integer> countOfSubjectEventStatuses = new LinkedHashMap<String, Integer>();
-			int countOfSubjectsStartedEvent = 0;
-
-			for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
-
-				ListEventsForSubjectFilter listEventsForSubjectFilter = new ListEventsForSubjectFilter(
-						studyEventDefinitions.get(i).getId(), sgcdao);
-				String property = "event.status";
-				String value = subjectEventStatus.getId() + "";
-				listEventsForSubjectFilter.addFilter(property, value);
-
-				int eventsWithStatusNoRepeats = studySubjectDAO.getCountWithFilter(listEventsForSubjectFilter, sb);
-
-				countOfSubjectEventStatuses.put(subjectEventStatus.getCode().toLowerCase().replaceAll(" ", "_"),
-						eventsWithStatusNoRepeats);
-
-				countOfSubjectsStartedEvent += eventsWithStatusNoRepeats;
-			}
-
-			currentRow.setId(studyEventDefinitions.get(i).getId());
-			currentRow.setRowName(studyEventDefinitions.get(i).getName());
-			currentRow.setRowValues(countOfSubjectEventStatuses);
-			eventCompletionRows.add(currentRow);
-		}
+		List<WidgetsRowWithName> eventCompletionRows = getEventCompletionDataRows(displayFrom, maxDisplayNumber, request);
 
 		hasPrevious = displayFrom != 0;
-
 		hasNext = displayFrom + EC_DISPLAY_PER_SCREEN < studyEventDefinitions.size();
 
 		model.addAttribute("eventCompletionRows", eventCompletionRows);
@@ -385,6 +345,44 @@ public class WidgetsLayoutController {
 		model.addAttribute("eventCompletionLastElement", displayFrom);
 
 		return page;
+	}
+
+	private List<WidgetsRowWithName> getEventCompletionDataRows(int displayFrom, int maxDisplayNumber, HttpServletRequest request) {
+		List<WidgetsRowWithName> eventCompletionRows = new ArrayList<WidgetsRowWithName>();
+		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
+				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
+				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
+				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED, SubjectEventStatus.REMOVED,
+				SubjectEventStatus.NOT_SCHEDULED};
+
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(datasource);
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
+
+		for (int i = displayFrom; i < studyEventDefinitions.size() && i < displayFrom + maxDisplayNumber; i++) {
+			WidgetsRowWithName currentRow = new WidgetsRowWithName();
+			LinkedHashMap<String, Integer> countOfSubjectEventStatuses = new LinkedHashMap<String, Integer>();
+			int countOfSubjectsStartedEvent = 0;
+
+			for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
+				ListEventsForSubjectFilter listEventsForSubjectFilter = new ListEventsForSubjectFilter(
+						studyEventDefinitions.get(i).getId(), sgcdao);
+				String property = "event.status";
+				String value = subjectEventStatus.getId() + "";
+				listEventsForSubjectFilter.addFilter(property, value);
+				int eventsWithStatusNoRepeats = studySubjectDAO.getCountWithFilter(listEventsForSubjectFilter, sb);
+				countOfSubjectEventStatuses.put(subjectEventStatus.getCode().toLowerCase().replaceAll(" ", "_"),
+						eventsWithStatusNoRepeats);
+				countOfSubjectsStartedEvent += eventsWithStatusNoRepeats;
+			}
+
+			currentRow.setId(studyEventDefinitions.get(i).getId());
+			currentRow.setRowName(studyEventDefinitions.get(i).getName());
+			currentRow.setRowValues(countOfSubjectEventStatuses);
+			eventCompletionRows.add(currentRow);
+		}
+		return eventCompletionRows;
 	}
 
 	/**
@@ -408,23 +406,23 @@ public class WidgetsLayoutController {
 		SubjectEventStatus[] subjectEventStatuses = {SubjectEventStatus.SCHEDULED,
 				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SIGNED,
 				SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED,
-				SubjectEventStatus.SOURCE_DATA_VERIFIED};
+				SubjectEventStatus.SOURCE_DATA_VERIFIED, SubjectEventStatus.REMOVED, SubjectEventStatus.NOT_SCHEDULED};
 
-		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
-		int countOfSubject = getCountOfSubjects(sb);
-		int countOfStartedEvents = 0;
-		int countOfNotStartedEvents;
+		List<WidgetsRowWithName> dataRows = getEventCompletionDataRows(FILTER_START, FILTER_END, request);
+		HashMap<SubjectEventStatus, Integer> statusesMap = new HashMap<SubjectEventStatus, Integer>();
+		for (WidgetsRowWithName row : dataRows) {
+			LinkedHashMap<String, Integer> values = row.getRowValues();
+			for (SubjectEventStatus status : subjectEventStatuses) {
+				int currentValue = statusesMap.get(status) == null ? 0 : statusesMap.get(status);
+				int valueForRow = values.get(status.getCode()) == null ? 0 : values.get(status.getCode());
+				statusesMap.put(status, currentValue + valueForRow);
+			}
+		}
 		List<Integer> listOfEventsWithStatuses = new ArrayList<Integer>();
 
 		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
-			int countOfEventsWithStatus = studyEventDAO.getCountOfEventsBasedOnEventStatus(sb, eventStatus);
-			int countOfEventsNoRepeats = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb, eventStatus);
-			listOfEventsWithStatuses.add(countOfEventsWithStatus);
-			countOfStartedEvents += countOfEventsNoRepeats;
+			listOfEventsWithStatuses.add(statusesMap.get(eventStatus));
 		}
-
-		countOfNotStartedEvents = countOfSubject * studyEventDefinitions.size() - countOfStartedEvents;
-		listOfEventsWithStatuses.add(countOfNotStartedEvents);
 
 		response.getWriter().println(listOfEventsWithStatuses);
 	}
