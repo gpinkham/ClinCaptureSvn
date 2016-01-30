@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"unchecked", "serial"})
 @Component
 public class RemoveCRFFromDefinitionServlet extends Controller {
 
