@@ -72,6 +72,8 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.managestudy.ListEventsForSubjectsServlet;
+import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.core.EmailEngine;
@@ -434,8 +436,16 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	private void clearDataEntrySession(HttpServletRequest request) {
+		if (this instanceof ListStudySubjectsServlet || this instanceof ListEventsForSubjectsServlet) {
+			request.getSession().removeAttribute(DataEntryServlet.HAS_DATA_FLAG);
+			request.getSession().removeAttribute(DataEntryServlet.GROUP_HAS_DATA);
+		}
+	}
+
 	private void process(HttpServletRequest request, HttpServletResponse response)
 			throws OpenClinicaException, UnsupportedEncodingException {
+		clearDataEntrySession(request);
 		request.setCharacterEncoding("UTF-8");
 		request.setAttribute(CURRENT_DATE, new Date());
 		HttpSession session = request.getSession();

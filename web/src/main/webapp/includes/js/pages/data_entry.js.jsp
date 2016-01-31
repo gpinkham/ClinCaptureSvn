@@ -163,7 +163,7 @@
 	var cancelRemoveMessage = '<fmt:message key="cancel_remove" bundle="${resword}"/>';
 
 	function replaceSwitch(element, eventCRFId, itemId, filename, status, isRepeating) {
-		var id = 'rp'
+		var id = 'rp';
 		var rp = document.getElementById(id + itemId);
 		var div = document.getElementById('div' + itemId);
 		var a = document.getElementById('a' + itemId);

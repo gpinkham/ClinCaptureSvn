@@ -63,17 +63,11 @@
  <c:if test="${empty displayItem.data.value}">
         <c:set var="isBlank" value="1" />
  </c:if>
+
 <%-- text input value--%>
 <c:choose>
-  <c:when test="${(originJSP eq 'doubleDataEntry' ||
-  (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
-  && (ddeEntered || (! sessionScope['groupHasData'])) &&
-  empty displayItem.metadata.responseSet.value}">
-    <c:set var="inputTxtValue" value="${defValue}"/>
-  </c:when>
-  <c:otherwise>
-    <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
-   </c:otherwise>
+  <c:when test="${section.section.processDefaultValues}"><c:set var="inputTxtValue" value="${defValue}"/></c:when>
+  <c:otherwise><c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/></c:otherwise>
 </c:choose>
 
 <c:forEach var="frmMsg" items="${formMessages}">
@@ -171,17 +165,15 @@
 <c:if test='${inputType == "checkbox"}'>
   <c:if test="${! isHorizontal}">
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+      <c:set var="checked" value="" />
       <c:choose>
-        <c:when test="${option.selected}"><c:set var="checked" value="checked" /></c:when>
-        <c:when test="${(option.text eq inputTxtValue) || (option.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
+        <c:when test="${section.section.processDefaultValues}">
+          <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
+            <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="checked" /></c:if>
+          </c:forTokens>
         </c:when>
-        <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+        <c:otherwise><c:if test="${option.selected}"><c:set var="checked" value="checked" /></c:if></c:otherwise>
       </c:choose>
-      <%-- handle multiple values --%>
-      <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
-        <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="checked" />
-        </c:if>
-      </c:forTokens>
       <label for="<c:out value="${inputName}"/>"></label>
       <c:choose>
         <c:when test="${isInError}">
@@ -194,18 +186,15 @@
     </c:forEach>
   </c:if>
   <c:if test="${isHorizontal}">
-    <%-- only one respOption displayed here, one per TD cell --%>
+    <c:set var="checked" value="" />
     <c:choose>
-      <c:when test="${responseOptionBean.selected}"><c:set var="checked" value="checked" /></c:when>
-      <c:when test="${(responseOptionBean.text eq inputTxtValue) || (responseOptionBean.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
+      <c:when test="${section.section.processDefaultValues}">
+        <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
+          <c:if test="${(responseOptionBean.text eq _item) || (responseOptionBean.value eq _item)}"><c:set var="checked" value="checked" /></c:if>
+        </c:forTokens>
       </c:when>
-      <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+      <c:otherwise><c:if test="${responseOptionBean.selected}"><c:set var="checked" value="checked" /></c:if></c:otherwise>
     </c:choose>
-    <%-- handle multiple values --%>
-      <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
-        <c:if test="${(responseOptionBean.text eq _item) || (responseOptionBean.value eq _item)}"><c:set var="checked" value="checked" />
-        </c:if>
-      </c:forTokens>
     <label for="<c:out value="${inputName}"/>"></label>
     <c:choose>
       <c:when test="${isInError}">
@@ -223,8 +212,6 @@
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
       <c:choose>
         <c:when test="${option.selected}"><c:set var="checked" value="checked" /></c:when>
-        <c:when test="${(option.text eq inputTxtValue) || (option.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
-        </c:when>
         <c:otherwise><c:set var="checked" value="" /></c:otherwise>
       </c:choose>
       <label for="<c:out value="${inputName}"/>"></label>
@@ -242,11 +229,8 @@
   <c:if test="${isHorizontal}">
     <c:choose>
       <c:when test="${responseOptionBean.selected}"><c:set var="checked" value="checked" /></c:when>
-      <c:when test="${(responseOptionBean.text eq inputTxtValue) || (responseOptionBean.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
-      </c:when>
       <c:otherwise><c:set var="checked" value="" /></c:otherwise>
     </c:choose>
-    <%-- Only have one of these per radio button--%>
     <label for="<c:out value="${inputName}"/>"></label>
     <c:choose>
       <c:when test="${isInError}">
@@ -259,89 +243,35 @@
   </c:if>
 </c:if>
 
-
-
 <c:if test='${inputType == "single-select"}'>
-
-  <label for="<c:out value="${inputName}"/>"></label>
-  <c:choose>
-
-    <c:when test="${isInError}">
-      <span class="aka_exclaim_error">! </span>
-      <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="<c:out value="${inputName}"/>" class="formfield">
-          <%-- taken from showItemInput.jsp, somebody kind of forgot to put the options in there but added the </select>--%>
-        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-          <c:choose>
-            <c:when test="${count==selectedOption}">
-              <c:set var="checked" value="selected" />
-            </c:when>
-            <c:otherwise>
-              <c:set var="checked" value="" />
-            </c:otherwise>
-          </c:choose>
-          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
-                    <c:if test="${option.selected}">
-      	                selected="selected"
-                    </c:if>
-                  >
-            <c:out value="${option.text}" />
-          </option>
-
-          <c:set var="count" value="${count+1}"/>
-        </c:forEach>
-      </select>
-    </c:when>
-
-    <c:otherwise>
-      <c:choose>
-        <c:when test="${displayItem.metadata.defaultValue != '' &&
-                displayItem.metadata.defaultValue != null}">
-          <c:set var="printDefault" value="true"/>
-        </c:when>
-        <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
-      </c:choose>
-      <c:set var="selectedOption" value="-1"/>
-      <c:set var="count" value="0"/>
-      <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-        <c:if test="${option.selected}"><c:set var="selectedOption" value="${count}" /></c:if>
-        <c:if test="${printDefault=='true'}">
-          <c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
-            <c:set var="printDefault" value="false"/>
-            <c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
-          </c:if>
+    <label for="${inputName}"></label>
+    <c:if test="${isInError}">
+        <span class="aka_exclaim_error">! </span>
+    </c:if>
+    <c:set var="optionWasSelected" value="false"/>
+    <c:set var="defaultValueInOptions" value="false"/>
+    <c:set var="selectDefault" value="${(isTemplateRow || section.section.processDefaultValues) && displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}"/>
+    <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+        <c:if test="${option.text eq displayItem.metadata.defaultValue || option.value eq displayItem.metadata.defaultValue}">
+            <c:set var="defaultValueInOptions" value="true"/>
         </c:if>
-        <c:set var="count" value="${count+1}"/>
-      </c:forEach>
-      <select id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="<c:out value="${inputName}"/>" class="formfield">
-        <c:choose>
-          <c:when test="${printDefault == 'true'}">
-            <c:set var="count" value="0"/>
-            <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
-            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-              <c:choose>
-                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
-                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
-              </c:choose>
-              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
-              <c:set var="count" value="${count+1}"/>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-            <c:set var="count" value="0"/>
-            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-              <c:choose>
-                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
-                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
-              </c:choose>
-              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
-              <c:set var="count" value="${count+1}"/>
-            </c:forEach>
-          </c:otherwise>
-        </c:choose>
-      </select>
-    </c:otherwise>
-  </c:choose>
+    </c:forEach>
+    <select id="${inputName}" tabindex="${tabNum}" name="${inputName}"
+            class="${isInError ? 'aka_input_error' : 'formfield'}"
+            onChange="this.className='changedField'; sameRepGrpInstant('${inputName}', '${itemId}',
+                    '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}',
+                    '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}');
+                    changeImage('${inputName}');">
+        <c:if test="${!defaultValueInOptions}">
+            <c:set var="optionWasSelected" value="${selectDefault}"/>
+            <option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
+        </c:if>
+        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+            <option value="${option.value}" ${!optionWasSelected && ((selectDefault && (option.text eq displayItem.metadata.defaultValue || option.value eq displayItem.metadata.defaultValue)) || option.selected) ? 'selected' : ''}>${option.text}</option>
+        </c:forEach>
+    </select>
 </c:if>
+
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
@@ -355,16 +285,16 @@
     </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+    <c:set var="checked" value="" />
     <c:choose>
-      <c:when test="${option.selected}"><c:set var="checked" value="selected" /></c:when>
-      <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+      <c:when test="${section.section.processDefaultValues}">
+        <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
+          <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="selected" /></c:if>
+        </c:forTokens>
+      </c:when>
+      <c:otherwise><c:if test="${option.selected}"><c:set var="checked" value="selected" /></c:if></c:otherwise>
     </c:choose>
-    <%-- handle multiple values --%>
-    <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
-      <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="selected" />
-      </c:if>
-    </c:forTokens>
-    <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
+    <option value="${option.value}" ${checked}>${option.text}</option>
   </c:forEach>
   </select>
 </c:if>

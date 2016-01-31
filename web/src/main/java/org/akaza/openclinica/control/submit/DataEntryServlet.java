@@ -1450,6 +1450,7 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 
+				request.setAttribute("inSameSection", inSameSection);
 				if (!inSameSection) {
 					ArrayList<String> updateFailedItems = sc.redoCalculations(scoreItems, scoreItemdata, changedItems,
 							itemOrdinals, sb.getId());
@@ -2156,11 +2157,33 @@ public abstract class DataEntryServlet extends Controller {
 		if (tabId <= 0) {
 			tabId = 1;
 		}
+		EventDefinitionCRFBean edcBean = getEventDefinitionCRFDAO().findByStudyEventIdAndCRFVersionId(
+				(StudyBean) getStudyDAO().findByPK(
+						((StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId())).getStudyId()),
+				ecb.getStudyEventId(), ecb.getCRFVersionId());
+		Boolean inSameSection = (Boolean) request.getAttribute("inSameSection");
+		List<ItemDataBean> itemDataList = getItemDataDAO().findAllActiveBySectionIdAndEventCRFId(sectionId,
+				ecb.getId());
+		sb.setProcessDefaultValues((!fp.isSubmitted() || (inSameSection != null && !inSameSection))
+				&& (this instanceof DoubleDataEntryServlet && !edcBean.isEvaluatedCRF()
+						? onPending(itemDataList)
+						: itemDataList.size() == 0));
 		request.setAttribute(INPUT_TAB, new Integer(tabId));
 		request.setAttribute(SECTION_BEAN, sb);
 	}
 
-	/**
+	private boolean onPending(List<ItemDataBean> itemDataList) {
+		boolean result = true;
+		for (ItemDataBean itemDataBean : itemDataList) {
+			if (!itemDataBean.getStatus().isPending()) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+
+	/**ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
 	 * Tries to check if a seciton has item groups.
 	 *
 	 * @param fp  FormProcessor

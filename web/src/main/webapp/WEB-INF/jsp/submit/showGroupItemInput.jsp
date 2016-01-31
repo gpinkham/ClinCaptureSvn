@@ -1,4 +1,4 @@
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+    <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
@@ -78,17 +78,11 @@ function changeImage(name) {
  <c:if test="${empty displayItem.data.value}">
         <c:set var="isBlank" value="1" />
  </c:if>
+
 <%-- text input value--%>
 <c:choose>
-  <c:when test="${(originJSP eq 'doubleDataEntry' ||
-  (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
-  && (ddeEntered || (! sessionScope['groupHasData'])) &&
-  empty displayItem.metadata.responseSet.value}">
-    <c:set var="inputTxtValue" value="${defValue}"/>
-  </c:when>
-  <c:otherwise>
-    <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
-   </c:otherwise>
+  <c:when test="${isTemplateRow || section.section.processDefaultValues}"><c:set var="inputTxtValue" value="${defValue}"/></c:when>
+  <c:otherwise><c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/></c:otherwise>
 </c:choose>
 
 <c:forEach var="frmMsg" items="${formMessages}">
@@ -199,11 +193,11 @@ function changeImage(name) {
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" default="${inputTxtValue}"/>
     </c:when>
     <c:otherwise>
       <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" default="${inputTxtValue}"/>
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -217,64 +211,64 @@ function changeImage(name) {
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" name="<c:out value="${inputName}"/>" rows="5" cols="40" default="${inputTxtValue}"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
       <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage('${inputName}');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage('${inputName}');" name="<c:out value="${inputName}"/>" rows="5" cols="40" default="${inputTxtValue}"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
 <c:if test='${inputType == "checkbox"}'>
   <c:if test="${! isHorizontal}">
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+      <c:set var="checked" value="" />
+      <c:set var="needsToBeChecked" value=""/>
       <c:choose>
-        <c:when test="${option.selected}"><c:set var="checked" value="checked" /></c:when>
-        <c:when test="${(option.text eq inputTxtValue) || (option.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
+        <c:when test="${isTemplateRow || section.section.processDefaultValues}">
+          <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
+            <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="checked" /></c:if>
+          </c:forTokens>
+          <c:set var="needsToBeChecked" value="${!(empty checked) ? 'needsToBeChecked' : ''}"/>
         </c:when>
-        <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+        <c:otherwise><c:if test="${option.selected}"><c:set var="checked" value="checked" /></c:if></c:otherwise>
       </c:choose>
-      <%-- handle multiple values --%>
-      <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
-        <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="checked" />
-        </c:if>
-      </c:forTokens>
       <label for="<c:out value="${inputName}"/>"></label>
       <c:choose>
         <c:when test="${isInError}">
           <span class="aka_exclaim_error">! </span>
-          <input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+          <input ${needsToBeChecked} class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
                  onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:when>
         <c:otherwise>
-          <input id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+          <input ${needsToBeChecked} id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
                  onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:otherwise>
       </c:choose>
     </c:forEach>
   </c:if>
   <c:if test="${isHorizontal}">
-    <%-- only one respOption displayed here, one per TD cell --%>
+    <c:set var="checked" value="" />
+    <c:set var="needsToBeChecked" value=""/>
     <c:choose>
-      <c:when test="${responseOptionBean.selected}"><c:set var="checked" value="checked" /></c:when>
-      <c:when test="${(responseOptionBean.text eq inputTxtValue) || (responseOptionBean.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
+      <c:when test="${isTemplateRow || section.section.processDefaultValues}">
+        <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
+          <c:if test="${(responseOptionBean.text eq _item) || (responseOptionBean.value eq _item)}"><c:set var="checked" value="checked" /></c:if>
+        </c:forTokens>
+        <c:set var="needsToBeChecked" value="${!(empty checked) ? 'needsToBeChecked' : ''}"/>
       </c:when>
-      <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+      <c:otherwise><c:if test="${responseOptionBean.selected}"><c:set var="checked" value="checked" /></c:if></c:otherwise>
     </c:choose>
-    <%-- handle multiple values --%>
-      <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
-        <c:if test="${(responseOptionBean.text eq _item) || (responseOptionBean.value eq _item)}"><c:set var="checked" value="checked" />
-        </c:if>
-      </c:forTokens>
+    <c:set var="needsToBeChecked" value="${isTemplateRow && !(empty checked) ? 'needsToBeChecked' : ''}"/>
     <label for="<c:out value="${inputName}"/>"></label>
     <c:choose>
       <c:when test="${isInError}">
         <span class="aka_exclaim_error">! </span>
-        <input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+        <input ${needsToBeChecked} class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
                onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
-        <input id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
+        <input ${needsToBeChecked} id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
                onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
@@ -286,8 +280,6 @@ function changeImage(name) {
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
       <c:choose>
         <c:when test="${option.selected}"><c:set var="checked" value="checked" /></c:when>
-        <c:when test="${(option.text eq inputTxtValue) || (option.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
-        </c:when>
         <c:otherwise><c:set var="checked" value="" /></c:otherwise>
       </c:choose>
       <label for="<c:out value="${inputName}"/>"></label>
@@ -308,8 +300,6 @@ function changeImage(name) {
   <c:if test="${isHorizontal}">
     <c:choose>
       <c:when test="${responseOptionBean.selected}"><c:set var="checked" value="checked" /></c:when>
-      <c:when test="${(responseOptionBean.text eq inputTxtValue) || (responseOptionBean.value eq inputTxtValue)}"><c:set var="checked" value="checked" />
-      </c:when>
       <c:otherwise><c:set var="checked" value="" /></c:otherwise>
     </c:choose>
     <%-- Only have one of these per radio button--%>
@@ -329,55 +319,35 @@ function changeImage(name) {
 </c:if>
 
 <c:if test='${inputType == "single-select"}'>
-	<label for="<c:out value="${inputName}"/>"></label>
-	<c:if test="${isInError}">
-		<span class="aka_exclaim_error">! </span>
-	</c:if>
-	<c:choose>
-		<c:when test="${displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">
-			<c:set var="printDefault" value="true"/>
-		</c:when>
-		<c:otherwise>
-			<c:set var="printDefault" value="false"/>
-		</c:otherwise>
-	</c:choose>
-	<c:set var="selectedOption" value="-1"/>
-	<c:set var="count" value="0"/>
-	<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-		<c:if test="${option.selected && !isTemplateRow}">
-			<c:set var="selectedOption" value="${count}"/>
-		</c:if>
-		<c:if test="${printDefault=='true'}">
-			<c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
-				<c:set var="printDefault" value="false"/>
-				<c:choose>
-					<c:when test="${isTemplateRow}">
-						<c:set var="selectedOption" value="${count}"/>
-					</c:when>
-					<c:otherwise>
-						<c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
-					</c:otherwise>
-				</c:choose>
-			</c:if>
-		</c:if>
-		<c:set var="count" value="${count+1}"/>
-	</c:forEach>
-	<select id="${inputName}" tabindex="${tabNum}" name="${inputName}"
-			class="${isInError ? 'aka_input_error' : 'formfield'}"
-			onChange="this.className='changedField'; sameRepGrpInstant('${inputName}', '${itemId}',
-					'${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}',
-					'${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}');
-					changeImage('${inputName}');">
-		<c:if test="${printDefault == 'true'}">
-			<option value="">${displayItem.metadata.defaultValue}</option>
-		</c:if>
-		<c:set var="count" value="0"/>
-		<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-			<option value="${option.value}" ${count==selectedOption ? 'selected' : ''}>${option.text}</option>
-			<c:set var="count" value="${count+1}"/>
-		</c:forEach>
-	</select>
+    <label for="${inputName}"></label>
+    <c:if test="${isInError}">
+        <span class="aka_exclaim_error">! </span>
+    </c:if>
+    <c:set var="optionWasSelected" value="false"/>
+    <c:set var="defaultValueInOptions" value="false"/>
+    <c:set var="selectDefault" value="${(isTemplateRow || section.section.processDefaultValues) && displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}"/>
+    <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+        <c:if test="${option.text eq displayItem.metadata.defaultValue || option.value eq displayItem.metadata.defaultValue}">
+            <c:set var="defaultValueInOptions" value="true"/>
+        </c:if>
+    </c:forEach>
+    <select id="${inputName}" tabindex="${tabNum}" name="${inputName}"
+            class="${isInError ? 'aka_input_error' : 'formfield'}"
+            onChange="this.className='changedField'; sameRepGrpInstant('${inputName}', '${itemId}',
+                    '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}',
+                    '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}');
+                    changeImage('${inputName}');">
+        <c:if test="${!defaultValueInOptions}">
+            <c:set var="optionWasSelected" value="${selectDefault}"/>
+            <option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
+        </c:if>
+        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+            <option value="${option.value}" ${!optionWasSelected && ((selectDefault && (option.text eq displayItem.metadata.defaultValue || option.value eq displayItem.metadata.defaultValue)) || option.selected) ? 'selected' : ''}>${option.text}</option>
+        </c:forEach>
+    </select>
 </c:if>
+
+
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
@@ -391,16 +361,16 @@ function changeImage(name) {
     </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+    <c:set var="checked" value="" />
     <c:choose>
-      <c:when test="${option.selected}"><c:set var="checked" value="selected" /></c:when>
-      <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+      <c:when test="${isTemplateRow || section.section.processDefaultValues}">
+        <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
+          <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="selected" /></c:if>
+        </c:forTokens>
+      </c:when>
+      <c:otherwise><c:if test="${option.selected}"><c:set var="checked" value="selected" /></c:if></c:otherwise>
     </c:choose>
-    <%-- handle multiple values --%>
-    <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
-      <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="selected" />
-      </c:if>
-    </c:forTokens>
-    <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
+    <option value="${option.value}" ${checked}>${option.text}</option>
   </c:forEach>
   </select>
 </c:if>

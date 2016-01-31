@@ -34,7 +34,8 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
  */
 @SuppressWarnings({"rawtypes", "serial"})
 public class SectionBean extends AuditableEntityBean {
-	private int CRFVersionId;
+
+	private int crfVersionId;
 
 	private String label;
 
@@ -57,7 +58,7 @@ public class SectionBean extends AuditableEntityBean {
 	 */
 	private int numItems = 0;
 
-	private ArrayList items;// no in DB
+	private ArrayList items; // no in DB
 
 	private ArrayList<ItemGroupBean> groups; // YW, 08-21-2007, not in DB
 
@@ -76,13 +77,18 @@ public class SectionBean extends AuditableEntityBean {
 	// if section contains simple conditional display item
 	private boolean hasSCDItem;
 
+	private boolean processDefaultValues;
+
 	/**
 	 * The Section whose id == parentId. Not in the database. Only used for display.
 	 */
 	private SectionBean parent;
 
+	/**
+	 * Constructor.
+	 */
 	public SectionBean() {
-		CRFVersionId = 0;
+		crfVersionId = 0;
 		label = "";
 		title = "";
 		instructions = "";
@@ -110,18 +116,18 @@ public class SectionBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @return Returns the cRFVersionId.
+	 * @return Returns the crfVersionId.
 	 */
 	public int getCRFVersionId() {
-		return CRFVersionId;
+		return crfVersionId;
 	}
 
 	/**
 	 * @param versionId
-	 *            The cRFVersionId to set.
+	 *            The crfVersionId to set.
 	 */
 	public void setCRFVersionId(int versionId) {
-		CRFVersionId = versionId;
+		crfVersionId = versionId;
 	}
 
 	/**
@@ -317,18 +323,10 @@ public class SectionBean extends AuditableEntityBean {
 		this.items = items;
 	}
 
-	/**
-	 * 
-	 * @return groups ArrayList<ItemGroupBean>
-	 */
 	public ArrayList<ItemGroupBean> getGroups() {
 		return groups;
 	}
 
-	/**
-	 * 
-	 * @param groups
-	 */
 	public void setGroups(ArrayList<ItemGroupBean> groups) {
 		this.groups = groups;
 	}
@@ -341,4 +339,11 @@ public class SectionBean extends AuditableEntityBean {
 		this.hasSCDItem = hasSCDItem;
 	}
 
+	public boolean isProcessDefaultValues() {
+		return processDefaultValues;
+	}
+
+	public void setProcessDefaultValues(boolean processDefaultValues) {
+		this.processDefaultValues = processDefaultValues;
+	}
 }

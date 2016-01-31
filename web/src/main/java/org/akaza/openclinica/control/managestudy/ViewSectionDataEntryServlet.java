@@ -390,6 +390,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		DisplaySectionBean dsb;
 		// want to get displayBean with grouped and ungrouped items
+		sb.setProcessDefaultValues(
+				getItemDataDAO().findAllActiveBySectionIdAndEventCRFId(sectionId, ecb.getId()).size() == 0);
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(SECTION_BEAN, sb);

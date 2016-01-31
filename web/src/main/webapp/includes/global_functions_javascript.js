@@ -699,76 +699,74 @@ function changeBtnDisabledState(buttonObj,cssOnStateClass,
  The method clears all the values in a new row added by this library.  All of the
  inputs values are set to empty Strings, or checked inputs are unchecked. */
 function clearInputElementValues(trElement) {
-    if(! trElement)  { return; }
-
+    if (!trElement)  { return; }
     var tdElements = trElement.getElementsByTagName('td');
-
-
     //variables representing all inputs, textareas
     //in the new row
     var inputs;
     var textareas;
     var myDiv;
     var myId="";
-    if(tdElements){
-        for(var i = 0; i < tdElements.length; i++) {
-            if(tdElements[i]) {
+    if (tdElements){
+        for (var i = 0; i < tdElements.length; i++) {
+            if (tdElements[i]) {
 			    var rp=-1;
 			    var rm=-1;
 			    var myDivEls="";
                 inputs = tdElements[i].getElementsByTagName('input');
                 selects= tdElements[i].getElementsByTagName('select');
-
                 textareas = tdElements[i].getElementsByTagName('textarea');
                 //for file datatype, please reference to showGroupItemInput.jsp 
                 myDiv = tdElements[i].getElementsByTagName('div');
-                if(myDiv) {
+                if (myDiv) {
 	                //for file datatype, which only have one <div> with id as "div+inputname"
-	                if(myDiv[0] && myDiv[0].getAttribute("id").startsWith("div")) {
+	                if (myDiv[0] && myDiv[0].getAttribute("id").startsWith("div")) {
 		            	myId = myDiv[0].getAttribute("id").substring(3);
 		            	myDivEls = myDiv[0].getElementsByTagName('a');
-		            	if(myDivEls.length<=0) {
+		            	if (myDivEls.length<=0) {
 			            	myDivEls = myDiv[0].getElementsByTagName('del');
 		            	}
 	           		}
             	}
-                if(inputs) {
-                    for(var j = 0; j < inputs.length; j++){
-                        if(inputs[j]){
-                            if(inputs[j].getAttribute("type") &&
-                               (inputs[j].getAttribute("type").indexOf("checkbox") != -1 ||
-                                inputs[j].getAttribute("type").indexOf("radio") != 1)){
+                if (inputs) {
+                    for (var j = 0; j < inputs.length; j++) {
+                        if (inputs[j]){
+                            if (inputs[j].getAttribute("type") &&
+                                (inputs[j].getAttribute("type").indexOf("checkbox") != -1 ||
+                                inputs[j].getAttribute("type").indexOf("radio") != 1)) {
                                 inputs[j].removeAttribute("checked");
                                 inputs[j].checked=false;
+                                setDefaultValue(inputs[j]);
                             }
-                            if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("text") != -1) {
+                            if (inputs[j].getAttribute("type") &&
+                                inputs[j].getAttribute("type").indexOf("text") != -1) {
                                 inputs[j].setAttribute("value","");
+                                setDefaultValue(inputs[j]);
                             }
                             //remove two buttons, Replace, Remove, for File datatype.if(inputs[j].getAttribute("type") &&
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("button") != -1 &&
-                               inputs[j].getAttribute("id") == "rp"+myId) {
-	                               rp = j;
-                           }
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("button") != -1 &&
-                               inputs[j].getAttribute("id") == "rm"+myId) {
-	                               rm = j;
-                           }
-                           if(inputs[j].getAttribute("id") == "hidft"+myId) {
-                               inputs[j].setAttribute("id", "ft"+myId);
-                               $(inputs[j]).removeClass("hidden");
-                           }
-                           if(inputs[j].getAttribute("id") == "hidup"+myId) {
-                               inputs[j].setAttribute("id", "up"+myId);
-                               $(inputs[j]).removeClass("hidden");
-                           }
+                            if (inputs[j].getAttribute("type") &&
+                                inputs[j].getAttribute("type").indexOf("button") != -1 &&
+                                inputs[j].getAttribute("id") == "rp" + myId) {
+                                rp = j;
+                            }
+                            if (inputs[j].getAttribute("type") &&
+                                inputs[j].getAttribute("type").indexOf("button") != -1 &&
+                                inputs[j].getAttribute("id") == "rm" + myId) {
+                                rm = j;
+                            }
+                            if (inputs[j].getAttribute("id") == "hidft" + myId) {
+                                inputs[j].setAttribute("id", "ft" + myId);
+                                $(inputs[j]).removeClass("hidden");
+                            }
+                            if (inputs[j].getAttribute("id") == "hidup" + myId) {
+                                inputs[j].setAttribute("id", "up" + myId);
+                                $(inputs[j]).removeClass("hidden");
+                            }
                         }
                     }
                 }
                 
-                if(rp>=0) {
+                if (rp >= 0) {
                 	tdElements[i].removeChild(inputs[rm]);
                 	tdElements[i].removeChild(inputs[rp]);
                 	if(myDivEls[0]) {
@@ -776,10 +774,11 @@ function clearInputElementValues(trElement) {
                 	}
             	}
 
-                if(textareas) {
-                    for(var m = 0; m < textareas.length; m++){
-                        if(textareas[m]) {
-                            textareas[m].innerHTML="";
+                if (textareas) {
+                    for (var m = 0; m < textareas.length; m++){
+                        if (textareas[m]) {
+                            textareas[m].innerHTML = "";
+                            setDefaultValue(textareas[m]);
                         }
                     }
                 }
@@ -787,6 +786,27 @@ function clearInputElementValues(trElement) {
         }
     }
 }
+
+function setDefaultValue(element) {
+    try {
+        var object = $(element);
+        var defaultValue = object.attr("default");
+        if (object.attr("type").toLowerCase() == "checkbox") {
+            object.each(function () {
+                if (object.attr("needsToBeChecked") != undefined) {
+                    object[0].checked = true;
+                }
+            });
+        } else if (object.attr("type").toLowerCase() == "text" && defaultValue != undefined) {
+            object.val(defaultValue);
+        } else if (object.attr("type").toLowerCase() == "textarea" && defaultValue != undefined) {
+            object.text(defaultValue);
+        }
+    } catch (e) {
+        //console.log(e.message);
+    }
+}
+
 function changeDNoteIcon(trElement) {
 
     if(! trElement)  { return; }
