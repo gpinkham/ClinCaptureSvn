@@ -266,7 +266,8 @@ public class RuleSetService implements RuleSetServiceInterface {
 	 * {@inheritDoc}
 	 */
 	public RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean) {
-		for (RuleSetRuleBean ruleSetRuleBean : ruleSetBean.getRuleSetRules()) {
+		List<RuleSetRuleBean> ruleSetRules = ruleSetBean.getRuleSetRules();
+		for (RuleSetRuleBean ruleSetRuleBean : ruleSetRules) {
 			if (ruleSetRuleBean.getId() != null
 					&& ruleSetRuleBean.getRuleSetRuleBeanImportStatus() == RuleSetRuleBeanImportStatus.TO_BE_REMOVED) {
 				ruleSetRuleBean.setStatus(org.akaza.openclinica.domain.Status.DELETED);

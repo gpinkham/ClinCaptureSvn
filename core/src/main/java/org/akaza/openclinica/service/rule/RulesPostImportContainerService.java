@@ -108,6 +108,9 @@ public final class RulesPostImportContainerService {
 					persistentRuleSetBean.setUpdaterAndDate(getUserAccount());
 					ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
 					Iterator<RuleSetRuleBean> itr = importedRuleSetRules.iterator();
+					if (Status.DELETED.equals(persistentRuleSetBean.getStatus())) {
+						persistentRuleSetBean.setStatus(Status.AVAILABLE);
+					}
 					while (itr.hasNext()) {
 						RuleSetRuleBean ruleSetRuleBean = itr.next();
 						ruleSetRuleBean.setRuleBean(getRuleDao().findByOid(ruleSetRuleBean.getOid(),
@@ -119,19 +122,18 @@ public final class RulesPostImportContainerService {
 								ruleSetRuleBean.setRuleBean(ruleBeanWrapper.getAuditableBean());
 							}
 						}
-						for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
-							if (persistentruleSetRuleBean.getStatus() != Status.DELETED
-									&& ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
-								persistentruleSetRuleBean
-										.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
-								itr.remove();
-								break;
-							} else if (persistentruleSetRuleBean.getStatus() != Status.DELETED
-									&& ruleSetRuleBean.getRuleBean() != null
-									&& ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
-								persistentruleSetRuleBean
-										.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
-								break;
+						List<RuleSetRuleBean> ruleSetRules = persistentRuleSetBean.getRuleSetRules();
+						for (RuleSetRuleBean persistentruleSetRuleBean : ruleSetRules) {
+							if (persistentruleSetRuleBean.getStatus() != Status.DELETED) {
+								if (ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
+									persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
+									itr.remove();
+									break;
+								} else if (ruleSetRuleBean.getRuleBean() != null
+										&& ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
+									persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
+									break;
+								}
 							}
 							ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
 						}
