@@ -337,7 +337,7 @@ function changeImage(name) {
                     '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}',
                     '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}');
                     changeImage('${inputName}');">
-        <c:if test="${!defaultValueInOptions}">
+        <c:if test="${!defaultValueInOptions and displayItem.metadata.defaultValue != null and displayItem.metadata.defaultValue != ''}">
             <c:set var="optionWasSelected" value="${selectDefault}"/>
             <option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
         </c:if>

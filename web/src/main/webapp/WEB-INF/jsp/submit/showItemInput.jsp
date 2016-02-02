@@ -336,7 +336,7 @@ form element in red --%>
 	</c:forEach>
 	<select class="${isInError ? 'aka_input_error' : 'formfield'}" id="input${itemId}" tabindex="${tabNum}"
 			onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); ${scdScript} changeImage('input${itemId}');" name="input${itemId}">
-		<c:if test="${!defaultValueInOptions}">
+		<c:if test="${!defaultValueInOptions and displayItem.metadata.defaultValue != null and displayItem.metadata.defaultValue != ''}">
 			<c:set var="optionWasSelected" value="${selectDefault}"/>
 			<option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
 		</c:if>
