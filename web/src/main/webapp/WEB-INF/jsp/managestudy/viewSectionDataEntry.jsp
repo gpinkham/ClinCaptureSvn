@@ -96,6 +96,7 @@
         return sib;
     }
 
+	crfShortcutsTableDefTop += 56;
 </script>
 
 		<c:import url="../submit/interviewer.jsp" />
@@ -1183,7 +1184,6 @@
 		style="position: absolute; visibility: hidden; background-color: white"></div>
 </body>
 <script language="JavaScript" type="text/javascript">
-	crfShortcutsTableDefTop += 56;
 	$(window).load(function() {
 		$("table > tbody  button").attr("disabled", "true");
 		$("table > tbody  input").attr("disabled", "disabled");
