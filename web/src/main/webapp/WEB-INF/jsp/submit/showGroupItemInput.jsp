@@ -342,7 +342,7 @@ function changeImage(name) {
             <option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
         </c:if>
         <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-            <option value="${option.value}" ${!optionWasSelected && ((selectDefault && (option.text eq displayItem.metadata.defaultValue || option.value eq displayItem.metadata.defaultValue)) || option.selected) ? 'selected' : ''}>${option.text}</option>
+            <option value="${option.value}" ${!optionWasSelected && ((selectDefault && (option.text eq displayItem.metadata.defaultValue || option.value eq displayItem.metadata.defaultValue)) || (option.selected && !isTemplateRow)) ? 'selected' : ''}>${option.text}</option>
         </c:forEach>
     </select>
 </c:if>
