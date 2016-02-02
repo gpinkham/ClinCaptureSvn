@@ -497,10 +497,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * 
 	 * @param pDate
 	 *            value that was entered in pDate format.
-	 * @return formated date.
+	 * @return formatted date.
 	 */
 	public String formatPDate(String pDate) {
-		String temp = "";
+
+		String temp = pDate;
 		String yearMonthFormat = StringUtil
 				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
 		String yearFormat = StringUtil
@@ -530,10 +531,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * 
 	 * @param pDate
 	 *            value that was entered for item.
-	 * @return formated date.
+	 * @return formatted date.
 	 */
 	public String reFormatPDate(String pDate) {
-		String temp = "";
+
+		String temp = pDate;
 		String yearMonthFormat = StringUtil
 				.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
 		String yearFormat = StringUtil
