@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -264,28 +265,41 @@ public class SimpleConditionalDisplayService {
 	 * @return
 	 */
 	public static boolean initConditionalDisplayToBeShown(DisplayItemBean controlItem, SCDItemMetadataBean cd) {
-		String chosenOption = controlItem.getData().getValue();
-		if (chosenOption != null && chosenOption.length() > 0) {
-			if (chosenOption.equals(cd.getOptionValue())) {
+		if (controlItem.getData().isActive()) {
+			if (scdOptionValueSelected(controlItem, cd, controlItem.getData().getValue())) {
 				return true;
 			}
 		} else {
-			chosenOption = controlItem.getMetadata().getDefaultValue();
-			if (chosenOption != null && chosenOption.length() > 0) {
-				if (chosenOption.equals(cd.getOptionValue())) {
-					return true;
-				}
+			if (scdOptionValueSelected(controlItem, cd, controlItem.getMetadata().getDefaultValue())) {
+				return true;
 			} else {
-				if (controlItem.getMetadata().getResponseSet().getResponseTypeId() == 6) {
-					// single-select
-					chosenOption = ((ResponseOptionBean) controlItem.getMetadata().getResponseSet().getOptions().get(0))
-							.getValue();
-					if (chosenOption != null && chosenOption.length() > 0) {
-						if (chosenOption.equals(cd.getOptionValue())) {
-							return true;
-						}
+				if (ResponseType.get(controlItem.getMetadata().getResponseSet().getResponseTypeId()).equals(
+						ResponseType.SELECT)) {
+					String firstOptionValue = ((ResponseOptionBean) controlItem.getMetadata().getResponseSet()
+							.getOptions().get(0)).getValue();
+					if (scdOptionValueSelected(controlItem, cd, firstOptionValue)) {
+						return true;
 					}
 				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean scdOptionValueSelected(DisplayItemBean controlItem, SCDItemMetadataBean cd, String selectedOptionValue) {
+		if (selectedOptionValue != null && selectedOptionValue.length() > 0) {
+			if (ResponseType.get(controlItem.getMetadata().getResponseSet().getResponseTypeId()).equals(
+					ResponseType.CHECKBOX)
+					|| ResponseType.get(controlItem.getMetadata().getResponseSet().getResponseTypeId()).equals(
+							ResponseType.SELECTMULTI)) {
+				String[] value = selectedOptionValue.split(",");
+				for (String option : value) {
+					if (option.equals(cd.getOptionValue())) {
+						return true;
+					}
+				}
+			} else if (selectedOptionValue.equals(cd.getOptionValue())) {
+				return true;
 			}
 		}
 		return false;
