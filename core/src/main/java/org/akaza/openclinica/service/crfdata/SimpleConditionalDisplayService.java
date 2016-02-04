@@ -21,6 +21,7 @@
 package org.akaza.openclinica.service.crfdata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,15 +29,21 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ResponseType;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +116,7 @@ public class SimpleConditionalDisplayService {
 						ArrayList<SCDItemMetadataBean> sets = scdPairMap.get(displayItem.getMetadata().getId());
 						displayItem.getScdData().setScdSetsForControl(sets);
 						for (SCDItemMetadataBean scd : sets) {
-							if (SimpleConditionalDisplayService.initConditionalDisplayToBeShown(displayItem, scd)) {
+							if (initConditionalDisplayToBeShown(displayItem, scd)) {
 								showSCDItemIds.add(scd.getScdItemId());
 							}
 						}
@@ -128,7 +135,7 @@ public class SimpleConditionalDisplayService {
 								ArrayList<SCDItemMetadataBean> sets = scdPairMap.get(c.getMetadata().getId());
 								c.getScdData().setScdSetsForControl(sets);
 								for (SCDItemMetadataBean scd : sets) {
-									if (SimpleConditionalDisplayService.initConditionalDisplayToBeShown(c, scd)) {
+									if (initConditionalDisplayToBeShown(c, scd)) {
 										showSCDItemIds.add(scd.getScdItemId());
 									}
 								}
@@ -260,21 +267,23 @@ public class SimpleConditionalDisplayService {
 	/**
 	 * Return true, if a SCDItemMetadataBean to show initially.
 	 * 
-	 * @param controlItem
-	 * @param cd
-	 * @return
+	 * @param controlItem DisplayItemBean
+	 * @param cd SCDItemMetadataBean
+	 * @return boolean
 	 */
-	public static boolean initConditionalDisplayToBeShown(DisplayItemBean controlItem, SCDItemMetadataBean cd) {
-		if (controlItem.getData().isActive()) {
+	private boolean initConditionalDisplayToBeShown(DisplayItemBean controlItem, SCDItemMetadataBean cd) {
+
+		if (controlItem.getData().isActive() && notStartedDoubleDataEntryStage(controlItem)) {
 			if (scdOptionValueSelected(controlItem, cd, controlItem.getData().getValue())) {
 				return true;
 			}
 		} else {
 			if (scdOptionValueSelected(controlItem, cd, controlItem.getMetadata().getDefaultValue())) {
 				return true;
+			} else if (scdOptionValueSelected(controlItem, cd, getDefaultValue(controlItem))) {
+				return true;
 			} else {
-				if (ResponseType.get(controlItem.getMetadata().getResponseSet().getResponseTypeId()).equals(
-						ResponseType.SELECT)) {
+				if (ResponseType.SELECT.equals(controlItem.getMetadata().getResponseSet().getResponseType())) {
 					String firstOptionValue = ((ResponseOptionBean) controlItem.getMetadata().getResponseSet()
 							.getOptions().get(0)).getValue();
 					if (scdOptionValueSelected(controlItem, cd, firstOptionValue)) {
@@ -286,12 +295,12 @@ public class SimpleConditionalDisplayService {
 		return false;
 	}
 
-	private static boolean scdOptionValueSelected(DisplayItemBean controlItem, SCDItemMetadataBean cd, String selectedOptionValue) {
+	private boolean scdOptionValueSelected(DisplayItemBean controlItem, SCDItemMetadataBean cd,
+			String selectedOptionValue) {
+
 		if (selectedOptionValue != null && selectedOptionValue.length() > 0) {
-			if (ResponseType.get(controlItem.getMetadata().getResponseSet().getResponseTypeId()).equals(
-					ResponseType.CHECKBOX)
-					|| ResponseType.get(controlItem.getMetadata().getResponseSet().getResponseTypeId()).equals(
-							ResponseType.SELECTMULTI)) {
+			ResponseType ctrlResponseType = controlItem.getMetadata().getResponseSet().getResponseType();
+			if (ResponseType.CHECKBOX.equals(ctrlResponseType) || ResponseType.SELECTMULTI.equals(ctrlResponseType)) {
 				String[] value = selectedOptionValue.split(",");
 				for (String option : value) {
 					if (option.equals(cd.getOptionValue())) {
@@ -303,6 +312,35 @@ public class SimpleConditionalDisplayService {
 			}
 		}
 		return false;
+	}
+
+	private String getDefaultValue(DisplayItemBean controlItem) {
+
+		String defaultValue = "";
+		if (!StringUtils.isEmpty(controlItem.getMetadata().getDefaultValue())) {
+
+			List<String> optionTexts = Arrays.asList(controlItem.getMetadata().getDefaultValue().split(","));
+			List<ResponseOptionBean> responseOptions = controlItem.getMetadata().getResponseSet().getOptions();
+			for (String text: optionTexts) {
+				for (ResponseOptionBean response: responseOptions) {
+					if (text.equals(response.getText())) {
+						defaultValue += response.getValue() + ",";
+						break;
+					}
+				}
+			}
+			defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
+		}
+		return defaultValue;
+	}
+
+	private boolean notStartedDoubleDataEntryStage(DisplayItemBean controlItem) {
+
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(getDataSource());
+		int eventCRFID = controlItem.getData().getEventCRFId();
+		EventCRFBean eventCRF = (EventCRFBean) eventCRFDAO.findByPK(eventCRFID);
+		EventDefinitionCRFBean eventDefCRF = controlItem.getEventDefinitionCRF();
+		return !(eventDefCRF.isDoubleEntry() && DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.equals(eventCRF.getStage()));
 	}
 
 	public DataSource getDataSource() {
