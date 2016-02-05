@@ -2372,6 +2372,7 @@ public abstract class DataEntryServlet extends Controller {
 		if (value != null && value.length() > 0 && !dib.getIsSCDtoBeShown() && !hasDN) {
 			String message = dib.getScdData().getScdItemMetadataBean().getMessage();
 			Validation vl = new Validation(Validator.TO_HIDE_CONDITIONAL_DISPLAY);
+			vl.setAlwaysExecuted(true);
 			vl.setErrorMessage(message);
 			v.addValidation(DataEntryUtil.getInputName(dib), vl);
 		}
