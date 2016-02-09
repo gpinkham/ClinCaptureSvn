@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -63,22 +64,22 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("studySubject.label", "ssID1");
 		assertEquals(Integer.valueOf(5), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 2, 3, 4, 5));
 	}
 
 	@Test
 	public void testOffset() {
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 2, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 2, 100);
 		assertEquals(3, noteBeans.size());
 	}
 
 	@Test
 	public void testLimit() {
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 3);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 3);
 		assertEquals(3, noteBeans.size());
 	}
 
@@ -88,8 +89,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.disType", "1");
 		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 4));
 	}
 
@@ -99,8 +100,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "1");
 		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(4, 5));
 	}
 
@@ -110,8 +111,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("siteId", "default-study");
 		assertEquals(Integer.valueOf(5), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 2, 3, 4, 5));
 	}
 
@@ -121,8 +122,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("eventName", "ED-1");
 		assertEquals(Integer.valueOf(3), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 4, 5));
 	}
 
@@ -132,8 +133,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("crfName", "Administration");
 		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 4));
 	}
 
@@ -143,8 +144,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("entityName", "periodStart");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1));
 	}
 
@@ -154,8 +155,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("entityValue", "2008");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1));
 	}
 
@@ -165,8 +166,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.entityType", "itemData");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1));
 	}
 
@@ -176,8 +177,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.entityType", "subject");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(2));
 	}
 
@@ -187,8 +188,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.entityType", "studySub");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(3));
 	}
 
@@ -198,8 +199,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.entityType", "eventCRF");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(4));
 	}
 
@@ -209,8 +210,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.entityType", "studyEvent");
 		assertEquals(Integer.valueOf(1), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(5));
 	}
 
@@ -220,8 +221,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.description", "entry error");
 		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(4, 5));
 	}
 
@@ -231,8 +232,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.user", "root");
 		assertEquals(Integer.valueOf(3), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 3, 4));
 	}
 
@@ -244,8 +245,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.description", "entry error");
 		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(4, 5));
 	}
 
@@ -258,32 +259,29 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		notesFilter.addFilter("discrepancyNoteBean.user", "root");
 		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
-		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
-				notesFilter, notesSort, 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study, notesFilter,
+				notesSort, 0, 100);
 		assertDNBeansInList(noteBeans, Arrays.asList(1, 4));
 	}
 
 	@Test
 	public void testThatGetUserDNsReturnsCorrectSizedListOfUserDNs() {
-		assertEquals(
-				5,
-				discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, user, new ListNotesFilter(),
-						new ListNotesSort()).size());
+		assertEquals(5, discrepancyNoteDAO
+				.getViewNotesWithFilterAndSort(study, user, new ListNotesFilter(), new ListNotesSort()).size());
 	}
 
 	@Test
 	public void testThatGetUserDNsReturnsEmptyListForUserWithNoDNs() {
 		UserAccountBean newUser = new UserAccountBean();
 		newUser.setId(111);
-		assertEquals(
-				0,
-				discrepancyNoteDAO.getViewNotesWithFilterAndSort(study, newUser, new ListNotesFilter(),
-						new ListNotesSort()).size());
+		assertEquals(0, discrepancyNoteDAO
+				.getViewNotesWithFilterAndSort(study, newUser, new ListNotesFilter(), new ListNotesSort()).size());
 	}
 
 	@Test
 	public void testStatistics() {
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study,
+				null);
 
 		assertEquals(5, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 1, 1)));
@@ -329,7 +327,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		eventCRFDAO.update(ecb);
 		// ----------------------------------------------------
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study,
+				null);
 
 		assertTrue(statisticBeans.isEmpty());
 
@@ -368,7 +367,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		eventCRFDAO.update(ecb);
 		// ----------------------------------------------------
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study,
+				null);
 
 		assertEquals(2, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
@@ -409,7 +409,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		eventCRFDAO.update(ecb);
 		// ----------------------------------------------------
 
-		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study, null);
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatisticWithMasks(study,
+				null);
 
 		assertEquals(3, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
@@ -467,8 +468,8 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		currentStudy.setId(1);
 		currentStudy.setParentStudyId(0);
 		assertNotNull(discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, ""));
-		assertEquals(1, discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, "")
-				.size());
+		assertEquals(1,
+				discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, "").size());
 	}
 
 	@Test
@@ -498,99 +499,99 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsCorrectNumberOfDCFs() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals(1, dcfs.size());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectStudyName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("Default Study", dcfs.get(0).getStudyName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSiteName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("Default Study", dcfs.get(0).getSiteName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectCrfItemName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("Start of Agent Administration Period", dcfs.get(0).getCrfItemName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectCrfName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("Agent Administration", dcfs.get(0).getCrfName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSubjectID() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("ssID1", dcfs.get(0).getSubjectId());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectEventName() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("ED-1-NonRepeating", dcfs.get(0).getEventName());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectQuestion() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("10:00pm bedtime\n[The input you provided is not an integer.]", dcfs.get(0).getQuestionToSite());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectPageNumber() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("AdministrationandDosage", dcfs.get(0).getPage());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectNoteId() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals(1, dcfs.get(0).getNoteId().intValue());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectNoteType() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("Failed Validation Check", dcfs.get(0).getNoteType());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectResolutionStatus() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("Closed", dcfs.get(0).getResolutionStatus());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectStudyProtocol() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("default-study", dcfs.get(0).getStudyProtocolID());
 	}
 
 	@Test
 	public void testThatGetDCFsByNoteIdsReturnsDCFWithCorrectSiteOID() {
-		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study,
-				resword, 1);
+		List<DiscrepancyCorrectionForm> dcfs = discrepancyNoteDAO.getDiscrepancyCorrectionFormsByNoteIds(study, resword,
+				1);
 		assertEquals("S_DEFAULTS1", dcfs.get(0).getSiteOID());
 	}
 
@@ -607,13 +608,22 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		study.setId(1);
 		UserAccountBean user = new UserAccountBean();
 		user.setId(1);
-		assertEquals(3, discrepancyNoteDAO.getNotesWithFilterAndSortForOutput(study, new ListNotesFilter(), user).size());
+		assertEquals(3,
+				discrepancyNoteDAO.getNotesWithFilterAndSortForOutput(study, new ListNotesFilter(), user).size());
 	}
 
 	@Test
 	public void testThatGetNotesWithFilterAndSortForOutputReturnsCorrectResultIfUserIsNull() {
 		StudyBean study = new StudyBean();
 		study.setId(1);
-		assertEquals(5, discrepancyNoteDAO.getNotesWithFilterAndSortForOutput(study, new ListNotesFilter(), null).size());
+		assertEquals(5,
+				discrepancyNoteDAO.getNotesWithFilterAndSortForOutput(study, new ListNotesFilter(), null).size());
+	}
+
+	@Test
+	public void testThatCountDNsByCRFsMethodReturnsCorrectValues() {
+		Map<String, Map<ResolutionStatus, Integer>> result = discrepancyNoteDAO.countDNsByCRFs(study,
+				new ListNotesFilter(), user);
+		assertEquals(result.keySet().size(), 0);
 	}
 }

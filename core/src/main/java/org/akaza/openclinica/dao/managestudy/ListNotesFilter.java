@@ -56,7 +56,6 @@ public class ListNotesFilter implements CriteriaCommand {
 		columnMapping.put("discrepancyNoteBean.createdDate", "dn.date_created");
 		columnMapping.put("discrepancyNoteBean.updatedDate", "dn.date_created");
 		columnMapping.put("discrepancyNoteBean.description", "dn.description");
-		columnMapping.put("discrepancyNoteBean.user", "ua.user_name");
 		columnMapping.put("discrepancyNoteBean.disType", "dn.discrepancy_note_type_id");
 		columnMapping.put("discrepancyNoteBean.entityType", "dn.entity_type");
 		columnMapping.put("discrepancyNoteBean.resolutionStatus", "dn.resolution_status_id");
@@ -107,6 +106,22 @@ public class ListNotesFilter implements CriteriaCommand {
 		return theCriteria;
 	}
 
+	/**
+	 * Adds user filter sql.
+	 * 
+	 * @return String
+	 */
+	public String addUserFilter() {
+		String result = " where 1 = 1 ";
+		for (Filter filter : filters) {
+			if (filter.getProperty().equalsIgnoreCase("discrepancyNoteBean.user")) {
+				result += parseUserAccountName("ua.user_name", (String) filter.getValue());
+				break;
+			}
+		}
+		return result;
+	}
+
 	private String buildCriteria(String criteria, String property, Object value) {
 
 		String pgDateFormat = "yyyy-MM-dd";
@@ -128,8 +143,6 @@ public class ListNotesFilter implements CriteriaCommand {
 			} else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")) {
 				criteria += " and UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')"
 						+ " ";
-			} else if (property.equals("discrepancyNoteBean.user")) {
-				criteria += parseUserAccountName(columnMapping.get(property), value.toString());
 			} else if (property.equals("siteId")) {
 				criteria += " and ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%"
 						+ value.toString() + "%')";
@@ -295,7 +308,7 @@ public class ListNotesFilter implements CriteriaCommand {
 	 * @return String
 	 */
 	public String getAdditionalFilter() {
-		StringBuilder builder = new StringBuilder(" where 1=1 ");
+		StringBuilder builder = new StringBuilder(" and 1 = 1 ");
 		for (ListNotesFilter.Filter filter : this.getFilters()) {
 			String property = filter.getProperty();
 			if (additionalColumnMapping.containsKey(property)) {

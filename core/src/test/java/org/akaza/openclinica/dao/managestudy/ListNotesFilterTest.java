@@ -33,7 +33,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("unique_identifier")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'unique_identifier' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'unique_identifier' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -51,7 +51,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("gender")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'gender' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'gender' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -69,7 +69,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("date_of_birth")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'date_of_birth' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'date_of_birth' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -87,7 +87,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("enrollment_date")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'enrollment_date' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'enrollment_date' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -105,7 +105,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("location")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'location' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'location' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -123,7 +123,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("start_date")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'date_start' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'date_start' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -141,7 +141,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("end_date")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'date_end' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'date_end' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -159,7 +159,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("interviewer_name")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'interviewer_name' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'interviewer_name' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -177,7 +177,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("date_interviewed")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name = 'date_interviewed' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name = 'date_interviewed' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -195,7 +195,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("AEOUT")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name like '%AEOUT%' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name like '%AEOUT%' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -213,7 +213,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("AEOUT(#1)")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.entity_name like '%AEOUT%'  and dns.item_data_ordinal = 1 ";
+		String expectedSqlFilter = " and 1 = 1  and dns.entity_name like '%AEOUT%'  and dns.item_data_ordinal = 1 ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -231,7 +231,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("crfName", ResourceBundleProvider.getResWord("Adverse Event")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.crf_name like '%Adverse Event%' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.crf_name like '%Adverse Event%' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -249,7 +249,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("eventName", ResourceBundleProvider.getResWord("Screening")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.event_name like '%Screening%' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.event_name like '%Screening%' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -267,7 +267,7 @@ public class ListNotesFilterTest {
 		List<ListNotesFilter.Filter> testFiltersList = new ArrayList<ListNotesFilter.Filter>();
 		testFiltersList.add(new ListNotesFilter.Filter("entityValue", ResourceBundleProvider.getResWord("23")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
-		String expectedSqlFilter = " where 1=1  and dns.item_value like '%23%' ";
+		String expectedSqlFilter = " and 1 = 1  and dns.item_value like '%23%' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();
@@ -288,7 +288,7 @@ public class ListNotesFilterTest {
 		testFiltersList.add(new ListNotesFilter.Filter("entityName", ResourceBundleProvider.getResWord("date_interviewed")));
 		Whitebox.setInternalState(listNotesFilter, "filters", testFiltersList);
 		String expectedSqlFilter =
-				" where 1=1  and dns.event_name like '%Screening%'  and dns.crf_name like '%Demographics%'  and dns.entity_name = 'date_interviewed' ";
+				" and 1 = 1  and dns.event_name like '%Screening%'  and dns.crf_name like '%Demographics%'  and dns.entity_name = 'date_interviewed' ";
 
 		// TEST
 		String sqlFilter = listNotesFilter.getAdditionalFilter();

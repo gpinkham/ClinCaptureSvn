@@ -27,12 +27,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.clinovo.service.CRFMaskingService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -83,6 +83,7 @@ import com.clinovo.jmesa.evaluation.CRFEvaluationSort;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
 
@@ -647,13 +648,29 @@ public class WidgetsLayoutController {
 		List<CRFBean> crfs = (List<CRFBean>) crfdao.findAllActiveByDefinitionsForCurrentStudy(sb.getId());
 		crfs = maskingService.removeCRFIfItsMaskedInAllEvents(crfs, sb.getId(), ub.getId());
 		List<NDsPerCRFDisplay> displays = new ArrayList<NDsPerCRFDisplay>();
-
+		ResolutionStatus[] statuses = {ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
+				ResolutionStatus.NOT_APPLICABLE};
+		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
+		LinkedHashMap<String, List<Integer>> crfNameToDataColumns = new LinkedHashMap<String, List<Integer>>();
+		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap = dnDao.countDNsByCRFs(sb,
+				new ListNotesFilter(), ub);
 		for (CRFBean crf : crfs) {
+			int total = 0;
 			NDsPerCRFDisplay currentDisplay = new NDsPerCRFDisplay();
 			currentDisplay.setCrfName(crf.getName());
-			ListNotesFilter filter = new ListNotesFilter();
-			filter.addFilter("crfName", crf.getName());
-			currentDisplay.setCountOfNds(dnDao.countViewNotesWithFilter(sb, filter, ub));
+			Map<ResolutionStatus, Integer> rsToDNCountMap = crfNameToRSToDNCountMap.get(crf.getName());
+			if (rsToDNCountMap == null) {
+				rsToDNCountMap = new HashMap<ResolutionStatus, Integer>();
+			}
+			List<Integer> contNdsWithStatuses = new ArrayList<Integer>();
+			for (ResolutionStatus status : statuses) {
+				Integer count = rsToDNCountMap.get(status);
+				count = count == null ? 0 : count;
+				total += count;
+				contNdsWithStatuses.add(count);
+			}
+			crfNameToDataColumns.put(crf.getName(), contNdsWithStatuses);
+			currentDisplay.setCountOfNds(total);
 			displays.add(currentDisplay);
 		}
 		Collections.sort(displays, new Comparator<NDsPerCRFDisplay>() {
@@ -669,9 +686,7 @@ public class WidgetsLayoutController {
 				return compareResult;
 			}
 		});
-		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
-		ResolutionStatus[] statuses = {ResolutionStatus.CLOSED, ResolutionStatus.UPDATED, ResolutionStatus.OPEN,
-				ResolutionStatus.NOT_APPLICABLE};
+
 		int start = Integer.parseInt(request.getParameter("start"));
 		int maxDispay = ND_PER_CRF_DISPLAY_PER_SCREEN;
 		String action = request.getParameter("action");
@@ -685,16 +700,7 @@ public class WidgetsLayoutController {
 		for (int i = start; i < displays.size() && i < start + maxDispay; i++) {
 			boolean eCrfExist = true;
 			String crfName = displays.get(i).getCrfName();
-			List<Integer> contNdsWithStatuses = new ArrayList<Integer>();
-
-			for (ResolutionStatus status : statuses) {
-				ListNotesFilter filter = new ListNotesFilter();
-				filter.addFilter("crfName", crfName);
-				filter.addFilter("discrepancyNoteBean.resolutionStatus", status.getId());
-				int count = dnDao.countViewNotesWithFilter(sb, filter, ub);
-				contNdsWithStatuses.add(count);
-			}
-			dataColumns.put(crfName, contNdsWithStatuses);
+			dataColumns.put(crfName, crfNameToDataColumns.get(crfName));
 		}
 		boolean hasPrevious = start != 0;
 		boolean hasNext = start + maxDispay < displays.size();

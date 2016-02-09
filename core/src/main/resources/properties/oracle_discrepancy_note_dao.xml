@@ -13,30 +13,25 @@
     <query>
         <name>findAllSubjectDNByStudy</name>
         <sql>
-            SELECT dn.*, ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value,
-			0 item_data_ordinal, ds.column_name AS entity_name
-            FROM study_subject ss,
-            dn_subject_map ds,
-            dn_age_days dad,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id=? or parent_study_id=? )
-            AND ss.subject_id = ds.subject_id AND dn.discrepancy_note_id = ds.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            SELECT distinct dn.*, ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value,
+            0 item_data_ordinal, ds.column_name AS entity_name
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_age_days dad on dad.discrepancy_note_id = dn.discrepancy_note_id
+            join dn_subject_map ds on ds.discrepancy_note_id = dn.discrepancy_note_id
+            join study_subject ss on ss.subject_id = ds.subject_id and ss.study_id = s.study_id and ss.status_id not in (5)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>countAllSubjectDNByStudyForStat</name>
         <sql>
             SELECT count(*), dn.discrepancy_note_type_id, dn.resolution_status_id, 1 as id
-            FROM study_subject ss,
-            dn_subject_map ds,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.subject_id = ds.subject_id
-            AND dn.discrepancy_note_id = ds.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND ss.status_id not in (5)
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_subject_map ds on ds.discrepancy_note_id = dn.discrepancy_note_id
+            join study_subject ss on ss.subject_id = ds.subject_id and ss.study_id = s.study_id and ss.status_id not in (5)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
 	<query>
@@ -120,160 +115,125 @@
     <query>
         <name>findAllStudySubjectDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value,
-			0 item_data_ordinal, dss.column_name AS entity_name
-            FROM study_subject ss,
-            dn_study_subject_map dss,
-            dn_age_days dad,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.study_subject_id = dss.study_subject_id
-            AND dn.discrepancy_note_id = dss.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            SELECT distinct dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value,
+            0 item_data_ordinal, dss.column_name AS entity_name
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_age_days dad on dad.discrepancy_note_id = dn.discrepancy_note_id
+            join dn_study_subject_map dss on dss.discrepancy_note_id = dn.discrepancy_note_id
+            join study_subject ss on ss.study_subject_id = dss.study_subject_id and ss.study_id = s.study_id and ss.status_id not in (5)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>countAllStudySubjectDNByStudyForStat</name>
         <sql>
             SELECT count(*), dn.discrepancy_note_type_id, dn.resolution_status_id, 2 as id
-            FROM study_subject ss,
-            dn_study_subject_map dss,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.study_subject_id = dss.study_subject_id
-            AND dn.discrepancy_note_id = dss.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND ss.status_id not in (5)
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_study_subject_map dss on dss.discrepancy_note_id = dn.discrepancy_note_id
+            join study_subject ss on ss.study_subject_id = dss.study_subject_id and ss.study_id = s.study_id and ss.status_id not in (5)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>findAllStudyEventDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, sed.name event_name, NULL item_value,
-			0 item_data_ordinal, dse.column_name AS entity_name
-            FROM study_subject ss,
-            study_event se left join study_event_definition sed on se.study_event_definition_id =
-            sed.study_event_definition_id,
-            dn_study_event_map dse,
-            dn_age_days dad,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.study_subject_id = se.study_subject_id
-            AND se.study_event_id = dse.study_event_id
-            AND dn.discrepancy_note_id = dse.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
-            AND sed.status_id not in (5,7)
-            AND se.status_id not in (5,7)
+            SELECT distinct dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, sed.name event_name, NULL item_value,
+            0 item_data_ordinal, dse.column_name AS entity_name
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_age_days dad on dad.discrepancy_note_id = dn.discrepancy_note_id
+            join dn_study_event_map dse on dse.discrepancy_note_id = dn.discrepancy_note_id
+            join study_event se on se.study_event_id = dse.study_event_id AND se.status_id not in (5,7)
+            join study_subject ss on ss.study_subject_id = se.study_subject_id and ss.study_id = s.study_id
+            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.status_id not in (5,7)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>countAllStudyEventDNByStudyForStat</name>
         <sql>
             SELECT count(*), dn.discrepancy_note_type_id, dn.resolution_status_id, 3 as id
-            FROM study_subject ss,
-            study_event se left join study_event_definition sed on se.study_event_definition_id =
-            sed.study_event_definition_id,
-            dn_study_event_map dse,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.study_subject_id = se.study_subject_id
-            AND se.study_event_id = dse.study_event_id
-            AND dn.discrepancy_note_id = dse.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND sed.status_id not in (5, 7)
-            AND se.status_id not in (5, 7)
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_study_event_map dse on dse.discrepancy_note_id = dn.discrepancy_note_id
+            join study_event se on se.study_event_id = dse.study_event_id AND se.status_id not in (5,7)
+            join study_subject ss on ss.study_subject_id = se.study_subject_id and ss.study_id = s.study_id
+            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.status_id not in (5,7)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>findAllEventCrfDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, c.name crf_name, sed.name event_name, NULL
+            SELECT distinct dn.*,ss.label, dad.age, dad.days, NULL item_name, c.name crf_name, sed.name event_name, NULL
             item_value, 0 item_data_ordinal, dec.column_name AS entity_name
-            FROM study_subject ss,
-            event_crf ec left join crf_version cv on ec.crf_version_id = cv.crf_version_id
-            left join crf c on c.crf_id = cv.crf_id
-            left join study_event se on se.study_event_id = ec.study_event_id
-            left join study_event_definition sed on se.study_event_definition_id = sed.study_event_definition_id,
-            dn_event_crf_map dec,
-            dn_age_days dad,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.study_subject_id = ec.study_subject_id
-            AND ec.event_crf_id = dec.event_crf_id
-            AND dn.discrepancy_note_id = dec.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
-            AND sed.status_id not in (5, 7)
-            AND se.status_id not in (5, 7) AND ec.status_id not in (5, 7)
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_age_days dad on dad.discrepancy_note_id = dn.discrepancy_note_id
+            join dn_event_crf_map dec on dec.discrepancy_note_id = dn.discrepancy_note_id
+            join event_crf ec on ec.event_crf_id = dec.event_crf_id and ec.status_id not in (5,7)
+            join study_subject ss on ss.study_subject_id = ec.study_subject_id and ss.study_id = s.study_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            join crf c on c.crf_id = cv.crf_id
+            join study_event se on se.study_event_id = ec.study_event_id AND se.status_id not in (5,7)
+            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.status_id not in (5,7)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>countAllEventCrfDNByStudyForStat</name>
         <sql>
             SELECT count(*), dn.discrepancy_note_type_id, dn.resolution_status_id, 4 as id
-            FROM study_subject ss,
-            event_crf ec left join study_event se on se.study_event_id = ec.study_event_id
-            left join study_event_definition sed on se.study_event_definition_id = sed.study_event_definition_id,
-            dn_event_crf_map dec,
-            discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-            AND ss.study_subject_id = ec.study_subject_id
-            AND ec.event_crf_id = dec.event_crf_id
-            AND dn.discrepancy_note_id = dec.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND sed.status_id not in (5, 7)
-            AND se.status_id not in (5, 7)
-            AND ec.status_id not in (5, 7)
-            <!-- add GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id in code-->
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_event_crf_map dec on dec.discrepancy_note_id = dn.discrepancy_note_id
+            join event_crf ec on ec.event_crf_id = dec.event_crf_id and ec.status_id not in (5,7)
+            join study_subject ss on ss.study_subject_id = ec.study_subject_id and ss.study_id = s.study_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            join crf c on c.crf_id = cv.crf_id
+            join study_event se on se.study_event_id = ec.study_event_id AND se.status_id not in (5,7)
+            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.status_id not in (5,7)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>findAllItemDataDNByStudy</name>
         <sql>
-			SELECT dn.*,ss.label, dad.age, dad.days, it.name item_name, c.name crf_name, sed.name event_name, itd.value
-			item_value, itd.ordinal item_data_ordinal, it.name AS entity_name
-			FROM study_subject ss,
-			event_crf ec left join crf_version cv on ec.crf_version_id = cv.crf_version_id
-			left join crf c on c.crf_id = cv.crf_id
-			left join study_event se on se.study_event_id = ec.study_event_id
-			left join study_event_definition sed on se.study_event_definition_id = sed.study_event_definition_id,
-			item_data itd left join item it on itd.item_id = it.item_id,
-			dn_item_data_map did,
-			dn_age_days dad,
-			discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-			WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id = ? )
-			AND ss.study_subject_id = ec.study_subject_id
-			AND ec.event_crf_id = itd.event_crf_id
-			AND itd.item_data_id = did.item_data_id
-			AND dn.discrepancy_note_id = did.discrepancy_note_id
-			AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-			AND dn.discrepancy_note_id = dad.discrepancy_note_id
-			AND sed.status_id not in (5,7)
-			AND se.status_id not in (5,7)
-			AND ec.status_id not in (5,7)
+            SELECT distinct dn.*, ss.label, dad.age, dad.days, it.name item_name, c.name crf_name, sed.name event_name, itd.value
+            item_value, itd.ordinal item_data_ordinal, it.name AS entity_name
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_age_days dad on dad.discrepancy_note_id = dn.discrepancy_note_id
+            join dn_item_data_map did on did.discrepancy_note_id = dn.discrepancy_note_id
+            join item_data itd on itd.item_data_id = did.item_data_id
+            join item it on it.item_id = itd.item_id
+            join event_crf ec on ec.event_crf_id = itd.event_crf_id and ec.status_id not in (5,7)
+            join study_subject ss on ss.study_subject_id = ec.study_subject_id and ss.study_id = s.study_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            join crf c on c.crf_id = cv.crf_id
+            join study_event se on se.study_event_id = ec.study_event_id AND se.status_id not in (5,7)
+            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.status_id not in (5,7)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
         <name>countAllItemDataDNByStudyForStat</name>
         <sql>
             SELECT count(*), dn.discrepancy_note_type_id, dn.resolution_status_id, 5 as id
-            FROM study_subject ss, event_crf ec,
-            item_data itd, dn_item_data_map did, dn_age_days dad, study_event se, study_event_definition sed,
-            discrepancy_note dn
-            left outer join user_account ua on ua.user_id = dn.assigned_user_id
-            WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id= ? )
-            AND ss.study_subject_id = ec.study_subject_id
-            AND ec.event_crf_id = itd.event_crf_id
-            AND ec.study_event_id = se.study_event_id
-            AND itd.item_data_id = did.item_data_id
-            AND se.study_event_definition_id = sed.study_event_definition_id
-            AND dn.discrepancy_note_id = did.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
-            AND sed.status_id not in (5,7)
-            AND se.status_id not in (5,7) AND ec.status_id not in (5,7)
+            FROM discrepancy_note dn
+            left join study s on s.study_id = ? or s.parent_study_id = ?
+            join dn_item_data_map did on did.discrepancy_note_id = dn.discrepancy_note_id
+            join item_data itd on itd.item_data_id = did.item_data_id
+            join item it on it.item_id = itd.item_id
+            join event_crf ec on ec.event_crf_id = itd.event_crf_id and ec.status_id not in (5,7)
+            join study_subject ss on ss.study_subject_id = ec.study_subject_id and ss.study_id = s.study_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            join crf c on c.crf_id = cv.crf_id
+            join study_event se on se.study_event_id = ec.study_event_id AND se.status_id not in (5,7)
+            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id and sed.status_id not in (5,7)
+            where (dn.parent_dn_id IS NULL or dn.parent_dn_id = 0)
             <!-- add GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id in code-->
         </sql>
     </query>

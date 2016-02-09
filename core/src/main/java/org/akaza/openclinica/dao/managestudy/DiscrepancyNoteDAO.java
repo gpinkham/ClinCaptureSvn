@@ -13,8 +13,20 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
-import com.clinovo.model.DiscrepancyCorrectionForm;
-import com.clinovo.util.DateUtil;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -37,18 +49,8 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.clinovo.model.DiscrepancyCorrectionForm;
+import com.clinovo.util.DateUtil;
 
 /**
  * <code>DiscrepancyNoteDAO</code> class is a member of DAO layer, extends <code>AuditableEntityDAO</code> class.
@@ -545,7 +547,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 					.append(" ) ");
 		}
 		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter());
-		sql.append(") dns ");
+		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
+				.append(filter.addUserFilter());
 		sql.append(filter.getAdditionalFilter());
 		if (!sortPart.isEmpty()) {
 			sql.append(sortPart);
@@ -657,9 +660,71 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 					.append(" ) ");
 		}
 		sql.append(filterPart);
-		sql.append(") dns ").append(filter.getAdditionalFilter());
+		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
+				.append(filter.addUserFilter()).append(filter.getAdditionalFilter());
 		ArrayList rows = select(sql.toString(), variables);
 		return rows.size() != 0 ? (Integer) ((Map) rows.get(0)).get("count") : new Integer(0);
+	}
+
+	/**
+	 * Returns a count of parent DNs by CRFs in study/site.
+	 *
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param ub
+	 *            UserAccountBean
+	 * @return Map
+	 */
+	public Map<String, Map<ResolutionStatus, Integer>> countDNsByCRFs(StudyBean currentStudy, ListNotesFilter filter,
+			UserAccountBean ub) {
+		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap = new HashMap<String, Map<ResolutionStatus, Integer>>();
+		int activeUserId = ub == null ? 0 : ub.getId();
+		int index = 1;
+		unsetTypeExpected();
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index, TypeNames.STRING);
+
+		Map variables = new HashMap();
+		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_1; i++) {
+			variables.put(i, currentStudy.getId());
+		}
+
+		StringBuilder sql = new StringBuilder(
+				"select count(discrepancy_note_id), resolution_status_id, crf_name from (");
+
+		String filterPart = filter.execute("");
+
+		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
+		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
+		}
+		sql.append(filterPart).append(UNION_OP);
+		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
+		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
+		}
+		sql.append(filterPart);
+		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
+				.append(filter.addUserFilter()).append(filter.getAdditionalFilter());
+		sql.append(" group by crf_name, dns.resolution_status_id order by crf_name, resolution_status_id");
+		List<Map> rows = select(sql.toString(), variables);
+		for (Map map : rows) {
+			Map<ResolutionStatus, Integer> rsToDNCountMap = crfNameToRSToDNCountMap.get(map.get("crf_name"));
+			if (rsToDNCountMap == null) {
+				rsToDNCountMap = new HashMap<ResolutionStatus, Integer>();
+				crfNameToRSToDNCountMap.put((String) map.get("crf_name"), rsToDNCountMap);
+			}
+			rsToDNCountMap.put(ResolutionStatus.get((Integer) map.get("resolution_status_id")),
+					(Integer) map.get("count"));
+		}
+		return crfNameToRSToDNCountMap;
 	}
 
 	/**
@@ -767,7 +832,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 					.append(" ) ");
 		}
 		sql.append(filterPart);
-		sql.append(") dns ");
+		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
+				.append(filter.addUserFilter());
 		sql.append(filter.getAdditionalFilter());
 		return sql;
 	}
@@ -977,7 +1043,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 					.append(" ) ");
 		}
 		sql.append(filterPart);
-		sql.append(") dns ");
+		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
+				.append(filter.addUserFilter());
 		sql.append(filter.getAdditionalFilter());
 		sql.append(" order by dns.label");
 
