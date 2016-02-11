@@ -620,7 +620,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			AuditLogBean auditBean = new AuditLogBean();
 			auditBean.setOid("AL_" + auditLogEvent.getAuditId());
 			auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
-			if (auditLogEvent.getEntityName() != null && auditLogEvent.getEntityName().equals(STATUS)) {
+			if ((auditLogEvent.getEntityName() != null && auditLogEvent.getEntityName().equals(STATUS)) 
+					|| (auditLogEvent.getAuditLogEventType() != null && auditLogEvent.getAuditLogEventType().getAuditLogEventTypeId() == 12)) {
 				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT)) {
 					auditBean.setNewValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getNewValue())));
 					auditBean.setOldValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getOldValue())));
