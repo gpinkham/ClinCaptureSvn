@@ -328,7 +328,9 @@ public class SimpleConditionalDisplayService {
 					}
 				}
 			}
-			defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
+			if (!StringUtils.isEmpty(defaultValue)) {
+				defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
+			}
 		}
 		return defaultValue;
 	}
