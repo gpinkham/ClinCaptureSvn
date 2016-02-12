@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css?r=${revisionNumber}" type="text/css" media="print">
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/js/crf_shortcuts.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/Tabs.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/prototype.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
@@ -96,7 +97,6 @@
         return sib;
     }
 
-	crfShortcutsTableDefTop += 56;
 </script>
 
 		<c:import url="../submit/interviewer.jsp" />
@@ -127,12 +127,15 @@
 		</c:choose>
 
 		<%-- deleted previous exit block--%>
-		<br /> <br> <c:set var="sectionNum" value="0" /> <c:forEach
+		<c:set var="sectionNum" value="0" /> <c:forEach
 				var="section" items="${toc.sections}">
 				<c:set var="sectionNum" value="${sectionNum+1}" />
 			</c:forEach> <%-- removed, tbh 102007 --%>
+
+<c:import url="../include/crfShortcuts.jsp"><c:param name="className" value="crf_shortcuts_view" /><c:param name="wrapperClass" value="crf_shortcuts_view" /></c:import>
+
 <!-- section tabs here -->
-<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0"  style="${!(crfShortcutsAnalyzer eq null || (crfShortcutsAnalyzer.totalNew == 0 && crfShortcutsAnalyzer.totalUpdated == 0 && crfShortcutsAnalyzer.totalResolutionProposed == 0 && crfShortcutsAnalyzer.totalClosed == 0 && crfShortcutsAnalyzer.totalAnnotations == 0 && crfShortcutsAnalyzer.totalItemsToSDV == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
+<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0">
 <tr>
 
 <script type="text/JavaScript" language="JavaScript">

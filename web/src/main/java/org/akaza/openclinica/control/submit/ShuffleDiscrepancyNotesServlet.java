@@ -13,17 +13,18 @@
 
 package org.akaza.openclinica.control.submit;
 
+import java.util.List;
+import java.util.TreeSet;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings({"serial"})
 @Component
@@ -37,8 +38,8 @@ public class ShuffleDiscrepancyNotesServlet extends Controller {
 		boolean shuffle = false;
 		String rowPrefix = request.getParameter(ROW_PREFIX);
 		int index = Integer.parseInt(rowPrefix.replaceAll(".*_manual", "").replaceAll("input.*", ""));
-		FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
-				FORM_DISCREPANCY_NOTES_NAME);
+		FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) request.getSession()
+				.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
 		if (newNotes != null) {
 			for (String k : new TreeSet<String>(newNotes.getFieldNotes().keySet())) {
@@ -51,8 +52,6 @@ public class ShuffleDiscrepancyNotesServlet extends Controller {
 						shuffle = true;
 						index = ind;
 						break;
-					} else {
-						continue;
 					}
 				}
 			}
@@ -66,8 +65,11 @@ public class ShuffleDiscrepancyNotesServlet extends Controller {
 						newNotes.getFieldNotes().remove(k);
 					} else if (ind > index) {
 						String k2 = k.replace("_manual" + ind, "_manual" + (ind - 1));
-						List<DiscrepancyNoteBean> note = newNotes.getFieldNotes().remove(k);
-						newNotes.getFieldNotes().put(k2, note);
+						List<DiscrepancyNoteBean> noteList = newNotes.getFieldNotes().remove(k);
+						for (DiscrepancyNoteBean dn : noteList) {
+							dn.setField(k2);
+						}
+						newNotes.getFieldNotes().put(k2, noteList);
 					}
 				}
 			}
@@ -77,7 +79,8 @@ public class ShuffleDiscrepancyNotesServlet extends Controller {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		//
 	}
 }

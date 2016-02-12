@@ -15,6 +15,8 @@
 <script type="text/javascript" language="JavaScript">
 	var checkboxObject;
 
+	clearRepeatTemplate();
+
 	var areCheckboxesValid = function() {
 		var partialSave = false;
 		var markComplete = false;
@@ -45,11 +47,6 @@
 	function disableSubmit(value) {
 		$("input[type=button],input[type=submit]").attr("disabled", value);
 	}
-
-	$(document).ready(function(){
-		$("#CRF_infobox_closed").css("display","block");
-		$("#CRF_infobox_open").css("display","none");
-	});
 
 	<c:if test="${dataEntryStage.isInitialDE()}">
 		var formChanged;

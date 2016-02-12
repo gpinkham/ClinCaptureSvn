@@ -2309,6 +2309,7 @@ div.crfInfoBlock {
 }
 
 div.crfInfoDiv {
+    padding-top: 8px;
     padding-right: 20px;
     text-align: left;
     float: left;
@@ -3014,4 +3015,16 @@ span.autoChange {
 
 .p10 {
 	padding: 10px;
+}
+
+table.crf_shortcuts_view {
+    padding-top: 18px;
+}
+
+table td.crf_shortcuts_view {
+    padding-bottom: 17px;
+}
+
+table td.crf_shortcuts_de {
+    padding-bottom: 16px;
 }

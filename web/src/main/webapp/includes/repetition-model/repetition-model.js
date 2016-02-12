@@ -97,8 +97,12 @@ removeButtonClick = function(btn, block) {
 			addOverlay();
 			var timestamp = new Date().getTime();
 			$.get("ShuffleDiscrepancyNotes?rp=" + rowPrefix + "&t=" + timestamp, function(data) {
-				for (var i = 0; i < block.parentNode.children.length; i++) {
-					var tr = block.parentNode.children[i];
+				var parentBlock = block.parentNode;
+				if(block) {
+					block.removeRepetitionBlock();
+				}
+				for (var i = 0; i < parentBlock.children.length; i++) {
+					var tr = parentBlock.children[i];
 					if (tr.nodeName.toUpperCase() == "TR") {
 						var repeatTemplate = tr.getAttribute("repeat-template");
 						if (repeatTemplate == undefined ) {
@@ -110,23 +114,30 @@ removeButtonClick = function(btn, block) {
 							if (rowPrefix.indexOf("_manual") >= 0 ) {
 								var rowIndex = parseInt(rowPrefix.replace(/.*_manual/g, ""));
 								if (rowIndex > deletedRowIndex) {
+									var repeatingTableRow = $(tr);
+									repeatingTableRow.attr("repeat", (rowIndex - 1) - 1);
+
+									var itemHolder = repeatingTableRow.find("td:first[id^=itemHolderId_]");
+									var postFix = itemHolder.attr("id").toString().replace(/itemHolderId_\d*/,"");
+									itemHolder.attr("id", "itemHolderId_" + (rowIndex - 1) + postFix);
+
+									var crfShortcutAnchor = repeatingTableRow.find("div:first[id^=crfShortcutAnchors_]");
+									postFix = crfShortcutAnchor.attr("id").toString().replace(/crfShortcutAnchors_\d*/,"");
+									crfShortcutAnchor.attr("id", "crfShortcutAnchors_" + (rowIndex - 1) + postFix);
+
 									var newRowPrefix = rowPrefix.replace("_manual" + rowIndex, "_manual" + (rowIndex - 1));
 									replaceRowPrefix(tr, rowPrefix, newRowPrefix);
 								}
-							} else
-							if (parseInt(rowPrefix.replace(repeatTemplate + "_", "")) > 0) {
+							} else if (parseInt(rowPrefix.replace(repeatTemplate + "_", "")) > 0) {
 								break;
 							}
 						}
 					}
 				}
-				if(block) {
-					block.removeRepetitionBlock();
-				}
+				updateCRFHeader('', '', '', '');
 				removeOverlay();
 			});
-		} else
-		if(block) {
+		} else if(block) {
 			block.removeRepetitionBlock();
 		}
 	} catch(e) {
@@ -182,8 +193,6 @@ if (!window.RepetitionElement || (
 			RepetitionElement._init_removeButtons();
 
 			RepetitionElement.__updateAddButtons();
-
-			initCrfMoreInfo();
 		},
 
 		/*##############################################################################################

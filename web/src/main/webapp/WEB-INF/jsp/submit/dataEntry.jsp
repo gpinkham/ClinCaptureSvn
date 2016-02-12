@@ -26,6 +26,7 @@
 	<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 	<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
 	<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/js/crf_shortcuts.js?r=${revisionNumber}"></script>
 	<script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js?r=${revisionNumber}"></script>
 	<script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js?r=${revisionNumber}"></script>
 	<script type="text/javascript" language="JavaScript" src="includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
@@ -116,8 +117,10 @@
 		<c:import url="../data-entry-include/request_password_block.jsp"/>
 	</c:if>
 
+	<c:import url="../include/crfShortcuts.jsp"><c:param name="className" value="crf_shortcuts_de" /><c:param name="wrapperClass" value="" /></c:import>
+
 	<!-- section tabs here -->
-	<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0" style="${!(crfShortcutsAnalyzer eq null || (crfShortcutsAnalyzer.totalNew == 0 && crfShortcutsAnalyzer.totalUpdated == 0 && crfShortcutsAnalyzer.totalResolutionProposed == 0 && crfShortcutsAnalyzer.totalClosed == 0 && crfShortcutsAnalyzer.totalAnnotations == 0 && crfShortcutsAnalyzer.totalItemsToSDV == 0)) ? 'padding-top: 80px;' : 'padding-top: 0px;'}">
+	<table id="crfSectionTabsTable" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
 			<c:import url="../data-entry-include/error_messages.jsp"/>
 		</td></tr>
