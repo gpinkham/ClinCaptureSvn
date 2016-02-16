@@ -15,6 +15,7 @@
 package com.clinovo.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -38,6 +40,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
@@ -329,7 +332,8 @@ public class DataEntryServiceImpl implements DataEntryService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createItemData(int itemId, int ordinal, Status status, EventCRFBean eventCrf, UserAccountBean ub) {
+	public void createItemData(int itemId, int ordinal, ItemFormMetadataBean itemFormMetadataBean,
+			EventCRFBean eventCrf, UserAccountBean ub) {
 		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
 		ItemDataBean idb = new ItemDataBean();
 		idb.setItemId(itemId);
@@ -337,15 +341,50 @@ public class DataEntryServiceImpl implements DataEntryService {
 		idb.setCreatedDate(new Date());
 		idb.setOrdinal(ordinal);
 		idb.setOwner(ub);
-		if (status != null) {
-			idb.setStatus(status);
-		} else {
-			idb.setStatus(Status.UNAVAILABLE);
-		}
-		idb.setValue("");
+		idb.setStatus(eventCrf.getStatus());
+		idb.setValue(getValue(itemFormMetadataBean));
 		itemDataDAO.create(idb);
 	}
 
+	private String getValue(ItemFormMetadataBean itemFormMetadataBean) {
+		String value = "";
+		if (itemFormMetadataBean != null && itemFormMetadataBean.getDefaultValue() != null) {
+			if (itemFormMetadataBean.getResponseSet().getResponseTypeId() == ResponseType.CHECKBOX.getId()
+					|| itemFormMetadataBean.getResponseSet().getResponseTypeId() == ResponseType.SELECT.getId()
+					|| itemFormMetadataBean.getResponseSet().getResponseTypeId() == ResponseType.SELECTMULTI.getId()) {
+				value = processDefaultValue(itemFormMetadataBean);
+			} else {
+				value = itemFormMetadataBean.getDefaultValue();
+			}
+		}
+		return value;
+	}
+
+	private String processDefaultValue(ItemFormMetadataBean itemFormMetadataBean) {
+		String value = "";
+		if (itemFormMetadataBean.getDefaultValue().isEmpty()
+				&& itemFormMetadataBean.getResponseSet().getResponseTypeId() == ResponseType.SELECT.getId()) {
+			value = itemFormMetadataBean.getResponseSet().getOptions().get(0).getValue();
+		} else {
+			value = processOptions(itemFormMetadataBean, value);
+		}
+		return value;
+	}
+
+	private String processOptions(ItemFormMetadataBean itemFormMetadataBean, String value) {
+		List<String> defaultValues = Arrays.asList(itemFormMetadataBean.getDefaultValue().split(","));
+		for (ResponseOptionBean responseOptionBean : itemFormMetadataBean.getResponseSet().getOptions()) {
+			if (defaultValues.contains(responseOptionBean.getText())
+					|| defaultValues.contains(responseOptionBean.getValue())) {
+				value += (value.isEmpty() ? "" : ",") + responseOptionBean.getValue();
+				if (itemFormMetadataBean.getResponseSet().getResponseTypeId() == ResponseType.SELECT.getId()) {
+					break;
+				}
+			}
+		}
+		return value;
+	}
+	
 	private DynamicsMetadataService getDynamicsMetadataService() {
 		if (dynamicsMetadataService == null) {
 			dynamicsMetadataService = new DynamicsMetadataService(dynamicsItemFormMetadataDao,

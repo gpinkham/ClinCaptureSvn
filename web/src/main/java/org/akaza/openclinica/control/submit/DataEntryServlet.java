@@ -1473,7 +1473,9 @@ public abstract class DataEntryServlet extends Controller {
 						}
 					}
 
-					saveItemsWithoutItemDataForCompletedCRF(ecb, ub);
+					if (markSuccessfully) {
+						saveItemsWithoutItemDataForCompletedCRF(ecb, ub);
+					}
 
 					// send email with CRF-report
 					if (markSuccessfully && "complete".equals(edcb.getEmailStep())) {
@@ -3125,43 +3127,48 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private void saveItemsWithoutItemDataForCompletedCRF(EventCRFBean ecb, UserAccountBean ub) throws Exception {
-		if (ecb.getStatus().isUnavailable() && ecb.getDateCompleted() != null) {
-			Set<Integer> itemIdsInGroup;
-			ItemDataDAO itemDataDAO = getItemDataDAO();
-			Map<Integer, Set<Integer>> groupIdToItemIdsMap = new HashMap<Integer, Set<Integer>>();
-			List<ItemGroupMetadataBean> itemGroupMetadataList = getItemGroupMetadataDAO()
-					.findByCrfVersion(ecb.getCRFVersionId());
-			for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataList) {
-				itemIdsInGroup = groupIdToItemIdsMap.get(itemGroupMetadataBean.getItemGroupId());
-				if (itemIdsInGroup == null) {
-					itemIdsInGroup = new HashSet<Integer>();
-					groupIdToItemIdsMap.put(itemGroupMetadataBean.getItemGroupId(), itemIdsInGroup);
-				}
-				itemIdsInGroup.add(itemGroupMetadataBean.getItemId());
+		Set<Integer> itemIdsInGroup;
+		ItemDataDAO itemDataDAO = getItemDataDAO();
+		Map<Integer, Set<Integer>> groupIdToItemIdsMap = new HashMap<Integer, Set<Integer>>();
+		List<ItemGroupMetadataBean> itemGroupMetadataList = getItemGroupMetadataDAO()
+				.findByCrfVersion(ecb.getCRFVersionId());
+		for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataList) {
+			itemIdsInGroup = groupIdToItemIdsMap.get(itemGroupMetadataBean.getItemGroupId());
+			if (itemIdsInGroup == null) {
+				itemIdsInGroup = new HashSet<Integer>();
+				groupIdToItemIdsMap.put(itemGroupMetadataBean.getItemGroupId(), itemIdsInGroup);
 			}
-			Map<Integer, Map<Integer, Integer>> groupToOrdinalVsItemsMap = getEventCRFDAO()
-					.getCRFGroupOrdinalItemsMap(ecb.getId());
-			for (int groupId : groupIdToItemIdsMap.keySet()) {
-				itemIdsInGroup = groupIdToItemIdsMap.get(groupId);
-				if (groupToOrdinalVsItemsMap.containsKey(groupId)) {
-					Map<Integer, Integer> ordinalVsItemsMap = groupToOrdinalVsItemsMap.get(groupId);
-					for (int ordinal : ordinalVsItemsMap.keySet()) {
-						int savedCountOfItems = ordinalVsItemsMap.get(ordinal);
-						if (savedCountOfItems < itemIdsInGroup.size()) {
-							for (int itemId : itemIdsInGroup) {
-								ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(itemId,
-										ecb.getId(), ordinal);
-								if (itemDataBean.getId() == 0) {
-									getDataEntryService(getServletContext()).createItemData(itemId, ordinal,
-											Status.UNAVAILABLE, ecb, ub);
-								}
+			itemIdsInGroup.add(itemGroupMetadataBean.getItemId());
+		}
+		Map<Integer, ItemFormMetadataBean> itemIdToMetaMap = new HashMap<Integer, ItemFormMetadataBean>();
+		List<ItemFormMetadataBean> itemFormMetadataBeanList = getItemFormMetadataDAO()
+				.findAllByCRFVersionId(ecb.getCRFVersionId());
+		for (ItemFormMetadataBean itemFormMetadataBean : itemFormMetadataBeanList) {
+			itemIdToMetaMap.put(itemFormMetadataBean.getItemId(), itemFormMetadataBean);
+		}
+		Map<Integer, Map<Integer, Integer>> groupToOrdinalVsItemsMap = getEventCRFDAO()
+				.getCRFGroupOrdinalItemsMap(ecb.getId());
+		for (int groupId : groupIdToItemIdsMap.keySet()) {
+			itemIdsInGroup = groupIdToItemIdsMap.get(groupId);
+			if (groupToOrdinalVsItemsMap.containsKey(groupId)) {
+				Map<Integer, Integer> ordinalVsItemsMap = groupToOrdinalVsItemsMap.get(groupId);
+				for (int ordinal : ordinalVsItemsMap.keySet()) {
+					int savedCountOfItems = ordinalVsItemsMap.get(ordinal);
+					if (savedCountOfItems < itemIdsInGroup.size()) {
+						for (int itemId : itemIdsInGroup) {
+							ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(itemId,
+									ecb.getId(), ordinal);
+							if (itemDataBean.getId() == 0) {
+								getDataEntryService(getServletContext()).createItemData(itemId, ordinal,
+										itemIdToMetaMap.get(itemId), ecb, ub);
 							}
 						}
 					}
-				} else {
-					for (int itemId : itemIdsInGroup) {
-						getDataEntryService(getServletContext()).createItemData(itemId, 1, Status.UNAVAILABLE, ecb, ub);
-					}
+				}
+			} else {
+				for (int itemId : itemIdsInGroup) {
+					getDataEntryService(getServletContext()).createItemData(itemId, 1, itemIdToMetaMap.get(itemId), ecb,
+							ub);
 				}
 			}
 		}

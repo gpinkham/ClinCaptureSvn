@@ -18,12 +18,12 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.view.Page;
 
@@ -99,12 +99,13 @@ public interface DataEntryService {
 	 *            int
 	 * @param ordinal
 	 *            int
-	 * @param status
-	 *            Status
+	 * @param itemFormMetadataBean
+	 *            ItemFormMetadataBean
 	 * @param eventCrf
 	 *            EventCRFBean
 	 * @param ub
 	 *            UserAccountBean
 	 */
-	void createItemData(int itemId, int ordinal, Status status, EventCRFBean eventCrf, UserAccountBean ub);
+	void createItemData(int itemId, int ordinal, ItemFormMetadataBean itemFormMetadataBean, EventCRFBean eventCrf,
+			UserAccountBean ub);
 }
