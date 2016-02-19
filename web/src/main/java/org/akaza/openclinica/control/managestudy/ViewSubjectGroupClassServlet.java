@@ -50,7 +50,7 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class ViewSubjectGroupClassServlet extends Controller {
 	@Override

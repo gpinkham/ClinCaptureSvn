@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
-@SuppressWarnings({ "serial" })
 @Component
 public class ShowCalendarFuncServlet extends Controller {
 

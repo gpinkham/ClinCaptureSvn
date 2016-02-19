@@ -44,7 +44,7 @@ import com.clinovo.util.EmailUtil;
 /**
  * Allows both deletion and remove/restore of a study user role.
  */
-@SuppressWarnings({"unchecked", "serial"})
+@SuppressWarnings("unchecked")
 @Component
 public class DeleteStudyUserRoleServlet extends Controller {
 	public static final String PATH = "DeleteStudyUserRole";

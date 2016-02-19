@@ -56,7 +56,7 @@ import com.clinovo.util.ValidatorHelper;
  * The servlet for creating sub study of user's current active study.
  * 
  */
-@SuppressWarnings({"unchecked", "serial", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class CreateSubStudyServlet extends Controller {
 

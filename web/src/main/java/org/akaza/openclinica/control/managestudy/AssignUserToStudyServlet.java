@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes request to assign a user to a study.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class AssignUserToStudyServlet extends Controller {
 

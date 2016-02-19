@@ -81,7 +81,7 @@ import com.clinovo.i18n.LocaleResolver;
  * 
  * @author thickerson
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ExportDatasetServlet extends Controller {
 

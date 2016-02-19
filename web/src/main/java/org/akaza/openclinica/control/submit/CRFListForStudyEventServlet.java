@@ -74,7 +74,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
  * 
  * @author ssachs
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class CRFListForStudyEventServlet extends Controller {
 

@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * Lists all the users in a study.
  * 
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ListStudyUserServlet extends RememberLastPage {
 

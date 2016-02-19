@@ -46,7 +46,6 @@ import com.clinovo.util.EmailUtil;
 /**
  * Allows both - locking and unlocking of a study user role.
  */
-@SuppressWarnings({"serial"})
 @Component
 public class UnLockUserServlet extends Controller {
 

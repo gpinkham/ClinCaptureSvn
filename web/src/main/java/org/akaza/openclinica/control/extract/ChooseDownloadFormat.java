@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
  * Created by IntelliJ IDEA. User: bruceperry Date: May 19, 2008 Time: 1:45:28 PM To change this template use File |
  * Settings | File Templates.
  */
-@SuppressWarnings("serial")
 @Component
 public class ChooseDownloadFormat extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

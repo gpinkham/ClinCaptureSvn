@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
 /**
  * Upload file servlet.
  */
-@SuppressWarnings({"unchecked", "serial"})
+@SuppressWarnings("unchecked")
 @Component
 public class UploadFileServlet extends Controller {
 

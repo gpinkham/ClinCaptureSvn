@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class ViewUserAccountServlet extends Controller {
 	public static final String PATH = "ViewUserAccount";

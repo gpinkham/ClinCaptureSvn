@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.List;
 
 
@@ -44,6 +45,7 @@ import java.util.List;
  * UpdateRuleSetRuleServlet, the class which handles the business case for updating or deleting a rule.
  */
 @Component
+@SuppressWarnings("unused")
 public class UpdateRuleSetRuleServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;

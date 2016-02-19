@@ -47,7 +47,6 @@ import java.io.InputStream;
 /**
  * AccessFileServlet class.
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class AccessFileServlet extends Controller {
 

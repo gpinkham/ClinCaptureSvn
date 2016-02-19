@@ -46,7 +46,7 @@ import java.util.Map;
  * Set user role servlet for adding roles for user account.
  * 
  */
-@SuppressWarnings({ "serial", "unchecked" })
+@SuppressWarnings("unchecked")
 @Component
 public class SetUserRoleServlet extends Controller {
 

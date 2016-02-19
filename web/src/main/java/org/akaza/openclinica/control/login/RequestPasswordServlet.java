@@ -55,7 +55,7 @@ import com.clinovo.util.ValidatorHelper;
  * 
  *          Servlet of requesting password
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 @Component
 public class RequestPasswordServlet extends Controller {
 

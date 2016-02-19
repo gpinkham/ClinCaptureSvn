@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
  * Servlet for user account list table.
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ListUserAccountsServlet extends RememberLastPage {
 

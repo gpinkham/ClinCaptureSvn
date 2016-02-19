@@ -38,7 +38,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
-@SuppressWarnings({ "serial" })
 @Component
 public class DownloadVersionSpreadSheetServlet extends Controller {
 

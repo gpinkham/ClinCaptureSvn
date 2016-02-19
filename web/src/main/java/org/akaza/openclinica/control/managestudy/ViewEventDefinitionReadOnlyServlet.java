@@ -44,7 +44,7 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 @Component
 public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServlet {
 

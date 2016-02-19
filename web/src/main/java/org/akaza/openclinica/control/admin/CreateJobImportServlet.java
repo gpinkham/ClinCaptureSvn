@@ -48,7 +48,7 @@ import com.clinovo.util.ValidatorHelper;
  * @author thickerson Purpose: to create jobs in the 'importTrigger' group, which will be meant to run the
  *         ImportStatefulJob.
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class CreateJobImportServlet extends Controller {
 

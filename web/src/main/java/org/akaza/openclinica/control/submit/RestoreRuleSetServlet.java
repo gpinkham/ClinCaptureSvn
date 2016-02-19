@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
+@SuppressWarnings("unused")
 public class RestoreRuleSetServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;

@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
 
 import com.clinovo.util.ValidatorHelper;
 
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class UpdateSubStudyServlet extends Controller {
 

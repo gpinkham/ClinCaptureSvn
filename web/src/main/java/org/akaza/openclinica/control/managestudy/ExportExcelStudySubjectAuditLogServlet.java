@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 /**
  * ExportExcelStudySubjectAuditLogServlet class.
  */
-@SuppressWarnings({"serial", "unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 

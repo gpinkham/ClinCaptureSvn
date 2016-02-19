@@ -54,6 +54,7 @@ import com.clinovo.validator.PasswordValidator;
  * @author ywang
  */
 @Component
+@SuppressWarnings("unused")
 public class ResetPasswordServlet extends Controller {
 
 	private static final long serialVersionUID = -5259201015824317949L;

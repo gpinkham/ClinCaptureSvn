@@ -35,7 +35,6 @@ import org.springframework.stereotype.Component;
  * @author shamim
  * 
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class MatchPasswordServlet extends Controller {
 	@Override

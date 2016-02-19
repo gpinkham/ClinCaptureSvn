@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 /**
  * Created by IntelliJ IDEA. User: A. Hamid Date: Apr 12, 2010 Time: 3:32:44 PM
  */
-@SuppressWarnings("serial")
 @Component
 public class CheckCRFLocked extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

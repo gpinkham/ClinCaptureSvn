@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 /**
  * The servlet for managing import jobs.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewImportJobServlet extends RememberLastPage {
 

@@ -42,7 +42,7 @@ import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class RemoveDatasetServlet extends Controller {
 

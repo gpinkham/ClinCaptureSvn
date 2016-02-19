@@ -73,8 +73,8 @@ import java.util.Map;
  * 
  * @author Krikor krumlian
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
+@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class TestRuleServlet extends Controller {
 
 	private static final long serialVersionUID = 9116068126651934226L;

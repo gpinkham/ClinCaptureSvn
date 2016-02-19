@@ -41,7 +41,7 @@ import org.akaza.openclinica.web.bean.DisplayStudyRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ListStudyServlet extends RememberLastPage {
 

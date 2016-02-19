@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ExtractDatasetsMainServlet extends Controller {
 

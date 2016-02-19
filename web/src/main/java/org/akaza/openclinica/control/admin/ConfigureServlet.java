@@ -33,8 +33,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "rawtypes" })
 @Component
+@SuppressWarnings({ "rawtypes", "unused" })
 public class ConfigureServlet extends Controller {
 
 	private static final long serialVersionUID = 2729725318725545575L;

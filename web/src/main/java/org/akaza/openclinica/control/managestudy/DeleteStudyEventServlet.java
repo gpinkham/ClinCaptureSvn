@@ -47,7 +47,7 @@ import java.util.List;
  * This servlet handles delete study event operations.
  *
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings("rawtypes")
 @Component
 public class DeleteStudyEventServlet extends Controller {
 

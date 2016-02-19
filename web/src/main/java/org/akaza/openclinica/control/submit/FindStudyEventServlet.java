@@ -48,7 +48,7 @@ import javax.servlet.http.HttpServletResponse;
  * Event Definition Step 2 - the user chooses a subject or study event definition whose study events he wants to see
  * Step 3 - the user chooses the study event he wants to add data to
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings("rawtypes")
 @Component
 public class FindStudyEventServlet extends Controller {
 

@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings("unchecked")
 @Component
 public class RestoreCRFFromDefinitionServlet extends Controller {
 	/**

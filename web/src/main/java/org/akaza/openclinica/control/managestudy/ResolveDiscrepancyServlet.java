@@ -74,7 +74,7 @@ import java.util.List;
  * ResolveDiscrepancyServlet that handles request when user click on "view within record"-button on "Notes &
  * Discrepancies"-page.
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 @Component
 public class ResolveDiscrepancyServlet extends Controller {
 

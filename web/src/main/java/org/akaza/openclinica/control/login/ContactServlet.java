@@ -45,7 +45,6 @@ import java.util.HashMap;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class ContactServlet extends Controller {
 	@Override

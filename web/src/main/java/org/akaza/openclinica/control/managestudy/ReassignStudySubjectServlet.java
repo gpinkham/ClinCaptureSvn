@@ -52,7 +52,7 @@ import java.util.Date;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class ReassignStudySubjectServlet extends Controller {
 	/**

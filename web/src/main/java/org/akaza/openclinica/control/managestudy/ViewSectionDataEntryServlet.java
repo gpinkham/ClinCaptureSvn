@@ -86,7 +86,7 @@ import com.clinovo.util.DateUtil;
  *
  * @author jxu
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ViewSectionDataEntryServlet extends DataEntryServlet {
 

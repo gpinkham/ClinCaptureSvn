@@ -74,7 +74,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
 /**
  * @author ssachs
  */
-@SuppressWarnings({"unchecked", "serial", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class EnterDataForStudyEventServlet extends Controller {
 

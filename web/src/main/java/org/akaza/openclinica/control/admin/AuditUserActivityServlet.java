@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
  * @author Krikor Krumlian
  */
 @Component
+@SuppressWarnings("unused")
 public class AuditUserActivityServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;

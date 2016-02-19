@@ -28,7 +28,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings("serial")
 @Component
 public class PentahoLoginServlet extends Controller {
 

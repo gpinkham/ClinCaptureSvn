@@ -56,7 +56,7 @@ import org.springframework.stereotype.Component;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateJobExportServlet extends Controller {
 

@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes user request to generate study event definition list.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ListEventDefinitionServlet extends Controller {
 

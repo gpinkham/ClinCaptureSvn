@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * 
  * @author Krikor Krumlian
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings("rawtypes")
 @Component
 public class VerifyImportedRuleServlet extends Controller {
 

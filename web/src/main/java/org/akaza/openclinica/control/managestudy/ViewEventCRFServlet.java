@@ -51,7 +51,7 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class ViewEventCRFServlet extends Controller {
 	/**

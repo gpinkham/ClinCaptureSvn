@@ -55,7 +55,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * Handles user request of "view study events".
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewStudyEventsServlet extends RememberLastPage {
 

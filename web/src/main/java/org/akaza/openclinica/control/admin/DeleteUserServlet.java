@@ -43,7 +43,6 @@ import com.clinovo.util.EmailUtil;
 /**
  * Allows both deletion and restoration of a study user role.
  */
-@SuppressWarnings("serial")
 @Component
 public class DeleteUserServlet extends Controller {
 

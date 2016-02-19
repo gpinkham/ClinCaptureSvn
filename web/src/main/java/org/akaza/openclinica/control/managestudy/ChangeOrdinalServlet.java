@@ -34,7 +34,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  * @author jxu
  */
-@SuppressWarnings("serial")
 public abstract class ChangeOrdinalServlet extends Controller {
 	/**
 	 * Checks whether the user has the correct privilege

@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  * Restores removed CRF.
  * 
  */
-@SuppressWarnings({"serial", "rawtypes"})
+@SuppressWarnings("rawtypes")
 @Component
 public class RestoreCRFServlet extends Controller {
 

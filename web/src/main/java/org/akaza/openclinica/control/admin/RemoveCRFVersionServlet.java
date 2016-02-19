@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 public class RemoveCRFVersionServlet extends Controller {
 
 	private static final String CRF_VERSION_ID_PARAMETER = "id";

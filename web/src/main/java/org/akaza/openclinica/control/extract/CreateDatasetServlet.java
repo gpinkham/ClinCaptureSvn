@@ -75,7 +75,7 @@ import org.springframework.stereotype.Component;
 /**
  * Creates a dataset by building a query based on study events, CRFs and items.
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial", "deprecation" })
+@SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
 @Component
 public class CreateDatasetServlet extends Controller {
 

@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  * 
  *         Removes a study event and all its related event CRFs, items
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class RemoveStudyEventServlet extends Controller {
 

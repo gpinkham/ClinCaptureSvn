@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 /**
  * LockSiteServlet.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class LockSiteServlet extends Controller {
 

@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class SelectItemsServlet extends Controller {
 

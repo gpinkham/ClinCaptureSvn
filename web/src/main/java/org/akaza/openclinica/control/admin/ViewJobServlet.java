@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author thickerson
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewJobServlet extends RememberLastPage {
 

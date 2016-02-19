@@ -90,8 +90,8 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * Performs updating study event action.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
+@SuppressWarnings({"rawtypes", "unchecked", "unused" })
 public class UpdateStudyEventServlet extends Controller {
 
 	private static final long serialVersionUID = -6029524999558420563L;

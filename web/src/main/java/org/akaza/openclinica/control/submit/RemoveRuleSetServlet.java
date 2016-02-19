@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  */
 @Component
+@SuppressWarnings("unused")
 public class RemoveRuleSetServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;

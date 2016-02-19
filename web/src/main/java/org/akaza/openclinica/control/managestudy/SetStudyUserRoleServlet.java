@@ -44,7 +44,7 @@ import java.util.Date;
  * Servlet for adding new role for user account.
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class SetStudyUserRoleServlet extends Controller {
 

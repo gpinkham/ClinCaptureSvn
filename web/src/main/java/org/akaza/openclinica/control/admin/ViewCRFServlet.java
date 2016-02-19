@@ -64,7 +64,7 @@ import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings("unchecked")
 @Component
 public class ViewCRFServlet extends Controller {
 

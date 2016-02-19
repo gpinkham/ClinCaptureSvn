@@ -57,7 +57,7 @@ import com.clinovo.util.ValidatorHelper;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class CreateJobExportServlet extends Controller {
 

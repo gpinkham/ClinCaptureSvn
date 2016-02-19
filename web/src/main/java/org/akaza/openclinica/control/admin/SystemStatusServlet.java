@@ -34,6 +34,7 @@ import com.clinovo.util.SystemStatusUtil;
  * SystemStatusServlet allows both deletion and restoration of a study user role.
  */
 @Component
+@SuppressWarnings("unused")
 public class SystemStatusServlet extends Controller {
 
 	private static final long serialVersionUID = 1722670001851393612L;

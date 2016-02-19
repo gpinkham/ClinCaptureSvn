@@ -59,7 +59,6 @@ import com.clinovo.util.EmailUtil;
  * @author jxu
  * 
  */
-@SuppressWarnings({"serial"})
 @Component
 public class RemoveEventCRFServlet extends Controller {
 

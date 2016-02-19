@@ -52,7 +52,6 @@ import org.springframework.stereotype.Component;
 /**
  * DeleteEventCRFServlet class.
  */
-@SuppressWarnings({"serial"})
 @Component
 public class DeleteEventCRFServlet extends Controller {
 

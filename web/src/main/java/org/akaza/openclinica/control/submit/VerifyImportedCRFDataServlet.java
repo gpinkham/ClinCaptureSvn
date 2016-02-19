@@ -51,8 +51,8 @@ import com.clinovo.crfdata.ImportCRFDataService;
  * 
  * @author Krikor Krumlian
  */
-@SuppressWarnings("unchecked")
 @Component
+@SuppressWarnings({"unchecked", "unused" })
 public class VerifyImportedCRFDataServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;

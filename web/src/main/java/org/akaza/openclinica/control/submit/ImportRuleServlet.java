@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -69,6 +70,7 @@ import java.util.List;
  * @author Krikor krumlian
  */
 @Component
+@SuppressWarnings("unused")
 public class ImportRuleServlet extends Controller {
 	private static final long serialVersionUID = 9116068126651934226L;
 	private final Logger log = LoggerFactory.getLogger(ImportRuleServlet.class);

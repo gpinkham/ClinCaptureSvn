@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
  * 
  * 
  */
-@SuppressWarnings({"serial"})
 @Component
 public class StudyAuditLogServlet extends RememberLastPage {
 

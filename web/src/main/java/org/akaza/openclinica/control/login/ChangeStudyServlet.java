@@ -56,7 +56,7 @@ import com.clinovo.util.ValidatorHelper;
  * Processes the request of changing current study.
  *
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ChangeStudyServlet extends Controller {
 

@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
 /**
  * Removes study event definition and all its related data.
  */
-@SuppressWarnings({"serial"})
 @Component
 public class RemoveEventDefinitionServlet extends Controller {
 

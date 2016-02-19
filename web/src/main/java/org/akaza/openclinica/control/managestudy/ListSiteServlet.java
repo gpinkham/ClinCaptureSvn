@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * ListSiteServlet class.
  */
 @Component
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ListSiteServlet extends RememberLastPage {
 
 	@Override

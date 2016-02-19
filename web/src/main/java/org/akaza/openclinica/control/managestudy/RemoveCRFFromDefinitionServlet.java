@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({"unchecked", "serial"})
+@SuppressWarnings("unchecked")
 @Component
 public class RemoveCRFFromDefinitionServlet extends Controller {
 

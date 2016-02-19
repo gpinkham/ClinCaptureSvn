@@ -50,7 +50,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewItemDetailServlet extends Controller {
 

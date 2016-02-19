@@ -49,7 +49,7 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ViewCalendaredEventsForSubjectServlet extends Controller {
 

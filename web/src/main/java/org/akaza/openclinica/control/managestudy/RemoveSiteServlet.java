@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
  *
  *         Removes a site from a study
  */
-@SuppressWarnings({"serial"})
 @Component
 public class RemoveSiteServlet extends Controller {
 

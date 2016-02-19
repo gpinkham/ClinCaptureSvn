@@ -49,7 +49,7 @@ import java.util.Map;
  * Updates CRF.
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings("rawtypes")
 @Component
 public class UpdateCRFServlet extends Controller {
 

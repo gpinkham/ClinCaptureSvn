@@ -41,7 +41,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ViewSingleJobServlet extends Controller {
 

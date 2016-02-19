@@ -87,7 +87,7 @@ import com.clinovo.util.ValidatorHelper;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class CreateDiscrepancyNoteServlet extends Controller {
 

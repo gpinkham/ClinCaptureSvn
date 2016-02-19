@@ -70,7 +70,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * CreateNewStudyEventServlet servlet.
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class CreateNewStudyEventServlet extends Controller {
 

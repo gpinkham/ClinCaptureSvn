@@ -66,7 +66,7 @@ import java.util.Map;
 /**
  * Processes request to update a study subject.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateStudySubjectServlet extends Controller {
 

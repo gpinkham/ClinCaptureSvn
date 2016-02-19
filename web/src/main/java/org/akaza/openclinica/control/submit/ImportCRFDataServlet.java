@@ -70,7 +70,7 @@ import com.clinovo.util.ValidatorHelper;
  * import all the XML in the ODM 1.3 standard.
  * 
  */
-@SuppressWarnings({"serial", "rawtypes"})
+@SuppressWarnings("rawtypes")
 @Component
 public class ImportCRFDataServlet extends Controller {
 

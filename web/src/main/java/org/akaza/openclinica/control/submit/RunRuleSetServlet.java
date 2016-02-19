@@ -40,7 +40,6 @@ import java.util.List;
 /**
  * This class used to run rules set.
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class RunRuleSetServlet extends Controller {
 

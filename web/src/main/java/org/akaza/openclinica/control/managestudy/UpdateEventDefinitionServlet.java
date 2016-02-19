@@ -57,7 +57,7 @@ import com.clinovo.validator.EventDefinitionValidator;
  * definition CRF beans, owned by study event definition bean.
  *
  */
-@SuppressWarnings({"rawtypes", "serial", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateEventDefinitionServlet extends Controller {
 

@@ -45,8 +45,8 @@ import com.clinovo.util.CookiesUtil;
  * Servlet for creating subject matrix page.
  * 
  */
-@SuppressWarnings("unchecked")
 @Component
+@SuppressWarnings({"unchecked", "unused"})
 public class ListStudySubjectsServlet extends RememberLastPage {
 
 	public static final String SUBJECT_MATRIX_PAGE_SIZE = "subjectMatrixPageSize";

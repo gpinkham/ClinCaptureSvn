@@ -42,7 +42,6 @@ import org.springframework.stereotype.Component;
 /**
  * Performs 'administrative editing' action for study director/study coordinator.
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class AdministrativeEditingServlet extends DataEntryServlet {
 

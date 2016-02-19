@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
  * 
  *         Restores a removed study event and all its data
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class RestoreStudyEventServlet extends Controller {
 

@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Krikor Krumlian
  */
 @Component
+@SuppressWarnings("unused")
 public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet {
 
 	private static final long serialVersionUID = 1L;

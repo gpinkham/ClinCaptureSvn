@@ -47,7 +47,7 @@ import java.util.Map;
  * Servlet for study user role editing.
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class EditStudyUserRoleServlet extends Controller {
 

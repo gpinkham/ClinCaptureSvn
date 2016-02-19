@@ -54,7 +54,7 @@ import com.clinovo.util.SignStateRestorer;
  * 
  */
 @Component
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 public class InitUpdateEventDefinitionServlet extends Controller {
 
 	/**

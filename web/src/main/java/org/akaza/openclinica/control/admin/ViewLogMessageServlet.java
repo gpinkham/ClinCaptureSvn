@@ -38,7 +38,6 @@ import java.io.IOException;
  * View Import File Server.
  * @author thickerson, purpose is to be able to show an external file in a log to a user
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class ViewLogMessageServlet extends Controller {
 

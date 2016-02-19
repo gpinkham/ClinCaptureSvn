@@ -77,7 +77,7 @@ import com.clinovo.util.ValidatorHelper;
  * @author ssachs
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu Exp $
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial", "deprecation"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 @Component
 public class AddNewSubjectServlet extends Controller {
 

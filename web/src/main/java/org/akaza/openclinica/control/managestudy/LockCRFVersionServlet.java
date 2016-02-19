@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 public class LockCRFVersionServlet extends Controller {
 
 	/**

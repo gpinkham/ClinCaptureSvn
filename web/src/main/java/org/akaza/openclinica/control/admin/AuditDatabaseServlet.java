@@ -23,8 +23,10 @@ package org.akaza.openclinica.control.admin;
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Component;
  * @author Krikor Krumlian
  */
 @Component
+@SuppressWarnings("unused")
 public class AuditDatabaseServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;

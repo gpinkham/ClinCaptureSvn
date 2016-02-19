@@ -58,7 +58,7 @@ import com.clinovo.util.RequestUtil;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewDatasetsServlet extends RememberLastPage {
 

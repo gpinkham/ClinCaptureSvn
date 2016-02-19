@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
  *         Processes the request of restoring a top level study, all the data assoicated with this study will be
  *         restored
  */
-@SuppressWarnings({"serial"})
 @Component
 public class RestoreStudyServlet extends Controller {
 	/**

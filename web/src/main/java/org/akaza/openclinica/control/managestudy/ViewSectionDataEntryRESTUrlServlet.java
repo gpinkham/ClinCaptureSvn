@@ -82,7 +82,7 @@ import org.springframework.stereotype.Component;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServlet {
 

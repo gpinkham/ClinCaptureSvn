@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 @Component
 public class RemoveCRFServlet extends Controller {
 	/**

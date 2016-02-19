@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 /**
  * ViewCRFVersionServlet.
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ViewCRFVersionServlet extends Controller {
 

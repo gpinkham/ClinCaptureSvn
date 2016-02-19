@@ -26,7 +26,7 @@ import javax.servlet.http.HttpSession;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.RequestUtil;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class RememberLastPage extends Controller {
 
 	public static final String URL_KEY_POSTFIX = ".rememberLastPage.lastUrl";

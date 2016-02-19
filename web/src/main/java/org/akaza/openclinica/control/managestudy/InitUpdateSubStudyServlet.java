@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
 /**
  * InitUpdateSubStudyServlet.
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class InitUpdateSubStudyServlet extends Controller {
 

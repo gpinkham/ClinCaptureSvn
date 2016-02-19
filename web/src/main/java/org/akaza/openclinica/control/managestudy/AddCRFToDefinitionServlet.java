@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
  * @author jxu
  */
 @Component
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class AddCRFToDefinitionServlet extends Controller {
 
 	public static final int FIVE = 5;

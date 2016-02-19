@@ -73,7 +73,7 @@ import org.springframework.stereotype.Component;
 /**
  * ViewStudySubjectServlet.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial", "unused"})
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 @Component
 public class ViewStudySubjectServlet extends RememberLastPage {
 

@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 @Component
-@SuppressWarnings({ "serial" })
 public class ViewStudyUserServlet extends Controller {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {

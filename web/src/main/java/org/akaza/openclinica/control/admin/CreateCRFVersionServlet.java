@@ -73,7 +73,7 @@ import com.clinovo.lib.crf.builder.CrfBuilder;
  *
  * @author jxu, ywang
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial", "unused"})
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 @Component
 public class CreateCRFVersionServlet extends Controller {
 

@@ -54,7 +54,7 @@ import com.clinovo.i18n.LocaleResolver;
 /**
  * Edit selected into dataset items servlet.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class EditSelectedServlet extends Controller {
 

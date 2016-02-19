@@ -32,7 +32,7 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
 /**
  * UpdateCRFHeaderServlet.
  */
-@SuppressWarnings({"serial", "unchecked", "unused"})
+@SuppressWarnings({"unchecked", "unused"})
 @Component
 public class UpdateCRFHeaderServlet extends Controller {
 

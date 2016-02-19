@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({ "serial" })
 @Component
 public class ViewRuleSetServlet extends Controller {
 

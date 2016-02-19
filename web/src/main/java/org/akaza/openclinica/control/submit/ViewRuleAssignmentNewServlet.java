@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
  * @author Krikor krumlian
  */
 @Component
+@SuppressWarnings("unused")
 public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 9116068126651934226L;

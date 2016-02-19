@@ -87,7 +87,7 @@ import com.clinovo.service.DiscrepancyDescriptionService;
  * 
  *         View the detail of a discrepancy note on the data entry page
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewDiscrepancyNoteServlet extends Controller {
 

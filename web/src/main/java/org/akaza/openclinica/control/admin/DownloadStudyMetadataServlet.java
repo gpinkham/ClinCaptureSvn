@@ -34,7 +34,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "serial" })
 @Component
 public class DownloadStudyMetadataServlet extends Controller {
 

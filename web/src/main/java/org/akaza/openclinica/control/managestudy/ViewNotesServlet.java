@@ -81,6 +81,7 @@ import com.clinovo.util.DcfRenderType;
  * 
  */
 @Component
+@SuppressWarnings("unused")
 public class ViewNotesServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 1L;

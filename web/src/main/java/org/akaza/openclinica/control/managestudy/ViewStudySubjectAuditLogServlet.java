@@ -64,7 +64,7 @@ import org.springframework.stereotype.Component;
 /**
  * ViewStudySubjectAuditLogServlet class.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewStudySubjectAuditLogServlet extends Controller {
 

@@ -56,7 +56,7 @@ import java.util.*;
  * 
  *         Servlet to create a new subject group class
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 @Component
 public class CreateSubjectGroupClassServlet extends Controller {
 	@Override

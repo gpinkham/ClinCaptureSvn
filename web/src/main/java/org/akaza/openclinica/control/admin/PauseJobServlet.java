@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
  * @author Tom Hickerson
  * 
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class PauseJobServlet extends Controller {
 

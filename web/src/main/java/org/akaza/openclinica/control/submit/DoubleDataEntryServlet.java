@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 /**
  * Double Data Entry Servlet.
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 @Component
 public class DoubleDataEntryServlet extends DataEntryServlet {
 

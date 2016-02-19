@@ -54,7 +54,7 @@ import com.clinovo.i18n.LocaleResolver;
  * Servlet to call appropriate application pages corresponding to supported RESTful URLs.
  * 
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings("rawtypes")
 @Component
 public class UrlRewriterServlet extends Controller {
 

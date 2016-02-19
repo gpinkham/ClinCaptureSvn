@@ -60,7 +60,7 @@ import com.clinovo.model.WidgetsLayout;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings("rawtypes")
 @Component
 public class MainMenuServlet extends Controller {
 

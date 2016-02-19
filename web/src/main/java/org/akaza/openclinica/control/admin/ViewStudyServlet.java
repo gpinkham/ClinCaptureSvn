@@ -49,7 +49,7 @@ import java.util.Map;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class ViewStudyServlet extends Controller {
 	/**

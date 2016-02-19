@@ -69,7 +69,7 @@ import org.springframework.stereotype.Component;
  * @author Bruce W. Perry
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class ViewSectionDataEntryPreview extends DataEntryServlet {
 

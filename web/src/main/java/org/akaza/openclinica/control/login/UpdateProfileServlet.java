@@ -52,6 +52,7 @@ import com.clinovo.validator.UserValidator;
  *          Servlet for processing 'update profile' request from user
  */
 @Component
+@SuppressWarnings("unused")
 public class UpdateProfileServlet extends Controller {
 
 	private static final long serialVersionUID = -2519124535258437372L;

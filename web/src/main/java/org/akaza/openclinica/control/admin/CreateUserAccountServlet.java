@@ -54,7 +54,7 @@ import com.clinovo.validator.UserValidator;
  * Servlet for creating a user account.
  * 
  */
-@SuppressWarnings({"rawtypes", "serial", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class CreateUserAccountServlet extends Controller {
 

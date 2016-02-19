@@ -49,7 +49,6 @@ import org.springframework.stereotype.Component;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class ViewEventCRFContentServlet extends Controller {
 

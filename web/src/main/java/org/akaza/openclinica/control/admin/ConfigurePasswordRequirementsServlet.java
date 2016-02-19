@@ -20,6 +20,7 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
 
 /**
@@ -41,6 +43,7 @@ import java.util.HashMap;
  * @author Douglas Rodrigues (drodrigues@openclinica.com)
  */
 @Component
+@SuppressWarnings("unused")
 public class ConfigurePasswordRequirementsServlet extends Controller {
 	private static final long serialVersionUID = 2729725318725545575L;
 

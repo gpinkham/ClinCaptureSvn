@@ -31,7 +31,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  * 
  */
-@SuppressWarnings("serial")
 public class EnterpriseServlet extends Controller {
 
 	@Override

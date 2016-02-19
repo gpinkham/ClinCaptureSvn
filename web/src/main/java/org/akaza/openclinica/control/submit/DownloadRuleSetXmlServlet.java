@@ -56,6 +56,7 @@ import org.springframework.stereotype.Component;
  * Download Rule Set in XML format.
  */
 @Component
+@SuppressWarnings("unused")
 public class DownloadRuleSetXmlServlet extends Controller {
 
 	protected final Logger log = LoggerFactory.getLogger(DownloadRuleSetXmlServlet.class);

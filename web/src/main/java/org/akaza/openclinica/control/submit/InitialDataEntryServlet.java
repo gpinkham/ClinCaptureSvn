@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Component
 @RequestMapping(value = "/InitialDataEntry")
-@SuppressWarnings({"serial", "unused"})
+@SuppressWarnings("unused")
 public class InitialDataEntryServlet extends DataEntryServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());

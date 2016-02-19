@@ -53,7 +53,6 @@ import java.util.HashMap;
  * End-point for all randomization calls.
  * 
  */
-@SuppressWarnings("serial")
 @Component
 public class RandomizeServlet extends Controller {
 

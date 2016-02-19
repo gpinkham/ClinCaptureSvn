@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ import java.util.Set;
  * @author Krikor krumlian
  */
 @Component
+@SuppressWarnings("unused")
 public class RunRuleServlet extends Controller {
 	private static final long serialVersionUID = 9116068126651934226L;
 

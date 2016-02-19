@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
  * Initializes Update CRF Servlet.
  *
  */
-@SuppressWarnings({ "serial" })
 @Component
 public class InitUpdateCRFServlet extends Controller {
 

@@ -75,7 +75,7 @@ import java.util.Map;
 /**
  * Handles signing of subject casebook.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class SignStudySubjectServlet extends Controller {
 

@@ -63,7 +63,7 @@ import com.clinovo.validator.StudyValidator;
 /**
  * Processes request to update study.
  **/
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateStudyServletNew extends Controller {
 

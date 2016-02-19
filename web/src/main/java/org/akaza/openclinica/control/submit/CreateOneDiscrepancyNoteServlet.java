@@ -59,7 +59,7 @@ import com.clinovo.util.ValidatorHelper;
  * Create a discrepancy note
  * 
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class CreateOneDiscrepancyNoteServlet extends Controller {
 
