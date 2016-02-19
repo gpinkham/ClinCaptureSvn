@@ -128,7 +128,6 @@ import com.clinovo.util.RequestUtil;
  * Abstract class for creating a spring servlet and extending capabilities of spring controller. However, not using the
  * SingleThreadModel.
  *
- * TODO We should rename this class to the SpringServlet!
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class SpringServlet extends SpringController implements HttpRequestHandler, ServletContextAware {
