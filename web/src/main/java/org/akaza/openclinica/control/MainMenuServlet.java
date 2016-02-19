@@ -39,7 +39,7 @@ import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -62,7 +62,7 @@ import com.clinovo.model.WidgetsLayout;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class MainMenuServlet extends Controller {
+public class MainMenuServlet extends SpringServlet {
 
 	public static final int EIGHT = 8;
 	public static final int SIXTY = 60;

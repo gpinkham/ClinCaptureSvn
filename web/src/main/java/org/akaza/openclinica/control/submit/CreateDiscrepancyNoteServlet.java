@@ -53,7 +53,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -89,7 +89,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class CreateDiscrepancyNoteServlet extends Controller {
+public class CreateDiscrepancyNoteServlet extends SpringServlet {
 
 	public static final String UPDATED_DISCREPANCY_NOTE = "updatedDiscrepancyNote";
 

@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.rule.FileProperties;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings("unchecked")
 @Component
-public class UploadFileServlet extends Controller {
+public class UploadFileServlet extends SpringServlet {
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)

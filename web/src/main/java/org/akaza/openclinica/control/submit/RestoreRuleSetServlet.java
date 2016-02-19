@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.service.rule.RuleSetService;
@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Component
 @SuppressWarnings("unused")
-public class RestoreRuleSetServlet extends Controller {
+public class RestoreRuleSetServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 1L;
 

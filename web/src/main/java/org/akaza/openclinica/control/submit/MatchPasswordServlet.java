@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class MatchPasswordServlet extends Controller {
+public class MatchPasswordServlet extends SpringServlet {
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String password = request.getParameter("password");

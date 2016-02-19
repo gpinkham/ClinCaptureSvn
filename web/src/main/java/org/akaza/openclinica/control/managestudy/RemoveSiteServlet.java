@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  *         Removes a site from a study
  */
 @Component
-public class RemoveSiteServlet extends Controller {
+public class RemoveSiteServlet extends SpringServlet {
 
 	/**
 	 *

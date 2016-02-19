@@ -110,7 +110,7 @@ public class EditUserAccountController extends SpringController {
 		if (!isAdmin(request)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
-			org.akaza.openclinica.control.core.Controller.restorePageMessages(request);
+			restorePageMessages(request);
 			FormProcessor fp = new FormProcessor(request);
 			// because we need to use this in the confirmation and error parts too
 			ArrayList studies = getAllStudies();
@@ -215,7 +215,7 @@ public class EditUserAccountController extends SpringController {
 				}
 			}
 		}
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		return page;
 	}
 

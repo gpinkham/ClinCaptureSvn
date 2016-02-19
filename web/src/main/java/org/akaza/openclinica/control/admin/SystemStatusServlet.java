@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +35,7 @@ import com.clinovo.util.SystemStatusUtil;
  */
 @Component
 @SuppressWarnings("unused")
-public class SystemStatusServlet extends Controller {
+public class SystemStatusServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 1722670001851393612L;
 

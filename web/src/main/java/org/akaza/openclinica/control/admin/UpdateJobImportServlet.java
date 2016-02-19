@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -49,7 +49,7 @@ import com.clinovo.util.ValidatorHelper;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class UpdateJobImportServlet extends Controller {
+public class UpdateJobImportServlet extends SpringServlet {
 
 	private static final String TRIGGER_IMPORT_GROUP = "importTrigger";
 

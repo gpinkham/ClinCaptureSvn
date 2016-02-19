@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -44,7 +44,7 @@ import com.clinovo.util.EmailUtil;
  * Allows both deletion and restoration of a study user role.
  */
 @Component
-public class DeleteUserServlet extends Controller {
+public class DeleteUserServlet extends SpringServlet {
 
 	public static final String PATH = "DeleteUser";
 	public static final String ARG_USERID = "userId";
@@ -171,6 +171,6 @@ public class DeleteUserServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

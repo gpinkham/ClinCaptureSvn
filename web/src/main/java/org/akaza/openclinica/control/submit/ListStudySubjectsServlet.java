@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -102,7 +102,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		Controller.removeLockedCRF(ub.getId());
+		SpringServlet.removeLockedCRF(ub.getId());
 
 		boolean showMoreLink;
 		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));

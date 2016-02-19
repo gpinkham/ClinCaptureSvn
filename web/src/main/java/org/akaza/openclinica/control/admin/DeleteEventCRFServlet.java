@@ -34,7 +34,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
  * DeleteEventCRFServlet class.
  */
 @Component
-public class DeleteEventCRFServlet extends Controller {
+public class DeleteEventCRFServlet extends SpringServlet {
 
 	public static final String STUDY_SUB_ID = "ssId";
 	public static final String EVENT_CRF_ID = "ecId";

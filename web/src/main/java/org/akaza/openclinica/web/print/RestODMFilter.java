@@ -12,7 +12,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -51,7 +51,7 @@ public class RestODMFilter extends HandlerInterceptorAdapter {
 			StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(studySubject);
 			StudyBean siteBean = studyDAO.findByStudySubjectId(studySubjectBean.getId());
 			UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
-					BaseController.USER_BEAN_NAME);
+					SpringController.USER_BEAN_NAME);
 			StudyUserRoleBean currentUserRole = userAccountBean.getRoleByStudy(siteBean);
 			if (siteBean.isSite(siteBean.getParentStudyId()) && currentUserRole.getId() == 0) {
 				StudyBean parentStudy = (StudyBean) studyDAO.findByPK(siteBean.getParentStudyId());

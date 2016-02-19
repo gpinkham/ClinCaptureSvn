@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.FileProperties;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -71,7 +71,7 @@ import java.util.List;
  */
 @Component
 @SuppressWarnings("unused")
-public class ImportRuleServlet extends Controller {
+public class ImportRuleServlet extends SpringServlet {
 	private static final long serialVersionUID = 9116068126651934226L;
 	private final Logger log = LoggerFactory.getLogger(ImportRuleServlet.class);
 	private static final int FIVE_H = 500;
@@ -256,7 +256,7 @@ public class ImportRuleServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -54,7 +54,7 @@ import java.util.HashMap;
  * 
  */
 @Component
-public class RandomizeServlet extends Controller {
+public class RandomizeServlet extends SpringServlet {
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 

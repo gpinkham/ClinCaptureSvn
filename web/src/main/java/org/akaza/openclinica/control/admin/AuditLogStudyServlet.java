@@ -31,7 +31,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class AuditLogStudyServlet extends Controller {
+public class AuditLogStudyServlet extends SpringServlet {
 
 	public static String getLink() {
 		return "AuditLogStudy";

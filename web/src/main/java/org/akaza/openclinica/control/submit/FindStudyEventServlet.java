@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -50,7 +50,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class FindStudyEventServlet extends Controller {
+public class FindStudyEventServlet extends SpringServlet {
 
 	public static final String INPUT_BROWSEBY = "browseBy";
 	public static final String INPUT_PAGENUM = "pageNum";

@@ -31,7 +31,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings("unchecked")
 @Component
-public class RemoveCRFFromDefinitionServlet extends Controller {
+public class RemoveCRFFromDefinitionServlet extends SpringServlet {
 
 	/**
 	 * Checks whether the user has the correct privilege

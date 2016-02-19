@@ -37,7 +37,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -56,7 +56,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class AddCRFToDefinitionServlet extends Controller {
+public class AddCRFToDefinitionServlet extends SpringServlet {
 
 	public static final int FIVE = 5;
 

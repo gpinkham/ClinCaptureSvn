@@ -16,8 +16,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.BaseController;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class LockStudySubjectServlet extends Controller {
+public class LockStudySubjectServlet extends SpringServlet {
 
 	public static final String REFERER_URL = "refererUrl";
 	public static final String REFERER = "referer";
@@ -179,7 +178,7 @@ public class LockStudySubjectServlet extends Controller {
 	private void showResultMessage(HttpServletRequest request, StudySubjectBean studySubjectBean, String message) {
 		addPageMessage(message.replace("{0}", studySubjectBean.getName()), request);
 		Map storedAttributes = new HashMap();
-		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
-		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
+		storedAttributes.put(SpringServlet.PAGE_MESSAGE, request.getAttribute(SpringServlet.PAGE_MESSAGE));
+		request.getSession().setAttribute(SpringServlet.STORED_ATTRIBUTES, storedAttributes);
 	}
 }

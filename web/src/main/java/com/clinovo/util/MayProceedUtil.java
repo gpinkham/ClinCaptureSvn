@@ -17,7 +17,7 @@ package com.clinovo.util;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public final class MayProceedUtil {
 
 	public static boolean mayProceed(HttpServletRequest request, Role... roles) {
 		boolean mayProceed = false;
-		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE);
+		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(SpringController.USER_ROLE);
 		for (Role role : roles) {
 			if (role.equals(userRole.getRole())) {
 				mayProceed = true;

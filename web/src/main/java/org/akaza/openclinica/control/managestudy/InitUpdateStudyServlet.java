@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * @author jxu
  */
 @Component
-public class InitUpdateStudyServlet extends Controller {
+public class InitUpdateStudyServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -93,7 +93,7 @@ public class InitUpdateStudyServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 
 }

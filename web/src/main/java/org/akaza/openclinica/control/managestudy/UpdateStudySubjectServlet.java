@@ -36,7 +36,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -68,7 +68,7 @@ import java.util.Map;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class UpdateStudySubjectServlet extends Controller {
+public class UpdateStudySubjectServlet extends SpringServlet {
 
 	public static final String ENROLLMENT_NOTE_STATUS = "enrollmentNoteStatus";
 	public static final String INPUT_ENROLLMENT_DATE = "enrollmentDate";

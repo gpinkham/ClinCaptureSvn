@@ -38,7 +38,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class AssignUserToStudyServlet extends Controller {
+public class AssignUserToStudyServlet extends SpringServlet {
 
 	private static final int ROLE_COL = 3;
 	private static final int SELECTED_COL = 4;

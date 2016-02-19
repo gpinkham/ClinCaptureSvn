@@ -3,7 +3,7 @@ package com.clinovo.controller;
 import com.clinovo.BaseControllerTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -23,7 +23,7 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 		userRole.setRole(Role.STUDY_ADMINISTRATOR);
 
 		this.mockMvc.perform(
-				get(DELETE_CRF_VERSION).param("crfVersionId", "1").sessionAttr(BaseController.USER_ROLE, userRole))
+				get(DELETE_CRF_VERSION).param("crfVersionId", "1").sessionAttr(SpringController.USER_ROLE, userRole))
 				.andExpect(status().isOk());
 	}
 
@@ -35,7 +35,7 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get(DELETE_CRF_VERSION).param("crfVersionId", "1")
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(
 				MockMvcResultMatchers.view().name("admin/deleteCRFVersion"));
 	}
 
@@ -47,7 +47,7 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get(DELETE_CRF_VERSION).param("crfVersionId", "1")
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(
 				MockMvcResultMatchers.view().name("redirect:/MainMenu?message=system_no_permission"));
 	}
 

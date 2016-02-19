@@ -33,7 +33,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class RestoreCRFServlet extends Controller {
+public class RestoreCRFServlet extends SpringServlet {
 
 	private static final String CRF_ID_PARAMETER = "id";
 

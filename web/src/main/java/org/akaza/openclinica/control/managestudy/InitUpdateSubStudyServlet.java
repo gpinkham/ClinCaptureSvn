@@ -38,7 +38,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class InitUpdateSubStudyServlet extends Controller {
+public class InitUpdateSubStudyServlet extends SpringServlet {
 
 	/**
      * 
@@ -210,7 +210,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

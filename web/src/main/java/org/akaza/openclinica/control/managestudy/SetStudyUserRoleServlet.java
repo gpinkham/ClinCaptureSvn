@@ -26,7 +26,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -46,7 +46,7 @@ import java.util.Date;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class SetStudyUserRoleServlet extends Controller {
+public class SetStudyUserRoleServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)

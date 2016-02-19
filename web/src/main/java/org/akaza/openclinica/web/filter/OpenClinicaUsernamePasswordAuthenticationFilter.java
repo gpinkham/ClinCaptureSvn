@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -112,9 +112,9 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		coreResources.setField("currentHostName", hostName);
 		String restoreSessionFlag = request.getParameter("shouldSessionParametersBeRestored");
 		if (restoreSessionFlag != null && restoreSessionFlag.equals("true")) {
-			Controller.setRestoreSessionFlag(restoreSessionFlag);
+			SpringServlet.setRestoreSessionFlag(restoreSessionFlag);
 		} else {
-			Controller.resetRestoreSessionFlag();
+			SpringServlet.resetRestoreSessionFlag();
 		}
 
 		String username = obtainUsername(request);
@@ -171,8 +171,8 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 			auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
 			resetLockCounter(userAccountBean);
 			// To remove the locking of Event CRFs previusly locked by this user.
-			Controller.removeLockedCRF(userAccountBean.getId());
-			Controller.setDomainName(request);
+			SpringServlet.removeLockedCRF(userAccountBean.getId());
+			SpringServlet.setDomainName(request);
 		} catch (LockedException le) {
 			auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
 			throw le;

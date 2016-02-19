@@ -38,7 +38,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class RestoreStudyEventServlet extends Controller {
+public class RestoreStudyEventServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)

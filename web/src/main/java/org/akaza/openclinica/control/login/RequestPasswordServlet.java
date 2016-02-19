@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
@@ -57,7 +57,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class RequestPasswordServlet extends Controller {
+public class RequestPasswordServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)

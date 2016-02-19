@@ -27,8 +27,8 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.BaseController;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringController;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -63,24 +63,24 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 		setupDefaultParameters(request, handler);
 		LocaleResolver.resolveLocale();
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
-			Controller.restorePageMessages(request);
+			SpringServlet.restorePageMessages(request);
 			Navigation.addToNavigationStack(request);
 			request.setAttribute(FORM_WITH_STATE_FLAG, request.getParameter(FORM_WITH_STATE_FLAG));
 			StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession()
-					.getAttribute(BaseController.USER_ROLE);
+					.getAttribute(SpringController.USER_ROLE);
 			UserAccountBean userBean = (UserAccountBean) request.getSession()
-					.getAttribute(BaseController.USER_BEAN_NAME);
-			StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
+					.getAttribute(SpringController.USER_BEAN_NAME);
+			StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(SpringController.STUDY);
 			ok = userBean != null && userRole != null && currentStudy != null;
-			request.setAttribute(BaseController.USER_ROLE, userRole);
-			request.setAttribute(BaseController.STUDY, currentStudy);
-			request.setAttribute(BaseController.USER_BEAN_NAME, userBean);
-			request.getSession().setAttribute(BaseController.STUDY_INFO_PANEL, new StudyInfoPanel());
+			request.setAttribute(SpringController.USER_ROLE, userRole);
+			request.setAttribute(SpringController.STUDY, currentStudy);
+			request.setAttribute(SpringController.USER_BEAN_NAME, userBean);
+			request.getSession().setAttribute(SpringController.STUDY_INFO_PANEL, new StudyInfoPanel());
 			// request.setAttribute(INCLUDE_REPORTING, !SQLInitServlet.getField("pentaho.url").trim().equals(""));
 			request.setAttribute(INCLUDE_REPORTING, false);
 			if (!ok) {
 				String queryString = request.getQueryString();
-				request.getSession().setAttribute(BaseController.REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN,
+				request.getSession().setAttribute(SpringController.REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN,
 						request.getRequestURI().concat(queryString != null ? "?".concat(queryString) : ""));
 				response.sendRedirect(request.getContextPath() + "/MainMenu");
 			}
@@ -108,10 +108,10 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 					if (!currentRole.isActive()) {
 						currentRole = userAccountBean.getRoleByStudy(currentStudy.getParentStudyId());
 					}
-					request.getSession().setAttribute(BaseController.THEME_COLOR, CoreResources.getField("themeColor"));
-					request.getSession().setAttribute(BaseController.USER_ROLE, currentRole);
-					request.getSession().setAttribute(BaseController.STUDY, currentStudy);
-					request.getSession().setAttribute(BaseController.USER_BEAN_NAME, userAccountBean);
+					request.getSession().setAttribute(SpringController.THEME_COLOR, CoreResources.getField("themeColor"));
+					request.getSession().setAttribute(SpringController.USER_ROLE, currentRole);
+					request.getSession().setAttribute(SpringController.STUDY, currentStudy);
+					request.getSession().setAttribute(SpringController.USER_BEAN_NAME, userAccountBean);
 				}
 			}
 

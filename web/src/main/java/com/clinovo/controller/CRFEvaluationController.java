@@ -20,7 +20,6 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -83,10 +82,10 @@ public class CRFEvaluationController extends SpringController {
 
 		String page = EVALUATION_CRF_EVALUATION;
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
-		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE);
+		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(USER_ROLE);
 		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
-				BaseController.USER_BEAN_NAME);
-		BaseController.removeLockedCRF(userAccountBean.getId());
+				USER_BEAN_NAME);
+		removeLockedCRF(userAccountBean.getId());
 		if (userRole.getRole() == Role.SYSTEM_ADMINISTRATOR || userRole.getRole() == Role.STUDY_ADMINISTRATOR
 				|| userRole.getRole() == Role.STUDY_EVALUATOR) {
 			CRFEvaluationTableFactory factory = new CRFEvaluationTableFactory(dataSource, messageSource,
@@ -95,10 +94,9 @@ public class CRFEvaluationController extends SpringController {
 			factory.setUserAccountDAO(new UserAccountDAO(dataSource));
 			request.setAttribute(CRF_EVALUATION_TABLE, factory.createTable(request, response).render());
 		} else {
-			org.akaza.openclinica.control.core.Controller.addPageMessage(
-					messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, LocaleResolver.getLocale(request)),
+			addPageMessage(messageSource.getMessage(NO_PERMISSION_TO_EVALUATE, null, LocaleResolver.getLocale(request)),
 					request, LOGGER);
-			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+			storePageMessages(request);
 			page = MAIN_MENU_REDIRECT;
 		}
 		return page;

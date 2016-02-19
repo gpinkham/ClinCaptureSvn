@@ -32,7 +32,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -56,7 +56,7 @@ import com.clinovo.i18n.LocaleResolver;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class UrlRewriterServlet extends Controller {
+public class UrlRewriterServlet extends SpringServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private static final int STUDY_KEY = 0;

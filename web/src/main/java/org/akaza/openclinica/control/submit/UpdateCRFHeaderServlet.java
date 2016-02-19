@@ -12,7 +12,7 @@ import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -34,7 +34,7 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
  */
 @SuppressWarnings({"unchecked", "unused"})
 @Component
-public class UpdateCRFHeaderServlet extends Controller {
+public class UpdateCRFHeaderServlet extends SpringServlet {
 
 	public static final String EVENT_DEFINITION_CRF_ID = "eventDefinitionCRFId";
 	public static final String INTERVIEW_DATE = "interviewDate";

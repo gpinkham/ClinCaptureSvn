@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -41,7 +41,7 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 @Component
-public class RestoreCRFFromDefinitionServlet extends Controller {
+public class RestoreCRFFromDefinitionServlet extends SpringServlet {
 	/**
 	 * Checks whether the user has the correct privilege
 	 */

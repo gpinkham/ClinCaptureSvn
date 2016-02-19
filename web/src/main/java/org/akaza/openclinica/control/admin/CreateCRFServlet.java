@@ -31,7 +31,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class CreateCRFServlet extends Controller {
+public class CreateCRFServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -163,7 +163,7 @@ public class CreateCRFServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

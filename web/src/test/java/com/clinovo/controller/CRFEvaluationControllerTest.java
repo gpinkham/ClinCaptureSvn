@@ -8,7 +8,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -40,9 +40,9 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 		userRole.setRole(Role.SYSTEM_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.sessionAttr(BaseController.STUDY, currentStudy)
-						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, currentStudy)
+						.sessionAttr(SpringController.USER_BEAN_NAME, userBean)
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 		userRole.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.sessionAttr(BaseController.STUDY, currentStudy)
-						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, currentStudy)
+						.sessionAttr(SpringController.USER_BEAN_NAME, userBean)
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -60,9 +60,9 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 		userRole.setRole(Role.STUDY_EVALUATOR);
 		this.mockMvc.perform(
 				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.sessionAttr(BaseController.STUDY, currentStudy)
-						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, currentStudy)
+						.sessionAttr(SpringController.USER_BEAN_NAME, userBean)
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -70,9 +70,9 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 		userRole.setRole(Role.INVESTIGATOR);
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.sessionAttr(BaseController.STUDY, currentStudy)
-						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(
+						.sessionAttr(SpringController.STUDY, currentStudy)
+						.sessionAttr(SpringController.USER_BEAN_NAME, userBean)
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(
 				MockMvcResultMatchers.view().name("redirect:/MainMenu"));
 
 	}
@@ -81,15 +81,15 @@ public class CRFEvaluationControllerTest extends BaseControllerTest {
 	public void testAllCrfsThatWereLockedByCurrentUserWillBeUnlockedForHim() throws Exception {
 		int ecbId = 1;
 		final int anotherUserId = 2;
-		BaseController.lockThisEventCRF(ecbId++, userBean.getId());
-		BaseController.lockThisEventCRF(ecbId, anotherUserId);
-		assertEquals(BaseController.getUnavailableCRFList().size(), 2);
+		SpringController.lockThisEventCRF(ecbId++, userBean.getId());
+		SpringController.lockThisEventCRF(ecbId, anotherUserId);
+		assertEquals(SpringController.getUnavailableCRFList().size(), 2);
 		userRole.setRole(Role.STUDY_EVALUATOR);
 		this.mockMvc.perform(
 				get(CRF_EVALUATION).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.sessionAttr(BaseController.STUDY, currentStudy)
-						.sessionAttr(BaseController.USER_BEAN_NAME, userBean)
-						.sessionAttr(BaseController.USER_ROLE, userRole)).andExpect(status().isOk());
-		assertEquals(BaseController.getUnavailableCRFList().size(), 1);
+						.sessionAttr(SpringController.STUDY, currentStudy)
+						.sessionAttr(SpringController.USER_BEAN_NAME, userBean)
+						.sessionAttr(SpringController.USER_ROLE, userRole)).andExpect(status().isOk());
+		assertEquals(SpringController.getUnavailableCRFList().size(), 1);
 	}
 }

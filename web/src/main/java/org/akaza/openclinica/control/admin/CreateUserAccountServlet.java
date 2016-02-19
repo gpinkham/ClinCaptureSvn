@@ -36,7 +36,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -56,7 +56,7 @@ import com.clinovo.validator.UserValidator;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class CreateUserAccountServlet extends Controller {
+public class CreateUserAccountServlet extends SpringServlet {
 
 	public static final String SHOW_EXIT_INSTEAD_OF_BACK = "showExitInsteadOfBack";
 	public static final String INPUT_USERNAME = "userName";
@@ -284,6 +284,6 @@ public class CreateUserAccountServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

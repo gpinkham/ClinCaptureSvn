@@ -28,7 +28,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -53,7 +53,7 @@ import java.util.ArrayList;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class ViewEventCRFServlet extends Controller {
+public class ViewEventCRFServlet extends SpringServlet {
 	/**
      *
      */

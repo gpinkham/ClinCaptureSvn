@@ -46,7 +46,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -221,7 +221,7 @@ import com.clinovo.i18n.LocaleResolver;
 
 		Locale locale = LocaleResolver.getLocale(request);
 		ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
-		UserAccountBean currentUser = (UserAccountBean) session.getAttribute(BaseController.USER_BEAN_NAME);
+		UserAccountBean currentUser = (UserAccountBean) session.getAttribute(SpringServlet.USER_BEAN_NAME);
 
 		try {
 			// defaults, can be reset by mistake by running through one page,

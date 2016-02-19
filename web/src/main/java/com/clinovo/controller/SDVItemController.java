@@ -17,7 +17,6 @@ package com.clinovo.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.SpringController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -62,8 +61,8 @@ public class SDVItemController extends SpringController {
 		int eventDefinitionCrfId = Integer.parseInt(request.getParameter(EVENT_DEFINITION_CRF_ID));
 
 		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute(
-				BaseController.USER_BEAN_NAME);
-		CrfShortcutsAnalyzer crfShortcutsAnalyzer = BaseController.getCrfShortcutsAnalyzer(request, itemSDVService);
+				SpringController.USER_BEAN_NAME);
+		CrfShortcutsAnalyzer crfShortcutsAnalyzer = SpringController.getCrfShortcutsAnalyzer(request, itemSDVService);
 
 		return itemSDVService.sdvItem(itemDataId, sectionId, eventDefinitionCrfId, action, userAccountBean,
 				crfShortcutsAnalyzer);

@@ -21,7 +21,7 @@ import com.clinovo.util.SDVUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.view.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,8 +108,8 @@ public class SDVStudySubjectLinkTag extends TagSupport {
 
 		HttpServletRequest request = pageContext != null ? (HttpServletRequest) pageContext.getRequest() : getRequest();
 		HttpSession session = request.getSession();
-		StudyBean currentStudy = (StudyBean) session.getAttribute(BaseController.STUDY);
-		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute(BaseController.USER_ROLE);
+		StudyBean currentStudy = (StudyBean) session.getAttribute(SpringController.STUDY);
+		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute(SpringController.USER_ROLE);
 		WebApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(session
 				.getServletContext());
 		DataSource dataSource = (DataSource) appContext.getBean("dataSource");

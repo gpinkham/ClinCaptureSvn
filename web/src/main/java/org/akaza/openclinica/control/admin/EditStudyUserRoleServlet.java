@@ -28,7 +28,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -49,7 +49,7 @@ import java.util.Map;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class EditStudyUserRoleServlet extends Controller {
+public class EditStudyUserRoleServlet extends SpringServlet {
 
 	public static final String INPUT_ROLE = "role";
 	public static final String PATH = "EditStudyUserRole";
@@ -173,6 +173,6 @@ public class EditStudyUserRoleServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

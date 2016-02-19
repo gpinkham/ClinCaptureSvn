@@ -606,8 +606,8 @@ public class ChangeCRFVersionController extends SpringController {
 			con.close();
 			pageMessages.add(resword.getString("confirm_crf_version_ms"));
 			String msg = resword.getString("confirm_crf_version_ms");
-			org.akaza.openclinica.control.core.Controller.addPageMessage(msg, request, logger);
-			org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+			addPageMessage(msg, request, logger);
+			storePageMessages(request);
 			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
 			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
 					.getStudyEventDefinitionId());

@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.service.rule.RuleSetService;
@@ -41,7 +41,7 @@ import java.util.List;
  * This class used to run rules set.
  */
 @Component
-public class RunRuleSetServlet extends Controller {
+public class RunRuleSetServlet extends SpringServlet {
 
 	private static final String RULESET_ID = "ruleSetId";
 	private static final String RULE_ID = "ruleId";
@@ -129,7 +129,7 @@ public class RunRuleSetServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

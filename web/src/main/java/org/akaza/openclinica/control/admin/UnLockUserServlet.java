@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -47,7 +47,7 @@ import com.clinovo.util.EmailUtil;
  * Allows both - locking and unlocking of a study user role.
  */
 @Component
-public class UnLockUserServlet extends Controller {
+public class UnLockUserServlet extends SpringServlet {
 
 	public static final String PATH = "DeleteUser";
 	public static final String ARG_USERID = "userId";
@@ -179,6 +179,6 @@ public class UnLockUserServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

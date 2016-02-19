@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  *         restored
  */
 @Component
-public class RestoreStudyServlet extends Controller {
+public class RestoreStudyServlet extends SpringServlet {
 	/**
 	 *
 	 */
@@ -95,7 +95,7 @@ public class RestoreStudyServlet extends Controller {
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
 		if (getUserAccountBean(request).isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

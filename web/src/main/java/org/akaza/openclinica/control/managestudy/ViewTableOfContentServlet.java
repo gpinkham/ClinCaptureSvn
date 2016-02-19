@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * @author jxu
  */
 @Component
-public class ViewTableOfContentServlet extends Controller {
+public class ViewTableOfContentServlet extends SpringServlet {
 	/**
 	 * Checks whether the user has the correct privilege
 	 */

@@ -46,7 +46,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.controller.helper.table.SDVToolbar;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
@@ -1308,6 +1308,6 @@ public class SDVUtil {
 	}
 
 	private UserAccountBean getCurrentUser(HttpServletRequest request) {
-		return (UserAccountBean) request.getSession().getAttribute(BaseController.USER_BEAN_NAME);
+		return (UserAccountBean) request.getSession().getAttribute(SpringController.USER_BEAN_NAME);
 	}
 }

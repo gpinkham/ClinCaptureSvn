@@ -36,7 +36,7 @@ import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
@@ -58,7 +58,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class ChangeStudyServlet extends Controller {
+public class ChangeStudyServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)

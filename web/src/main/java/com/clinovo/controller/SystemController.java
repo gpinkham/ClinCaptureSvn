@@ -20,9 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.control.core.BaseController;
-import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.core.SpringController;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -80,7 +79,7 @@ public class SystemController extends SpringController {
 			request.getSession().removeAttribute(SYSTEM_COMMAND);
 			if (systemCommand == null || !systemCommand.isBackMode()) {
 				systemCommand = new SystemCommand();
-				Role role = ((StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE)).getRole();
+				Role role = ((StudyUserRoleBean) request.getSession().getAttribute(SpringController.USER_ROLE)).getRole();
 				systemCommand.setSystemPropertyGroups(systemService.getSystemPropertyGroups(role));
 			}
 			model.addAttribute(SYSTEM_COMMAND, systemCommand);

@@ -56,7 +56,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SessionManager;
@@ -89,7 +89,7 @@ import com.clinovo.service.DiscrepancyDescriptionService;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class ViewDiscrepancyNoteServlet extends Controller {
+public class ViewDiscrepancyNoteServlet extends SpringServlet {
 
 	public static final String INTERVIEWER = "interviewer";
 	public static final String INTERVIEW_DATE = "interviewDate";

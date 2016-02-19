@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Component
-public class ViewRuleSetAuditServlet extends Controller {
+public class ViewRuleSetAuditServlet extends SpringServlet {
 
 	private static String RULESET_ID = "ruleSetId";
 	private static String RULESET = "ruleSet";
@@ -99,7 +99,7 @@ public class ViewRuleSetAuditServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

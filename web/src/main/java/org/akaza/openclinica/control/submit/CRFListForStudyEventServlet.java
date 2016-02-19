@@ -44,7 +44,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -76,7 +76,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class CRFListForStudyEventServlet extends Controller {
+public class CRFListForStudyEventServlet extends SpringServlet {
 
 	public static final String SUBJECT_FLAG_COLOR = "subjectFlagColor";
 	public static final String STUDY_ID = "studyId";

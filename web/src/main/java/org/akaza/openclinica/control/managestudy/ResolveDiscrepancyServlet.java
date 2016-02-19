@@ -43,7 +43,7 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
@@ -76,7 +76,7 @@ import java.util.List;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class ResolveDiscrepancyServlet extends Controller {
+public class ResolveDiscrepancyServlet extends SpringServlet {
 
 	private static final String INPUT_NOTE_ID = "noteId";
 	private static final String EVENT_CRF_ID = "ecId";

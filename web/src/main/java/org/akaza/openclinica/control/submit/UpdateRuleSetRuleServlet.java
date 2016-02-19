@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -46,7 +46,7 @@ import java.util.List;
  */
 @Component
 @SuppressWarnings("unused")
-public class UpdateRuleSetRuleServlet extends Controller {
+public class UpdateRuleSetRuleServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 1L;
 

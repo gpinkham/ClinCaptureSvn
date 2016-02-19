@@ -23,7 +23,6 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -136,8 +135,8 @@ public class DeleteEventDefinitionCRFController extends SpringController {
 		HashMap<String, Object> storedAttributes = new HashMap<String, Object>();
 		ArrayList<String> pageMessages = new ArrayList<String>();
 		pageMessages.add(message);
-		storedAttributes.put(BaseController.PAGE_MESSAGE, pageMessages);
-		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
+		storedAttributes.put(PAGE_MESSAGE, pageMessages);
+		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
 		return page;
 	}
 

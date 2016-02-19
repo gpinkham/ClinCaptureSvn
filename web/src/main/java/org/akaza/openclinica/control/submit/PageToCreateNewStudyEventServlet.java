@@ -36,7 +36,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -61,7 +61,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class PageToCreateNewStudyEventServlet extends Controller {
+public class PageToCreateNewStudyEventServlet extends SpringServlet {
 
 	public static final String INPUT_PAGE_TO_SHOW_POPUP = "page";
 

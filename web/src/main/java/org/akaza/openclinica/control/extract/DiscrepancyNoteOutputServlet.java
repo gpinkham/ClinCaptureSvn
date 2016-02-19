@@ -15,7 +15,6 @@ package org.akaza.openclinica.control.extract;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +34,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -50,7 +49,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -67,7 +65,7 @@ import com.clinovo.i18n.LocaleResolver;
  */
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 @Component
-public class DiscrepancyNoteOutputServlet extends Controller {
+public class DiscrepancyNoteOutputServlet extends SpringServlet {
 	// These are the headers that must appear in the HTTP response, when sending a
 	// file back to the user
 	public static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";

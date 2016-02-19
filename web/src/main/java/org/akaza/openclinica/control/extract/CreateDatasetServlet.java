@@ -54,7 +54,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -77,7 +77,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
 @Component
-public class CreateDatasetServlet extends Controller {
+public class CreateDatasetServlet extends SpringServlet {
 
 	public static final String BEAN_YEARS = "years";
 	public static final String BEAN_MONTHS = "months";

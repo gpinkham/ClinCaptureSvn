@@ -30,7 +30,6 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -194,7 +193,7 @@ public class ScheduledJobController extends SpringController {
 				jobs.setCheckbox(checkbox.toString());
 				jobs.setDatasetId(epBean.getDatasetName());
 				UserAccountBean currentUser =
-						(UserAccountBean) request.getSession().getAttribute(BaseController.USER_BEAN_NAME);
+						(UserAccountBean) request.getSession().getAttribute(SpringController.USER_BEAN_NAME);
 				jobs.setFireTime(DateUtil.printDate(st.getStartTime(), currentUser.getUserTimeZoneId(),
 						DateUtil.DatePattern.TIMESTAMP_WITH_SECONDS, LocaleResolver.getLocale()));
 				if (st.getNextFireTime() != null) {

@@ -31,7 +31,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -53,7 +53,7 @@ import com.clinovo.validator.UserValidator;
  */
 @Component
 @SuppressWarnings("unused")
-public class UpdateProfileServlet extends Controller {
+public class UpdateProfileServlet extends SpringServlet {
 
 	private static final long serialVersionUID = -2519124535258437372L;
 	public static final String EMAIL = "contactEmail";

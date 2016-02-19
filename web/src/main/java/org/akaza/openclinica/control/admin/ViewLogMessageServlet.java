@@ -17,7 +17,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -39,7 +39,7 @@ import java.io.IOException;
  * @author thickerson, purpose is to be able to show an external file in a log to a user
  */
 @Component
-public class ViewLogMessageServlet extends Controller {
+public class ViewLogMessageServlet extends SpringServlet {
 
 	@Autowired
 	private DataSource dataSource;

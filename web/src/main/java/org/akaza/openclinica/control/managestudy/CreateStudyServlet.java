@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -57,7 +57,7 @@ import com.clinovo.validator.StudyValidator;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class CreateStudyServlet extends Controller {
+public class CreateStudyServlet extends SpringServlet {
 
 	public static final String FAC_NAME = "FacName";
 	public static final String FAC_CITY = "FacCity";
@@ -634,7 +634,7 @@ public class CreateStudyServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 
 }

@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -52,7 +52,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class ViewItemDetailServlet extends Controller {
+public class ViewItemDetailServlet extends SpringServlet {
 
 	public static String ITEM_ID = "itemId";
 	public static String ITEM_OID = "itemOid";

@@ -31,7 +31,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -46,7 +46,7 @@ import com.clinovo.util.EmailUtil;
  */
 @SuppressWarnings("unchecked")
 @Component
-public class DeleteStudyUserRoleServlet extends Controller {
+public class DeleteStudyUserRoleServlet extends SpringServlet {
 	public static final String PATH = "DeleteStudyUserRole";
 	public static final String ARG_USERID = "userId";
 	public static final String ARG_STUDYID = "studyId";
@@ -156,6 +156,6 @@ public class DeleteStudyUserRoleServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

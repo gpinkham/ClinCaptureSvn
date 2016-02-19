@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * Settings | File Templates.
  */
 @Component
-public class ChooseDownloadFormat extends Controller {
+public class ChooseDownloadFormat extends SpringServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         StudyBean currentStudy = getCurrentStudy(request);
 		// FormProcessor fp = new FormProcessor(request);

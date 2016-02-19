@@ -22,7 +22,7 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class ViewSubjectServlet extends Controller {
+public class ViewSubjectServlet extends SpringServlet {
 	/**
 	 * 
 	 * @param request
@@ -94,7 +94,7 @@ public class ViewSubjectServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

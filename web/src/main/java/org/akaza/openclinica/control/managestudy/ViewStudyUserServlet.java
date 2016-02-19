@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 @Component
-public class ViewStudyUserServlet extends Controller {
+public class ViewStudyUserServlet extends SpringServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);

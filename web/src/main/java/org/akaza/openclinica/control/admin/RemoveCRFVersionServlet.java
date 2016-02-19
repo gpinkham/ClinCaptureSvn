@@ -32,7 +32,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SuppressWarnings("rawtypes")
-public class RemoveCRFVersionServlet extends Controller {
+public class RemoveCRFVersionServlet extends SpringServlet {
 
 	private static final String CRF_VERSION_ID_PARAMETER = "id";
 
@@ -128,7 +128,7 @@ public class RemoveCRFVersionServlet extends Controller {
 
 		if (keyValue != null) {
 			Map storedAttributes = new HashMap();
-			storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
+			storedAttributes.put(SpringServlet.PAGE_MESSAGE, request.getAttribute(SpringServlet.PAGE_MESSAGE));
 			request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
 			response.sendRedirect(response.encodeRedirectURL(keyValue));
 		} else {
@@ -141,7 +141,7 @@ public class RemoveCRFVersionServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

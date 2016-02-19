@@ -11,7 +11,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
@@ -83,9 +83,9 @@ public class SetUpSessionInterceptorTest {
 		PowerMockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 		request.setContextPath(CLINCAPTURE);
 		request.setSession(session);
-		Mockito.when(session.getAttribute(BaseController.STUDY)).thenReturn(studyBean);
-		Mockito.when(session.getAttribute(BaseController.USER_BEAN_NAME)).thenReturn(userBean);
-		Mockito.when(session.getAttribute(BaseController.USER_ROLE)).thenReturn(userRole);
+		Mockito.when(session.getAttribute(SpringController.STUDY)).thenReturn(studyBean);
+		Mockito.when(session.getAttribute(SpringController.USER_BEAN_NAME)).thenReturn(userBean);
+		Mockito.when(session.getAttribute(SpringController.USER_ROLE)).thenReturn(userRole);
 		Mockito.when(session.getAttribute(LocaleResolver.CURRENT_SESSION_LOCALE)).thenReturn(Locale.ENGLISH);
 		PowerMockito.mockStatic(RequestContextHolder.class);
 		Whitebox.setInternalState(servletRequestAttributes, "request", request);
@@ -115,7 +115,7 @@ public class SetUpSessionInterceptorTest {
 		PowerMockito.when(method.getMethod()).thenReturn(m);
 		PowerMockito.doCallRealMethod().when(setUpSessionInterceptor).preHandle(request, response, method);
 		setUpSessionInterceptor.preHandle(request, response, method);
-		StudyBean study = (StudyBean) request.getSession().getAttribute(BaseController.STUDY);
+		StudyBean study = (StudyBean) request.getSession().getAttribute(SpringController.STUDY);
 		assertEquals(1, study.getId());
 	}
 }

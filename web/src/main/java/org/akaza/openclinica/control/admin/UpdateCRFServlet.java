@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -51,7 +51,7 @@ import java.util.Map;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class UpdateCRFServlet extends Controller {
+public class UpdateCRFServlet extends SpringServlet {
 
 	private static final String CRF = "crf";
 	private static final int MAXIMUM_NAME_SIZE = 255;
@@ -204,7 +204,7 @@ public class UpdateCRFServlet extends Controller {
 
 		if (keyValue != null) {
 			Map storedAttributes = new HashMap();
-			storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
+			storedAttributes.put(SpringServlet.PAGE_MESSAGE, request.getAttribute(SpringServlet.PAGE_MESSAGE));
 			request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
 			response.sendRedirect(response.encodeRedirectURL(keyValue));
 		} else {
@@ -216,7 +216,7 @@ public class UpdateCRFServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

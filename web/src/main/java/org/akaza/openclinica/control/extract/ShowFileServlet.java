@@ -29,7 +29,7 @@ import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class ShowFileServlet extends Controller {
+public class ShowFileServlet extends SpringServlet {
 
 	public static String getLink(int fId, int dId) {
 		return "ShowFile?fileId=" + fId + "&datasetId=" + dId;

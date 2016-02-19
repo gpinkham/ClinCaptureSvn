@@ -41,7 +41,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -64,7 +64,7 @@ import com.clinovo.validator.EventDefinitionValidator;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class DefineStudyEventServlet extends Controller {
+public class DefineStudyEventServlet extends SpringServlet {
 
 	public static final int FIVE = 5;
 	public static final int INT_2000 = 2000;

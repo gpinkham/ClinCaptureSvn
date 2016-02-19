@@ -32,7 +32,7 @@ import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class RemoveDatasetServlet extends Controller {
+public class RemoveDatasetServlet extends SpringServlet {
 
 	public static String getLink(int dsId) {
 		return "RemoveDataset?dsId=" + dsId;

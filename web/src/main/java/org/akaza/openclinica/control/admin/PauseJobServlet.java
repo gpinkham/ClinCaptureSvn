@@ -16,7 +16,7 @@ package org.akaza.openclinica.control.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class PauseJobServlet extends Controller {
+public class PauseJobServlet extends SpringServlet {
 
 	private static final String GROUP_IMPORT_NAME = "importTrigger";
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());

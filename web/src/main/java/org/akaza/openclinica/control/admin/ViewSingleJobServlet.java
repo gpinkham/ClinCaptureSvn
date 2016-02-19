@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class ViewSingleJobServlet extends Controller {
+public class ViewSingleJobServlet extends SpringServlet {
 
 	private static final String TRIGGER_IMPORT_GROUP = "importTrigger";
 

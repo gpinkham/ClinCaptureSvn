@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings("rawtypes")
 @Component
-public class RemoveSubjectServlet extends Controller {
+public class RemoveSubjectServlet extends SpringServlet {
 	/**
 	 *
 	 */
@@ -110,7 +110,7 @@ public class RemoveSubjectServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 
 }

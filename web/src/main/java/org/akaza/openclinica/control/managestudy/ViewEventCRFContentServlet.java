@@ -33,7 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class ViewEventCRFContentServlet extends Controller {
+public class ViewEventCRFContentServlet extends SpringServlet {
 
 	public static final String BEAN_STUDY_EVENT = "studyEvent";
 

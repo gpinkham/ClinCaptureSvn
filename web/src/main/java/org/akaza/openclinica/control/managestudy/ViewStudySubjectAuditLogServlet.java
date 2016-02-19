@@ -45,7 +45,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -66,7 +66,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class ViewStudySubjectAuditLogServlet extends Controller {
+public class ViewStudySubjectAuditLogServlet extends SpringServlet {
 
 	@Autowired
 	private AuditLogRandomizationService auditLogRandomizationService;
@@ -242,7 +242,7 @@ public class ViewStudySubjectAuditLogServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

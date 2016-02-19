@@ -33,7 +33,7 @@ import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings("unchecked")
 @Component
-public class DownloadAttachedFileServlet extends Controller {
+public class DownloadAttachedFileServlet extends SpringServlet {
 
 	/**
 	 * Checks whether the user has the correct privilege

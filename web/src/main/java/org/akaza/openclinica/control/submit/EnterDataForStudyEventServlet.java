@@ -46,7 +46,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SessionManager;
@@ -76,7 +76,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class EnterDataForStudyEventServlet extends Controller {
+public class EnterDataForStudyEventServlet extends SpringServlet {
 
 	public static final String TRUE = "true";
 	public static final String INPUT_EVENT_ID = "eventId";

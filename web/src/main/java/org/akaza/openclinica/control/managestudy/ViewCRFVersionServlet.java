@@ -36,7 +36,7 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class ViewCRFVersionServlet extends Controller {
+public class ViewCRFVersionServlet extends SpringServlet {
 
 	/**
 	 * Checks whether the user has the right permission to proceed function.

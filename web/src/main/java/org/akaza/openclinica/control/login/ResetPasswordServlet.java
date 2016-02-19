@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
@@ -55,7 +55,7 @@ import com.clinovo.validator.PasswordValidator;
  */
 @Component
 @SuppressWarnings("unused")
-public class ResetPasswordServlet extends Controller {
+public class ResetPasswordServlet extends SpringServlet {
 
 	private static final long serialVersionUID = -5259201015824317949L;
 

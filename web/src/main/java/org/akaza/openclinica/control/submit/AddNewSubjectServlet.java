@@ -45,7 +45,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -79,7 +79,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 @Component
-public class AddNewSubjectServlet extends Controller {
+public class AddNewSubjectServlet extends SpringServlet {
 
 	public static final String OPEN_FIRST_CRF = "openFirstCrf";
 	public static final String TRUE = "true";
@@ -903,7 +903,7 @@ public class AddNewSubjectServlet extends Controller {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.akaza.openclinica.control.core.Controller#mayProceed()
+	 * @see org.akaza.openclinica.control.core.SpringServlet#mayProceed()
 	 */
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)

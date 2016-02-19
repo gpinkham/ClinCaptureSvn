@@ -74,7 +74,7 @@ import java.util.Set;
  * 
  * <li>Put the table in the request: <br/>
  * <code>setTable(table);
- * <br/>This method is inherited from Controller.
+ * <br/>This method is inherited from SpringServlet.
  * 
  * <li> Send the user to the JSP with forwardPage as usual.
  * </ul>

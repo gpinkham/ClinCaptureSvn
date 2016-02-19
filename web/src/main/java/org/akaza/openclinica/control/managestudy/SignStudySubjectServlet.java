@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
 import org.akaza.openclinica.core.SecurityManager;
@@ -77,7 +77,7 @@ import java.util.Map;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class SignStudySubjectServlet extends Controller {
+public class SignStudySubjectServlet extends SpringServlet {
 
 	/**
 	 * {@inheritDoc}
@@ -524,7 +524,7 @@ public class SignStudySubjectServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

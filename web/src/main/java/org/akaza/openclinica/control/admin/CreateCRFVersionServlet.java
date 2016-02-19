@@ -44,7 +44,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -75,7 +75,7 @@ import com.clinovo.lib.crf.builder.CrfBuilder;
  */
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 @Component
-public class CreateCRFVersionServlet extends Controller {
+public class CreateCRFVersionServlet extends SpringServlet {
 
 	/**
 	 * {@inheritDoc}
@@ -559,7 +559,7 @@ public class CreateCRFVersionServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

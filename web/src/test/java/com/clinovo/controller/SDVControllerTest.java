@@ -4,7 +4,7 @@ import com.clinovo.BaseControllerTest;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class SDVControllerTest extends BaseControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		session.setAttribute(BaseController.USER_BEAN_NAME, new UserAccountDAO(dataSource).findByPK(1));
+		session.setAttribute(SpringController.USER_BEAN_NAME, new UserAccountDAO(dataSource).findByPK(1));
 	}
 
 	@Test
@@ -32,8 +32,8 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get("/viewSubjectAggregate").param("studyId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -41,8 +41,8 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.INVESTIGATOR);
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get("/viewSubjectAggregate").param("studyId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -50,8 +50,8 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get("/viewAllSubjectSDVtmp").param("studyId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
 	@Test
@@ -59,16 +59,16 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.INVESTIGATOR);
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get("/viewAllSubjectSDVtmp").param("studyId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatSdvAllSubjectsFormHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/handleSDVPost").session(session).sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+				get("/handleSDVPost").session(session).sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
@@ -76,8 +76,8 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get("/handleSDVGet").param("crfId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
@@ -85,8 +85,8 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get("/handleSDVRemove").param("crfId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
@@ -94,8 +94,8 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get("/sdvStudySubject").param("theStudySubjectId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
@@ -103,15 +103,15 @@ public class SDVControllerTest extends BaseControllerTest {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
 				get("/unSdvStudySubject").param("theStudySubjectId", "1").session(session)
-						.sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+						.sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 
 	@Test
 	public void testThatSdvStudySubjectsHandlerReturnsCode302() throws Exception {
 		USER_ROLE.setRole(Role.STUDY_ADMINISTRATOR);
 		this.mockMvc.perform(
-				get("/sdvStudySubjects").session(session).sessionAttr(BaseController.STUDY, CURRENT_STUDY)
-						.sessionAttr(BaseController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
+				get("/sdvStudySubjects").session(session).sessionAttr(SpringController.STUDY, CURRENT_STUDY)
+						.sessionAttr(SpringController.USER_ROLE, USER_ROLE)).andExpect(status().isFound());
 	}
 }

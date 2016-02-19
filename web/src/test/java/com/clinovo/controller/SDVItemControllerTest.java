@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class SDVItemControllerTest extends BaseControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		session.setAttribute(BaseController.USER_BEAN_NAME, new UserAccountDAO(dataSource).findByPK(1));
+		session.setAttribute(SpringController.USER_BEAN_NAME, new UserAccountDAO(dataSource).findByPK(1));
 	}
 
 	@Test

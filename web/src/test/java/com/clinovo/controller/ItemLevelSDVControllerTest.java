@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Item Level SDV Controller Test.
+ * Item Level SDV SpringServlet Test.
  */
 public class ItemLevelSDVControllerTest extends BaseControllerTest {
 

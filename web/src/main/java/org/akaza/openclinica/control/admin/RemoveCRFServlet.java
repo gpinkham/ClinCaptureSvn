@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class RemoveCRFServlet extends Controller {
+public class RemoveCRFServlet extends SpringServlet {
 	/**
 	 *
 	 */
@@ -171,7 +171,7 @@ public class RemoveCRFServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 
 }

@@ -5,7 +5,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,13 +36,13 @@ public class CRFEvaluationTableFactoryTest extends BaseControllerTest {
 		StudyBean currentStudy = new StudyBean();
 		currentStudy.setId(1);
 		currentStudy.setStatus(org.akaza.openclinica.bean.core.Status.AVAILABLE);
-		request.getSession().setAttribute(BaseController.STUDY, currentStudy);
+		request.getSession().setAttribute(SpringController.STUDY, currentStudy);
 		UserAccountBean currentUser = new UserAccountBean();
 		currentStudy.setId(1);
-		request.getSession().setAttribute(BaseController.USER_BEAN_NAME, currentUser);
+		request.getSession().setAttribute(SpringController.USER_BEAN_NAME, currentUser);
 		StudyUserRoleBean currentRole = new StudyUserRoleBean();
 		currentRole.setRole(Role.SYSTEM_ADMINISTRATOR);
-		request.getSession().setAttribute(BaseController.USER_ROLE, currentRole);
+		request.getSession().setAttribute(SpringController.USER_ROLE, currentRole);
 
 		StudyParameterValueBean studyParameter = new StudyParameterValueBean();
 		studyParameter.setParameter("evaluateWithContext");

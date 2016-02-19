@@ -34,7 +34,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class ExportExcelStudySubjectAuditLogServlet extends Controller {
+public class ExportExcelStudySubjectAuditLogServlet extends SpringServlet {
 
 	public static final int AUDIT_EVENT_TYPE_3 = 3; // Subject's status was changed
 
@@ -218,7 +218,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

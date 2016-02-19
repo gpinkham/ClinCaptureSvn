@@ -14,7 +14,7 @@
 package org.akaza.openclinica.control.pentaho;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-public class PentahoLoginServlet extends Controller {
+public class PentahoLoginServlet extends SpringServlet {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 

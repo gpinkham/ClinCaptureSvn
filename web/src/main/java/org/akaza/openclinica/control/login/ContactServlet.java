@@ -25,7 +25,7 @@ import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
@@ -46,7 +46,7 @@ import java.util.HashMap;
  * 
  */
 @Component
-public class ContactServlet extends Controller {
+public class ContactServlet extends SpringServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {

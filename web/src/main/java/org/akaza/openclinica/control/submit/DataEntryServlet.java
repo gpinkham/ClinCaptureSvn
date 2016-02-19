@@ -81,7 +81,7 @@ import org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -161,7 +161,7 @@ import com.clinovo.validator.CodedTermValidator;
  * Data Entry Servlet.
  */
 @SuppressWarnings({"all"})
-public abstract class DataEntryServlet extends Controller {
+public abstract class DataEntryServlet extends SpringServlet {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
 	public static final String DATA_ENTRY_CURRENT_CRF_OID = "dataEntryCurrentCrfOid";

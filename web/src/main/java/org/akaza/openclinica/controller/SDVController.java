@@ -242,7 +242,7 @@ public class SDVController extends SpringController {
 			}
 			request.setAttribute("pageMessages", pageMessages);
 		}
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		response.sendRedirect(request.getContextPath().concat(
 				"/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=".concat(Integer.toString(currentStudy.getId()))));
 	}
@@ -289,7 +289,7 @@ public class SDVController extends SpringController {
 
 		request.setAttribute("sdv_restore", "true");
 
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		response.sendRedirect(request.getContextPath().concat(
 				"/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=".concat(Integer.toString(currentStudy.getId()))));
 	}
@@ -327,7 +327,7 @@ public class SDVController extends SpringController {
 		request.setAttribute("pageMessages", pageMessages);
 		request.setAttribute("sdv_restore", "true");
 
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		response.sendRedirect(request.getContextPath().concat(
 				"/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=".concat(Integer.toString(currentStudy.getId()))));
 	}
@@ -365,7 +365,7 @@ public class SDVController extends SpringController {
 		}
 		request.setAttribute("pageMessages", pageMessages);
 		request.setAttribute("s_sdv_restore", "true");
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		response.sendRedirect(request.getContextPath()
 				.concat("/pages/viewSubjectAggregate?s_sdv_restore=true&studyId=".concat(Integer.toString(currentStudy
 						.getId()))));
@@ -404,7 +404,7 @@ public class SDVController extends SpringController {
 		request.setAttribute("pageMessages", pageMessages);
 		request.setAttribute("s_sdv_restore", "true");
 
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		response.sendRedirect(request.getContextPath()
 				.concat("/pages/viewSubjectAggregate?s_sdv_restore=true&studyId=".concat(Integer.toString(currentStudy
 						.getId()))));
@@ -460,7 +460,7 @@ public class SDVController extends SpringController {
 			}
 			request.setAttribute("pageMessages", pageMessages);
 		}
-		org.akaza.openclinica.control.core.Controller.storePageMessages(request);
+		storePageMessages(request);
 		response.sendRedirect(request.getContextPath()
 				.concat("/pages/viewSubjectAggregate?s_sdv_restore=true&studyId=".concat(Integer.toString(currentStudy
 						.getId()))));

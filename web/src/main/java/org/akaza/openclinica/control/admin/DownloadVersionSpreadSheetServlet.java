@@ -23,7 +23,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 @Component
-public class DownloadVersionSpreadSheetServlet extends Controller {
+public class DownloadVersionSpreadSheetServlet extends SpringServlet {
 
 	public static String CRF_ID = "crfId";
 	public static String CRF_VERSION_ID = "crfVersionId";

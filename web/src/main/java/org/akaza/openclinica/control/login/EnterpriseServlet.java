@@ -21,7 +21,7 @@ package org.akaza.openclinica.control.login;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -31,7 +31,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  * 
  */
-public class EnterpriseServlet extends Controller {
+public class EnterpriseServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {

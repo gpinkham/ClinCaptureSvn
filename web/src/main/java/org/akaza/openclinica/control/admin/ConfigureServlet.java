@@ -25,7 +25,7 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @SuppressWarnings({ "rawtypes", "unused" })
-public class ConfigureServlet extends Controller {
+public class ConfigureServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 2729725318725545575L;
 
@@ -112,6 +112,6 @@ public class ConfigureServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

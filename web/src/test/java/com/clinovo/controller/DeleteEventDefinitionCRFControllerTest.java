@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.junit.Test;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -64,10 +64,10 @@ public class DeleteEventDefinitionCRFControllerTest extends BaseControllerTest {
 		HashMap<String, Object> storedAttributes = new HashMap<String, Object>();
 		ArrayList<String> pageMessages = new ArrayList<String>();
 		pageMessages.add(expectedMessage);
-		storedAttributes.put(BaseController.PAGE_MESSAGE, pageMessages);
+		storedAttributes.put(SpringController.PAGE_MESSAGE, pageMessages);
 		mockMvc.perform(
 				get(DELETE_EVENT_DEFINITION_CRF_CONTROLLER).param("edId", "1").param("submit", "true").param("id", "1"))
-				.andExpect(MockMvcResultMatchers.request().sessionAttribute(BaseController.STORED_ATTRIBUTES,
+				.andExpect(MockMvcResultMatchers.request().sessionAttribute(SpringController.STORED_ATTRIBUTES,
 						storedAttributes));
 	}
 
@@ -78,10 +78,10 @@ public class DeleteEventDefinitionCRFControllerTest extends BaseControllerTest {
 		HashMap<String, Object> storedAttributes = new HashMap<String, Object>();
 		ArrayList<String> pageMessages = new ArrayList<String>();
 		pageMessages.add(expectedMessage);
-		storedAttributes.put(BaseController.PAGE_MESSAGE, pageMessages);
+		storedAttributes.put(SpringController.PAGE_MESSAGE, pageMessages);
 		mockMvc.perform(get(DELETE_EVENT_DEFINITION_CRF_CONTROLLER).param("edId", "1").param("submit", "true")
 				.param("id", "12"))
-				.andExpect(MockMvcResultMatchers.request().sessionAttribute(BaseController.STORED_ATTRIBUTES,
+				.andExpect(MockMvcResultMatchers.request().sessionAttribute(SpringController.STORED_ATTRIBUTES,
 						storedAttributes));
 	}
 }

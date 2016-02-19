@@ -27,7 +27,7 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.RequestUtil;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class RememberLastPage extends Controller {
+public abstract class RememberLastPage extends SpringServlet {
 
 	public static final String URL_KEY_POSTFIX = ".rememberLastPage.lastUrl";
 

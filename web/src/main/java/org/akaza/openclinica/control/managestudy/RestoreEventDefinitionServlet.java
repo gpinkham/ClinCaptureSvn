@@ -29,7 +29,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class RestoreEventDefinitionServlet extends Controller {
+public class RestoreEventDefinitionServlet extends SpringServlet {
 	/**
 	 *
 	 */

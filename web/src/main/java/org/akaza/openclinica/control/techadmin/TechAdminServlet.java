@@ -17,7 +17,7 @@
 package org.akaza.openclinica.control.techadmin;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("rawtypes")
 @Component
-public class TechAdminServlet extends Controller {
+public class TechAdminServlet extends SpringServlet {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -84,6 +84,6 @@ public class TechAdminServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

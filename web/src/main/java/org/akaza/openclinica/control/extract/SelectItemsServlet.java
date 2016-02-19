@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -57,7 +57,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class SelectItemsServlet extends Controller {
+public class SelectItemsServlet extends SpringServlet {
 
 	public static String CURRENT_DEF_ID = "currentDefId";
 

@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class VerifyImportedRuleServlet extends Controller {
+public class VerifyImportedRuleServlet extends SpringServlet {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

@@ -49,7 +49,7 @@ import org.akaza.openclinica.bean.extract.TabReportBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -83,7 +83,7 @@ import com.clinovo.i18n.LocaleResolver;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class ExportDatasetServlet extends Controller {
+public class ExportDatasetServlet extends SpringServlet {
 
 	/**
 	 * Get link for this servlet.

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,15 +30,15 @@ public class UnavailableCRFListTest {
 		public void run() {
 			try {
 				for (int ecbId = 1; ecbId < TOTAL_ECB_IDS; ecbId++) {
-					Controller.lockThisEventCRF(ecbId, userId);
+					SpringServlet.lockThisEventCRF(ecbId, userId);
 				}
-				Controller.removeLockedCRF(userId);
+				SpringServlet.removeLockedCRF(userId);
 				for (int ecbId = 1; ecbId < TOTAL_ECB_IDS; ecbId++) {
-					Controller.lockThisEventCRF(ecbId, userId);
+					SpringServlet.lockThisEventCRF(ecbId, userId);
 				}
 				for (int ecbId = 1; ecbId < TOTAL_ECB_IDS; ecbId++) {
-					if (Controller.getUnavailableCRFList().containsKey(ecbId)) {
-						Controller.justRemoveLockedCRF(ecbId);
+					if (SpringServlet.getUnavailableCRFList().containsKey(ecbId)) {
+						SpringServlet.justRemoveLockedCRF(ecbId);
 					}
 				}
 			} catch (ConcurrentModificationException e) {

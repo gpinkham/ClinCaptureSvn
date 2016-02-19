@@ -25,7 +25,6 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -92,7 +91,7 @@ public class DeleteCRFVersionController extends SpringController {
 	public String mainGet(HttpServletRequest request, Model model, @RequestParam("crfVersionId") int crfVersionId)
 			throws Exception {
 
-		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE);
+		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(SpringController.USER_ROLE);
 
 		if (userRole.getRole() == Role.SYSTEM_ADMINISTRATOR || (userRole.getRole() == Role.STUDY_ADMINISTRATOR)) {
 

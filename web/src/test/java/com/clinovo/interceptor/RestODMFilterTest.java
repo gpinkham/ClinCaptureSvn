@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.web.print.ODMClinicaDataResource;
@@ -60,7 +60,7 @@ public class RestODMFilterTest {
 		studyBean.setId(1);
 		request.setRequestURI(QUERY);
 		request.setSession(session);
-		request.getSession().setAttribute(BaseController.USER_BEAN_NAME, userBean);
+		request.getSession().setAttribute(SpringController.USER_BEAN_NAME, userBean);
 		request.getSession().setAttribute(LocaleResolver.CURRENT_SESSION_LOCALE, Locale.ENGLISH);
 		PowerMockito.mockStatic(RequestContextHolder.class);
 		Whitebox.setInternalState(servletRequestAttributes, "request", request);

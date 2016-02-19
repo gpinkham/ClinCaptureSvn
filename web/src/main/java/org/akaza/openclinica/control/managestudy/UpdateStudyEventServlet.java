@@ -50,8 +50,8 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.BaseController;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -92,7 +92,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @Component
 @SuppressWarnings({"rawtypes", "unchecked", "unused" })
-public class UpdateStudyEventServlet extends Controller {
+public class UpdateStudyEventServlet extends SpringServlet {
 
 	private static final long serialVersionUID = -6029524999558420563L;
 
@@ -125,8 +125,8 @@ public class UpdateStudyEventServlet extends Controller {
 	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response,
 			int studySubjectId) throws Exception {
 		Map storedAttributes = new HashMap();
-		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
-		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
+		storedAttributes.put(SpringServlet.PAGE_MESSAGE, request.getAttribute(SpringServlet.PAGE_MESSAGE));
+		request.getSession().setAttribute(SpringServlet.STORED_ATTRIBUTES, storedAttributes);
 		String viewStudySubjectUrl = (String) request.getSession()
 				.getAttribute(RememberLastPage.getUrlKey(ViewStudySubjectServlet.class));
 		if (viewStudySubjectUrl != null && viewStudySubjectUrl.contains("id=" + studySubjectId + "&")) {

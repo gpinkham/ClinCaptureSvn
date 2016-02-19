@@ -37,7 +37,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -59,7 +59,7 @@ import com.clinovo.validator.EventDefinitionValidator;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class UpdateEventDefinitionServlet extends Controller {
+public class UpdateEventDefinitionServlet extends SpringServlet {
 
 	public static final int VALIDATION_MAX_DIGIT_NUMBER = 3;
 	public static final int VALIDATION_MAX_CHARACTERS_NUMBER = 2000;

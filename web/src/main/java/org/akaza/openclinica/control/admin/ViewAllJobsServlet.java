@@ -14,7 +14,7 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-public class ViewAllJobsServlet extends Controller {
+public class ViewAllJobsServlet extends SpringServlet {
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)

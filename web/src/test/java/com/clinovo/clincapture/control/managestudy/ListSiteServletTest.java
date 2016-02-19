@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.managestudy.ListSiteServlet;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -75,8 +75,8 @@ public class ListSiteServletTest {
 		studyMap.put("countEvents", 0);
 		mapContainer.put(1, studyMap);
 
-		Mockito.doReturn(studyDAO).when((BaseController) listSiteServlet).getStudyDAO();
-		Mockito.doReturn(studyFromDb).when((BaseController) listSiteServlet).getCurrentStudy(request);
+		Mockito.doReturn(studyDAO).when((SpringServlet) listSiteServlet).getStudyDAO();
+		Mockito.doReturn(studyFromDb).when((SpringServlet) listSiteServlet).getCurrentStudy(request);
 		Mockito.doReturn(studies).when(studyDAO).findAllByParent(studyFromDb.getId());
 		Mockito.doCallRealMethod().when(listSiteServlet).processRequest(request, response);
 

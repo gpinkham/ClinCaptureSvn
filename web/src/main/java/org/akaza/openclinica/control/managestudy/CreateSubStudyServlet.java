@@ -33,7 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -58,7 +58,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class CreateSubStudyServlet extends Controller {
+public class CreateSubStudyServlet extends SpringServlet {
 
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
 	public static final String INPUT_START_DATE = "startDate";
@@ -707,7 +707,7 @@ public class CreateSubStudyServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

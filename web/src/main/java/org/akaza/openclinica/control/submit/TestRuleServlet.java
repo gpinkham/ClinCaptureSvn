@@ -33,7 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -75,7 +75,7 @@ import java.util.Map;
  */
 @Component
 @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
-public class TestRuleServlet extends Controller {
+public class TestRuleServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 9116068126651934226L;
 	protected final Logger log = LoggerFactory.getLogger(TestRuleServlet.class);
@@ -427,7 +427,7 @@ public class TestRuleServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

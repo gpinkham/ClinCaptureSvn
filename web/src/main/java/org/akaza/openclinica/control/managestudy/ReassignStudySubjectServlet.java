@@ -29,7 +29,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -54,7 +54,7 @@ import java.util.Date;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class ReassignStudySubjectServlet extends Controller {
+public class ReassignStudySubjectServlet extends SpringServlet {
 	/**
 	 * Permits access to reassigning subject.
 	 * 

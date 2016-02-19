@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -60,7 +60,7 @@ import com.clinovo.util.EmailUtil;
  * 
  */
 @Component
-public class RemoveEventCRFServlet extends Controller {
+public class RemoveEventCRFServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)

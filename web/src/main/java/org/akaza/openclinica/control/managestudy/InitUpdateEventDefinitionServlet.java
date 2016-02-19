@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -55,7 +55,7 @@ import com.clinovo.util.SignStateRestorer;
  */
 @Component
 @SuppressWarnings("rawtypes")
-public class InitUpdateEventDefinitionServlet extends Controller {
+public class InitUpdateEventDefinitionServlet extends SpringServlet {
 
 	/**
 	 * Checks whether the user has the correct privilege.

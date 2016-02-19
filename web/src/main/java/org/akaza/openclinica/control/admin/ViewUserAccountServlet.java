@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
-public class ViewUserAccountServlet extends Controller {
+public class ViewUserAccountServlet extends SpringServlet {
 	public static final String PATH = "ViewUserAccount";
 	public static final String ARG_USER_ID = "userId";
 
@@ -101,6 +101,6 @@ public class ViewUserAccountServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

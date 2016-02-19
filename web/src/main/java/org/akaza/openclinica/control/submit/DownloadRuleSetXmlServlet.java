@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SuppressWarnings("unused")
-public class DownloadRuleSetXmlServlet extends Controller {
+public class DownloadRuleSetXmlServlet extends SpringServlet {
 
 	protected final Logger log = LoggerFactory.getLogger(DownloadRuleSetXmlServlet.class);
 	private static final long serialVersionUID = 5381321212952389008L;

@@ -24,7 +24,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
@@ -47,7 +47,7 @@ import java.util.Set;
  */
 @Component
 @SuppressWarnings("unused")
-public class RunRuleServlet extends Controller {
+public class RunRuleServlet extends SpringServlet {
 	private static final long serialVersionUID = 9116068126651934226L;
 
 	@Override
@@ -90,7 +90,7 @@ public class RunRuleServlet extends Controller {
 	protected String getAdminServlet(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SpringServlet.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

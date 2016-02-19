@@ -35,7 +35,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.util.ImportSummaryInfo;
@@ -53,7 +53,7 @@ import com.clinovo.crfdata.ImportCRFDataService;
  */
 @Component
 @SuppressWarnings({"unchecked", "unused" })
-public class VerifyImportedCRFDataServlet extends Controller {
+public class VerifyImportedCRFDataServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 1L;
 	public static final int INT_3600 = 3600;

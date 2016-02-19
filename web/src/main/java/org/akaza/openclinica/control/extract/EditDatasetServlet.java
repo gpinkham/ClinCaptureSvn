@@ -37,7 +37,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -56,7 +56,7 @@ import org.springframework.stereotype.Component;
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "unused"})
 @Component
-public class EditDatasetServlet extends Controller {
+public class EditDatasetServlet extends SpringServlet {
 
 	/**
 	 * Get link for this servlet.

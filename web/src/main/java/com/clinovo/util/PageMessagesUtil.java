@@ -15,7 +15,7 @@
 
 package com.clinovo.util;
 
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,21 +29,21 @@ public final class PageMessagesUtil {
 	}
 
 	public static void addPageMessage(HttpServletRequest request, String pageMessage) {
-		List<String> pageMessages = (List<String>) request.getAttribute(BaseController.PAGE_MESSAGE);
+		List<String> pageMessages = (List<String>) request.getAttribute(SpringController.PAGE_MESSAGE);
 		if (pageMessages == null) {
 			pageMessages = new ArrayList<String>();
-			request.setAttribute(BaseController.PAGE_MESSAGE, pageMessages);
+			request.setAttribute(SpringController.PAGE_MESSAGE, pageMessages);
 		}
 		pageMessages.add(pageMessage);
 	}
 
 	public static void addPageMessage(Model model, String pageMessage) {
-		List<String> pageMessages = (List<String>) model.asMap().get(BaseController.PAGE_MESSAGE);
+		List<String> pageMessages = (List<String>) model.asMap().get(SpringController.PAGE_MESSAGE);
 		if (pageMessages == null) {
 			pageMessages = new ArrayList<String>();
-			model.addAttribute(BaseController.PAGE_MESSAGE, pageMessages);
+			model.addAttribute(SpringController.PAGE_MESSAGE, pageMessages);
 		}
 		pageMessages.add(pageMessage);
-		model.addAttribute(BaseController.PAGE_MESSAGE, pageMessages);
+		model.addAttribute(SpringController.PAGE_MESSAGE, pageMessages);
 	}
 }

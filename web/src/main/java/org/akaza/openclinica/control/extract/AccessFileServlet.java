@@ -26,7 +26,7 @@ import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -48,7 +48,7 @@ import java.io.InputStream;
  * AccessFileServlet class.
  */
 @Component
-public class AccessFileServlet extends Controller {
+public class AccessFileServlet extends SpringServlet {
 
 	/**
 	 * Method builds link to download a file by file id.

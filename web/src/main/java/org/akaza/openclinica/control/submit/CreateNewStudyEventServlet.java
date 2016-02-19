@@ -42,7 +42,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -72,7 +72,7 @@ import com.clinovo.util.ValidatorHelper;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class CreateNewStudyEventServlet extends Controller {
+public class CreateNewStudyEventServlet extends SpringServlet {
 
 	public static final int TWO_THOUSAND = 2000;
 

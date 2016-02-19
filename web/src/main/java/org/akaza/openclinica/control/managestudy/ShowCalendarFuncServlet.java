@@ -14,7 +14,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 @Component
-public class ShowCalendarFuncServlet extends Controller {
+public class ShowCalendarFuncServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)

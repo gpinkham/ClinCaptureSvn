@@ -28,7 +28,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -52,7 +52,7 @@ import java.util.ArrayList;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
-public class ViewSiteServlet extends Controller {
+public class ViewSiteServlet extends SpringServlet {
 
 	/**
 	 * Checks whether the user has the correct privilege.

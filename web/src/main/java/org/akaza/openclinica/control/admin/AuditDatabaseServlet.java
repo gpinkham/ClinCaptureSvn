@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SuppressWarnings("unused")
-public class AuditDatabaseServlet extends Controller {
+public class AuditDatabaseServlet extends SpringServlet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -115,6 +115,6 @@ public class AuditDatabaseServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-		return Controller.ADMIN_SERVLET_CODE;
+		return SpringServlet.ADMIN_SERVLET_CODE;
 	}
 }

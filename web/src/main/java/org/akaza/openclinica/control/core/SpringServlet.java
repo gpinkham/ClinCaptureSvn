@@ -125,13 +125,13 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.RequestUtil;
 
 /**
- * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the
+ * Abstract class for creating a spring servlet and extending capabilities of spring controller. However, not using the
  * SingleThreadModel.
  *
  * TODO We should rename this class to the SpringServlet!
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public abstract class Controller extends BaseController implements HttpRequestHandler, ServletContextAware {
+public abstract class SpringServlet extends SpringController implements HttpRequestHandler, ServletContextAware {
 
 	public final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -201,7 +201,7 @@ public abstract class Controller extends BaseController implements HttpRequestHa
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
 		}
 	}
@@ -227,7 +227,7 @@ public abstract class Controller extends BaseController implements HttpRequestHa
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
 		}
 	}
@@ -342,7 +342,7 @@ public abstract class Controller extends BaseController implements HttpRequestHa
 		HttpSession session = request.getSession();
 		reloadUserBean(session, getUserAccountDAO());
 		String newThemeColor = CoreResources.getField("themeColor");
-		session.setAttribute(BaseController.THEME_COLOR, newThemeColor);
+		session.setAttribute(SpringController.THEME_COLOR, newThemeColor);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
@@ -528,18 +528,18 @@ public abstract class Controller extends BaseController implements HttpRequestHa
 			}
 		} catch (InconsistentStateException ise) {
 			ise.printStackTrace();
-			logger.warn("InconsistentStateException: org.akaza.openclinica.control.Controller: " + ise.getMessage());
+			logger.warn("InconsistentStateException: org.akaza.openclinica.control.SpringServlet: " + ise.getMessage());
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
 			addPageMessage(ise.getOpenClinicaMessage(), request);
 			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
 			logger.warn(
-					"InsufficientPermissionException: org.akaza.openclinica.control.Controller: " + ipe.getMessage());
+					"InsufficientPermissionException: org.akaza.openclinica.control.SpringServlet: " + ipe.getMessage());
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
 			forwardPage(ipe.getGoTo(), request, response);
 		} catch (OutOfMemoryError ome) {
@@ -547,14 +547,14 @@ public abstract class Controller extends BaseController implements HttpRequestHa
 			long heapSize = Runtime.getRuntime().totalMemory();
 			logger.error("OutOfMemory Exception - " + heapSize);
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
 			session.setAttribute("ome", "yes");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("Error has occurred.", e);
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
 			forwardPage(Page.ERROR, request, response);
 		}
@@ -900,7 +900,7 @@ public abstract class Controller extends BaseController implements HttpRequestHa
 	}
 
 	/**
-	 * @return A blank String if this servlet is not an Administer System servlet. Controller.ADMIN_SERVLET_CODE
+	 * @return A blank String if this servlet is not an Administer System servlet. SpringServlet.ADMIN_SERVLET_CODE
 	 *         otherwise.
 	 * @param request
 	 *            HttpServletRequest

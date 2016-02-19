@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Tests for Includes Controller.
+ * Tests for Includes SpringServlet.
  */
 public class IncludesControllerTest extends BaseControllerTest{
 

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * Created by IntelliJ IDEA. User: A. Hamid Date: Apr 12, 2010 Time: 3:32:44 PM
  */
 @Component
-public class CheckCRFLocked extends Controller {
+public class CheckCRFLocked extends SpringServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		int userId;
 		String ecId = request.getParameter("ecId");

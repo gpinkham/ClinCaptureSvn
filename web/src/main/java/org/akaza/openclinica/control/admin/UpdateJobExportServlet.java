@@ -29,7 +29,7 @@ import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -58,7 +58,7 @@ import com.clinovo.util.ValidatorHelper;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
-public class UpdateJobExportServlet extends Controller {
+public class UpdateJobExportServlet extends SpringServlet {
 
 	public static final String PERIOD = "periodToRun";
 	public static final String FORMAT_ID = "formatId";

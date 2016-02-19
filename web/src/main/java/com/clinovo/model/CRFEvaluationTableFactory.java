@@ -29,7 +29,7 @@ import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -459,11 +459,11 @@ public class CRFEvaluationTableFactory extends AbstractTableFactory {
 				org.akaza.openclinica.bean.core.Term.normalizeString(messageSource.getMessage(LOCKED, null, locale)),
 				Status.LOCKED);
 
-		currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute(BaseController.STUDY);
+		currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute(SpringController.STUDY);
 		StudyUserRoleBean userRole = (StudyUserRoleBean) tableFacade.getWebContext().getSessionAttribute(
-				BaseController.USER_ROLE);
+				SpringController.USER_ROLE);
 		UserAccountBean userBean = (UserAccountBean) tableFacade.getWebContext().getSessionAttribute(
-				BaseController.USER_BEAN_NAME);
+				SpringController.USER_BEAN_NAME);
 
 		CRFDAO crfDao = new CRFDAO(dataSource);
 		EventCRFDAO ecDao = new EventCRFDAO(dataSource);

@@ -20,14 +20,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ShuffleDiscrepancyNotesServlet extends Controller {
+public class ShuffleDiscrepancyNotesServlet extends SpringServlet {
 
 	public static final String ROW_PREFIX = "rp";
 	public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
