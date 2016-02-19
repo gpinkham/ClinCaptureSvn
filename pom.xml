@@ -711,7 +711,6 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.14.1</version>
 					<configuration>
-     <skipTests>true</skipTests>
 						<systemProperties>
 							<property>
 								<name>test.core.build.classes</name>

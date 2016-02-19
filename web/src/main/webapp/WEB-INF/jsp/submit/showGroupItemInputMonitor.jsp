@@ -348,7 +348,7 @@
     <c:when test="${displayItem.item.dataType.id eq 13 or displayItem.item.dataType.id eq 14}"></c:when>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
         <a class="dnLink"
-           tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip()"
+           tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onmouseover="callTip(genToolTips(${displayItem.data.id}));" onmouseout="UnTip()"
            onClick="openDNoteWindow('<c:out value="${contextPath}" />/ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
             <img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}" />"
                  src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
@@ -362,7 +362,7 @@
       <c:set var="imageFileName" value="icon_noNote" />
 
          <a class="dnLink"
-            tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip()"
+            tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${displayItem.data.id}));" onmouseout="UnTip()"
             onClick="openDNWindow('<c:out value="${contextPath}" />/CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
              <img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>"
                   src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>

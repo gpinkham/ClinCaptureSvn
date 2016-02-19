@@ -35,6 +35,7 @@
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
     <!-- Added for the new Calender -->
 	<c:import url="/includes/js/dialogs.js.jsp" />
+	<c:import url="/includes/js/dn_flag_tooltip.js.jsp" />
     <ui:calendar/>
     <!-- End -->
     <ui:theme/>
