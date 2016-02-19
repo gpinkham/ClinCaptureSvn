@@ -1,40 +1,20 @@
+/*******************************************************************************
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ *
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer.
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ *
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use.
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ *******************************************************************************/
 package com.clinovo.controller;
 
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.model.CasebooksTableFactory;
-import com.clinovo.model.DownloadCasebooksTableFactory;
-import com.clinovo.service.EmailService;
-import com.clinovo.util.EmailUtil;
-import com.gargoylesoftware.htmlunit.AjaxController;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.util.Cookie;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import com.clinovo.util.HtmlToPdfUtil;
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.RequestContextHolder;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,12 +24,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.control.core.SpringController;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.CasebooksTableFactory;
+import com.clinovo.model.DownloadCasebooksTableFactory;
+import com.clinovo.service.EmailService;
+import com.clinovo.util.EmailUtil;
+import com.clinovo.util.HtmlToPdfUtil;
+import com.gargoylesoftware.htmlunit.AjaxController;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.util.Cookie;
+
 /**
  * Controller for print subject casebooks page.
  */
 @Controller
 @SuppressWarnings("serial")
-public class CasebooksController extends Redirection {
+public class CasebooksController extends SpringController {
 
     @Autowired
     private DataSource dataSource;
@@ -274,8 +288,7 @@ public class CasebooksController extends Redirection {
             String casebookPath = getCasebookFilePath(studyOid, studySubjectOid);
             File file = new File(casebookPath);
             if (file.isFile()) {
-                uploadFileToResponse(file, response);
-
+                downloadFile(file, "text/xml", response);
             }
         }
         return DOWNLOADCASEBOOKS_PAGE;
@@ -305,38 +318,6 @@ public class CasebooksController extends Redirection {
         }
 
         return downloadCasebookPageHandler(request);
-    }
-
-
-    private void uploadFileToResponse(File file, HttpServletResponse response) throws IOException {
-        response.setHeader("Content-disposition", "attachment; filename=\"" + file.getName() + "\";");
-        response.setContentType("text/xml");
-        response.setHeader("Pragma", "public");
-        ServletOutputStream op = response.getOutputStream();
-        DataInputStream in = null;
-        try {
-            response.setContentType("text/xml");
-            response.setHeader("Pragma", "public");
-            response.setContentLength((int) file.length());
-            byte[] bbuf = new byte[(int) file.length()];
-            in = new DataInputStream(new FileInputStream(file));
-            int length;
-            while ((length = in.read(bbuf)) != -1) {
-                op.write(bbuf, 0, length);
-            }
-            in.close();
-            op.flush();
-            op.close();
-        } catch (Exception ee) {
-            ee.printStackTrace();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (op != null) {
-                op.close();
-            }
-        }
     }
 
     private List<StudySubjectBean> getStudySubjectBeanList(List<String> studySubjectOid, int studyId, boolean isSite) {
@@ -432,9 +413,4 @@ public class CasebooksController extends Redirection {
 	private void cleanupOIDs(List<String> list) {
 		getSubjectOIDs().removeAll(list);
 	}
-
-    @Override
-    public String getUrl() {
-        return CASEBOOKS_PAGE;
-    }
 }

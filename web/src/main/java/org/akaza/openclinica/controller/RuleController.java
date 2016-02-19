@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -93,7 +94,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/rule")
-public class RuleController {
+public class RuleController extends SpringController {
 
 	@Autowired
 	private RuleDao ruleDao;

@@ -12,7 +12,6 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.controller;
 
 import java.util.Locale;
@@ -23,6 +22,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.RememberLastPage;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -47,7 +47,7 @@ import com.clinovo.validation.SystemValidator;
 
 @Controller
 @RequestMapping("/system")
-public class SystemController {
+public class SystemController extends SpringController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 

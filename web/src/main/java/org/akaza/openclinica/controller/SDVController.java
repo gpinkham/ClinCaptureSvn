@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -49,7 +50,7 @@ import com.clinovo.service.ItemSDVService;
  */
 @Controller("sdvController")
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class SDVController {
+public class SDVController extends SpringController {
 
 	public static final String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
 

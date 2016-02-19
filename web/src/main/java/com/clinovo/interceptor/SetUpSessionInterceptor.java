@@ -39,7 +39,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.clinovo.controller.Redirection;
 import com.clinovo.i18n.LocaleResolver;
 
 /**
@@ -84,8 +83,6 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 				request.getSession().setAttribute(BaseController.REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN,
 						request.getRequestURI().concat(queryString != null ? "?".concat(queryString) : ""));
 				response.sendRedirect(request.getContextPath() + "/MainMenu");
-			} else {
-				ok = checkForRedirection(request, response, handler);
 			}
 		}
 		return ok;
@@ -150,23 +147,5 @@ public class SetUpSessionInterceptor extends HandlerInterceptorAdapter {
 	 */
 	public DataSource getDataSource() {
 		return dataSource;
-	}
-
-	private boolean checkForRedirection(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
-		boolean result = true;
-		if (handler instanceof Redirection) {
-			String queryString = request.getQueryString();
-			String key = handler.getClass().getName().concat(PREV_URL);
-			String prevQueryString = (String) request.getSession().getAttribute(key);
-			if (prevQueryString != null && queryString == null) {
-				response.sendRedirect(request.getContextPath().concat(((Redirection) handler).getUrl())
-						.concat(FIRST_URL_PARAMETER).concat(prevQueryString));
-				result = false;
-			} else {
-				request.getSession().setAttribute(key, queryString);
-			}
-		}
-		return result;
 	}
 }

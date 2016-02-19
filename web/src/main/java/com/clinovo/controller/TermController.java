@@ -12,13 +12,13 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.clinovo.model.CodedItem;
 import com.clinovo.service.CodedItemService;
+import org.akaza.openclinica.control.core.SpringController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -29,7 +29,7 @@ import com.clinovo.model.Term;
 import com.clinovo.service.TermService;
 
 @Controller
-public class TermController {
+public class TermController extends SpringController {
 
 	@Autowired
 	private TermService termService;
@@ -41,10 +41,7 @@ public class TermController {
 	 * Handle for deleting a given term from a custom dictionary.
 	 * 
 	 * @param request The request containing the term code.
-	 * 
-	 * @return Empty string
-	 * 
-	 * @throws Exception For all exceptions
+	 *
 	 */
     @RequestMapping("/deleteTerm")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -55,7 +52,7 @@ public class TermController {
 
         CodedItem codedItem = itemService.findCodedItem(Integer.valueOf(itemId));
 
-        if(codedItem != null) {
+        if (codedItem != null) {
 
         	Term term = termService.findByAliasAndExternalDictionary(code, codedItem.getDictionary());
 

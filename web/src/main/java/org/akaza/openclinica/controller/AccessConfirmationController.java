@@ -15,6 +15,7 @@ package org.akaza.openclinica.controller;
 
 import java.util.TreeMap;
 
+import org.akaza.openclinica.control.core.SpringController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -32,7 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @SessionAttributes(types = AuthorizationRequest.class)
-public class AccessConfirmationController {
+public class AccessConfirmationController extends SpringController {
 	
 	@Autowired
 	private ClientDetailsService clientDetailsService;

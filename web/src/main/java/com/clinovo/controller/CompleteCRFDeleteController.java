@@ -10,7 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-
 package com.clinovo.controller;
 
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -51,16 +51,16 @@ import com.clinovo.util.PageMessagesUtil;
 @Controller
 @RequestMapping("/completeCRFDelete")
 @SuppressWarnings("unchecked")
-public class CompleteCRFDeleteController {
+public class CompleteCRFDeleteController extends SpringController {
+
+	@Autowired
+	private RuleSetDao ruleSetDao;
 
 	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
 	private MessageSource messageSource;
-
-	@Autowired
-	private RuleSetDao ruleSetDao;
 
 	@Autowired
 	private DeleteCrfService deleteCrfService;

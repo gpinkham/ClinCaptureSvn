@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ import com.clinovo.i18n.LocaleResolver;
 @Controller
 @RequestMapping("/clinicaldata")
 @Scope("prototype")
-public class ODMClinicaDataResource {
+public class ODMClinicaDataResource extends SpringController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ODMClinicaDataResource.class);
 	private static final int INDENT_LEVEL = 2;

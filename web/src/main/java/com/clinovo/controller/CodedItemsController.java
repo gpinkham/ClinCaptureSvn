@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -76,7 +77,7 @@ import com.clinovo.util.CodingFieldsUtil;
  * The controller for managing coded items. Acts as the glue between the service layer and the UI.
  */
 @Controller
-public class CodedItemsController {
+public class CodedItemsController extends SpringController {
 
 	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -90,10 +91,10 @@ public class CodedItemsController {
 	private TermService termService;
 
 	@Autowired
-	private DictionaryService dictionaryService;
+	private CodedItemService codedItemService;
 
 	@Autowired
-	private CodedItemService codedItemService;
+	private DictionaryService dictionaryService;
 
 	private static final String BIOONTOLOGY_URL = "http://bioportal.bioontology.org";
 	private static final String BIOONTOLOGY_WS_URL = "http://data.bioontology.org";

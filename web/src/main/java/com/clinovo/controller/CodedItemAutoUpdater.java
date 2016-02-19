@@ -12,7 +12,6 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.controller;
 
 import com.clinovo.dao.SystemDAO;
@@ -22,6 +21,7 @@ import com.clinovo.model.Term;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.TermService;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
@@ -45,21 +45,19 @@ import java.util.List;
  * Encapsulates functionality required to build coding result.
  */
 @Controller
-public class CodedItemAutoUpdater {
+public class CodedItemAutoUpdater extends SpringController {
+
+	@Autowired
+	private SystemDAO systemDAO;
+
+	@Autowired
+	private DataSource datasource;
 
 	@Autowired
 	private TermService termService;
 
 	@Autowired
 	private CodedItemService codedItemService;
-
-	@Autowired
-	private DataSource datasource;
-
-	@Autowired
-	private SystemDAO systemDAO;
-
-	private String themeColor;
 
 	private final String bioontologyUrlDefault = "http://bioportal.bioontology.org";
 	private final String bioontologyWsUrl = "http://data.bioontology.org";
@@ -80,9 +78,7 @@ public class CodedItemAutoUpdater {
 		String codedItemIdList = request.getParameter("arr");
 		List<String> codedItemIdListString = new ArrayList<String>(Arrays.asList(codedItemIdList.split(",")));
 		List<Integer> codedItemIdListInt = convertStringListToIntList(codedItemIdListString);
-		themeColor = (String) request.getSession().getAttribute("newThemeColor");
 		String showContext = request.getParameter("showContext");
-		themeColor = themeColor == null ? "blue" : themeColor;
 		showContext = showContext == null ? "false" : showContext;
 
 		response.getWriter().println(buildResponseBox(codedItemIdListInt, showContext));
@@ -202,16 +198,5 @@ public class CodedItemAutoUpdater {
 			intList.add(Integer.valueOf(s));
 		}
 		return intList;
-	}
-
-	private String getThemeColor() {
-		if (themeColor.equalsIgnoreCase("violet")) {
-			return "#aa62c6";
-		} else if (themeColor.equalsIgnoreCase("green")) {
-			return "#75b894";
-		} else if (themeColor.equalsIgnoreCase("darkBlue")) {
-			return "#2c6caf";
-		}
-		return "#729fcf";
 	}
 }

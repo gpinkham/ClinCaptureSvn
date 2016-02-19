@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -52,7 +53,7 @@ import com.clinovo.i18n.LocaleResolver;
  */
 @Controller("extractController")
 @RequestMapping("/extract")
-public class ExtractController {
+public class ExtractController extends SpringController {
 
 	public static final String SCHEDULER = "schedulerFactoryBean";
 

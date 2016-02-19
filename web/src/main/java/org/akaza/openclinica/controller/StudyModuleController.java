@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
 import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
@@ -59,7 +60,7 @@ import com.clinovo.util.RuleSetServiceUtil;
 @RequestMapping("/studymodule")
 @SessionAttributes("studyModuleStatus")
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class StudyModuleController {
+public class StudyModuleController extends SpringController {
 
 	@Autowired
 	private StudyModuleStatusDao studyModuleStatusDao;

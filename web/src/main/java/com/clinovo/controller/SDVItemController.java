@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,7 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
  */
 @Controller
 @RequestMapping("/sdvItem")
-public class SDVItemController {
+public class SDVItemController extends SpringController {
 
 	public static final String ACTION = "action";
 	public static final String SECTION_ID = "sectionId";

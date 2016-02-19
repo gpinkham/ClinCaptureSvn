@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
+ * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package com.clinovo.controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +21,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.slf4j.Logger;
@@ -26,7 +39,7 @@ import com.clinovo.model.CRFEvaluationTableFactory;
  * 
  */
 @Controller
-public class CRFEvaluationController extends Redirection {
+public class CRFEvaluationController extends SpringController {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(CRFEvaluationController.class);
 
@@ -89,9 +102,5 @@ public class CRFEvaluationController extends Redirection {
 			page = MAIN_MENU_REDIRECT;
 		}
 		return page;
-	}
-
-	public String getUrl() {
-		return PAGE_CRF_EVALUATION;
 	}
 }

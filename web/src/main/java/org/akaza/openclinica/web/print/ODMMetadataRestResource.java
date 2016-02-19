@@ -2,6 +2,7 @@ package org.akaza.openclinica.web.print;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.akaza.openclinica.control.core.SpringController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/metadata")
 @Scope("prototype")
-public class ODMMetadataRestResource {
+public class ODMMetadataRestResource extends SpringController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ODMMetadataRestResource.class);
 

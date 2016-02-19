@@ -31,6 +31,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.BaseController;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
@@ -63,7 +64,7 @@ import com.clinovo.i18n.LocaleResolver;
  */
 @SuppressWarnings({"unchecked"})
 @Controller("ScheduledJobController")
-public class ScheduledJobController {
+public class ScheduledJobController extends SpringController {
 
 	public static final String SCHEDULED_TABLE_ATTRIBUTE = "scheduledTableAttribute";
 

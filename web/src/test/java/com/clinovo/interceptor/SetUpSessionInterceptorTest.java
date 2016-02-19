@@ -1,7 +1,6 @@
 package com.clinovo.interceptor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -78,7 +77,6 @@ public class SetUpSessionInterceptorTest {
 		studyBean.setId(1);
 		userRole = new StudyUserRoleBean();
 		userRole.setRole(Role.SYSTEM_ADMINISTRATOR);
-		Mockito.when(crfEvaluationController.getUrl()).thenReturn(CRFEvaluationController.PAGE_CRF_EVALUATION);
 		PowerMockito.mockStatic(Navigation.class);
 		PowerMockito.mockStatic(SecurityContextHolder.class);
 		PowerMockito.when(SecurityContextHolder.getContext()).thenReturn(securityContext);
@@ -92,16 +90,6 @@ public class SetUpSessionInterceptorTest {
 		PowerMockito.mockStatic(RequestContextHolder.class);
 		Whitebox.setInternalState(servletRequestAttributes, "request", request);
 		PowerMockito.when(RequestContextHolder.currentRequestAttributes()).thenReturn(servletRequestAttributes);
-	}
-
-	@Test
-	public void testThatRedirectionWorksFineForCRFEvaluationController() throws Exception {
-		PowerMockito.doCallRealMethod().when(setUpSessionInterceptor)
-				.preHandle(request, response, crfEvaluationController);
-		Mockito.when(session.getAttribute(Mockito.contains("CRFEvaluationController"))).thenReturn(PREV_QUERY_STRING);
-		setUpSessionInterceptor.preHandle(request, response, crfEvaluationController);
-		assertTrue(response.getHeader("Location").equals(
-				CLINCAPTURE.concat(CRFEvaluationController.PAGE_CRF_EVALUATION).concat("?").concat(PREV_QUERY_STRING)));
 	}
 
 	@Test

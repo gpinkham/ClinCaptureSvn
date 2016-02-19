@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.login;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,13 +38,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
-import org.quartz.JobDataMap;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
-import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.StdScheduler;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.util.DateUtil;
@@ -170,46 +162,12 @@ public class UpdateProfileServlet extends Controller {
 		if (userBean1 != null) {
 			userBean1.setLastVisitDate(new Date());
 			userBean1.setUpdater(ub);
-			updateCalendarEmailJob(userBean1);
+			updateCalendarEmailJob(userBean1, logger);
 			udao.update(userBean1);
 
 			request.getSession().setAttribute("reloadUserBean", true);
 			request.getSession().setAttribute("userBean", userBean1);
 			request.getSession().removeAttribute("userBean1");
-		}
-	}
-
-	private void updateCalendarEmailJob(UserAccountBean uaBean) {
-		String triggerGroup = "CALENDAR";
-		StdScheduler scheduler = getStdScheduler();
-		try {
-			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
-			if (legacyTriggers == null || legacyTriggers.size() == 0) {
-				return;
-			}
-			for (TriggerKey triggerKey : legacyTriggers) {
-				Trigger trigger = scheduler.getTrigger(triggerKey);
-				JobDataMap dataMap = trigger.getJobDataMap();
-				String contactEmail = dataMap.getString(EMAIL);
-				int userId = dataMap.getInt(USER_ID);
-				logger.info("contact email from calendared " + contactEmail + " for user userId " + userId);
-				logger.info("Old email " + dataMap.getString(EMAIL));
-				if (uaBean.getId() == userId) {
-					dataMap.put(EMAIL, uaBean.getEmail());
-					JobDetailImpl jobDetailBean = new JobDetailImpl();
-					jobDetailBean.setKey(trigger.getJobKey());
-					jobDetailBean.setDescription(trigger.getDescription());
-					jobDetailBean.setGroup(triggerGroup);
-					jobDetailBean.setName(triggerKey.getName());
-					jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
-					jobDetailBean.setJobDataMap(dataMap);
-					logger.info("New email " + dataMap.getString(EMAIL));
-					jobDetailBean.setDurability(true);
-					scheduler.addJob(jobDetailBean, true);
-				}
-			}
-		} catch (SchedulerException e) {
-			e.printStackTrace();
 		}
 	}
 }

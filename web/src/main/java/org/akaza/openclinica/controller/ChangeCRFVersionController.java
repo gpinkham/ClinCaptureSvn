@@ -41,6 +41,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -75,7 +76,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
  */
 @Controller("changeCRFVersionController")
 @SuppressWarnings({"unchecked"})
-public class ChangeCRFVersionController {
+public class ChangeCRFVersionController extends SpringController {
 	@Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;

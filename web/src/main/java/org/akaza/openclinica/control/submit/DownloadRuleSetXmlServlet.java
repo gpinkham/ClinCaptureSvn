@@ -19,6 +19,18 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,20 +51,6 @@ import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Download Rule Set in XML format.
@@ -157,40 +155,6 @@ public class DownloadRuleSetXmlServlet extends Controller {
 			return;
 		}
 
-		response.setHeader("Content-disposition", "attachment; filename=\"" + "rules" + currentStudy.getOid() + "-"
-				+ time + ".xml" + "\";");
-		response.setContentType("text/xml");
-		response.setHeader("Pragma", "public");
-
-		ServletOutputStream op = response.getOutputStream();
-
-
-		DataInputStream in = null;
-		try {
-			response.setContentType("text/xml");
-			response.setHeader("Pragma", "public");
-			response.setContentLength((int) f.length());
-
-			byte[] bbuf = new byte[(int) f.length()];
-			in = new DataInputStream(new FileInputStream(f));
-			int length;
-			while ((length = in.read(bbuf)) != -1) {
-				op.write(bbuf, 0, length);
-			}
-
-			in.close();
-			op.flush();
-			op.close();
-		} catch (Exception ee) {
-			ee.printStackTrace();
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-			if (op != null) {
-				op.close();
-			}
-		}
-
+		downloadFile(f, "rules" + currentStudy.getOid() + "-" + time + ".xml", "text/xml", response);
 	}
 }

@@ -13,9 +13,6 @@
 
 package org.akaza.openclinica.control.core;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -27,16 +24,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.Map;
-import java.util.StringTokenizer;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -125,8 +116,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -136,40 +127,110 @@ import com.clinovo.util.RequestUtil;
 /**
  * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the
  * SingleThreadModel.
- * 
- * @author jnyayapathi
- * 
+ *
+ * TODO We should rename this class to the SpringServlet!
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
-public abstract class Controller extends BaseController {
+@SuppressWarnings({"unchecked", "rawtypes"})
+public abstract class Controller extends BaseController implements HttpRequestHandler, ServletContextAware {
 
 	public final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	public static final String CW = "cw";
-	public static final int MONTH_IN_SECONDS = 2592000;
-	public static final String CURRENT_DATE = "currentDate";
-	public static final String INPUT_TIME_ZONE = "timeZone";
-	public static final String CC_DATE_FORMAT = "ccDateFormat";
-	public static final String JUST_CLOSE_WINDOW = "justCloseWindow";
-	public static final String CURRENT_MAPS_HOLDER = "currentMapHolder";
-	public static final String EVALUATION_ENABLED = "evaluationEnabled";
-	public static final String DATE_FORMAT_STRING = "date_format_string";
-	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
-	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
-	public static final String TIME_ZONE_IDS_SORTED_REQUEST_ATR = "timeZoneIDsSorted";
-	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
+	/**
+	 * Process request.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws Exception
+	 */
+	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-	// entity bean list field names
-	public static final String EBL_PAGE = "ebl_page";
-	public static final String EBL_FILTERED = "ebl_filtered";
-	public static final String EBL_PAGINATED = "ebl_paginated";
-	public static final String EBL_SORT_ORDER = "ebl_sortAscending";
-	public static final String EBL_SORT_COLUMN = "ebl_sortColumnInd";
-	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
-	public static final String COOKIE_NAME = "lastAccessedInstanceType";
+	/**
+	 * Checks whether the user has the right permission to proceed function.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @throws InsufficientPermissionException
+	 *             custom InsufficientPermissionException
+	 */
+	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException;
 
-	protected final static String EVENT_DEFINITION_CRFS_LABEL = "eventDefinitionCRFs";
-	protected static final String ADDED_EVENT_DEFINITION_CRFS_LABEL = "addedEventDefinitionCRFs";
+	/**
+	 * This method is used to handle request and resend it to doGet or doPost methods.
+	 *
+	 * @param request
+	 *            the HttpServletRequest.
+	 * @param response
+	 *            the HttpServletResponse.
+	 * @throws ServletException
+	 *             in case if servlet encounters difficulty.
+	 * @throws IOException
+	 *             will be thrown in case of failed or interrupted I/O operations.
+	 */
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		if (request.getMethod().equalsIgnoreCase("GET")) {
+			doGet(request, response);
+		} else if (request.getMethod().equalsIgnoreCase("POST")) {
+			doPost(request, response);
+		}
+	}
+
+	/**
+	 * Handles the HTTP <code>GET</code> method.
+	 *
+	 * @param request
+	 *            the HttpServletRequest.
+	 * @param response
+	 *            the HttpServletResponse.
+	 * @throws ServletException
+	 *             in case if servlet encounters difficulty.
+	 * @throws IOException
+	 *             will be thrown in case of failed or interrupted I/O operations.
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+		try {
+			Navigation.addToNavigationStack(request);
+			logger.debug("Request");
+			process(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
+		}
+	}
+
+	/**
+	 * Handles the HTTP <code>POST</code> method.
+	 *
+	 * @param request
+	 *            the HttpServletRequest.
+	 * @param response
+	 *            the HttpServletResponse.
+	 * @throws ServletException
+	 *             in case if servlet encounters difficulty.
+	 * @throws IOException
+	 *             will be thrown in case of failed or interrupted I/O operations.
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+		try {
+			Navigation.addToNavigationStack(request);
+			logger.debug("Post");
+			process(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
+			}
+		}
+	}
 
 	/**
 	 * Check if user have access for data review.
@@ -183,10 +244,12 @@ public abstract class Controller extends BaseController {
 	public static boolean mayViewData(UserAccountBean ub, StudyUserRoleBean currentRole) {
 		if (currentRole != null) {
 			Role r = currentRole.getRole();
-			if (r != null && (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
-					|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
-					|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
-					|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r)) || r.equals(Role.STUDY_SPONSOR)) {
+			if (r != null
+					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_CODER)
+							|| r.equals(Role.STUDY_EVALUATOR) || Role.isMonitor(r))
+					|| (r != null && r.equals(Role.STUDY_SPONSOR))) {
 				return true;
 			}
 		}
@@ -214,136 +277,6 @@ public abstract class Controller extends BaseController {
 		}
 
 		return false;
-	}
-
-	protected void addPageMessage(String message, HttpServletRequest request) {
-		addPageMessage(message, request, logger);
-	}
-
-	/**
-	 * Method that adds a message to the request.
-	 * 
-	 * @param message
-	 *            String
-	 * @param request
-	 *            HttpServletRequest
-	 * @param aLogger
-	 *            Logger
-	 */
-	public static void addPageMessage(String message, HttpServletRequest request, Logger aLogger) {
-		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-
-		if (pageMessages == null) {
-			pageMessages = new ArrayList();
-		}
-
-		if (!pageMessages.contains(message) && !message.isEmpty()) {
-			pageMessages.add(message);
-		}
-		aLogger.debug(message);
-		request.setAttribute(PAGE_MESSAGE, pageMessages);
-	}
-
-	/**
-	 * Method that moves messages from request to the session.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 */
-	public static void storePageMessages(HttpServletRequest request) {
-		Map storedAttributes = new HashMap();
-		storedAttributes.put(PAGE_MESSAGE, request.getAttribute(PAGE_MESSAGE));
-		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
-	}
-
-	/**
-	 * Method that restores messages from the session.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 */
-	public static void restorePageMessages(HttpServletRequest request) {
-		Map storedAttributes = (Map) request.getSession().getAttribute(STORED_ATTRIBUTES);
-		if (storedAttributes != null) {
-			request.getSession().removeAttribute(STORED_ATTRIBUTES);
-			ArrayList pageMessages = (ArrayList) storedAttributes.get(PAGE_MESSAGE);
-			if (pageMessages != null) {
-				request.setAttribute(PAGE_MESSAGE, pageMessages);
-			}
-		}
-	}
-
-	protected void setToPanel(String title, String info, HttpServletRequest request) {
-		StudyInfoPanel panel = getStudyInfoPanel(request);
-		if (panel.isOrderedData()) {
-			ArrayList data = panel.getUserOrderedData();
-			data.add(new StudyInfoPanelLine(title, info));
-			panel.setUserOrderedData(data);
-		} else {
-			panel.setData(title, info);
-		}
-		request.setAttribute(STUDY_INFO_PANEL, panel);
-	}
-
-	protected void setInputMessages(HashMap messages, HttpServletRequest request) {
-		request.setAttribute(INPUT_MESSAGES, messages);
-	}
-
-	protected void setPresetValues(HashMap presetValues, HttpServletRequest request) {
-		request.setAttribute(PRESET_VALUES, presetValues);
-	}
-
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-	}
-
-	/**
-	 * Process request.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws Exception
-	 */
-	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
-
-	/**
-	 * Checks whether the user has the right permission to proceed function.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws InsufficientPermissionException
-	 *             custom InsufficientPermissionException
-	 */
-	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException;
-
-	public static final String USER_BEAN_NAME = "userBean";
-
-	/**
-	 * Method that checks password timeout.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
-	public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response) {
-		UserAccountBean ub = getUserAccountBean(request);
-		Date lastChangeDate = ub.getPasswdTimestamp();
-		if (lastChangeDate == null) {
-			addPageMessage(getResPage().getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
-					+ getResPage().getString("password_set"), request);
-			int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("pwd.change.required"));
-			if (pwdChangeRequired == 1) {
-				request.setAttribute("mustChangePass", "yes");
-				forwardPage(Page.RESET_PASSWORD, request, response);
-			}
-		}
 	}
 
 	private void pingJobServer(HttpServletRequest request) {
@@ -399,48 +332,6 @@ public abstract class Controller extends BaseController {
 			se.printStackTrace();
 		}
 
-	}
-
-	private String decodeLINKURL(Integer datasetId) {
-
-		String successMsg = "";
-		ArchivedDatasetFileDAO asdfDAO = getArchivedDatasetFileDAO();
-		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
-
-		if (fileBeans.size() > 0) {
-			successMsg = successMsg.replace("$linkURL",
-					"<a href=\"" + SQLInitServlet.getSystemURL() + "AccessFile?fileId=" + fileBeans.get(0).getId()
-							+ "\">" + getResWord().getString("here_lower_case") + "</a>");
-		}
-		return successMsg;
-	}
-
-	static void reloadUserBean(HttpSession session, UserAccountDAO userAccountDao) {
-		if (session.getAttribute("reloadUserBean") != null) {
-			UserAccountBean userAccountBean = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-			session.setAttribute(USER_BEAN_NAME, userAccountDao.findByUserName(userAccountBean.getName()));
-			session.removeAttribute("study");
-			session.removeAttribute("userRole");
-			session.removeAttribute("reloadUserBean");
-		}
-	}
-
-	protected static void updateLastAccessedInstanceType(HttpServletResponse response, StudyBean currentStudy) {
-		if (currentStudy != null) {
-			String cookieValue = currentStudy.getStudyParameterConfig().getInstanceType();
-			String cookiePath = "/";
-			Cookie cookie = new Cookie(COOKIE_NAME, cookieValue);
-			cookie.setMaxAge(MONTH_IN_SECONDS);
-			cookie.setPath(cookiePath);
-			response.addCookie(cookie);
-		}
-	}
-
-	private void clearDataEntrySession(HttpServletRequest request) {
-		if (this instanceof ListStudySubjectsServlet || this instanceof ListEventsForSubjectsServlet) {
-			request.getSession().removeAttribute(DataEntryServlet.HAS_DATA_FLAG);
-			request.getSession().removeAttribute(DataEntryServlet.GROUP_HAS_DATA);
-		}
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response)
@@ -669,6 +560,142 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	/**
+	 * Method that checks password timeout.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
+	public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response) {
+		UserAccountBean ub = getUserAccountBean(request);
+		Date lastChangeDate = ub.getPasswdTimestamp();
+		if (lastChangeDate == null) {
+			addPageMessage(getResPage().getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
+					+ getResPage().getString("password_set"), request);
+			int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("pwd.change.required"));
+			if (pwdChangeRequired == 1) {
+				request.setAttribute("mustChangePass", "yes");
+				forwardPage(Page.RESET_PASSWORD, request, response);
+			}
+		}
+	}
+
+	private void reloadUserBean(HttpSession session, UserAccountDAO userAccountDao) {
+		if (session.getAttribute("reloadUserBean") != null) {
+			UserAccountBean userAccountBean = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+			session.setAttribute(USER_BEAN_NAME, userAccountDao.findByUserName(userAccountBean.getName()));
+			session.removeAttribute("study");
+			session.removeAttribute("userRole");
+			session.removeAttribute("reloadUserBean");
+		}
+	}
+
+	protected static void updateLastAccessedInstanceType(HttpServletResponse response, StudyBean currentStudy) {
+		if (currentStudy != null) {
+			String cookieValue = currentStudy.getStudyParameterConfig().getInstanceType();
+			String cookiePath = "/";
+			Cookie cookie = new Cookie(COOKIE_NAME, cookieValue);
+			cookie.setMaxAge(MONTH_IN_SECONDS);
+			cookie.setPath(cookiePath);
+			response.addCookie(cookie);
+		}
+	}
+
+	private void clearDataEntrySession(HttpServletRequest request) {
+		if (this instanceof ListStudySubjectsServlet || this instanceof ListEventsForSubjectsServlet) {
+			request.getSession().removeAttribute(DataEntryServlet.HAS_DATA_FLAG);
+			request.getSession().removeAttribute(DataEntryServlet.GROUP_HAS_DATA);
+		}
+	}
+
+	private String decodeLINKURL(Integer datasetId) {
+
+		String successMsg = "";
+		ArchivedDatasetFileDAO asdfDAO = getArchivedDatasetFileDAO();
+		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
+
+		if (fileBeans.size() > 0) {
+			successMsg = successMsg.replace("$linkURL",
+					"<a href=\"" + SQLInitServlet.getSystemURL() + "AccessFile?fileId=" + fileBeans.get(0).getId()
+							+ "\">" + getResWord().getString("here_lower_case") + "</a>");
+		}
+		return successMsg;
+	}
+
+	/**
+	 * Method that adds a message to the request.
+	 *
+	 * @param message
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 */
+	public void addPageMessage(String message, HttpServletRequest request) {
+		addPageMessage(message, request, logger);
+	}
+
+	protected void setToPanel(String title, String info, HttpServletRequest request) {
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		if (panel.isOrderedData()) {
+			ArrayList data = panel.getUserOrderedData();
+			data.add(new StudyInfoPanelLine(title, info));
+			panel.setUserOrderedData(data);
+		} else {
+			panel.setData(title, info);
+		}
+		request.setAttribute(STUDY_INFO_PANEL, panel);
+	}
+
+	/**
+	 * Get SessionManager from request.
+	 *
+	 * @param request
+	 *            HttpServletRequest request
+	 * @return SessionManager
+	 */
+	public SessionManager getSessionManager(HttpServletRequest request) {
+		return (SessionManager) request.getAttribute(SESSION_MANAGER);
+	}
+
+	/**
+	 * Get errors holder.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @return HashMap
+	 */
+	public HashMap getErrorsHolder(HttpServletRequest request) {
+		HashMap errors = (HashMap) request.getAttribute(ERRORS_HOLDER);
+		if (errors == null) {
+			errors = new HashMap();
+			request.setAttribute(ERRORS_HOLDER, errors);
+		}
+		return errors;
+	}
+
+	/**
+	 * Get studyInfoPanel.
+	 *
+	 * @param request
+	 *            HttpServletRequest
+	 * @return StudyInfoPanel
+	 */
+	public StudyInfoPanel getStudyInfoPanel(HttpServletRequest request) {
+		StudyInfoPanel panel = (StudyInfoPanel) request.getSession().getAttribute(STUDY_INFO_PANEL);
+		if (panel == null) {
+			panel = new StudyInfoPanel();
+			request.getSession().setAttribute(STUDY_INFO_PANEL, panel);
+			request.setAttribute(STUDY_INFO_PANEL, panel);
+		}
+		return panel;
+	}
+
+	protected void setPresetValues(HashMap presetValues, HttpServletRequest request) {
+		request.setAttribute(PRESET_VALUES, presetValues);
+	}
+
 	private StudyBean getUpdatedStudy(HttpServletRequest request) {
 		StudyBean currentStudy = getCurrentStudy(request);
 		if (currentStudy != null) {
@@ -777,81 +804,6 @@ public abstract class Controller extends BaseController {
 
 		getMapsHolder().getTimingMap().put("retrospective", getResAdmin().getString("retrospective"));
 		getMapsHolder().getTimingMap().put("prospective", getResAdmin().getString("prospective"));
-	}
-
-	/**
-	 * This method is used to handle request and resend it to doGet or doPost methods.
-	 * 
-	 * @param request
-	 *            the HttpServletRequest.
-	 * @param response
-	 *            the HttpServletResponse.
-	 * @throws ServletException
-	 *             in case if servlet encounters difficulty.
-	 * @throws IOException
-	 *             will be thrown in case of failed or interrupted I/O operations.
-	 */
-	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		if (request.getMethod().equalsIgnoreCase("GET")) {
-			doGet(request, response);
-		} else if (request.getMethod().equalsIgnoreCase("POST")) {
-			doPost(request, response);
-		}
-	}
-
-	/**
-	 * Handles the HTTP <code>GET</code> method.
-	 *
-	 * @param request
-	 *            the HttpServletRequest.
-	 * @param response
-	 *            the HttpServletResponse.
-	 * @throws ServletException
-	 *             in case if servlet encounters difficulty.
-	 * @throws IOException
-	 *             will be thrown in case of failed or interrupted I/O operations.
-	 */
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
-		try {
-			Navigation.addToNavigationStack(request);
-			logger.debug("Request");
-			process(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
-			}
-		}
-	}
-
-	/**
-	 * Handles the HTTP <code>POST</code> method.
-	 *
-	 * @param request
-	 *            the HttpServletRequest.
-	 * @param response
-	 *            the HttpServletResponse.
-	 * @throws ServletException
-	 *             in case if servlet encounters difficulty.
-	 * @throws IOException
-	 *             will be thrown in case of failed or interrupted I/O operations.
-	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
-		try {
-			Navigation.addToNavigationStack(request);
-			logger.debug("Post");
-			process(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
-			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
-				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
-			}
-		}
 	}
 
 	/**
@@ -1030,17 +982,6 @@ public abstract class Controller extends BaseController {
 	}
 
 	/**
-	 * This method returns context path.
-	 * 
-	 * @param request
-	 *            the HttpServletRequest from which path will be take.
-	 * @return context path.
-	 */
-	public String getContextPath(HttpServletRequest request) {
-		return request.getContextPath().replaceAll("/", "");
-	}
-
-	/**
 	 * Checks if the current study is LOCKED.
 	 * 
 	 * @param page
@@ -1206,20 +1147,6 @@ public abstract class Controller extends BaseController {
 		Collections.sort(dynamicGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		return dynamicGroupClasses;
-	}
-
-	/**
-	 * Get UserDetails from Context.
-	 * 
-	 * @return UserDetails.
-	 */
-	protected UserDetails getUserDetails() {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (principal instanceof UserDetails) {
-			return (UserDetails) principal;
-		} else {
-			return null;
-		}
 	}
 
 	/**
@@ -1400,82 +1327,6 @@ public abstract class Controller extends BaseController {
 
 	private boolean allRequiredAttributesNotEmpty(String to, String from) {
 		return !to.isEmpty() && !from.isEmpty();
-	}
-
-	/**
-	 * Process Multiple Email Addresses.
-	 * 
-	 * @param to
-	 *            list of the recipients.
-	 * @return InternetAddress[].
-	 * @throws MessagingException
-	 *             if there was an error.
-	 */
-	private InternetAddress[] processMultipleImailAddresses(String to) throws MessagingException {
-		ArrayList<String> recipientsArray = new ArrayList<String>();
-		StringTokenizer st = new StringTokenizer(to, ",");
-		while (st.hasMoreTokens()) {
-			recipientsArray.add(st.nextToken());
-		}
-
-		int sizeTo = recipientsArray.size();
-		InternetAddress[] addressTo = new InternetAddress[sizeTo];
-		for (int i = 0; i < sizeTo; i++) {
-			addressTo[i] = new InternetAddress(recipientsArray.get(i));
-		}
-		return addressTo;
-
-	}
-
-	/**
-	 * Download file.
-	 * 
-	 * @param f
-	 *            File.
-	 * @param contentType
-	 *            String.
-	 * @param request
-	 *            HttpServletRequest.
-	 * @param response
-	 *            HttpServletResponse.
-	 * @throws Exception
-	 *             if there was some error.
-	 */
-	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-
-		response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
-		response.setContentType("text/xml");
-		response.setHeader("Pragma", "public");
-
-		ServletOutputStream op = response.getOutputStream();
-
-		DataInputStream in = null;
-		try {
-			response.setContentType("text/xml");
-			response.setHeader("Pragma", "public");
-			response.setContentLength((int) f.length());
-
-			byte[] bbuf = new byte[(int) f.length()];
-			in = new DataInputStream(new FileInputStream(f));
-			int length;
-			while ((length = in.read(bbuf)) != -1) {
-				op.write(bbuf, 0, length);
-			}
-
-			in.close();
-			op.flush();
-			op.close();
-		} catch (Exception ee) {
-			ee.printStackTrace();
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-			if (op != null) {
-				op.close();
-			}
-		}
 	}
 
 	/**
@@ -2336,10 +2187,6 @@ public abstract class Controller extends BaseController {
 		return result;
 	}
 
-	public Locale getLocale() {
-		return LocaleResolver.getLocale();
-	}
-
 	/**
 	 * Returns EntityBeanTable.
 	 * 
@@ -2403,20 +2250,23 @@ public abstract class Controller extends BaseController {
 	}
 
 	protected ArrayList<EventDefinitionCRFBean> getAddedEventDefinitionCRFs(HttpSession session) {
-		ArrayList<EventDefinitionCRFBean> eventCRFs = (ArrayList<EventDefinitionCRFBean>) session.getAttribute(ADDED_EVENT_DEFINITION_CRFS_LABEL);
+		ArrayList<EventDefinitionCRFBean> eventCRFs = (ArrayList<EventDefinitionCRFBean>) session
+				.getAttribute(ADDED_EVENT_DEFINITION_CRFS_LABEL);
 		if (eventCRFs == null)
 			eventCRFs = new ArrayList<EventDefinitionCRFBean>();
 		return eventCRFs;
 	}
 
 	protected ArrayList<EventDefinitionCRFBean> getExistingEventDefinitionCRFs(HttpSession session) {
-		ArrayList<EventDefinitionCRFBean> eventCRFs = (ArrayList<EventDefinitionCRFBean>) session.getAttribute(EVENT_DEFINITION_CRFS_LABEL);
+		ArrayList<EventDefinitionCRFBean> eventCRFs = (ArrayList<EventDefinitionCRFBean>) session
+				.getAttribute(EVENT_DEFINITION_CRFS_LABEL);
 		if (eventCRFs == null)
 			eventCRFs = new ArrayList<EventDefinitionCRFBean>();
 		return eventCRFs;
 	}
 
-	protected List<EventDefinitionCRFBean> mergeEventDefinitions(HttpSession session, List<EventDefinitionCRFBean> crfs) {
+	protected List<EventDefinitionCRFBean> mergeEventDefinitions(HttpSession session,
+			List<EventDefinitionCRFBean> crfs) {
 		if (this.getAddedEventDefinitionCRFs(session).size() > 0) {
 			List<EventDefinitionCRFBean> addedCrfs = getAddedEventDefinitionCRFs(session);
 			for (EventDefinitionCRFBean crf : addedCrfs) {
@@ -2428,7 +2278,8 @@ public abstract class Controller extends BaseController {
 		return crfs;
 	}
 
-	protected ArrayList<EventDefinitionCRFBean> processEventDefinitionCRFs(HttpSession session, EventDefinitionCRFBean crf) {
+	protected ArrayList<EventDefinitionCRFBean> processEventDefinitionCRFs(HttpSession session,
+			EventDefinitionCRFBean crf) {
 		ArrayList<EventDefinitionCRFBean> crfs = getAddedEventDefinitionCRFs(session);
 		if (existsInList(crfs, crf))
 			crfs.remove(crf);

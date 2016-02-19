@@ -96,15 +96,15 @@ public class ImportRuleServlet extends Controller {
 		}
 		if ("downloadrulesxsd".equalsIgnoreCase(action)) {
 			File xsdFile = getCoreResources().getFile("rules.xsd", "rules" + File.separator);
-			dowloadFile(xsdFile, "text/xml", request, response);
+			downloadFile(xsdFile, "text/xml", response);
 		}
 		if ("downloadtemplate".equalsIgnoreCase(action)) {
 			File file = getCoreResources().getFile("rules_template.xml", "rules" + File.separator);
-			dowloadFile(file, "text/xml", request, response);
+			downloadFile(file, "text/xml", response);
 		}
 		if ("downloadtemplateWithNotes".equalsIgnoreCase(action)) {
 			File file = getCoreResources().getFile("rules_template_with_notes.xml", "rules" + File.separator);
-			dowloadFile(file, "text/xml", request, response);
+			downloadFile(file, "text/xml", response);
 		}
 		if ("confirm".equalsIgnoreCase(action)) {
 			try {

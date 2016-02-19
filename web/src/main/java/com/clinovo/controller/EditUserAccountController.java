@@ -1,36 +1,44 @@
+/*******************************************************************************
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ *
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer.
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ *
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use.
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ *******************************************************************************/
 package com.clinovo.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.quartz.JobDataMap;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
-import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.StdScheduler;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.clinovo.controller.base.BaseController;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.EmailService;
 import com.clinovo.service.UserAccountService;
@@ -45,12 +53,18 @@ import com.clinovo.validator.UserValidator;
 @Controller
 @RequestMapping("/EditUserAccount")
 @SuppressWarnings("rawtypes")
-public class EditUserAccountController extends BaseController {
+public class EditUserAccountController extends SpringController {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(CRFEvaluationController.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(EditUserAccountController.class);
 
 	@Autowired
 	private EmailService mailer;
+
+	@Autowired
+	private DataSource dataSource;
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@Autowired
 	private UserAccountService userAccountService;
@@ -187,7 +201,7 @@ public class EditUserAccountController extends BaseController {
 			UserAccountBean user = (UserAccountBean) userAccountDao.findByPK(userId);
 			boolean wasSysAdmin = user.isSysAdmin();
 			updateMainFieldsForEditedUser(user, fp, request);
-			updateCalendarEmailJob(user);
+			updateCalendarEmailJob(user, LOGGER);
 			Locale locale = LocaleResolver.getLocale(request);
 			PageMessagesUtil.addPageMessage(request,
 					messageSource.getMessage("the_user_account", null, locale) + " \"" + user.getName() + "\" "
@@ -308,44 +322,6 @@ public class EditUserAccountController extends BaseController {
 				request);
 	}
 
-	private void updateCalendarEmailJob(UserAccountBean uaBean) {
-		String triggerGroup = "CALENDAR";
-		StdScheduler scheduler = getStdScheduler();
-		try {
-			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
-			if (legacyTriggers != null && legacyTriggers.size() > 0) {
-				for (TriggerKey triggerKey : legacyTriggers) {
-					Trigger trigger = scheduler.getTrigger(triggerKey);
-					JobDataMap dataMap = trigger.getJobDataMap();
-					String contactEmail = dataMap.getString(EMAIL);
-					int userId = dataMap.getInt(USER_ID);
-					LOGGER.info("contact email from calendared " + contactEmail + " for user userId " + userId);
-					LOGGER.info("Old email " + dataMap.getString(EMAIL));
-					if (uaBean.getId() == userId) {
-						dataMap.put(EMAIL, uaBean.getEmail());
-						JobDetailImpl jobDetailBean = new JobDetailImpl();
-						jobDetailBean.setKey(trigger.getJobKey());
-						jobDetailBean.setDescription(trigger.getDescription());
-						jobDetailBean.setGroup(triggerGroup);
-						jobDetailBean.setName(triggerKey.getName());
-						jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
-						jobDetailBean.setJobDataMap(dataMap);
-						LOGGER.info("New email " + dataMap.getString(EMAIL));
-						jobDetailBean.setDurability(true);
-						scheduler.addJob(jobDetailBean, true);
-					}
-				}
-			}
-		} catch (SchedulerException e) {
-			LOGGER.error(e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	private UserAccountBean getUserAccountBean(HttpServletRequest request) {
-		return (UserAccountBean) request.getSession().getAttribute("userBean");
-	}
-
 	private void updateMainFieldsForEditedUser(UserAccountBean user, FormProcessor fp, HttpServletRequest request) {
 		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
 		UserAccountBean ub = getUserAccountBean(request);
@@ -401,10 +377,6 @@ public class EditUserAccountController extends BaseController {
 		} else {
 			userAccountDao.update(user);
 		}
-	}
-
-	private StudyBean getCurrentStudy(HttpServletRequest request) {
-		return (StudyBean) request.getSession().getAttribute("study");
 	}
 
 	private boolean isAdmin(HttpServletRequest request) {

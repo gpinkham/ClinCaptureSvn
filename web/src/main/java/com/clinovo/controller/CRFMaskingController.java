@@ -1,6 +1,17 @@
+/*******************************************************************************
+ * ClinCapture, Copyright (C) 2009-2015 Clinovo Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
+ * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package com.clinovo.controller;
 
-import com.clinovo.controller.base.BaseController;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.CRFMask;
 import com.clinovo.service.CRFMaskingService;
@@ -12,12 +23,14 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -39,12 +53,17 @@ import java.util.Map;
 @Controller
 @RequestMapping("/CRFsMasking")
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class CRFMaskingController extends BaseController {
+public class CRFMaskingController extends SpringController {
+
+	@Autowired
+	private DataSource dataSource;
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@Autowired
 	private CRFMaskingService maskingService;
 
-	private StudyDAO studyDAO;
 	public static final String CRF_PREFIX = "_c";
 	public static final String CRF_C_PREFIX = "C";
 	public static final String EVENT_PREFIX = "_e";
@@ -65,7 +84,7 @@ public class CRFMaskingController extends BaseController {
 		String page = "admin/crfs_masking";
 		saveAttributesToModel(model, request);
 
-		studyDAO = new StudyDAO(dataSource);
+		StudyDAO studyDAO = new StudyDAO(dataSource);
 		UserAccountDAO userDAO = new UserAccountDAO(dataSource);
 		int userId = Integer.parseInt(request.getParameter("userId"));
 		UserAccountBean user = (UserAccountBean) userDAO.findByPK(userId);
@@ -116,7 +135,7 @@ public class CRFMaskingController extends BaseController {
 		String page = "redirect:/pages/EditUserAccount";
 		saveAttributesToModel(model, request);
 		attributes.addAllAttributes(model.asMap());
-		studyDAO = new StudyDAO(dataSource);
+		StudyDAO studyDAO = new StudyDAO(dataSource);
 		UserAccountDAO userDAO = new UserAccountDAO(dataSource);
 		int userId = Integer.parseInt(request.getParameter("userId"));
 		UserAccountBean user = (UserAccountBean) userDAO.findByPK(userId);
@@ -217,7 +236,7 @@ public class CRFMaskingController extends BaseController {
 	private LinkedHashMap<String, ArrayList<StudyBean>> getSitesByStudyMap(ArrayList<StudyBean> sBeans,
 																	 UserAccountBean user) {
 		LinkedHashMap<String, ArrayList<StudyBean>> sitesByStudies = new LinkedHashMap<String, ArrayList<StudyBean>>();
-
+		StudyDAO studyDAO = new StudyDAO(dataSource);
 		// Create list of active sites for Site or Study level user.
 		if (isSiteLevelUser(sBeans)) {
 			ArrayList<StudyBean> parentStudies = (ArrayList<StudyBean>) studyDAO
@@ -280,7 +299,7 @@ public class CRFMaskingController extends BaseController {
 
 		for (Map.Entry<String, ArrayList<StudyBean>> studyEntry : sitesByStudies.entrySet()) {
 			ArrayList<StudyBean> sites = studyEntry.getValue();
-			StudyBean study = (StudyBean) studyDAO.findStudyByName(studyEntry.getKey());
+			StudyBean study = (StudyBean) new StudyDAO(dataSource).findStudyByName(studyEntry.getKey());
 			ArrayList<StudyEventDefinitionBean> events = eventsByStudies.get(study.getId());
 
 			for (StudyBean site : sites) {
