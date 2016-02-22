@@ -10,7 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.logic.rulerunner;
 
 import java.util.ArrayList;
@@ -21,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.rulerunner.DataEntryRuleRunnerParameter;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -58,13 +57,12 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public class DataEntryRuleRunner extends RuleRunner {
 
 	private final Logger logger = LoggerFactory.getLogger(DataEntryRuleRunner.class);
-
+	
 	private Phase phase;
 	private EventCRFBean ecb;
 	private StudyBean currentStudy;
 	private ResourceBundle respagemsgs;
 	private ResourceBundle resexception;
-	private HttpServletRequest request;
 	private ExecutionMode executionMode;
 	private List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult;
 
@@ -99,12 +97,12 @@ public class DataEntryRuleRunner extends RuleRunner {
 	 *            List of RuleSetBeans to be used.
 	 * @param variableAndValue
 	 *            Variable and value map to be used.
+	 * @param dataEntryRuleRunnerParameter
+	 *            DataEntryRuleRunnerParameter
 	 * @return MessageContainer object
 	 */
 	public MessageContainer runRules(UserAccountBean ub, List<RuleSetBean> ruleSets,
-			HashMap<String, String> variableAndValue) {
-		String currentCrfVersionOid = (String) request.getAttribute("dataEntryCurrentCrfVersionOid");
-		String currentCrfOid = (String) request.getAttribute("dataEntryCurrentCrfOid");
+			HashMap<String, String> variableAndValue, DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter) {
 		allActionContainerListBasedOnRuleExecutionResult = null;
 		if (variableAndValue == null || variableAndValue.isEmpty()) {
 			logger.warn("You must be executing Rules in Batch");
@@ -112,18 +110,18 @@ public class DataEntryRuleRunner extends RuleRunner {
 		}
 
 		MessageContainer messageContainer = new MessageContainer();
-		HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
+		Map<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 		switch (executionMode) {
 			case SAVE :
-				toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>) request.getAttribute("toBeExecuted");
-
-				if (request.getAttribute("insertAction") == null) {
+				toBeExecuted = (Map<String, ArrayList<RuleActionContainer>>) dataEntryRuleRunnerParameter
+						.getAttributes().get("toBeExecuted");
+				if (dataEntryRuleRunnerParameter.getAttributes().get("insertAction") == null) {
 					break;
 				} else {
 					toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 				}
 			case DRY_RUN :
-				performDryRun(ruleSets, variableAndValue, currentCrfVersionOid, currentCrfOid, toBeExecuted);
+				performDryRun(ruleSets, variableAndValue, dataEntryRuleRunnerParameter, toBeExecuted);
 				break;
 			default :
 				break;
@@ -162,7 +160,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 						DiscrepancyNoteBean.ITEM_DATA,
 						currentStudy,
 						ub,
-						shouldCreateDNForItem(itemData, request),
+						shouldCreateDNForItem(itemData, dataEntryRuleRunnerParameter.getTransformedDNs()),
 						prepareEmailContents(ruleActionContainer.getRuleSetBean(), currentStudy, ruleActionContainer.getRuleAction()));
 				if (rab != null) {
 					if (rab instanceof ShowActionBean) {
@@ -184,8 +182,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 	}
 
 	private void performDryRun(List<RuleSetBean> ruleSets, HashMap<String, String> variableAndValue,
-			String currentCrfVersionOid, String currentCrfOid,
-			HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
+			DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter,
+			Map<String, ArrayList<RuleActionContainer>> toBeExecuted) {
 		for (RuleSetBean ruleSet : ruleSets) {
 			String key = getDynamicsMetadataService().getExpressionService().getItemOid(
 					ruleSet.getOriginalTarget().getValue());
@@ -199,8 +197,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 				ruleSet.setTarget(expressionBean);
 				String ruleSetForCrfVersionOid = getDynamicsMetadataService().getExpressionService().getCrfOid(
 						ruleSet.getTarget().getValue());
-				if (!ruleSetForCrfVersionOid.equals(currentCrfVersionOid)
-						&& !ruleSetForCrfVersionOid.equals(currentCrfOid)) {
+				if (!ruleSetForCrfVersionOid.equals(dataEntryRuleRunnerParameter.getCurrentCrfVersionOid())
+						&& !ruleSetForCrfVersionOid.equals(dataEntryRuleRunnerParameter.getCurrentCrfOid())) {
 					continue;
 				}
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
@@ -209,8 +207,9 @@ public class DataEntryRuleRunner extends RuleRunner {
 							new ExpressionObjectWrapper(getDataSource(), currentStudy, rule.getExpression(), ruleSet,
 									variableAndValue, ecb));
 					try {
-						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(currentStudy, request,
-								getDynamicsMetadataService().getExpressionService(), getTargetTimeZone());
+						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(currentStudy, dataEntryRuleRunnerParameter.getSubjectBean(),
+								dataEntryRuleRunnerParameter.getStudySubjectBean(), getDynamicsMetadataService().getExpressionService(),
+								getTargetTimeZone());
 						List<String> expressions = getDynamicsMetadataService().getExpressionService()
 								.prepareRuleExpression(rule.getExpression().getValue(), ruleSet);
 						for (String expression : expressions) {
@@ -224,7 +223,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 								Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
 								while (itr.hasNext()) {
 									if (doesTheRuleActionRunLogExist(itemData, ruleSetRule, ruleSet, itr.next(),
-											variableAndValue)) {
+											variableAndValue, dataEntryRuleRunnerParameter)) {
 										itr.remove();
 									}
 								}
@@ -249,7 +248,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 								&& (code.equalsIgnoreCase("OCRERR_DATE_SHOULD_BE_ENTERED")
 										|| code.equalsIgnoreCase("OCRERR_CANT_GET_SUBJEC_DOB") || code
 											.equalsIgnoreCase("OCRERR_CANT_GET_SUBJECT_ENROLLMENT"))) {
-							showCustomErrors(ruleSetRule, ruleSet, variableAndValue, respagemsgs.getString(code));
+							showCustomErrors(ruleSetRule, ruleSet, variableAndValue, respagemsgs.getString(code),
+									dataEntryRuleRunnerParameter);
 						}
 					} catch (NullPointerException npe) {
 						logger.info("found NPE while running rules, possible empty execution Mode");
@@ -259,7 +259,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 				}
 			}
 		}
-		request.setAttribute("toBeExecuted", toBeExecuted);
+		dataEntryRuleRunnerParameter.getAttributes().put("toBeExecuted", toBeExecuted);
 	}
 
 	/**
@@ -267,14 +267,12 @@ public class DataEntryRuleRunner extends RuleRunner {
 	 * 
 	 * @param itemData
 	 *            ItemDataBean to be used.
-	 * @param request
-	 *            HttpServletRequest to be used.
+	 * @param transformedDNs
+	 *            List of DiscrepancyNoteBean
 	 * @return true if dn should be created, false otherwise.
 	 */
-	public static boolean shouldCreateDNForItem(ItemDataBean itemData, HttpServletRequest request) {
+	public static boolean shouldCreateDNForItem(ItemDataBean itemData, List<DiscrepancyNoteBean> transformedDNs) {
 		// some DNs have been already transformed from Annotations, so we should skip them to prevent duplicating
-		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
-				"transformedSubmittedDNs");
 		if (transformedDNs == null || itemData == null || transformedDNs.isEmpty()) {
 			return true;
 		}
@@ -287,19 +285,20 @@ public class DataEntryRuleRunner extends RuleRunner {
 	}
 
 	private boolean doesTheRuleActionRunLogExist(ItemDataBean itemData, RuleSetRuleBean ruleSetRule,
-			RuleSetBean ruleSet, RuleActionBean ruleActionBean, HashMap<String, String> variableAndValue) {
+			RuleSetBean ruleSet, RuleActionBean ruleActionBean, HashMap<String, String> variableAndValue,
+			DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter) {
 		boolean exists = false;
 		String firstDDE = "firstDDEInsert_" + ruleSetRule.getOid() + "_" + itemData.getId();
 		if (ruleActionBean.getActionType() == ActionType.INSERT) {
-			request.setAttribute("insertAction", true);
+			dataEntryRuleRunnerParameter.getAttributes().put("insertAction", true);
 			final int four = 4;
 			if (phase == RuleActionRunBean.Phase.DOUBLE_DATA_ENTRY && itemData.getStatus().getId() == four
-					&& request.getAttribute(firstDDE) == null) {
-				request.setAttribute(firstDDE, true);
+					&& dataEntryRuleRunnerParameter.getAttributes().get(firstDDE) == null) {
+				dataEntryRuleRunnerParameter.getAttributes().put(firstDDE, true);
 			}
 		}
 
-		if (!(request.getAttribute(firstDDE) == Boolean.TRUE)) {
+		if (!(dataEntryRuleRunnerParameter.getAttributes().get(firstDDE) == Boolean.TRUE)) {
 
 			String key = getDynamicsMetadataService().getExpressionService().getItemOid(
 					ruleSet.getOriginalTarget().getValue());
@@ -319,15 +318,15 @@ public class DataEntryRuleRunner extends RuleRunner {
 	}
 
 	private void showCustomErrors(RuleSetRuleBean ruleSetRule, RuleSetBean ruleSet,
-			HashMap<String, String> variableAndValue, String customMessage) {
+			HashMap<String, String> variableAndValue, String customMessage,
+			DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter) {
 		for (RuleActionBean ruleActionBean : ruleSetRule.getActions()) {
 			if (ruleActionBean.getRuleSetRule() == ruleSetRule && ruleActionBean.getRuleActionRun().canRun(phase)
 					&& ruleActionBean instanceof DiscrepancyNoteActionBean) {
-				ItemDataBean itemData = getDynamicsMetadataService().getExpressionService().getItemDataBeanFromDb(
-						ruleSet.getTarget().getValue());
-				if (itemData == null
-						|| !doesTheRuleActionRunLogExist(itemData, ruleSetRule, ruleSet, ruleActionBean,
-								variableAndValue)) {
+				ItemDataBean itemData = getDynamicsMetadataService().getExpressionService()
+						.getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+				if (itemData == null || !doesTheRuleActionRunLogExist(itemData, ruleSetRule, ruleSet, ruleActionBean,
+						variableAndValue, dataEntryRuleRunnerParameter)) {
 					((DiscrepancyNoteActionBean) ruleActionBean).setCustomMessage(customMessage);
 					RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean,
 							ruleSet.getTarget(), itemData, ruleSet);
@@ -335,16 +334,6 @@ public class DataEntryRuleRunner extends RuleRunner {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Sets HttpServletRequest for this object.
-	 * 
-	 * @param request
-	 *            to be set.
-	 */
-	public void setRequest(HttpServletRequest request) {
-		this.request = request;
 	}
 
 	/**

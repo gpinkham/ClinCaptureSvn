@@ -18,8 +18,10 @@
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2010 Akaza Research
  */
-package org.akaza.openclinica.bean.rule;
+package org.akaza.openclinica.upload;
 
+import org.akaza.openclinica.bean.rule.FileProperties;
+import org.akaza.openclinica.bean.rule.FileRenamePolicy;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;

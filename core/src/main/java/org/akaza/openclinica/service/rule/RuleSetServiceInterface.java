@@ -13,6 +13,12 @@
 
 package org.akaza.openclinica.service.rule;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -36,18 +42,12 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.bean.rulerunner.DataEntryRuleRunnerParameter;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpServletRequest;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Contains ruleset service methods.
@@ -188,14 +188,13 @@ public interface RuleSetServiceInterface {
 	 *            variable and value pairs
 	 * @param phase
 	 *            data entry phase
-	 * @param ecb
-	 *            EventCRFBean
-	 * @param request
-	 *            HttpServletRequest
+	 * @param dataEntryRuleRunnerParameter
+	 *            DataEntryRuleRunnerParameter
 	 * @return MessageContainer
 	 */
 	MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, UserAccountBean ub,
-			HashMap<String, String> variableAndValue, Phase phase, EventCRFBean ecb, HttpServletRequest request);
+			HashMap<String, String> variableAndValue, Phase phase,
+			DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter);
 
 	/**
 	 * Runs rules in data import.

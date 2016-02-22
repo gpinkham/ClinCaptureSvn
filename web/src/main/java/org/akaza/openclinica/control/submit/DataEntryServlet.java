@@ -27,6 +27,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,6 +64,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.rulerunner.DataEntryRuleRunnerParameter;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
@@ -117,6 +119,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
 import org.akaza.openclinica.navigation.Navigation;
@@ -2625,12 +2628,17 @@ public abstract class DataEntryServlet extends SpringServlet {
 	 * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used
 	 * to controll processRequest.
 	 *
-	 * @param request     HttpServletRequest
-	 * @param isSubmitted isSubmitted
+	 * @param request
+	 *            HttpServletRequest
+	 * @param isSubmitted
+	 *            isSubmitted
 	 */
-	protected DisplaySectionBean getDisplayBean(boolean hasGroup, HttpServletRequest request, boolean isSubmitted) throws Exception {
-		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, isSubmitted,
-				getServletPage(request), request);
+	protected DisplaySectionBean getDisplayBean(boolean hasGroup, HttpServletRequest request, boolean isSubmitted)
+			throws Exception {
+		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
+		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
+		return getDataEntryService(getServletContext()).getDisplayBean(getCurrentStudy(), ecb, sb, hasGroup,
+				isSubmitted, getServletPage(request));
 	}
 
 	/**
@@ -3485,12 +3493,45 @@ public abstract class DataEntryServlet extends SpringServlet {
 				npe.printStackTrace();
 			}
 			logger.debug("running rules ... rule sets size is " + ruleSets.size());
-			result = ruleSetService.runRulesInDataEntry(ruleSets, dryRun, ub, c.variableAndValue, phase, ecb, request)
-					.getByMessageType(mt);
+			DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter = prepareDataEntryRuleRunnerParameter(request,
+					ecb);
+			MessageContainer messageContainer = ruleSetService.runRulesInDataEntry(ruleSets, dryRun, ub,
+					c.variableAndValue, phase, dataEntryRuleRunnerParameter);
+			attributeTransfer(request, dataEntryRuleRunnerParameter);
+			result = messageContainer.getByMessageType(mt);
 		}
 		return result;
 	}
 
+	private DataEntryRuleRunnerParameter prepareDataEntryRuleRunnerParameter(HttpServletRequest request,
+			EventCRFBean ecb) {
+		DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter = new DataEntryRuleRunnerParameter();
+		dataEntryRuleRunnerParameter.setEventCRFBean(ecb);
+		dataEntryRuleRunnerParameter.setStudy(getCurrentStudy());
+		dataEntryRuleRunnerParameter.setSubjectBean((SubjectBean) request.getAttribute("subject"));
+		dataEntryRuleRunnerParameter.setCurrentCrfOid((String) request.getAttribute("dataEntryCurrentCrfOid"));
+		dataEntryRuleRunnerParameter.setStudySubjectBean((StudySubjectBean) request.getAttribute("studySubject"));
+		dataEntryRuleRunnerParameter
+				.setCurrentCrfVersionOid((String) request.getAttribute("dataEntryCurrentCrfVersionOid"));
+		dataEntryRuleRunnerParameter.setTransformedDNs(
+				(List<DiscrepancyNoteBean>) request.getSession().getAttribute("transformedSubmittedDNs"));
+		Enumeration enumeration = request.getAttributeNames();
+		while (enumeration.hasMoreElements()) {
+			String key = (String) enumeration.nextElement();
+			if (key.equalsIgnoreCase("insertAction") || key.equalsIgnoreCase("toBeExecuted")
+					|| key.startsWith("firstDDEInsert_")) {
+				dataEntryRuleRunnerParameter.getAttributes().put(key, request.getAttribute(key));
+			}
+		}
+		return dataEntryRuleRunnerParameter;
+	}
+
+	private void attributeTransfer(HttpServletRequest request, DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter) {
+		for (String key : dataEntryRuleRunnerParameter.getAttributes().keySet()) {
+			request.setAttribute(key, dataEntryRuleRunnerParameter.getAttributes().get(key));
+		}
+	}
+	
 	protected abstract boolean shouldRunRules();
 
 	protected abstract boolean isAdministrativeEditing();

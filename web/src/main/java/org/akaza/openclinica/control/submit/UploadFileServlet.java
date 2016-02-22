@@ -32,11 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.rule.FileProperties;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.upload.FileUploadHelper;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;

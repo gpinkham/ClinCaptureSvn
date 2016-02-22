@@ -33,7 +33,6 @@ import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.mock.web.MockHttpServletRequest;
 
 public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 
@@ -41,7 +40,6 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 	public static final int FOUR = 4;
 	public static final int FIVE = 5;
 	public static final int SIX = 6;
-	private MockHttpServletRequest request;
 	private DisplayItemBean displayItemBean;
 	private DiscrepancyNoteBean discrepancyNoteBean;
 	private List<DiscrepancyNoteThread> noteThreads;
@@ -49,7 +47,6 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 
 	@Before
 	public void setUp() throws Exception {
-		request = new MockHttpServletRequest();
 		EventCRFBean eventCRFBean = new EventCRFBean();
 		eventCRFBean.setId(1);
 		eventCRFBean.setCRFVersionId(1);
@@ -77,8 +74,8 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.put(CrfShortcutsAnalyzer.SECTION_ID, 0);
 		attributes.put(CrfShortcutsAnalyzer.SERVLET_PATH, "");
-		crfShortcutsAnalyzer = new CrfShortcutsAnalyzer(request.getScheme(), request.getMethod(),
-				request.getRequestURI(), request.getServletPath(), "http", attributes, itemSDVService);
+		crfShortcutsAnalyzer = new CrfShortcutsAnalyzer("http", "post", "/uri", "/clincapture", "http", attributes,
+				itemSDVService);
 	}
 
 	@Test
@@ -124,36 +121,31 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatPrepareCrfShortcutLinksBuildCorrectUrlForNonPopupPage() throws Exception {
-		buildAnalyzerUrl(false);
+		buildAnalyzerUrl();
 		assertEquals("#newDn_1", crfShortcutsAnalyzer.getNextNewDnLink());
 
 	}
 
 	@Test
 	public void testThatPrepareCrfShortcutLinksBuildCorrectUrlForPopupPage() throws Exception {
-		buildAnalyzerUrl(true);
+		buildAnalyzerUrl();
 		assertEquals("#newDn_1", crfShortcutsAnalyzer.getNextNewDnLink());
 
 	}
 
-	private void buildAnalyzerUrl(boolean isPopup) {
+	private void buildAnalyzerUrl() {
 
 		EventCRFBean eventCRFBean = new EventCRFBean();
 		eventCRFBean.setId(2);
 		ItemFormMetadataDAO itemFormMetadataDAO = Mockito.mock(ItemFormMetadataDAO.class);
 		ItemFormMetadataBean itemFormMetadataBean = new ItemFormMetadataBean();
 		itemFormMetadataBean.setId(FOUR);
-		Mockito.when(itemFormMetadataDAO.findByItemIdAndCRFVersionId(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
-				itemFormMetadataBean);
+		Mockito.when(itemFormMetadataDAO.findByItemIdAndCRFVersionId(Mockito.anyInt(), Mockito.anyInt()))
+				.thenReturn(itemFormMetadataBean);
 		SectionBean section = new SectionBean();
 		section.setId(FOUR);
 		List<SectionBean> sectionBeans = new ArrayList<SectionBean>();
 		sectionBeans.add(section);
-		if (isPopup) {
-			request.setParameter("cw", "1");
-		}
-		request.setParameter("tabId", "3");
-		request.getSession().setAttribute("domain_name", "clincapture.com");
 		crfShortcutsAnalyzer.prepareCrfShortcutLinks(eventCRFBean, itemFormMetadataDAO, SIX, sectionBeans, noteThreads);
 	}
 }

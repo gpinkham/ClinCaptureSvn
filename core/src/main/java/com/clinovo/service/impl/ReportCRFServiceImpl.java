@@ -39,6 +39,16 @@ import java.util.TreeMap;
 
 import javax.sql.DataSource;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
+import net.sf.dynamicreports.report.constant.HorizontalAlignment;
+import net.sf.dynamicreports.report.datasource.DRDataSource;
+import net.sf.dynamicreports.report.exception.DRException;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Utils;
@@ -82,16 +92,6 @@ import com.clinovo.service.DataEntryService;
 import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.DRTemplates;
 import com.clinovo.util.DRUtil;
-
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
-import net.sf.dynamicreports.report.builder.group.ColumnGroupBuilder;
-import net.sf.dynamicreports.report.constant.HorizontalAlignment;
-import net.sf.dynamicreports.report.datasource.DRDataSource;
-import net.sf.dynamicreports.report.exception.DRException;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JREmptyDataSource;
 
 /**
  * Provides report generation service.
@@ -188,12 +188,13 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 				Page.VIEW_SECTION_DATA_ENTRY_SERVLET);
 		String titleText = cb.getName() + " " + crfVerBean.getName();
 		String reportFilePath = dataPath + (titleText + " " + ssubj.getLabel()).replaceAll("( |/|\\\\)", "_");
-        Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer = getSectionRepeatingGroupItemData(crfVerBean, ecb, dynamicsMetadataService);
-        generateReportFile(sectionBeans, repeatingGroupSectionContainer, createHeaderValues(study, subj, ssubj, se, ecb, studydao, locale), titleText,
-                reportFilePath, fileExt, urlPath, sysPath);
-        return reportFilePath + fileExt;
-    }
-
+		Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer = getSectionRepeatingGroupItemData(
+				crfVerBean, ecb, dynamicsMetadataService);
+		return generateReportFile(sectionBeans, repeatingGroupSectionContainer,
+				createHeaderValues(study, subj, ssubj, se, ecb, studydao, locale), titleText, reportFilePath, fileExt,
+				urlPath, sysPath);
+	}
+	
 	/**
 	 *
 	 * @param displaySectionBeans
@@ -210,12 +211,13 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 	 *            Path of URL
 	 * @param sysPath
 	 *            Path on system
+	 * @return String representing full path to report file
 	 * @throws IOException
 	 *             Thrown in case of I/O failure
 	 * @throws DRException
 	 *             Thrown in case of DynamicReports failure
      */
-    private void generateReportFile(List<DisplaySectionBean> displaySectionBeans, Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer,
+    public String generateReportFile(List<DisplaySectionBean> displaySectionBeans, Map<List<DisplayItemBean>, SortedMap<Integer, List<DisplayItemBean>>> repeatingGroupSectionContainer,
                                     Map<String, String> values, String titleText, String reportFilePath, String fileExt, String urlPath, String sysPath)
             throws IOException, DRException {
         OutputStream out = new FileOutputStream(reportFilePath + fileExt);
@@ -264,6 +266,7 @@ public class ReportCRFServiceImpl implements ReportCRFService {
 
         report.toPdf(out);
         out.close();
+		return reportFilePath + fileExt;
     }
 
     private JRDataSource createRepeatingGroupDataset(List<DisplayItemBean> firstRow, SortedMap<Integer, List<DisplayItemBean>> groupAdditionalRows) {

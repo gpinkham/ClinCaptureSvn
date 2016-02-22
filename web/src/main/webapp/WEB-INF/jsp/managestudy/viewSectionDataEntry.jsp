@@ -85,6 +85,7 @@
 		</form>
 
 <script type="text/javascript" language="JavaScript">
+	crfShortcutsTableDefTop += $("#crfSectionTabsTable").position().top;
 
     function getSib(theSibling) {
         var sib;

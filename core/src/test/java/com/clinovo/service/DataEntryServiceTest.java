@@ -13,6 +13,8 @@
 
 package com.clinovo.service;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -25,21 +27,10 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-
-import java.util.ArrayList;
 
 @SuppressWarnings("unchecked")
 public class DataEntryServiceTest extends DefaultAppContextTest {
-
-	private MockHttpServletRequest request;
-
-	@Before
-	public void setUp() throws Exception {
-		request = new MockHttpServletRequest();
-	}
 
 	@Test
 	public void testGetAllDisplayBeansReturnsNotNull() throws Exception {
@@ -47,7 +38,8 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		ArrayList<SectionBean> allSectionBeans = sdao.findAllByCRFVersionId(1);
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
-		assertNotNull(dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET));
+		assertNotNull(
+				dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET));
 	}
 
 	@Test
@@ -55,8 +47,8 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		ArrayList<SectionBean> allSectionBeans = sectionDAO.findAllByCRFVersionId(1);
 		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);
-		assertEquals(3, (dataEntryService.getAllDisplayBeans(allSectionBeans, ecb, study,
-				Page.INITIAL_DATA_ENTRY_SERVLET).size()));
+		assertEquals(3, (dataEntryService
+				.getAllDisplayBeans(allSectionBeans, ecb, study, Page.INITIAL_DATA_ENTRY_SERVLET).size()));
 	}
 
 	@Test
@@ -110,11 +102,7 @@ public class DataEntryServiceTest extends DefaultAppContextTest {
 		ib.setId(1);
 		items.add(ib);
 		sb.setItems(items);
-		request.getSession().setAttribute("study", study);
-		request.setAttribute("event", ecb);
-		request.setAttribute("section_bean", sb);
-		DisplaySectionBean dsb = dataEntryService.getDisplayBean(hasGroup, isSubmitted,
-				servletPage, request);
+		DisplaySectionBean dsb = dataEntryService.getDisplayBean(study, ecb, sb, hasGroup, isSubmitted, servletPage);
 		assertNotNull(dsb);
 	}
 }

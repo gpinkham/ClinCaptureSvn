@@ -16,8 +16,6 @@ package com.clinovo.service;
 
 import java.util.ArrayList;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -36,21 +34,25 @@ public interface DataEntryService {
 
 	/**
 	 * Get DisplaySectionBean.
-	 * 
+	 *
+	 * @param study
+	 *            StudyBean
+	 * @param ecb
+	 *            EventCRFBean
+	 * @param sb
+	 *            SectionBean
 	 * @param hasGroup
 	 *            boolean
 	 * @param isSubmitted
 	 *            boolean
 	 * @param servletPage
 	 *            Page
-	 * @param request
-	 *            HttpServletRequest
 	 * @return DisplaySectionBean
 	 * @throws Exception
 	 *             in case if some data is corrupted.
 	 */
-	DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted, Page servletPage,
-			HttpServletRequest request) throws Exception;
+	DisplaySectionBean getDisplayBean(StudyBean study, EventCRFBean ecb, SectionBean sb, boolean hasGroup,
+			boolean isSubmitted, Page servletPage) throws Exception;
 
 	/**
 	 * Method that checks that values should be loaded from DB.

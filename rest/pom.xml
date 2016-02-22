@@ -38,6 +38,11 @@
             <artifactId>commons</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jvnet.ws.wadl</groupId>
             <artifactId>wadl-core</artifactId>
         </dependency>

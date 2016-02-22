@@ -19,7 +19,6 @@ package org.akaza.openclinica.service.usageStats;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
@@ -34,7 +33,6 @@ public class LogUsageStatsService {
 
 	DataSource dataSource;
 	UsageStatsServiceDAO usageStatsServiceDAO;
-	ServletContext context;
 
 	public LogUsageStatsService(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -43,20 +41,20 @@ public class LogUsageStatsService {
 	// constants used for usage statistics
 	public final static String event = "EVENT: ";
 	public final static String event_start = "EVENT START: ";// This will be
-																// followed by the
-																// name of the
-																// event
+	// followed by the
+	// name of the
+	// event
 	public final static String event_complete = "EVENT COMPLETE: ";// This will
-																	// be
-																	// followed
-																	// by the
-																	// name of
-																	// the event
+	// be
+	// followed
+	// by the
+	// name of
+	// the event
 	public final static String event_details = "EVENT DETAILS: ";// This will be
-																	// followed by
-																	// the event
-																	// details
-																	// information
+	// followed by
+	// the event
+	// details
+	// information
 
 	// constants for event messages
 	public final static String event_msg_OC_started = "US003 OpenClinica was started";
@@ -108,26 +106,9 @@ public class LogUsageStatsService {
 	}
 
 	/**
-	 * @param dataSource
-	 *            the dataSource to set
+	 * @param dataSource the dataSource to set
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-
-	/**
-	 * @return the context
-	 */
-	public ServletContext getContext() {
-		return context;
-	}
-
-	/**
-	 * @param context
-	 *            the context to set
-	 */
-	public void setContext(ServletContext context) {
-		this.context = context;
-	}
-
 }

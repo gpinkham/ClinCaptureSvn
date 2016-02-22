@@ -10,12 +10,18 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
+package org.akaza.openclinica.listener;
 
-package org.akaza.openclinica.dao.core;
+import java.io.File;
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
+import java.util.Properties;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
+import javax.servlet.ServletContextEvent;
+
 import liquibase.log.LogFactory;
+
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -24,19 +30,21 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.context.ContextLoaderListener;
 
-import javax.servlet.ServletContextEvent;
-import java.io.File;
-import java.net.InetAddress;
-import java.net.URLDecoder;
-import java.net.UnknownHostException;
-import java.util.Properties;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
 
+/**
+ * OCContextLoaderListener
+ */
 public class OCContextLoaderListener extends ContextLoaderListener {
 
 	public static final String UTF_8 = "utf-8";
 
 	private org.slf4j.Logger logger;
 
+	/**
+	 * Constructor.
+	 */
 	public OCContextLoaderListener() {
 		super();
 		initLoggerFactory();
@@ -44,13 +52,13 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 
 	private void initLoggerFactory() {
 		try {
-			String catalinaHome = new File(URLDecoder.decode(getClass().getClassLoader().getResource(".").getPath(),
-					UTF_8)).getParent();
+			String catalinaHome = new File(
+					URLDecoder.decode(getClass().getClassLoader().getResource(".").getPath(), UTF_8)).getParent();
 			System.setProperty("catalina.home", catalinaHome);
 			DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
 			String webAppName = defaultResourceLoader.getResource("../../").getFile().getName();
-			Properties props = PropertiesLoaderUtils.loadProperties(defaultResourceLoader
-					.getResource("datainfo.properties"));
+			Properties props = PropertiesLoaderUtils
+					.loadProperties(defaultResourceLoader.getResource("datainfo.properties"));
 			// Log directory path
 			StringBuilder logPath = new StringBuilder(catalinaHome);
 			logPath.append(File.separator);
@@ -104,6 +112,13 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 		super.contextInitialized(event);
 	}
 
+	/**
+	 * Returns web app name.
+	 * 
+	 * @param servletCtxRealPath
+	 *            String
+	 * @return String
+	 */
 	public String getWebAppName(String servletCtxRealPath) {
 		String webAppName = null;
 		if (null != servletCtxRealPath) {
@@ -113,6 +128,13 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 		return webAppName;
 	}
 
+	/**
+	 * Returns host name.
+	 * 
+	 * @return String
+	 * @throws UnknownHostException
+	 *             the UnknownHostException
+	 */
 	public String getHostName() throws UnknownHostException {
 		InetAddress addr = InetAddress.getLocalHost();
 		return addr.getCanonicalHostName();

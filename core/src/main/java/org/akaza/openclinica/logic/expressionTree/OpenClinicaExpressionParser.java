@@ -20,6 +20,9 @@
  */
 package org.akaza.openclinica.logic.expressionTree;
 
+import java.util.Date;
+import java.util.HashMap;
+
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -29,10 +32,6 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
 
 /**
  * @author Krikor Krumlian
@@ -48,8 +47,6 @@ public class OpenClinicaExpressionParser {
 
 	public static final String ONE = "1";
 	public static final String NOT_USED = "not_used";
-	public static final String STUDY_SUBJECT = "studySubject";
-	public static final String SUBJECT = "subject";
 
 	private HashMap<String, String> testValues;
 	private HashMap<String, String> responseTestValues;
@@ -89,15 +86,15 @@ public class OpenClinicaExpressionParser {
 		this.targetTimeZone = targetTimeZone;
 	}
 
-	public OpenClinicaExpressionParser(StudyBean currentStudy, HttpServletRequest request,
-			ExpressionService expressionService, DateTimeZone targetTimeZone) {
+	public OpenClinicaExpressionParser(StudyBean currentStudy, SubjectBean subjectBean,
+			StudySubjectBean studySubjectBean, ExpressionService expressionService, DateTimeZone targetTimeZone) {
 		this(expressionService, targetTimeZone);
 		importRulesMode = false;
 		if (currentStudy.getStudyParameterConfig().getCollectDob().equalsIgnoreCase(ONE)) {
-			setSubjectDob(((SubjectBean) request.getAttribute(SUBJECT)).getDateOfBirth());
+			setSubjectDob(subjectBean.getDateOfBirth());
 		}
 		if (!currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equalsIgnoreCase(NOT_USED)) {
-			setSubjectEnrollment(((StudySubjectBean) request.getAttribute(STUDY_SUBJECT)).getEnrollmentDate());
+			setSubjectEnrollment(studySubjectBean.getEnrollmentDate());
 		}
 	}
 

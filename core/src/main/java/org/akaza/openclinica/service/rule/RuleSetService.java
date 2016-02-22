@@ -20,6 +20,16 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -64,6 +74,7 @@ import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
+import org.akaza.openclinica.bean.rulerunner.DataEntryRuleRunnerParameter;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
@@ -75,16 +86,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Contains RuleSet services.
@@ -337,18 +338,17 @@ public class RuleSetService implements RuleSetServiceInterface {
 	 * {@inheritDoc}
 	 */
 	public MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, UserAccountBean ub,
-			HashMap<String, String> variableAndValue, Phase phase, EventCRFBean ecb, HttpServletRequest request) {
-		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+			HashMap<String, String> variableAndValue, Phase phase,
+			DataEntryRuleRunnerParameter dataEntryRuleRunnerParameter) {
 		DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
-				mailSender, ecb);
+				mailSender, dataEntryRuleRunnerParameter.getEventCRFBean());
 		ruleRunner.setPhase(phase);
-		ruleRunner.setRequest(request);
-		ruleRunner.setCurrentStudy(currentStudy);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+		ruleRunner.setCurrentStudy(dataEntryRuleRunnerParameter.getStudy());
 		ruleRunner.setTargetTimeZone(DateTimeZone.forID(ub.getUserTimeZoneId()));
 		ruleRunner.setExecutionMode(dryRun ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE);
-		return ruleRunner.runRules(ub, ruleSets, variableAndValue);
+		return ruleRunner.runRules(ub, ruleSets, variableAndValue, dataEntryRuleRunnerParameter);
 	}
 
 	/**

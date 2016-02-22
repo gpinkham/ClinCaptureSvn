@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -85,13 +84,9 @@ public class DataEntryServiceImpl implements DataEntryService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public DisplaySectionBean getDisplayBean(boolean hasGroup, boolean isSubmitted, Page servletPage,
-			HttpServletRequest request) throws Exception {
-
+	public DisplaySectionBean getDisplayBean(StudyBean study, EventCRFBean ecb, SectionBean sb, boolean hasGroup,
+			boolean isSubmitted, Page servletPage) throws Exception {
 		DisplaySectionBean section = new DisplaySectionBean();
-		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		EventDefinitionCRFBean edcb = getEventDefinitionCRFFromSubjectsSite(ecb);
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();

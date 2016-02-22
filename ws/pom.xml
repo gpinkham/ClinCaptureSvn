@@ -25,6 +25,10 @@
             <groupId>com.clinovo.clincapture</groupId>
             <artifactId>core</artifactId>
         </dependency>
+		<dependency>
+			<groupId>com.clinovo.clincapture</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
 	    <dependency>
             <groupId>rome</groupId>
             <artifactId>rome-fetcher</artifactId>
@@ -152,6 +156,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>

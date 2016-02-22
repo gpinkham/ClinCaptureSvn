@@ -25,7 +25,7 @@
     <listener>
         <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
-        <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
+        <listener-class>org.akaza.openclinica.listener.OCContextLoaderListener</listener-class>
     </listener>
     <!-- added to properly shut down ehcache -->
     <listener>
