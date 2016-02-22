@@ -3,66 +3,126 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-01" dbms="postgresql">
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-10" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="i_crfs_masking_study_id"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                select
+                    count(i.relname)
+                from
+                    pg_class t,
+                    pg_class i,
+                    pg_index ix
+                where
+                    t.oid = ix.indrelid
+                    and i.oid = ix.indexrelid
+                    and t.relname = 'crfs_masking'
+                    and i.relname = 'i_crfs_masking_study_id'
+            </sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             CREATE INDEX i_crfs_masking_study_id ON crfs_masking (study_id);
         </sql>
     </changeSet>
 
-    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-02" dbms="postgresql">
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-11" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="i_crfs_masking_study_event_definition_id"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                select
+                    count(i.relname)
+                from
+                    pg_class t,
+                    pg_class i,
+                    pg_index ix
+                where
+                    t.oid = ix.indrelid
+                    and i.oid = ix.indexrelid
+                    and t.relname = 'crfs_masking'
+                    and i.relname = 'i_crfs_masking_study_event_definition_id'
+            </sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             CREATE INDEX i_crfs_masking_study_event_definition_id ON crfs_masking (study_event_definition_id);
         </sql>
     </changeSet>
 
-    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-03" dbms="postgresql">
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-12" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="i_crfs_masking_event_definition_crf_id"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                select
+                    count(i.relname)
+                from
+                    pg_class t,
+                    pg_class i,
+                    pg_index ix
+                where
+                    t.oid = ix.indrelid
+                    and i.oid = ix.indexrelid
+                    and t.relname = 'crfs_masking'
+                    and i.relname = 'i_crfs_masking_event_definition_crf_id'
+            </sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             CREATE INDEX i_crfs_masking_event_definition_crf_id ON crfs_masking (event_definition_crf_id);
         </sql>
     </changeSet>
 
-    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-04" dbms="postgresql">
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-13" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="i_crfs_masking_user_id"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                select
+                    count(i.relname)
+                from
+                    pg_class t,
+                    pg_class i,
+                    pg_index ix
+                where
+                    t.oid = ix.indrelid
+                    and i.oid = ix.indexrelid
+                    and t.relname = 'crfs_masking'
+                    and i.relname = 'i_crfs_masking_user_id'
+            </sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             CREATE INDEX i_crfs_masking_user_id ON crfs_masking (user_id);
         </sql>
     </changeSet>
 
-    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-05" dbms="postgresql">
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-14" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="i_crfs_masking_study_user_role_id"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                select
+                    count(i.relname)
+                from
+                    pg_class t,
+                    pg_class i,
+                    pg_index ix
+                where
+                    t.oid = ix.indrelid
+                    and i.oid = ix.indexrelid
+                    and t.relname = 'crfs_masking'
+                    and i.relname = 'i_crfs_masking_study_user_role_id'
+            </sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             CREATE INDEX i_crfs_masking_study_user_role_id ON crfs_masking (study_user_role_id);
         </sql>
     </changeSet>
 
-    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-06" dbms="postgresql">
+    <changeSet author="skirpichenok" id="2016-01-13-TICKET2783-15" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="i_crfs_masking_status_id"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                select
+                    count(i.relname)
+                from
+                    pg_class t,
+                    pg_class i,
+                    pg_index ix
+                where
+                    t.oid = ix.indrelid
+                    and i.oid = ix.indexrelid
+                    and t.relname = 'crfs_masking'
+                    and i.relname = 'i_crfs_masking_status_id'
+            </sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             CREATE INDEX i_crfs_masking_status_id ON crfs_masking (status_id);
