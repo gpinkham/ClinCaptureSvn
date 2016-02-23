@@ -49,6 +49,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
@@ -79,6 +80,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -414,35 +416,38 @@ public class ImportCRFDataService {
 		return ssBean;
 	}
 
-	private EventCRFBean createEventCRFBean(UserAccountBean ub, CRFVersionBean crfVersion, StudyBean studyBean,
-			StudySubjectBean studySubjectBean, StudyEventBean studyEvent, EventCRFDAO eventCRFDAO) {
+	private EventCRFBean createEventCRFBean(UserAccountBean ub, int crfVersionId, StudySubjectBean studySubject,
+			StudyEventBean studyEvent, EventCRFDAO eventCRFDAO) {
+
 		EventCRFBean eventCRFBean = new EventCRFBean();
 		eventCRFBean.setAnnotations("");
 		eventCRFBean.setCreatedDate(new Date());
-		eventCRFBean.setCRFVersionId(crfVersion.getId());
+		eventCRFBean.setCRFVersionId(crfVersionId);
 
-		if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+		StudyParameterValueBean studyParameter = getStudyParameterValueDAO()
+				.findByHandleAndStudy(studySubject.getStudyId(), "interviewerNameDefault");
+		if ("blank".equals(studyParameter.getValue())) {
 			eventCRFBean.setInterviewerName("");
 		} else {
 			eventCRFBean.setInterviewerName(studyEvent.getOwner().getName());
-
 		}
-		if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+
+		studyParameter = getStudyParameterValueDAO()
+				.findByHandleAndStudy(studySubject.getStudyId(), "interviewDateDefault");
+		if ("blank".equals(studyParameter.getValue())) {
 			eventCRFBean.setDateInterviewed(null);
 		} else {
 			eventCRFBean.setDateInterviewed(studyEvent.getDateStarted());
 		}
 
 		eventCRFBean.setOwner(ub);
-
 		eventCRFBean.setNotStarted(true);
 		eventCRFBean.setStatus(Status.AVAILABLE);
 		eventCRFBean.setCompletionStatusId(1);
-		eventCRFBean.setStudySubjectId(studySubjectBean.getId());
+		eventCRFBean.setStudySubjectId(studySubject.getId());
 		eventCRFBean.setStudyEventId(studyEvent.getId());
 		eventCRFBean.setValidateString("");
 		eventCRFBean.setValidatorAnnotations("");
-
 		return (EventCRFBean) eventCRFDAO.create(eventCRFBean);
 	}
 
@@ -564,7 +569,7 @@ public class ImportCRFDataService {
 						}
 					}
 					if (eventCRFBean == null) {
-						eventCRFBean = createEventCRFBean(ub, crfVersion, studyBean, studySubjectBean, studyEvent,
+						eventCRFBean = createEventCRFBean(ub, crfVersion.getId(), studySubjectBean, studyEvent,
 								eventCRFDAO);
 						permittedEventCRFIds.add(eventCRFBean.getId());
 					}
@@ -1052,7 +1057,7 @@ public class ImportCRFDataService {
 								LOGGER.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
 							} else {
 								EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
-								ArrayList<EventDefinitionCRFBean> requiredCrfs = (ArrayList<EventDefinitionCRFBean>) eventDefinitionCrfDao
+								ArrayList<EventDefinitionCRFBean> requiredCrfs = eventDefinitionCrfDao
 										.findAllByEventDefinitionId(studyEventDefintionBean.getId());
 
 								for (EventDefinitionCRFBean def : requiredCrfs) {
@@ -1221,43 +1226,6 @@ public class ImportCRFDataService {
 		eventCrfDao.delete(eventCrfId);
 	}
 
-	private EventCRFBean createEventCRFBean(UserAccountBean ub, int crfVersionId, StudyBean studyBean,
-			EventCRFBean prevEventCrfBean, StudyEventDAO studyEventDAO, EventCRFDAO eventCRFDAO) {
-		int studySubjectId = prevEventCrfBean.getStudySubjectId();
-		int studyEventId = prevEventCrfBean.getStudyEventId();
-
-		EventCRFBean eventCRFBean = new EventCRFBean();
-		eventCRFBean.setAnnotations("");
-		eventCRFBean.setCreatedDate(new Date());
-		eventCRFBean.setCRFVersionId(crfVersionId);
-
-		StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
-
-		if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
-			eventCRFBean.setInterviewerName("");
-		} else {
-			eventCRFBean.setInterviewerName(studyEvent.getOwner().getName());
-
-		}
-		if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
-			eventCRFBean.setDateInterviewed(null);
-		} else {
-			eventCRFBean.setDateInterviewed(studyEvent.getDateStarted());
-		}
-
-		eventCRFBean.setOwner(ub);
-
-		eventCRFBean.setNotStarted(true);
-		eventCRFBean.setStatus(Status.AVAILABLE);
-		eventCRFBean.setCompletionStatusId(1);
-		eventCRFBean.setStudySubjectId(studySubjectId);
-		eventCRFBean.setStudyEventId(studyEventId);
-		eventCRFBean.setValidateString("");
-		eventCRFBean.setValidatorAnnotations("");
-
-		return (EventCRFBean) eventCRFDAO.create(eventCRFBean);
-	}
-
 	private DiscrepancyNoteBean createDiscrepancyNote(DiscrepancyNoteBean note, EventCRFBean eventCrfBean,
 			DisplayItemBean displayItemBean, Integer parentId, DataSource ds, Connection con) {
 		StudySubjectDAO ssdao = new StudySubjectDAO(ds, con);
@@ -1326,6 +1294,7 @@ public class ImportCRFDataService {
 			StudyEventDAO studyEventDao = new StudyEventDAO(ds, con);
 			DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(ds, con);
 			EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds, con);
+			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds, con);
 
 			// setup ruleSets to run if applicable
 			LOGGER.debug("=== about to generate rule containers ===");
@@ -1352,8 +1321,11 @@ public class ImportCRFDataService {
 						if (!displayItemBean.isSkip()
 								&& displayItemBean.getMetadata().getCrfVersionId() != eventCrfBean.getCRFVersionId()) {
 							deleteEventCRF(ub, eventCrfBean.getId(), itemDataDao, eventCrfDao, discrepancyNoteDao);
+							StudyEventBean studyEvent = (StudyEventBean) studyEventDao.findByPK(eventCrfBean.getStudyEventId());
+							StudySubjectBean studySubject
+									= (StudySubjectBean) studySubjectDAO.findByPK(eventCrfBean.getStudySubjectId());
 							eventCrfBean = createEventCRFBean(ub, displayItemBean.getMetadata().getCrfVersionId(),
-									studyBean, eventCrfBean, studyEventDao, eventCrfDao);
+									studySubject, studyEvent, eventCrfDao);
 							idToEventCrfBeans.put(eventCrfBean.getId(), eventCrfBean);
 							for (DisplayItemBean dib : wrapper.getDisplayItemBeans()) {
 								dib.getData().setEventCRFId(eventCrfBean.getId());
@@ -1435,8 +1407,11 @@ public class ImportCRFDataService {
 								|| eventCrfBean.getStatus().equals(Status.PARTIAL_DATA_ENTRY)
 										? Status.PARTIAL_DATA_ENTRY
 										: Status.AVAILABLE);
-						if (studyBean.getStudyParameterConfig().getMarkImportedCRFAsCompleted()
-								.equalsIgnoreCase("yes")) {
+						StudySubjectBean studySubject =
+								(StudySubjectBean) studySubjectDAO.findByPK(eventCrfBean.getStudySubjectId());
+						StudyParameterValueBean studyParameter = getStudyParameterValueDAO()
+								.findByHandleAndStudy(studySubject.getStudyId(), "markImportedCRFAsCompleted");
+						if ("yes".equalsIgnoreCase(studyParameter.getValue())) {
 							EventDefinitionCRFBean edcb = eventDefinitionCrfDao.findByStudyEventIdAndCRFVersionId(
 									studyBean, eventCrfBean.getStudyEventId(), eventCrfBean.getCRFVersionId());
 
@@ -1618,5 +1593,9 @@ public class ImportCRFDataService {
 			}
 			return mesg.toString();
 		}
+	}
+
+	private StudyParameterValueDAO getStudyParameterValueDAO() {
+		return new StudyParameterValueDAO(ds);
 	}
 }

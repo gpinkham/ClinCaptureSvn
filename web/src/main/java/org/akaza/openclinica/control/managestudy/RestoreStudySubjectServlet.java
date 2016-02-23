@@ -89,7 +89,6 @@ public class RestoreStudySubjectServlet extends SpringServlet {
 			addPageMessage(getResPage().getString("please_choose_study_subject_to_restore"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 		} else {
-			int studyId = Integer.parseInt(studyIdString.trim());
 			int studySubId = Integer.parseInt(studySubIdString.trim());
 			int subjectId = Integer.parseInt(subIdString.trim());
 
@@ -98,10 +97,8 @@ public class RestoreStudySubjectServlet extends SpringServlet {
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
 			StudyDAO studydao = getStudyDAO();
-			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
-			StudyBean study = (StudyBean) studydao.findByPK(studyId);
-			study.getStudyParameterConfig().setSubjectPersonIdRequired(
-					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
+			StudyBean subjectStudy = (StudyBean) studydao.findByPK(studySub.getStudyId());
+			getStudyConfigService().setParametersForStudy(subjectStudy);
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -113,7 +110,7 @@ public class RestoreStudySubjectServlet extends SpringServlet {
 				}
 
 				request.setAttribute("subject", subject);
-				request.setAttribute("subjectStudy", study);
+				request.setAttribute("subjectStudy", subjectStudy);
 				request.setAttribute("studySub", studySub);
 				request.setAttribute("events", getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
 						currentUser, currentRole, false));
@@ -126,10 +123,10 @@ public class RestoreStudySubjectServlet extends SpringServlet {
 
 				String emailBody = new StringBuilder("").append(getResPage().getString("the_subject")).append(" ")
 						.append(studySub.getLabel()).append(" ")
-						.append((study.isSite(study.getParentStudyId())
+						.append((subjectStudy.isSite()
 								? getResPage().getString("has_been_restored_to_the_site")
 								: getResPage().getString("has_been_restored_to_the_study")))
-						.append(" ").append(study.getName()).append(".").toString();
+						.append(" ").append(subjectStudy.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 

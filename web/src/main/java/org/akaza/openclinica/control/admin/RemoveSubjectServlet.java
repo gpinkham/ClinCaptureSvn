@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -36,6 +38,10 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+/**
+* Handles requests to remove a subject entity.
+*/
 
 @SuppressWarnings("rawtypes")
 @Component
@@ -51,7 +57,7 @@ public class RemoveSubjectServlet extends SpringServlet {
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
 
-		if (ub.isSysAdmin() ) {
+		if (ub.isSysAdmin()) {
 			return;
 		}
 
@@ -86,6 +92,9 @@ public class RemoveSubjectServlet extends SpringServlet {
 			StudyEventDAO sedao = new StudyEventDAO(getDataSource());
 			ArrayList events = sedao.findAllBySubjectId(subjectId);
 			if ("confirm".equalsIgnoreCase(action)) {
+				StudyBean subjectStudy = getStudyService().getSubjectStudy(getCurrentStudy(),
+						(StudySubjectBean) studySubs.get(0));
+				request.setAttribute("subjectStudy", subjectStudy);
 				request.setAttribute("subjectToRemove", subject);
 				request.setAttribute("studySubs", studySubs);
 				request.setAttribute("events", events);

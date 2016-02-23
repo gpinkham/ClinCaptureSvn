@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -81,7 +83,10 @@ public class ViewSubjectServlet extends SpringServlet {
 			// find all study subjects
 			StudySubjectDAO ssdao = getStudySubjectDAO();
 			ArrayList studySubs = ssdao.findAllBySubjectId(subjectId);
+			StudyBean subjectStudy = getStudyService().getSubjectStudy(getCurrentStudy(),
+					(StudySubjectBean) studySubs.get(0));
 
+			request.setAttribute("subjectStudy", subjectStudy);
 			request.setAttribute("subject", subject);
 			request.setAttribute("studySubs", studySubs);
 			forwardPage(Page.VIEW_SUBJECT, request, response);

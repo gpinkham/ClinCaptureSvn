@@ -17,6 +17,7 @@ package com.clinovo.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 
 /**
  * StudyService.
@@ -94,4 +95,13 @@ public interface StudyService {
 	 *             an Exception
 	 */
 	void unlockSite(StudyBean studyBean, UserAccountBean updater) throws Exception;
+
+	/**
+	 * Returns study bean, where specified study subject was created.
+	 *
+	 * @param currentStudy StudyBean represents current scope.
+	 * @param studySubject StudySubjectBean represents target study subject.
+	 * @return StudyBean
+	 */
+	StudyBean getSubjectStudy(StudyBean currentStudy, StudySubjectBean studySubject);
 }

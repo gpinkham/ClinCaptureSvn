@@ -290,6 +290,10 @@ public abstract class DataEntryServlet extends SpringServlet {
 		StudyBean currentStudy = (StudyBean) session.getAttribute("study");
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
+		StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId());
+		StudyBean subjectStudy = getStudyService().getSubjectStudy(currentStudy, ssb);
+		request.setAttribute("subjectStudy", subjectStudy);
+
 		boolean isSubmitted = false;
 		boolean hasGroup = false;
 
@@ -305,8 +309,8 @@ public abstract class DataEntryServlet extends SpringServlet {
 		request.setAttribute("isFirstTimeOnSection", isFirstTimeOnSection + "");
 		request.setAttribute("currentDataEntryStage", getCurrentDataEntryStage());
 
-		boolean headerRequiredField = currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")
-				|| currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes");
+		boolean headerRequiredField = subjectStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")
+				|| subjectStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes");
 		request.setAttribute("expandCrfInfo", headerRequiredField);
 		if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("")
 				&& fp.getString("sectionId").equals("")) {
@@ -357,8 +361,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 		prepareSessionNotesIfValidationsWillFail(request, hasGroup, isSubmitted, allNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, currentStudy, null, -1);
 
-		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
 		Status s = ssb.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
 			addPageMessage(
@@ -415,13 +417,9 @@ public abstract class DataEntryServlet extends SpringServlet {
 			eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
 		}
 
-		StudyDAO studydao = new StudyDAO(getDataSource());
-		StudyBean subjectsStudy = (StudyBean) studydao.findByPK(ssb.getStudyId());
-
 		if (eventDefinitionCRFId <= 0) {
-			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId((StudyBean) studydao
-					.findByPK(((StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId())).getStudyId()), ecb
-					.getStudyEventId(), ecb.getCRFVersionId());
+			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(subjectStudy,
+					ecb.getStudyEventId(), ecb.getCRFVersionId());
 			eventDefinitionCRFId = edcBean.getId();
 		}
 
@@ -503,13 +501,13 @@ public abstract class DataEntryServlet extends SpringServlet {
 
 		// Get the study then the parent study
 		logMe("Entering  Get the study then the parent study   " + System.currentTimeMillis());
-		if (subjectsStudy.getParentStudyId() > 0) {
+		if (subjectStudy.isSite()) {
 			// this is a site,find parent
-			StudyBean parentStudy = (StudyBean) studydao.findByPK(subjectsStudy.getParentStudyId());
+			StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(subjectStudy.getParentStudyId());
 			request.setAttribute("studyTitle", parentStudy.getName());
-			request.setAttribute("siteTitle", subjectsStudy.getName());
+			request.setAttribute("siteTitle", subjectStudy.getName());
 		} else {
-			request.setAttribute("studyTitle", subjectsStudy.getName());
+			request.setAttribute("studyTitle", subjectStudy.getName());
 		}
 
 		provideRandomizationStatisticsForSite(request);
@@ -938,12 +936,12 @@ public abstract class DataEntryServlet extends SpringServlet {
 
 			section.setDisplayItemGroups(allItems);
 
-			if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes") && 
+			if (subjectStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes") &&
 					!isMarkedPartialSaved) {
 				v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
 			}
 
-			if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes") && 
+			if (subjectStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes") &&
 					!isMarkedPartialSaved) {
 				v.addValidation(INPUT_INTERVIEW_DATE, Validator.NO_BLANKS);
 			}
@@ -2298,14 +2296,15 @@ public abstract class DataEntryServlet extends SpringServlet {
 				ecb.setCreatedDate(new Date());
 				ecb.setCRFVersionId(crfVersionId);
 
-				if (currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+				StudyBean subjectStudy = getStudyService().getSubjectStudy(currentStudy, ssb);
+				if (subjectStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
 					ecb.setInterviewerName("");
 				} else {
 					// default will be event's owner name
 					ecb.setInterviewerName(sEvent.getOwner().getName());
 
 				}
-				if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+				if (!subjectStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
 					if (sEvent.getDateStarted() != null) {
 						ecb.setDateInterviewed(sEvent.getDateStarted());
 						// default date
@@ -3192,19 +3191,22 @@ public abstract class DataEntryServlet extends SpringServlet {
 	}
 
 	private EventCRFBean updateECB(StudyEventBean sEvent, HttpServletRequest request) {
-		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		if (!currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")
+		StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId());
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+		StudyBean subjectStudy = getStudyService().getSubjectStudy(currentStudy, ssb);
+
+		if (!subjectStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")
 				&& ("".equals(ecb.getInterviewerName()) || ecb.getInterviewerName() == null)) {
 			// default will be event's owner name
 			ecb.setInterviewerName(sEvent.getOwner().getName());
 		}
 
-		if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")
+		if (!subjectStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")
 				&& ("".equals(ecb.getDateInterviewed()) || ecb.getDateInterviewed() == null)) {
 			if (sEvent.getDateStarted() != null) {
-				ecb.setDateInterviewed(sEvent.getDateStarted());
-				// default date
+				ecb.setDateInterviewed(sEvent.getDateStarted());				// default date
 			} else {
 				ecb.setDateInterviewed(null);
 			}

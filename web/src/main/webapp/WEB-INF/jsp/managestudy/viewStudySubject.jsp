@@ -240,7 +240,14 @@
 							</c:if>
 							</td>
 							<td class="table_cell_br">
-								<c:out value="${subject.uniqueIdentifier}"/>
+								<c:choose>
+									<c:when test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+										<c:out value="${subject.uniqueIdentifier}"/>
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="not_used" bundle="${resword}"/>
+									</c:otherwise>
+								</c:choose>
 							</td>
 						</tr>
 

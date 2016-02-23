@@ -86,7 +86,17 @@ public class StudyConfigService {
 		}
 		study.setStudyParameterConfig(spc);
 		return study;
+	}
 
+	/**
+	 * This method is used to set all study parameters to site.
+	 *
+	 * @param site
+	 *            The <code>StudyBean</code> for which all site parameters should be set.
+	 * @return The <code>StudyBean</code> for which all site parameters had been set
+	 */
+	public StudyBean setParametersForSite(StudyBean site) {
+		return setParametersForStudy(site);
 	}
 
 	private void setStudyParameterValues(StudyParameterValueDAO spvdao, StudyParameterConfig spc, String handle,
@@ -253,29 +263,5 @@ public class StudyConfigService {
 				spc.setEvaluateWithContext(value);
 			}
 		}
-	}
-
-	/**
-	 * This method is used to set all study parameters to site.
-	 *
-	 * @param site
-	 *            The <code>StudyBean</code> for which all site parameters should be set.
-	 * @return The <code>StudyBean</code> for which all site parameters had been set
-	 */
-	public StudyBean setParametersForSite(StudyBean site) {
-
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-		ArrayList parameters = spvdao.findAllParameters();
-		StudyParameterConfig spc = new StudyParameterConfig();
-
-		for (Object parameter : parameters) {
-			StudyParameter sp = (StudyParameter) parameter;
-			String handle = sp.getHandle();
-			StudyParameterValueBean spv = spvdao.findByHandleAndStudy(site.getId(), handle);
-
-			setStudyParameterValues(spvdao, spc, handle, spv);
-		}
-		site.setStudyParameterConfig(spc);
-		return site;
 	}
 }

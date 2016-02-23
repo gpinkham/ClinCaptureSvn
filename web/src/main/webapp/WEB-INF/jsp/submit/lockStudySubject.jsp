@@ -129,9 +129,14 @@
             </c:choose>
         </c:if>
     </td>
-    <td class="table_cell_top">
-    	<c:out value="${subject.uniqueIdentifier}"/>
-    </td>
+	<c:choose>
+		<c:when test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+			<td class="table_cell_top"><c:out value="${subject.uniqueIdentifier}"/></td>
+		</c:when>
+		<c:otherwise>
+			<td class="table_cell"><fmt:message key="not_used" bundle="${resword}"/></td>
+		</c:otherwise>
+	</c:choose>
 </tr>
 
 <tr>

@@ -24,8 +24,10 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +62,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private EventDefinitionCrfService eventDefinitionCrfService;
+
+	@Autowired
+	private StudyConfigService studyConfigService;
 
 	private StudyDAO getStudyDAO() {
 		return new StudyDAO(dataSource);
@@ -202,5 +207,20 @@ public class StudyServiceImpl implements StudyService {
 	 */
 	public void unlockSite(StudyBean studyBean, UserAccountBean updater) throws Exception {
 		enableSite(studyBean, updater, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public StudyBean getSubjectStudy(StudyBean currentStudy, StudySubjectBean studySubject) {
+
+		StudyBean subjectStudy;
+		if (currentStudy.getId() == studySubject.getStudyId()) {
+			subjectStudy = currentStudy;
+		} else {
+			subjectStudy = (StudyBean) getStudyDAO().findByPK(studySubject.getStudyId());
+			studyConfigService.setParametersForStudy(subjectStudy);
+		}
+		return subjectStudy;
 	}
 }

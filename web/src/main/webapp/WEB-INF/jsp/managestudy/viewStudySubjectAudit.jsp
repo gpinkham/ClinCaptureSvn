@@ -56,7 +56,9 @@
 			<td><b>${secondaryIdLabel}</b></td>
 		</c:if>
 		<td><b><fmt:message key="date_of_birth" bundle="${resword}"/></b></td>
-		<td><b><fmt:message key="person_ID" bundle="${resword}"/></b></td>
+		<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+			<td><b><fmt:message key="person_ID" bundle="${resword}"/></b></td>
+		</c:if>
 		<td><b><fmt:message key="created_by" bundle="${resword}"/></b></td>
 		<td><b><fmt:message key="status" bundle="${resword}"/></b></td>
 	</tr>
@@ -66,7 +68,9 @@
 			<td><c:out value="${studySub.secondaryLabel}"/>&nbsp</td>
 		</c:if>
 		<td><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/>&nbsp</td>
-		<td><c:out value="${subject.uniqueIdentifier}"/>&nbsp;</td>
+		<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+			<td><c:out value="${subject.uniqueIdentifier}"/>&nbsp;</td>
+		</c:if>
 		<td><c:out value="${studySub.owner.name}"/>&nbsp;</td>
 		<td><c:out value="${studySub.status.name}"/></td>
 	</tr>
@@ -359,17 +363,25 @@
 								<tr>
 									<td><fmt:message key="name" bundle="${resword}"/></td>
 									<td><fmt:message key="version" bundle="${resword}"/></td>
-									<td><fmt:message key="date_interviewed" bundle="${resword}"/></td>
-									<td><fmt:message key="interviewer_name" bundle="${resword}"/></td>
+									<c:if test="${subjectStudy.studyParameterConfig.interviewDateRequired != 'not_used'}">
+										<td><fmt:message key="date_interviewed" bundle="${resword}"/></td>
+									</c:if>
+									<c:if test="${subjectStudy.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+										<td><fmt:message key="interviewer_name" bundle="${resword}"/></td>
+									</c:if>
 									<td><fmt:message key="owner" bundle="${resword}"/></td>
 								</tr>
 								<tr>
 									<td>${eventCRF.crf.name}</td>
 									<td>${eventCRF.crfVersion.name}</td>
-									<td>
-										<cc-fmt:formatDate value="${eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
-									</td>
-									<td>${eventCRF.interviewerName}</td>
+									<c:if test="${subjectStudy.studyParameterConfig.interviewDateRequired != 'not_used'}">
+										<td>
+											<cc-fmt:formatDate value="${eventCRF.dateInterviewed}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
+										</td>
+									</c:if>
+									<c:if test="${subjectStudy.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+										<td>${eventCRF.interviewerName}</td>
+									</c:if>
 									<td>${eventCRF.owner.name}</td>
 								</tr>
 							</table>

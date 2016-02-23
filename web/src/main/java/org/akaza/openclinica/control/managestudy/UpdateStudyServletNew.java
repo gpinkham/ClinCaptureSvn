@@ -781,12 +781,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 		spv.setValue(study1.getStudyParameterConfig().getInterviewerNameEditable());
 		updateParameter(spvdao, spv);
 
-		List<StudyBean> sites;
-		sites = (ArrayList) sdao.findAllByParent(study1.getId());
-		if (sites != null && (!sites.isEmpty())) {
-			updateInterviewerForSites(study1, sites, spvdao, "interviewerNameEditable");
-		}
-
 		spv.setParameter("interviewDateRequired");
 		spv.setValue(study1.getStudyParameterConfig().getInterviewDateRequired());
 		updateParameter(spvdao, spv);
@@ -798,9 +792,7 @@ public class UpdateStudyServletNew extends SpringServlet {
 		spv.setParameter("interviewDateEditable");
 		spv.setValue(study1.getStudyParameterConfig().getInterviewDateEditable());
 		updateParameter(spvdao, spv);
-		if (sites != null && (!sites.isEmpty())) {
-			updateInterviewerForSites(study1, sites, spvdao, "interviewDateEditable");
-		}
+
 		spv.setParameter("subjectIdGeneration");
 		spv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
 		updateParameter(spvdao, spv);
@@ -1056,10 +1048,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 			childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
 			updateParameter(spvdao, childspv);
 
-			childspv.setParameter("subjectPersonIdRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getSubjectPersonIdRequired());
-			updateParameter(spvdao, childspv);
-
 			childspv.setParameter("subjectIdGeneration");
 			childspv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
 			updateParameter(spvdao, childspv);
@@ -1154,10 +1142,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 			childspv.setParameter("allowDiscrepancyCorrectionForms");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("markImportedCRFAsCompleted");
-			childspv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("autoScheduleEventDuringImport");
@@ -1279,24 +1263,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 		} else {
 			logger.debug("Creating " + spv.getParameter() + " for study " + spv.getStudyId());
 			spvdao.create(spv);
-		}
-	}
-
-	private void updateInterviewerForSites(StudyBean studyBean, List<StudyBean> sites,
-			StudyParameterValueDAO studyParameterValueDAO, String parameterType) {
-
-		StudyParameterValueBean studyParameterValueBean = new StudyParameterValueBean();
-
-		if ("interviewerNameEditable".equalsIgnoreCase(parameterType)) {
-			studyParameterValueBean.setParameter("interviewerNameEditable");
-			studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewerNameEditable());
-		} else {
-			studyParameterValueBean.setParameter("interviewDateEditable");
-			studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewDateEditable());
-		}
-		for (StudyBean siteBean : sites) {
-			studyParameterValueBean.setStudyId(siteBean.getId());
-			updateParameter(studyParameterValueDAO, studyParameterValueBean);
 		}
 	}
 }

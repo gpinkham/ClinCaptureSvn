@@ -107,18 +107,16 @@ public class CasebooksController extends SpringController {
             request.getSession().setAttribute(CRF_CASEBOOK_STORED_URL, queryString);
         }
 
-        StudyDAO studyDAO = new StudyDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         SubjectDAO subjectDAO = new SubjectDAO(dataSource);
         StudyParameterValueDAO studyParameterValueDao = new StudyParameterValueDAO(dataSource);
 
         List<StudySubjectBean> studySubjects = studySubjectDAO.findAllByStudyId(studyBean.getId());
-        StudyBean parentStudy = isSite ? (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId()) : studyBean;
-        boolean secondaryIdRequired = !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "secondaryIdRequired").getValue().equalsIgnoreCase("not_used") && !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "secondaryIdRequired").getValue().isEmpty();
-        boolean collectDob = !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "collectDob").getValue().equalsIgnoreCase("3") && !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "collectDob").getValue().isEmpty();
-        boolean genderRequired = studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "genderRequired").getValue().equalsIgnoreCase("true");
-        boolean personIdRequired = !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "subjectPersonIdRequired").getValue().equalsIgnoreCase("not used") && !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "subjectPersonIdRequired").getValue().isEmpty();
-        boolean copyPersonIdFromStudySubId = studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "subjectPersonIdRequired").getValue().equalsIgnoreCase("copyFromSSID") && !studyParameterValueDao.findByHandleAndStudy(parentStudy.getId(), "subjectPersonIdRequired").getValue().isEmpty();
+        boolean secondaryIdRequired = !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "secondaryIdRequired").getValue().equalsIgnoreCase("not_used") && !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "secondaryIdRequired").getValue().isEmpty();
+        boolean collectDob = !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "collectDob").getValue().equalsIgnoreCase("3") && !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "collectDob").getValue().isEmpty();
+        boolean genderRequired = studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "genderRequired").getValue().equalsIgnoreCase("true");
+        boolean personIdRequired = !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "subjectPersonIdRequired").getValue().equalsIgnoreCase("not used") && !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "subjectPersonIdRequired").getValue().isEmpty();
+        boolean copyPersonIdFromStudySubId = studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "subjectPersonIdRequired").getValue().equalsIgnoreCase("copyFromSSID") && !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "subjectPersonIdRequired").getValue().isEmpty();
 
         CasebooksTableFactory casebooksTableFactory = new CasebooksTableFactory(studySubjects);
         casebooksTableFactory.setSecondaryIdRequired(secondaryIdRequired);
@@ -132,7 +130,7 @@ public class CasebooksController extends SpringController {
         casebooksTableFactory.setLocale(LocaleResolver.getLocale(request));
 
         request.setAttribute("crfEvaluationTable", casebooksTableFactory.createTable(request, response).render());
-        request.setAttribute("studyName", parentStudy.getName());
+        request.setAttribute("studyName", studyBean.getName());
 		request.setAttribute("generatingOIDs", getSubjectOIDs());
         return CASEBOOKS_PAGE;
     }

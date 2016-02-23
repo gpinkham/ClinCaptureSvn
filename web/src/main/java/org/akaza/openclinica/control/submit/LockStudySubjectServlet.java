@@ -77,16 +77,14 @@ public class LockStudySubjectServlet extends SpringServlet {
 		int studySubjectId = Integer.parseInt(request.getParameter("id"));
 		StudySubjectBean studySubjectBean = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubjectId);
 		SubjectBean subjectBean = (SubjectBean) subjectDao.findByPK(studySubjectBean.getSubjectId());
-		StudyBean studyBean = (StudyBean) studyDao.findByPK(studySubjectBean.getStudyId());
-		StudyBean parentStudyBean = studyBean.getParentStudyId() > 0
-				? (StudyBean) studyDao.findByPK(studyBean.getParentStudyId())
+		StudyBean subjectStudy = (StudyBean) studyDao.findByPK(studySubjectBean.getStudyId());
+		getStudyConfigService().setParametersForStudy(subjectStudy);
+		StudyBean parentStudyBean = subjectStudy.getParentStudyId() > 0
+				? (StudyBean) studyDao.findByPK(subjectStudy.getParentStudyId())
 				: null;
 
-		studyBean.getStudyParameterConfig().setCollectDob(
-				getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getId(), "collectDob").getValue());
-
 		boolean subjectStudyIsCurrentStudy = studySubjectBean.getStudyId() == currentStudy.getId();
-		boolean isParentStudy = studyBean.getParentStudyId() < 1;
+		boolean isParentStudy = subjectStudy.getParentStudyId() < 1;
 
 		// Get any disc notes for this subject : studySubId
 		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDAO();
@@ -94,25 +92,25 @@ public class LockStudySubjectServlet extends SpringServlet {
 
 		// These methods return only parent disc notes
 		if (subjectStudyIsCurrentStudy && isParentStudy) {
-			allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudyAndId(studyBean,
+			allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudyAndId(subjectStudy,
 					studySubjectBean.getSubjectId());
 			allNotesforSubject.addAll(
-					discrepancyNoteDAO.findAllStudySubjectByStudyAndId(studyBean, studySubjectBean.getSubjectId()));
+					discrepancyNoteDAO.findAllStudySubjectByStudyAndId(subjectStudy, studySubjectBean.getSubjectId()));
 		} else {
 			if (!isParentStudy) {
-				StudyBean stParent = (StudyBean) studyDao.findByPK(studyBean.getParentStudyId());
-				allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, studyBean,
+				StudyBean stParent = (StudyBean) studyDao.findByPK(subjectStudy.getParentStudyId());
+				allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, subjectStudy,
 						studySubjectBean.getSubjectId());
 
 				allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent,
-						studyBean, studySubjectBean.getSubjectId()));
+						subjectStudy, studySubjectBean.getSubjectId()));
 
 			} else {
-				allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(currentStudy, studyBean,
+				allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(currentStudy, subjectStudy,
 						studySubjectBean.getSubjectId());
 
 				allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(currentStudy,
-						studyBean, studySubjectId));
+						subjectStudy, studySubjectId));
 			}
 
 		}
@@ -136,7 +134,7 @@ public class LockStudySubjectServlet extends SpringServlet {
 
 		request.setAttribute("studySubjectBean", studySubjectBean);
 		request.setAttribute("parentStudy", parentStudyBean);
-		request.setAttribute("subjectStudy", studyBean);
+		request.setAttribute("subjectStudy", subjectStudy);
 		request.setAttribute("subject", subjectBean);
 		request.setAttribute("action", action);
 		request.setAttribute("study", currentStudy);

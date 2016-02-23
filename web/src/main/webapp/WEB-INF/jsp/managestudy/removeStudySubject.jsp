@@ -45,10 +45,6 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="subjectStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="remove_subject_from_Study"  bundle="${resword}"/>
@@ -70,10 +66,12 @@
       <td class="table_cell"><c:out value="${studySub.label}"/><%--<c:out value="${subject.id}"/>--%><%--above removed 092007, tbh--%></td>
   </tr>
 
-  <tr valign="top">
-  	<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-  	<td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
-  </tr>
+  <c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+      <tr valign="top">
+		  <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+		  <td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
+	  </tr>
+  </c:if>
 
   <c:set var="genderShow" value="${true}"/>
   <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>

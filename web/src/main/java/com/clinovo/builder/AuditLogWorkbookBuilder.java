@@ -19,6 +19,7 @@ import jxl.write.WriteException;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -39,10 +40,11 @@ public class AuditLogWorkbookBuilder {
 
 	private int row;
 	private int sheet;
-	private String[] currentRow;
+	private List<String> currentRow;
 	private WritableWorkbook workbook;
 	private WritableSheet currentSheet;
 	private WritableCellFormat headersFormat;
+	private StudyBean study;
 
 	public static final int TWO = 2;
 	public static final int SIX = 6;
@@ -50,23 +52,15 @@ public class AuditLogWorkbookBuilder {
 	public static final int AUDIT_EVENT_TYPE_32 = 32;
 	public static final int AUDIT_EVENT_TYPE_12 = 12;
 
-	public static final String[] STUDY_SUBJECT_INFO_ROW = new String[]{"study_subject_ID", "secondary_subject_ID",
-			"date_of_birth", "person_ID", "created_by", "status"};
-	public static final String[] AUDIT_EVENTS_ROW = new String[]{"audit_event", "local_date_time", "user",
-			"value_type", "old", "new"};
-	public static final String[] STUDY_EVENT_ROW = new String[]{"study_events", "location", "date", "occurrence_number"};
-	public static final String[] DELETED_EVENT_CRF_ROW = new String[]{"name", "version", "deleted_by", "delete_date"};
-	public static final String[] EVENT_CRF_ROW = new String[]{"name", "version", "date_interviewed",
-			"interviewer_name", "owner"};
-	public static final String[] RANDOMIZATION_AUDIT_ROW = new String[]{"audit_event", "local_date_time", "user", "event_description"};
-
 	/**
 	 * Default constructor.
 	 *
-	 * @param response HttpServletResponse
+	 * @param response     HttpServletResponse
+	 * @param study StudyBean
 	 * @throws java.io.IOException in case of workbook creation failure.
 	 */
-	public AuditLogWorkbookBuilder(HttpServletResponse response) throws IOException {
+	public AuditLogWorkbookBuilder(HttpServletResponse response, StudyBean study) throws IOException {
+
 		WritableFont font = new WritableFont(WritableFont.ARIAL, EIGHT, WritableFont.BOLD, false,
 				UnderlineStyle.NO_UNDERLINE, Colour.VIOLET2);
 		WritableCellFormat cellFormat = new WritableCellFormat();
@@ -76,6 +70,7 @@ public class AuditLogWorkbookBuilder {
 		WorkbookSettings wbSettings = new WorkbookSettings();
 		wbSettings.setLocale(LocaleResolver.getLocale());
 		workbook = Workbook.createWorkbook(response.getOutputStream(), wbSettings);
+		this.study = study;
 	}
 
 	/**
@@ -94,6 +89,7 @@ public class AuditLogWorkbookBuilder {
 	public WritableWorkbook buildWorkbook(StudySubjectBean studySubject, ArrayList studySubjectAudits,
 										  List<StudyEventBean> events, ArrayList allDeletedEventCRFs, ArrayList studyEventAudits,
 										  ArrayList eventCRFAudits, List<AuditLogRandomization> randomizationAudits) throws WriteException {
+
 		workbook.createSheet("Subject Information", 0);
 		currentSheet = workbook.getSheet(0);
 
@@ -122,24 +118,29 @@ public class AuditLogWorkbookBuilder {
 	}
 
 	private void createSubjectInfoTable(StudySubjectBean studySubject, List studySubjectAudits) throws WriteException {
-		addRowToSheet(STUDY_SUBJECT_INFO_ROW, headersFormat);
+
+		addRowToSheet(getStudySubjectHeaderRow(), headersFormat);
 		addRowToSheet(getStudySubjectRow(studySubject), null);
 		row++;
-		addRowToSheet(AUDIT_EVENTS_ROW, headersFormat);
+		addRowToSheet(getAuditEventsHeaderRow(), headersFormat);
 
 		for (Object studySubjectAudit : studySubjectAudits) {
 			AuditBean audit = (AuditBean) studySubjectAudit;
-			currentRow = new String[]{
-					ResourceBundleProvider.getAuditEventsBundle().getString(audit.getAuditEventTypeName()),
-					dateTimeFormat(audit.getAuditDate()), audit.getUserName(), audit.getEntityName(),
-					audit.getOldValue(), audit.getNewValue()};
+			currentRow = new ArrayList<String>();
+			currentRow.add(ResourceBundleProvider.getAuditEventsBundle().getString(audit.getAuditEventTypeName()));
+			currentRow.add(dateTimeFormat(audit.getAuditDate()));
+			currentRow.add(audit.getUserName());
+			currentRow.add(audit.getEntityName());
+			currentRow.add(audit.getOldValue());
+			currentRow.add(audit.getNewValue());
 			addRowToSheet(currentRow, null);
 		}
 		addBlankRow();
 	}
 
 	private void createRandomizationAuditsTable(List<AuditLogRandomization> randomizationAudits) throws WriteException {
-		addRowToSheet(RANDOMIZATION_AUDIT_ROW, headersFormat);
+
+		addRowToSheet(getRandomizationAuditEventHeaderRow(), headersFormat);
 		for (AuditLogRandomization audit : randomizationAudits) {
 			String randomizationResult = audit.getSuccess() == 1 ? "randomization.call.result.success" : "randomization.call.result.error";
 			String eventDescription = ResourceBundleProvider.getResWord("systemProperty.randomizationAuthenticationUrl.label") + ": "
@@ -154,33 +155,34 @@ public class AuditLogWorkbookBuilder {
 					+ audit.getStrataVariables() + "\n"
 					+ ResourceBundleProvider.getResWord("randomization_result") + ": "
 					+ audit.getResponse();
-			currentRow = new String[]{
-					ResourceBundleProvider.getResWord(randomizationResult),
-					dateTimeFormat(audit.getAuditDate()), audit.getUserName(),
-					eventDescription
-			};
+			currentRow = new ArrayList<String>();
+			currentRow.add(ResourceBundleProvider.getResWord(randomizationResult));
+			currentRow.add(dateTimeFormat(audit.getAuditDate()));
+			currentRow.add(audit.getUserName());
+			currentRow.add(eventDescription);
 			addRowToSheet(currentRow, null);
 		}
 		addBlankRow();
 	}
 
 	private void createStudyEventsInfoTable(List<StudyEventBean> events) throws WriteException {
-		addRowToSheet(STUDY_EVENT_ROW, headersFormat);
+
+		addRowToSheet(getStudyEventHeaderRow(), headersFormat);
 
 		for (StudyEventBean event : events) {
-			if (event.getStartTimeFlag()) {
-				currentRow = new String[]{event.getStudyEventDefinition().getName(), event.getLocation(),
-						dateTimeFormat(event.getDateStarted()), Integer.toString(event.getSampleOrdinal())};
-			} else {
-				currentRow = new String[]{event.getStudyEventDefinition().getName(), event.getLocation(),
-						dateFormat(event.getDateStarted()), Integer.toString(event.getSampleOrdinal())};
-			}
+			currentRow = new ArrayList<String>();
+			currentRow.add(event.getStudyEventDefinition().getName());
+			currentRow.add(event.getLocation());
+			currentRow.add(event.getStartTimeFlag() ? dateTimeFormat(event.getDateStarted())
+					: dateFormat(event.getDateStarted()));
+			currentRow.add(Integer.toString(event.getSampleOrdinal()));
 			addRowToSheet(currentRow, null);
 		}
 		autoSizeColumns(currentSheet);
 	}
 
 	private void createEventInfoTable(StudyEventBean event) throws WriteException {
+
 		currentSheet.addCell(new Label(0, row, ResourceBundleProvider.getResWord("name"), headersFormat));
 		currentSheet.addCell(new Label(1, row, event.getStudyEventDefinition().getName(), headersFormat));
 		row++;
@@ -205,36 +207,40 @@ public class AuditLogWorkbookBuilder {
 	}
 
 	private void createDeletedEventCRFsTable(StudyEventBean event, ArrayList allDeletedEventCRFs) throws WriteException {
-		addRowToSheet(DELETED_EVENT_CRF_ROW, headersFormat);
+
+		addRowToSheet(getDeletedEventCRFHeaderRow(), headersFormat);
 
 		for (Object allDeletedEventCRF : allDeletedEventCRFs) {
 			DeletedEventCRFBean deletedEventCRF = (DeletedEventCRFBean) allDeletedEventCRF;
 			if (deletedEventCRF.getStudyEventId() == event.getId()) {
-				currentRow = new String[]{deletedEventCRF.getCrfName(), deletedEventCRF.getCrfVersion(),
-						deletedEventCRF.getDeletedBy(), dateFormat(deletedEventCRF.getDeletedDate())};
-				addRowToSheet(currentRow, null);
+				currentRow = new ArrayList<String>();
+				currentRow.add(deletedEventCRF.getCrfName());
+				currentRow.add(deletedEventCRF.getCrfVersion());
+				currentRow.add(deletedEventCRF.getDeletedBy());
+				currentRow.add(dateFormat(deletedEventCRF.getDeletedDate()));
 			}
 		}
 		addBlankRow();
 	}
 
 	private void createStudyEventAuditsTable(StudyEventBean event, ArrayList studyEventAudits) throws WriteException {
-		addRowToSheet(AUDIT_EVENTS_ROW, headersFormat);
+
+		addRowToSheet(getAuditEventsHeaderRow(), headersFormat);
 
 		for (Object studyEventAudit : studyEventAudits) {
 			AuditBean studyEvent = (AuditBean) studyEventAudit;
 			if (studyEvent.getEntityId() == event.getId()) {
 				String oldValue = getStudyEventValueByCode(studyEvent.getOldValue());
 				String newValue = getStudyEventValueByCode(studyEvent.getNewValue());
-
-				currentRow = new String[]{
-						ResourceBundleProvider.getAuditEventsBundle().getString(
-								studyEvent.getAuditEventTypeName()),
-						dateTimeFormat(studyEvent.getAuditDate()),
-						studyEvent.getUserName(),
-						studyEvent.getEntityName()
-								+ (event.getStudyEventDefinition().isRepeating() ? "("
-								+ studyEvent.getOrdinal() + ")" : ""), oldValue, newValue};
+				currentRow = new ArrayList<String>();
+				currentRow.add(ResourceBundleProvider.getAuditEventsBundle()
+						.getString(studyEvent.getAuditEventTypeName()));
+				currentRow.add(dateTimeFormat(studyEvent.getAuditDate()));
+				currentRow.add(studyEvent.getUserName());
+				currentRow.add(studyEvent.getEntityName()
+						+ (event.getStudyEventDefinition().isRepeating() ? "(" + studyEvent.getOrdinal() + ")" : ""));
+				currentRow.add(oldValue);
+				currentRow.add(newValue);
 				addRowToSheet(currentRow, null);
 			}
 		}
@@ -242,16 +248,25 @@ public class AuditLogWorkbookBuilder {
 	}
 
 	private void createEventCRFInfoTable(EventCRFBean eventCrf) throws WriteException {
-		addRowToSheet(EVENT_CRF_ROW, headersFormat);
-		currentRow = new String[]{eventCrf.getCrf().getName(), eventCrf.getCrfVersion().getName(),
-				dateTimeFormat(eventCrf.getDateInterviewed()), eventCrf.getInterviewerName(),
-				eventCrf.getOwner().getName()};
+
+		addRowToSheet(getEventCRFHeaderRow(), headersFormat);
+		currentRow = new ArrayList<String>();
+		currentRow.add(eventCrf.getCrf().getName());
+		currentRow.add(eventCrf.getCrfVersion().getName());
+		if (!"not_used".equals(study.getStudyParameterConfig().getInterviewDateRequired())) {
+			currentRow.add(dateTimeFormat(eventCrf.getDateInterviewed()));
+		}
+		if (!"not_used".equals(study.getStudyParameterConfig().getInterviewerNameRequired())) {
+			currentRow.add(eventCrf.getInterviewerName());
+		}
+		currentRow.add(eventCrf.getOwner().getName());
 		addRowToSheet(currentRow, null);
 		addBlankRow();
 	}
 
 	private void createEventCRFAuditsTable(EventCRFBean eventCrf, ArrayList eventCRFAudits) throws WriteException {
-		addRowToSheet(AUDIT_EVENTS_ROW, headersFormat);
+
+		addRowToSheet(getAuditEventsHeaderRow(), headersFormat);
 
 		for (Object eventCRFAudit : eventCRFAudits) {
 			AuditBean eventCrfAudit = (AuditBean) eventCRFAudit;
@@ -260,43 +275,118 @@ public class AuditLogWorkbookBuilder {
 						eventCrfAudit.getAuditEventTypeId(), eventCrfAudit.getEntityName());
 				String newValue = getEventCRFValueByCode(eventCrfAudit.getNewValue(),
 						eventCrfAudit.getAuditEventTypeId(), eventCrfAudit.getEntityName());
-				currentRow = new String[]{
-						ResourceBundleProvider.getAuditEventsBundle().getString(
-								eventCrfAudit.getAuditEventTypeName()),
-						dateTimeFormat(eventCrfAudit.getAuditDate()), eventCrfAudit.getUserName(),
-						eventCrfAudit.getEntityName() + "(" + eventCrfAudit.getOrdinal() + ")", oldValue,
-						newValue};
+				currentRow = new ArrayList<String>();
+				currentRow.add(ResourceBundleProvider.getAuditEventsBundle()
+						.getString(eventCrfAudit.getAuditEventTypeName()));
+				currentRow.add(dateTimeFormat(eventCrfAudit.getAuditDate()));
+				currentRow.add(eventCrfAudit.getUserName());
+				currentRow.add(eventCrfAudit.getEntityName() + "(" + eventCrfAudit.getOrdinal() + ")");
+				currentRow.add(oldValue);
+				currentRow.add(newValue);
 				addRowToSheet(currentRow, null);
 			}
 		}
 		row++;
 	}
 
-	private void addRowToSheet(String[] excelRow, WritableCellFormat cellFormat) throws WriteException {
-		for (int i = 0; i < excelRow.length; i++) {
-			if (cellFormat != null) {
-				Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
-				currentSheet.addCell(label);
-			} else {
-				Label label = new Label(i, row, excelRow[i]);
-				currentSheet.addCell(label);
-			}
+	private void addRowToSheet(List<String> excelRow, WritableCellFormat cellFormat) throws WriteException {
+
+		for (int i = 0; i < excelRow.size(); i++) {
+			Label label = cellFormat == null ? new Label(i, row, excelRow.get(i))
+					: new Label(i, row, ResourceBundleProvider.getResWord(excelRow.get(i)), cellFormat);
+			currentSheet.addCell(label);
 		}
 		row++;
 	}
 
-	private String[] getStudySubjectRow(StudySubjectBean studySubject) {
-		return new String[]{studySubject.getLabel(),
-				studySubject.getSecondaryLabel(),
-				studySubject.getDateOfBirth() != null
-						? DateUtil.printDate(studySubject.getDateOfBirth(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale()) : null,
-				studySubject.getUniqueIdentifier(),
-				studySubject.getOwner().getName(),
-				studySubject.getStatus().getName()};
+	private List<String> getStudySubjectRow(StudySubjectBean studySubject) {
+
+		List<String> list = new ArrayList<String>();
+		list.add(studySubject.getLabel());
+		list.add(studySubject.getSecondaryLabel());
+		list.add(studySubject.getDateOfBirth() != null
+				? DateUtil.printDate(studySubject.getDateOfBirth(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale())
+				: null);
+		if (!"not used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+			list.add(studySubject.getUniqueIdentifier());
+		}
+		list.add(studySubject.getOwner().getName());
+		list.add(studySubject.getStatus().getName());
+		return list;
 	}
 
-	private String dateFormat(Date date) {
-		if (date == null) {
+	private List<String> getStudySubjectHeaderRow() {
+
+		List<String> list = new ArrayList<String>();
+		list.add("study_subject_ID");
+		list.add("secondary_subject_ID");
+		list.add("date_of_birth");
+		if (!"not used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+			list.add("person_ID");
+		}
+		list.add("created_by");
+		list.add("status");
+		return list;
+	}
+
+	private List<String> getStudyEventHeaderRow() {
+
+		List<String> list = new ArrayList<String>();
+		list.add("study_events");
+		list.add("location");
+		list.add("date");
+		list.add("occurrence_number");
+		return list;
+	}
+
+	private List<String> getDeletedEventCRFHeaderRow() {
+
+		List<String> list = new ArrayList<String>();
+		list.add("name");
+		list.add("version");
+		list.add("deleted_by");
+		list.add("delete_date");
+		return list;
+	}
+
+	private List<String> getEventCRFHeaderRow() {
+
+		List<String> list = new ArrayList<String>();
+		list.add("name");
+		list.add("version");
+		if (!"not_used".equals(study.getStudyParameterConfig().getInterviewDateRequired())) {
+			list.add("date_interviewed");
+		}
+		if (!"not_used".equals(study.getStudyParameterConfig().getInterviewerNameRequired())) {
+			list.add("interviewer_name");
+		}
+		list.add("owner");
+		return list;
+	}
+
+	private List<String> getAuditEventsHeaderRow() {
+
+		List<String> list = new ArrayList<String>();
+		list.add("audit_event");
+		list.add("local_date_time");
+		list.add("user");
+		list.add("value_type");
+		list.add("old");
+		list.add("new");
+		return list;
+	}
+
+	private List<String> getRandomizationAuditEventHeaderRow() {
+
+		List<String> list = new ArrayList<String>();
+		list.add("audit_event");
+		list.add("local_date_time");
+		list.add("user");
+		list.add("event_description");
+		return list;
+	}
+
+	private String dateFormat(Date date) {		if (date == null) {
 			return "";
 		} else {
 			return DateUtil.printDate(date, RequestUtil.getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE,

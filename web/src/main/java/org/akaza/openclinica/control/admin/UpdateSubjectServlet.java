@@ -25,6 +25,7 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SpringServlet;
@@ -37,7 +38,6 @@ import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
@@ -148,16 +148,11 @@ public class UpdateSubjectServlet extends SpringServlet {
 				subject = (SubjectBean) subjdao.findByPK(subjectId);
 				request.getSession().setAttribute("subjectToUpdate", subject);
 
-				ArrayList<StudyParamsConfig> listOfParams;
-
-				if (currentStudy.getParentStudyId() > 0) {
-					StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
-					StudyBean parentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
-					parentStudy.setStudyParameters(spvdao.findParamConfigByStudy(parentStudy));
-					listOfParams = selectParametersFromStudyAndSite(parentStudy, currentStudy);
-				} else {
-					listOfParams = currentStudy.getStudyParameters();
-				}
+				StudySubjectBean studySubjectBean = (StudySubjectBean) getStudySubjectDAO()
+						.findAllBySubjectId(subjectId).get(0);
+				StudyBean subjectStudy = (StudyBean) sdao.findByPK(studySubjectBean.getStudyId());
+				ArrayList<StudyParamsConfig> listOfParams
+						= getStudyParameterValueDAO().findParamConfigByStudy(subjectStudy);
 
 				for (StudyParamsConfig spc : listOfParams) {
 					parameters.put(spc.getParameter().getHandle(), spc.getValue().getValue());
@@ -381,28 +376,6 @@ public class UpdateSubjectServlet extends SpringServlet {
 		} else {
 			return "";
 		}
-	}
-
-	private ArrayList<StudyParamsConfig> selectParametersFromStudyAndSite(StudyBean study, StudyBean site) {
-		ArrayList<StudyParamsConfig> result = new ArrayList<StudyParamsConfig>();
-
-		HashMap<String, StudyParamsConfig> parametersFromStudy = new HashMap<String, StudyParamsConfig>();
-		for (int i = 0; i < study.getStudyParameters().size(); i++) {
-			StudyParamsConfig spc = (StudyParamsConfig) study.getStudyParameters().get(i);
-			parametersFromStudy.put(spc.getParameter().getHandle(), spc);
-		}
-
-		for (int i = 0; i < site.getStudyParameters().size(); i++) {
-			StudyParamsConfig spc = (StudyParamsConfig) site.getStudyParameters().get(i);
-			if (spc.getParameter().isOverridable() || !spc.getParameter().isInheritable()) {
-				// take parameter from Site
-				result.add(spc);
-			} else {
-				// take parameter from Study
-				result.add(parametersFromStudy.get(spc.getParameter().getHandle()));
-			}
-		}
-		return result;
 	}
 
 	private void clearSession(HttpServletRequest request) {

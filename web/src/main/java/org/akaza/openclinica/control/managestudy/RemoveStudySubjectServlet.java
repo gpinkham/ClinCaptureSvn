@@ -34,14 +34,13 @@ import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 /**
- * Removes a study subject and all the related data
+ * Removes a study subject and all the related data.
  * 
  * @author jxu
  * 
@@ -91,14 +90,12 @@ public class RemoveStudySubjectServlet extends SpringServlet {
 
 		SubjectDAO sdao = getSubjectDAO();
 		StudySubjectDAO subdao = getStudySubjectDAO();
-		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 
 		if (StringUtil.isBlank(studySubIdString) || StringUtil.isBlank(subIdString)
 				|| StringUtil.isBlank(studyIdString)) {
 			addPageMessage(getResPage().getString("please_choose_a_study_subject_to_remove"), request);
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 		} else {
-			int studyId = Integer.parseInt(studyIdString.trim());
 			int studySubId = Integer.parseInt(studySubIdString.trim());
 			int subjectId = Integer.parseInt(subIdString.trim());
 
@@ -107,11 +104,11 @@ public class RemoveStudySubjectServlet extends SpringServlet {
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
 			StudyDAO studydao = getStudyDAO();
-			StudyBean study = (StudyBean) studydao.findByPK(studyId);
-			study.getStudyParameterConfig().setSubjectPersonIdRequired(
-					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
+			StudyBean subjectStudy = (StudyBean) studydao.findByPK(studySub.getStudyId());
+			getStudyConfigService().setParametersForStudy(subjectStudy);
 
-			checkRoleByUserAndStudy(request, response, currentUser, study.getParentStudyId(), study.getId());
+			checkRoleByUserAndStudy(request, response, currentUser, getCurrentStudy().getParentStudyId(),
+					getCurrentStudy().getId());
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
@@ -123,7 +120,7 @@ public class RemoveStudySubjectServlet extends SpringServlet {
 				}
 
 				request.setAttribute("subject", subject);
-				request.setAttribute("subjectStudy", study);
+				request.setAttribute("subjectStudy", subjectStudy);
 				request.setAttribute("studySub", studySub);
 				request.setAttribute("events", getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
 						currentUser, currentRole, false));
@@ -135,11 +132,10 @@ public class RemoveStudySubjectServlet extends SpringServlet {
 				getStudySubjectService().removeStudySubject(studySub, currentUser);
 
 				String emailBody = new StringBuilder("").append(getResPage().getString("the_subject")).append(" ")
-						.append(studySub.getLabel()).append(" ")
-						.append((study.isSite(study.getParentStudyId())
+						.append(studySub.getLabel()).append(" ").append((subjectStudy.isSite()
 								? getResPage().getString("has_been_removed_from_the_site")
 								: getResPage().getString("has_been_removed_from_the_study")))
-						.append(study.getName()).append(".").toString();
+						.append(subjectStudy.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);

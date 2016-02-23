@@ -15,6 +15,8 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.Locale;
 
+import com.clinovo.service.StudyService;
+import com.clinovo.service.impl.StudyServiceImpl;
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -29,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -43,10 +46,9 @@ import com.clinovo.i18n.LocaleResolver;
 @PrepareForTest({ReassignStudySubjectServlet.class, StudySubjectDAO.class, SubjectDAO.class, StudyDAO.class})
 public class ReassignStudySubjectServletTest {
 
-	@Mock
-	private MockHttpServletResponse response;
-
+	private StudyService studyService;
 	private ReassignStudySubjectServlet reassignStudySubjectServlet;
+	private MockHttpServletResponse response;
 	private MockHttpServletRequest request;
 	private StudyBean currentStudy;
 	private MockServletContext servletContext;
@@ -54,6 +56,9 @@ public class ReassignStudySubjectServletTest {
 
 	@Before
 	public void setUp() throws Exception {
+
+		studyService = Mockito.mock(StudyServiceImpl.class);
+		response = new MockHttpServletResponse();
 		request = new MockHttpServletRequest();
 		reassignStudySubjectServlet = PowerMockito.spy(new ReassignStudySubjectServlet());
 		servletContext = Mockito.mock(MockServletContext.class);
@@ -62,6 +67,7 @@ public class ReassignStudySubjectServletTest {
 		Locale locale = new Locale("en");
 		LocaleResolver.updateLocale(request, locale);
 		ResourceBundleProvider.updateLocale(locale);
+		Whitebox.setInternalState(reassignStudySubjectServlet, "studyService", studyService);
 
 		currentStudy = new StudyBean();
 		currentStudy.setId(1);
@@ -83,9 +89,12 @@ public class ReassignStudySubjectServletTest {
 		Mockito.doReturn(studySubjectDAO).when(reassignStudySubjectServlet).getStudySubjectDAO();
 		Mockito.doReturn(studyDAO).when(reassignStudySubjectServlet).getStudyDAO();
 		Mockito.doReturn(subjectDAO).when(reassignStudySubjectServlet).getSubjectDAO();
+		Mockito.doReturn(currentStudy).when(reassignStudySubjectServlet).getCurrentStudy();
 
 		Mockito.when(servletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(requestDispatcher);
 		Mockito.doReturn(servletContext).when(reassignStudySubjectServlet).getServletContext();
+		Mockito.when(studyService.getSubjectStudy(Mockito.any(StudyBean.class), Mockito.any(StudySubjectBean.class)))
+				.thenReturn(currentStudy);
 	}
 
 	@Test

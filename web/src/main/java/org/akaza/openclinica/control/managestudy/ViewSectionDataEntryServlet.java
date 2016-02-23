@@ -210,6 +210,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		if (studySubjectId > 0) {
 			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", sub);
+			StudyBean subjectStudy = getStudyService().getSubjectStudy(currentStudy, sub);
+			request.setAttribute("subjectStudy", subjectStudy);
 		}
 
 		List<DiscrepancyNoteBean> allNotes;
@@ -366,6 +368,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				request.setAttribute("studyTitle", study.getName());
 			}
 
+			StudyBean subjectStudy = getStudyService().getSubjectStudy(currentStudy, sub);
+			request.setAttribute("subjectStudy", subjectStudy);
 			request.setAttribute("studySubject", sub);
 			request.setAttribute("subject", subject);
 			request.setAttribute("age", age);

@@ -254,7 +254,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			// study ID, then its study ID may be different than the study
 			// subject's ID.
 			boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-			boolean isParentStudy = study.getParentStudyId() < 1;
+			boolean isParentStudy = !study.isSite();
 
 			// Get any disc notes for this subject : studySubId
 			DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(getDataSource());
@@ -301,11 +301,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			request.setAttribute("subject", subject);
 
-			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
-			study.getStudyParameterConfig()
-					.setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
-			study.getStudyParameterConfig().setSubjectPersonIdRequired(
-					spvdao.findByHandleAndStudy(studyId, "subjectPersonIdRequired").getValue());
+			getStudyConfigService().setParametersForStudy(study);
 			request.setAttribute("subjectStudy", study);
 
 			if (study.getParentStudyId() > 0) { // this is a site,find parent

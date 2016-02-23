@@ -120,7 +120,6 @@ public class ViewStudySubjectAuditLogServlet extends SpringServlet {
 		StudyDAO studydao = getStudyDAO();
 		CRFDAO cdao = getCRFDAO();
 		CRFVersionDAO cvdao = getCRFVersionDAO();
-		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 
 		ArrayList studySubjectAudits = new ArrayList();
 		ArrayList eventCRFAudits = new ArrayList();
@@ -137,9 +136,7 @@ public class ViewStudySubjectAuditLogServlet extends SpringServlet {
 		} else {
 			StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
 			StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
-
-			study.getStudyParameterConfig().setSubjectPersonIdRequired(
-					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
+			getStudyConfigService().setParametersForStudy(study);
 
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySubject.getStudyId() != currentStudy.getId()) {
@@ -166,7 +163,7 @@ public class ViewStudySubjectAuditLogServlet extends SpringServlet {
 			SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
 			request.setAttribute("subject", subject);
 
-			request.setAttribute("study", study);
+			request.setAttribute("subjectStudy", study);
 
 			/* Show both study subject and subject audit events together */
 			// Study subject value changed

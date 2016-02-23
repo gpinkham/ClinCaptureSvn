@@ -167,14 +167,14 @@
 </script>
 
 <c:set var="hideAditionalInfoPanel"
-       value="${study.studyParameterConfig.interviewerNameRequired == 'not_used' and
-		study.studyParameterConfig.interviewDateRequired == 'not_used' and
+       value="${subjectStudy.studyParameterConfig.interviewerNameRequired == 'not_used' and
+		subjectStudy.studyParameterConfig.interviewDateRequired == 'not_used' and
 		study.studyParameterConfig.secondaryIdRequired == 'not_used' and
 		study.studyParameterConfig.secondaryLabelViewable == 'false' and
 		study.studyParameterConfig.genderRequired == 'false' and
 		!toc.studyEventDefinition.repeating and
 		study.studyParameterConfig.collectDob == '3' and
-		study.studyParameterConfig.personIdShownOnCRF == 'false'}" />
+		subjectStudy.studyParameterConfig.personIdShownOnCRF == 'false'}" />
 
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "interviewer"}'>
@@ -193,7 +193,8 @@
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
 
 <c:choose>
-<c:when test="${study.studyParameterConfig.interviewerNameRequired == 'yes' || study.studyParameterConfig.interviewDateRequired == 'yes'}">
+<c:when test="${subjectStudy.studyParameterConfig.interviewerNameRequired == 'yes'
+	|| subjectStudy.studyParameterConfig.interviewDateRequired == 'yes'}">
 <tr id="CRF_infobox_closed" style="display: all;">
     <td style="padding-top: 3px; padding-left: 0px;" nowrap>
         <div class="moreCrfInfoBlock">
@@ -376,7 +377,7 @@
         </c:choose>
     </td>
     </c:if>
-    <c:if test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
+    <c:if test="${subjectStudy.studyParameterConfig.personIdShownOnCRF == 'true'}">
         <td class="header_crf_cell">
             <b><fmt:message key="person_ID" bundle="${resword}"/>:</b>
             <c:out value="${subject.uniqueIdentifier}"/>
@@ -398,7 +399,7 @@
             <c:param name="itemId" value="interviewer" />
             <c:param name="inputName" value="interviewer"/>
         </c:import>
-        <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+        <c:if test="${subjectStudy.studyParameterConfig.interviewerNameRequired != 'not_used'}">
             <c:set var="showPreCrfShortcutsTr" value="true"/>
             <c:choose>
                 <c:when test="${isInError_Int}">
@@ -406,15 +407,15 @@
                 </c:when>
                 <c:otherwise>
                     <fmt:message key="interviewer_name" bundle="${resword}"/>:
-                    <c:if test="${study.studyParameterConfig.interviewerNameRequired=='yes'}"><span class="alert">*</span></c:if>
+                    <c:if test="${subjectStudy.studyParameterConfig.interviewerNameRequired=='yes'}"><span class="alert">*</span></c:if>
                 </c:otherwise>
             </c:choose>
         </c:if>
-        <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+        <c:if test="${subjectStudy.studyParameterConfig.interviewerNameRequired != 'not_used'}">
             <c:set var="showPreCrfShortcutsTr" value="true"/>
             <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
             <c:choose>
-                <c:when test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
+                <c:when test="${subjectStudy.studyParameterConfig.interviewerNameEditable=='true'}">
                     <c:choose>
                         <c:when test="${isInError_Int}">
                             <span class="aka_input_error" style="display:inline-block;height:22px;">
@@ -488,7 +489,7 @@
             <c:param name="itemId" value="interviewDate" />
             <c:param name="inputName" value="interviewDate"/>
         </c:import>
-        <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
+        <c:if test="${subjectStudy.studyParameterConfig.interviewDateRequired != 'not_used'}">
             <c:set var="showPreCrfShortcutsTr" value="true"/>
             <c:choose>
                 <c:when test="${isInError_Dat}">
@@ -496,17 +497,17 @@
                 </c:when>
                 <c:otherwise>
                     <fmt:message key="interview_date" bundle="${resword}"/>:
-                    <c:if test="${study.studyParameterConfig.interviewDateRequired=='yes'}">
+                    <c:if test="${subjectStudy.studyParameterConfig.interviewDateRequired=='yes'}">
                         <span class="alert">*</span>
                     </c:if>
                 </c:otherwise>
             </c:choose>
         </c:if>
-        <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
+        <c:if test="${subjectStudy.studyParameterConfig.interviewDateRequired != 'not_used'}">
                 <c:set var="showPreCrfShortcutsTr" value="true"/>
                 <c:set var="crfTabIndex" value="${crfTabIndex + 1}" scope="request"/>
                 <c:choose>
-                    <c:when test="${study.studyParameterConfig.interviewDateEditable=='true'}">
+                    <c:when test="${subjectStudy.studyParameterConfig.interviewDateEditable=='true'}">
                         <c:choose>
                             <c:when test="${isInError_Dat}">
                                 <span class="aka_input_error" style="display:inline-block;height:22px;">

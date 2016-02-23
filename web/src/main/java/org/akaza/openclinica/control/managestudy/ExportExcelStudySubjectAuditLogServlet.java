@@ -170,11 +170,12 @@ public class ExportExcelStudySubjectAuditLogServlet extends SpringServlet {
 		response.setContentType("application/vnd.ms-excel");
 		response.setHeader("Content-Disposition", "attachment; filename=export.xls");
 
-		AuditLogWorkbookBuilder workbookFactory = new AuditLogWorkbookBuilder(response);
+		StudyBean subjectStudy = (StudyBean) getStudyDAO().findByPK(studySubject.getStudyId());
+		getStudyConfigService().setParametersForStudy(subjectStudy);
+		AuditLogWorkbookBuilder workbookFactory = new AuditLogWorkbookBuilder(response, subjectStudy);
 		WritableWorkbook workbook = workbookFactory.buildWorkbook(studySubject, studySubjectAudits, events,
 				allDeletedEventCRFs, studyEventAudits, eventCRFAudits, randomizationAudit);
-		workbook.write();
-		workbook.close();
+		workbook.write();		workbook.close();
 		clearSession(request);
 	}
 

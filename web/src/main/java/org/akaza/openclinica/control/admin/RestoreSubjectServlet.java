@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -94,6 +96,9 @@ public class RestoreSubjectServlet extends SpringServlet {
 			StudyEventDAO sedao = getStudyEventDAO();
 			ArrayList events = sedao.findAllBySubjectId(subjectId);
 			if ("confirm".equalsIgnoreCase(action)) {
+				StudyBean subjectStudy = getStudyService().getSubjectStudy(getCurrentStudy(),
+						(StudySubjectBean) studySubs.get(0));
+				request.setAttribute("subjectStudy", subjectStudy);
 				request.setAttribute("subjectToRestore", subject);
 				request.setAttribute("studySubs", studySubs);
 				request.setAttribute("events", events);

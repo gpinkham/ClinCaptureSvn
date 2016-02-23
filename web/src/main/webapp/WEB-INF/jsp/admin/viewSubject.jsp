@@ -45,13 +45,13 @@
 			<div class="tablebox_center">
 			
 			<table border="0" cellpadding="0" cellspacing="0">
-				<c:if test="${study.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
-				<tr valign="top">
-					<td class="table_header_column_top">
-						<fmt:message key="person_ID" bundle="${resword}" />:</td>
-					<td class="table_cell_top">
-						<c:out value="${subject.uniqueIdentifier}" />&nbsp;</td>
-				</tr>
+				<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+					<tr valign="top">
+						<td class="table_header_column_top">
+							<fmt:message key="person_ID" bundle="${resword}" />:</td>
+						<td class="table_cell_top">
+							<c:out value="${subject.uniqueIdentifier}" />&nbsp;</td>
+					</tr>
 				</c:if>
 			
 				<c:set var="genderShow" value="${true}" />

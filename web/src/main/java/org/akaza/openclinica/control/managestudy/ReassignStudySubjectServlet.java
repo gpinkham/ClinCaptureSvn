@@ -117,10 +117,12 @@ public class ReassignStudySubjectServlet extends SpringServlet {
 			request.setAttribute("studySub", studySub);
 			SubjectBean subject = (SubjectBean) subdao.findByPK(subjectId);
 			request.setAttribute("subject", subject);
+			StudyBean subjectStudy = getStudyService().getSubjectStudy(getCurrentStudy(), studySub);
 
 			DisplayStudyBean displayStudy = getDisplayStudy(sdao, studySub);
 			if (StringUtil.isBlank(action)) {
 				request.setAttribute("displayStudy", displayStudy);
+				request.setAttribute("subjectStudy", subjectStudy);
 				forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 			} else {
 				int studyId = fp.getInt("studyId");
@@ -149,6 +151,7 @@ public class ReassignStudySubjectServlet extends SpringServlet {
 						request.setAttribute("isDataChanged", true);
 					}
 					request.setAttribute("studySub", studySub);
+					request.setAttribute("subjectStudy", subjectStudy);
 					forwardPage(Page.REASSIGN_STUDY_SUBJECT, request, response);
 				} else {
 					addPageMessage(checkAndUpdateSubject(studyId, studySub, displayStudy, ub, ssdao, st), request);
