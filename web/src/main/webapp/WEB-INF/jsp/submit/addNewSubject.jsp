@@ -51,8 +51,8 @@
 <c:set var="label" value="" />
 <c:set var="secondaryLabel" value="" />
 <c:set var="enrollmentDate" value="" />
-<c:set var="dob" value="" />
-<c:set var="yob" value="" />
+<c:set var="dateOfBirth" value="" />
+<c:set var="yearOfBirth" value="" />
 <c:set var="groupId" value="${0}" />
 <c:set var="fatherId" value="${0}" />
 <c:set var="motherId" value="${0}" />
@@ -73,11 +73,11 @@
 	<c:if test='${presetValue.key == "enrollmentDate"}'>
 		<c:set var="enrollmentDate" value="${presetValue.value}" />
 	</c:if>
-	<c:if test='${presetValue.key == "dob"}'>
-		<c:set var="dob" value="${presetValue.value}" />
+	<c:if test='${presetValue.key == "dateOfBirth"}'>
+		<c:set var="dateOfBirth" value="${presetValue.value}" />
 	</c:if>
-	<c:if test='${presetValue.key == "yob"}'>
-		<c:set var="yob" value="${presetValue.value}" />
+	<c:if test='${presetValue.key == "yearOfBirth"}'>
+		<c:set var="yearOfBirth" value="${presetValue.value}" />
 	</c:if>
 	<c:if test='${presetValue.key == "group"}'>
 		<c:set var="groupId" value="${presetValue.value}" />
@@ -353,7 +353,7 @@
 				<tr>
 					<td valign="top">
                         <div class="formfieldM_BG">
-						    <input onfocus="this.select()" type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
+						    <input onfocus="this.select()" type="text" name="dateOfBirth" size="15" value="<c:out value="${dateOfBirth}" />" class="formfieldM" id="dobField" />
                         </div>
 					</td>
 					<td valign="top">
@@ -361,11 +361,11 @@
 						<ui:calendarIcon onClickSelector="'#dobField'"/>
                     </td>
 					<td valign="top">
-					<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                        &nbsp;<img name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+					<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
+                        &nbsp;<img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
 				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
+					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include></td>
 				</tr>
 			</table>
 	  	</td>
@@ -379,21 +379,21 @@
 				<tr>
 					<td valign="top">
                         <div class="formfieldM_BG">
-						    <input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM" />
+						    <input onfocus="this.select()" type="text" name="yearOfBirth" size="15" value="<c:out value="${yearOfBirth}" />" class="formfieldM" />
                         </div>
 					</td>
-					<td valign="top">(<fmt:message key="date_format_year" bundle="${resformat}"/>) <span class="alert">*</span> <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=yob&column=date_of_birth','spanAlert-yob'); return false;">
-					<img name="flag_yob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+					<td valign="top">(<fmt:message key="date_format_year" bundle="${resformat}"/>) <span class="alert">*</span> <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=yearOfBirth&column=date_of_birth','spanAlert-yearOfBirth'); return false;">
+					<img name="flag_yearOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
 				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yob"/></jsp:include></td>
+					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include></td>
 				</tr>
 			</table>
 	  	</td>
 	</tr>
   </c:when>
   <c:otherwise>
-    <input type="hidden" name="dob" value="" />
+    <input type="hidden" name="dateOfBirth" value="" />
   </c:otherwise>
  </c:choose>
 

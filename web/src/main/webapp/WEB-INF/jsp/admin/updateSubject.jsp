@@ -74,7 +74,7 @@
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td><c:choose>
-				<c:when test="${parameters['subjectPersonIdRequired'] == 'required'}">
+				<c:when test="${parameters.subjectPersonIdRequired == 'required'}">
 					<table><tr>
 						<td>
 							<div class="formfieldXL_BG">
@@ -82,7 +82,7 @@
 							</div>
 						</td>
 						<td> <span class="alert">*</span>
-							<c:if test="${parameters['discrepancyManagement']}">
+							<c:if test="${parameters.discrepancyManagement}">
 							
 							<c:choose>
 								<c:when test="${hasUniqueIDNote eq 'yes'}">
@@ -102,7 +102,7 @@
 					</tr></table>
 				</c:when>
 				
-				<c:when test="${parameters['subjectPersonIdRequired'] == 'optional'}">
+				<c:when test="${parameters.subjectPersonIdRequired == 'optional'}">
 					<table><tr>
 							<td>
 								<div class="formfieldXL_BG">
@@ -110,7 +110,7 @@
 								</div>
 							</td>
 							<td>
-								<c:if test="${parameters['discrepancyManagement']}">
+								<c:if test="${parameters.discrepancyManagement}">
 								<c:choose>
 									<c:when test="${hasUniqueIDNote eq 'yes'}">
 										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=0&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
@@ -129,7 +129,7 @@
 						</tr></table>
 				</c:when>
 
-				<c:when test="${parameters['subjectPersonIdRequired'] == 'copyFromSSID'}">
+				<c:when test="${parameters.subjectPersonIdRequired == 'copyFromSSID'}">
 					<table><tr>
 							<td>
 								<div class="formfieldXL_BG">
@@ -151,9 +151,9 @@
 		</td>
 	</tr>
 
-	<c:if test="${parameters['genderRequired']}">
+	<c:if test="${parameters.genderRequired}">
 	<tr valign="top">
-		<td class="formlabel">${parameters['genderLabel']}:</td>
+		<td class="formlabel">${parameters.genderLabel}:</td>
 		<td>
 			<table style="padding-bottom: 4px">
 				<tr>
@@ -178,8 +178,8 @@
 					</td>
 
 					<td>
-						<c:if test="${parameters['genderRequired']}"><span class="alert">*</span></c:if>
-						<c:if test="${parameters['discrepancyManagement']}">
+						<c:if test="${parameters.genderRequired}"><span class="alert">*</span></c:if>
+						<c:if test="${parameters.discrepancyManagement}">
 
 							<c:choose>
 								<c:when test="${hasGenderNote eq 'yes'}">
@@ -205,7 +205,7 @@
 	</c:if>
 
 	<c:choose>
-	<c:when test="${parameters['collectDob'] == '1'}">
+	<c:when test="${parameters.collectDob == '1'}">
 		<tr valign="top">
 			<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
 			<td>
@@ -221,7 +221,7 @@
 						</td>
 						<td class="formlabel">
 							(<fmt:message key="date_format" bundle="${resformat}"/>)<span class="alert">*</span>
-							<c:if test="${parameters['discrepancyManagement']}">
+							<c:if test="${parameters.discrepancyManagement}">
                 <c:choose>
                   <c:when test="${hasDOBNote eq 'yes'}">
                     <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=0&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
@@ -243,7 +243,7 @@
 			</td>
 		</tr>
 	</c:when>
-	<c:when test="${parameters['collectDob'] == '2'}">
+	<c:when test="${parameters.collectDob == '2'}">
 		<tr valign="top">
 			<td class="formlabel"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
 			<td>
@@ -256,7 +256,7 @@
 						</td>
 						<td class="formlabel">
 							(<fmt:message key="date_format_year" bundle="${resformat}"/>)<span class="alert">*</span>
-							<c:if test="${parameters['discrepancyManagement']}">
+							<c:if test="${parameters.discrepancyManagement}">
                 <c:choose>
                   <c:when test="${hasDOBNote eq 'yes'}">
                     <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=0&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
@@ -304,7 +304,7 @@
 </div>
 <input type="button" onclick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium medium_back"/>
 
-<c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || (parameters['subjectPersonIdRequired'] != 'not used' && parameters['subjectPersonIdRequired'] != 'copyFromSSID')}">
+<c:if test="${parameters.genderRequired || parameters.collectDob != 3 || (parameters.subjectPersonIdRequired != 'not used' && parameters.subjectPersonIdRequired != 'copyFromSSID')}">
 	<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue">
 </c:if>
 

@@ -31,7 +31,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import com.clinovo.validator.StudySubjectValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -46,7 +46,6 @@ import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.SpringServlet;
-import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -69,7 +68,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.util.DateUtil;
-import com.clinovo.util.ValidatorHelper;
 
 /**
  * Enroll a new subject into system.
@@ -84,18 +82,12 @@ public class AddNewSubjectServlet extends SpringServlet {
 	public static final String OPEN_FIRST_CRF = "openFirstCrf";
 	public static final String TRUE = "true";
 	public static final int INT_255 = 255;
-	public static final int INT_30 = 30;
-	public static final int INT_1000 = 1000;
 
 	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private final Object simpleLockObj = new Object();
 
 	public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";
-
-	public static final String INPUT_DOB = "dob";
-
-	public static final String INPUT_YOB = "yob"; // year of birth
 
 	public static final String INPUT_GENDER = "gender";
 
@@ -177,16 +169,9 @@ public class AddNewSubjectServlet extends SpringServlet {
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		FormProcessor fp = new FormProcessor(request);
-		FormDiscrepancyNotes discNotes;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		// TODO l10n for dates? Note that in some places we hard-code the yob by
-		// using "01/01/"+yob,
-		// not exactly supporting i18n...tbh
 
-		// Update study parameters of current study.
-		// "collectDob" and "genderRequired" are set as the same as the parent
-		// study
 		int studyIdToSearchOn = currentStudy.isSite() ? currentStudy.getParentStudyId() : currentStudy.getId();
 		StudyBean studyToSearchOn = currentStudy.isSite()
 				? (StudyBean) stdao.findByPK(currentStudy.getParentStudyId())
@@ -208,31 +193,24 @@ public class AddNewSubjectServlet extends SpringServlet {
 				request.getSession().removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
 				forwardPage(Page.INSTRUCTIONS_ENROLL_SUBJECT, request, response);
 			} else {
-
 				setUpBeans(classes, request);
 				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 
 				fp.addPresetValue(INPUT_ENROLLMENT_DATE, DateUtil.printDate(new Date(),
 						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 
-				String idSetting;
-				idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+				String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 				logger.info("subject id setting :" + idSetting);
 				// set up auto study subject id
 				// If idSetting is auto, do not calculate the next
 				// available ID (label) for now
 				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-
 					String nextLabel = ssd.findNextLabel(currentStudy, studyToSearchOn);
 					fp.addPresetValue(INPUT_LABEL, nextLabel);
-
 				}
-
 				setPresetValues(fp.getPresetValues(), request);
-				discNotes = new FormDiscrepancyNotes();
-				request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
+				request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, new FormDiscrepancyNotes());
 				forwardPage(Page.ADD_NEW_SUBJECT, request, response);
-
 			}
 		} else {
 			// submitted
@@ -240,93 +218,13 @@ public class AddNewSubjectServlet extends SpringServlet {
 			// could be used to compare against
 			// values in database <subject> table for "add existing subject"
 			if (!fp.getBoolean(EXISTING_SUB_SHOWN)) {
-				dob = fp.getString(INPUT_DOB);
-				yob = fp.getString(INPUT_YOB);
+				dob = fp.getString(StudySubjectValidator.INPUT_DOB);
+				yob = fp.getString(StudySubjectValidator.INPUT_YOB);
 				gender = fp.getString(INPUT_GENDER);
 			}
 
-			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
-			if (discNotes == null) {
-				discNotes = new FormDiscrepancyNotes();
-			}
-			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
-					discNotes);
-
-			v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
-			v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_30);
-
-			if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")) {
-				v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.NO_BLANKS);
-			}
-			v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
-
-			if (!StringUtil.isBlank(fp.getString(INPUT_SECONDARY_LABEL))) {
-				v.addValidation(INPUT_SECONDARY_LABEL, Validator.LENGTH_NUMERIC_COMPARISON,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_30);
-			}
-
-			String dobSetting = currentStudy.getStudyParameterConfig().getCollectDob();
-			if (dobSetting.equals("1")) {
-				// date of birth
-				v.addValidation(INPUT_DOB, Validator.IS_A_DATE);
-				if (!StringUtil.isBlank(fp.getString("INPUT_DOB"))) {
-					v.alwaysExecuteLastValidation(INPUT_DOB);
-				}
-				v.addValidation(INPUT_DOB, Validator.DATE_IN_PAST);
-			} else if (dobSetting.equals("2")) {
-				// year of birth
-				v.addValidation(INPUT_YOB, Validator.IS_AN_INTEGER);
-				v.alwaysExecuteLastValidation(INPUT_YOB);
-				v.addValidation(INPUT_YOB, Validator.COMPARES_TO_STATIC_VALUE,
-						NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, INT_1000);
-
-				// get today's year
-				Date today = new Date();
-				Calendar c = Calendar.getInstance();
-				c.setTime(today);
-				int currentYear = c.get(Calendar.YEAR);
-				v.addValidation(INPUT_YOB, Validator.COMPARES_TO_STATIC_VALUE,
-						NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, currentYear);
-			} else { // dob not used, added
-				logger.info("should read this only if dob not used");
-			}
-
-			ArrayList acceptableGenders = new ArrayList();
-			acceptableGenders.add("m");
-			acceptableGenders.add("f");
-
-			if (!currentStudy.getStudyParameterConfig().getGenderRequired().equals("false")) {
-				v.addValidation(INPUT_GENDER, Validator.IS_IN_SET, acceptableGenders);
-			}
-
-			if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equals("yes")) {
-				v.addValidation("enrollmentDate", Validator.NO_BLANKS);
-			}
-			if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equals("yes")) {
-				v.addValidation("secondaryLabel", Validator.NO_BLANKS);
-			}
-
-			if (!"".equals(fp.getDateTimeInputString("enrollment"))) {
-				v.addValidation(INPUT_ENROLLMENT_DATE, Validator.IS_A_DATE);
-				v.alwaysExecuteLastValidation(INPUT_ENROLLMENT_DATE);
-				v.addValidation(INPUT_ENROLLMENT_DATE, Validator.DATE_IN_PAST);
-			}
-
-			boolean locationError = false;
-			if (fp.getBoolean("addWithEvent")) {
-				if (!"".equals(fp.getDateTimeInputString("enrollment"))) {
-					v.addValidation(INPUT_EVENT_START_DATE, Validator.IS_A_DATE);
-					v.alwaysExecuteLastValidation(INPUT_EVENT_START_DATE);
-				}
-				if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
-					v.addValidation("location", Validator.NO_BLANKS);
-					locationError = true;
-				}
-			}
-
-			HashMap errors = v.validate();
+			StudySubjectValidator validator = new StudySubjectValidator();
+			HashMap errors = validator.validate(request, getConfigurationDao(), currentStudy, true);
 
 			SubjectDAO sdao = getSubjectDAO();
 			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);
@@ -455,13 +353,10 @@ public class AddNewSubjectServlet extends SpringServlet {
 			if (!errors.isEmpty()) {
 
 				addPageMessage(getResPage().getString("there_were_some_errors_submission"), request);
-				if (locationError) {
-					addPageMessage(getResPage().getString("location_blank_error"), request);
-				}
 
 				setInputMessages(errors, request);
-				fp.addPresetValue(INPUT_DOB, fp.getString(INPUT_DOB));
-				fp.addPresetValue(INPUT_YOB, fp.getString(INPUT_YOB));
+				fp.addPresetValue(StudySubjectValidator.INPUT_DOB, fp.getString(StudySubjectValidator.INPUT_DOB));
+				fp.addPresetValue(StudySubjectValidator.INPUT_YOB, fp.getString(StudySubjectValidator.INPUT_YOB));
 				fp.addPresetValue(INPUT_GENDER, fp.getString(INPUT_GENDER));
 				fp.addPresetValue(INPUT_UNIQUE_IDENTIFIER, uniqueIdentifier);
 				fp.addPresetValue(INPUT_LABEL, label);
@@ -502,16 +397,16 @@ public class AddNewSubjectServlet extends SpringServlet {
 					if (subject.getDateOfBirth() != null) {
 						cal.setTime(subject.getDateOfBirth());
 						year = cal.get(Calendar.YEAR);
-						fp.addPresetValue(INPUT_DOB, localDf.format(subject.getDateOfBirth()));
+						fp.addPresetValue(StudySubjectValidator.INPUT_DOB, localDf.format(subject.getDateOfBirth()));
 					} else {
-						fp.addPresetValue(INPUT_DOB, "");
+						fp.addPresetValue(StudySubjectValidator.INPUT_DOB, "");
 					}
 
 					if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")
 							&& !subject.isDobCollected()) {
-						fp.addPresetValue(INPUT_DOB, fp.getString(INPUT_DOB));
+						fp.addPresetValue(StudySubjectValidator.INPUT_DOB, fp.getString(StudySubjectValidator.INPUT_DOB));
 					}
-					fp.addPresetValue(INPUT_YOB, String.valueOf(year));
+					fp.addPresetValue(StudySubjectValidator.INPUT_YOB, String.valueOf(year));
 
 					if (!currentStudy.getStudyParameterConfig().getGenderRequired().equals("false")) {
 						fp.addPresetValue(INPUT_GENDER, subject.getGender() + "");
@@ -564,7 +459,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 							updateSubject.setDobCollected(true);
 
 							if (subjectWithSameId.getDateOfBirth() == null) {
-								fp.addPresetValue(INPUT_DOB, dob);
+								fp.addPresetValue(StudySubjectValidator.INPUT_DOB, dob);
 								updateSubject.setDateOfBirth(new Date(dob));
 							} else {
 								String y = String.valueOf(subjectWithSameId.getDateOfBirth()).split("\\-")[0];
@@ -575,16 +470,16 @@ public class AddNewSubjectServlet extends SpringServlet {
 									// year, use year-of-birth
 									if (!y.equals(d[2])) {
 										fp.addPresetValue(D_WARNING, "dobYearWrong");
-										fp.addPresetValue(INPUT_DOB, d[0] + "/" + d[1] + "/" + y);
+										fp.addPresetValue(StudySubjectValidator.INPUT_DOB, d[0] + "/" + d[1] + "/" + y);
 										updateSubject.setDateOfBirth(sdf.parse(d[0] + "/" + d[1] + "/" + y));
 									} else {
 										fp.addPresetValue(D_WARNING, "dobUsed");
-										fp.addPresetValue(INPUT_DOB, dob);
+										fp.addPresetValue(StudySubjectValidator.INPUT_DOB, dob);
 										updateSubject.setDateOfBirth(sdf.parse(dob));
 									}
 								} else {
 									fp.addPresetValue(D_WARNING, "emptyD");
-									fp.addPresetValue(INPUT_DOB, dob);
+									fp.addPresetValue(StudySubjectValidator.INPUT_DOB, dob);
 									updateSubject.setDateOfBirth(sdf.parse(dob));
 								}
 							}
@@ -610,7 +505,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 							needUpdate = true;
 							updateSubject = subjectWithSameId;
 							fp.addPresetValue(Y_WARNING, "yearEmpty");
-							fp.addPresetValue(INPUT_YOB, yob);
+							fp.addPresetValue(StudySubjectValidator.INPUT_YOB, yob);
 							updateSubject.setDateOfBirth(sdf.parse("01/01/" + yob));
 							warningCount++;
 						}
@@ -640,8 +535,8 @@ public class AddNewSubjectServlet extends SpringServlet {
 					subject.setUniqueIdentifier(uniqueIdentifier);
 
 					if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
-						if (!StringUtil.isBlank(fp.getString(INPUT_DOB))) {
-							subject.setDateOfBirth(fp.getDate(INPUT_DOB));
+						if (!StringUtil.isBlank(fp.getString(StudySubjectValidator.INPUT_DOB))) {
+							subject.setDateOfBirth(fp.getDate(StudySubjectValidator.INPUT_DOB));
 							subject.setDobCollected(true);
 						} else {
 							subject.setDateOfBirth(null);
@@ -655,7 +550,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 						// added the "2" to make sure that 'not used' is kept to
 						// null, tbh 102007
 						subject.setDobCollected(false);
-						int intYob = fp.getInt(INPUT_YOB);
+						int intYob = fp.getInt(StudySubjectValidator.INPUT_YOB);
 						Date fakeDate = new Date("01/01/" + intYob);
 
 						String dobString = localDf.format(fakeDate);
@@ -714,9 +609,6 @@ public class AddNewSubjectServlet extends SpringServlet {
 				if (!StringUtil.isBlank(fp.getString(INPUT_ENROLLMENT_DATE))) {
 					studySubject.setEnrollmentDate(fp.getDateInputWithServerTimeOfDay(INPUT_ENROLLMENT_DATE));
 				}
-				if (fp.getBoolean("addWithEvent")) {
-					studySubject.setEventStartDate(fp.getDate(INPUT_EVENT_START_DATE));
-				}
 
 				studySubject.setOwner(ub);
 
@@ -767,7 +659,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
 						.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
-				String[] subjectFields = {INPUT_DOB, INPUT_YOB, INPUT_GENDER};
+				String[] subjectFields = { StudySubjectValidator.INPUT_DOB, StudySubjectValidator.INPUT_YOB, INPUT_GENDER };
 				for (String element : subjectFields) {
 					dnService.saveFieldNotes(element, fdn, subject.getId(), "subject", currentStudy);
 				}
@@ -780,15 +672,6 @@ public class AddNewSubjectServlet extends SpringServlet {
 
 				addPageMessage(getResPage().getString("subject_with_unique_identifier") + studySubject.getLabel()
 						+ getResPage().getString("X_was_created_succesfully"), request);
-
-				if (fp.getBoolean("addWithEvent")) {
-					createStudyEvent(fp, studySubject);
-					// YW <<
-					request.setAttribute("id", studySubject.getId() + "");
-					response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
-					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
-					return;
-				}
 
 				String submitEvent = fp.getString(SUBMIT_EVENT_BUTTON);
 				String submitEnroll = fp.getString(SUBMIT_ENROLL_BUTTON);
@@ -815,8 +698,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 					}
 
 					setPresetValues(fp.getPresetValues(), request);
-					discNotes = new FormDiscrepancyNotes();
-					request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
+					request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, new FormDiscrepancyNotes());
 					forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 				} else {
 					if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
@@ -856,10 +738,6 @@ public class AddNewSubjectServlet extends SpringServlet {
 				}
 			}
 		}
-	}
-
-	protected StudyEventBean createStudyEvent(FormProcessor fp, StudySubjectBean s) {
-		return createStudyEvent(fp, null, s);
 	}
 
 	protected StudyEventBean createStudyEvent(FormProcessor fp, Integer sedId, StudySubjectBean s) {
@@ -985,8 +863,6 @@ public class AddNewSubjectServlet extends SpringServlet {
 			dsb.setSubject(subject);
 			dsb.setStudySubjectIds(protocolSubjectIds);
 			displayArray.add(dsb);
-
 		}
-
 	}
 }

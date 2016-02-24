@@ -20,16 +20,13 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.ValidatorHelper;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import com.clinovo.validator.StudySubjectValidator;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SpringServlet;
-import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -38,6 +35,8 @@ import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.view.Page;
@@ -59,10 +58,6 @@ import java.util.Map;
 @Component
 public class UpdateSubjectServlet extends SpringServlet {
 
-	public static final String YEAR_DOB = "yearOfBirth";
-
-	public static final String DATE_DOB = "dateOfBirth";
-
 	public final static String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
 	public final static String HAS_DOB_NOTE = "hasDOBNote";
 	public final static String HAS_GENDER_NOTE = "hasGenderNote";
@@ -70,9 +65,8 @@ public class UpdateSubjectServlet extends SpringServlet {
 	public final static String DOB_NOTE = "dOBNote";
 	public final static String GENDER_NOTE = "genderNote";
 
-	/**
-     *
-     */
+	public final static String SUBJECTS_STUDY = "subjectsStudy";
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -99,7 +93,6 @@ public class UpdateSubjectServlet extends SpringServlet {
 		FormProcessor fp = new FormProcessor(request);
 		FormDiscrepancyNotes discNotes;
 		Map<String, String> fields = new HashMap<String, String>();
-		Map<String, String> parameters;
 		SubjectBean subject;
 
 		String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
@@ -144,20 +137,23 @@ public class UpdateSubjectServlet extends SpringServlet {
 				clearSession(request);
 
 				StudyDAO sdao = new StudyDAO(getDataSource());
-				parameters = new HashMap<String, String>();
 				subject = (SubjectBean) subjdao.findByPK(subjectId);
 				request.getSession().setAttribute("subjectToUpdate", subject);
 
 				StudySubjectBean studySubjectBean = (StudySubjectBean) getStudySubjectDAO()
 						.findAllBySubjectId(subjectId).get(0);
 				StudyBean subjectStudy = (StudyBean) sdao.findByPK(studySubjectBean.getStudyId());
-				ArrayList<StudyParamsConfig> listOfParams
-						= getStudyParameterValueDAO().findParamConfigByStudy(subjectStudy);
-
-				for (StudyParamsConfig spc : listOfParams) {
-					parameters.put(spc.getParameter().getHandle(), spc.getValue().getValue());
+				StudyConfigService studyConfigService = getStudyConfigService();
+				StudyParameterValueDAO studyParameterValueDAO = getStudyParameterValueDAO();
+				ArrayList studyParameters = studyParameterValueDAO.findParamConfigByStudy(currentStudy);
+				subjectStudy.setStudyParameters(studyParameters);
+				if (subjectStudy.isSite()) {
+					studyConfigService.setParametersForSite(subjectStudy);
+				} else {
+					studyConfigService.setParametersForStudy(subjectStudy);
 				}
-				request.getSession().setAttribute("parameters", parameters);
+				request.getSession().setAttribute(SUBJECTS_STUDY, subjectStudy);
+				request.getSession().setAttribute("parameters", subjectStudy.getStudyParameterConfig());
 
 				String personId = subject.getUniqueIdentifier() == null ? "" : subject.getUniqueIdentifier();
 				String gender = (Object) subject.getGender() == null ? "" : String.valueOf(subject.getGender());
@@ -168,21 +164,21 @@ public class UpdateSubjectServlet extends SpringServlet {
 				String dateToDisplay = "";
 
 				if (!"".equals(personId)) {
-					if (!"not used".equals(parameters.get("subjectPersonIdRequired"))) {
+					if (!"not used".equals(subjectStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 						personIdToDisplay = personId;
 					}
 				}
 
 				if (!"".equals(gender)) {
-					if ("true".equals(parameters.get("genderRequired"))) {
+					if ("true".equals(subjectStudy.getStudyParameterConfig().getGenderRequired())) {
 						genderToDisplay = gender;
 					}
 				}
 
 				if (birthDate != null) {
-					if ("1".equals(parameters.get("collectDob"))) {
+					if ("1".equals(subjectStudy.getStudyParameterConfig().getCollectDob())) {
 						dateToDisplay = localDf.format(birthDate);
-					} else if ("2".equals(parameters.get("collectDob"))) {
+					} else if ("2".equals(subjectStudy.getStudyParameterConfig().getCollectDob())) {
 						GregorianCalendar cal = new GregorianCalendar();
 						cal.setTime(birthDate);
 						dateToDisplay = String.valueOf(cal.get(Calendar.YEAR));
@@ -219,14 +215,14 @@ public class UpdateSubjectServlet extends SpringServlet {
 			} else if ("submit".equalsIgnoreCase(action)) {
 				subject = (SubjectBean) request.getSession().getAttribute("subjectToUpdate");
 				fields = (HashMap<String, String>) request.getSession().getAttribute("fields");
-				parameters = (HashMap<String, String>) request.getSession().getAttribute("parameters");
+				StudyBean subjectsStudy = (StudyBean) request.getSession().getAttribute(SUBJECTS_STUDY);
 
 				subject.setUpdater(ub);
-				if (!"not used".equals(parameters.get("subjectPersonIdRequired"))) {
+				if (!"not used".equals(subjectsStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 					subject.setUniqueIdentifier(fields.get("personId"));
 				}
 
-				if ("true".equals(parameters.get("genderRequired"))) {
+				if ("true".equals(subjectsStudy.getStudyParameterConfig().getGenderRequired())) {
 					if ("m".equals(fields.get("gender"))) {
 						subject.setGender('m');
 					} else if ("f".equals(fields.get("gender"))) {
@@ -237,7 +233,7 @@ public class UpdateSubjectServlet extends SpringServlet {
 				}
 
 				Date dateOfBirth;
-				if ("1".equals(parameters.get("collectDob"))) {
+				if ("1".equals(subjectsStudy.getStudyParameterConfig().getCollectDob())) {
 					try {
 						dateOfBirth = localDf.parse(fields.get("dateOfBirth"));
 						subject.setDateOfBirth(dateOfBirth);
@@ -245,7 +241,7 @@ public class UpdateSubjectServlet extends SpringServlet {
 					} catch (ParseException pe) {
 						logger.info("Parse exception happened.");
 					}
-				} else if ("2".equals(parameters.get("collectDob"))) {
+				} else if ("2".equals(subjectsStudy.getStudyParameterConfig().getCollectDob())) {
 					try {
 						Calendar cal = Calendar.getInstance();
 						cal.set(Integer.valueOf(fields.get("dateOfBirth")), Calendar.JANUARY, 1);
@@ -263,8 +259,8 @@ public class UpdateSubjectServlet extends SpringServlet {
 						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				dnService.saveFieldNotes("uniqueIdentifier", fdn, subject.getId(), "subject", currentStudy);
 				dnService.saveFieldNotes("gender", fdn, subject.getId(), "subject", currentStudy);
-				dnService.saveFieldNotes(YEAR_DOB, fdn, subject.getId(), "subject", currentStudy);
-				dnService.saveFieldNotes(DATE_DOB, fdn, subject.getId(), "subject", currentStudy);
+				dnService.saveFieldNotes(StudySubjectValidator.INPUT_YOB, fdn, subject.getId(), "subject", currentStudy);
+				dnService.saveFieldNotes(StudySubjectValidator.INPUT_DOB, fdn, subject.getId(), "subject", currentStudy);
 
 				addPageMessage(getResPage().getString("subject_updated_succcesfully"), request);
 				clearSession(request);
@@ -277,92 +273,34 @@ public class UpdateSubjectServlet extends SpringServlet {
 		}
 	}
 
-	/**
-	 * Processes 'confirm' request, validate the subject object
-	 * 
-	 * @throws Exception
-	 */
 	private void confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		SubjectBean subject = (SubjectBean) request.getSession().getAttribute("subjectToUpdate");
-		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
-				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
-				discNotes);
 		FormProcessor fp = new FormProcessor(request);
+		StudyBean subjectsStudy = (StudyBean) request.getSession().getAttribute(SUBJECTS_STUDY);
 
-		Map<String, String> fields = (HashMap<String, String>) request.getSession().getAttribute("fields");
-		Map<String, String> parameters = (HashMap<String, String>) request.getSession().getAttribute("parameters");
-		HashMap errors = new HashMap();
-		if (!"not used".equals(parameters.get("subjectPersonIdRequired"))) {
-			fields.put("personId", fp.getString("uniqueIdentifier"));
-			if ("required".equals(parameters.get("subjectPersonIdRequired"))) {
-				// uniqueIdentifier(personId) shouldn't be empty or consists of whitespaces
-				v.addValidation("uniqueIdentifier", Validator.NO_BLANKS);
-			}
-			v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-			v.alwaysExecuteLastValidation("uniqueIdentifier");
 
-			// uniqueIdentifier(personId) must be unique in the system
-			if (!StringUtil.isBlank(fp.getString("uniqueIdentifier").trim())) {
+		StudySubjectValidator studySubjectValidator = new StudySubjectValidator();
+		HashMap errors = studySubjectValidator.validate(request, getConfigurationDao(), subjectsStudy, false);
+
+		if (!"not used".equals(subjectsStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+			if (!fp.getString("uniqueIdentifier").isEmpty()) {
+				String uid = fp.getString("uniqueIdentifier").trim();
 				SubjectDAO sdao = new SubjectDAO(getDataSource());
-
-				SubjectBean sub1 = (SubjectBean) sdao.findAnotherByIdentifier(fp.getString("uniqueIdentifier").trim(),
-						subject.getId());
-				logger.info("checking unique identifier: " + subject.getUniqueIdentifier() + " and "
-						+ fp.getString("uniqueIdentifier").trim());
-				if (sub1.getId() > 0) {
+				SubjectBean subjectWithSameUID = (SubjectBean) sdao.findAnotherByIdentifier(uid, subject.getId());
+				if (subjectWithSameUID.getId() > 0) {
 					Validator.addError(errors, "uniqueIdentifier",
 							getResException().getString("person_ID_used_by_another_choose_unique"));
 				}
 			}
 		}
 
-		if ("1".equals(parameters.get("collectDob"))) {
-			fields.put("dateOfBirth", fp.getString(DATE_DOB));
-
-			v.addValidation(DATE_DOB, Validator.IS_A_DATE);
-			v.alwaysExecuteLastValidation(DATE_DOB);
-			errors = v.validate();
-		} else if ("2".equals(parameters.get("collectDob"))) {
-			fields.put("dateOfBirth", fp.getString(YEAR_DOB));
-
-			Calendar c = Calendar.getInstance();
-			c.setTime(new Date());
-			v.addValidation(YEAR_DOB, Validator.COMPARES_TO_STATIC_VALUE,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, c.get(Calendar.YEAR));
-			v.addValidation(YEAR_DOB, Validator.COMPARES_TO_STATIC_VALUE,
-					NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, 1900);
-			v.addValidation(YEAR_DOB, Validator.IS_AN_INTEGER);
-			v.alwaysExecuteLastValidation(YEAR_DOB);
-			v.addValidation(YEAR_DOB, Validator.NO_BLANKS);
-			errors = v.validate();
-
-			try {
-				Calendar cal = Calendar.getInstance();
-				cal.set(Integer.valueOf(fields.get("dateOfBirth")), Calendar.JANUARY, 1);
-			} catch (NumberFormatException pe) {
-				logger.info("Parse exception happened.");
-				Validator.addError(errors, YEAR_DOB, getResException().getString("please_enter_a_valid_year_birth"));
-			}
-		}
-
-		// should be after v.validate()
-		if ("true".equals(parameters.get("genderRequired"))) {
-			fields.put("gender",
-					fp.getString("gender").equals("") ? "" : String.valueOf(fp.getString("gender").charAt(0)));
-			if ("".equals(fp.getString("gender"))) {
-				Validator.addError(errors, "gender", getResException().getString("please_choose_the_gender_of_the_subject"));
-			}
-		}
+		saveFieldsToSession(subjectsStudy, request);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
-
 			forwardPage(Page.UPDATE_SUBJECT_CONFIRM, request, response);
 		} else {
 			logger.info("validation errors");
-
 			setInputMessages(errors, request);
 			forwardPage(Page.UPDATE_SUBJECT, request, response);
 		}
@@ -378,6 +316,24 @@ public class UpdateSubjectServlet extends SpringServlet {
 		}
 	}
 
+	private void saveFieldsToSession(StudyBean study, HttpServletRequest request) {
+		Map<String, String> fields = (HashMap<String, String>) request.getSession().getAttribute("fields");
+		FormProcessor fp = new FormProcessor(request);
+
+		if (!"not used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+			fields.put("personId", fp.getString("uniqueIdentifier"));
+		}
+		if ("1".equals(study.getStudyParameterConfig().getCollectDob())) {
+			fields.put(StudySubjectValidator.INPUT_DOB, fp.getString(StudySubjectValidator.INPUT_DOB));
+		} else if ("2".equals(study.getStudyParameterConfig().getCollectDob())) {
+			fields.put(StudySubjectValidator.INPUT_DOB, fp.getString(StudySubjectValidator.INPUT_YOB));
+		}
+		if ("true".equals(study.getStudyParameterConfig().getGenderRequired())) {
+			String gender = fp.getString("gender");
+			fields.put("gender", gender.isEmpty() ? "" : String.valueOf(gender.charAt(0)));
+		}
+	}
+
 	private void clearSession(HttpServletRequest request) {
 		request.getSession().removeAttribute("parameters");
 		request.getSession().removeAttribute("fields");
@@ -385,5 +341,6 @@ public class UpdateSubjectServlet extends SpringServlet {
 		request.getSession().removeAttribute("subjectToUpdate");
 		request.getSession().removeAttribute("id");
 		request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+		request.getSession().removeAttribute(SUBJECTS_STUDY);
 	}
 }
