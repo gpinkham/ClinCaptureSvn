@@ -2559,8 +2559,10 @@ public class OdmExtractDAO extends DatasetDAO {
 					se.setEndTimeFlag((Boolean) row.get("end_time_flag"));
                 }
 
-                se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
-
+                if (dataset.isShowEventStatus()) {
+                	se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
+                }
+                
                 se.setStudyEventRepeatKey(studyEventRepeating ? sampleOrdinal + "" : "-1");
                 sub.getExportStudyEventData().add(se);
                 formprev = "";

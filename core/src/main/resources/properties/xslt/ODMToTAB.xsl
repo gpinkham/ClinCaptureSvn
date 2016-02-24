@@ -43,7 +43,9 @@
   <!-- evt-map: a list of extra fields for events. -->
   <xsl:variable name="evt-map">
     <xsl:for-each select="/ODM:ODM/ODM:ClinicalData">
-      <event-status />
+    	<xsl:if test="ODM:SubjectData/ODM:StudyEventData/@OC:Status">
+        	<event-status />
+      	</xsl:if>
       <xsl:if test="ODM:SubjectData/ODM:StudyEventData/
           @OC:StudyEventLocation">
         <location />
