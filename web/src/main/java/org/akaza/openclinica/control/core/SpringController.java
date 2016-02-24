@@ -52,7 +52,7 @@ import com.clinovo.util.RequestUtil;
  * Here we can keep common methods for Servlets and for Controllers.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class SpringController extends BaseSpringController {
+public abstract class SpringController extends BaseSpringController {
 
 	/**
 	 * Method that adds a message to the request.
