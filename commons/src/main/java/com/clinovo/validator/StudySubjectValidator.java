@@ -16,6 +16,7 @@
 package com.clinovo.validator;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -26,6 +27,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +36,7 @@ import java.util.HashMap;
 /**
  * Validator for StudySubjectBean.
  */
+@SuppressWarnings("rawtypes")
 public class StudySubjectValidator {
 
 	public static final int INT_255 = 255;
