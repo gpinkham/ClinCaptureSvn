@@ -64,9 +64,9 @@ public abstract class BaseWadlService extends BaseService {
 		QName nm = new QName("");
 		String className = type.toString();
 		if (className.contains("String")) {
-			nm = new QName(XS_NAMESPACE, "string", "xs");
+			nm = new QName(XS_NAMESPACE, "string".concat(className.contains("[L") ? "[]" : ""), "xs");
 		} else if (className.contains("Integer")) {
-			nm = new QName(XS_NAMESPACE, "integer", "xs");
+			nm = new QName(XS_NAMESPACE, "integer".concat(className.contains("[L") ? "[]" : ""), "xs");
 		} else if (className.contains("int")) {
 			nm = new QName(XS_NAMESPACE, "int", "xs");
 		} else if (className.contains("boolean") || className.contains("Boolean")) {

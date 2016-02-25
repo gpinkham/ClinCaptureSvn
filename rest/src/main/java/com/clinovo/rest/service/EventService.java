@@ -373,6 +373,73 @@ public class EventService extends BaseEventService {
 	}
 
 	/**
+	 * Method edits crf of site level in the study event definition.
+	 *
+	 * @param eventId
+	 *            int
+	 * @param crfName
+	 *            String
+	 * @param siteName
+	 *            String
+	 * @param required
+	 *            boolean
+	 * @param passwordRequired
+	 *            boolean
+	 * @param defaultVersion
+	 *            String
+	 * @param availableVersions
+	 *            String
+	 * @param hide
+	 *            boolean
+	 * @param sourceDataVerification
+	 *            int
+	 * @param dataEntryQuality
+	 *            String
+	 * @param emailWhen
+	 *            String
+	 * @param email
+	 *            String
+	 * @param tabbing
+	 *            String
+	 * @return EventDefinitionCRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ResponseBody
+	@RestProvideAtLeastOneNotRequired
+	@RestParameterPossibleValuesHolder({
+			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
+			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
+			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
+			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom")})
+	@RequestMapping(value = "/editSiteCrf", method = RequestMethod.POST)
+	public EventDefinitionCRFBean editSiteCrf(@RequestParam(value = "eventId") int eventId,
+			@RequestParam("crfName") String crfName, @RequestParam("siteName") String siteName,
+			@RequestParam(value = "defaultVersion", required = false) String defaultVersion,
+			@RequestParam(value = "availableVersions", required = false) Integer[] availableVersions,
+			@RequestParam(value = "required", required = false) Boolean required,
+			@RequestParam(value = "passwordRequired", required = false) Boolean passwordRequired,
+			@RequestParam(value = "hide", required = false) Boolean hide,
+			@RequestParam(value = "sourceDataVerification", required = false) Integer sourceDataVerification,
+			@RequestParam(value = "dataEntryQuality", required = false) String dataEntryQuality,
+			@RequestParam(value = "emailWhen", required = false) String emailWhen,
+			@RequestParam(value = "email", required = false) String email,
+			@RequestParam(value = "tabbing", required = false) String tabbing) throws Exception {
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
+
+		EventDefinitionCRFBean eventDefinitionCRFBean = editChildEventDefinitionCRF(eventId, crfName, siteName,
+				defaultVersion, required, passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen,
+				email, tabbing, availableVersions);
+
+		HashMap errors = EventDefinitionValidator.validateSiteEDC(messageSource, dataSource, eventId,
+				studyEventDefinitionBean, eventDefinitionCRFBean, getCurrentStudy(), edcItemMetadataService);
+
+		ValidatorUtil.checkForErrors(errors);
+
+		return eventDefinitionService.updateChildEventDefinitionCRF(eventDefinitionCRFBean, getCurrentUser());
+	}
+
+	/**
 	 * Method removes the event definition crf.
 	 *
 	 * @param eventId

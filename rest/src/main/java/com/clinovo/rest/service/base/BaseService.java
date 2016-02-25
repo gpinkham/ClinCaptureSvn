@@ -14,6 +14,9 @@
  *******************************************************************************/
 package com.clinovo.rest.service.base;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
@@ -96,6 +99,36 @@ public abstract class BaseService {
 		}
 		studyConfigService.setParametersForSite(site);
 		return site;
+	}
+
+	protected List<String> commaSeparatedStringAsList(String values) {
+		List<String> list = new ArrayList<String>();
+		if (values != null && !values.isEmpty()) {
+			for (String versionId : values.split(",")) {
+				versionId = versionId.trim();
+				if (!list.contains(versionId)) {
+					list.add(versionId);
+				}
+			}
+		}
+		return list;
+	}
+
+	protected String listAsCommaSeparatedString(List<String> stringList) {
+		String result = "";
+		if (stringList.size() > 0) {
+			String listAsString = stringList.toString();
+			result = listAsString.substring(1, listAsString.length() - 1);
+		}
+		return result.replaceAll(" ", "");
+	}
+
+	protected String intArrayAsString(Integer[] intArray) {
+		String result = "";
+		for (Integer value : intArray) {
+			result += (result.isEmpty() ? "" : ",").concat(Integer.toString(value));
+		}
+		return result;
 	}
 
 	protected CRFDAO getCRFDAO() {

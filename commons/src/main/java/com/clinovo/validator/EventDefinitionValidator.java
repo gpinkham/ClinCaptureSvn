@@ -423,28 +423,23 @@ public final class EventDefinitionValidator {
 						messageSource.getMessage("eventDefinitionValidator.availableVersionsIsEmpty", null, locale));
 				errors.put("availableversions", errorMessages);
 			} else {
-				String selectedVersionIds = "";
 				boolean defaultVersionIsPresent = false;
 				CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
-				for (String versionName : eventDefinitionCRFBean.getSelectedVersionNames().split(",")) {
-					versionName = versionName.trim();
+				for (String stringVersionId : eventDefinitionCRFBean.getSelectedVersionIds().split(",")) {
+					Integer versionId = Integer.parseInt(stringVersionId.trim());
 					defaultVersionIsPresent = !defaultVersionIsPresent
-							&& versionName.equals(eventDefinitionCRFBean.getDefaultVersionName())
-							|| defaultVersionIsPresent;
-					CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(versionName,
+							&& versionId == eventDefinitionCRFBean.getDefaultVersionId() || defaultVersionIsPresent;
+					CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(versionId);
+					crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(crfVersionBean.getName(),
 							eventDefinitionCRFBean.getCrfName());
 					if (crfVersionBean.getId() == 0) {
 						ArrayList errorMessages = new ArrayList();
 						errorMessages.add(messageSource.getMessage("eventDefinitionValidator.crfDoesNotHaveVersion",
-								new Object[]{eventDefinitionCRFBean.getCrfName(), versionName}, locale));
+								new Object[]{eventDefinitionCRFBean.getCrfName(), crfVersionBean.getName()}, locale));
 						errors.put("availableversions", errorMessages);
 						return errors;
-					} else {
-						selectedVersionIds = selectedVersionIds.concat(selectedVersionIds.isEmpty() ? "" : ",")
-								.concat(Integer.toString(crfVersionBean.getId()));
 					}
 				}
-				eventDefinitionCRFBean.setSelectedVersionIds(selectedVersionIds);
 				if (!defaultVersionIsPresent) {
 					ArrayList errorMessages = new ArrayList();
 					errorMessages.add(messageSource.getMessage(

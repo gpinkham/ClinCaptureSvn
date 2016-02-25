@@ -65,8 +65,8 @@ public abstract class BaseEventService extends BaseService {
 			boolean editMode) throws RestException {
 		Locale locale = LocaleResolver.getLocale();
 		if (!(studyEventDefinitionBean.getId() > 0)) {
-			throw new RestException(
-					messageSource.getMessage("rest.eventservice.isNotFound", new Object[]{eventId}, locale));
+			throw new RestException(messageSource.getMessage("rest.eventservice.studyEventDefinitionIsNotFound",
+					new Object[]{eventId}, locale));
 		} else if (studyEventDefinitionBean.getStudyId() != currentStudy.getId()) {
 			throw new RestException(
 					messageSource.getMessage("rest.eventservice.studyEventDefinitionDoesNotBelongToCurrentScope",
@@ -164,8 +164,8 @@ public abstract class BaseEventService extends BaseService {
 			throw new RestException(messageSource, "rest.eventservice.crfNameIsNotFound", new Object[]{crfName},
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} else if (studyEventDefinitionBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.eventservice.isNotFound", new Object[]{eventId},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			throw new RestException(messageSource, "rest.eventservice.studyEventDefinitionIsNotFound",
+					new Object[]{eventId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} else if (!studyEventDefinitionBean.getStatus().equals(Status.AVAILABLE)) {
 			throw new RestException(messageSource,
 					"rest.eventservice.cannotPerformOperationOnEDCBecauseTheSEDIsNotAvailable");
@@ -217,7 +217,7 @@ public abstract class BaseEventService extends BaseService {
 	protected EventDefinitionCRFBean editChildEventDefinitionCRF(int eventId, String crfName, String siteName,
 			String defaultVersion, Boolean required, Boolean passwordRequired, Boolean hide,
 			Integer sourceDataVerification, String dataEntryQuality, String emailWhen, String email, String tabbing,
-			String availableVersions) throws Exception {
+			Integer[] availableVersions) throws Exception {
 		StudyBean site = getSite(siteName);
 		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, site);
 		return prepareEventDefinitionCRF(site, eventDefinitionCRFBean, crfName, defaultVersion, required,
@@ -229,11 +229,14 @@ public abstract class BaseEventService extends BaseService {
 			EventDefinitionCRFBean eventDefinitionCRFBean, String crfName, String defaultVersion, Boolean required,
 			Boolean passwordRequired, Boolean hide, Integer sourceDataVerification, String dataEntryQuality,
 			String emailWhen, String email, String tabbing, Boolean acceptNewCrfVersions, Integer propagateChange,
-			String availableVersions) throws Exception {
-		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
+			Integer[] availableVersions) throws Exception {
 		eventDefinitionCRFBean.setCrfName(crfName);
 		eventDefinitionCRFBean.setDefaultVersionName(
 				defaultVersion != null ? defaultVersion : eventDefinitionCRFBean.getDefaultVersionName());
+		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO()
+				.findByFullName(eventDefinitionCRFBean.getDefaultVersionName(), eventDefinitionCRFBean.getCrfName());
+		eventDefinitionCRFBean.setDefaultVersionId(crfVersionBean.getId());
+		eventDefinitionCRFBean.setCrfId(crfVersionBean.getCrfId());
 		eventDefinitionCRFBean.setRequiredCRF(required != null ? required : eventDefinitionCRFBean.isRequiredCRF());
 		eventDefinitionCRFBean.setElectronicSignature(
 				passwordRequired != null ? passwordRequired : eventDefinitionCRFBean.isElectronicSignature());
@@ -259,24 +262,17 @@ public abstract class BaseEventService extends BaseService {
 		eventDefinitionCRFBean.setPropagateChange(propagateChange != null ? propagateChange : PROPAGATE_CHANGE_NO);
 
 		if (studyBean.isSite()) {
+			List<String> selectedVersionNameList = new ArrayList<String>();
 			if (availableVersions == null) {
-				String selectedVersionNames = "";
-				for (String versionId : eventDefinitionCRFBean.getSelectedVersionIds().split(",")) {
-					CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao
-							.findByPK(Integer.parseInt(versionId.trim()));
-					selectedVersionNames = selectedVersionNames.concat(selectedVersionNames.isEmpty() ? "" : ",")
-							.concat(crfVersionBean.getName());
-				}
-				eventDefinitionCRFBean.setSelectedVersionNames(selectedVersionNames);
+				prepareSelectedVersionIds(eventDefinitionCRFBean);
+				fillSelectedVersionNameList(selectedVersionNameList, eventDefinitionCRFBean.getSelectedVersionIds());
+				eventDefinitionCRFBean.setSelectedVersionNames(listAsCommaSeparatedString(selectedVersionNameList));
 			} else {
-				eventDefinitionCRFBean.setSelectedVersionNames(availableVersions);
+				eventDefinitionCRFBean.setSelectedVersionIds(intArrayAsString(availableVersions));
+				fillSelectedVersionNameList(selectedVersionNameList, eventDefinitionCRFBean.getSelectedVersionIds());
+				eventDefinitionCRFBean.setSelectedVersionNames(listAsCommaSeparatedString(selectedVersionNameList));
 			}
 		}
-
-		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao
-				.findByFullName(eventDefinitionCRFBean.getDefaultVersionName(), eventDefinitionCRFBean.getCrfName());
-		eventDefinitionCRFBean.setDefaultVersionId(crfVersionBean.getId());
-		eventDefinitionCRFBean.setCrfId(crfVersionBean.getCrfId());
 
 		return eventDefinitionCRFBean;
 	}
@@ -328,5 +324,33 @@ public abstract class BaseEventService extends BaseService {
 		eventDefinitionCrfService.deleteEventDefinitionCRF(RuleSetServiceUtil.getRuleSetService(),
 				studyEventDefinitionBean, eventDefinitionCRFBean, LocaleResolver.getLocale());
 		return new Response(String.valueOf(HttpServletResponse.SC_OK));
+	}
+
+	private void fillSelectedVersionNameList(List<String> selectedVersionNameList, String versionIds) {
+		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
+		try {
+			for (String versionId : versionIds.split(",")) {
+				CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao
+						.findByPK(Integer.parseInt(versionId.trim()));
+				if (!selectedVersionNameList.contains(crfVersionBean.getName())) {
+					selectedVersionNameList.add(crfVersionBean.getName());
+				}
+			}
+		} catch (Exception ex) {
+			throw new RestException(messageSource,
+					"eventDefinitionValidator.availableVersionsShouldContainCommaSeparatedCRFVersionIds");
+		}
+	}
+
+	private void prepareSelectedVersionIds(EventDefinitionCRFBean eventDefinitionCRFBean) {
+		String defaultVersion = Integer.toString(eventDefinitionCRFBean.getDefaultVersionId());
+		eventDefinitionCRFBean.setSelectedVersionIds(eventDefinitionCRFBean.getSelectedVersionIds() == null
+				? ""
+				: eventDefinitionCRFBean.getSelectedVersionIds());
+		List<String> selectedVersionIds = commaSeparatedStringAsList(eventDefinitionCRFBean.getSelectedVersionIds());
+		if (!selectedVersionIds.contains(defaultVersion)) {
+			selectedVersionIds.add(defaultVersion);
+		}
+		eventDefinitionCRFBean.setSelectedVersionIds(listAsCommaSeparatedString(selectedVersionIds));
 	}
 }

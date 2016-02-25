@@ -42,8 +42,9 @@ public class RestConversionService extends DefaultConversionService {
 			String targetTypeName = targetType.getType().getName();
 			targetTypeName = targetTypeName.equals("java.lang.Boolean") ? "boolean" : targetTypeName;
 			targetTypeName = targetTypeName.equals("java.lang.Integer") ? "int" : targetTypeName;
-			throw new RestException(messageSource, "rest.wrongParameterType", new Object[]{
-					targetType.getAnnotation(RequestParam.class).value(), targetTypeName},
+			targetTypeName = targetTypeName.equals("[Ljava.lang.Integer;") ? "Integer[]" : targetTypeName;
+			throw new RestException(messageSource, "rest.wrongParameterType",
+					new Object[]{targetType.getAnnotation(RequestParam.class).value(), targetTypeName},
 					HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}

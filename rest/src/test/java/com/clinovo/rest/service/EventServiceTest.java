@@ -1381,6 +1381,9 @@ public class EventServiceTest extends BaseServiceTest {
 				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventId", "9").param("crfName", "Test CRF")
 						.param("defaultVersion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -1413,6 +1416,9 @@ public class EventServiceTest extends BaseServiceTest {
 				.perform(post(API_EVENT_EDIT_STUDY_CRF).param("eventId", "9").param("crfName", "Test CRF")
 						.param("defaultVersion", "v1.0").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1").accept(mediaType).secure(true).session(session))
 				.andExpect(expectStatus);
 		this.mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1").accept(mediaType).secure(true).session(session))
@@ -2132,6 +2138,440 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatItIsImpossibleToDeleteSEDThatIsDeleted() throws Exception {
 		setStatusForSED(9, Status.DELETED);
 		this.mockMvc.perform(post(API_EVENT_DELETE).param("id", "9").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionThatDoesNotExist() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "1234").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodThrowsExceptionIfDefaultVersionParameterIsInWrongCase() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultvErsion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodThrowsExceptionIfCrfNameParameterIsInWrongCase() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfnAme", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodThrowsExceptionIfSiteNameParameterIsInWrongCase() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("sitename", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodThrowsExceptionIfEventIdParameterIsInWrongCase() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("evEntid", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("xparamX", "56")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfCrfDoesNotExist() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "xxxxxx")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfDefaultCrfVersionDoesNotExist()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.000000").accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfCrfVersionIsLocked() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		CRFVersionBean crfVersionBean = setStatusForCrfVersion(5, Status.LOCKED);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", crfVersionBean.getName())
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfCrfVersionIsDeleted() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		CRFVersionBean crfVersionBean = setStatusForCrfVersion(5, Status.DELETED);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", crfVersionBean.getName())
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfEDCIsLocked() throws Exception {
+		createNewSite(currentScope.getId());
+		EventDefinitionCRFBean eventDefinitionCRF = createChildEDCForNewSite(7, newSite);
+		setStatusForEDC(eventDefinitionCRF.getId(), Status.LOCKED);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfEDCIsDeleted() throws Exception {
+		createNewSite(currentScope.getId());
+		EventDefinitionCRFBean eventDefinitionCRF = createChildEDCForNewSite(7, newSite);
+		setStatusForEDC(eventDefinitionCRF.getId(), Status.DELETED);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfEventIdParameterIsMissing()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("crfName", "Test CRF").param("siteName", newSite.getName())
+						.param("defaultVersion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfEventIdParameterIsEmpty() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.000000").accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfCrfNameParameterIsMissing()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("siteName", newSite.getName())
+						.param("defaultVersion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfCrfNameParameterIsEmpty() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.000000").accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfSiteNameParameterIsMissing()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+						.param("defaultVersion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfSiteNameParameterIsEmpty() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(
+				post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF").param("siteName", "")
+						.param("defaultVersion", "v1.000000").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfSourceDataVerificationParameterHasWrongValue()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+						.param("siteName", newSite.getName()).param("defaultVersion", "v1.0")
+						.param("sourceDataVerification", "45").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfDataEntryQualityParameterHasWrongValue()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+						.param("siteName", newSite.getName()).param("defaultVersion", "v1.0")
+						.param("dataEntryQuality", "x").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfEmailWhenParameterHasWrongValue()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("emailWhen", "z")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfTabbingParameterHasWrongValue()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("tabbing", "ppp")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToEditSiteCrfOfStudyEventDefinitionIfEmailParameterHasWrongValue()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("emailWhen", "complete")
+				.param("email", "sdfsdfsdf").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItImpossibleToEditSiteCrfOfStudyEventDefinitionIfSiteDoesNotExist() throws Exception {
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", "blablabla").param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItImpossibleToEditSiteCrfOfStudyEventDefinitionIfSiteDoesNotBelongToCurrentScope()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		String siteName = newSite.getName();
+		createChildEDCForNewSite(7, newSite);
+		createNewStudy();
+		createNewSite(newStudy.getId());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", siteName).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItImpossibleToEditSiteCrfOfStudyEventDefinitionIfEDCDoesNotExistInSite() throws Exception {
+		createNewSite(currentScope.getId());
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItImpossibleToEditSiteCrfOfStudyEventDefinitionThatDoesNotBelongToCurrentScope()
+			throws Exception {
+		createNewStudy();
+		createNewSite(newStudy.getId());
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatHttpGetIsNotSupportedForEditingSiteCrfOfStudyEventDefinition() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(get(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsPossibleToEditSiteCrfOfStudyEventDefinitionIfOnlyRequiredParametersArePassed()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		result = this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEventName(),
+					"ED-9-NotRepeating");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getCrfName(), "Test CRF");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getDefaultVersionName(), "v1.0");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isHideCrf(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isRequiredCRF(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isElectronicSignature(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isAcceptNewCrfVersions(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isEvaluatedCRF(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isDoubleEntry(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getTabbingMode(), "leftToRight");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailStep(), "");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailTo(), "");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getParentId(), 7);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getStudyId(), newSite.getId());
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSelectedVersionIds(), "5");
+			assertEquals(
+					SourceDataVerification
+							.getByDescription(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSdvCode()),
+					SourceDataVerification.NOTREQUIRED);
+			assertEquals(Status.getByName(restOdmContainer.getRestData().getEventDefinitionCRFBean().getStatusCode()),
+					Status.AVAILABLE);
+			assertTrue(restOdmContainer.getRestData().getEventDefinitionCRFBean().getId() > 0);
+		}
+	}
+
+	@Test
+	public void testThatItIsPossibleToEditSiteCrfOfStudyEventDefinitionIfAllParametersArePassed() throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		result = this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("availableVersions", "5")
+				.param("emailWhen", "complete").param("email", "clinovo@gmail.com, clinovo2@gmail.com")
+				.param("required", "false").param("passwordRequired", "true").param("hide", "true")
+				.param("sourceDataVerification", "3").param("dataEntryQuality", "dde").param("tabbing", "topToBottom")
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEventName(),
+					"ED-9-NotRepeating");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getCrfName(), "Test CRF");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getDefaultVersionName(), "v1.0");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isHideCrf(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isRequiredCRF(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isElectronicSignature(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isAcceptNewCrfVersions(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isEvaluatedCRF(), false);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().isDoubleEntry(), true);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getTabbingMode(), "topToBottom");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailStep(), "complete");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getEmailTo(),
+					"clinovo@gmail.com, clinovo2@gmail.com");
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getParentId(), 7);
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getStudyId(), newSite.getId());
+			assertEquals(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSelectedVersionIds(), "5");
+			assertEquals(
+					SourceDataVerification
+							.getByDescription(restOdmContainer.getRestData().getEventDefinitionCRFBean().getSdvCode()),
+					SourceDataVerification.NOTREQUIRED);
+			assertEquals(Status.getByName(restOdmContainer.getRestData().getEventDefinitionCRFBean().getStatusCode()),
+					Status.AVAILABLE);
+			assertTrue(restOdmContainer.getRestData().getEventDefinitionCRFBean().getId() > 0);
+		}
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodCanUnsetTheEmailWhenParameter() throws Exception {
+		createNewSite(currentScope.getId());
+		EventDefinitionCRFBean eventDefinitionCRFBean = createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("availableVersions", "5")
+				.param("emailWhen", "complete").param("email", "clinovo@gmail.com").param("required", "false")
+				.param("passwordRequired", "true").param("hide", "true").param("sourceDataVerification", "3")
+				.param("dataEntryQuality", "dde").param("tabbing", "topToBottom").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO
+				.findByPK(eventDefinitionCRFBean.getId());
+		assertTrue(eventDefinitionCRFBean.getEmailStep().equals("complete"));
+		assertTrue(eventDefinitionCRFBean.getEmailTo().equals("clinovo@gmail.com"));
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+						.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("emailWhen", "none")
+						.param("required", "false").param("passwordRequired", "true").param("hide", "true")
+						.param("sourceDataVerification", "3").param("dataEntryQuality", "dde")
+						.param("tabbing", "topToBottom").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO
+				.findByPK(eventDefinitionCRFBean.getId());
+		assertTrue(eventDefinitionCRFBean.getEmailStep().isEmpty());
+		assertTrue(eventDefinitionCRFBean.getEmailTo().isEmpty());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodCanUnsetTheDataEntryQualityParameter() throws Exception {
+		createNewSite(currentScope.getId());
+		EventDefinitionCRFBean eventDefinitionCRFBean = createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("availableVersions", "5")
+				.param("emailWhen", "complete").param("email", "clinovo@gmail.com").param("required", "false")
+				.param("passwordRequired", "true").param("hide", "true").param("sourceDataVerification", "3")
+				.param("dataEntryQuality", "dde").param("tabbing", "topToBottom").accept(mediaType).secure(true)
+				.session(session)).andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO
+				.findByPK(eventDefinitionCRFBean.getId());
+		assertTrue(eventDefinitionCRFBean.isDoubleEntry());
+		assertFalse(eventDefinitionCRFBean.isEvaluatedCRF());
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+						.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("emailWhen", "none")
+						.param("required", "false").param("passwordRequired", "true").param("hide", "true")
+						.param("sourceDataVerification", "3").param("dataEntryQuality", "none")
+						.param("tabbing", "topToBottom").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk());
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO
+				.findByPK(eventDefinitionCRFBean.getId());
+		assertFalse(eventDefinitionCRFBean.isDoubleEntry());
+		assertFalse(eventDefinitionCRFBean.isEvaluatedCRF());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodReturnsExceptionIfEmailParameterIsPresentWithoutEmailWhenParameter()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+				.param("siteName", newSite.getName()).param("defaultVersion", "v1.0")
+				.param("email", "clinovo@gmail.com").param("required", "false").param("passwordRequired", "true")
+				.param("hide", "true").param("sourceDataVerification", "3").param("dataEntryQuality", "dde")
+				.param("tabbing", "topToBottom").accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEditSiteCrfMethodReturnsExceptionIfEmailParameterIsNotPresentButEmailWhenParameterIsPresent()
+			throws Exception {
+		createNewSite(currentScope.getId());
+		createChildEDCForNewSite(7, newSite);
+		this.mockMvc
+				.perform(post(API_EVENT_EDIT_SITE_CRF).param("eventId", "9").param("crfName", "Test CRF")
+						.param("siteName", newSite.getName()).param("defaultVersion", "v1.0").param("emailWhen", "sign")
+						.param("required", "false").param("passwordRequired", "true").param("hide", "true")
+						.param("sourceDataVerification", "3").param("dataEntryQuality", "dde")
+						.param("tabbing", "topToBottom").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 }
