@@ -1,7 +1,6 @@
 package com.clinovo.rest.odm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.StringWriter;
 import java.lang.reflect.Method;
@@ -20,6 +19,7 @@ import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
 
 import com.clinovo.rest.model.RestData;
+import com.clinovo.rest.serializer.OdmXmlSerializer;
 
 public class XsdSchemaValidationTest {
 
@@ -38,19 +38,10 @@ public class XsdSchemaValidationTest {
 		return (RestOdmContainer) jaxbUnmarshaller.unmarshal(resource.getFile());
 	}
 
-	private Method getSetterMethod(Method[] methods, Object o) {
-		for (Method method : methods) {
-			if (method.getName().equalsIgnoreCase("set".concat(o.getClass().getSimpleName()))) {
-				return method;
-			}
-		}
-		return null;
-	}
-
 	private String marshal(Object o) throws Exception {
 		RestOdmContainer restOdmContainer = new RestOdmContainer();
 		restOdmContainer.setRestData(new RestData());
-		Method method = getSetterMethod(RestData.class.getMethods(), o);
+		Method method = OdmXmlSerializer.getSetterMethod(RestData.class.getMethods(), o);
 		method.invoke(restOdmContainer.getRestData(), o);
 		restOdmContainer.collectOdmRoot();
 		Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
@@ -84,6 +75,15 @@ public class XsdSchemaValidationTest {
 		assertNotNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
 		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionBean().getName(), "test visit");
 		marshal(restOdmContainer.getRestData().getStudyEventDefinitionBean());
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheStudyEventDefinitionBeans() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition3.xml"));
+		assertNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
+		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitions().size(), 2);
+		marshal(restOdmContainer.getRestData().getStudyEventDefinitions());
 	}
 
 	@Test

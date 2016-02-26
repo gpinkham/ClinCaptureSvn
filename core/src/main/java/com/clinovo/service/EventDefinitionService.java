@@ -1,10 +1,6 @@
 package com.clinovo.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -138,6 +134,15 @@ public interface EventDefinitionService {
 	StudyEventDefinitionBean fillEventDefinitionCrfs(StudyEventDefinitionBean studyEventDefinitionBean,
 			StudyBean currentStudy);
 
+	/**
+	 * Returns list of study event definitions for current study.
+	 *
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return List list of study event definitions StudyBean
+	 */
+	List<StudyEventDefinitionBean> getAllStudyEventDefinitions(StudyBean currentStudy);
+	
 	/**
 	 * Method prepares the SignStateRestorer.
 	 *

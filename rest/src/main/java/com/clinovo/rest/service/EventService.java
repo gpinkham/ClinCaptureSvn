@@ -16,6 +16,7 @@
 package com.clinovo.rest.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -45,7 +46,6 @@ import com.clinovo.validator.EventDefinitionValidator;
  * RestEventService.
  */
 @Controller("restEventService")
-@RequestMapping("/event")
 @SuppressWarnings("rawtypes")
 public class EventService extends BaseEventService {
 
@@ -68,6 +68,19 @@ public class EventService extends BaseEventService {
 	private DataSource dataSource;
 
 	/**
+	 * Method returns list of study event definitions for current scope / study.
+	 *
+	 * @return List list of study event definitions
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/events", method = RequestMethod.GET)
+	public List<StudyEventDefinitionBean> getEvents() throws Exception {
+		return eventDefinitionService.getAllStudyEventDefinitions(getCurrentStudy());
+	}
+
+	/**
 	 * Method returns info about study event definition.
 	 *
 	 * @param eventId
@@ -77,7 +90,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value = "/event", method = RequestMethod.GET)
 	public StudyEventDefinitionBean getEventDefinition(@RequestParam(value = "id") int eventId) throws Exception {
 		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(eventId), getCurrentStudy());
 	}
@@ -114,7 +127,7 @@ public class EventService extends BaseEventService {
 	@ResponseBody
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/create", method = RequestMethod.POST)
 	public StudyEventDefinitionBean createEvent(@RequestParam("name") String name,
 			@RequestParam(value = "type") String type,
 			@RequestParam(value = "description", defaultValue = "", required = false) String description,
@@ -171,7 +184,7 @@ public class EventService extends BaseEventService {
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
-	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/edit", method = RequestMethod.POST)
 	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int eventId,
 			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "type", required = false) String type,
@@ -204,7 +217,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/remove", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int eventId) throws Exception {
 		return eventDefinitionService.removeStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
 	}
@@ -219,7 +232,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/restore", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int eventId) throws Exception {
 		return eventDefinitionService.restoreStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
 	}
@@ -234,7 +247,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/delete", method = RequestMethod.POST)
 	public Response delete(@RequestParam("id") int eventId) throws Exception {
 		return deleteStudyEventDefinition(eventId);
 	}
@@ -276,7 +289,7 @@ public class EventService extends BaseEventService {
 			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataEntryQuality.valueDescription"),
 			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailWhen.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
-	@RequestMapping(value = "/addCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/addCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName, @RequestParam("defaultVersion") String defaultVersion,
 			@RequestParam(value = "required", defaultValue = "true", required = false) boolean required,
@@ -344,7 +357,7 @@ public class EventService extends BaseEventService {
 			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom"),
 			@RestParameterPossibleValues(name = "propagateChange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagateChange.valueDescription")})
-	@RequestMapping(value = "/editStudyCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/editStudyCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean editStudyCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName,
 			@RequestParam(value = "defaultVersion", required = false) String defaultVersion,
@@ -412,7 +425,7 @@ public class EventService extends BaseEventService {
 			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
 			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
 			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom")})
-	@RequestMapping(value = "/editSiteCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/editSiteCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean editSiteCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName, @RequestParam("siteName") String siteName,
 			@RequestParam(value = "defaultVersion", required = false) String defaultVersion,
@@ -451,7 +464,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/removeCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/removeCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
 		return eventDefinitionCrfService.removeParentEventDefinitionCrf(
@@ -470,7 +483,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/restoreCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/restoreCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
 		return eventDefinitionCrfService.restoreParentEventDefinitionCrf(
@@ -489,7 +502,7 @@ public class EventService extends BaseEventService {
 	 *             an Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/deleteCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/event/deleteCrf", method = RequestMethod.POST)
 	public Response deleteCrf(@RequestParam("eventId") int eventId, @RequestParam("crfName") String crfName)
 			throws Exception {
 		return deleteEventDefinitionCRF(eventId, crfName);

@@ -15,6 +15,9 @@
 
 package com.clinovo.rest.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,7 +48,7 @@ public class RestData {
 	private UserAccountBean userAccountBean;
 
 	@XmlElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private StudyEventDefinitionBean studyEventDefinitionBean;
+	private List<StudyEventDefinitionBean> studyEventDefinitions = new ArrayList<StudyEventDefinitionBean>();
 
 	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private EventDefinitionCRFBean eventDefinitionCRFBean;
@@ -86,11 +89,11 @@ public class RestData {
 	}
 
 	public StudyEventDefinitionBean getStudyEventDefinitionBean() {
-		return studyEventDefinitionBean;
+		return studyEventDefinitions.size() == 1 ? studyEventDefinitions.get(0) : null;
 	}
 
 	public void setStudyEventDefinitionBean(StudyEventDefinitionBean studyEventDefinitionBean) {
-		this.studyEventDefinitionBean = studyEventDefinitionBean;
+		studyEventDefinitions.add(studyEventDefinitionBean);
 	}
 
 	public EventDefinitionCRFBean getEventDefinitionCRFBean() {
@@ -107,5 +110,13 @@ public class RestData {
 
 	public void setCrfVersionBean(CRFVersionBean crfVersionBean) {
 		this.crfVersionBean = crfVersionBean;
+	}
+
+	public List<StudyEventDefinitionBean> getStudyEventDefinitions() {
+		return studyEventDefinitions;
+	}
+
+	public void setStudyEventDefinitions(List<StudyEventDefinitionBean> studyEventDefinitions) {
+		this.studyEventDefinitions = studyEventDefinitions;
 	}
 }

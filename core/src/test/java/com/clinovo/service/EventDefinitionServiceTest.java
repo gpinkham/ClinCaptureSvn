@@ -1,6 +1,7 @@
 package com.clinovo.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -59,6 +60,13 @@ public class EventDefinitionServiceTest extends DefaultAppContextTest {
 		assertEquals(studyEventDefinitionBean.getEventDefinitionCrfs().size(), 3);
 	}
 
+	@Test
+	public void testThatGetAllStudyEventDefinitionsMethodReturnsCorrectCollectionSize() {
+		List<StudyEventDefinitionBean> studyEventDefinitionBeanList = eventDefinitionService
+				.getAllStudyEventDefinitions(studyBean);
+		assertEquals(studyEventDefinitionBeanList.size(), 9);
+	}
+	
 	@Test
 	public void testThatAddEventDefinitionCrfMethodAddsEventDefinitionCrfCorrectly() {
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(8);

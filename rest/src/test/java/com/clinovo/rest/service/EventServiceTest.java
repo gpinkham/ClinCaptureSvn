@@ -2574,4 +2574,20 @@ public class EventServiceTest extends BaseServiceTest {
 						.param("tabbing", "topToBottom").accept(mediaType).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
+
+	@Test
+	public void testThaGetEventsMethodReturnsStudyEventDefinitionsCorrectly() throws Exception {
+		result = this.mockMvc.perform(get(API_EVENTS).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitions().size(), 9);
+		}
+	}
+
+	@Test
+	public void testThatGetEventsMethodDoesNotSupportTheHttpPost() throws Exception {
+		this.mockMvc.perform(post(API_EVENTS).accept(mediaType).secure(true).session(session))
+				.andExpect(status().isInternalServerError());
+	}
 }

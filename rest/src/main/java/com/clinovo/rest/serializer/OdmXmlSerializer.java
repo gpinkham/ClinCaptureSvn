@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.XMLConstants;
@@ -115,9 +116,22 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 		}
 	}
 
-	private Method getSetterMethod(Method[] methods, Object o) {
+	/**
+	 * Returns setter method in RestData.
+	 * 
+	 * @param methods
+	 *            Method[]
+	 * @param o
+	 *            Object
+	 * @return Method
+	 */
+	public static Method getSetterMethod(Method[] methods, Object o) {
+		String simpleName = o.getClass().getSimpleName().toLowerCase();
+		if (o instanceof List && ((List) o).size() > 0) {
+			simpleName = ((List) o).get(0).getClass().getSimpleName().toLowerCase().replace("bean", "s");
+		}
 		for (Method method : methods) {
-			if (method.getName().equalsIgnoreCase("set".concat(o.getClass().getSimpleName()))) {
+			if (method.getName().equalsIgnoreCase("set".concat(simpleName))) {
 				return method;
 			}
 		}

@@ -16,7 +16,7 @@
         <xs:sequence>
             <xs:element ref="CrfVersion" minOccurs="0"/>
             <xs:element ref="EventDefinitionCrf" minOccurs="0"/>
-            <xs:element ref="StudyEventDefinition" minOccurs="0"/>
+            <xs:element ref="StudyEventDefinition" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="UserAccount" minOccurs="0"/>
             <xs:element ref="UserDetails" minOccurs="0"/>
             <xs:element ref="Error" minOccurs="0"/>

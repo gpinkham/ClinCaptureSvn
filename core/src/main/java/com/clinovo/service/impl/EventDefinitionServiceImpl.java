@@ -1,12 +1,6 @@
 package com.clinovo.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -224,6 +218,13 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 		return studyEventDefinitionBean;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<StudyEventDefinitionBean> getAllStudyEventDefinitions(StudyBean currentStudy) {
+		return getStudyEventDefinitionDAO().findAllByStudy(currentStudy);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
