@@ -24,13 +24,13 @@
 </c:if>
 <input type="hidden" id="currentUser" value="${userBean.name}">
 <!-- For randomization -->
-<input type="hidden" name="studySubjectId" value="${studySubject.id}">
+<input type="hidden" name="studySubjectId" value="${subject.id}">
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
 <input type="hidden" name="assignRandomizationResultTo" value="${study.studyParameterConfig.assignRandomizationResultTo}"/>
 <input type="hidden" name="randomizationMessage" value="<fmt:message key="randomization_successful_message" bundle="${restext}"/>"/>
 <input type="hidden" name="randomizationEnabled" value="${study.studyParameterConfig.randomization}"/>
 <c:choose>
-	<c:when test="${assignRandomizationResultTo eq 'ssid'}">
+	<c:when test="${study.studyParameterConfig.assignRandomizationResultTo eq 'ssid'}">
 		<input type="hidden" name="subjectLabel" value="${subject.uniqueIdentifier}" />
 		<input type="hidden" name="personIdMissing" value="<fmt:message key="person_id_should_be_specifyed" bundle="${restext}"/>"/>
 	</c:when>

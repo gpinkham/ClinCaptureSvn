@@ -2498,7 +2498,7 @@ function randomizeSubject() {
 
 	if ($("input:hidden[name='assignRandomizationResultTo']").val() == "ssid"
 		&& (subject == "" || subject == undefined)) {
-		alert($("input[name=personIdMissing]").val());
+		alertDialog({message: $("input[name=personIdMissing]").val(), height: 150, width: 500});
 		$("input[type='submit']").removeAttr("disabled");
 		return false;
 	}
