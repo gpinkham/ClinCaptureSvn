@@ -1023,7 +1023,7 @@
 					<fmt:message key="required" bundle="${resword}" />
 				</c:when>
 				<c:when test="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no'}">
-					<fmt:message key="optional" bundle="${resword}" />
+					<fmt:message key="auto_populate_with_current_date_upon_creation" bundle="${resword}" />
 				</c:when>
 				<c:otherwise>
 					<fmt:message key="not_used" bundle="${resword}" />

@@ -1786,7 +1786,7 @@
 		<input type="radio" name="dateOfEnrollmentForStudyRequired"
 		${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no' ? "checked" : ""}
 		       value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
-		<fmt:message key="optional" bundle="${resword}"/>
+		<fmt:message key="auto_populate_with_current_date_upon_creation" bundle="${resword}"/>
 		<input type="radio" name="dateOfEnrollmentForStudyRequired"
 		${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used' ? "checked" : ""}
 		       value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="dateOfEnrollment">

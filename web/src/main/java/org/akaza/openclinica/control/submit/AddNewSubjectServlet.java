@@ -608,6 +608,8 @@ public class AddNewSubjectServlet extends SpringServlet {
 
 				if (!StringUtil.isBlank(fp.getString(INPUT_ENROLLMENT_DATE))) {
 					studySubject.setEnrollmentDate(fp.getDateInputWithServerTimeOfDay(INPUT_ENROLLMENT_DATE));
+				} else if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equals("no")) {
+					studySubject.setEnrollmentDate(new Date());
 				}
 
 				studySubject.setOwner(ub);

@@ -283,6 +283,9 @@
 					    <img name="flag_enrollmentDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 					  </a>
 					</c:if>
+						<c:if test="${study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no'}">
+							<i><fmt:message bundle="${resword}" key="will_be_auto_populated_if_blank"/></i>
+						</c:if>
 					</td>
 				</tr>
 				<tr>

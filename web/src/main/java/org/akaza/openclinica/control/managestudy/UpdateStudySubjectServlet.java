@@ -273,7 +273,9 @@ public class UpdateStudySubjectServlet extends SpringServlet {
 				logger.error("Date parsing error.", fe);
 			}
 			subjectToUpdate.setEnrollmentDate(enrollDate);
-		} 
+		} else if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equals("no")) {
+			subjectToUpdate.setEnrollmentDate(new Date());
+		}
 		request.getSession().setAttribute("studySub", subjectToUpdate);
 
 		if (!classes.isEmpty()) {
