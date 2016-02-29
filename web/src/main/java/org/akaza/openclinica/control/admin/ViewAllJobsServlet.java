@@ -30,7 +30,7 @@ public class ViewAllJobsServlet extends SpringServlet {
 			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 
-		if (ub.isSysAdmin() || ub.isTechAdmin()) {
+		if ((ub.isSysAdmin() || ub.isTechAdmin()) && !getCurrentRole(request).isStudySponsor()) {
 			return;
 		}
 
