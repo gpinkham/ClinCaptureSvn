@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
@@ -113,6 +115,15 @@ public class CodedItemsController extends SpringController {
 	@RequestMapping("/codedItems")
 	public ModelMap codedItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		if (!mayProceed(request)) {
+			try {
+				response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		
 		String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
 		String queryString = request.getQueryString();
 
@@ -195,6 +206,12 @@ public class CodedItemsController extends SpringController {
 		model.addAttribute("autoCodedItems", request.getAttribute("autoCodedItems"));
 
 		return model;
+	}
+	
+	private boolean mayProceed(HttpServletRequest request) {
+		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+		Role r = currentRole.getRole();
+		return Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_CODER.equals(r) || Role.STUDY_ADMINISTRATOR.equals(r);
 	}
 
 	/**
