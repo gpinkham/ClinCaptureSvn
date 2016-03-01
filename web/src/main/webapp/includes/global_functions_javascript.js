@@ -2417,6 +2417,19 @@ $(function() {
     $(dateInput).attr("readonly", "readonly");
     $(resultInput).attr("readonly", "readonly");
 
+	var $dateWrapper = $("#Rand_Date");
+	if ($dateWrapper.length) {
+		var message = $("input[name=randomizationTZMessage]").val();
+		var tzOffset = $("input[name=timeZoneWithOffset]").val();
+		if (message && tzOffset) {
+			message = message.replace("{0}", tzOffset);
+			var $rightText = $dateWrapper.parent().parent().find(">td:last-child");
+			if ($rightText) {
+				$rightText.html(message);
+			}
+		}
+	}
+
     fixFileInputsForFireFox();
 });
 
@@ -2440,8 +2453,9 @@ function randomizeSubject() {
 	}
 	disableRandomizeCRFButtons(true);
 	var crf = $("input:hidden[name='crfId']").val();
+	var randDateSelector = "#Rand_Date";
 	var eventCrfId = $("input:hidden[name='eventCRFId']").val();
-	var dateInputId = $("#Rand_Date").find(":input").attr("id").replace('input','');
+	var dateInputId = $(randDateSelector).find(":input").attr("id").replace('input','');
 	var resultInputId = $("#Rand_Result").find(":input").attr("id").replace('input','');
 	var randoCodeInputId = "";
 	var $resultInput = $("#Rand_ID");

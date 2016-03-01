@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -138,6 +139,8 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.quartz.impl.StdScheduler;
 
 import com.clinovo.enums.CurrentDataEntryStage;
@@ -511,6 +514,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 		}
 
 		provideRandomizationStatisticsForSite(request);
+		addTimeZoneInfoToRequest(request);
 
 		logMe("Entering  Get the study then the parent study end  " + System.currentTimeMillis());
 		// Let us process the age
@@ -3803,6 +3807,19 @@ public abstract class DataEntryServlet extends SpringServlet {
 			request.setAttribute("subjectsNumberAssignedToEachDynamicGroupMap",
 					subjectsNumberAssignedToEachDynamicGroupMap);
 		}
+	}
+
+	private void addTimeZoneInfoToRequest(HttpServletRequest request) {
+		DateTimeZone tz = DateTimeZone.getDefault();
+		Long instant = DateTime.now().getMillis();
+		String name = tz.getShortName(instant, LocaleResolver.getLocale(request));
+
+		long offsetInMilliseconds = tz.getOffset(instant);
+		long hours = TimeUnit.MILLISECONDS.toHours(offsetInMilliseconds);
+		String offset = Long.toString(hours);
+		String sign = hours >= 0 ? "+" : "";
+		String responce = name + sign + offset;
+		request.setAttribute("timeZoneWithOffset", responce);
 	}
 
 	protected abstract CurrentDataEntryStage getCurrentDataEntryStage();

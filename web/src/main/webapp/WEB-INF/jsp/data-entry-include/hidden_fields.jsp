@@ -70,5 +70,7 @@
 	<!-- /Randomization statistics for current site -->
 </c:if>
 <!-- Messages -->
+<input type="hidden" name="timeZoneWithOffset" value="${timeZoneWithOffset}"/>
+<input type="hidden" name="randomizationTZMessage" value='<fmt:message key="date_is_shown_in_the_timezone" bundle="${resword}"/>'/>
 <input type="hidden" name="randDataEntryStepMessage" value='<fmt:message key="randomization_des_message" bundle="${restext}"/>'/>
 <!-- /Messages -->
