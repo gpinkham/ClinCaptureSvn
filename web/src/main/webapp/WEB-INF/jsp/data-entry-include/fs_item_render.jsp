@@ -30,15 +30,20 @@
 	</div>
 </c:if>
 
+<c:set var="rowWidth" value="${displayItemWithGroup.itemsRow.rowWidth}"/>
+
 <div style="border-bottom: 1px solid #eeeeee; width: 100%; ${rowShown ? "" : "display: none;"}" row-number="${itemStatus.index}">
+	<div style="width: ${rowWidth}px;">
 	<c:forEach items="${displayItemWithGroup.itemsRow.items}" var="displayItem" varStatus="rowStatus">
 		<c:set var="displayItem" value="${displayItem}" scope="request"/>
 		<c:set var="itemShown" value="${displayItem.scdData.scdDisplayInfo.scdShowStatus != 2}" scope="request"/>
 		<c:set var="leftTextWidth" value="${(not empty displayItem.item.itemRenderMetadata && displayItem.item.itemRenderMetadata.leftItemTextWidth != 0)
 				? displayItem.item.itemRenderMetadata.leftItemTextWidth : '200'}" scope="request"/>
+		<c:set var="rightBlockWidth" value="${(not empty displayItem.item.itemRenderMetadata && displayItem.item.itemRenderMetadata.rightBlockWidth != 0)
+				? displayItem.item.itemRenderMetadata.rightBlockWidth : '330'}" scope="request"/>
 		<c:set var="itemWidth" value="${(not empty displayItem.item.itemRenderMetadata && displayItem.item.itemRenderMetadata.width != 0)
-				? displayItem.item.itemRenderMetadata.width : '555'}" scope="request"/>
-		<div style="display: table-cell; padding: 5px; min-width: ${itemWidth}px; vertical-align: top;">
+				? displayItem.item.itemRenderMetadata.width : '560'}" scope="request"/>
+		<div style="display: table-cell; padding: 5px; width: ${itemWidth}px; vertical-align: top;">
 			<div class="item-cell" style="position: relative; display: ${itemShown ? 'table' : 'none'}" id="t${displayItem.item.id}">
 				<div style="float: left; width: ${leftTextWidth}px; min-height: 10px">
 					<div style="float: left;">
@@ -50,34 +55,37 @@
 						</c:import>
 					</div>
 				</div>
-				<div style="float: left; width: 350px">
-					<div style="display: inline-block">
+				<div style="float: left; width: ${rightBlockWidth}px">
+					<div class="item_input" style="display: inline-block; width: 40%;">
 						<c:import url="../submit/showItemInput.jsp">
-							<c:param name="key" value="${numOfDate}" />
-							<c:param name="tabNum" value="${itemNum}"/>
-							<c:param name="defaultValue" value="${displayItem.metadata.defaultValue}"/>
-							<c:param name="respLayout" value="${displayItem.metadata.responseLayout}"/>
-							<c:param name="originJSP" value="${originJSP}"/>
-							<c:param name="isForcedRFC" value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
+								<c:param name="key" value="${numOfDate}" />
+								<c:param name="tabNum" value="${itemNum}"/>
+								<c:param name="defaultValue" value="${displayItem.metadata.defaultValue}"/>
+								<c:param name="respLayout" value="${displayItem.metadata.responseLayout}"/>
+								<c:param name="originJSP" value="${originJSP}"/>
+								<c:param name="isForcedRFC" value="${dataEntryStage.isAdmin_Editing() ? study.studyParameterConfig.adminForcedReasonForChange : ''}"/>
 						</c:import>
 					</div>
-					<div style="display: inline-block">
-						<c:import url="../data-entry-include/discrepancy_flag.jsp">
-							<c:param name="originJSP" value="${originJSP}"/>
-						</c:import>
-					</div>
-					<c:if test="${displayItem.item.units != ''}">
-						<div style="display: inline-block">
-							<c:out value="(${displayItem.item.units})" escapeXml="false"/>
+					<div style="display: inline-block; width: 56%; vertical-align: top;">
+						<div style="display: table-cell;">
+							<c:import url="../data-entry-include/discrepancy_flag.jsp">
+								<c:param name="originJSP" value="${originJSP}"/>
+							</c:import>
 						</div>
-					</c:if>
-					<div style="display: inline-block">
-						<c:import url="../submit/generateLeftItemTxt.jsp">
-							<c:param name="linkText" value="${displayItem.metadata.rightItemText}"/>
-						</c:import>
+						<c:if test="${displayItem.item.units != ''}">
+							<div style="display: table-cell;">
+								<c:out value="(${displayItem.item.units})" escapeXml="false"/>
+							</div>
+						</c:if>
+						<div style="display: table-cell;">
+							<c:import url="../submit/generateLeftItemTxt.jsp">
+								<c:param name="linkText" value="${displayItem.metadata.rightItemText}"/>
+							</c:import>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</c:forEach>
+</div>
 </div>

@@ -3865,14 +3865,15 @@ public abstract class DataEntryServlet extends SpringServlet {
 				changeDDEItemValueToPartiallySavedIfExist(sectionBean);
 			}
 			return sectionBean;
-		} else if (getCurrentDataEntryStage() == CurrentDataEntryStage.DOUBLE_DATA_ENTRY) {
+		}
+
+		if (getCurrentDataEntryStage() == CurrentDataEntryStage.DOUBLE_DATA_ENTRY) {
 			if (sectionBean.getEventCRFSection().isPartialSaved() && !isInError) {
 				changeDDEItemValueToPartiallySavedIfExist(sectionBean);
 			}
-			return sectionBean;
-		} else {
-			return DataEntryRenderUtil.convertSingleItemsToDisplayItemRowsDependingOnSource(sectionBean);
 		}
+
+		return DataEntryRenderUtil.convertSingleItemsToDisplayItemRowsDependingOnSource(sectionBean);
 	}
 
 	private void populateItemsWithRenderMetadata(DisplaySectionBean sectionBean) {

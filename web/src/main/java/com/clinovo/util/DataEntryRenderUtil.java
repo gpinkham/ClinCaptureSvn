@@ -15,6 +15,15 @@ import java.util.List;
  */
 public final class DataEntryRenderUtil {
 
+	public static final int DEFAULT_ITEM_WIDTH = 560;
+	public static final int DEFAULT_LEFT_ITEM_BLOCK_WIDTH = 220;
+	public static final int DEFAULT_RIGHT_BLOCK_WIDTH = 330;
+	public static final int DEFAULT_PADDING_WIDTH = 10;
+	public static final int DEFAULT_ROW_PADDING = 5;
+	public static final float DEFAULT_LEFT_BLOCK_WIDTH_MULTIPLIER = 0.4f;
+	public static final float DEFAULT_RIGHT_BLOCK_WIDTH_MULTIPLIER = 0.6f;
+
+
 	private DataEntryRenderUtil() {
 	}
 
@@ -86,12 +95,74 @@ public final class DataEntryRenderUtil {
 													   DisplayItemRowBean prevRow) {
 		processSCDLogic(newRow);
 
+		// Set width of items in the row if both rows have same number of columns.
 		if (prevRow != null) {
 			populateRenderMetadataFromPrevRow(newRow, prevRow);
 		}
+		// Set correct width of right item text and left item text depending on item width.
+		recalculateWidthOfItemElements(newRow);
+	}
+
+	private static void recalculateWidthOfItemElements(DisplayItemRowBean newRow) {
+		int rowWidth = 0;
+
+		for (DisplayItemBean displayItemBean : newRow.getItems()) {
+			ItemRenderMetadata renderMetadata = displayItemBean.getItem().getItemRenderMetadata();
+			// Create new Object or detach from hibernate layer.
+			renderMetadata = renderMetadata == null ? new ItemRenderMetadata() : new ItemRenderMetadata(renderMetadata);
+			// Skip calculation if it was already done for previous row.
+			if (renderMetadata.isInheritedFromPreviousRow()) {
+				rowWidth += renderMetadata.getWidth();
+				continue;
+			}
+
+			int itemWidth = renderMetadata.getWidth();
+			int leftBlockWidth = renderMetadata.getLeftItemTextWidth();
+			// Set width of whole item block.
+			if (itemWidth == 0) {
+				if (leftBlockWidth != 0) {
+					if (leftBlockWidth > DEFAULT_ITEM_WIDTH - DEFAULT_RIGHT_BLOCK_WIDTH - DEFAULT_PADDING_WIDTH) {
+						renderMetadata.setRightBlockWidth(DEFAULT_RIGHT_BLOCK_WIDTH);
+						renderMetadata.setWidth(leftBlockWidth + DEFAULT_RIGHT_BLOCK_WIDTH + DEFAULT_PADDING_WIDTH);
+					} else {
+						renderMetadata.setRightBlockWidth(DEFAULT_ITEM_WIDTH - leftBlockWidth - DEFAULT_PADDING_WIDTH);
+						renderMetadata.setWidth(DEFAULT_ITEM_WIDTH);
+					}
+				} else {
+					renderMetadata.setRightBlockWidth(DEFAULT_RIGHT_BLOCK_WIDTH);
+					renderMetadata.setLeftItemTextWidth(DEFAULT_LEFT_ITEM_BLOCK_WIDTH);
+					renderMetadata.setWidth(DEFAULT_ITEM_WIDTH);
+				}
+			} else {
+				if (leftBlockWidth != 0) {
+					if (leftBlockWidth + DEFAULT_PADDING_WIDTH > itemWidth) {
+						renderMetadata.setWidth(leftBlockWidth + DEFAULT_PADDING_WIDTH);
+						renderMetadata.setRightBlockWidth(leftBlockWidth);
+					} else {
+						if (leftBlockWidth + DEFAULT_PADDING_WIDTH > itemWidth - DEFAULT_RIGHT_BLOCK_WIDTH) {
+							renderMetadata.setRightBlockWidth(itemWidth - DEFAULT_PADDING_WIDTH);
+						} else {
+							renderMetadata.setRightBlockWidth(itemWidth - leftBlockWidth - DEFAULT_PADDING_WIDTH);
+						}
+					}
+				} else {
+					float calculatedItemWidth = (float) (itemWidth - DEFAULT_PADDING_WIDTH);
+					float calculatedLeftBlockWidth = calculatedItemWidth * DEFAULT_LEFT_BLOCK_WIDTH_MULTIPLIER;
+					float calculatedRightBlockWidth = calculatedItemWidth * DEFAULT_RIGHT_BLOCK_WIDTH_MULTIPLIER;
+					renderMetadata.setLeftItemTextWidth((int) calculatedLeftBlockWidth);
+					renderMetadata.setRightBlockWidth((int) calculatedRightBlockWidth);
+				}
+			}
+			displayItemBean.getItem().setItemRenderMetadata(renderMetadata);
+			rowWidth += renderMetadata.getWidth();
+		}
+		newRow.setRowWidth(rowWidth + DEFAULT_PADDING_WIDTH * newRow.getTotalItemsInRow() + DEFAULT_ROW_PADDING);
 	}
 
 	private static void populateRenderMetadataFromPrevRow(DisplayItemRowBean newRow, DisplayItemRowBean previousRow) {
+		if (newRow.getTotalItemsInRow() == 1) {
+			return;
+		}
 		if (previousRow.getTotalItemsInRow() == newRow.getTotalItemsInRow()) {
 			List<DisplayItemBean> newDisplayItemBeans = newRow.getItems();
 			List<DisplayItemBean> prevDisplayItemBeans = previousRow.getItems();
@@ -101,8 +172,10 @@ public final class DataEntryRenderUtil {
 					DisplayItemBean prevDisplay = prevDisplayItemBeans.get(i);
 					ItemRenderMetadata prevRenderMetadata = prevDisplay.getItem().getItemRenderMetadata();
 					if (prevRenderMetadata != null) {
+						ItemRenderMetadata clonedMetadata = new ItemRenderMetadata(prevRenderMetadata);
+						clonedMetadata.setInheritedFromPreviousRow(true);
 						DisplayItemBean newItem = newDisplayItemBeans.get(i);
-						newItem.getItem().setItemRenderMetadata(prevRenderMetadata);
+						newItem.getItem().setItemRenderMetadata(clonedMetadata);
 					}
 				}
 			}

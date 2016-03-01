@@ -13,6 +13,7 @@ public class DisplayItemRowBean {
 	private ArrayList<String> subHeaders;
 	private int totalItemsInRow;
 	private int maxColumn;
+	private int rowWidth;
 	private boolean containsItemsWithCustomWidth;
 	private boolean haveSubHeaders;
 	private boolean haveHeaders;
@@ -137,6 +138,14 @@ public class DisplayItemRowBean {
 		this.isShown = isShown;
 	}
 
+	public int getRowWidth() {
+		return rowWidth;
+	}
+
+	public void setRowWidth(int rowWidth) {
+		this.rowWidth = rowWidth;
+	}
+
 	/**
 	 * Clone DisplayItemRowBean.
 	 * @return DisplayItemRowBean
@@ -152,6 +161,7 @@ public class DisplayItemRowBean {
 		clone.setHaveSubHeaders(haveSubHeaders);
 		clone.setHaveHeaders(haveHeaders);
 		clone.setShown(isShown);
+		clone.setRowWidth(rowWidth);
 		return clone;
 	}
 }

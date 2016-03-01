@@ -116,7 +116,6 @@ form element in red --%>
 	<c:set var="inputType" value="label"/>
 </c:if>
 
-<%-- adding here, tbh clinovo 10/18/2012 --%>
 <div id="<c:out value='${itemName }'/>" style="display: ${isFSCRF ? 'inline-block' : ''}">
 <%-- end addition --%>
 <c:if test='${inputType=="file"}'>
@@ -126,18 +125,23 @@ form element in red --%>
 		<c:when test="${inputTxtValue==null || empty inputTxtValue}">
 			<input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
 			<div id="div<c:out value="${itemId}"/>" name="myDiv">
+				<div style="display: table-cell">
 				<c:choose>
 					<c:when test="${isInError && !hasShown}">
 						<span class="<c:out value="${exclaim}"/>">! </span>
-						<input type="text" class="<c:out value="${input}"/>" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
+						<input type="text" class="${input}" id="ft${itemId}" name="fileText${itemId}" disabled style="width: ${isFSCRF ? '100%' : ''}">
 					</c:when>
 					<c:otherwise>
-						<input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
+						<input type="text" id="ft${itemId}" name="fileText${itemId}" disabled style="width: ${isFSCRF ? '100%' : ''}">
 					</c:otherwise>
 				</c:choose>
-				<input type="button" id="up<c:out value="${itemId}"/>" name="uploadFile<c:out value="${itemId}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>"
-					   onClick="javascript:openFileWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>'); changeImage('input${itemId}');">
-				<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="upload">
+				</div>
+
+				<div style="display: table-cell">
+					<input type="button" id="up${itemId}" name="uploadFile${itemId}" value="<fmt:message key="click_to_upload" bundle="${resword}"/>"
+						   onClick="openFileWindow('UploadFile?submitted=no&itemId=${itemId}'); changeImage('input${itemId}');">
+					<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="upload">
+				</div>
 			</div>
 		</c:when>
 		<c:otherwise>
@@ -161,7 +165,7 @@ form element in red --%>
 					<input id="rm${itemId}" filePathName="${fn:replace(pathAndName,'+','%2B')}" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch(this, '${section.eventCRF.id}', '${itemId}', '${inputTxtValue}','found');changeImage('input${itemId}');">
 				</c:otherwise>
 			</c:choose>
-			<input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
+			<input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>" style="width: ${isFSCRF ? '100%' : ''}">
 			<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="noAction">
 		</c:otherwise>
 	</c:choose>
@@ -183,34 +187,42 @@ form element in red --%>
 	</c:choose>
 </c:if>
 <c:if test='${inputType == "text"}'>
-	<label for="input<c:out value="${itemId}"/>"></label>
+	<label for="input${itemId}"></label>
+	<div style="display: table-cell;">
 	<c:choose>
 		<c:when test="${isInError && !hasShown}">
-			<span class="<c:out value="${exclaim}"/>">! </span>
-			<input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-				   autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage('input${itemId}');" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+			<span class="${exclaim}">! </span>
+			<input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="${input}" id="input${itemId}" tabindex="${tabNum}"
+				   autotabbing="" onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); changeImage('input${itemId}');"
+				   type="text" name="input${itemId}" ${respLayout} value="${inputTxtValue}" style="${isFSCRF ? 'width: 100%;' : ''}"/>
 		</c:when>
 		<c:otherwise>
-			<input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-				   autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage('input${itemId}');" type="text" name="input<c:out value="${itemId}" />" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+			<input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="input${itemId}" tabindex="${tabNum}"
+				   autotabbing="" onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); changeImage('input${itemId}');"
+				   type="text" name="input${itemId}" ${respLayout} value="${inputTxtValue}" style="${isFSCRF ? 'width: 100%;' : ''}"/>
 		</c:otherwise>
 	</c:choose>
+	</div>
 	<c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-		<ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${itemId}" linkId="anchor${itemId}" imageId="anchor${itemId}" checkIfShowYear="true"/>
-		<c:set var="numOfDate" value="${numOfDate+1}"/>
+		<div style="display: table-cell; padding-left: 10px;">
+			<ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${itemId}" linkId="anchor${itemId}" imageId="anchor${itemId}" checkIfShowYear="true"/>
+			<c:set var="numOfDate" value="${numOfDate+1}"/>
+		</div>
 	</c:if>
 </c:if>
 <c:if test='${inputType == "textarea"}'>
-	<label for="input<c:out value="${itemId}"/>"></label>
+	<label for="input${itemId}"></label>
 	<c:choose>
 		<c:when test="${isInError && !hasShown}">
-			<span class="<c:out value="${exclaim}"/>">! </span>
-      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-				autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage('input${itemId}');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+			<span class="${exclaim}">! </span>
+      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="${input}" id="input${itemId}" tabindex="${tabNum}"
+				autotabbing="" onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); changeImage('input${itemId}');"
+				name="input${itemId}" rows="5" cols="40" style="${isFSCRF ? 'width: 100%;' : ''}">${inputTxtValue}</textarea>
 		</c:when>
 		<c:otherwise>
-      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}"
-				autotabbing="" onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage('input${itemId}');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="input${itemId}" tabindex="${tabNum}"
+				autotabbing="" onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); changeImage('input${itemId}');"
+				name="input${itemId}" rows="5" cols="40" style="${isFSCRF ? 'width: 100%;' : ''}">${inputTxtValue}</textarea>
 		</c:otherwise>
 	</c:choose>
 </c:if>
@@ -335,7 +347,8 @@ form element in red --%>
 		</c:if>
 	</c:forEach>
 	<select class="${isInError ? 'aka_input_error' : 'formfield'}" id="input${itemId}" tabindex="${tabNum}"
-			onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); ${scdScript} changeImage('input${itemId}');" name="input${itemId}">
+			onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); ${scdScript} changeImage('input${itemId}');"
+			name="input${itemId}"  style="${isFSCRF ? 'width: 100%;' : ''}">
 		<c:if test="${!defaultValueInOptions and displayItem.metadata.defaultValue != null and displayItem.metadata.defaultValue != ''}">
 			<c:set var="optionWasSelected" value="${selectDefault}"/>
 			<option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
@@ -357,12 +370,14 @@ form element in red --%>
 					<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 					</c:forEach>
-					<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
-					onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); changeImage('input${itemId}');">
+					<select class="${input}" id="input${itemId}" multiple  tabindex="${tabNum}" name="input${itemId}"
+						onChange="destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); selectControlShow(this, '${scdPairStr}'); changeImage('input${itemId}');"
+						style="${isFSCRF ? 'width: 100%;' : ''}">
 				</c:when>
 				<c:otherwise>
-					<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
-					onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage('input${itemId}');">
+					<select class="${input}" id="input${itemId}" multiple  tabindex="${tabNum}" name="input${itemId}"
+					onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); changeImage('input${itemId}');"
+					style="${isFSCRF ? 'width: 100%;' : ''}">
 				</c:otherwise>
 			</c:choose>
 		</c:when>
@@ -373,12 +388,14 @@ form element in red --%>
 					<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 					</c:forEach>
-					<select id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
-					onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; changeImage('input${itemId}');">
+					<select id="input${itemId}" multiple  tabindex="${tabNum}" name="input${itemId}"
+						onChange="destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); selectControlShow(this, '${scdPairStr}'); this.className='changedField'; changeImage('input${itemId}');"
+						style="${isFSCRF ? 'width: 100%;' : ''}">
 				</c:when>
 				<c:otherwise>
-					<select id="input<c:out value="${itemId}"/>" multiple  tabindex="${tabNum}" name="input<c:out value="${itemId}"/>"
-					onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); changeImage('input${itemId}');">
+					<select id="input${itemId}" multiple  tabindex="${tabNum}" name="input${itemId}"
+						onChange="this.className='changedField'; destNonRepInstant('${itemId}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}', '${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}'); changeImage('input${itemId}');"
+						style="${isFSCRF ? 'width: 100%;' : ''}">
 				</c:otherwise>
 			</c:choose>
 		</c:otherwise>
@@ -404,12 +421,17 @@ form element in red --%>
 	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 	<c:choose>
 		<c:when test="${isInError && !hasShown}">
-			<span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
-				"this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+			<span class="<c:out value="${exclaim}"/>">! </span>
+			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
+				"this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />"
+				value="<c:out value="${displayItem.metadata.responseSet.value}"/>"
+				style="${isFSCRF ? 'width: 100%;' : ''}"/>
 		</c:when>
 		<c:otherwise>
 			<input id="input<c:out value="${itemId}"/>" tabindex="${tabNum}" onChange=
-					"this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+				"this.className='changedField'; changeImage('input${itemId}');" type="text" class="disabled" disabled="disabled" name="input<c:out value="${itemId}" />"
+				value="<c:out value="${displayItem.metadata.responseSet.value}"/>"
+				style="${isFSCRF ? 'width: 100%;' : ''}"/>
 		</c:otherwise>
 	</c:choose>
 </c:if>
