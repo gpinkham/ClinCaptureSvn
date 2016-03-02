@@ -78,21 +78,27 @@ public class AddSubjectPage extends BasePage {
 		
     	iStudySubjectID.type(ssubj.getStudySubjectID());
 
-    	iPersonID.type(ssubj.getPersonID());
+    	if (!ssubj.getPersonID().isEmpty()) { 
+    		iPersonID.type(ssubj.getPersonID());
+    	}
     	
-    	if (iSecondaryID.isCurrentlyVisible()) { 
+    	if (!ssubj.getSecondaryID().isEmpty()) { 
     		iSecondaryID.type(ssubj.getSecondaryID());
     	}
     	
-    	if (!"".equals(ssubj.getDateOfEnrollmentForStudy())) { 
+    	if (!ssubj.getDateOfEnrollmentForStudy().isEmpty()) { 
     		iDateOfEnrollment.type(ssubj.getDateOfEnrollmentForStudy());
     	}
 
-    	iGender.selectByValue(StudySubject.convertGenderNameToValue(ssubj.getGender()));
+    	if (!ssubj.getGender().isEmpty()) {  
+    		iGender.selectByValue(StudySubject.convertGenderNameToValue(ssubj.getGender()));
+    	}
     	
-    	iDOB.type(ssubj.getDateOfBirth());
+    	if (!ssubj.getDateOfBirth().isEmpty()) { 
+    		iDOB.type(ssubj.getDateOfBirth());
+    	}
     	
-    	if (!"".equals(ssubj.getDynamicGroupName())) { 
+    	if (!ssubj.getDynamicGroupName().isEmpty()) { 
     		sDynamicGroupName.selectByVisibleText(ssubj.getDynamicGroupName());
     	}
 	}

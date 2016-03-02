@@ -135,7 +135,7 @@ public class CreateNewSitePage extends BasePage {
 
 		rCollectInterviewerName.selectByValue(subStudy.getCollectInterviewerName());
 
-		rCollectPersonID.selectByValue(subStudy.getInterviewDateDefault());
+		rCollectPersonID.selectByValue(subStudy.getCollectPersonID());
 
 		if (interviewDateDefaultIsShown(subStudy)) {
 			rInterviewDateDefault.selectByValue(subStudy.getInterviewDateDefault());
