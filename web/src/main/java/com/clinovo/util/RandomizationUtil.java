@@ -287,14 +287,14 @@ public class RandomizationUtil {
 
 		StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eCRFBean.getStudyEventId());
 
-		if (studyEventBean.getSubjectEventStatus().isScheduled()) {
+		SubjectEventStatus currentEventStatus = studyEventBean.getSubjectEventStatus();
+		if (currentEventStatus.isNotScheduled() || currentEventStatus.isScheduled()) {
 
 			studyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-			studyEventBean.setPrevSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+			studyEventBean.setPrevSubjectEventStatus(currentEventStatus);
 			studyEventBean.setUpdatedDate(new Date());
 			studyEventBean.setUpdater(ub);
 			studyEventDAO.update(studyEventBean);
-
 			checQuerySuccessfull(studyEventDAO);
 		}
 	}
