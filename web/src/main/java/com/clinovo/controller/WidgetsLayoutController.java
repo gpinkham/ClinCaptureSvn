@@ -615,11 +615,14 @@ public class WidgetsLayoutController extends SpringController {
 				LOGGER.error("Warning, event CRF with id=" + avCRF.getId() + " was updated, but updated date is NULL.");
 			}
 		}
+		
 		model.addAttribute("sdvAvailableECRFs", countAvailableCRFs);
 		model.addAttribute("sdvProgressYear", sdvProgressYear);
 		model.addAttribute("sdvValuesByMonth", valuesAndSigns);
 		model.addAttribute("sdvNextYearExists", nextDataExists);
 		model.addAttribute("sdvPreviousYearExists", previousDataExists);
+		model.addAttribute("sdvProgressActivateLegend", !getCurrentRole(request).isStudySponsor());
+
 		return "widgets/includes/sdvProgressChart";
 	}
 
@@ -1192,7 +1195,7 @@ public class WidgetsLayoutController extends SpringController {
 		filter.addFilter("crfCompletedYear", previousYear);
 		boolean evalProgNextYearExists = currentYear > displayedYear;
 		boolean evalProgPreviousYearExists = eventCRFDAO.countOfAllEventCrfsForEvaluation(filter, sb) != 0;
-		boolean evaluationProgressActivateLegend = sb.getStudyParameterConfig().getStudyEvaluator().equals("yes");
+		boolean evaluationProgressActivateLegend = sb.getStudyParameterConfig().getStudyEvaluator().equals("yes") && !getCurrentRole(request).isStudySponsor();
 		model.addAttribute("evalProgNextYearExists", evalProgNextYearExists);
 		model.addAttribute("evalProgPreviousYearExists", evalProgPreviousYearExists);
 		model.addAttribute("evaluationProgressYear", displayedYear);

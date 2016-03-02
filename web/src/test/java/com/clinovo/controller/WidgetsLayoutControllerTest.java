@@ -25,7 +25,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 	private static final int EVENT_COMPL_ATTRIBUTES = 4;
 	private static final int SUBJECT_STAT_ATTRIBUTES = 4;
-	private static final int SDV_PROG_ATTRIBUTES = 5;
+	private static final int SDV_PROG_ATTRIBUTES = 6;
 	private static final int NDS_PER_CRF_ATTRIBUTES = 4;
 	private static final int ENROLL_PROG_ATTRIBUTES = 4;
 	private static final int CODING_PROG_ATTRIBUTES = 5;
@@ -34,7 +34,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	private static final int EVALUATION_PROG_ATTRIBUTES = 5;
 
 	private StudyBean sb;
+	StudyUserRoleBean surb;
 	private UserAccountBean ub;
+	
 
 	/**
 	 * Initialize all fields for tests.
@@ -43,9 +45,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	public void prepear() {
 
 		ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
-		StudyUserRoleBean adminRole = new StudyUserRoleBean();
-		adminRole.setRole(Role.SYSTEM_ADMINISTRATOR);
-		roles.add(adminRole);
+		surb = new StudyUserRoleBean();
+		surb.setRole(Role.SYSTEM_ADMINISTRATOR);
+		roles.add(surb);
 		ub = new UserAccountBean();
 		ub.setId(1);
 		ub.setRoles(roles);
@@ -155,7 +157,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				get(SDV_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("sdvProgressYear", "0").sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(status().isOk());
+						.param("sdvProgressYear", "0").sessionAttr("study", sb).sessionAttr("userBean", ub).sessionAttr("userRole", surb)).andExpect(status().isOk());
 	}
 
 	/**
@@ -177,7 +179,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
+						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb).sessionAttr("userRole", surb))
 				.andExpect(status().isOk());
 	}
 
@@ -385,7 +387,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 	 *             if method returns incorrect url.
 	 **/
 	@Test
-	public void testThatInitStudyProgressReurnsCorrectUrl() throws Exception {
+	public void testThatInitStudyProgressReturnsCorrectUrl() throws Exception {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(STUDY_PROGRESS_WIDGET)
@@ -406,7 +408,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET)
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
-						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(MockMvcResultMatchers.model().size(SDV_PROG_ATTRIBUTES));
+						.sessionAttr("study", sb).sessionAttr("userBean", ub).sessionAttr("userRole", surb)).andExpect(MockMvcResultMatchers.model().size(SDV_PROG_ATTRIBUTES));
 	}
 
 	/**
@@ -421,9 +423,9 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET)
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
-						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+						.sessionAttr("study", sb).sessionAttr("userBean", ub).sessionAttr("userRole", surb)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("sdvAvailableECRFs", "sdvProgressYear",
-						"sdvValuesByMonth", "sdvNextYearExists", "sdvPreviousYearExists"));
+						"sdvValuesByMonth", "sdvNextYearExists", "sdvPreviousYearExists", "sdvProgressActivateLegend"));
 	}
 
 	/**
@@ -438,7 +440,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(SDV_PROGRESS_WIDGET)
 						.sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE).param("sdvProgressYear", "0")
-						.sessionAttr("study", sb).sessionAttr("userBean", ub)).andExpect(
+						.sessionAttr("study", sb).sessionAttr("userBean", ub).sessionAttr("userRole", surb)).andExpect(
 				MockMvcResultMatchers.view().name("widgets/includes/sdvProgressChart"));
 	}
 
@@ -594,7 +596,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
+						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb).sessionAttr("userRole", surb))
 				.andExpect(MockMvcResultMatchers.model().size(EVALUATION_PROG_ATTRIBUTES));
 	}
 
@@ -603,7 +605,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
+						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb).sessionAttr("userRole", surb))
 				.andExpect(
 						MockMvcResultMatchers.model().attributeExists("evaluationProgressYear",
 								"evaluationProgressDataRows", "evalProgPreviousYearExists", "evalProgNextYearExists",
@@ -615,7 +617,7 @@ public class WidgetsLayoutControllerTest extends BaseControllerTest {
 
 		this.mockMvc.perform(
 				get(EVALUATION_PROGRESS_WIDGET).sessionAttr(LocaleResolver.CURRENT_SESSION_LOCALE, LOCALE)
-						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb))
+						.param("evaluationProgressYear", "0").sessionAttr("userBean", ub).sessionAttr("study", sb).sessionAttr("userRole", surb))
 				.andExpect(MockMvcResultMatchers.view().name("widgets/includes/evaluationProgressChart"));
 	}
 

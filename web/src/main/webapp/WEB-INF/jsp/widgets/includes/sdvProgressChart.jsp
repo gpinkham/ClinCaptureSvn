@@ -36,6 +36,7 @@
 	<input type="hidden" class="status available_for_sdv" value="<fmt:message bundle='${resword}' key='w_status_available_for_sdv'/>" />
 	<input type="hidden" class="status_sdved_jmesa_filter" value="<fmt:message bundle='${resword}' key='complete'/>" />
 	<input type="hidden" class="status_available_for_sdv_jmesa_filter" value="<fmt:message bundle='${resword}' key='not_done'/>" />
+	<input type="hidden" id="sdvProgressActivateLegend" value="${sdvProgressActivateLegend}">
 </form>
 <input type="hidden" value="${study.id}" id="sdvWStudyId">
 

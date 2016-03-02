@@ -41,7 +41,8 @@ function initSdvProgress(action) {
 			sdvProgressChart.draw(data, options);
 			setButtonsColor(".sdv_progress");
 			var element = document.getElementById('toolbar');
-			if (!element) {
+			var activate = $("#sdvProgressActivateLegend").val();
+			if (!element && activate == "true") {
 				function selectHandler() {
 					var statuses = [];
 					statuses.push(($("#sdv_progress .status_available_for_sdv_jmesa_filter").val()).replace(/\s/g, '+'));
@@ -58,6 +59,7 @@ function initSdvProgress(action) {
 					} else 
 						sdvProgressChart.setSelection([]);
 				}
+				
 				google.visualization.events
 						.addListener(sdvProgressChart, 'select',
 						selectHandler);

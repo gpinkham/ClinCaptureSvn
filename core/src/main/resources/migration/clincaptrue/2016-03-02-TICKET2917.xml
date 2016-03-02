@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
+ 	<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" 
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd"> 
+  
+		<changeSet author="Igor" id="2016-03-02-TICKET2917"> 
+			<comment>Add widget support for Study Sponsor role</comment> 
+ 	        <update tableName="widget"> 
+ 	                        <column name="have_access" value="1,2,6,10" />  
+ 	                        <column name="display_as_default" value="1,2,6,10" />  
+ 	            <where>id = 14</where> 
+ 	        </update> 
+ 	        <update tableName="widget"> 
+ 	                        <column name="have_access" value="1,2,8,10" />  
+ 	                        <column name="display_as_default" value="1,2,8,10" />  
+ 	            <where>id = 15</where> 
+ 	        </update> 
+ 	    </changeSet> 
+ 	</databaseChangeLog> 
