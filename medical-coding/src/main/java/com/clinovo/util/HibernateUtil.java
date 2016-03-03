@@ -49,7 +49,7 @@ public final class HibernateUtil {
     private static SessionFactory sessionFactory;
 
     private static final String WHOD_DEFAULT = "WHOD-0915";
-    private static final String MEDDRA_DEFAULT = "MEDDRA-171";
+    private static final String MEDDRA_DEFAULT = "MEDDRA-19";
 
     /**
      * Returns session for term search.
