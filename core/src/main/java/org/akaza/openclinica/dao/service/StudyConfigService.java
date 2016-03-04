@@ -28,17 +28,29 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameter;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * StudyConfigService class.
  */
+@Service
 @SuppressWarnings({"rawtypes"})
 public class StudyConfigService {
 
-	private DataSource ds;
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+	@Autowired
+	private DataSource ds;
+
+	/**
+	 * Default constructor.
+	 */
+	public StudyConfigService() {
+	}
 
 	/**
 	 * This method is used to initialize Study Config Service.
@@ -86,6 +98,29 @@ public class StudyConfigService {
 		}
 		study.setStudyParameterConfig(spc);
 		return study;
+	}
+
+	/**
+	 * Populates study bean.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @return StudyBean
+	 */
+	public StudyBean populateStudyBean(StudyBean studyBean) {
+		StudyDAO studyDao = new StudyDAO(ds);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
+		ArrayList studyParameters = spvdao.findParamConfigByStudy(studyBean);
+		studyBean.setStudyParameters(studyParameters);
+		StudyConfigService scs = new StudyConfigService(ds);
+		if (studyBean.getParentStudyId() <= 0) {
+			studyBean = scs.setParametersForStudy(studyBean);
+		} else {
+			studyBean.setParentStudyName((studyDao.findByPK(studyBean.getParentStudyId())).getName());
+			studyBean = scs.setParametersForSite(studyBean);
+		}
+
+		return studyBean;
 	}
 
 	/**

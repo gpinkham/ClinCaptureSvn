@@ -15,12 +15,6 @@
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource 
           and Hibernate DAO injection via autowiring -->
 
-    <bean id="studyConfigService" class="org.akaza.openclinica.dao.service.StudyConfigService" autowire="byName">
-        <constructor-arg name="ds" ref="dataSource"/>
-    </bean>
-
-    <bean id="subjectService" class="org.akaza.openclinica.service.subject.SubjectService"/>
-
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>

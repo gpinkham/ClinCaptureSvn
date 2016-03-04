@@ -74,4 +74,14 @@ public interface SubjectServiceInterface {
 	 */
 	List<StudySubjectBean> getStudySubject(StudyBean study);
 
+	/**
+	 * Returns studySubjectOID.
+	 *
+	 * @param subjectIdentifier
+	 *            String
+	 * @param studyOID
+	 *            String
+	 * @return String
+	 */
+	String getStudySubjectOID(String subjectIdentifier, String studyOID);
 }

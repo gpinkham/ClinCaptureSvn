@@ -68,15 +68,17 @@
 			<artifactId>Saxon-HE</artifactId>
 			<version>9.6.0-6</version>
 		</dependency>
-        <dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.3</version>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
 		</dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -150,8 +152,8 @@
 			<artifactId>cglib-nodep</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -169,12 +171,10 @@
 		<dependency>
 			<groupId>org.xhtmlrenderer</groupId>
 			<artifactId>flying-saucer-pdf</artifactId>
-			<version>9.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.htmlcleaner</groupId>
 			<artifactId>htmlcleaner</artifactId>
-			<version>2.10</version>
 		</dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -312,8 +312,7 @@
     	<dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-            <classifier>jdk15</classifier>
+			<classifier>jdk15</classifier>
         </dependency>
 		<dependency>
 			<groupId>xom</groupId>

@@ -28,12 +28,14 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.clinovo.service.StudySubjectService;
 
 /**
  * SubjectService.
  */
+@Service
 @SuppressWarnings({"unchecked"})
 public class SubjectService implements SubjectServiceInterface {
 
@@ -69,6 +71,26 @@ public class SubjectService implements SubjectServiceInterface {
 		UserAccountBean user = new UserAccountBean();
 		user.setId(1);
 		return user;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getStudySubjectOID(String subjectIdentifier, String studyOID) {
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
+		StudySubjectBean studySubject = studySubjectDAO.findByOid(subjectIdentifier);
+		if (subjectIdentifier.equals("*") || (studySubject != null && studySubject.getOid() != null)) {
+			return subjectIdentifier;
+		} else {
+			StudyDAO studyDAO = new StudyDAO(dataSource);
+			StudyBean study = studyDAO.findByOid(studyOID);
+			studySubject = studySubjectDAO.findByLabelAndStudy(subjectIdentifier, study);
+			if (studySubject != null && studySubject.getOid() != null) {
+				return studySubject.getOid();
+			} else {
+				return subjectIdentifier;
+			}
+		}
 	}
 
 	/**

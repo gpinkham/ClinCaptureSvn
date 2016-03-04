@@ -108,4 +108,8 @@ public class SoapCreateSubject extends WebServiceGatewaySupport implements Subje
 		return null;
 	}
 
+	public String getStudySubjectOID(String subjectIdentifier, String studyOID) {
+		return null;
+	}
+
 }
