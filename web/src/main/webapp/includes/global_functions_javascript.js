@@ -2581,6 +2581,7 @@ function randomizeSubject() {
                 $(resultInput).attr("readonly", "readonly");
                 
                 $("input[type='submit']").removeAttr("disabled");
+				checkRandomizationCRF();
                 var errorMessage = $("input[name=randomizationMessage]").val();
                 alertDialog({ message: errorMessage, height: 150, width: 500 });
             }
