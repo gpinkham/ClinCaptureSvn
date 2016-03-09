@@ -257,8 +257,11 @@ public class CodedItemsController extends SpringController {
 			} else {
 				dataValue = data.getValue();
 			}
-
-			term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(), codedItem.getDictionary());
+			try {
+				term = termService.findByAliasAndExternalDictionary(dataValue.toLowerCase(), codedItem.getDictionary());
+			} catch (Exception ex) {
+				logger.error("Exception is thrown while searching for coding term: " + ex.getMessage());
+			}
 		}
 
 		if (term != null) {
