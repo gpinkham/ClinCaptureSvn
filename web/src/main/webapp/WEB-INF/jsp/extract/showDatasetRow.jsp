@@ -45,7 +45,7 @@
 	<td class="table_cell">
 	<table border="0" cellpadding="0" cellspacing="0">
       <c:choose>
-          <c:when test="${userBean.sysAdmin}">
+          <c:when test="${userBean.sysAdmin && !(userRole.id eq 10)}">
               <tr class="innerTable">
                 <c:choose>
                     <c:when test='${currRow.bean.status.name == "removed" and !viewModeOnly}'>
@@ -101,10 +101,9 @@
           <c:otherwise>
               <tr class="innerTable">
                 <c:choose>
-                    <c:when test='${currRow.bean.status.name == "removed" and !viewModeOnly}}'>
+                    <c:when test='${currRow.bean.status.name == "removed" and !viewModeOnly}'>
                         <c:choose>
                          <c:when test="${currRow.bean.owner.name == userBean.name}">
-                        <%-- parts to be added later, look at showUserAccountRow.jsp, tbh --%>
                         <td><a href="RestoreDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                             onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
                             onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"

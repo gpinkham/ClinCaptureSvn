@@ -145,15 +145,7 @@ public class EditDatasetServlet extends SpringServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		// TODO add a limit so that the owner can edit, no one else?
-		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| Role.isMonitor(currentRole.getRole())) {
+		if (CreateDatasetServlet.haveAccess(getUserAccountBean(request), getCurrentRole(request))){
 			return;
 		}
 

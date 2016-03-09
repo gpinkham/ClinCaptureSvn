@@ -107,15 +107,7 @@ public class CreateDatasetServlet extends SpringServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| Role.isMonitor(currentRole.getRole())) {
+		if (haveAccess(getUserAccountBean(request), getCurrentRole(request))){
 			return;
 		}
 
@@ -123,6 +115,15 @@ public class CreateDatasetServlet extends SpringServlet {
 				+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				getResException().getString("not_allowed_access_extract_data_servlet"), "1");
+	}
+
+	public static boolean haveAccess(UserAccountBean ub, StudyUserRoleBean currentRole) {
+		if (ub.isSysAdmin() || Role.STUDY_ADMINISTRATOR.equals(currentRole.getRole()) || Role.INVESTIGATOR.equals(currentRole.getRole())
+				|| Role.isMonitor(currentRole.getRole()) || Role.STUDY_SPONSOR.equals(currentRole.getRole())) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	/**
