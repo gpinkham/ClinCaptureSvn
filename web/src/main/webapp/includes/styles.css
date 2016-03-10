@@ -3035,3 +3035,9 @@ table td.crf_shortcuts_de {
 	margin-bottom: 5px;
 	margin-top: 5px;
 }
+.table_cell .divider {
+	height: 1px;
+	border-bottom: 1px solid #CCCCCC;
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
