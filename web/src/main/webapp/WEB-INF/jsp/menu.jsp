@@ -47,13 +47,13 @@
 </style>
 
 <script type="text/JavaScript" language="JavaScript">
-  //alignment of headers and icons
+	//alignment of headers and icons
 
-  jQuery(document).ready(function () {
-    jQuery("div[id^='Event_']").parent().parent().parent().parent().parent().attr("align", "center");
-    jQuery("tr.header").attr("align", "center");
-	checkCookiesDialog();
-  });
+	$(document).ready(function () {
+		$("div[id^='Event_']").parent().parent().parent().parent().parent().attr("align", "center");
+		$("tr.header").attr("align", "center");
+		checkCookiesDialog();
+	});
 </script>
 
 <!-- then instructions-->
@@ -310,8 +310,10 @@
 <c:if test="${displayPageVersion=='new'}">
 	<!--New home page layout-->
 	<span class="new_home_page">
-	<input type="hidden" id="userId" name="userId" value="${userBean.id}"/>
-	<input type="hidden" id="studyId" name="studyId" value="${study.id}"/>
+		<input type="hidden" id="userId" name="userId" value="${userBean.id}"/>
+		<input type="hidden" id="studyId" name="studyId" value="${study.id}"/>
+		<input type="hidden" id="isSponsor" name="isSponsor" value="${userRole.role.id == 10}"/>
+		<input type="hidden" id="sponsorAccessMessage" value="<fmt:message bundle="${resword}" key="sponsor_no_privileges_for_chart"/>"/>
 	
 	<c:if test="${!empty dispayWidgetsLayout}">
 		<table class="widgets_container">

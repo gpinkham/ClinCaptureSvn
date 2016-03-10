@@ -707,4 +707,13 @@ function moveElementsToTheRight(selector,length) {
 	var offset = parseInt(length, 10) + 2;
 	$(selector).css("padding-left", offset + "px");
 }
+
+function showNoAccessDialogSponsor() {
+	var message = $("#sponsorAccessMessage").val();
+	alertDialog({ message: message, height: 150, width: 550 });
+}
+
+function isSponsor() {
+	return $("#isSponsor").val() == "true";
+}
 /* /Supporting functions */

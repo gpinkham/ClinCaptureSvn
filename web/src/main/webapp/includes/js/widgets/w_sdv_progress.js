@@ -56,15 +56,23 @@ function initSdvProgress(action) {
 						var redirectSufix = "&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15";
 						var studyId = $("input[id=sdvWStudyId]").val();
 						window.location.href = redirectPrefix + studyId + redirectSufix + "&sdv_f_sdvStatus=" + sdvStep;
-					} else 
+					} else
 						sdvProgressChart.setSelection([]);
 				}
-				
+
 				google.visualization.events
 						.addListener(sdvProgressChart, 'select',
 						selectHandler);
-			} else
+			} else if (!element && isSponsor()) {
+				function onClickHandler() {
+					showNoAccessDialogSponsor();
+					sdvProgressChart.setSelection([]);
+				}
+
+				google.visualization.events.addListener(sdvProgressChart, 'select', onClickHandler);
+			} else {
 				$(".widget input[type=button], .widget_big input[type=button]").remove();
+			}
 		},
 		error : function(e) {
 			console.log("Error:" + e);

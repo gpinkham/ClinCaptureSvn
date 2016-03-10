@@ -55,6 +55,13 @@ function initEvaluationProgress(action) {
 				}
 				google.visualization.events.addListener(evaluationProgressChart, 'select',
 					selectHandler);
+			} else if (!element && isSponsor()) {
+				function onClickHandler() {
+					showNoAccessDialogSponsor();
+					evaluationProgressChart.setSelection([]);
+				}
+
+				google.visualization.events.addListener(evaluationProgressChart, 'select', onClickHandler);
 			}
 		},
 		error : function(e) {
