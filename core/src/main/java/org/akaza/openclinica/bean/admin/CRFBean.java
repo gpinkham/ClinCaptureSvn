@@ -14,6 +14,7 @@
 package org.akaza.openclinica.bean.admin;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.CrfOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -42,6 +43,7 @@ public class CRFBean extends AuditableEntityBean {
 	private OidGenerator oidGenerator;
 	private int studyId;
 	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
+	private ArrayList<StudyBean> studiesWhereUsed;
 
 	/**
 	 * Determines if a given CRF should use auto-layout or not. True indicates that auto layout should be applied, False
@@ -190,5 +192,13 @@ public class CRFBean extends AuditableEntityBean {
 	 */
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+	public ArrayList<StudyBean> getStudiesWhereUsed() {
+		return studiesWhereUsed == null ? new ArrayList<StudyBean>() : studiesWhereUsed;
+	}
+
+	public void setStudiesWhereUsed(ArrayList<StudyBean> studiesWhereUsed) {
+		this.studiesWhereUsed = studiesWhereUsed;
 	}
 }

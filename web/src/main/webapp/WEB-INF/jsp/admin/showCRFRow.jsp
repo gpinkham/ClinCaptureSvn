@@ -26,7 +26,12 @@
   
 </c:choose>
 <tr valign="top" bgcolor="#F5F5F5">
-  <td rowspan="<c:out value="${count}"/>" class="table_cell_left"><c:out value="${currRow.bean.name}"/></td>
+	<td rowspan="${count}" class="table_cell_left">
+		<c:forEach var="study" items="${currRow.bean.studiesWhereUsed}" varStatus="studyVarStatus">
+			${studyVarStatus.index == 0 ? '' : '<div class="divider"> </div>'} ${study.identifier}
+		</c:forEach>
+	</td>
+  <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.name}"/></td>
   <td rowspan="<c:out value="${count}"/>" class="table_cell">
 	  <cc-fmt:formatDate value="${currRow.bean.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>
 	  &nbsp;
@@ -232,4 +237,4 @@
     </td>
   </tr>
 </c:forEach>
-<tr><td class="table_divider" colspan="9">&nbsp;</td></tr>
+<tr><td class="table_divider" colspan="12">&nbsp;</td></tr>

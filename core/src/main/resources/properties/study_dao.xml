@@ -254,4 +254,15 @@
             group by studyId;
         </sql>
     </query>
+	<query>
+		<name>findAllActiveWhereCRFIsUsed</name>
+		<sql>
+			SELECT DISTINCT s.*
+			FROM study s
+			INNER JOIN study_event_definition sed ON s.study_id = sed.study_id
+			INNER JOIN event_definition_crf edc ON edc.study_event_definition_id = sed.study_event_definition_id
+				AND edc.study_id = s.study_id
+			WHERE edc.crf_id = ?
+		</sql>
+	</query>
 </queries>

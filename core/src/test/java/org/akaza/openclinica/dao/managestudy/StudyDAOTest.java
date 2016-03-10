@@ -69,6 +69,11 @@ public class StudyDAOTest extends DefaultAppContextTest {
 		assertEquals(0, studyDAO.findAllActiveWhereUserHasActiveRole(user.getName()).size());
 	}
 
+	@Test
+	public void testThatFindAllWhereCRFIsUsedReturnsCorrectResult() {
+		assertEquals(1, studyDAO.findAllActiveWhereCRFIsUsed(1).size());
+	}
+
 	@After
 	public void cleanup() {
 		userAccountDAO.execute("delete from authorities where username = '".concat(user.getName()).concat("'"),

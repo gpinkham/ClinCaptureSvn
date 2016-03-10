@@ -21,6 +21,7 @@
 
 package org.akaza.openclinica.web.bean;
 
+import com.clinovo.service.ListCRFService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 
 import java.util.ArrayList;
@@ -98,23 +99,12 @@ public class ListCRFRow extends EntityBeanRow {
 		return thisCRF.getName();
 	}
 
+	/**
+	 * DEPRECATED. Please use ListCRFService.generateRowsFromBeans instead.
+	 */
 	@Override
+	@Deprecated
 	public ArrayList generatRowsFromBeans(ArrayList beans) {
-		return ListCRFRow.generateRowsFromBeans(beans);
-	}
-
-	public static ArrayList generateRowsFromBeans(ArrayList beans) {
-		ArrayList answer = new ArrayList();
-
-		for (int i = 0; i < beans.size(); i++) {
-			try {
-				ListCRFRow row = new ListCRFRow();
-				row.setBean((CRFBean) beans.get(i));
-				answer.add(row);
-			} catch (Exception e) {
-			}
-		}
-
-		return answer;
+		return new ArrayList();
 	}
 }

@@ -95,13 +95,6 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void crfNameHasAlreadyBeenUsed() throws CRFReadingException {
-		throw new CRFReadingException(crfBuilder.getMessage("crf_name_already_used"));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public void crfVersionHasAlreadyBeenUsed() throws CRFReadingException {
 		throw new CRFReadingException(crfBuilder.getMessage("crf_version_already_used"));
 	}

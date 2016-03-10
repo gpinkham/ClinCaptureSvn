@@ -129,11 +129,6 @@ public class ExcelErrorMessageProducerTest {
 	}
 
 	@Test(expected = CRFReadingException.class)
-	public void testThatCrfNameHasAlreadyBeenUsedMethodGeneratesErrorMessage() throws Exception {
-		excelErrorMessageProducer.crfNameHasAlreadyBeenUsed();
-	}
-
-	@Test(expected = CRFReadingException.class)
 	public void testThatCrfVersionHasAlreadyBeenUsedMethodGeneratesErrorMessage() throws Exception {
 		excelErrorMessageProducer.crfVersionHasAlreadyBeenUsed();
 	}

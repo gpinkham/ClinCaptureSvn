@@ -84,13 +84,6 @@ public final class CommonValidator {
 		if (crfBuilder.getCrfBean().getName().length() > INT_255) {
 			crfBuilder.getErrorMessageProducer().crfNameLengthIsExceeded();
 		}
-		if (crfBuilder.getOperationType() == OperationType.IMPORT_NEW_CRF) {
-			CRFBean crfBean = (CRFBean) crfDao.findByName(crfBuilder.getCrfBean().getName());
-			if (crfBean.getId() > 0) {
-				crfBuilder.getErrorMessageProducer().crfNameHasAlreadyBeenUsed();
-			}
-
-		}
 		if (crfBuilder.getOperationType() == OperationType.IMPORT_NEW_CRF_VERSION) {
 			CRFBean crfBean = (CRFBean) crfDao.findByPK(crfBuilder.getCrfBean().getId());
 			if (!crfBean.getName().equalsIgnoreCase(crfBuilder.getCrfBean().getName())) {

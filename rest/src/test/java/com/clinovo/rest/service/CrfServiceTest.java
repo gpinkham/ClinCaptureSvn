@@ -36,24 +36,6 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatImportCrfServiceDoesNotAllowToImportSameCrfTwice() throws Exception {
-		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
-		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatImportCrfServiceDoesNotAllowToImportSameCrfTwiceEvenIfVersionIsDifferent() throws Exception {
-		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
-		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
-		jsonObject.put("version", "v2.0");
-		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", jsonObject.toString()).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
 	public void testThatImportCrfVersionServiceWorksFine() throws Exception {
 		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
 				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());

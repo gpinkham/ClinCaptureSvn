@@ -1226,4 +1226,17 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		}
 		return al;
 	}
+
+	public ArrayList<StudyBean> findAllActiveWhereCRFIsUsed(int crfId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+		ArrayList alist = this.select(digester.getQuery("findAllActiveWhereCRFIsUsed"), variables);
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
 }

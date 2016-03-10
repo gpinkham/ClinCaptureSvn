@@ -25,15 +25,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.service.ListCRFService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -136,23 +139,25 @@ public class ListCRFServlet extends RememberLastPage {
 
 			}
 			eb.setVersions(versions);
-
 		}
 
 		EntityBeanTable table = getEntityBeanTable();
-		ArrayList allRows = ListCRFRow.generateRowsFromBeans(crfs);
+		ArrayList allRows = getListCRFService(getServletContext()).generateRowsFromBeans(crfs);
 
-		String[] columns = {getResWord().getString("CRF_name"), getResWord().getString("date_updated"),
-				getResWord().getString("last_updated_by"), getResWord().getString("crf_oid"),
-				getResWord().getString("versions"), getResWord().getString("version_oid"),
-				getResWord().getString("date_created"), getResWord().getString("owner"),
-				getResWord().getString("status"), getResWord().getString("download"),
-				getResWord().getString("actions")};
+		String[] columns = {getResWord().getString("studies"), getResWord().getString("CRF_name"),
+				getResWord().getString("date_updated"), getResWord().getString("last_updated_by"),
+				getResWord().getString("crf_oid"), getResWord().getString("versions"),
+				getResWord().getString("version_oid"), getResWord().getString("date_created"),
+				getResWord().getString("owner"), getResWord().getString("status"),
+				getResWord().getString("download"), getResWord().getString("actions")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(3);
-		table.hideColumnLink(4); // oid column
-		table.hideColumnLink(8);
+		table.hideColumnLink(0);
+		table.hideColumnLink(4);
+		table.hideColumnLink(5); // oid column
+		table.hideColumnLink(9);
+		table.hideColumnLink(10);
+		table.hideColumnLink(11);
 		table.setQuery("ListCRF", new HashMap());
 		table.addLink(getResWord().getString("blank_CRF_template"), "DownloadVersionSpreadSheet?template=1");
 		table.addLink(getResWord().getString("randomization_crf_template"), "DownloadVersionSpreadSheet?template=2");
@@ -183,6 +188,7 @@ public class ListCRFServlet extends RememberLastPage {
 				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
 				getResPage().getString("br_download_example_CRF_instructions_from"), request);
+		request.setAttribute("tableWidth", "1200px");
 		forwardPage(Page.CRF_LIST, request, response);
 	}
 
@@ -212,5 +218,10 @@ public class ListCRFServlet extends RememberLastPage {
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+	}
+
+	private ListCRFService getListCRFService(ServletContext context) {
+		return (ListCRFService) SpringServletAccess.getApplicationContext(context)
+				.getBean("listCRFService");
 	}
 }

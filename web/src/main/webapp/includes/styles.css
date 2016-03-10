@@ -3028,3 +3028,10 @@ table td.crf_shortcuts_view {
 table td.crf_shortcuts_de {
     padding-bottom: 16px;
 }
+
+.table_cell .divider {
+	height: 1px;
+	border-bottom: 1px solid #CCCCCC;
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
