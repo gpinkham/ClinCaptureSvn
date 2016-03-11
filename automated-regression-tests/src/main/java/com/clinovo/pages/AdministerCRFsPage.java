@@ -22,10 +22,10 @@ public class AdministerCRFsPage extends BasePage {
     @FindBy(xpath = ".//img[@name='btnSearch']")
     private WebElementFacade iFindButton;
     
-    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[1]")
+    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[2]")
     private WebElementFacade tdWithCRFName;
     
-    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[2]")
+    @FindBy(xpath = ".//*[@id='contentTable']/tbody/tr[2]/td[3]")
     private WebElementFacade tdWithCRFDateUpdated;
     
     public AdministerCRFsPage (WebDriver driver) {

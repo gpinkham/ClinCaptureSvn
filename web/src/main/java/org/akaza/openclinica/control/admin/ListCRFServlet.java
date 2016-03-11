@@ -188,7 +188,7 @@ public class ListCRFServlet extends RememberLastPage {
 				getResPage().getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(getResWord().getString("example_CRF_br_spreadsheets"),
 				getResPage().getString("br_download_example_CRF_instructions_from"), request);
-		request.setAttribute("tableWidth", "1200px");
+		request.setAttribute("tableWidth", "140");
 		forwardPage(Page.CRF_LIST, request, response);
 	}
 
