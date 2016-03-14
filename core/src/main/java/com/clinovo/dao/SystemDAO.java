@@ -14,15 +14,15 @@
  *******************************************************************************/
 package com.clinovo.dao;
 
-import com.clinovo.model.System;
-import com.clinovo.model.SystemGroup;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 import org.springframework.stereotype.Repository;
+
+import com.clinovo.model.System;
+import com.clinovo.model.SystemGroup;
 
 /**
  * This class is the database interface for system properties.
@@ -43,7 +43,7 @@ public class SystemDAO extends AbstractDomainDao<System> {
 	 */
 	public System findByName(String name) {
 		return (System) getCurrentSession().createQuery("from " + getDomainClassName() + " where name = :name")
-				.setString("name", name).uniqueResult();
+				.setString("name", name).setCacheable(true).uniqueResult();
 	}
 
 	/**
@@ -53,7 +53,8 @@ public class SystemDAO extends AbstractDomainDao<System> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<System> findAll() {
-		return getCurrentSession().createQuery("from " + getDomainClassName() + " order by name asc").list();
+		return getCurrentSession().createQuery("from " + getDomainClassName() + " order by name asc").setCacheable(true)
+				.list();
 	}
 
 	/**
@@ -63,8 +64,9 @@ public class SystemDAO extends AbstractDomainDao<System> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<SystemGroup> getAllMainGroups() {
-		return getCurrentSession().createQuery(
-				"from " + SystemGroup.class.getName() + " where parentId = 0 order by orderId asc").list();
+		return getCurrentSession()
+				.createQuery("from " + SystemGroup.class.getName() + " where parentId = 0 order by orderId asc")
+				.setCacheable(true).list();
 	}
 
 	/**
@@ -76,7 +78,7 @@ public class SystemDAO extends AbstractDomainDao<System> {
 	public List<SystemGroup> getAllChildGroups(int parentId) {
 		return getCurrentSession()
 				.createQuery("from " + SystemGroup.class.getName() + " where parentId = :parentId order by orderId asc")
-				.setInteger("parentId", parentId).list();
+				.setInteger("parentId", parentId).setCacheable(true).list();
 	}
 
 	/**
@@ -102,9 +104,11 @@ public class SystemDAO extends AbstractDomainDao<System> {
 		} else if (role.equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			user = "crc";
 		}
-		return user == null ? new ArrayList<System>() : getCurrentSession()
-				.createQuery(
-						"from " + getDomainClassName() + " where groupId = :groupId and " + user
-								+ " != 'HIDDEN' order by orderId asc").setInteger("groupId", groupId).list();
+		return user == null
+				? new ArrayList<System>()
+				: getCurrentSession()
+						.createQuery("from " + getDomainClassName() + " where groupId = :groupId and " + user
+								+ " != 'HIDDEN' order by orderId asc")
+						.setInteger("groupId", groupId).setCacheable(true).list();
 	}
 }

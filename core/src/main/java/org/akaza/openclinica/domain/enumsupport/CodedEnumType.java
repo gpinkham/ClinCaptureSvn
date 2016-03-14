@@ -13,21 +13,18 @@
 
 package org.akaza.openclinica.domain.enumsupport;
 
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.usertype.EnhancedUserType;
-import org.hibernate.usertype.ParameterizedType;
-import org.hibernate.util.ReflectHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.sql.Types;
+
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.type.EnumType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -39,29 +36,10 @@ import java.util.Properties;
  * 
  * @author Krikor Krumlian
  */
-public class CodedEnumType implements EnhancedUserType, ParameterizedType {
+@SuppressWarnings("serial")
+public class CodedEnumType extends EnumType {
 
-	private Class<CodedEnum> enumClass;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-	@SuppressWarnings("unchecked")
-	public void setParameterValues(Properties parameters) {
-		String enumClassName = parameters.getProperty("enumClassname");
-		try {
-			enumClass = ReflectHelper.classForName(enumClassName);
-		} catch (ClassNotFoundException cnfe) {
-			throw new HibernateException("Enum class not found", cnfe);
-		}
-	}
-
-	/*
-	 * Tells Hibernate what Java value type class is mapped by this userType
-	 * 
-	 * @see org.hibernate.usertype.UserType#returnedClass()
-	 */
-	public Class<CodedEnum> returnedClass() {
-		return enumClass;
-	}
 
 	/*
 	 * Tells Hibernate what SQL column types to use for DDL schema generation.
@@ -69,7 +47,7 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
 	 * @see org.hibernate.usertype.UserType#sqlTypes()
 	 */
 	public int[] sqlTypes() {
-		return new int[] { Hibernate.INTEGER.sqlType() };
+		return new int[]{Types.INTEGER};
 	}
 
 	/*
@@ -145,7 +123,8 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
 	 * 
 	 * @see org.hibernate.usertype.UserType#nullSafeGet(java.sql.ResultSet, java.lang.String[], java.lang.Object)
 	 */
-	public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws SQLException {
+	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
+			throws SQLException {
 		String key = rs.getString(names[0]);
 		return rs.wasNull() ? null : getByCode(key);
 	}
@@ -155,9 +134,10 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
 	 * 
 	 * @see org.hibernate.usertype.UserType#nullSafeSet(java.sql.PreparedStatement, java.lang.Object, int)
 	 */
-	public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
+	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
+			throws SQLException {
 		if (value == null) {
-			st.setNull(index, Hibernate.INTEGER.sqlType());
+			st.setNull(index, Types.INTEGER);
 		} else {
 			Integer code = getCode(value);
 			logger.debug("Binding '{}' to parameter: {}", code, index);
@@ -179,26 +159,27 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
 		Integer theKey = null;
 		try {
 			theKey = Integer.valueOf(key);
-			method = enumClass.getMethod("getByCode", Integer.class);
+			method = returnedClass().getMethod("getByCode", Integer.class);
 			value = method.invoke(null, theKey);
 		} catch (NumberFormatException e) {
 			throw new CodedEnumPersistenceException("Value passed in to this Method has wrong type " + method
 					+ " being passed " + theKey + " on value " + value, e);
 		} catch (SecurityException e) {
-			throw new CodedEnumPersistenceException("SecurityException on Method " + method + " being passed " + theKey
-					+ " on value " + value, e);
+			throw new CodedEnumPersistenceException(
+					"SecurityException on Method " + method + " being passed " + theKey + " on value " + value, e);
 		} catch (NoSuchMethodException e) {
-			throw new CodedEnumPersistenceException("Method not found " + method + " being passed " + theKey
-					+ " on value " + value, e);
+			throw new CodedEnumPersistenceException(
+					"Method not found " + method + " being passed " + theKey + " on value " + value, e);
 		} catch (IllegalArgumentException e) {
-			throw new CodedEnumPersistenceException("Could not call Method " + method + " being passed " + theKey
-					+ " on value " + value, e);
+			throw new CodedEnumPersistenceException(
+					"Could not call Method " + method + " being passed " + theKey + " on value " + value, e);
 		} catch (IllegalAccessException e) {
-			throw new CodedEnumPersistenceException("Don't have access to Method " + method + " being passed " + theKey
-					+ " on value " + value, e);
+			throw new CodedEnumPersistenceException(
+					"Don't have access to Method " + method + " being passed " + theKey + " on value " + value, e);
 		} catch (InvocationTargetException e) {
-			throw new CodedEnumPersistenceException("InvocationTargetException on Method " + method + " being passed "
-					+ theKey + " on value " + value, e);
+			throw new CodedEnumPersistenceException(
+					"InvocationTargetException on Method " + method + " being passed " + theKey + " on value " + value,
+					e);
 		}
 		return value;
 	}

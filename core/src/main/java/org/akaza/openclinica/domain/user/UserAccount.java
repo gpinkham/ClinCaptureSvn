@@ -43,7 +43,7 @@ import org.joda.time.DateTimeZone;
  */
 @Entity
 @Table(name = "user_account", schema = "public")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "user_account_user_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence_name", value = "user_account_user_id_seq")})
 
 public class UserAccount extends DataMapDomainObject {
 

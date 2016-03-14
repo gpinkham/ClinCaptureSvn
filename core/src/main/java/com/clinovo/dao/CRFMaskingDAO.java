@@ -1,13 +1,13 @@
 package com.clinovo.dao;
 
-import com.clinovo.model.CRFMask;
+import java.util.List;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.clinovo.model.CRFMask;
 
 /**
  * CRF Masking DAO class.
@@ -25,49 +25,53 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 	 * Retrieves all the masks from the database.
 	 *
 	 * @return List of all masks
-	 */	
+	 */
 	public List<CRFMask> findAll() {
 		String query = "from  " + this.getDomainClassName();
 		Query q = this.getCurrentSession().createQuery(query);
-		return (List<CRFMask>) q.list();
+		return (List<CRFMask>) q.setCacheable(true).list();
 	}
 
 	/**
 	 * Retrieves CRFs Masks for specific user.
 	 *
-	 * @param id The ID of widget to filter on.
+	 * @param id
+	 *            The ID of widget to filter on.
 	 * @return Widget selected by id
 	 */
 	public List<CRFMask> findByUserId(int id) {
 		String query = "from " + getDomainClassName() + " cm where cm.userId = :id";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("id", id);
-		return (List<CRFMask>) q.list();
+		return (List<CRFMask>) q.setCacheable(true).list();
 	}
 
 	/**
 	 * Find CRF Mask by user ID, site ID, crf ID.
 	 *
-	 * @param userId int
-	 * @param siteId int
-	 * @param crfId  int
+	 * @param userId
+	 *            int
+	 * @param siteId
+	 *            int
+	 * @param crfId
+	 *            int
 	 * @return CRF Mask
 	 */
 	public CRFMask findByUserIdSiteIdAndCRFId(int userId, int siteId, int crfId) {
-		String query = "from " + getDomainClassName()
-				+ " cm where cm.userId = :userId and "
+		String query = "from " + getDomainClassName() + " cm where cm.userId = :userId and "
 				+ "cm.eventDefinitionCrfId = :crfId and cm.studyId = :siteId";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("userId", userId);
 		q.setInteger("crfId", crfId);
 		q.setInteger("siteId", siteId);
-		return (CRFMask) q.uniqueResult();
+		return (CRFMask) q.setCacheable(true).uniqueResult();
 	}
 
 	/**
 	 * Delete CRF Mask.
 	 *
-	 * @param mask CRF Mask to be deleted
+	 * @param mask
+	 *            CRF Mask to be deleted
 	 */
 	public void delete(CRFMask mask) {
 		getCurrentSession().delete(mask);
@@ -76,29 +80,32 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 	/**
 	 * Find Active CRF Mask by UserAccountBean ID, StudyBean ID and EventDefinitionCRF ID.
 	 *
-	 * @param userId UserAccountBeanID
-	 * @param siteId StudyBeanID
-	 * @param crfId EventDefinitionCRFID
+	 * @param userId
+	 *            UserAccountBeanID
+	 * @param siteId
+	 *            StudyBeanID
+	 * @param crfId
+	 *            EventDefinitionCRFID
 	 * @return CRF Mask
 	 */
 	public CRFMask findActiveByUserIdSiteIdAndCRFId(int userId, int siteId, int crfId) {
-		String query = "from " + getDomainClassName()
-				+ " cm where cm.userId = :userId and "
-				+ "cm.eventDefinitionCrfId = :crfId and "
-				+ "cm.studyId = :siteId and "
-				+ "cm.statusId != " + Status.DELETED.getId();
+		String query = "from " + getDomainClassName() + " cm where cm.userId = :userId and "
+				+ "cm.eventDefinitionCrfId = :crfId and " + "cm.studyId = :siteId and " + "cm.statusId != "
+				+ Status.DELETED.getId();
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("userId", userId);
 		q.setInteger("crfId", crfId);
 		q.setInteger("siteId", siteId);
-		return (CRFMask) q.uniqueResult();
+		return (CRFMask) q.setCacheable(true).uniqueResult();
 	}
 
 	/**
 	 * Restore Masks for site.
 	 *
-	 * @param userId int UserAccountBean Id
-	 * @param studyId int StudyBean Id
+	 * @param userId
+	 *            int UserAccountBean Id
+	 * @param studyId
+	 *            int StudyBean Id
 	 */
 	public void restoreMasksBySiteAndUserIds(int userId, int studyId) {
 		setStatusBySiteAndUserIds(userId, studyId, Status.AVAILABLE.getId());
@@ -107,8 +114,10 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 	/**
 	 * Remove Masks for site.
 	 *
-	 * @param userId int UserAccountBean Id
-	 * @param studyId int StudyBean Id
+	 * @param userId
+	 *            int UserAccountBean Id
+	 * @param studyId
+	 *            int StudyBean Id
 	 */
 	public void removeMasksBySiteAndUserIds(int userId, int studyId) {
 		setStatusBySiteAndUserIds(userId, studyId, Status.DELETED.getId());
@@ -117,13 +126,15 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 	/**
 	 * Set status by StudyBean and UserAccountBean Ids.
 	 *
-	 * @param userId UserAccountBean Id.
-	 * @param studyId Study Id.
-	 * @param statusId Status Id.
+	 * @param userId
+	 *            UserAccountBean Id.
+	 * @param studyId
+	 *            Study Id.
+	 * @param statusId
+	 *            Status Id.
 	 */
 	public void setStatusBySiteAndUserIds(int userId, int studyId, int statusId) {
-		String query = "update " + getDomainClassName() + " set statusId = :statusId "
-				+ "where userId = :userId and "
+		String query = "update " + getDomainClassName() + " set statusId = :statusId " + "where userId = :userId and "
 				+ "studyId = :studyId";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("statusId", statusId);
@@ -134,20 +145,22 @@ public class CRFMaskingDAO extends AbstractDomainDao<CRFMask> {
 
 	/**
 	 * This method will return all masks in the Study Event Definition.
-	 * @param userId UserAccountBean Id.
-	 * @param eventDefinitionId StudyEventDefinitionBean id.
-	 * @param studyId int.
+	 * 
+	 * @param userId
+	 *            UserAccountBean Id.
+	 * @param eventDefinitionId
+	 *            StudyEventDefinitionBean id.
+	 * @param studyId
+	 *            int.
 	 * @return List of CRFMasks.
 	 */
 	public List<CRFMask> findAllActiveByUserStudyAndEventDefinitionIds(int userId, int eventDefinitionId, int studyId) {
 		String query = "from " + getDomainClassName() + " cm where cm.userId = :userId and "
-				+ "studyEventDefinitionId = :eventId and "
-				+ "studyId = :studyId and "
-				+ "statusId = 1";
+				+ "studyEventDefinitionId = :eventId and " + "studyId = :studyId and " + "statusId = 1";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("userId", userId);
 		q.setInteger("eventId", eventDefinitionId);
 		q.setInteger("studyId", studyId);
-		return (List<CRFMask>) q.list();
+		return (List<CRFMask>) q.setCacheable(true).list();
 	}
 }

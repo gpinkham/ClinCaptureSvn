@@ -39,7 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
         @UniqueConstraint(columnNames = "oc_oid"),
         @UniqueConstraint(columnNames = "name")})
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@org.hibernate.annotations.Parameter(name = "sequence", value = "measurement_unit_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@org.hibernate.annotations.Parameter(name = "sequence_name", value = "measurement_unit_id_seq")})
 public class MeasurementUnit extends AbstractMutableDomainObject {
 
     private String ocOid;

@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "section")
 @SuppressWarnings("serial")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "section_section_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence_name", value = "section_section_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Section extends DataMapDomainObject {
 

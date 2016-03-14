@@ -29,6 +29,9 @@ public class EhCacheWrapper<K, V> implements CacheWrapper<K, V> {
 	public EhCacheWrapper(final String cacheName, final CacheManager cacheManager) {
 		this.cacheName = cacheName;
 		this.cacheManager = cacheManager;
+		if (!cacheManager.cacheExists(cacheName)) {
+			cacheManager.addCache(cacheName);
+		}
 	}
 
 	public void put(final K key, final V value) {

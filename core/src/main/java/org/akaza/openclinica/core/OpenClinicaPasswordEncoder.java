@@ -16,6 +16,7 @@ package org.akaza.openclinica.core;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
+@SuppressWarnings("deprecation")
 public class OpenClinicaPasswordEncoder implements PasswordEncoder {
 
 	PasswordEncoder currentPasswordEncoder;

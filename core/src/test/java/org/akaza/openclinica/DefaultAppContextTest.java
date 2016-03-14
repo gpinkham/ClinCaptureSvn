@@ -44,7 +44,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.springframework.core.io.DefaultResourceLoader;
 

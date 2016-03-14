@@ -25,12 +25,12 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 
-@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class OpenClinicaJdbcService extends JdbcDaoImpl {
 
 	private MappingSqlQuery ocUsersByUsernameMapping;
@@ -48,7 +48,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
 	/**
 	 * Can be overridden to customize the creation of the final UserDetailsObject returnd from
 	 * <tt>loadUserByUsername</tt>.
-	 * 
+	 *
 	 * @param username
 	 *            the name originally passed to loadUserByUsername
 	 * @param userFromUserQuery
@@ -86,7 +86,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
 			boolean enabled = rs.getBoolean(3);
 			boolean nonLocked = rs.getBoolean(4);
 			ArrayList<GrantedAuthority> newAuthorities = new ArrayList<GrantedAuthority>();
-			newAuthorities.add(new GrantedAuthorityImpl("HOLDER"));
+			newAuthorities.add(new SimpleGrantedAuthority("HOLDER"));
 			UserDetails user = new User(username, password, enabled, true, true, nonLocked, newAuthorities);
 
 			return user;

@@ -22,7 +22,7 @@ import java.util.List;
 @Entity
 @SuppressWarnings("serial")
 @Table(name = "resolution_status")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "resolution_status_resolution_status_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence_name", value = "resolution_status_resolution_status_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class ResolutionStatus extends DataMapDomainObject {
 

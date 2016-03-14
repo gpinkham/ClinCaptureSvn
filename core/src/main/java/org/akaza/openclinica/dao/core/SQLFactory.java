@@ -128,7 +128,7 @@ public class SQLFactory {
 	public void run(String dbName, ResourceLoader resourceLoader) {
 		digesters.clear();
 		HashMap fileList = new HashMap();
-		CacheManager cacheManager = new CacheManager();
+		CacheManager cacheManager = CacheManager.create();
 
 		try {
 			Resource resource = resourceLoader.getResource("classpath:org/akaza/openclinica/ehcache.xml");

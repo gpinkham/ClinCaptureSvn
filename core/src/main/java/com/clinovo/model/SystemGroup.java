@@ -16,6 +16,8 @@
 package com.clinovo.model;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -24,7 +26,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "system_group")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "system_group_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "system_group_id_seq") })
 public class SystemGroup extends AbstractMutableDomainObject {
 
 	private String name;

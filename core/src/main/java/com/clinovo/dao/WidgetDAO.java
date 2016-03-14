@@ -29,12 +29,12 @@ import com.clinovo.model.Widget;
 @Repository
 @SuppressWarnings("unchecked")
 public class WidgetDAO extends AbstractDomainDao<Widget> {
-	
+
 	@Override
 	public Class<Widget> domainClass() {
 		return Widget.class;
 	}
-	
+
 	/**
 	 * Retrieves all the widgets from the database.
 	 * 
@@ -43,33 +43,34 @@ public class WidgetDAO extends AbstractDomainDao<Widget> {
 	public List<Widget> findAll() {
 		String query = "from  " + this.getDomainClassName();
 		Query q = this.getCurrentSession().createQuery(query);
-		return (List<Widget>) q.list();
+		return (List<Widget>) q.setCacheable(true).list();
 	}
 
 	/**
 	 * Retrieves widgets selected by id.
 	 * 
-	 * @param id The ID of widget to filter on.
+	 * @param id
+	 *            The ID of widget to filter on.
 	 * @return Widget selected by id
 	 */
 	public Widget findById(int id) {
 		String query = "from " + getDomainClassName() + " wi where wi.id = :id";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("id", id);
-		return (Widget) q.uniqueResult();
+		return (Widget) q.setCacheable(true).uniqueResult();
 	}
 
 	/**
 	 * Retrieves widget selected by child.
 	 * 
-	 * @param id of widgetLayout, using which Widget should be found.
+	 * @param id
+	 *            of widgetLayout, using which Widget should be found.
 	 * @return Widget selected by id of layout.
-	 */	
+	 */
 	public Widget findByChildsId(int id) {
-		String query = "select wi from " + getDomainClassName()
-				+ " wi join wi.widgetsLayout wl where wl.id = :id";
+		String query = "select wi from " + getDomainClassName() + " wi join wi.widgetsLayout wl where wl.id = :id";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("id", id);
-		return (Widget) q.uniqueResult();
+		return (Widget) q.setCacheable(true).uniqueResult();
 	}
 }

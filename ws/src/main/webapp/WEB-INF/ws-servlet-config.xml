@@ -4,9 +4,9 @@
 		xmlns:tx="http://www.springframework.org/schema/tx"
 		xmlns:util="http://www.springframework.org/schema/util"
 		xsi:schemaLocation="http://www.springframework.org/schema/beans
-							http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+							http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
 							http://www.springframework.org/schema/util 
-							http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+							http://www.springframework.org/schema/util/spring-util-4.2.xsd">
 
      
      <!-- WSDL Definitions -->
@@ -211,11 +211,13 @@
     </bean>
     
     <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
-      <property name="providers">
-          <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
-              <property name="userDetailsService" ref="ocUserDetailsService"/>
-          </bean>
-      </property>
+      <constructor-arg index="0">
+          <list>
+              <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+                  <property name="userDetailsService" ref="ocUserDetailsService"/>
+              </bean>
+          </list>
+      </constructor-arg>
     </bean>
   
     <bean id="springSecurityHandler"

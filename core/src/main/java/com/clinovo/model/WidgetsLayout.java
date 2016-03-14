@@ -21,12 +21,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "widgets_layout")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "widgets_layout_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "widgets_layout_id_seq") })
 public class WidgetsLayout extends AbstractMutableDomainObject {
 
 	private Widget widget;
@@ -46,6 +49,7 @@ public class WidgetsLayout extends AbstractMutableDomainObject {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@JoinColumn(name = "widget_id", referencedColumnName = "id", insertable = false, updatable = false, nullable = false)
 	public Widget getWidget() {
 		return widget;

@@ -24,7 +24,7 @@ import java.util.Set;
 @Entity
 @SuppressWarnings("serial")
 @Table(name = "study_group")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "study_group_study_group_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence_name", value = "study_group_study_group_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyGroup extends DataMapDomainObject {
 

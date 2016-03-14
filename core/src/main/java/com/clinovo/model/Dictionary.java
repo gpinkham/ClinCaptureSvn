@@ -31,7 +31,7 @@ import com.clinovo.model.Status.DictionaryType;
  */
 @Entity
 @Table(name = "dictionary")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dictionary_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "dictionary_id_seq") })
 public class Dictionary extends AbstractMutableDomainObject {
 
 	private int study = -1;

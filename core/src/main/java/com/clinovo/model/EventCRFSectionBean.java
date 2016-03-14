@@ -15,7 +15,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "event_crf_section")
 @GenericGenerator(name = "id-generator", strategy = "native",
-		parameters = { @Parameter(name = "sequence", value = "event_crf_section_id_seq") })
+		parameters = { @Parameter(name = "sequence_name", value = "event_crf_section_id_seq") })
 public class EventCRFSectionBean extends AbstractMutableDomainObject {
 
 	private int sectionId;

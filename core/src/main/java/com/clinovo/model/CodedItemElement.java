@@ -23,7 +23,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "coded_item_element")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "coded_item_element_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "coded_item_element_id_seq") })
 public class CodedItemElement extends AbstractMutableDomainObject {
 
     private CodedItem codedItem;

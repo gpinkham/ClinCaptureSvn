@@ -14,7 +14,7 @@ import java.util.Date;
 @Entity
 @Table(name = "audit_log_randomization")
 @GenericGenerator(name = "id-generator", strategy = "native",
-		parameters = { @Parameter(name = "sequence", value = "audit_log_randomization_id_seq") })
+		parameters = { @Parameter(name = "sequence_name", value = "audit_log_randomization_id_seq") })
 public class AuditLogRandomization extends AbstractMutableDomainObject {
 
 	private Date auditDate;

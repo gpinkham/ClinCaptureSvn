@@ -28,7 +28,7 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "term")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "term_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "term_id_seq") })
 public class Term extends AbstractMutableDomainObject {
 
 	private String httpPath = "";

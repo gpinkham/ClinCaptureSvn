@@ -115,7 +115,6 @@ public class FileUploadHelper {
 				: new ArrayList<File>();
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<File> getFiles(HttpServletRequest request, String dirToSaveUploadedFileIn) {
 		List<File> files = new ArrayList<File>();
 		// Create a factory for disk-based file items

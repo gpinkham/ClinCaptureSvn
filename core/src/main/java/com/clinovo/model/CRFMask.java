@@ -1,6 +1,8 @@
 package com.clinovo.model;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -12,8 +14,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "crfs_masking")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native",
-		parameters = { @Parameter(name = "sequence", value = "crfs_masking_id_seq") })
+		parameters = { @Parameter(name = "sequence_name", value = "crfs_masking_id_seq") })
 public class CRFMask extends AbstractMutableDomainObject {
 
 	private int studyId;

@@ -23,79 +23,75 @@ import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDomainDao<T extends DomainObject> {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+	@Autowired
+	private SessionFactory sessionFactory;
 
-    public abstract Class<T> domainClass();
+	public abstract Class<T> domainClass();
 
-    public String getDomainClassName() {
-        return domainClass().getName();
-    }
+	public String getDomainClassName() {
+		return domainClass().getName();
+	}
 
-    @SuppressWarnings("unchecked")
-    public T findById(Integer id) {
-        getSessionFactory().getStatistics().logSummary();
-        String query = "from " + getDomainClassName() + " do  where do.id = :id";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("id", id);
-        return (T) q.uniqueResult();
-    }
+	@SuppressWarnings("unchecked")
+	public T findById(Integer id) {
+		getSessionFactory().getStatistics().logSummary();
+		String query = "from " + getDomainClassName() + " do  where do.id = :id";
+		org.hibernate.Query q = getCurrentSession().createQuery(query);
+		q.setInteger("id", id);
+		return (T) q.uniqueResult();
+	}
 
-    @Transactional
-    public T saveOrUpdate(T domainObject, Connection con) {
-        getSessionFactory().getStatistics().logSummary();
-        getSessionForTransaction(con).saveOrUpdate(domainObject);
-        return domainObject;
-    }
+	@Transactional
+	public T saveOrUpdate(T domainObject, Connection con) {
+		getSessionFactory().getStatistics().logSummary();
+		if (con != null) {
+			sessionFactory.openStatelessSession(con).update(domainObject);
+		} else {
+			sessionFactory.getCurrentSession().saveOrUpdate(domainObject);
+		}
+		return domainObject;
+	}
 
-    @Transactional
-    public T saveOrUpdate(T domainObject) {
-        getSessionFactory().getStatistics().logSummary();
-        getCurrentSession().saveOrUpdate(domainObject);
-        return domainObject;
-    }
+	@Transactional
+	public T saveOrUpdate(T domainObject) {
+		getSessionFactory().getStatistics().logSummary();
+		getCurrentSession().saveOrUpdate(domainObject);
+		return domainObject;
+	}
 
-    public Long count() {
-        return (Long) getCurrentSession().createQuery("select count(*) from " + domainClass().getName()).uniqueResult();
-    }
+	public Long count() {
+		return (Long) getCurrentSession().createQuery("select count(*) from " + domainClass().getName()).uniqueResult();
+	}
 
-    /**
-     * @return the sessionFactory
-     */
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
+	/**
+	 * @return the sessionFactory
+	 */
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
 
-    /**
-     * @param sessionFactory the sessionFactory to set
-     */
-    public void setSessionFactory(SessionFactory sessionFactory) {
+	/**
+	 * @param sessionFactory
+	 *            the sessionFactory to set
+	 */
+	public void setSessionFactory(SessionFactory sessionFactory) {
 
-        this.sessionFactory = sessionFactory;
-    }
+		this.sessionFactory = sessionFactory;
+	}
 
-    /**
-     * @return Session Object
-     */
-    protected Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
-    }
-
-    protected Session getSessionForTransaction(Connection con) {
-        if (con != null) {
-            return sessionFactory.openSession(con);
-        } else {
-            return sessionFactory.getCurrentSession();
-        }
-
-    }
+	/**
+	 * @return Session Object
+	 */
+	protected Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
+	}
 
 	@Transactional
 	@SuppressWarnings("unchecked")
-    public T findByColumnName(Object id, String key) {
-        String query = "from " + getDomainClassName() + " do where do." + key + "= ?";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setParameter(0, id);
-        return (T) q.uniqueResult();
-    }
+	public T findByColumnName(Object id, String key) {
+		String query = "from " + getDomainClassName() + " do where do." + key + "= ?";
+		org.hibernate.Query q = getCurrentSession().createQuery(query);
+		q.setParameter(0, id);
+		return (T) q.uniqueResult();
+	}
 }

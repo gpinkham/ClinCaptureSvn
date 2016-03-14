@@ -54,7 +54,7 @@ import java.util.List;
 @Table(name = "rule_set_rule")
 @SuppressWarnings({ "unchecked" })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_rule_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_rule_id_seq") })
 public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
 	RuleSetBean ruleSetBean;

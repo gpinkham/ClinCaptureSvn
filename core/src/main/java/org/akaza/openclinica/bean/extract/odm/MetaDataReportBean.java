@@ -21,6 +21,7 @@
 package org.akaza.openclinica.bean.extract.odm;
 
 import com.clinovo.util.DRUtil;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -73,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+@SuppressWarnings("deprecation")
 public class MetaDataReportBean extends OdmXmlReportBean {
     private OdmStudyBean odmStudy;
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;

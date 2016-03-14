@@ -14,6 +14,20 @@
  *******************************************************************************/
 package com.clinovo.util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+
+import com.clinovo.hibernate.ImprovedNamingStrategy;
 import com.clinovo.model.AtcClassification;
 import com.clinovo.model.CountryCode;
 import com.clinovo.model.Ingredient;
@@ -23,73 +37,70 @@ import com.clinovo.model.MedicalProduct;
 import com.clinovo.model.Substance;
 import com.clinovo.model.Therapgroup;
 
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.ImprovedNamingStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.orm.hibernate3.AbstractSessionFactoryBean;
-import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
-
-import javax.sql.DataSource;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Properties;
-
 /**
  * WHOD/MEDDRA hibernate session util.
  */
 @SuppressWarnings("rawtypes")
 public final class HibernateUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
 
-    private static SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
 
-    private static final String WHOD_DEFAULT = "WHOD-0915";
-    private static final String MEDDRA_DEFAULT = "MEDDRA-19";
+	private static final String WHOD_DEFAULT = "WHOD-0915";
+	private static final String MEDDRA_DEFAULT = "MEDDRA-19";
 
-    /**
-     * Returns session for term search.
-     * @param ontologyName the name of ontology.
-     * @param bioontologyUrl the bioontology instance URL.
-     * @param bioontologyUser the user for authterisation to the bioontology instance.
-     * @return the Session bean.
-     * @throws Exception for all exceptions.
-     */
-    public static Session getSession(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
-        sessionFactory = sessionFactory(ontologyName, bioontologyUrl, bioontologyUser).getObject();
-        return sessionFactory.openSession();
-    }
+	/**
+	 * Returns session for term search.
+	 * 
+	 * @param ontologyName
+	 *            the name of ontology.
+	 * @param bioontologyUrl
+	 *            the bioontology instance URL.
+	 * @param bioontologyUser
+	 *            the user for authterisation to the bioontology instance.
+	 * @return the Session bean.
+	 * @throws Exception
+	 *             for all exceptions.
+	 */
+	public static Session getSession(String ontologyName, String bioontologyUrl, String bioontologyUser)
+			throws Exception {
+		sessionFactory = sessionFactory(ontologyName, bioontologyUrl, bioontologyUser).getObject();
+		return sessionFactory.openSession();
+	}
 
-    private static AbstractSessionFactoryBean sessionFactory(String ontologyName, String bioontologyUrl, String bioontologyUser) throws Exception {
-        AnnotationSessionFactoryBean lsfb = new AnnotationSessionFactoryBean();
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        lsfb.setDataSource(dataSource(ontologyName, bioontologyUrl, bioontologyUser));
-        lsfb.setHibernateProperties(properties);
-        Class[] annotatedClasses = {MedicalHierarchy.class, AtcClassification.class, CountryCode.class,
-                Ingredient.class, MedicalProduct.class, Substance.class, Therapgroup.class, LowLevelTerm.class};
-        lsfb.setAnnotatedClasses(annotatedClasses);
-        lsfb.setNamingStrategy(new ImprovedNamingStrategy());
-        lsfb.afterPropertiesSet();
-        LOGGER.info("Session initialized");
-        return lsfb;
-    }
+	private static LocalSessionFactoryBean sessionFactory(String ontologyName, String bioontologyUrl,
+			String bioontologyUser) throws Exception {
+		LocalSessionFactoryBean lsfb = new LocalSessionFactoryBean();
+		Properties properties = new Properties();
+		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+		properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+		lsfb.setDataSource(dataSource(ontologyName, bioontologyUrl, bioontologyUser));
+		lsfb.setHibernateProperties(properties);
+		Class[] annotatedClasses = {MedicalHierarchy.class, AtcClassification.class, CountryCode.class,
+				Ingredient.class, MedicalProduct.class, Substance.class, Therapgroup.class, LowLevelTerm.class};
+		lsfb.setAnnotatedClasses(annotatedClasses);
+		lsfb.setPhysicalNamingStrategy(new ImprovedNamingStrategy());
+		lsfb.afterPropertiesSet();
+		LOGGER.info("Session initialized");
+		return lsfb;
+	}
 
-    private static String getHostName(String bioontologyUrl) throws MalformedURLException {
-        URL myURL = new URL(bioontologyUrl);
-        return myURL.getHost();
-    }
+	private static String getHostName(String bioontologyUrl) throws MalformedURLException {
+		URL myURL = new URL(bioontologyUrl);
+		return myURL.getHost();
+	}
 
-    private static DataSource dataSource(String ontologyName, String bioontologyUrl, String bioontologyUser) throws MalformedURLException {
-        ontologyName = ontologyName.equals("MEDDRA") ? MEDDRA_DEFAULT : ontologyName.equals("WHOD") ? WHOD_DEFAULT : ontologyName;
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://" + getHostName(bioontologyUrl) + ":5432/" + ontologyName);
-        dataSource.setUsername(bioontologyUser);
-        dataSource.setPassword("");
-        return dataSource;    }
+	private static DataSource dataSource(String ontologyName, String bioontologyUrl, String bioontologyUser)
+			throws MalformedURLException {
+		ontologyName = ontologyName.equals("MEDDRA")
+				? MEDDRA_DEFAULT
+				: ontologyName.equals("WHOD") ? WHOD_DEFAULT : ontologyName;
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setUrl("jdbc:postgresql://" + getHostName(bioontologyUrl) + ":5432/" + ontologyName);
+		dataSource.setUsername(bioontologyUser);
+		dataSource.setPassword("");
+		return dataSource;
+	}
 }

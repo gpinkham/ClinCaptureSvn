@@ -97,7 +97,7 @@ import com.clinovo.util.DRUtil;
  * Provides report generation service.
  */
 @Service("reportCRFService")
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "deprecation"})
 public class ReportCRFServiceImpl implements ReportCRFService {
 	@Autowired
 	private DataSource dataSource;

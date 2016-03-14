@@ -31,7 +31,7 @@ import java.util.List;
 @Entity
 @SuppressWarnings("serial")
 @Table(name = "crf", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "crf_crf_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence_name", value = "crf_crf_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CrfBean extends DataMapDomainObject {
 

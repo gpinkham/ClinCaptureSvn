@@ -30,7 +30,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "event_crf")
 @SuppressWarnings("serial")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence", value = "event_crf_event_crf_id_seq")})
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {@Parameter(name = "sequence_name", value = "event_crf_event_crf_id_seq")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventCrf extends DataMapDomainObject {
 

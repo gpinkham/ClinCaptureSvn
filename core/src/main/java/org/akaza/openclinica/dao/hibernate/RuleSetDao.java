@@ -13,19 +13,19 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.hibernate.Session;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.classic.Session;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
 
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
@@ -106,19 +106,19 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 				+ " OR (rs.crf_version_id is null AND rs.crf_id = :crfId ))) OR ( rs.study_event_definition_id is null "
 				+ " and rs.item_id in (select item_id from item_form_metadata where crf_version_id = :crfVersionId)  ))";
 		Session s = getSessionFactory().openSession();
-        org.hibernate.Query q = s.createSQLQuery(query).addEntity(domainClass());
-        
-        q.setInteger("crfVersionId", crfVersion.getId());
+		org.hibernate.Query q = s.createSQLQuery(query).addEntity(domainClass());
+
+		q.setInteger("crfVersionId", crfVersion.getId());
 		q.setInteger("crfId", crfBean.getId());
 		q.setInteger("studyId",
 				currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId());
 		q.setInteger("studyEventDefinitionId", sed.getId());
-		
+
 		ArrayList<RuleSetBean> results = (ArrayList<RuleSetBean>) q.list();
 		s.close();
-		
+
 		return results;
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -144,7 +144,9 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetBean> findByCrfIdAndCrfOid(CRFBean crfBean) {
 		String query = "select distinct rs.* from rule_set rs, rule r, rule_expression re, rule_set_rule rsr left OUTER join rule_action ra on ra.rule_set_rule_id = rsr.id left outer join rule_action_property rap on rap.rule_action_id = ra.id where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
-				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm, crf_version cv where ifm.crf_version_id = cv.crf_version_id and cv.crf_id = :crfId) or re.value like '%" + crfBean.getOid() + ".%' or rap.oc_oid like '%" + crfBean.getOid() + ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_id = :crfId))";
+				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm, crf_version cv where ifm.crf_version_id = cv.crf_version_id and cv.crf_id = :crfId) or re.value like '%"
+				+ crfBean.getOid() + ".%' or rap.oc_oid like '%" + crfBean.getOid()
+				+ ".%' or re.target_version_oid in (select cv.oc_oid from crf_version cv where cv.crf_id = :crfId))";
 		// Using a sql query because we are referencing objects not managed by hibernate
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
 		q.setInteger("crfId", crfBean.getId());
@@ -154,21 +156,18 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
 	@SuppressWarnings("unchecked")
 	public ArrayList<RuleSetBean> findByCrfVersionIdAndCrfVersionOid(CRFVersionBean crfVersionBean) {
-		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re " +
-				"where rsr.rule_set_id = rs.id " +
-				"and rsr.rule_id = r.id " +
-				"and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id) " +
-				"and (re.value like '%" + crfVersionBean.getOid() + ".%'" +
-				"or ((re.target_version_oid = '" + crfVersionBean.getOid() + "') " +
-				"and (select count(*) from item_form_metadata ifm, rule_set rs where rs.item_id = ifm.item_id) = 1));";
+		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re "
+				+ "where rsr.rule_set_id = rs.id " + "and rsr.rule_id = r.id "
+				+ "and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id) " + "and (re.value like '%"
+				+ crfVersionBean.getOid() + ".%'" + "or ((re.target_version_oid = '" + crfVersionBean.getOid() + "') "
+				+ "and (select count(*) from item_form_metadata ifm, rule_set rs where rs.item_id = ifm.item_id) = 1));";
 		// Using a sql query because we are referencing objects not managed by hibernate
 		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
 	public RuleSetBean findByExpression(RuleSetBean ruleSet) {
-		String query = "from "
-				+ getDomainClassName()
+		String query = "from " + getDomainClassName()
 				+ " ruleSet  where ruleSet.originalTarget.value = :value AND ruleSet.originalTarget.context = :context ";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
 		q.setString("value", ruleSet.getTarget().getValue());
@@ -198,7 +197,8 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 	/**
 	 * Cleanup RS metadata on deletion of CRF version.
 	 *
-	 * @param oid of version that will be deleted
+	 * @param oid
+	 *            of version that will be deleted
 	 */
 	public void deleteRuleStudioMetadataByCRFVersionOID(String oid) {
 		String query = "UPDATE rule_expression SET target_version_oid = NULL WHERE target_version_oid = '" + oid + "'";

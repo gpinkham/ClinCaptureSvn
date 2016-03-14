@@ -56,6 +56,7 @@ import com.clinovo.util.DateUtil;
  * @author Frank
  * 
  */
+@SuppressWarnings("deprecation")
 public class DcfReportBuilder {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());

@@ -73,11 +73,12 @@ public class StudyModuleController extends SpringController {
 	/**
 	 * Handle Build Study page.
 	 *
-	 * @param request  HttpServletRequest
-	 * @param response HttpServletResponse
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 * @return ModelMap
 	 */
-	@SuppressWarnings("deprecation")
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
 		ModelMap map = new ModelMap();
@@ -170,7 +171,7 @@ public class StudyModuleController extends SpringController {
 			sms.setUsers(StudyModuleStatus.IN_PROGRESS);
 		}
 
-		map.addObject(sms);
+		map.addAttribute(sms);
 		map.addAttribute("crfCount", totalCrf);
 		map.addAttribute("eventDefinitionCount", eventDefinitionCount);
 		map.addAttribute("subjectGroupCount", subjectGroupCount);
@@ -197,8 +198,8 @@ public class StudyModuleController extends SpringController {
 			request.getSession().removeAttribute("pageMessages");
 		}
 		StudyParameterValueDAO studyParameterValueDao = new StudyParameterValueDAO(dataSource);
-		boolean isEvaluationEnabled = studyParameterValueDao.findByHandleAndStudy(currentStudy.getId(), "studyEvaluator")
-				.getValue().equalsIgnoreCase("yes");
+		boolean isEvaluationEnabled = studyParameterValueDao
+				.findByHandleAndStudy(currentStudy.getId(), "studyEvaluator").getValue().equalsIgnoreCase("yes");
 		request.getSession().setAttribute("evaluationEnabled", isEvaluationEnabled);
 		return map;
 	}
@@ -206,14 +207,17 @@ public class StudyModuleController extends SpringController {
 	/**
 	 * Process submit request.
 	 *
-	 * @param studyModuleStatus StudyModuleStatus
-	 * @param status            SessionStatus
-	 * @param request           HttpServletRequest
+	 * @param studyModuleStatus
+	 *            StudyModuleStatus
+	 * @param status
+	 *            SessionStatus
+	 * @param request
+	 *            HttpServletRequest
 	 * @return String
 	 */
 	@RequestMapping(method = RequestMethod.POST)
 	public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus,
-								SessionStatus status, HttpServletRequest request) {
+			SessionStatus status, HttpServletRequest request) {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 		if (request.getParameter("saveStudyStatus") == null) {
@@ -257,8 +261,10 @@ public class StudyModuleController extends SpringController {
 	/**
 	 * NPE handler.
 	 *
-	 * @param ex      NullPointerException
-	 * @param request HttpServletRequest
+	 * @param ex
+	 *            NullPointerException
+	 * @param request
+	 *            HttpServletRequest
 	 * @return String
 	 */
 	@ExceptionHandler(NullPointerException.class)
@@ -277,7 +283,8 @@ public class StudyModuleController extends SpringController {
 	/**
 	 * Get context path.
 	 *
-	 * @param request HttpServletRequest
+	 * @param request
+	 *            HttpServletRequest
 	 * @return String
 	 */
 	public String getContextPath(HttpServletRequest request) {

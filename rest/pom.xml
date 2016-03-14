@@ -25,7 +25,6 @@
         <dependency>
             <groupId>com.clinovo.clincapture</groupId>
             <artifactId>core</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -40,7 +39,10 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jvnet.ws.wadl</groupId>
@@ -61,7 +63,6 @@
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>dbcp</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -83,5 +84,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+        </dependency>
     </dependencies>
+
 </project>

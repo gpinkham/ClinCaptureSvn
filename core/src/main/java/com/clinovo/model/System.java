@@ -22,12 +22,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "system")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "system_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "system_id_seq") })
 public class System extends AbstractMutableDomainObject {
 
 	private String name;
@@ -193,6 +196,7 @@ public class System extends AbstractMutableDomainObject {
 	}
 
 	@ManyToOne
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@JoinColumn(name = "groupId", referencedColumnName = "id", insertable = false, updatable = false, nullable = false)
 	public SystemGroup getSystemGroup() {
 		return systemGroup;

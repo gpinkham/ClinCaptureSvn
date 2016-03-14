@@ -13,7 +13,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "item_render_metadata")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "item_render_metadata_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "item_render_metadata_id_seq") })
 public class ItemRenderMetadata extends AbstractMutableDomainObject {
 	private int crfVersionId;
 	private int itemId;

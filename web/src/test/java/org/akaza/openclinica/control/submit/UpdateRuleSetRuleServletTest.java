@@ -16,8 +16,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
 import org.springframework.mock.web.MockServletContext;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @PrepareForTest(UpdateRuleSetRuleServlet.class)
 public class UpdateRuleSetRuleServletTest extends DefaultAppContextTest {
@@ -60,7 +58,6 @@ public class UpdateRuleSetRuleServletTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public void testThatDeleteRuleSetRuleReturnsCorrectResultAfterDeletion() throws Exception {
 		updateRuleSetRuleServlet.processRequest(request, response);
 		RuleSetRuleBean ruleSetRuleBeanAfterUpdate = ruleSetRuleDao.findById(Integer.valueOf(ruleSetRuleId));

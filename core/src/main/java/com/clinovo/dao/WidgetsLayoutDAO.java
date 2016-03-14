@@ -23,62 +23,66 @@ import org.springframework.stereotype.Repository;
 import com.clinovo.model.WidgetsLayout;
 
 /**
- * This class is the database interface for widgets displayed on the home page. 
+ * This class is the database interface for widgets displayed on the home page.
  */
 
 @Repository
 @SuppressWarnings("unchecked")
-public class WidgetsLayoutDAO extends AbstractDomainDao<WidgetsLayout>{
+public class WidgetsLayoutDAO extends AbstractDomainDao<WidgetsLayout> {
 
 	@Override
 	public Class<WidgetsLayout> domainClass() {
 		return WidgetsLayout.class;
 	}
-	
+
 	/**
 	 * Find all widgets layouts for specific user and study
 	 * 
-	 * @param studyId The ID of Study to filter on.
-	 * @param userId The ID of User dictionary to filter on.
+	 * @param studyId
+	 *            The ID of Study to filter on.
+	 * @param userId
+	 *            The ID of User dictionary to filter on.
 	 * 
 	 * @return List of WidgetsLayouts
 	 */
 	public List<WidgetsLayout> findAllByStudyIdAndUserId(int studyId, int userId) {
-		String query = "from "
-				+ getDomainClassName()
+		String query = "from " + getDomainClassName()
 				+ " where studyId = :studyId and userId = :userId order by ordinal";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("studyId", studyId);
 		q.setInteger("userId", userId);
 
-		return (List<WidgetsLayout>) q.list();
+		return (List<WidgetsLayout>) q.setCacheable(true).list();
 	}
-	
+
 	/**
 	 * Find widgets layout by widget ID for specific user and study
 	 * 
-	 * @param widgetId The ID of widget to filter on.
-	 * @param studyId The ID of Study to filter on.
-	 * @param userId The ID of User dictionary to filter on.
+	 * @param widgetId
+	 *            The ID of widget to filter on.
+	 * @param studyId
+	 *            The ID of Study to filter on.
+	 * @param userId
+	 *            The ID of User dictionary to filter on.
 	 * 
 	 * @return WidgetsLayout
 	 */
 	public WidgetsLayout findByWidgetIdAndStudyIdAndUserId(int widgetId, int studyId, int userId) {
-		String query = "from "
-				+ getDomainClassName()
+		String query = "from " + getDomainClassName()
 				+ " where studyId = :studyId and userId = :userId  and widget_id = :widgetId order by ordinal";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("studyId", studyId);
 		q.setInteger("userId", userId);
 		q.setInteger("widgetId", widgetId);
 
-		return (WidgetsLayout) q.uniqueResult();
+		return (WidgetsLayout) q.setCacheable(true).uniqueResult();
 	}
-	
+
 	/**
 	 * Save layout of all widgets for specific user and study
 	 * 
-	 * @param widgetsLayout The list of widgetsLayots that should be saved to database	
+	 * @param widgetsLayout
+	 *            The list of widgetsLayots that should be saved to database
 	 */
 	public void saveLayout(List<WidgetsLayout> widgetsLayout) {
 		for (int i = 0; i < widgetsLayout.size(); i++) {

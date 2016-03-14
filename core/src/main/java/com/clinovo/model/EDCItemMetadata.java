@@ -26,7 +26,7 @@ import javax.persistence.Table;
  * Event Definition CRF Item Metadata Bean.
  */
 @Table(name = "edc_item_metadata")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "edc_item_metadata_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "edc_item_metadata_id_seq") })
 @Entity
 public class EDCItemMetadata extends AbstractMutableDomainObject {
 

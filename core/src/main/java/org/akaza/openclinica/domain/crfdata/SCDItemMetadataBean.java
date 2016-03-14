@@ -37,7 +37,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "scd_item_metadata")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "scd_item_metadata_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "scd_item_metadata_id_seq") })
 public class SCDItemMetadataBean extends AbstractMutableDomainObject {
 	@Override
 	public int hashCode() {

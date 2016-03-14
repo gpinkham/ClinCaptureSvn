@@ -41,6 +41,7 @@ import net.sf.dynamicreports.report.definition.ReportParameters;
  * DynamicReports templates.
  * 
  */
+@SuppressWarnings("deprecation")
 public final class DRTemplates {
 	public static final StyleBuilder ROOT_STYLE;
 	public static final StyleBuilder BOLD_STYLE;

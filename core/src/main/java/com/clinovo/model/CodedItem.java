@@ -41,7 +41,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "coded_item")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "coded_item_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "coded_item_id_seq") })
 public class CodedItem extends AbstractMutableDomainObject {
 
     private int itemId = -1;

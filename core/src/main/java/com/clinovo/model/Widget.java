@@ -24,6 +24,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,7 +33,8 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "widget")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "widget_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "widget_id_seq") })
 public class Widget extends AbstractMutableDomainObject {
 
 	private String widgetName = "";
@@ -43,8 +46,9 @@ public class Widget extends AbstractMutableDomainObject {
 	private boolean siteMetrics = false;
 	private boolean twoColumnWidget = false;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "widget_id", referencedColumnName = "id", nullable = false)
 	public List<WidgetsLayout> getWidgetsLayout() {
 		return widgetsLayout;

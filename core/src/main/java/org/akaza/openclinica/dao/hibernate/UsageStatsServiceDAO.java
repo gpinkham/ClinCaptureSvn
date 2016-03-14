@@ -41,11 +41,12 @@ public class UsageStatsServiceDAO extends AbstractDomainDao<LogUsageStatsBean> {
 	public LogUsageStatsBean findLatestUsageStatParamValue(String param_key) {
 
 		String query = "from " + getDomainClassName()
-				+ " usageStatParams where param_key = :param_key order by update_timestamp desc limit 1;";
+				+ " usageStatParams where param_key = :param_key order by update_timestamp desc";
 
 		List<LogUsageStatsBean> logUsageStatsBeanLst = new ArrayList<LogUsageStatsBean>();
 		LogUsageStatsBean logUsageStatsBeanRet = new LogUsageStatsBean();
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
+		q.setMaxResults(1);
 		q.setString("param_key", param_key);
 		logUsageStatsBeanLst = q.list();
 		if ((null != logUsageStatsBeanLst) && (logUsageStatsBeanLst.size() != 0)) {

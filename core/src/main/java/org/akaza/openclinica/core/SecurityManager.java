@@ -32,6 +32,7 @@ import java.util.Random;
  * @author Krikor Krumlian
  * 
  */
+@SuppressWarnings("deprecation")
 public class SecurityManager {
 
 	private PasswordEncoder encoder;

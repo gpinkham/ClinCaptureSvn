@@ -21,6 +21,7 @@ import org.exolab.castor.mapping.GeneralizedFieldHandler;
  * The FieldHandler for the Date class
  * 
  */
+@SuppressWarnings("deprecation")
 public class EmailHandler extends GeneralizedFieldHandler {
 
 	/**

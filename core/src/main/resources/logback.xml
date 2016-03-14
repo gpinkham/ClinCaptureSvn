@@ -352,7 +352,7 @@
 		</then>
 	</if>
   </logger>
-  <logger additivity="false" name="org.springframework.orm.hibernate3">
+  <logger additivity="false" name="org.springframework.orm.hibernate5">
     <level value="${logLevel}" />
 	<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
 		<then>
