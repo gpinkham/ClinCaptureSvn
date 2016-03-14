@@ -778,12 +778,13 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		String valueToInsert = getValue(propertyBean, ruleSet, sourceEventCrfBean);
 		List<ItemDataBean> destinationItemDataBeans = getItemDataBeansToUpdate(sourceEventCrfBean,
 				destinationEventCrfBean, sourceItemDataBean, destinationItemBean, expression, ruleSet, ub);
+		boolean isDDEStage = destinationEventCrfBean == null? false : (DataEntryStage.DOUBLE_DATA_ENTRY.equals(destinationEventCrfBean.getStage())
+					|| DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.equals(destinationEventCrfBean.getStage()));
 		for (ItemDataBean destinationItemDataBean : destinationItemDataBeans) {
-			if (!destinationItemDataBean.getValue().equals(valueToInsert)) {
+			if (!destinationItemDataBean.getValue().equals(valueToInsert) || isDDEStage) {
 				isAllowedToInsertDataIntoDestinationEventCRF = true;
 				destinationItemDataBean.setValue(valueToInsert);
-				if (DataEntryStage.DOUBLE_DATA_ENTRY.equals(destinationEventCrfBean.getStage())
-						|| DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.equals(destinationEventCrfBean.getStage())) {
+				if (isDDEStage) {
 					destinationItemDataBean.setStatus(Status.UNAVAILABLE);
 				}
 				getItemDataDAO().updateValue(destinationItemDataBean, "yyyy-MM-dd", con);
