@@ -430,7 +430,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 						List<DisplayItemBean> items = displayGroup.getItems();
 						logger.info("item size: " + items.size());
 						for (DisplayItemBean displayItem : items) {
-							String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, false);
+							String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem);
 							logger.info("inputName:" + inputName);
 							logger.info("item data id:" + displayItem.getData().getId());
 							dnService.saveFieldNotes(inputName, discNotes, displayItem.getData().getId(), "itemData",

@@ -616,7 +616,6 @@ public class ClinovoJBehave {
         	commonSteps.fill_in_crf(crf);
     		if (saveCRF) {
     			userClicksSaveButton();
-    			CRF.transformItemsNameFromRepeatingGroup(crf);
     		}
     		listWithCRFs.add(crf);
     	}

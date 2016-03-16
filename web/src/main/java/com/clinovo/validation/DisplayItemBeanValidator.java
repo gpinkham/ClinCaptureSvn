@@ -314,8 +314,8 @@ public final class DisplayItemBeanValidator {
 			for (DisplayItemGroupBean displayGroup : formGroups) {
 				List<DisplayItemBean> items = displayGroup.getItems();
 				for (DisplayItemBean displayItem : items) {
-					String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem, !displayGroup.isAuto());
+					String inputName = DataEntryUtil.getGroupItemInputName(displayGroup,
+							displayGroup.getFormInputOrdinal(), displayItem);
 					validateDisplayItemBean(v, displayItem, inputName, request);
 				}
 			}
@@ -331,7 +331,7 @@ public final class DisplayItemBeanValidator {
 				List<DisplayItemBean> items = displayGroup.getItems();
 				for (DisplayItemBean displayItem : items) {
 					inputName = DataEntryUtil.getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem, !displayGroup.isAuto());
+							displayItem);
 					validateDisplayItemBean(v, displayItem, inputName, request);
 				}
 
@@ -401,7 +401,8 @@ public final class DisplayItemBeanValidator {
 					List<DisplayItemBean> items = displayGroup.getItems();
 					int order = displayGroup.getOrdinal();
 					for (DisplayItemBean displayItem : items) {
-						String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem, !displayGroup.isAuto());
+						String inputName = DataEntryUtil.getGroupItemInputName(displayGroup,
+								displayGroup.getFormInputOrdinal(), displayItem);
 						if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
 								|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)
 								+ displayItem.getItem().getOid())) {
@@ -422,8 +423,8 @@ public final class DisplayItemBeanValidator {
 					int order = displayGroup.getOrdinal();
 
 					for (DisplayItemBean displayItem : items) {
-						String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-								displayItem, !displayGroup.isAuto());
+						String inputName = DataEntryUtil.getGroupItemInputName(displayGroup,
+								displayGroup.getFormInputOrdinal(), displayItem);
 
 						if (displayItem.getMetadata().isShowItem()
 								|| getDynamicsMetadataService().isShown(displayItem.getItem().getId(), ecb,

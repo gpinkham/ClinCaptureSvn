@@ -16,6 +16,9 @@ package org.akaza.openclinica.bean.submit;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DisplayItemGroupBean.
+ */
 @SuppressWarnings("rawtypes")
 public class DisplayItemGroupBean implements Comparable {
 	@Override
@@ -27,7 +30,6 @@ public class DisplayItemGroupBean implements Comparable {
 		result = prime * result + ((groupMetaBean == null) ? 0 : groupMetaBean.hashCode());
 		result = prime * result + index;
 		result = prime * result + ((inputId == null) ? 0 : inputId.hashCode());
-		result = prime * result + (isAuto ? 1231 : 1237);
 		result = prime * result + ((itemGroupBean == null) ? 0 : itemGroupBean.hashCode());
 		result = prime * result + ((items == null) ? 0 : items.hashCode());
 		result = prime * result + ordinal;
@@ -62,8 +64,6 @@ public class DisplayItemGroupBean implements Comparable {
 				return false;
 		} else if (!inputId.equals(other.inputId))
 			return false;
-		if (isAuto != other.isAuto)
-			return false;
 		if (itemGroupBean == null) {
 			if (other.itemGroupBean != null)
 				return false;
@@ -83,12 +83,14 @@ public class DisplayItemGroupBean implements Comparable {
 	private ItemGroupMetadataBean groupMetaBean;
 	private List<DisplayItemBean> items;
 	private int ordinal;
-	private String editFlag;// add, edit or remove
+	private String editFlag; // add, edit or remove
 	private int formInputOrdinal;
-	private boolean isAuto;// if it is auto generated from rep model
 	private String inputId; // @See loadFormValueForItemGroup()
 	private int index;
 
+	/**
+	 * Default constructor.
+	 */
 	public DisplayItemGroupBean() {
 		this.itemGroupBean = new ItemGroupBean();
 		this.groupMetaBean = new ItemGroupMetadataBean();
@@ -96,7 +98,6 @@ public class DisplayItemGroupBean implements Comparable {
 		ordinal = 0;
 		editFlag = "";
 		formInputOrdinal = 0;
-		isAuto = true;
 	}
 
 	public ItemGroupBean getItemGroupBean() {
@@ -175,21 +176,6 @@ public class DisplayItemGroupBean implements Comparable {
 		this.formInputOrdinal = formInputOrdinal;
 	}
 
-	/**
-	 * @return the isAuto
-	 */
-	public boolean isAuto() {
-		return isAuto;
-	}
-
-	/**
-	 * @param isAuto
-	 *            the isAuto to set
-	 */
-	public void setAuto(boolean isAuto) {
-		this.isAuto = isAuto;
-	}
-
 	public String getInputId() {
 		return inputId;
 	}
@@ -206,6 +192,9 @@ public class DisplayItemGroupBean implements Comparable {
 		this.index = index;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int compareTo(Object o) {
 		if (!o.getClass().equals(this.getClass())) {
 			return 0;
@@ -214,5 +203,4 @@ public class DisplayItemGroupBean implements Comparable {
 		DisplayItemGroupBean arg = (DisplayItemGroupBean) o;
 		return getOrdinal() - arg.getOrdinal();
 	}
-
 }

@@ -98,8 +98,6 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 
 		DynamicsMetadataService dynamicsMetadataService = getDynamicsMetadataService();
 		ItemGroupBean igb = displayItemGroupBean.getItemGroupBean();
-		int manualGroupsCount = DataEntryUtil.getManualRowsCount(fp, igb, repeatMax);
-		int ordinal = 0;
 
 		for (int i = 0; i < repeatMax; i++) {
 			if (!DataEntryUtil.rowPresentInRequest(fp, igb.getOid(), i)) {
@@ -108,27 +106,15 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
 			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
 					itemFormMetadataCache, ecb, sb.getId(), nullValuesList, dynamicsMetadataService);
-			boolean isRowNotManual = !DataEntryUtil.isRowManualOrNew(fp, igb.getOid(), i);
-			dibs = processInputForGroupItem(fp, dibs, i, displayItemGroupBean, isRowNotManual);
+			dibs = processInputForGroupItem(fp, dibs, i, displayItemGroupBean);
+			formGroup.setItems(dibs);
 			formGroup.setItemGroupBean(displayItemGroupBean.getItemGroupBean());
 			formGroup.setGroupMetaBean(runDynamicsCheck(displayItemGroupBean.getGroupMetaBean(), request));
 			formGroup.setFormInputOrdinal(i);
-			formGroup.setAuto(isRowNotManual);
-			formGroup.setItems(dibs);
-
-			if (isRowNotManual) {
-				formGroup.setInputId(igb.getOid() + "_" + i);
-				if (i != 0) {
-					formGroup.setOrdinal(++ordinal + manualGroupsCount);
-				}
-			} else {
-				String suphics = DataEntryUtil.isRowNew(fp, igb.getOid(), i) ? ".newRow" : "";
-				formGroup.setInputId(igb.getOid() + "_manual" + i + suphics);
-				formGroup.setOrdinal(i);
-			}
+			formGroup.setOrdinal(i);
+			formGroup.setInputId(igb.getOid() + "_" + i);
 			formGroups.add(formGroup);
 		}
-		request.setAttribute("manualRows", manualGroupsCount);
 		Collections.sort(formGroups);
 		return setEditFlagsAndPopulateGroupItemsWithData(dataBaseGroups, formGroups);
 	}
@@ -399,19 +385,14 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 	}
 
 	private List<DisplayItemBean> processInputForGroupItem(FormProcessor fp, List<DisplayItemBean> dibs, int i,
-														   DisplayItemGroupBean digb, boolean isAuto) {
+														   DisplayItemGroupBean digb) {
 		for (DisplayItemBean displayItem : dibs) {
-			String inputName = "";
-			ResponseType rt = displayItem.getMetadata().getResponseSet()
-					.getResponseType();
-			if (rt.equals(ResponseType.CHECKBOX)
-					|| rt.equals(ResponseType.SELECTMULTI)) {
-				inputName = DataEntryUtil.getGroupItemInputName(digb, i, displayItem, !isAuto);
+			String inputName = DataEntryUtil.getGroupItemInputName(digb, i, displayItem);
+			ResponseType rt = displayItem.getMetadata().getResponseSet().getResponseType();
+			if (rt.equals(ResponseType.CHECKBOX) || rt.equals(ResponseType.SELECTMULTI)) {
 				ArrayList valueArray = fp.getStringArray(inputName);
 				displayItem.loadFormValue(valueArray);
-
 			} else {
-				inputName = DataEntryUtil.getGroupItemInputName(digb, i, displayItem, !isAuto);
 				displayItem.loadFormValue(fp.getString(inputName));
 				if (rt.equals(ResponseType.SELECT)) {
 					ensureSelectedOption(displayItem);

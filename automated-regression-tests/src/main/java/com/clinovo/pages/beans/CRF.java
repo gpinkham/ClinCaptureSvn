@@ -146,23 +146,6 @@ public class CRF{
 	public void setAddRows(String addRows) {
 		this.addRows = addRows;
 	}
-
-	public static void transformItemsNameFromRepeatingGroup(CRF crf) {
-		Map<String, String> map = new HashMap<>(crf.getFieldNameToValueMap());
-		String value = "";
-		Pattern p = Pattern.compile(".+_(\\d+)input.+");
-		int b = 0;
-		for (String key: crf.getFieldNameToValueMap().keySet()) {
-			value = map.get(key);
-			Matcher m = p.matcher(key);
-			b = m.matches()? Integer.parseInt(m.group(1)) : 0;
-			if (b > 0) {
-				map.put(key.replace("_" + b + "input", "_manual" + b + "input"), value);
-				map.remove(key);
-			}
-		}
-		crf.setFieldNameToValueMap(map);
-	}
 	
 	public static Map<String, String> changeKeysForCRFItems(Map<String, String> map, Map<String, String> values) {
     	Map<String, String> result = new HashMap<String, String>();
@@ -204,11 +187,10 @@ class ComparatorForItemOIDs implements Comparator<String> {
 		b1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;
 		b2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
 		
-		p = Pattern.compile(".+_manual(\\d+)input.+");
+		p = Pattern.compile(".+_(\\d+)input.+");
 		m1 = p.matcher(str1);
 		m2 = p.matcher(str2);
-		c1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;
-		c2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
+		c1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;		c2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
 		
 		p = Pattern.compile(".*input(\\d+).*");
 		m1 = p.matcher(str1);

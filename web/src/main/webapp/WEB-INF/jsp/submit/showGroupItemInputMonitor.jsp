@@ -37,17 +37,8 @@
 <c:set var="orderForDN" value="${rowCount}" />
 <c:set var="errorInputName" value="${repeatParentId}_${rowCount}input${itemId}" />
 
-<c:if test="${rowCount > 0}">
-    <c:set var="errorInputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
-</c:if>
-
-<c:if test="${!isLast && rowCount == 0}">
+<c:if test="${!isLast}">
     <c:set var="inputName" value="${repeatParentId}_${rowCount}input${itemId}" />
-</c:if>
-
-<c:if test="${!isLast && rowCount > 0}">
-    <c:set var="inputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
-    <c:set var="parsedInputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
 </c:if>
 
 <c:set var="isLocked" value="${param.isLocked}" />

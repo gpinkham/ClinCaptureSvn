@@ -707,8 +707,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 								if (scoreItemdata.containsKey(itemId + "_" + ordinal)) {
 									scoreItemdata.remove(itemId + "_" + ordinal);
 								}
-								boolean manual = j != 0;
-								String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, manual);
+								String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem);
 								changedItems.add(formName);
 								inputNameToItemDataIdMap.put(formName, displayItem.getData().getId());
 								changedItemsList.add(displayItem);
@@ -764,8 +763,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 								ordinalSet.add(ordinal);
 								itemOrdinals.put(itemId, ordinalSet);
 							}
-							boolean manual = j != 0;
-							String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, manual);
+							String formName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem);
 							inputNameToItemDataIdMap.put(formName, displayItem.getData().getId());
 							if (newRow || isChanged(displayItem, oldItemdata, attachedFilePath)) {
 								logger.debug("RESET: formName group-item-input:" + formName);
@@ -844,8 +842,8 @@ public abstract class DataEntryServlet extends SpringServlet {
 								ResponseOptionBean robBean = (ResponseOptionBean) ifmb.getResponseSet().getOptions()
 										.get(0);
 								String value = "";
-								String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-										displayItem, !displayGroup.isAuto());
+								String inputName = DataEntryUtil.getGroupItemInputName(displayGroup,
+										displayGroup.getFormInputOrdinal(), displayItem);
 								logger.debug("returning input name: " + inputName);
 
 								value = sc.doCalculation(displayItem, scoreItems, scoreItemdata, itemOrdinals, err,
@@ -972,7 +970,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 			if (errors.size() > 0 && !checkDobleDataEntryErrors(errors)) {
 				request.setAttribute("Hardrules", true);
 			}
-			reshuffleErrorGroupNamesKK(errors, allItems, request);
 
 			if (this.isAdminForcedReasonForChange(request) && this.isAdministrativeEditing() && errors.isEmpty()) {
 				String error = getResPage().getString("reason_for_change_error");
@@ -1016,7 +1013,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 						}
 					}
 				}
-				reshuffleErrorGroupNamesKK(errors, allItems, request);
 			}
 
 			populateNotesWithDBNoteCounts(discNotes, noteThreads, section, request);
@@ -1028,7 +1024,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 				logger.debug("Errors was empty");
 				if (session.getAttribute("rulesErrors") != null) {
 					HashMap h = ruleValidator.validate();
-					reshuffleErrorGroupNamesKK(h, allItems, request);
 					Set<String> a = (Set<String>) session.getAttribute("rulesErrors");
 					Set<String> ba = h.keySet();
 					Boolean showErrors = false;
@@ -1059,7 +1054,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 				} else {
 					// get soft rules
 					errors = ruleValidator.validate();
-					reshuffleErrorGroupNamesKK(errors, allItems, request);
 					if (errors.size() > 0) {
 						session.setAttribute("shouldRunValidation", "1");
 						session.setAttribute("rulesErrors", errors.keySet());
@@ -1245,8 +1239,8 @@ public abstract class DataEntryServlet extends SpringServlet {
 								if (temp && newUploadedFiles.containsKey(fileName)) {
 									newUploadedFiles.remove(fileName);
 								}
-								String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-										displayItem, !displayGroup.isAuto());
+								String inputName = DataEntryUtil.getGroupItemInputName(displayGroup,
+										displayGroup.getFormInputOrdinal(), displayItem);
 								dnService.saveFieldNotes(inputName, fdn, displayItem.getData().getId(), "itemData",
 										currentStudy);
 								success = success && temp;
@@ -1376,7 +1370,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 														|| !prevShownDynItemDataIds.contains(dib.getData().getId())) {
 													inSameSection = true;
 													errorsPostDryRun.put(
-															DataEntryUtil.getGroupItemInputName(displayGroup, j, dib, false),
+															DataEntryUtil.getGroupItemInputName(displayGroup, j, dib),
 															rulesPostDryRun.get(fieldName));
 												}
 											}
@@ -2758,8 +2752,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 					List<DisplayItemBean> items = displayGroup.getItems();
 					for (int j = 0; j < items.size(); j++) {
 						DisplayItemBean dib = items.get(j);
-						boolean manual = i != 0;
-						String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, i, dib, manual);
+						String inputName = DataEntryUtil.getGroupItemInputName(displayGroup, i, dib);
 						int itemDataId = 0;
 						if (i <= itemWithGroup.getDbItemGroups().size() - 1) {
 							itemDataId = dib.getData().getId();
@@ -2892,7 +2885,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 	 *
 	 * @param dib
 	 * @param list
-	 * @param ecbId TODO
+	 * @param ecbId
 	 */
 	private DisplayItemBean setTotals(DisplayItemBean dib, int itemDataId, List<DiscrepancyNoteBean> toolTipDNotes,
 									  List parentNotes, List<DiscrepancyNoteBean> list, int ecbId, HttpServletRequest request) {
@@ -3575,49 +3568,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 		}
 	}
 
-	private HashMap reshuffleErrorGroupNamesKK(HashMap errors, List<DisplayItemWithGroupBean> allItems,
-											   HttpServletRequest request) {
-		int manualRows = 0;
-		if (errors != null && errors.size() > 0) {
-			for (int i = 0; i < allItems.size(); i++) {
-				DisplayItemWithGroupBean diwb = allItems.get(i);
-
-				if (diwb.isInGroup()) {
-					List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-					for (int j = 0; j < dgbs.size(); j++) {
-
-						DisplayItemGroupBean digb = dgbs.get(j);
-						List<DisplayItemBean> dibs = digb.getItems();
-
-						if (j == 0) {
-							for (DisplayItemBean dib : dibs) {
-								String intendedKey = digb.getInputId() + DataEntryUtil.getInputName(dib);
-								String replacementKey = digb.getItemGroupBean().getOid() + "_" + j + DataEntryUtil.getInputName(dib);
-								if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
-									errors.put(replacementKey, errors.get(intendedKey));
-									errors.remove(intendedKey);
-								}
-							}
-						} else {
-							manualRows++;
-							for (DisplayItemBean dib : dibs) {
-								String intendedKey = digb.getInputId() + DataEntryUtil.getInputName(dib);
-								String replacementKey = digb.getItemGroupBean().getOid() + "_manual"
-										+ digb.getOrdinal() + DataEntryUtil.getInputName(dib);
-								if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
-									errors.put(replacementKey, errors.get(intendedKey));
-									errors.remove(intendedKey);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		request.setAttribute("manualRows", new Integer(manualRows));
-		return errors;
-	}
-
 	/**
 	 * Method checks access.
 	 *
@@ -3710,12 +3660,10 @@ public abstract class DataEntryServlet extends SpringServlet {
 					DisplayItemGroupBean displayGroup = dbGroups.get(j);
 					for (DisplayItemBean displayItem : displayGroup.getItems()) {
 						// DisplayItemBean from repeating Group
-						boolean manual = j != 0;
-						inputName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem, manual);
+						inputName = DataEntryUtil.getGroupItemInputName(displayGroup, j, displayItem);
 						dnCreatingParameters.put(inputName,
 								calculateDNParametersForOneItem(displayItem, inputName, request));
-					}
-				}
+					}				}
 			} else {
 				DisplayItemBean displayItem = diwgb.getSingleItem();
 				inputName = DataEntryUtil.getInputName(displayItem);

@@ -88,11 +88,8 @@ processRemoveButtons = function() {
 
 removeButtonClick = function(btn, block) {
 	try {
-		var deletedRowIndex = undefined;
 		var rowPrefix = btn.parentNode.children[0].getAttribute("name").replace('.newRow','');
-		if (rowPrefix.indexOf("_manual") >= 0) {
-			deletedRowIndex = parseInt(rowPrefix.replace(/.*_manual/g, ""));
-		}
+		var deletedRowIndex = parseInt(rowPrefix.replace(/.*_/g, ""));
 		if (deletedRowIndex != undefined && rowPrefix != undefined && block != undefined) {
 			addOverlay();
 			var timestamp = new Date().getTime();
@@ -111,25 +108,24 @@ removeButtonClick = function(btn, block) {
 						var rButtons = _getElementsByClassName(tr, "button_remove");
 						if (rButtons.length == 1) {
 							var rowPrefix = rButtons[0].parentNode.children[0].getAttribute("name").replace('.newRow','');
-							if (rowPrefix.indexOf("_manual") >= 0 ) {
-								var rowIndex = parseInt(rowPrefix.replace(/.*_manual/g, ""));
-								if (rowIndex > deletedRowIndex) {
-									var repeatingTableRow = $(tr);
-									repeatingTableRow.attr("repeat", (rowIndex - 1) - 1);
+							var rowIndex = parseInt(rowPrefix.replace(/.*_/g, ""));
+							if (rowIndex > deletedRowIndex) {
+								var repeatingTableRow = $(tr);
+								repeatingTableRow.attr("repeat", (rowIndex - 1) - 1);
 
-									var itemHolder = repeatingTableRow.find("td:first[id^=itemHolderId_]");
-									var postFix = itemHolder.attr("id").toString().replace(/itemHolderId_\d*/,"");
-									itemHolder.attr("id", "itemHolderId_" + (rowIndex - 1) + postFix);
+								var itemHolder = repeatingTableRow.find("td:first[id^=itemHolderId_]");
+								var postFix = itemHolder.attr("id").toString().replace(/itemHolderId_\d*/,"");
+								itemHolder.attr("id", "itemHolderId_" + (rowIndex - 1) + postFix);
 
-									var crfShortcutAnchor = repeatingTableRow.find("div:first[id^=crfShortcutAnchors_]");
-									postFix = crfShortcutAnchor.attr("id").toString().replace(/crfShortcutAnchors_\d*/,"");
-									crfShortcutAnchor.attr("id", "crfShortcutAnchors_" + (rowIndex - 1) + postFix);
+								var crfShortcutAnchor = repeatingTableRow.find("div:first[id^=crfShortcutAnchors_]");
+								postFix = crfShortcutAnchor.attr("id").toString().replace(/crfShortcutAnchors_\d*/,"");
+								crfShortcutAnchor.attr("id", "crfShortcutAnchors_" + (rowIndex - 1) + postFix);
 
-									var newRowPrefix = rowPrefix.replace("_manual" + rowIndex, "_manual" + (rowIndex - 1));
-									replaceRowPrefix(tr, rowPrefix, newRowPrefix);
-								}
-							} else if (parseInt(rowPrefix.replace(repeatTemplate + "_", "")) > 0) {
-								break;
+								var splitter = "_";
+								var rowPrefixSplitted = rowPrefix.split(splitter);
+								rowPrefixSplitted[rowPrefixSplitted.length - 1] = (rowIndex - 1).toString();
+								var newRowPrefix = rowPrefixSplitted.join(splitter);
+								replaceRowPrefix(tr, rowPrefix, newRowPrefix);
 							}
 						}
 					}

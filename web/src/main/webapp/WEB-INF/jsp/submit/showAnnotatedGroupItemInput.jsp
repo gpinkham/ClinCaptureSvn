@@ -20,17 +20,11 @@
 <c:set var="isHorizontal" value="${param.isHorizontal}" />
 <c:set var="defValue" value="${param.defaultValue}" />
 
-<c:if test="${!isLast && rowCount == 0}">
+<c:if test="${!isLast}">
     <c:set var="inputName" value="${repeatParentId}_${rowCount}input${itemId}" />
 </c:if>
 
-<c:if test="${!isLast && rowCount > 0}">
-    <c:set var="inputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
-    <c:set var="parsedInputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
-</c:if>
-
 <c:set var="respLayout" value="${displayItem.metadata.responseLayout}" />
-
 <c:choose>
 <c:when test="${empty displayItem.metadata.responseSet.value}">
 	<c:set var="inputTxtValue" value="${defValue}"/>

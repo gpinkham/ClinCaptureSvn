@@ -235,8 +235,8 @@ public class ViewDiscrepancyNoteServlet extends SpringServlet {
 							itemData.getItemId(), ecb.getCRFVersionId());
 					ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
 					if (igmBean.isRepeatingGroup()) {
-						field = igBean.getOid() + "_" + (itemData.getOrdinal() == 1 ? "" : "manual")
-								+ ((itemData.getOrdinal() - 1) + "input") + itemData.getItemId();
+						field = igBean.getOid() + "_" + ((itemData.getOrdinal() - 1) + "input")
+								+ itemData.getItemId();
 					} else {
 						field = "input" + itemData.getItemId();
 					}

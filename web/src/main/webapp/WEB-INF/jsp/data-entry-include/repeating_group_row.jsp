@@ -82,16 +82,8 @@
 </c:forEach>
 <c:if test="${displayItemWithGroup.itemGroup.groupMetaBean.repeatingGroup}">
 	<td class="aka_padding_norm aka_cellBorders">
-		<c:choose>
-			<c:when test="${uniqueId ==0}">
-				<input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
-			</c:when>
-			<c:otherwise>
-				<input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
-			</c:otherwise>
-		</c:choose>
+		<input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
 		<c:if test="${isButtonRemShow == true }">
 			<button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" rel="${savedIntoDB}"></button>
-		</c:if>
-	</td>
+		</c:if>	</td>
 </c:if>

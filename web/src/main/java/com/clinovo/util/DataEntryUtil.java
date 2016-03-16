@@ -6,7 +6,6 @@ import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -27,55 +26,14 @@ public final class DataEntryUtil {
 	}
 
 	/**
-	 * Check if row is manual or new.
-	 * @param fp FormProcessor
-	 * @param groupOid String
-	 * @param i int
-	 * @return boolean
-	 */
-	public static boolean isRowManualOrNew(FormProcessor fp, String groupOid, int i) {
-		return fp.getStartsWith(groupOid + "_manual" + i + "input")
-				|| !StringUtil.isBlank(fp.getString(groupOid + "_manual" + i + ".newRow"));
-	}
-
-	/**
-	 * Check if row in newly added.
-	 * @param fp FormProcessor
-	 * @param groupOid String
-	 * @param i int
-	 * @return boolean
-	 */
-	public static boolean isRowNew(FormProcessor fp, String groupOid, int i) {
-		return !StringUtil.isBlank(fp.getString(groupOid + "_manual" + i + ".newRow"));
-	}
-
-	/**
-	 * Get count of rows with Manual or NewRow tag.
-	 * @param fp FormProcessor
-	 * @param igb ItemGroupBean
-	 * @param repeatMax int
-	 * @return int
-	 */
-	public static int getManualRowsCount(FormProcessor fp, ItemGroupBean igb, int repeatMax) {
-		int result = 0;
-		for (int i = 0; i < repeatMax; i++) {
-			if (isRowManualOrNew(fp, igb.getOid(), i)) {
-				result++;
-			}
-		}
-		return result;
-	}
-
-	/**
 	 * Get group item input name.
 	 * @param digb DisplayItemGroupBean
 	 * @param ordinal int
 	 * @param dib DisplayItemBean
-	 * @param isManual boolean
 	 * @return String
 	 */
-	public static String getGroupItemInputName(DisplayItemGroupBean digb, int ordinal, DisplayItemBean dib, boolean isManual) {
-		return digb.getItemGroupBean().getOid() + (isManual ? "_manual" : "_") + ordinal + getInputName(dib);
+	public static String getGroupItemInputName(DisplayItemGroupBean digb, int ordinal, DisplayItemBean dib) {
+		return digb.getItemGroupBean().getOid() + "_" + ordinal + getInputName(dib);
 	}
 
 	/**
@@ -111,7 +69,7 @@ public final class DataEntryUtil {
 	 * @return boolean
 	 */
 	public static boolean rowPresentInRequest(FormProcessor fp, String oid, int i) {
-		return isRowManualOrNew(fp, oid, i) || fp.getStartsWith(oid + "_" + i + "input")
+		return fp.getStartsWith(oid + "_" + i + "input")
 				|| !StringUtil.isBlank(fp.getString(oid + "_" + i + ".newRow"));
 	}
 

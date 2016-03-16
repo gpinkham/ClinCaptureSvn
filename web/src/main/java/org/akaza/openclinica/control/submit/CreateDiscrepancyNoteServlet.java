@@ -76,7 +76,6 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.EmailUtil;
 import com.clinovo.util.ValidatorHelper;
@@ -104,8 +103,6 @@ public class CreateDiscrepancyNoteServlet extends SpringServlet {
 	public static final String SUBJECT_ID = "subjectId";
 
 	public static final String ITEM_ID = "itemId";
-
-	public static final String IS_GROUP_ITEM = "isGroup";
 
 	public static final String PARENT_ID = "parentId"; // parent note id
 
@@ -146,12 +143,9 @@ public class CreateDiscrepancyNoteServlet extends SpringServlet {
 	public static final String TRANSFORMED_SUBMITTED_DNS = "transformedSubmittedDNs";
 
 	public static final String EVENT_CRF_ID = "eventCRFId";
-	public static final String PARENT_ROW_COUNT = "rowCount";
 
 	public static final String NO_PERMISSION_EXCEPTION = "no_permission_to_create_discrepancy_note";
 
-	private static final int FOUR = 4;
-	private static final int FIVE = 5;
 	private static final int TWO_FIFTY_FIVE = 255;
 	private static final int ONE_THOUSAND = 1000;
 
@@ -220,20 +214,9 @@ public class CreateDiscrepancyNoteServlet extends SpringServlet {
 		String column = fp.getString(ENTITY_COLUMN);
 		int parentId = fp.getInt(PARENT_ID);
 
-		int isGroup = fp.getInt(IS_GROUP_ITEM);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
 		request.setAttribute(EVENT_CRF_ID, eventCRFId);
 		EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(eventCRFId);
-		int rowCount = fp.getInt(PARENT_ROW_COUNT);
-		// run only once: try to recalculate writeToDB
-		if (!StringUtil.isBlank(entityType) && "itemData".equalsIgnoreCase(entityType) && isGroup != 0
-				&& eventCRFId != 0) {
-			int ordinalForRepeatingGroupField = calculateOrdinal(request, isGroup, field, eventCRFId, rowCount);
-			logger.info("*** found entity id: " + entityId);
-			int writeToDBStatus = isWriteToDB(request, isGroup, field, entityId, itemId, ordinalForRepeatingGroupField,
-					eventCRFId);
-			writeToDB = writeToDBStatus != -1 && (writeToDBStatus == 1 || writeToDB);
-		}
 
 		String strResStatus = fp.getString(PRESET_RES_STATUS);
 		if (!strResStatus.equals("")) {
@@ -840,7 +823,7 @@ public class CreateDiscrepancyNoteServlet extends SpringServlet {
 		}
 		Map<String, List<DiscrepancyNoteBean>> submittedDNs = (Map) request.getSession().getAttribute(
 				SUBMITTED_DNS_MAP);
-		submittedDNs = submittedDNs == null? new HashMap<String, List<DiscrepancyNoteBean>>() : submittedDNs;
+		submittedDNs = submittedDNs == null ? new HashMap<String, List<DiscrepancyNoteBean>>() : submittedDNs;
 		
 		List<DiscrepancyNoteBean> notes;
 		if (submittedDNs.containsKey(note.getField())) {
@@ -1032,92 +1015,6 @@ public class CreateDiscrepancyNoteServlet extends SpringServlet {
 		}
 		noteSubmitted.put(fieldNameOrItemDataBeanId, Boolean.TRUE);
 		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
-	}
-
-	private int isWriteToDB(HttpServletRequest request, int isGroup, String field, int itemDataId, int itemId,
-			int ordinalForRepeatingGroupField, int ecId) {
-		if (itemDataId > 0 && isGroup == -1) { // non repeating group; coming from showItemInput.jsp
-			return 1;
-		} else if (itemDataId < 0 && isGroup == -1) { // non repeating group; coming from showItemInput.jsp
-			return -1;
-		} else if (isGroup == 1) { // repeating group;
-			// initial data entry or if template cell is empty (last row)
-			if (itemDataId < 0) {
-				return -1;
-			}
-			if (itemDataId > 0) {
-				if (field.contains("_0input") || field.contains("manual")) {
-					// get ordinal
-					ItemDataDAO iddao = new ItemDataDAO(getDataSource(), LocaleResolver.getLocale(request));
-
-					boolean isExistInDB = iddao.isItemExists(itemId, ordinalForRepeatingGroupField, ecId);
-					return (isExistInDB) ? 1 : -1;
-				} else if (field.contains("input")) {
-					return -1;
-				}
-			}
-		}
-		return 0;
-	}
-
-	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param isGroup
-	 *            int
-	 * @param fieldName
-	 *            String
-	 * @param ecId
-	 *            int
-	 * @param rowCount
-	 *            int
-	 * @return int
-	 */
-	public int calculateOrdinal(HttpServletRequest request, int isGroup, String fieldName, int ecId, int rowCount) {
-		int ordinal = 0;
-		int start;
-		int end;
-		if (isGroup == -1) {
-			return 1;
-		}
-		if (fieldName.contains("_0input")) {
-			return 1;
-		}
-		try {
-			if (fieldName.contains("manual")) {
-				start = fieldName.indexOf("manual") + FIVE;
-				end = fieldName.indexOf("input");
-				if (start == FOUR || end == -1) {
-					return 0;
-				}
-				ordinal = Integer.valueOf(fieldName.substring(start + 1, end));
-				return ordinal + 1;
-
-			} else {
-				// get max ordinal from DB
-				ItemDataDAO iddao = new ItemDataDAO(getDataSource(), LocaleResolver.getLocale(request));
-				String[] fieldNameItems = fieldName.split("_");
-
-				String groupOid = fieldName.substring(0,
-						fieldName.indexOf(fieldNameItems[fieldNameItems.length - 1]) - 1);
-				int maxOrdinal = iddao.getMaxOrdinalForGroupByGroupOID(groupOid, ecId);
-
-				// get ordinal from field
-				end = fieldName.indexOf("input");
-				start = fieldName.lastIndexOf("_");
-				if (end == -1 || start == -1) {
-					return 0;
-				}
-				ordinal = Integer.valueOf(fieldName.substring(start + 1, end));
-				return ordinal + maxOrdinal + rowCount;
-			}
-		} catch (NumberFormatException e) {
-			logger.error(e.getLocalizedMessage());
-		}
-
-		return ordinal;
-
 	}
 
 	/**
