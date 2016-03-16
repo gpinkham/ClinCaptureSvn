@@ -111,21 +111,22 @@ removeButtonClick = function(btn, block) {
 							var rowIndex = parseInt(rowPrefix.replace(/.*_/g, ""));
 							if (rowIndex > deletedRowIndex) {
 								var repeatingTableRow = $(tr);
-								repeatingTableRow.attr("repeat", (rowIndex - 1) - 1);
-
-								var itemHolder = repeatingTableRow.find("td:first[id^=itemHolderId_]");
-								var postFix = itemHolder.attr("id").toString().replace(/itemHolderId_\d*/,"");
-								itemHolder.attr("id", "itemHolderId_" + (rowIndex - 1) + postFix);
-
 								var crfShortcutAnchor = repeatingTableRow.find("div:first[id^=crfShortcutAnchors_]");
-								postFix = crfShortcutAnchor.attr("id").toString().replace(/crfShortcutAnchors_\d*/,"");
-								crfShortcutAnchor.attr("id", "crfShortcutAnchors_" + (rowIndex - 1) + postFix);
+								if (crfShortcutAnchor && crfShortcutAnchor.length > 0) {
+									repeatingTableRow.attr("repeat", (rowIndex - 1) - 1);
+									var itemHolder = repeatingTableRow.find("td:first[id^=itemHolderId_]");
+									var postFix = itemHolder.attr("id").toString().replace(/itemHolderId_\d*/,"");
+									itemHolder.attr("id", "itemHolderId_" + (rowIndex - 1) + postFix);
 
-								var splitter = "_";
-								var rowPrefixSplitted = rowPrefix.split(splitter);
-								rowPrefixSplitted[rowPrefixSplitted.length - 1] = (rowIndex - 1).toString();
-								var newRowPrefix = rowPrefixSplitted.join(splitter);
-								replaceRowPrefix(tr, rowPrefix, newRowPrefix);
+									postFix = crfShortcutAnchor.attr("id").toString().replace(/crfShortcutAnchors_\d*/,"");
+									crfShortcutAnchor.attr("id", "crfShortcutAnchors_" + (rowIndex - 1) + postFix);
+
+									var splitter = "_";
+									var rowPrefixSplitted = rowPrefix.split(splitter);
+									rowPrefixSplitted[rowPrefixSplitted.length - 1] = (rowIndex - 1).toString();
+									var newRowPrefix = rowPrefixSplitted.join(splitter);
+									replaceRowPrefix(tr, rowPrefix, newRowPrefix);
+								}
 							}
 						}
 					}
