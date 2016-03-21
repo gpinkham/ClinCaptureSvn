@@ -47,7 +47,6 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.bean.ListCRFRow;
 import org.springframework.stereotype.Component;
 
 /**

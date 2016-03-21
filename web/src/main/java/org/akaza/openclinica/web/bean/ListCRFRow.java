@@ -21,7 +21,6 @@
 
 package org.akaza.openclinica.web.bean;
 
-import com.clinovo.service.ListCRFService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings("rawtypes")
 public class ListCRFRow extends EntityBeanRow {
 	// columns:
 	public static final int COL_NAME = 0;
