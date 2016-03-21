@@ -642,7 +642,7 @@ Parser.prototype.getRule = function() {
 		rule.evaluates = this.getEvaluates();
         for (var x = 0; x < parser.rule.targets.length; x++) {
             var target = parser.rule.targets[x];
-            target.expression = target.expression.join().replace(/\,/g, " ");
+            target.expression = target.expression.join(" ");
         }
 		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 		return rule;
