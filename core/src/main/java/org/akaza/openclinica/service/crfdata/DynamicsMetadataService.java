@@ -565,6 +565,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		studyEventBeanB.setUpdatedDate(new Date());
 		studyEventBeanB.setOwner(studyEventBeanA.getOwner());
 		studyEventBeanB.setStatus(Status.AVAILABLE);
+		studyEventBeanB.setOldStatus(Status.NOT_STARTED);
 		studyEventBeanB.setLocation(studyEventBeanA.getLocation());
 		studyEventBeanB.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 		studyEventBeanB.setSampleOrdinal(sed.getMaxSampleOrdinal(studyEventDefinitionBeanB, ssbean) + 1);
