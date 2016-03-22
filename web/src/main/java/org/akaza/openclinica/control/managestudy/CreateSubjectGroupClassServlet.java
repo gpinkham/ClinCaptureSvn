@@ -100,8 +100,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 		if (StringUtil.isBlank(action)) {
 			ArrayList studyGroups = new ArrayList();
 			StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
-			StudyGroupClassBean defaultStudyGroupClass = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(currentStudy
-					.getId());
+			StudyGroupClassBean defaultStudyGroupClass = sgcdao.findDefaultByStudyId(currentStudy.getId());
 
 			clearSession(request);
 
@@ -150,6 +149,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 		boolean atLeastOneEventDefSelected = false;
 		boolean isDefault = false;
 
+		StudyBean currentStudy = getCurrentStudy(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -163,8 +163,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 
 		v.addValidation("name", Validator.NO_BLANKS);
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
-		ArrayList<StudyGroupClassBean> allStudyGroupClasses = (ArrayList<StudyGroupClassBean>) studyGroupClassDAO
-				.findAll();
+		ArrayList<StudyGroupClassBean> allStudyGroupClasses = studyGroupClassDAO.findAllByStudy(currentStudy);
 
 		v.addValidation("subjectAssignment", Validator.NO_BLANKS);
 
@@ -279,7 +278,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 		group.setStatus(Status.AVAILABLE);
 		group.setDynamicOrdinal(sgcdao.getMaxDynamicOrdinalByStudyId(currentStudy.getId()) + 1);
 
-		group = (StudyGroupClassBean) sgcdao.create(group);
+		group = sgcdao.create(group);
 
 		if (!group.isActive()) {
 			addPageMessage(getResPage().getString("the_subject_group_class_not_created_database"), request);

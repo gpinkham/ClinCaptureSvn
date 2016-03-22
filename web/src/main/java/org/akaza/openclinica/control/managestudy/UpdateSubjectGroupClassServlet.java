@@ -94,7 +94,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 					StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 					StudyGroupDAO sgdao = getStudyGroupDAO();
 
-					StudyGroupClassBean oldGroup = (StudyGroupClassBean) sgcdao.findByPK(classId);
+					StudyGroupClassBean oldGroup = sgcdao.findByPK(classId);
 					Map<String, String> fields = new HashMap<String, String>();
 
 					fields.put("groupClassName", oldGroup.getName());
@@ -104,8 +104,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 
 					request.getSession().setAttribute("fields", fields);
 
-					StudyGroupClassBean defaultStudyGroupClass = (StudyGroupClassBean) sgcdao
-							.findDefaultByStudyId(currentStudy.getId());
+					StudyGroupClassBean defaultStudyGroupClass = sgcdao.findDefaultByStudyId(currentStudy.getId());
 					request.getSession().setAttribute("defaultGroupAlreadyExists", defaultStudyGroupClass.getId() > 0);
 
 					StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
@@ -196,6 +195,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		Map<String, String> fields = new HashMap<String, String>();
 		fields.put("groupClassName", fp.getString("name").trim());
@@ -207,8 +207,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 
 		v.addValidation("name", Validator.NO_BLANKS);
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
-		ArrayList<StudyGroupClassBean> allStudyGroupClasses = (ArrayList<StudyGroupClassBean>) studyGroupClassDAO
-				.findAll();
+		ArrayList<StudyGroupClassBean> allStudyGroupClasses = studyGroupClassDAO.findAllByStudy(currentStudy);
 
 		v.addValidation("subjectAssignment", Validator.NO_BLANKS);
 
@@ -344,7 +343,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 		group.setId(oldGroup.getId());
 		group.setDynamicOrdinal(oldGroup.getDynamicOrdinal());
 
-		group = (StudyGroupClassBean) sgcdao.update(group);
+		group = sgcdao.update(group);
 
 		if (!group.isActive()) {
 			addPageMessage(getResPage().getString("the_subject_group_class_no_updated_database"), request);
