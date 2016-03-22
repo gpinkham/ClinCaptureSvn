@@ -184,11 +184,11 @@ function changeImage(name) {
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" default="${inputTxtValue}"/>
+             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" default="${inputTxtValue}"/>
     </c:when>
     <c:otherwise>
       <input datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" default="${inputTxtValue}"/>
+             autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" default="${inputTxtValue}"/>
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -202,11 +202,11 @@ function changeImage(name) {
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" name="<c:out value="${inputName}"/>" rows="5" cols="40" default="${inputTxtValue}"><c:out value="${inputTxtValue}"/></textarea>
+                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" name="<c:out value="${inputName}"/>" rows="5" cols="40" default="${inputTxtValue}"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
       <textarea datatype="${displayItem.item.dataType.name}" maxlength="${displayItem.maxLength}" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage('${inputName}');" name="<c:out value="${inputName}"/>" rows="5" cols="40" default="${inputTxtValue}"><c:out value="${inputTxtValue}"/></textarea>
+                autotabbing="" onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage(this.id);" name="<c:out value="${inputName}"/>" rows="5" cols="40" default="${inputTxtValue}"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -229,11 +229,11 @@ function changeImage(name) {
         <c:when test="${isInError}">
           <span class="aka_exclaim_error">! </span>
           <input ${needsToBeChecked} class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                 onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
+                 onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this.id);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:when>
         <c:otherwise>
           <input ${needsToBeChecked} id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                 onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
+                 onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this.id);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:otherwise>
       </c:choose>
     </c:forEach>
@@ -256,11 +256,11 @@ function changeImage(name) {
       <c:when test="${isInError}">
         <span class="aka_exclaim_error">! </span>
         <input ${needsToBeChecked} class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-               onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this.id);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
         <input ${needsToBeChecked} id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-               onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage('${inputName}');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this.id);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
 
@@ -279,11 +279,11 @@ function changeImage(name) {
           <!-- this.className='changedField';-->
           <span class="aka_exclaim_error">! </span>
           <input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');} radioButtonOnClick(event);"
-                 onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /><c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
+                 onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /><c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
         </c:when>
         <c:otherwise>
           <input id="<c:out value="${inputName}"/>" tabindex="${tabNum}"
-                 onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');} radioButtonOnClick(event);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
+                 onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');} radioButtonOnClick(event);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
         </c:otherwise>
       </c:choose>
     </c:forEach>
@@ -299,11 +299,11 @@ function changeImage(name) {
       <c:when test="${isInError}">
         <span class="aka_exclaim_error">! </span>
         <input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');} radioButtonOnClick(event);"
-               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
         <input id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');} radioButtonOnClick(event);"
-               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
   </c:if>
@@ -324,10 +324,10 @@ function changeImage(name) {
     </c:forEach>
     <select id="${inputName}" tabindex="${tabNum}" name="${inputName}"
             class="${isInError ? 'aka_input_error' : 'formfield'}"
-            onChange="this.className='changedField'; sameRepGrpInstant('${inputName}', '${itemId}',
+            onChange="this.className='changedField'; sameRepGrpInstant(this.id, '${itemId}',
                     '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}',
                     '${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}');
-                    changeImage('${inputName}');">
+                    changeImage(this.id);">
         <c:if test="${!defaultValueInOptions and displayItem.metadata.defaultValue != null and displayItem.metadata.defaultValue != ''}">
             <c:set var="optionWasSelected" value="${selectDefault}"/>
             <option value="" ${selectDefault ? 'selected' : ''}>${displayItem.metadata.defaultValue}</option>
@@ -344,11 +344,11 @@ function changeImage(name) {
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><select class="aka_input_error" id="<c:out value="${inputName}"/>" multiple  tabindex=
-      "${tabNum}" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');">
+      "${tabNum}" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);">
     </c:when>
     <c:otherwise>
       <select id="<c:out value="${inputName}"/>" multiple  tabindex=
-      "${tabNum}" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage('${inputName}');">
+      "${tabNum}" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; sameRepGrpInstant(this.id, '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this.id);">
     </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
@@ -370,11 +370,11 @@ function changeImage(name) {
 	<label for="<c:out value="${inputName}"/>"></label>
 	<c:choose>
 		<c:when test="${isInError}">
-			<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; changeImage('${inputName}');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+			<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; changeImage(this.id);" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 		</c:when>
 		<c:otherwise>
 			<input id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onChange=
-				"this.className='changedField'; changeImage('${inputName}');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+				"this.className='changedField'; changeImage(this.id);" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
     	</c:otherwise>
 	</c:choose>
 </c:if>
@@ -442,9 +442,9 @@ function changeImage(name) {
 					<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dateTimeFormat}"/>
 				</c:set>
 				<c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
-				<a class="dnLink"
+				<a class="dnLink" field="<c:out value="${inputName}"/>"
 							tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${displayItem.data.id}));" onmouseout="UnTip();"
-							onClick="openDNWindow('CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=${writeToDB}&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}&originJSP=<c:out value="${param.originJSP}"/>&enterData=1','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
+							onClick="openDNWindow('CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=' + this.getAttribute('field') + '&column=value&monitor=1&writeToDB=${writeToDB}&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}&originJSP=<c:out value="${param.originJSP}"/>&enterData=1','spanAlert-' + this.getAttribute('field'),'<c:out value="${errorTxtMessage}"/>', event); return false;">
 					<img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>"
 							src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
 					<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&stSubjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${dataId}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>&writeToDB=${writeToDB}"/>

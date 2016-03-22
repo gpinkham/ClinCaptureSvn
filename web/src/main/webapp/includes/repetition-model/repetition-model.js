@@ -110,8 +110,9 @@ removeButtonClick = function(btn, block) {
 							var rowPrefix = rButtons[0].parentNode.children[0].getAttribute("name").replace('.newRow','');
 							var rowIndex = parseInt(rowPrefix.replace(/.*_/g, ""));
 							if (rowIndex > deletedRowIndex) {
+								tr.setAttribute("repeat", (rowIndex - 1).toString());
+								tr.repetitionIndex--;
 								var repeatingTableRow = $(tr);
-								repeatingTableRow.attr("repeat", (rowIndex - 1) - 1);
 								var itemHolder = repeatingTableRow.find("td:first[id^=itemHolderId_]");
 								var postFix = itemHolder.attr("id").toString().replace(/itemHolderId_\d*/,"");
 								itemHolder.attr("id", "itemHolderId_" + (rowIndex - 1) + postFix);
@@ -923,6 +924,10 @@ if (!window.RepetitionElement || (
 			//   (This occurs even if the repetition block is an orphan repetition block.)
 			var parentNode = this.parentNode; //save for __updateMoveButtons
 			var block = parentNode.removeChild(this);
+
+			if(this.repetitionTemplate != null){
+				this.repetitionTemplate.repetitionIndex--;
+			}
 
 			//The following loop used to appear within step #3 below;
 			//  this caused problems because the program state was incorrect when onremove was called (repetitionBlocks was not modified)
