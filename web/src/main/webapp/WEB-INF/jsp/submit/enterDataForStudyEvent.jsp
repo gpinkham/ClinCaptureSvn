@@ -491,11 +491,11 @@
 			<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_View${rowCount}"/>
 			<ui:printEventCRFLink studyOid="${parentStudyOid}" subjectOid="${studySubject.oid}" studyEvent="${studyEvent}" dec="${dec}" hspace="4"/>
 
-            <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available) && userRole.id ne 10}">
+            <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available) && userRole.id ne 10 && !userRole.studyMonitor && !userRole.siteMonitor}">
 				<ui:removeEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
             </c:if>
 
-            <c:if test="${userBean.sysAdmin && (study.status.available) && userRole.id ne 10}">
+            <c:if test="${userBean.sysAdmin && (study.status.available) && userRole.id ne 10 && !userRole.studyMonitor && !userRole.siteMonitor}">
                 <ui:deleteEventCRFLink object="${dec}" subjectId="${studySubject.id}" hspace="4"/>
             </c:if>
 

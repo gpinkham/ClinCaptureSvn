@@ -519,13 +519,13 @@
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
 										<ui:viewDataEntryLink object="${dec}" queryTail="&eventId=${eventId}" name="bt_Pring${rowCount}"/>
-                                        <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
+                                        <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available) && !userRole.studyMonitor && !userRole.siteMonitor}">
                                             <c:set var="hideCol3" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
 											<ui:removeEventCRFLink object="${dec}" subjectId="${studySubject.id}"/>
                                         </c:if>
 
-                                        <c:if test="${userBean.sysAdmin && (study.status.available)}">
+                                        <c:if test="${userBean.sysAdmin && (study.status.available) && !userRole.studyMonitor && !userRole.siteMonitor}">
                                             <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="3"/>
 											<ui:deleteEventCRFLink object="${dec}" subjectId="${studySubject.id}" hspace="4"/>
