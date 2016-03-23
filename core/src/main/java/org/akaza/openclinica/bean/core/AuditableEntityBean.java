@@ -26,7 +26,6 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -34,7 +33,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -54,54 +53,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  */
 @SuppressWarnings({"serial"})
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AuditableEntityBean extends EntityBean {
 
 	public static final int DEFAULT_STATES_LENGTH = 2;
 
-	@JsonIgnore
-	@XmlTransient
 	protected Date createdDate;
 
-	@JsonIgnore
-	@XmlTransient
 	protected Date updatedDate;
 
-	@JsonIgnore
-	@XmlTransient
 	protected int ownerId;
 
-	@JsonIgnore
-	@XmlTransient
 	protected UserAccountBean owner;
 
-	@JsonIgnore
-	@XmlTransient
 	protected int updaterId;
 
-	@JsonIgnore
-	@XmlTransient
 	protected UserAccountBean updater;
 
 	@JsonProperty("status")
 	@XmlElement(name = "Status", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	protected String statusCode = "";
 
-	@JsonIgnore
-	@XmlTransient
 	protected Status status;
 
-	@JsonIgnore
-	@XmlTransient
 	protected Status oldStatus;
 
-	@JsonIgnore
-	@XmlTransient
 	protected String states;
 
 	// used to retrieve the owner and updater when needed
-	@JsonIgnore
-	@XmlTransient
 	protected UserAccountDAO udao;
 
 	/**

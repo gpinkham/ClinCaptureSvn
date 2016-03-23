@@ -16,18 +16,17 @@
 package com.clinovo.rest.service;
 
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.clinovo.rest.service.base.BaseCrfService;
 
 /**
  * CrfService.
  */
-@Controller("restCrfService")
+@RestController("restCrfService")
 @RequestMapping("/crf")
 public class CrfService extends BaseCrfService {
 
@@ -40,7 +39,6 @@ public class CrfService extends BaseCrfService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/json/importCrf", method = RequestMethod.POST)
 	public CRFVersionBean importCrf(@RequestParam("jsonData") String jsonData) throws Exception {
 		return importCrf(jsonData, false);
@@ -55,7 +53,6 @@ public class CrfService extends BaseCrfService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
 	public CRFVersionBean importCrfVersion(@RequestParam("jsonData") String jsonData) throws Exception {
 		return importCrf(jsonData, true);

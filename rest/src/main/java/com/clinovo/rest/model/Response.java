@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * Response.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "Response", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonPropertyOrder({"status"})
 public class Response {

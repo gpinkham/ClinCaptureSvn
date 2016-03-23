@@ -10,37 +10,41 @@
  * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
  * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
 
- * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
-package com.clinovo.rest.service;
-
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.FileSystemResourceLoader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.clinovo.rest.service.base.BaseService;
+package com.clinovo.enums;
 
 /**
- * OdmService.
+ * StudyProtocolType.
  */
-@RestController("restOdmService")
-@RequestMapping("/odm")
-public class OdmService extends BaseService {
+public enum StudyProtocolType {
 
-	/**
-	 * Odm http method.
-	 * 
-	 * @return String
-	 * @throws IOException
-	 *             the IOException
-	 */
-	@RequestMapping
-	public String odm() throws IOException {
-		return IOUtils.toString(new FileSystemResourceLoader()
-				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
+	INTERVENTIONAL(0, "interventional"), OBSERVATIONAL(1, "observational");
+
+	private int id;
+	private String name;
+
+	StudyProtocolType(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public static StudyProtocolType getStudyProtocolType(int id) {
+		StudyProtocolType result = INTERVENTIONAL;
+		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
+			if (studyProtocolType.getId() == id) {
+				result = studyProtocolType;
+				break;
+			}
+		}
+		return result;
 	}
 }

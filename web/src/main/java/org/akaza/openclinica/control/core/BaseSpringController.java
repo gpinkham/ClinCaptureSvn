@@ -166,6 +166,7 @@ public abstract class BaseSpringController {
 	public static final String PRESET_VALUES = "presetValues";
 	public static final String INPUT_MESSAGES = "formMessages";
 	public static final String ERRORS_HOLDER = "errors_holder";
+	public static final String STUDY_FEATURES = "studyFeatures";
 	public static final String SESSION_MANAGER = "sessionManager";
 	public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
 	public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
@@ -173,6 +174,7 @@ public abstract class BaseSpringController {
 	public static final String ACTION_CONTINUE_DOUBLE_DATA_ENTRY = "dde_c";
 	public static final String ACTION_CONTINUE_INITIAL_DATA_ENTRY = "ide_c";
 	public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
+	public static final String STUDY_CONFIGURATION_PARAMETERS = "studyConfigurationParameters";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 	public static final String REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN = "redirectBackToControllerAfterLogin";
 

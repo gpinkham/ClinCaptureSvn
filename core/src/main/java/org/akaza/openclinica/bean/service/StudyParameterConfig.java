@@ -20,11 +20,20 @@
  */
 package org.akaza.openclinica.bean.service;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This is a help class for each study, it saves all the parameter configurations.
  * 
  * @author jxu
  */
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "Parameters", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class StudyParameterConfig {
 
 	private String collectDob;
@@ -108,6 +117,7 @@ public class StudyParameterConfig {
 
 	// Medical coding parameters
 	// private String allowCodingVerification = "no";
+	private String bioontologyUsername = "";
 	private String defaultBioontologyURL = "";
 	private String medicalCodingApiKey = "";
 	private String autoCodeDictionaryName = "";
@@ -129,19 +139,9 @@ public class StudyParameterConfig {
 	private String autoTabbing = "yes";
 	private String showYearsInCalendar = "yes";
 	private String instanceType = "development";
-	
+
 	// features
-	private String crfAnnotation = "yes";
-	private String dynamicGroup = "yes";
-	private String calendaredVisits = "yes";
-	private String interactiveDashboards = "yes";
-	private String itemLevelSDV = "yes";
-	private String subjectCasebookInPDF = "yes";
-	private String crfMasking = "yes";
-	private String sasExtracts = "yes";
-	private String studyEvaluator = "yes";
-	private String randomization = "no";
-	private String medicalCoding = "yes";
+	private StudyFeatureConfig studyFeatureConfig = new StudyFeatureConfig();
 
 	/**
 	 * This is base constructor to set all default values.
@@ -196,6 +196,14 @@ public class StudyParameterConfig {
 
 		autoTabbing = "yes";
 		showYearsInCalendar = "yes";
+	}
+
+	public StudyFeatureConfig getStudyFeatureConfig() {
+		return studyFeatureConfig;
+	}
+
+	public void setStudyFeatureConfig(StudyFeatureConfig studyFeatureConfig) {
+		this.studyFeatureConfig = studyFeatureConfig;
 	}
 
 	/**
@@ -582,6 +590,14 @@ public class StudyParameterConfig {
 		this.replaceExisitingDataDuringImport = replaceExisitingDataDuringImport;
 	}
 
+	public String getBioontologyUsername() {
+		return bioontologyUsername;
+	}
+
+	public void setBioontologyUsername(String bioontologyUsername) {
+		this.bioontologyUsername = bioontologyUsername;
+	}
+
 	public String getDefaultBioontologyURL() {
 		return defaultBioontologyURL;
 	}
@@ -603,7 +619,9 @@ public class StudyParameterConfig {
 	}
 
 	public void setMedicalCodingApprovalNeeded(String medicalCodingApprovalNeeded) {
-		this.medicalCodingApprovalNeeded = medicalCodingApprovalNeeded;
+		if (!medicalCodingApprovalNeeded.isEmpty()) {
+			this.medicalCodingApprovalNeeded = medicalCodingApprovalNeeded;
+		}
 	}
 
 	public String getAutoScheduleEventDuringImport() {
@@ -767,12 +785,12 @@ public class StudyParameterConfig {
 	public void setInstanceType(String instanceType) {
 		this.instanceType = instanceType;
 	}
-	
+
 	/**
 	 * @return Returns the crfAnnotation.
 	 */
 	public String getCrfAnnotation() {
-		return crfAnnotation;
+		return studyFeatureConfig.getCrfAnnotation();
 	}
 
 	/**
@@ -780,14 +798,14 @@ public class StudyParameterConfig {
 	 *            the crfAnnotation to set
 	 */
 	public void setCrfAnnotation(String crfAnnotation) {
-		this.crfAnnotation = crfAnnotation;
+		studyFeatureConfig.setCrfAnnotation(crfAnnotation);
 	}
-	
+
 	/**
 	 * @return Returns the dynamicGroup.
 	 */
 	public String getDynamicGroup() {
-		return dynamicGroup;
+		return studyFeatureConfig.getDynamicGroup();
 	}
 
 	/**
@@ -795,14 +813,14 @@ public class StudyParameterConfig {
 	 *            the dynamicGroup to set
 	 */
 	public void setDynamicGroup(String dynamicGroup) {
-		this.dynamicGroup = dynamicGroup;
+		studyFeatureConfig.setDynamicGroup(dynamicGroup);
 	}
-	
+
 	/**
 	 * @return Returns the calendaredVisits.
 	 */
 	public String getCalendaredVisits() {
-		return calendaredVisits;
+		return studyFeatureConfig.getCalendaredVisits();
 	}
 
 	/**
@@ -810,14 +828,14 @@ public class StudyParameterConfig {
 	 *            the calendaredVisits to set
 	 */
 	public void setCalendaredVisits(String calendaredVisits) {
-		this.calendaredVisits = calendaredVisits;
+		studyFeatureConfig.setCalendaredVisits(calendaredVisits);
 	}
-	
+
 	/**
 	 * @return Returns the interactiveDashboards.
 	 */
 	public String getInteractiveDashboards() {
-		return interactiveDashboards;
+		return studyFeatureConfig.getInteractiveDashboards();
 	}
 
 	/**
@@ -825,14 +843,14 @@ public class StudyParameterConfig {
 	 *            the interactiveDashboards to set
 	 */
 	public void setInteractiveDashboards(String interactiveDashboards) {
-		this.interactiveDashboards = interactiveDashboards;
+		studyFeatureConfig.setInteractiveDashboards(interactiveDashboards);
 	}
-	
+
 	/**
 	 * @return Returns the itemLevelSDV.
 	 */
 	public String getItemLevelSDV() {
-		return itemLevelSDV;
+		return studyFeatureConfig.getItemLevelSDV();
 	}
 
 	/**
@@ -840,29 +858,29 @@ public class StudyParameterConfig {
 	 *            the itemLevelSDV to set
 	 */
 	public void setItemLevelSDV(String itemLevelSDV) {
-		this.itemLevelSDV = itemLevelSDV;
+		studyFeatureConfig.setItemLevelSDV(itemLevelSDV);
 	}
-	
+
 	/**
 	 * @return Returns the subjectCasebookInPDF.
 	 */
 	public String getSubjectCasebookInPDF() {
-		return subjectCasebookInPDF;
+		return studyFeatureConfig.getSubjectCasebookInPDF();
 	}
-	
+
 	/**
 	 * @param subjectCasebookInPDF
 	 *            the subjectCasebookInPDF to set
 	 */
 	public void setSubjectCasebookInPDF(String subjectCasebookInPDF) {
-		this.subjectCasebookInPDF = subjectCasebookInPDF;
+		studyFeatureConfig.setSubjectCasebookInPDF(subjectCasebookInPDF);
 	}
-	
+
 	/**
 	 * @return Returns the crfMasking.
 	 */
 	public String getCrfMasking() {
-		return crfMasking;
+		return studyFeatureConfig.getCrfMasking();
 	}
 
 	/**
@@ -870,14 +888,14 @@ public class StudyParameterConfig {
 	 *            the crfMasking to set
 	 */
 	public void setCrfMasking(String crfMasking) {
-		this.crfMasking = crfMasking;
+		studyFeatureConfig.setCrfMasking(crfMasking);
 	}
-	
+
 	/**
 	 * @return Returns the sasExtracts.
 	 */
 	public String getSasExtracts() {
-		return sasExtracts;
+		return studyFeatureConfig.getSasExtracts();
 	}
 
 	/**
@@ -885,14 +903,14 @@ public class StudyParameterConfig {
 	 *            the sasExtracts to set
 	 */
 	public void setSasExtracts(String sasExtracts) {
-		this.sasExtracts = sasExtracts;
+		studyFeatureConfig.setSasExtracts(sasExtracts);
 	}
-	
+
 	/**
 	 * @return Returns the studyEvaluator.
 	 */
 	public String getStudyEvaluator() {
-		return studyEvaluator;
+		return studyFeatureConfig.getStudyEvaluator();
 	}
 
 	/**
@@ -900,14 +918,14 @@ public class StudyParameterConfig {
 	 *            the studyEvaluator to set
 	 */
 	public void setStudyEvaluator(String studyEvaluator) {
-		this.studyEvaluator = studyEvaluator;
+		studyFeatureConfig.setStudyEvaluator(studyEvaluator);
 	}
-	
+
 	/**
 	 * @return Returns the randomization.
 	 */
 	public String getRandomization() {
-		return randomization;
+		return studyFeatureConfig.getRandomization();
 	}
 
 	/**
@@ -915,22 +933,21 @@ public class StudyParameterConfig {
 	 *            the randomization to set
 	 */
 	public void setRandomization(String randomization) {
-		this.randomization = randomization;
+		studyFeatureConfig.setRandomization(randomization);
 	}
-	
+
 	/**
 	 * @return Returns the medicalCoding.
 	 */
 	public String getMedicalCoding() {
-		return medicalCoding;
+		return studyFeatureConfig.getMedicalCoding();
 	}
-	
+
 	/**
 	 * @param medicalCoding
 	 *            the medicalCoding to set
 	 */
 	public void setMedicalCoding(String medicalCoding) {
-		this.medicalCoding = medicalCoding;
+		studyFeatureConfig.setMedicalCoding(medicalCoding);
 	}
-	
 }

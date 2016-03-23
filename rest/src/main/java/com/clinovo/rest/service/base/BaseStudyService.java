@@ -12,35 +12,51 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
+package com.clinovo.rest.service.base;
 
-package com.clinovo.rest.service;
+import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.FileSystemResourceLoader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.clinovo.rest.service.base.BaseService;
+import com.clinovo.rest.exception.RestException;
+import com.clinovo.service.StudyService;
+import com.clinovo.util.StudyUtil;
 
 /**
- * OdmService.
+ * BaseStudyService.
  */
-@RestController("restOdmService")
-@RequestMapping("/odm")
-public class OdmService extends BaseService {
+public abstract class BaseStudyService extends BaseService {
 
-	/**
-	 * Odm http method.
-	 * 
-	 * @return String
-	 * @throws IOException
-	 *             the IOException
-	 */
-	@RequestMapping
-	public String odm() throws IOException {
-		return IOUtils.toString(new FileSystemResourceLoader()
-				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private MessageSource messageSource;
+
+	protected StudyBean prepareStudyBean() {
+		return studyService.prepareStudyBean(new StudyBean(), StudyUtil.getStudyParametersMap(),
+				StudyUtil.getStudyFeaturesMap());
+	}
+
+	protected StudyBean saveStudyBean(String userName, StudyBean studyBean) {
+		int userId = 0;
+		if (userName != null) {
+			UserAccountBean userAccountBean = (UserAccountBean) getUserAccountDAO().findByUserName(userName);
+			if (userAccountBean.getId() == 0) {
+				throw new RestException(messageSource, "rest.studyservice.createstudy.userDoesNotExist",
+						new Object[]{userName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} else {
+				userId = userAccountBean.getId();
+			}
+		}
+		studyService.saveStudyBean(userId, studyBean, getCurrentUser(), ResourceBundleProvider.getPageMessagesBundle());
+		if (studyBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.studyservice.createstudy.operationFailed");
+		}
+		return studyBean;
 	}
 }

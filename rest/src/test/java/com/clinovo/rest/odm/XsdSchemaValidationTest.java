@@ -1,6 +1,8 @@
 package com.clinovo.rest.odm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.StringWriter;
 import java.lang.reflect.Method;
@@ -140,5 +142,27 @@ public class XsdSchemaValidationTest {
 		assertNotNull(restOdmContainer.getRestData().getCrfVersionBean());
 		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getCrfName(), "Test CRF");
 		marshal(restOdmContainer.getRestData().getCrfVersionBean());
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheStudyBean() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/study.xml"));
+		assertNotNull(restOdmContainer.getRestData().getStudyBean());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getId(), 1);
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getName(), "TEST1");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getOid(), "OC_TEST1");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getIdentifier(), "UN_TEST1");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getProtocolTypeKey(), "Interventional");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getOfficialTitle(), "");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getSecondaryIdentifier(), "");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getSummary(), "test!");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getProtocolDescription(), "");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getPrincipalInvestigator(), "test");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getSponsor(), "");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getCollaborators(), "");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getStatusCode(), "avaliable");
+		assertNotNull(restOdmContainer.getRestData().getStudyBean().getStudyFeatureConfig());
+		marshal(restOdmContainer.getRestData().getStudyBean());
 	}
 }

@@ -14,6 +14,7 @@
 
     <xs:complexType name="restData">
         <xs:sequence>
+            <xs:element ref="StudyBean" minOccurs="0"/>
             <xs:element ref="CrfVersion" minOccurs="0"/>
             <xs:element ref="EventDefinitionCrf" minOccurs="0"/>
             <xs:element ref="StudyEventDefinition" minOccurs="0" maxOccurs="unbounded"/>
@@ -179,6 +180,75 @@
             <xs:element ref="CrfId" minOccurs="0"/>
             <xs:element ref="CrfName" minOccurs="0"/>
             <xs:element ref="Version" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="StudyBean" type="studyBean"/>
+
+    <xs:element name="ProtocolId" type="xs:string"/>
+    <xs:element name="ProtocolType" type="xs:string"/>
+    <xs:element name="SecondaryIDs" type="xs:string"/>
+    <xs:element name="OfficialTitle" type="xs:string"/>
+    <xs:element name="Summary" type="xs:string"/>
+    <xs:element name="DetailedDescription" type="xs:string"/>
+    <xs:element name="PrincipalInvestigator" type="xs:string"/>
+    <xs:element name="Sponsor" type="xs:string"/>
+    <xs:element name="Collaborators" type="xs:string"/>
+
+    <xs:complexType name="studyBean">
+        <xs:sequence>
+            <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
+            <xs:element ref="StudyName" minOccurs="0"/>
+            <xs:element ref="OfficialTitle" minOccurs="0"/>
+            <xs:element ref="ProtocolId" minOccurs="0"/>
+            <xs:element ref="SecondaryIDs" minOccurs="0"/>
+            <xs:element ref="Summary" minOccurs="0"/>
+            <xs:element ref="PrincipalInvestigator" minOccurs="0"/>
+            <xs:element ref="ProtocolType" minOccurs="0"/>
+            <xs:element ref="DetailedDescription" minOccurs="0"/>
+            <xs:element ref="Sponsor" minOccurs="0"/>
+            <xs:element ref="Collaborators" minOccurs="0"/>
+            <xs:element ref="Oid" minOccurs="0"/>
+            <xs:element ref="Parameters" minOccurs="0"/>
+            <xs:element ref="Features" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="Features" type="features"/>
+
+    <xs:element name="CRFAnnotation" type="xs:string"/>
+    <xs:element name="DynamicGroup" type="xs:string"/>
+    <xs:element name="CalendaredVisits" type="xs:string"/>
+    <xs:element name="InteractiveDashboards" type="xs:string"/>
+    <xs:element name="ItemLevelSDV" type="xs:string"/>
+    <xs:element name="SubjectCasebookInPDF" type="xs:string"/>
+    <xs:element name="CRFMasking" type="xs:string"/>
+    <xs:element name="SASExtracts" type="xs:string"/>
+    <xs:element name="StudyEvaluator" type="xs:string"/>
+    <xs:element name="Randomization" type="xs:string"/>
+    <xs:element name="MedicalCoding" type="xs:string"/>
+
+    <xs:complexType name="features">
+        <xs:sequence>
+            <xs:element ref="CRFAnnotation" minOccurs="0"/>
+            <xs:element ref="DynamicGroup" minOccurs="0"/>
+            <xs:element ref="CalendaredVisits" minOccurs="0"/>
+            <xs:element ref="InteractiveDashboards" minOccurs="0"/>
+            <xs:element ref="ItemLevelSDV" minOccurs="0"/>
+            <xs:element ref="SubjectCasebookInPDF" minOccurs="0"/>
+            <xs:element ref="CRFMasking" minOccurs="0"/>
+            <xs:element ref="SASExtracts" minOccurs="0"/>
+            <xs:element ref="StudyEvaluator" minOccurs="0"/>
+            <xs:element ref="Randomization" minOccurs="0"/>
+            <xs:element ref="MedicalCoding" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="Parameters" type="parameters"/>
+
+    <xs:complexType name="parameters">
+        <xs:sequence>
         </xs:sequence>
     </xs:complexType>
 

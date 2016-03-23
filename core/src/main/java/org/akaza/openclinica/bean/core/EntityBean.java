@@ -23,16 +23,16 @@ package org.akaza.openclinica.bean.core;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * EntityBean.
  */
 @SuppressWarnings("serial")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class EntityBean extends ExcelRowAware implements java.io.Serializable {
 
 	public static final int INT_1231 = 1231;
@@ -42,8 +42,6 @@ public class EntityBean extends ExcelRowAware implements java.io.Serializable {
 	// ss - changed visibility of these fields so Term could see them
 	// think we should change all fields to protected here
 
-	@JsonIgnore
-	@XmlTransient
 	protected String name;
 
 	@JsonProperty("id")
@@ -57,8 +55,6 @@ public class EntityBean extends ExcelRowAware implements java.io.Serializable {
 	 * when it is changed � the notion being that the bean no longer reflects the current state of the database. The
 	 * relevant DAO�s update method should set active to true again once the database has been successfully changed.
 	 */
-	@JsonIgnore
-	@XmlTransient
 	protected boolean active = false;
 
 	/*

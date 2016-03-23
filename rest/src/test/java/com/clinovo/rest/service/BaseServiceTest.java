@@ -71,6 +71,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final Locale LOCALE = new Locale("en");
 
 	// Managed services
+	public static final String API_STUDY_CREATE = "/study/create";
 	public static final String API_CRF_JSON_IMPORT_CRF = "/crf/json/importCrf";
 	public static final String API_CRF_JSON_IMPORT_CRF_VERSION = "/crf/json/importCrfVersion";
 	public static final String API_EVENT = "/event";
@@ -187,6 +188,14 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		site.setCreatedDate(new Date());
 		site.setStatus(Status.PENDING);
 		return (StudyBean) studyDAO.create(site);
+	}
+
+	protected String getSymbols(int size) {
+		String result = "";
+		for (int i = 1; i <= size; i++) {
+			result = result.concat("a");
+		}
+		return result;
 	}
 
 	protected int getMaxId(EntityBean entityBean, int max) {
@@ -389,6 +398,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 			studyBean.setUpdater(updater);
 			studyDAO.update(studyBean);
 		}
+		studyDAO.execute("delete from study_parameter_value where study_id > ".concat(Integer.toString(max)),
+				new HashMap());
 		studyDAO.execute("delete from study where study_id > ".concat(Integer.toString(max)), new HashMap());
 	}
 

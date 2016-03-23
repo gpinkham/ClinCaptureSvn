@@ -12,35 +12,52 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
+package com.clinovo.util;
 
-package com.clinovo.rest.service;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.IOException;
+import org.akaza.openclinica.control.form.FormProcessor;
 
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.FileSystemResourceLoader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.clinovo.rest.service.base.BaseService;
+import com.clinovo.enums.StudyConfigurationParameters;
+import com.clinovo.enums.StudyFeatures;
+import com.clinovo.enums.StudyParameterNames;
 
 /**
- * OdmService.
+ * StudyUtil.
  */
-@RestController("restOdmService")
-@RequestMapping("/odm")
-public class OdmService extends BaseService {
+public final class StudyUtil {
 
-	/**
-	 * Odm http method.
-	 * 
-	 * @return String
-	 * @throws IOException
-	 *             the IOException
-	 */
-	@RequestMapping
-	public String odm() throws IOException {
-		return IOUtils.toString(new FileSystemResourceLoader()
-				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
+	private StudyUtil() {
+	}
+
+	public static Map<String, String> getStudyFeaturesMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
+		for (StudyFeatures studyFeature : StudyFeatures.values()) {
+			String featureName = studyFeature.getName();
+			map.put(featureName, fp.getString(featureName));
+		}
+		return map;
+	}
+
+	public static Map<String, String> getStudyParametersMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
+		for (StudyParameterNames studyParameterName : StudyParameterNames.values()) {
+			String parameterName = studyParameterName.getName();
+			map.put(parameterName, fp.getString(parameterName));
+		}
+		return map;
+	}
+
+	public static Map<String, String> getStudyConfigurationParametersMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
+		for (StudyConfigurationParameters studyConfigurationParameter : StudyConfigurationParameters.values()) {
+			String parameterName = studyConfigurationParameter.getName();
+			map.put(parameterName, fp.getString(parameterName));
+		}
+		return map;
 	}
 }

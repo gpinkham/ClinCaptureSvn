@@ -53,11 +53,11 @@ public final class RequestParametersValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestParametersValidator.class);
 
-	public static final String REST = "rest.";
 	public static final String DOT = ".";
+	public static final String REST = "rest.";
 	public static final String EMPTY = ".empty.";
-	public static final String MISSING = ".missing.";
 	public static final String ACCEPT = "Accept";
+	public static final String MISSING = ".missing.";
 
 	private RequestParametersValidator() {
 	}

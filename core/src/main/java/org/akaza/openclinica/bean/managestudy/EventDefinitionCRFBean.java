@@ -28,13 +28,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -42,8 +41,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * The bean for event definition crf parameters.
  *
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonPropertyOrder({"id", "eventName", "crfName", "status", "defaultVersion", "hideCrf", "required", "parentId",
 		"availableVersionIds", "passwordRequired", "acceptNewCrfVersions", "evaluatedCrf", "doubleDataEntry",
 		"sourceDataVerification", "tabbingMode", "ordinal", "studyId", "emailWhen", "email"})
@@ -66,8 +66,6 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlElement(name = "HideCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean hideCrf = false;
 
-	@JsonIgnore
-	@XmlTransient
 	private boolean hidden = false;
 
 	@JsonProperty("required")
@@ -94,8 +92,6 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlElement(name = "SourceDataVerification", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String sdvCode = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private SourceDataVerification sourceDataVerification = null;
 
 	@JsonProperty("tabbingMode")
@@ -110,16 +106,10 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlElement(name = "StudyId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int studyId = 0;
 
-	@JsonIgnore
-	@XmlTransient
 	private boolean requireAllTextFilled = false;
 
-	@JsonIgnore
-	@XmlTransient
 	private boolean decisionCondition = true;
 
-	@JsonIgnore
-	@XmlTransient
 	private int studyEventDefinitionId = 0;
 
 	@JsonProperty("emailWhen")
@@ -130,56 +120,34 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	@XmlElement(name = "Email", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String emailTo = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private int crfId = 0;
 
 	@JsonProperty("parentId")
 	@XmlElement(name = "ParentId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int parentId = 0;
 
-	@JsonIgnore
-	@XmlTransient
 	private int defaultVersionId = 0;
 
 	@JsonProperty("availableVersionIds")
 	@XmlElement(name = "AvailableVersionIds", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String selectedVersionIds = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private String selectedVersionNames = ""; // not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private String nullValues = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private CRFBean crf = new CRFBean(); // not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private ArrayList nullValuesList = new ArrayList();
 
-	@JsonIgnore
-	@XmlTransient
 	private ArrayList versions = new ArrayList(); // not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private HashMap nullFlags = new LinkedHashMap(); // not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 
-	@JsonIgnore
-	@XmlTransient
 	private int propagateChange; // not in DB
 
 	@Override

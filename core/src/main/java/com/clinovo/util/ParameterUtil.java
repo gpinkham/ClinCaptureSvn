@@ -12,35 +12,30 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
+package com.clinovo.util;
 
-package com.clinovo.rest.service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.FileSystemResourceLoader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.clinovo.rest.service.base.BaseService;
+import java.util.Map;
 
 /**
- * OdmService.
+ * ParameterUtil.
  */
-@RestController("restOdmService")
-@RequestMapping("/odm")
-public class OdmService extends BaseService {
+public final class ParameterUtil {
 
-	/**
-	 * Odm http method.
-	 * 
-	 * @return String
-	 * @throws IOException
-	 *             the IOException
-	 */
-	@RequestMapping
-	public String odm() throws IOException {
-		return IOUtils.toString(new FileSystemResourceLoader()
-				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getInputStream());
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParameterUtil.class);
+
+	private ParameterUtil() {
+	}
+
+	public static int getIntValue(Map<String, String> parametersMap, String name, int defaultValue) {
+		int result = defaultValue;
+		try {
+			result = Integer.parseInt(parametersMap.get(name).trim());
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return result;
 	}
 }

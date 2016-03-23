@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * Error.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "Error", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonPropertyOrder({"status", "message"})
 public class Error {

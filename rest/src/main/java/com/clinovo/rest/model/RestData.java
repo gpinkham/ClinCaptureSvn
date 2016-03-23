@@ -25,13 +25,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 
 /**
  * RestData.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "RestData", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 public class RestData {
 
@@ -55,6 +56,9 @@ public class RestData {
 
 	@XmlElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private CRFVersionBean crfVersionBean;
+
+	@XmlElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private StudyBean studyBean;
 
 	public Error getError() {
 		return error;
@@ -118,5 +122,13 @@ public class RestData {
 
 	public void setStudyEventDefinitions(List<StudyEventDefinitionBean> studyEventDefinitions) {
 		this.studyEventDefinitions = studyEventDefinitions;
+	}
+
+	public StudyBean getStudyBean() {
+		return studyBean;
+	}
+
+	public void setStudyBean(StudyBean studyBean) {
+		this.studyBean = studyBean;
 	}
 }

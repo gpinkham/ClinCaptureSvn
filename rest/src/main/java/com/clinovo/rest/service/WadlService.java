@@ -18,16 +18,15 @@ package com.clinovo.rest.service;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jvnet.ws.wadl.Application;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.clinovo.rest.service.base.BaseWadlService;
 
 /**
  * WadlService.
  */
-@Controller("restWadlService")
+@RestController("restWadlService")
 public class WadlService extends BaseWadlService {
 
 	/**
@@ -37,7 +36,6 @@ public class WadlService extends BaseWadlService {
 	 *            HttpServletRequest
 	 * @return Application
 	 */
-	@ResponseBody
 	@RequestMapping("/wadl")
 	public Application wadl(HttpServletRequest request) {
 		return prepareWadl(request);

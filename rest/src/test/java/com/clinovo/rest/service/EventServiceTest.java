@@ -18,14 +18,6 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 public class EventServiceTest extends BaseServiceTest {
 
-	private String getSymbols(int size) {
-		String result = "";
-		for (int i = 1; i <= size; i++) {
-			result = result.concat("a");
-		}
-		return result;
-	}
-
 	@Test
 	public void testThatItIsImpossibleToCreateAStudyEventDefinitionIfTypeParameterHasWrongValue() throws Exception {
 		this.mockMvc.perform(post(API_EVENT_CREATE).param("name", "test_event").param("type", "scheduledfdfdfdfdf")

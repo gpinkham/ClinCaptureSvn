@@ -20,14 +20,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -37,14 +36,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * @author thickerson
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonPropertyOrder({"id", "crfId", "crfName", "version", "status"})
 @SuppressWarnings("serial")
 public class CRFVersionBean extends AuditableEntityBean {
 
-	@JsonIgnore
-	@XmlTransient
 	private String description = "";
 
 	@JsonProperty("crfId")
@@ -59,28 +57,16 @@ public class CRFVersionBean extends AuditableEntityBean {
 	@XmlElement(name = "Version", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String version = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private int statusId = 1;
 
-	@JsonIgnore
-	@XmlTransient
 	private String revisionNotes = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private Date dateCreated;
 
-	@JsonIgnore
-	@XmlTransient
 	private boolean downloadable = false; // not in DB, tells whether the spreadsheet is downloadable
 
-	@JsonIgnore
-	@XmlTransient
 	private String oid;
 
-	@JsonIgnore
-	@XmlTransient
 	private OidGenerator oidGenerator;
 
 	/**

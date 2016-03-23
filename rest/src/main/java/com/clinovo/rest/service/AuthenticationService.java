@@ -21,11 +21,10 @@ import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
@@ -36,7 +35,7 @@ import com.clinovo.util.RequestUtil;
 /**
  * AuthenticationService.
  */
-@Controller("restAuthenticationService")
+@RestController("restAuthenticationService")
 public class AuthenticationService extends BaseAuthenticationService {
 
 	/**
@@ -48,7 +47,6 @@ public class AuthenticationService extends BaseAuthenticationService {
 	 *             the RESTException
 	 * @return String
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/changeScope", method = RequestMethod.POST)
 	public UserDetails changeScope(@RequestParam("studyName") String studyName) throws RestException {
 		UserDetails userDetails = getUserDetails();
@@ -76,7 +74,6 @@ public class AuthenticationService extends BaseAuthenticationService {
 	 *             the RESTException
 	 * @return String
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/authentication", method = RequestMethod.POST)
 	public UserDetails authenticate(@RequestParam("userName") String userName,
 			@RequestParam("password") String password, @RequestParam("studyName") String studyName)

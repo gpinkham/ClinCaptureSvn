@@ -20,8 +20,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -30,28 +30,24 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.util.RequestUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * UserDetails.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "UserDetails", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonPropertyOrder({"userName", "userStatus", "studyName", "studyStatus", "role", "userType"})
 public class UserDetails {
 
-	@JsonIgnore
-	@XmlTransient
 	private int userId;
 
 	@JsonProperty("userName")
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userName;
 
-	@JsonIgnore
-	@XmlTransient
 	private String password;
 
 	@JsonProperty("userStatus")
@@ -66,8 +62,6 @@ public class UserDetails {
 	@XmlElement(name = "StudyStatus", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String studyStatus;
 
-	@JsonIgnore
-	@XmlTransient
 	private String studyOid;
 
 	@JsonProperty("role")

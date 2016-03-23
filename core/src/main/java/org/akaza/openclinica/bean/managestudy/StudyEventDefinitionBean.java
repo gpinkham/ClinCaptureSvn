@@ -22,13 +22,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,8 +35,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * StudyEventDefinitionBean.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonPropertyOrder({"id", "oid", "eventName", "type", "repeating", "description", "category", "isReference", "minDay",
 		"maxDay", "schDay", "emailDay", "userEmailId", "status", "eventDefinitionCrfs"})
 @SuppressWarnings({"rawtypes", "serial"})
@@ -63,46 +63,30 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	@XmlElement(name = "EventType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String type = "";
 
-	@JsonIgnore
-	@XmlTransient
 	private int studyId; // fk for study table
 
-	@JsonIgnore
-	@XmlTransient
 	private String studyName = ""; // not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private ArrayList crfs = new ArrayList();
 
-	@JsonIgnore
-	@XmlTransient
 	private int crfNum = 0; // number of crfs, not in DB
 
-	@JsonIgnore
-	@XmlTransient
 	private int ordinal = 1;
 
-	@JsonIgnore
-	@XmlTransient
 	private boolean lockable = false; // not in the DB, check whether we can
 	// show
 	// lock link on the JSP
 
-	@JsonIgnore
-	@XmlTransient
 	private boolean populated = false; // not in DB
 
 	// Will be used to show CRFs and their default version in the Event
 	// Definition matrix
-	@JsonIgnore
-	@XmlTransient
 	private Map crfsWithDefaultVersion;
+
 	@JsonProperty("oid")
 	@XmlElement(name = "Oid", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String oid;
-	@JsonIgnore
-	@XmlTransient
+
 	private OidGenerator oidGenerator;
 	// Clinovo #62 start
 	@JsonProperty("minDay")

@@ -21,7 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -46,17 +44,17 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.exception.CodeException;
+import com.clinovo.enums.StudyProtocolType;
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.model.DiscrepancyDescriptionType;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.StudyUtil;
 import com.clinovo.util.ValidatorHelper;
 import com.clinovo.validator.StudyValidator;
 
@@ -67,18 +65,9 @@ import com.clinovo.validator.StudyValidator;
 @Component
 public class UpdateStudyServletNew extends SpringServlet {
 
-	public static final String INPUT_START_DATE = "startDate";
 	public static final String INPUT_END_DATE = "endDate";
+	public static final String INPUT_START_DATE = "startDate";
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
-
-	public static final int VALIDATION_NUM1 = 20;
-	public static final int VALIDATION_NUM2 = 30;
-	public static final int VALIDATION_NUM3 = 64;
-	public static final int VALIDATION_NUM4 = 100;
-	public static final int VALIDATION_NUM5 = 255;
-	public static final int VALIDATION_NUM6 = 500;
-	public static final int VALIDATION_NUM7 = 1000;
-	public static final int VALIDATION_NUM8 = 2000;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -93,10 +82,10 @@ public class UpdateStudyServletNew extends SpringServlet {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("may_not_submit_data"),
+				"1");
 	}
 
 	@Override
@@ -122,8 +111,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		if (study.getId() != currentStudy.getId()) {
-			addPageMessage(getResPage().getString("not_current_study") + getResPage().getString("change_study_contact_sysadmin"),
-					request);
+			addPageMessage(getResPage().getString("not_current_study")
+					+ getResPage().getString("change_study_contact_sysadmin"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -141,11 +130,10 @@ public class UpdateStudyServletNew extends SpringServlet {
 		statuses.add(Status.PENDING);
 		request.setAttribute("statuses", statuses);
 
-		String interventional = getResAdmin().getString("interventional");
-		boolean isInterventional = interventional.equalsIgnoreCase(study.getProtocolType());
-
-		request.setAttribute("isInterventional", isInterventional ? "1" : "0");
 		String protocolType = study.getProtocolTypeKey();
+
+		boolean isInterventional = StudyProtocolType.INTERVENTIONAL.getName().equals(protocolType);
+		request.setAttribute("isInterventional", isInterventional ? "1" : "0");
 
 		if (study.getParentStudyId() > 0) {
 			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
@@ -192,11 +180,12 @@ public class UpdateStudyServletNew extends SpringServlet {
 				logger.debug("found errors : " + errors.toString());
 				request.setAttribute("formMessages", errors);
 				request.setAttribute("dDescriptions", dDescriptionsMap);
-
 				forwardPage(Page.UPDATE_STUDY_NEW, request, response);
 			} else {
-				study.setProtocolType(protocolType);
-				submitStudy(study, dDescriptionsMap, request);
+				getStudyService().updateStudy(study, dDescriptionsMap, getUserAccountBean());
+				if (study.getId() == currentStudy.getId()) {
+					request.getSession().setAttribute("study", study);
+				}
 				study.setStudyParameters(getStudyParameterValueDAO().findParamConfigByStudy(study));
 				updateLastAccessedInstanceType(response, study);
 				addPageMessage(getResPage().getString("the_study_has_been_updated_succesfully"), request);
@@ -209,83 +198,10 @@ public class UpdateStudyServletNew extends SpringServlet {
 		}
 	}
 
-	private void validateStudy1(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
-
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("uniqueProId", Validator.NO_BLANKS);
-		v.addValidation("description", Validator.NO_BLANKS);
-		v.addValidation("prinInvestigator", Validator.NO_BLANKS);
-		v.addValidation("sponsor", Validator.NO_BLANKS);
-
-		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
-		v.addValidation("collaborators", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
-		v.addValidation("protocolDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM7);
-
-		v.addValidation("instanceType", Validator.NO_BLANKS);
-		v.addValidation("instanceType", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM1);
-
-		v.addValidation("studySubjectIdLabel", Validator.NO_BLANKS);
-		v.addValidation("secondaryIdLabel", Validator.NO_BLANKS);
-		v.addValidation("dateOfEnrollmentForStudyLabel", Validator.NO_BLANKS);
-		v.addValidation("genderLabel", Validator.NO_BLANKS);
-
-		v.addValidation("startDateTimeLabel", Validator.NO_BLANKS);
-		v.addValidation("endDateTimeLabel", Validator.NO_BLANKS);
-
-		errors.putAll(v.validate());
-
-		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(), study);
-
-		if (fp.getString("name").trim().length() > VALIDATION_NUM4) {
-			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
-		}
-		if (fp.getString("uniqueProId").trim().length() > VALIDATION_NUM2) {
-			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
-		}
-		if (fp.getString("description").trim().length() > VALIDATION_NUM8) {
-			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
-		}
-		if (fp.getString("prinInvestigator").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "prinInvestigator",
-					getResException().getString("maximum_lenght_principal_investigator_255"));
-		}
-		if (fp.getString("sponsor").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "sponsor", getResException().getString("maximum_lenght_sponsor_255"));
-		}
-		if (fp.getString("officialTitle").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "officialTitle", getResException().getString("maximum_lenght_official_title_255"));
-		}
-
-		if (fp.getString("studySubjectIdLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "studySubjectIdLabel",
-					getResException().getString("maximum_lenght_studySubjectIdLabel_255"));
-		}
-		if (fp.getString("secondaryIdLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "secondaryIdLabel",
-					getResException().getString("maximum_lenght_secondaryIdLabel_255"));
-		}
-		if (fp.getString("dateOfEnrollmentForStudyLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "dateOfEnrollmentForStudyLabel",
-					getResException().getString("maximum_lenght_dateOfEnrollmentForStudyLabel_255"));
-		}
-		if (fp.getString("genderLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "genderLabel", getResException().getString("maximum_lenght_genderLabel_255"));
-		}
-
-		if (fp.getString("startDateTimeLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "startDateTimeLabel",
-					getResException().getString("maximum_lenght_startDateTimeLabel_255"));
-		}
-		if (fp.getString("endDateTimeLabel").trim().length() > VALIDATION_NUM5) {
-			Validator.addError(errors, "endDateTimeLabel",
-					getResException().getString("maximum_lenght_endDateTimeLabel_255"));
-		}
-
-		createStudyBean(fp, study);
+	private void validateStudy1(FormProcessor fp, StudyBean study, HashMap errors, Validator validator) {
+		study.setId(fp.getInt("studyId"));
+		errors.putAll(StudyValidator.validate(validator, getStudyDAO(), study));
+		getStudyService().prepareStudyBean(study, StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFeaturesMap());
 	}
 
 	private void validateStudy2(FormProcessor fp, StudyBean study, Validator v) {
@@ -313,12 +229,14 @@ public class UpdateStudyServletNew extends SpringServlet {
 			String name = fp.getString("interName" + i);
 			if (!StringUtil.isBlank(type) && StringUtil.isBlank(name)) {
 				v.addValidation("interName", Validator.NO_BLANKS);
-				fp.getRequest().setAttribute("interventionError", getResPage().getString("name_cannot_be_blank_if_type"));
+				fp.getRequest().setAttribute("interventionError",
+						getResPage().getString("name_cannot_be_blank_if_type"));
 				break;
 			}
 			if (!StringUtil.isBlank(name) && StringUtil.isBlank(type)) {
 				v.addValidation("interType", Validator.NO_BLANKS);
-				fp.getRequest().setAttribute("interventionError", getResPage().getString("name_cannot_be_blank_if_name"));
+				fp.getRequest().setAttribute("interventionError",
+						getResPage().getString("name_cannot_be_blank_if_name"));
 				break;
 			}
 		}
@@ -329,11 +247,11 @@ public class UpdateStudyServletNew extends SpringServlet {
 	private void validateStudy4(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 
 		v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM6);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM6);
 		v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 		v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM6);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM6);
 		errors.putAll(v.validate());
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
@@ -361,24 +279,24 @@ public class UpdateStudyServletNew extends SpringServlet {
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				StudyValidator.VALIDATION_NUM5);
+		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				StudyValidator.VALIDATION_NUM5);
 		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM1);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM1);
 		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				VALIDATION_NUM3);
+				StudyValidator.VALIDATION_NUM3);
 		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM3);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM3);
 		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 
 		errors.putAll(v.validate());
 
@@ -401,11 +319,11 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 	private void validateStudy6(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				VALIDATION_NUM5);
+				StudyValidator.VALIDATION_NUM5);
 		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 
 		errors.putAll(v.validate());
 
@@ -438,7 +356,7 @@ public class UpdateStudyServletNew extends SpringServlet {
 		final int counter = 25;
 		for (int i = 0; i < counter; i++) {
 			v.addValidation(descriptionName + i, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, VALIDATION_NUM5);
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
 			// set list of dn descriptions for specified type here
 			if (!"".equals(fp.getString(descriptionName + i))) {
 				DiscrepancyDescription dDescription = new DiscrepancyDescription();
@@ -468,7 +386,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 				DiscrepancyDescription rfcTerm2 = newDescriptions.get(j);
 				if (rfcTerm1.getName().equals(rfcTerm2.getName())) {
 					Validator.addError(errors, descriptionError + i,
-							getResPage().getString("please_correct_the_duplicate_description_found_in_row") + " " + (j + 1));
+							getResPage().getString("please_correct_the_duplicate_description_found_in_row") + " "
+									+ (j + 1));
 				}
 			}
 		}
@@ -476,122 +395,10 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 	private void confirmWholeStudy(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 		errors.putAll(v.validate());
-		if (study.getStatus().isLocked()) {
-			study.getStudyParameterConfig().setDiscrepancyManagement("false");
-		} else {
-			study.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
-		}
-		study.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
-		study.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
-		study.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-		study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-		study.getStudyParameterConfig().setInterviewDateEditable(fp.getString("interviewDateEditable"));
-		study.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-		study.getStudyParameterConfig().setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
-		study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
-		study.getStudyParameterConfig().setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
-		study.getStudyParameterConfig().setAutoGeneratedPrefix(fp.getString("autoGeneratedPrefix"));
-		study.getStudyParameterConfig().setAutoGeneratedSeparator(fp.getString("autoGeneratedSeparator"));
-		study.getStudyParameterConfig().setAutoGeneratedSuffix(fp.getString("autoGeneratedSuffix"));
-		study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
-		study.getStudyParameterConfig().setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
-		study.getStudyParameterConfig().setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
-		study.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
-		study.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
-		study.getStudyParameterConfig().setEventLocationRequired(fp.getString("eventLocationRequired"));
-		study.getStudyParameterConfig().setSecondaryIdRequired(fp.getString("secondaryIdRequired"));
-		study.getStudyParameterConfig().setDateOfEnrollmentForStudyRequired(
-				fp.getString("dateOfEnrollmentForStudyRequired"));
-		study.getStudyParameterConfig().setStudySubjectIdLabel(fp.getString("studySubjectIdLabel"));
-		study.getStudyParameterConfig().setSecondaryIdLabel(fp.getString("secondaryIdLabel"));
-		study.getStudyParameterConfig().setDateOfEnrollmentForStudyLabel(fp.getString("dateOfEnrollmentForStudyLabel"));
-		study.getStudyParameterConfig().setGenderLabel(fp.getString("genderLabel"));
-		study.getStudyParameterConfig().setStartDateTimeRequired(fp.getString("startDateTimeRequired"));
-		study.getStudyParameterConfig().setUseStartTime(fp.getString("useStartTime"));
-		study.getStudyParameterConfig().setEndDateTimeRequired(fp.getString("endDateTimeRequired"));
-		study.getStudyParameterConfig().setUseEndTime(fp.getString("useEndTime"));
-		study.getStudyParameterConfig().setStartDateTimeLabel(fp.getString("startDateTimeLabel"));
-		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
-		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setAllowDynamicGroupsManagement(fp.getString("allowDynamicGroupsManagement"));
-		study.getStudyParameterConfig().setAllowDiscrepancyCorrectionForms(
-				fp.getString("allowDiscrepancyCorrectionForms"));
-
-		// Data Import
-		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
-		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
-		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
-				fp.getString("replaceExisitingDataDuringImport"));
-
-		// Medical coding
-		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
-		study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
-		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
-
-		// Randomization
-		study.getStudyParameterConfig().setAssignRandomizationResultTo(fp.getString("assignRandomizationResultTo"));
-		study.getStudyParameterConfig().setRandomizationTrialId(fp.getString("randomizationTrialId"));
-		study.getStudyParameterConfig().setRandomizationEnviroment(fp.getString("randomizationEnviroment"));
-
-		// Evaluation
-		study.getStudyParameterConfig().setEvaluateWithContext(fp.getString("evaluateWithContext"));
-
-		study.getStudyParameterConfig().setAllowRulesAutoScheduling(fp.getString("allowRulesAutoScheduling"));
-
-		// SAS Item Names
-		study.getStudyParameterConfig().setAnnotatedCrfSasItemNames(fp.getString("annotatedCrfSasItemNames"));
-
-		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
-		study.getStudyParameterConfig().setShowYearsInCalendar(fp.getString("showYearsInCalendar"));
-		study.getStudyParameterConfig().setInstanceType(fp.getString("instanceType"));
-		
-		// Features 
-		study.getStudyParameterConfig().setCrfAnnotation(fp.getString("crfAnnotation"));
-		study.getStudyParameterConfig().setDynamicGroup(fp.getString("dynamicGroup"));
-		study.getStudyParameterConfig().setCalendaredVisits(fp.getString("calendaredVisits"));
-		study.getStudyParameterConfig().setInteractiveDashboards(fp.getString("interactiveDashboards"));
-		study.getStudyParameterConfig().setItemLevelSDV(fp.getString("itemLevelSDV"));
-		study.getStudyParameterConfig().setSubjectCasebookInPDF(fp.getString("subjectCasebookInPDF"));
-		study.getStudyParameterConfig().setCrfMasking(fp.getString("crfMasking"));
-		study.getStudyParameterConfig().setSasExtracts(fp.getString("sasExtracts"));
-		study.getStudyParameterConfig().setStudyEvaluator(fp.getString("studyEvaluator"));
-		study.getStudyParameterConfig().setRandomization(fp.getString("randomization"));
-		study.getStudyParameterConfig().setMedicalCoding(fp.getString("medicalCoding"));
-		
-		try {
-
-			// Create custom dictionary
-			if (study.getStudyParameterConfig().getAutoCodeDictionaryName() != null
-					&& !study.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
-				getDictionaryService().createDictionary(study.getStudyParameterConfig().getAutoCodeDictionaryName(),
-						study);
-			}
-		} catch (CodeException e) {
-
-			logger.info("Custom dictionary with similar name exists");
-		}
-
+		getStudyService().prepareStudyBeanConfiguration(study, StudyUtil.getStudyConfigurationParametersMap());
 		if (!errors.isEmpty()) {
 			fp.getRequest().setAttribute("formMessages", errors);
 		}
-	}
-
-	private StudyBean createStudyBean(FormProcessor fp, StudyBean study) {
-		study.setId(fp.getInt("studyId"));
-		study.setName(fp.getString("name"));
-		study.setOfficialTitle(fp.getString("officialTitle"));
-		study.setIdentifier(fp.getString("uniqueProId"));
-		study.setSecondaryIdentifier(fp.getString("secondProId"));
-		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
-
-		study.setSummary(fp.getString("description"));
-		study.setProtocolDescription(fp.getString("protocolDescription"));
-
-		study.setSponsor(fp.getString("sponsor"));
-		study.setCollaborators(fp.getString("collaborators"));
-		return study;
-
 	}
 
 	private boolean updateStudy2(FormProcessor fp, StudyBean study) {
@@ -599,7 +406,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 		study.setOldStatus(study.getStatus());
 		study.setStatus(Status.get(fp.getInt("status")));
 		try {
-			study.setProtocolDateVerification(fp.getUpdatedDateProperty(INPUT_VER_DATE, study.getProtocolDateVerification()));
+			study.setProtocolDateVerification(
+					fp.getUpdatedDateProperty(INPUT_VER_DATE, study.getProtocolDateVerification()));
 			study.setDatePlannedStart(fp.getUpdatedDateProperty(INPUT_START_DATE, study.getDatePlannedStart()));
 			study.setDatePlannedEnd(fp.getUpdatedDateProperty(INPUT_END_DATE, study.getDatePlannedEnd()));
 		} catch (IllegalArgumentException ex) {
@@ -632,8 +440,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 				String type = fp.getString("interType" + i);
 				String name = fp.getString("interName" + i);
 				if (!StringUtil.isBlank(type) && !StringUtil.isBlank(name)) {
-					InterventionBean ib = new InterventionBean(fp.getString("interType" + i), fp.getString("interName"
-							+ i));
+					InterventionBean ib = new InterventionBean(fp.getString("interType" + i),
+							fp.getString("interName" + i));
 					interventionArray.add(ib);
 					interventions.append(ib.toString()).append(",");
 				}
@@ -688,581 +496,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 		}
 	}
 
-	private void submitDescriptions(Map<String, List<DiscrepancyDescription>> dDescriptionsMap, int studyId) {
-		submitSpecifiedDescriptions(dDescriptionsMap.get("dnUpdateDescriptions"),
-				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId(), studyId);
-		submitSpecifiedDescriptions(dDescriptionsMap.get("dnCloseDescriptions"),
-				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId(), studyId);
-		submitSpecifiedDescriptions(dDescriptionsMap.get("dnRFCDescriptions"),
-				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId(), studyId);
-	}
-
-	private void submitSpecifiedDescriptions(List<DiscrepancyDescription> newDescriptions, int typeId, int studyId) {
-		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess
-				.getApplicationContext(getServletContext()).getBean("discrepancyDescriptionService");
-
-		// DiscrepancyDescriptions-section start
-		Map<Integer, DiscrepancyDescription> idToDnDescriptionMap = new HashMap<Integer, DiscrepancyDescription>();
-
-		for (DiscrepancyDescription dDescription : dDescriptionService.findAllByStudyIdAndTypeId(studyId, typeId)) {
-			idToDnDescriptionMap.put(dDescription.getId(), dDescription);
-		}
-		for (DiscrepancyDescription dDescription : newDescriptions) {
-			if (idToDnDescriptionMap.keySet().contains(dDescription.getId())) {
-				DiscrepancyDescription dDescriptionOld = idToDnDescriptionMap.get(dDescription.getId());
-				if (!dDescription.getName().equals(dDescriptionOld.getName())
-						|| !dDescription.getVisibilityLevel().equals(dDescriptionOld.getVisibilityLevel())) {
-					// description was changed
-					dDescriptionService.saveDiscrepancyDescription(dDescription);
-					idToDnDescriptionMap.remove(dDescription.getId());
-				} else {
-					// description wasn't changed
-					idToDnDescriptionMap.remove(dDescription.getId());
-				}
-			} else {
-				// description is new (id=0)
-				dDescriptionService.saveDiscrepancyDescription(dDescription);
-			}
-		}
-		// delete unneeded descriptions
-		for (DiscrepancyDescription dDescriptionForDelete : idToDnDescriptionMap.values()) {
-			dDescriptionService.deleteDiscrepancyDescription(dDescriptionForDelete);
-		}
-	}
-
-	private void submitStudy(StudyBean study1, Map<String, List<DiscrepancyDescription>> dDescriptionsMap,
-			HttpServletRequest request) throws CodeException {
-		UserAccountBean ub = getUserAccountBean(request);
-
-		StudyDAO sdao = new StudyDAO(getDataSource());
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
-		submitDescriptions(dDescriptionsMap, study1.getId());
-
-		logger.info("study bean to be updated:" + study1.getName());
-		study1.setUpdatedDate(new Date());
-		study1.setUpdater(ub);
-		sdao.update(study1);
-		logger.debug("about to create dn descripts");
-
-		ArrayList siteList = (ArrayList) sdao.findAllByParent(study1.getId());
-		if (siteList.size() > 0) {
-			sdao.updateSitesStatus(study1);
-		}
-
-		StudyParameterValueBean spv = new StudyParameterValueBean();
-
-		spv.setStudyId(study1.getId());
-
-		spv.setParameter("collectDob");
-		spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("discrepancyManagement");
-		spv.setValue(study1.getStudyParameterConfig().getDiscrepancyManagement());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("genderRequired");
-		spv.setValue(study1.getStudyParameterConfig().getGenderRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("subjectPersonIdRequired");
-		spv.setValue(study1.getStudyParameterConfig().getSubjectPersonIdRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("interviewerNameRequired");
-		spv.setValue(study1.getStudyParameterConfig().getInterviewerNameRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("interviewerNameDefault");
-		spv.setValue(study1.getStudyParameterConfig().getInterviewerNameDefault());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("interviewerNameEditable");
-		spv.setValue(study1.getStudyParameterConfig().getInterviewerNameEditable());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("interviewDateRequired");
-		spv.setValue(study1.getStudyParameterConfig().getInterviewDateRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("interviewDateDefault");
-		spv.setValue(study1.getStudyParameterConfig().getInterviewDateDefault());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("interviewDateEditable");
-		spv.setValue(study1.getStudyParameterConfig().getInterviewDateEditable());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("subjectIdGeneration");
-		spv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoGeneratedPrefix");
-		spv.setValue(study1.getStudyParameterConfig().getAutoGeneratedPrefix());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoGeneratedSeparator");
-		spv.setValue(study1.getStudyParameterConfig().getAutoGeneratedSeparator());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoGeneratedSuffix");
-		spv.setValue(study1.getStudyParameterConfig().getAutoGeneratedSuffix());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("subjectIdPrefixSuffix");
-		spv.setValue(study1.getStudyParameterConfig().getSubjectIdPrefixSuffix());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("personIdShownOnCRF");
-		spv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("secondaryLabelViewable");
-		spv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("adminForcedReasonForChange");
-		spv.setValue(study1.getStudyParameterConfig().getAdminForcedReasonForChange());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("eventLocationRequired");
-		spv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("secondaryIdRequired");
-		spv.setValue(study1.getStudyParameterConfig().getSecondaryIdRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("dateOfEnrollmentForStudyRequired");
-		spv.setValue(study1.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("studySubjectIdLabel");
-		spv.setValue(study1.getStudyParameterConfig().getStudySubjectIdLabel());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("secondaryIdLabel");
-		spv.setValue(study1.getStudyParameterConfig().getSecondaryIdLabel());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("dateOfEnrollmentForStudyLabel");
-		spv.setValue(study1.getStudyParameterConfig().getDateOfEnrollmentForStudyLabel());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("genderLabel");
-		spv.setValue(study1.getStudyParameterConfig().getGenderLabel());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("startDateTimeRequired");
-		spv.setValue(study1.getStudyParameterConfig().getStartDateTimeRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("useStartTime");
-		spv.setValue(study1.getStudyParameterConfig().getUseStartTime());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("endDateTimeRequired");
-		spv.setValue(study1.getStudyParameterConfig().getEndDateTimeRequired());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("useEndTime");
-		spv.setValue(study1.getStudyParameterConfig().getUseEndTime());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("startDateTimeLabel");
-		spv.setValue(study1.getStudyParameterConfig().getStartDateTimeLabel());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("endDateTimeLabel");
-		spv.setValue(study1.getStudyParameterConfig().getEndDateTimeLabel());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("allowSdvWithOpenQueries");
-		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("allowDynamicGroupsManagement");
-		spv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("allowDiscrepancyCorrectionForms");
-		spv.setValue(study1.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("markImportedCRFAsCompleted");
-		spv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoScheduleEventDuringImport");
-		spv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoCreateSubjectDuringImport");
-		spv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("replaceExisitingDataDuringImport");
-		spv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoCodeDictionaryName");
-		spv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("medicalCodingApprovalNeeded");
-		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("medicalCodingContextNeeded");
-		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("assignRandomizationResultTo");
-		spv.setValue(study1.getStudyParameterConfig().getAssignRandomizationResultTo());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("randomizationTrialId");
-		spv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("evaluateWithContext");
-		spv.setValue(study1.getStudyParameterConfig().getEvaluateWithContext());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("allowRulesAutoScheduling");
-		spv.setValue(study1.getStudyParameterConfig().getAllowRulesAutoScheduling());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("annotatedCrfSasItemNames");
-		spv.setValue(study1.getStudyParameterConfig().getAnnotatedCrfSasItemNames());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("randomizationEnviroment");
-		spv.setValue(study1.getStudyParameterConfig().getRandomizationEnviroment());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoTabbing");
-		spv.setValue(study1.getStudyParameterConfig().getAutoTabbing());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("showYearsInCalendar");
-		spv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("instanceType");
-		spv.setValue(study1.getStudyParameterConfig().getInstanceType());
-		updateParameter(spvdao, spv);
-		
-		if (ub.isSysAdmin()) {
-			
-			spv.setParameter("crfAnnotation");
-			spv.setValue(study1.getStudyParameterConfig().getCrfAnnotation());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("dynamicGroup");
-			spv.setValue(study1.getStudyParameterConfig().getDynamicGroup());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("calendaredVisits");
-			spv.setValue(study1.getStudyParameterConfig().getCalendaredVisits());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("interactiveDashboards");
-			spv.setValue(study1.getStudyParameterConfig().getInteractiveDashboards());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("itemLevelSDV");
-			spv.setValue(study1.getStudyParameterConfig().getItemLevelSDV());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("subjectCasebookInPDF");
-			spv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("crfMasking");
-			spv.setValue(study1.getStudyParameterConfig().getCrfMasking());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("sasExtracts");
-			spv.setValue(study1.getStudyParameterConfig().getSasExtracts());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("studyEvaluator");
-			spv.setValue(study1.getStudyParameterConfig().getStudyEvaluator());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("randomization");
-			spv.setValue(study1.getStudyParameterConfig().getRandomization());
-			updateParameter(spvdao, spv);
-			
-			spv.setParameter("medicalCoding");
-			spv.setValue(study1.getStudyParameterConfig().getMedicalCoding());
-			updateParameter(spvdao, spv);
-		}
-
-		try {
-
-			// Create custom dictionary
-			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null
-					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
-				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(),
-						study1);
-			}
-		} catch (CodeException e) {
-
-			logger.info("Custom dictionary with similar name exists");
-		}
-
-		StudyBean curStudy = (StudyBean) request.getSession().getAttribute("study");
-		if (curStudy != null && study1.getId() == curStudy.getId()) {
-			request.getSession().setAttribute("study", study1);
-		}
-		// update manage_pedigrees for all sites
-		updateSiteParameters(study1, ub, sdao, spvdao);
-	}
-
-	private void updateSiteParameters(StudyBean study1, UserAccountBean ub, StudyDAO sdao, StudyParameterValueDAO spvdao) {
-		ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
-		for (Object aChildren : children) {
-			StudyBean child = (StudyBean) aChildren;
-			child.setType(study1.getType()); // same as parent's type
-			child.setUpdatedDate(new Date());
-			child.setUpdater(ub);
-			sdao.update(child);
-			StudyParameterValueBean childspv = new StudyParameterValueBean();
-			childspv.setStudyId(child.getId());
-
-			childspv.setParameter("collectDob");
-			childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("genderRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("discrepancyManagement");
-			childspv.setValue(study1.getStudyParameterConfig().getDiscrepancyManagement());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("genderRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("subjectIdGeneration");
-			childspv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoGeneratedPrefix");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoGeneratedPrefix());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoGeneratedSeparator");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoGeneratedSeparator());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoGeneratedSuffix");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoGeneratedSuffix());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("subjectIdPrefixSuffix");
-			childspv.setValue(study1.getStudyParameterConfig().getSubjectIdPrefixSuffix());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("personIdShownOnCRF");
-			childspv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("secondaryLabelViewable");
-			childspv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("adminForcedReasonForChange");
-			childspv.setValue(study1.getStudyParameterConfig().getAdminForcedReasonForChange());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("eventLocationRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("secondaryIdRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getSecondaryIdRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("dateOfEnrollmentForStudyRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("studySubjectIdLabel");
-			childspv.setValue(study1.getStudyParameterConfig().getStudySubjectIdLabel());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("secondaryIdLabel");
-			childspv.setValue(study1.getStudyParameterConfig().getSecondaryIdLabel());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("dateOfEnrollmentForStudyLabel");
-			childspv.setValue(study1.getStudyParameterConfig().getDateOfEnrollmentForStudyLabel());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("genderLabel");
-			childspv.setValue(study1.getStudyParameterConfig().getGenderLabel());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("startDateTimeRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getStartDateTimeRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("useStartTime");
-			childspv.setValue(study1.getStudyParameterConfig().getUseStartTime());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("endDateTimeRequired");
-			childspv.setValue(study1.getStudyParameterConfig().getEndDateTimeRequired());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("useEndTime");
-			childspv.setValue(study1.getStudyParameterConfig().getUseEndTime());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("startDateTimeLabel");
-			childspv.setValue(study1.getStudyParameterConfig().getStartDateTimeLabel());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("endDateTimeLabel");
-			childspv.setValue(study1.getStudyParameterConfig().getEndDateTimeLabel());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowSdvWithOpenQueries");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowDynamicGroupsManagement");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowDynamicGroupsManagement());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowDiscrepancyCorrectionForms");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowDiscrepancyCorrectionForms());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoScheduleEventDuringImport");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoCreateSubjectDuringImport");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("replaceExisitingDataDuringImport");
-			childspv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoCodeDictionaryName");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("medicalCodingApprovalNeeded");
-			childspv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("medicalCodingContextNeeded");
-			childspv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("assignRandomizationResultTo");
-			childspv.setValue(study1.getStudyParameterConfig().getAssignRandomizationResultTo());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("randomizationTrialId");
-			childspv.setValue(study1.getStudyParameterConfig().getRandomizationTrialId());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("evaluateWithContext");
-			childspv.setValue(study1.getStudyParameterConfig().getEvaluateWithContext());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowRulesAutoScheduling");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowRulesAutoScheduling());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("randomizationEnviroment");
-			childspv.setValue(study1.getStudyParameterConfig().getRandomizationEnviroment());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("annotatedCrfSasItemNames");
-			childspv.setValue(study1.getStudyParameterConfig().getAnnotatedCrfSasItemNames());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoTabbing");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoTabbing());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("showYearsInCalendar");
-			childspv.setValue(study1.getStudyParameterConfig().getShowYearsInCalendar());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("instanceType");
-			childspv.setValue(study1.getStudyParameterConfig().getInstanceType());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("crfAnnotation");
-			childspv.setValue(study1.getStudyParameterConfig().getCrfAnnotation());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("dynamicGroup");
-			childspv.setValue(study1.getStudyParameterConfig().getDynamicGroup());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("calendaredVisits");
-			childspv.setValue(study1.getStudyParameterConfig().getCalendaredVisits());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("interactiveDashboards");
-			childspv.setValue(study1.getStudyParameterConfig().getInteractiveDashboards());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("itemLevelSDV");
-			childspv.setValue(study1.getStudyParameterConfig().getItemLevelSDV());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("subjectCasebookInPDF");
-			childspv.setValue(study1.getStudyParameterConfig().getSubjectCasebookInPDF());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("crfMasking");
-			childspv.setValue(study1.getStudyParameterConfig().getCrfMasking());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("sasExtracts");
-			childspv.setValue(study1.getStudyParameterConfig().getSasExtracts());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("studyEvaluator");
-			childspv.setValue(study1.getStudyParameterConfig().getStudyEvaluator());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("randomization");
-			childspv.setValue(study1.getStudyParameterConfig().getRandomization());
-			updateParameter(spvdao, childspv);
-			
-			childspv.setParameter("medicalCoding");
-			childspv.setValue(study1.getStudyParameterConfig().getMedicalCoding());
-			updateParameter(spvdao, childspv);
-		}
-	}
-
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
 		return SpringServlet.ADMIN_SERVLET_CODE;
-	}
-
-	private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
-		StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
-		if (spv1.getId() > 0) {
-			logger.debug("Updating " + spv.getParameter() + " for study " + spv.getStudyId());
-			spvdao.update(spv);
-		} else {
-			logger.debug("Creating " + spv.getParameter() + " for study " + spv.getStudyId());
-			spvdao.create(spv);
-		}
 	}
 }

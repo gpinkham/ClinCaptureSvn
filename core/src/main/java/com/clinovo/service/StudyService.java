@@ -15,9 +15,16 @@
 
 package com.clinovo.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+
+import com.clinovo.exception.CodeException;
+import com.clinovo.model.DiscrepancyDescription;
 
 /**
  * StudyService.
@@ -99,9 +106,67 @@ public interface StudyService {
 	/**
 	 * Returns study bean, where specified study subject was created.
 	 *
-	 * @param currentStudy StudyBean represents current scope.
-	 * @param studySubject StudySubjectBean represents target study subject.
+	 * @param currentStudy
+	 *            StudyBean represents current scope.
+	 * @param studySubject
+	 *            StudySubjectBean represents target study subject.
 	 * @return StudyBean
 	 */
 	StudyBean getSubjectStudy(StudyBean currentStudy, StudySubjectBean studySubject);
+
+	/**
+	 * Prepares study bean and fills it.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @param parametersMap
+	 *            Map
+	 * @param featuresMap
+	 *            map
+	 * @return StudyBean
+	 */
+	StudyBean prepareStudyBean(StudyBean studyBean, Map<String, String> parametersMap, Map<String, String> featuresMap);
+
+	/**
+	 * Prepares study bean configuration and fills it.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @param configurationParametersMap
+	 *            Map
+	 * @return StudyBean
+	 */
+	StudyBean prepareStudyBeanConfiguration(StudyBean studyBean, Map<String, String> configurationParametersMap);
+
+	/**
+	 * Saves study bean.
+	 *
+	 * @param userId
+	 *            int
+	 * @param studyBean
+	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param pageMessagesBundle
+	 *            ResourceBundle
+	 * @return StudyBean
+	 */
+	StudyBean saveStudyBean(int userId, StudyBean studyBean, UserAccountBean currentUser,
+			ResourceBundle pageMessagesBundle);
+
+	/**
+	 * Updates study bean.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @param dDescriptionsMap
+	 *            Map
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @return StudyBean
+	 * @throws CodeException
+	 *             the CodeException
+	 */
+	StudyBean updateStudy(StudyBean studyBean, Map<String, List<DiscrepancyDescription>> dDescriptionsMap,
+			UserAccountBean currentUser) throws CodeException;
 }

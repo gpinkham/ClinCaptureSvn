@@ -25,11 +25,10 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.clinovo.rest.annotation.RestParameterPossibleValues;
 import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
@@ -45,7 +44,7 @@ import com.clinovo.validator.EventDefinitionValidator;
 /**
  * RestEventService.
  */
-@Controller("restEventService")
+@RestController("restEventService")
 @SuppressWarnings("rawtypes")
 public class EventService extends BaseEventService {
 
@@ -74,7 +73,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/events", method = RequestMethod.GET)
 	public List<StudyEventDefinitionBean> getEvents() throws Exception {
 		return eventDefinitionService.getAllStudyEventDefinitions(getCurrentStudy());
@@ -89,7 +87,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event", method = RequestMethod.GET)
 	public StudyEventDefinitionBean getEventDefinition(@RequestParam(value = "id") int eventId) throws Exception {
 		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(eventId), getCurrentStudy());
@@ -124,7 +121,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST)
@@ -180,7 +176,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
@@ -216,7 +211,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int eventId) throws Exception {
 		return eventDefinitionService.removeStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
@@ -231,7 +225,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int eventId) throws Exception {
 		return eventDefinitionService.restoreStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
@@ -246,7 +239,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event/delete", method = RequestMethod.POST)
 	public Response delete(@RequestParam("id") int eventId) throws Exception {
 		return deleteStudyEventDefinition(eventId);
@@ -283,7 +275,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "sourceDataVerification", values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
 			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataEntryQuality.valueDescription"),
@@ -349,7 +340,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
@@ -418,7 +408,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RestProvideAtLeastOneNotRequired
 	@RestParameterPossibleValuesHolder({
 			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
@@ -463,7 +452,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event/removeCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
@@ -482,7 +470,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event/restoreCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
@@ -501,7 +488,6 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/event/deleteCrf", method = RequestMethod.POST)
 	public Response deleteCrf(@RequestParam("eventId") int eventId, @RequestParam("crfName") String crfName)
 			throws Exception {

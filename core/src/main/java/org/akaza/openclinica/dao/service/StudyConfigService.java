@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.dao.service;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.sql.DataSource;
@@ -34,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.clinovo.enums.SystemConfigurationParameters;
+
 /**
  * StudyConfigService class.
  */
@@ -41,7 +44,10 @@ import org.springframework.stereotype.Service;
 @SuppressWarnings({"rawtypes"})
 public class StudyConfigService {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(StudyConfigService.class);
+
+	private static final String GET = "get";
+	private static final String SET = "set";
 
 	@Autowired
 	private DataSource ds;
@@ -54,7 +60,7 @@ public class StudyConfigService {
 
 	/**
 	 * This method is used to initialize Study Config Service.
-	 * 
+	 *
 	 * @param ds
 	 *            The data source to set.
 	 */
@@ -102,7 +108,7 @@ public class StudyConfigService {
 
 	/**
 	 * Populates study bean.
-	 * 
+	 *
 	 * @param studyBean
 	 *            StudyBean
 	 * @return StudyBean
@@ -134,168 +140,79 @@ public class StudyConfigService {
 		return setParametersForStudy(site);
 	}
 
+	public Method getMethod(Class clazz, String parameterName) {
+		Method method = null;
+		for (Method classMethod : clazz.getMethods()) {
+			if (classMethod.getName().equalsIgnoreCase(GET.concat(parameterName))) {
+				method = classMethod;
+				break;
+			}
+		}
+		return method;
+	}
+
+	public Method setMethod(Class clazz, String parameterName) {
+		Method method = null;
+		for (Method classMethod : clazz.getMethods()) {
+			if (classMethod.getName().equalsIgnoreCase(SET.concat(parameterName))) {
+				method = classMethod;
+				break;
+			}
+		}
+		return method;
+	}
+
+	public void setParameter(String parameterName, String value, StudyParameterConfig spc) {
+		try {
+			Method method = setMethod(spc.getClass(), parameterName);
+			method.invoke(spc, value);
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+	}
+
+	public void updateParameter(String parameterName, StudyParameterConfig spc, StudyParameterValueBean spv,
+			StudyParameterValueDAO spvdao) {
+		try {
+			spv.setParameter(parameterName);
+			Method method = getMethod(spc.getClass(), parameterName);
+			spv.setValue((String) method.invoke(spc));
+			updateParameter(spvdao, spv);
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+	}
+
+	private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
+		StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
+		if (spv1.getId() > 0) {
+			spvdao.update(spv);
+		} else {
+			spvdao.create(spv);
+		}
+	}
+
 	private void setStudyParameterValues(StudyParameterValueDAO spvdao, StudyParameterConfig spc, String handle,
 			StudyParameterValueBean spv) {
-
-		// TO DO: will change to use java reflection later
 		if (spv.getId() > 0) {
-			if (handle.equalsIgnoreCase("collectDob")) {
-				spc.setCollectDob(spv.getValue());
-			} else if (handle.equalsIgnoreCase("genderRequired")) {
-				spc.setGenderRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("discrepancyManagement")) {
-				spc.setDiscrepancyManagement(spv.getValue());
-			} else if (handle.equalsIgnoreCase("subjectPersonIdRequired")) {
-				spc.setSubjectPersonIdRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interviewerNameRequired")) {
-				spc.setInterviewerNameRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interviewerNameDefault")) {
-				spc.setInterviewerNameDefault(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interviewerNameEditable")) {
-				spc.setInterviewerNameEditable(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interviewDateRequired")) {
-				spc.setInterviewDateRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interviewDateDefault")) {
-				spc.setInterviewDateDefault(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interviewDateEditable")) {
-				spc.setInterviewDateEditable(spv.getValue());
-			} else if (handle.equalsIgnoreCase("subjectIdGeneration")) {
-				spc.setSubjectIdGeneration(spv.getValue());
-				logger.info("subjectIdGeneration" + spc.getSubjectIdGeneration());
-			} else if (handle.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-				spc.setSubjectIdPrefixSuffix(spv.getValue());
-			} else if (handle.equalsIgnoreCase("personIdShownOnCRF")) {
-				spc.setPersonIdShownOnCRF(spv.getValue());
-			} else if (handle.equalsIgnoreCase("secondaryLabelViewable")) {
-				spc.setSecondaryLabelViewable(spv.getValue());
-			} else if (handle.equalsIgnoreCase("adminForcedReasonForChange")) {
-				spc.setAdminForcedReasonForChange(spv.getValue());
-			} else if (handle.equalsIgnoreCase("eventLocationRequired")) {
-				spc.setEventLocationRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("secondaryIdRequired")) {
-				spc.setSecondaryIdRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("dateOfEnrollmentForStudyRequired")) {
-				spc.setDateOfEnrollmentForStudyRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("studySubjectIdLabel")) {
-				spc.setStudySubjectIdLabel(spv.getValue());
-			} else if (handle.equalsIgnoreCase("secondaryIdLabel")) {
-				spc.setSecondaryIdLabel(spv.getValue());
-			} else if (handle.equalsIgnoreCase("dateOfEnrollmentForStudyLabel")) {
-				spc.setDateOfEnrollmentForStudyLabel(spv.getValue());
-			} else if (handle.equalsIgnoreCase("genderLabel")) {
-				spc.setGenderLabel(spv.getValue());
-			} else if (handle.equalsIgnoreCase("startDateTimeRequired")) {
-				spc.setStartDateTimeRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("useStartTime")) {
-				spc.setUseStartTime(spv.getValue());
-			} else if (handle.equalsIgnoreCase("endDateTimeRequired")) {
-				spc.setEndDateTimeRequired(spv.getValue());
-			} else if (handle.equalsIgnoreCase("useEndTime")) {
-				spc.setUseEndTime(spv.getValue());
-			} else if (handle.equalsIgnoreCase("startDateTimeLabel")) {
-				spc.setStartDateTimeLabel(spv.getValue());
-			} else if (handle.equalsIgnoreCase("endDateTimeLabel")) {
-				spc.setEndDateTimeLabel(spv.getValue());
-			} else if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
-				spc.setMarkImportedCRFAsCompleted(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoScheduleEventDuringImport")) {
-				spc.setAutoScheduleEventDuringImport(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
-				spc.setAutoCreateSubjectDuringImport(spv.getValue());
-			} else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
-				spc.setAllowSdvWithOpenQueries(spv.getValue());
-			} else if (handle.equalsIgnoreCase("allowDynamicGroupsManagement")) {
-				spc.setAllowDynamicGroupsManagement(spv.getValue());
-			} else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
-				spc.setReplaceExisitingDataDuringImport(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
-				spc.setAutoCodeDictionaryName(spv.getValue());
-			} else if (handle.equalsIgnoreCase("medicalCodingApprovalNeeded")) {
-				spc.setMedicalCodingApprovalNeeded(spv.getValue());
-			} else if (handle.equalsIgnoreCase("medicalCodingContextNeeded")) {
-				spc.setMedicalCodingContextNeeded(spv.getValue());
-			} else if (handle.equalsIgnoreCase("assignRandomizationResultTo")) {
-				spc.setAssignRandomizationResultTo(spv.getValue());
-			} else if (handle.equalsIgnoreCase("randomizationTrialId")) {
-				spc.setRandomizationTrialId(spv.getValue());
-			} else if (handle.equalsIgnoreCase("evaluateWithContext")) {
-				spc.setEvaluateWithContext(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoGeneratedPrefix")) {
-				spc.setAutoGeneratedPrefix(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoGeneratedSeparator")) {
-				spc.setAutoGeneratedSeparator(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoGeneratedSuffix")) {
-				spc.setAutoGeneratedSuffix(spv.getValue());
-			} else if (handle.equalsIgnoreCase("allowRulesAutoScheduling")) {
-				spc.setAllowRulesAutoScheduling(spv.getValue());
-			} else if (handle.equalsIgnoreCase("annotatedCrfSasItemNames")) {
-				spc.setAnnotatedCrfSasItemNames(spv.getValue());
-			} else if (handle.equalsIgnoreCase("allowDiscrepancyCorrectionForms")) {
-				spc.setAllowDiscrepancyCorrectionForms(spv.getValue());
-			} else if (handle.equalsIgnoreCase("randomizationEnviroment")) {
-				spc.setRandomizationEnviroment(spv.getValue());
-			} else if (handle.equalsIgnoreCase("autoTabbing")) {
-				spc.setAutoTabbing(spv.getValue());
-			} else if (handle.equalsIgnoreCase("showYearsInCalendar")) {
-				spc.setShowYearsInCalendar(spv.getValue());
-			} else if (handle.equalsIgnoreCase("instanceType")) {
-				spc.setInstanceType(spv.getValue());
-			} else if (handle.equalsIgnoreCase("crfAnnotation")) {
-				spc.setCrfAnnotation(spv.getValue());
-			} else if (handle.equalsIgnoreCase("dynamicGroup")) {
-				spc.setDynamicGroup(spv.getValue());
-			} else if (handle.equalsIgnoreCase("calendaredVisits")) {
-				spc.setCalendaredVisits(spv.getValue());
-			} else if (handle.equalsIgnoreCase("interactiveDashboards")) {
-				spc.setInteractiveDashboards(spv.getValue());
-			} else if (handle.equalsIgnoreCase("itemLevelSDV")) {
-				spc.setItemLevelSDV(spv.getValue());
-			} else if (handle.equalsIgnoreCase("subjectCasebookInPDF")) {
-				spc.setSubjectCasebookInPDF(spv.getValue());
-			} else if (handle.equalsIgnoreCase("crfMasking")) {
-				spc.setCrfMasking(spv.getValue());
-			} else if (handle.equalsIgnoreCase("sasExtracts")) {
-				spc.setSasExtracts(spv.getValue());
-			} else if (handle.equalsIgnoreCase("studyEvaluator")) {
-				spc.setStudyEvaluator(spv.getValue());
-			} else if (handle.equalsIgnoreCase("randomization")) {
-				spc.setRandomization(spv.getValue());
-			} else if (handle.equalsIgnoreCase("medicalCoding")) {
-				spc.setMedicalCoding(spv.getValue());
-			}
+			setParameter(handle, spv.getValue(), spc);
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);
 		}
-
-		if (handle.equalsIgnoreCase("defaultBioontologyURL")) {
+		if (handle.equalsIgnoreCase(SystemConfigurationParameters.DEFAULT_BIOONTOLOGY_URL.getName())) {
 			setSystemParameterValues(spvdao, spc, handle);
-		} else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
+		} else if (handle.equalsIgnoreCase(SystemConfigurationParameters.MEDICAL_CODING_API_KEY.getName())) {
 			setSystemParameterValues(spvdao, spc, handle);
 		}
 	}
 
 	private void setSystemParameterValues(StudyParameterValueDAO spvdao, StudyParameterConfig spc, String handle) {
-
 		com.clinovo.model.System systemProp = spvdao.findSystemPropertyByName(handle);
 		String value;
 		if (systemProp != null) {
 			value = systemProp.getValue();
-			if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
-				spc.setMarkImportedCRFAsCompleted(value);
-			} else if (handle.equalsIgnoreCase("autoScheduleEventDuringImport")) {
-				spc.setAutoScheduleEventDuringImport(value);
-			} else if (handle.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
-				spc.setAutoCreateSubjectDuringImport(value);
-			} else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
-				spc.setReplaceExisitingDataDuringImport(value);
-			} else if (handle.equalsIgnoreCase("defaultBioontologyURL")) {
-				spc.setDefaultBioontologyURL(value);
-			} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
-				spc.setAutoCodeDictionaryName(value);
-			} else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
-				spc.setMedicalCodingApiKey(value);
-			} else if (handle.equalsIgnoreCase("evaluateWithContext")) {
-				spc.setEvaluateWithContext(value);
+			if (SystemConfigurationParameters.isPresent(handle)) {
+				setParameter(handle, value, spc);
 			}
 		}
 	}

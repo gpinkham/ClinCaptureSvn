@@ -18,19 +18,37 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 import javax.sql.DataSource;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
+import org.akaza.openclinica.bean.service.StudyFeatureConfig;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * <code>StudyBean</code> class represents a study entity, extends <code>AuditableEntityBean</code> class.
  */
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "summary", "detailedDescription", "sponsor",
+		"collaborators", "officialTitle", "secondaryIDs", "principalInvestigator", "status", "parameters", "features"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyBean extends AuditableEntityBean {
+
+	@JsonProperty("studyName")
+	@XmlElement(name = "StudyName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String name = "";
 
 	private int parentStudyId = 0;
 
@@ -38,12 +56,21 @@ public class StudyBean extends AuditableEntityBean {
 	// userbox.jsp the study name to which a site belong.
 	// This property doesn't exist in the database table <Study>, so it might
 	// not has value if it hasn't been assigned
+
 	private String parentStudyName = "";
 	private String parentStudyOid = "";
 
+	@JsonProperty("officialTitle")
+	@XmlElement(name = "OfficialTitle", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String officialTitle = "";
+	@JsonProperty("protocolId")
+	@XmlElement(name = "ProtocolId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String identifier = "";
+	@JsonProperty("secondaryIDs")
+	@XmlElement(name = "SecondaryIDs", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String secondaryIdentifier = "";
+	@JsonProperty("summary")
+	@XmlElement(name = "Summary", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String summary = ""; // need to be removed
 
 	private Date datePlannedStart;
@@ -62,7 +89,10 @@ public class StudyBean extends AuditableEntityBean {
 	private boolean showLockEventsButton;
 	private boolean showUnlockEventsButton;
 
+	@JsonProperty("principalInvestigator")
+	@XmlElement(name = "PrincipalInvestigator", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String principalInvestigator = "";
+
 	private String facilityName = "";
 	private String facilityCity = "";
 	private String facilityState = "";
@@ -73,22 +103,47 @@ public class StudyBean extends AuditableEntityBean {
 	private String facilityContactDegree = "";
 	private String facilityContactPhone = "";
 	private String facilityContactEmail = "";
+	@JsonProperty("protocolType")
+	@XmlElement(name = "ProtocolType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String protocolType = "";
+	@JsonProperty("detailedDescription")
+	@XmlElement(name = "DetailedDescription", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String protocolDescription = "";
+
 	private Date protocolDateVerification;
 	private String phase = "";
 	private int expectedTotalEnrollment = 0;
+	@JsonProperty("sponsor")
+	@XmlElement(name = "Sponsor", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String sponsor = "n_a";
+	@JsonProperty("collaborators")
+	@XmlElement(name = "Collaborators", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String collaborators = "";
+
 	private String medlineIdentifier = "";
 	private boolean resultsReference = false;
 
+	@JsonProperty("oid")
+	@XmlElement(name = "Oid", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String oid;
+
 	private OidGenerator oidGenerator = new StudyOidGenerator();
 
+	@JsonProperty("parameters")
+	@XmlElement(name = "Parameters", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private StudyParameterConfig studyParameterConfig = new StudyParameterConfig();
 
 	private ArrayList studyParameters = new ArrayList();
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
 
 	/**
 	 * @return Returns the studyParameters.
@@ -1117,5 +1172,15 @@ public class StudyBean extends AuditableEntityBean {
 
 	public void setShowLockEventsButton(boolean showLockEventsButton) {
 		this.showLockEventsButton = showLockEventsButton;
+	}
+
+	@JsonProperty("features")
+	@XmlElement(name = "Features", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	public StudyFeatureConfig getStudyFeatureConfig() {
+		return studyParameterConfig.getStudyFeatureConfig();
+	}
+
+	public void setStudyFeatureConfig(StudyFeatureConfig studyFeatureConfig) {
+		studyParameterConfig.setStudyFeatureConfig(studyFeatureConfig);
 	}
 }

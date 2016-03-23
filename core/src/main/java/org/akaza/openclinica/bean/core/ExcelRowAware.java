@@ -17,24 +17,16 @@ package org.akaza.openclinica.bean.core;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * ExcelRowAware.
  */
 @XmlTransient
 public abstract class ExcelRowAware {
 
-	@JsonIgnore
-	@XmlTransient
 	private int index;
 
-	@JsonIgnore
-	@XmlTransient
 	private int rowNumber;
 
-	@JsonIgnore
-	@XmlTransient
 	private int sheetNumber;
 
 	public int getIndex() {
