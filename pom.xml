@@ -943,6 +943,10 @@
 					<configuration>
 						<systemProperties>
 							<property>
+								<name>org.jboss.logging.provider</name>
+								<value>slf4j</value>
+							</property>
+							<property>
 								<name>test.core.build.classes</name>
 								<value>${project.parent.basedir}/core/target/classes</value>
 							</property>
