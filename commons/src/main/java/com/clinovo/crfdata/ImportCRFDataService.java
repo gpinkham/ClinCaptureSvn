@@ -977,6 +977,7 @@ public class ImportCRFDataService {
 	public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId, UserAccountBean ub) {
 		List<String> errors = new ArrayList<String>();
 		MessageFormat mf = new MessageFormat("");
+		ArrayList<SubjectInfoHolder> subjectInfoHolders = new ArrayList<SubjectInfoHolder>();
 
 		try {
 			StudyDAO studyDAO = new StudyDAO(ds);
@@ -1023,6 +1024,7 @@ public class ImportCRFDataService {
 					StudySubjectBean studySubjectBean = oid != null && !oid.trim().isEmpty()
 							? studySubjectDAO.findByOid(oid)
 							: null;
+					SubjectInfoHolder subjectInfoHolder = new SubjectInfoHolder();
 					if (studySubjectBean == null && studyBean.getStudyParameterConfig()
 							.getAutoCreateSubjectDuringImport().equalsIgnoreCase("yes")) {
 						studySubjectBean = createStudySubject(ub, studyBean, subjectDataBean, subjectDAO,
@@ -1043,6 +1045,15 @@ public class ImportCRFDataService {
 						LOGGER.debug("logged an error with subject oid " + oid);
 					}
 
+					if (studySubjectBean != null) {
+						subjectInfoHolder.setOid(studySubjectBean.getOid());
+						if (subjectInfoHolders.contains(subjectInfoHolder)) {
+							mf.applyPattern(respage.getString("xml_multiple_tags_for_same_subject"));
+							Object[] arguments = {oid};
+							errors.add(mf.format(arguments));
+						}
+					}
+
 					ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 					ArrayList<Integer> listOfCrfIds = new ArrayList<Integer>();
 					if (studyEventDataBeans != null) {
@@ -1055,7 +1066,12 @@ public class ImportCRFDataService {
 								Object[] arguments = {sedOid, oid};
 								errors.add(mf.format(arguments));
 								LOGGER.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+							} else if (subjectInfoHolder.eventAlreadyPresent(sedOid)) {
+								mf.applyPattern(respage.getString("xml_multiple_tags_for_same_event"));
+								Object[] arguments = {sedOid, oid};
+								errors.add(mf.format(arguments));
 							} else {
+								subjectInfoHolder.addEvent(sedOid);
 								EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
 								ArrayList<EventDefinitionCRFBean> requiredCrfs = eventDefinitionCrfDao
 										.findAllByEventDefinitionId(studyEventDefintionBean.getId());
@@ -1064,13 +1080,19 @@ public class ImportCRFDataService {
 									int crfId = def.getCrfId();
 									listOfCrfIds.add(crfId);
 								}
-
 							}
 
 							ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 							if (formDataBeans != null) {
 								for (FormDataBean formDataBean : formDataBeans) {
 									String formOid = formDataBean.getFormOID();
+									if (subjectInfoHolder.eventCRFAlreadyPresent(sedOid, formOid)) {
+										mf.applyPattern(respage.getString("xml_multiple_tags_for_same_crf"));
+										Object[] arguments = {formOid, sedOid, oid};
+										errors.add(mf.format(arguments));
+									} else {
+										subjectInfoHolder.addCRFToEvent(sedOid, formOid);
+									}
 									ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formOid);
 									// ideally we should look to compare
 									// versions within
@@ -1195,6 +1217,7 @@ public class ImportCRFDataService {
 							}
 						}
 					}
+					subjectInfoHolders.add(subjectInfoHolder);
 				}
 			}
 		} catch (OpenClinicaException oce) {
@@ -1597,5 +1620,79 @@ public class ImportCRFDataService {
 
 	private StudyParameterValueDAO getStudyParameterValueDAO() {
 		return new StudyParameterValueDAO(ds);
+	}
+
+	private class SubjectInfoHolder {
+		private String oid;
+		private HashMap<String, ArrayList<String>> eventsWithCRFs;
+
+		public SubjectInfoHolder() {
+			oid = "";
+			eventsWithCRFs = new HashMap<String, ArrayList<String>>();
+		}
+
+		public String getOid() {
+			return oid;
+		}
+
+		public void setOid(String oid) {
+			this.oid = oid;
+		}
+
+		/**
+		 * Add a new event to the map.
+		 * @param eventOid String.
+		 */
+		public void addEvent(String eventOid) {
+			if (!this.eventsWithCRFs.containsKey(eventOid)) {
+				this.eventsWithCRFs.put(eventOid, new ArrayList<String>());
+			}
+		}
+
+		/**
+		 * Add a new CRF oid to the event.
+		 * @param eventOid String
+		 * @param crfOid String
+		 */
+		public void addCRFToEvent(String eventOid, String crfOid) {
+			ArrayList<String> crfOIDs = this.eventsWithCRFs.get(eventOid);
+			if (crfOIDs == null) {
+				crfOIDs = new ArrayList<String>();
+			}
+			crfOIDs.add(crfOid);
+			this.eventsWithCRFs.put(eventOid, crfOIDs);
+		}
+
+		/**
+		 * Check if event is already present in the list.
+		 * @param eventOid String
+		 * @return boolean
+		 */
+		public boolean eventAlreadyPresent(String eventOid) {
+			ArrayList<String> crfOIDs = this.eventsWithCRFs.get(eventOid);
+			return  crfOIDs != null && crfOIDs.size() > 0;
+		}
+
+		public boolean eventCRFAlreadyPresent(String eventOid, String crfOid) {
+			if (eventAlreadyPresent(eventOid)) {
+				ArrayList<String> crfOIDs = this.eventsWithCRFs.get(eventOid);
+				return crfOIDs.contains(crfOid);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			if (other == null) {
+				return false;
+			}
+			if (!SubjectInfoHolder.class.isAssignableFrom(other.getClass())) {
+				return false;
+			}
+			SubjectInfoHolder otherHolder = (SubjectInfoHolder) other;
+
+			return this.oid.equals(otherHolder.oid);
+		}
 	}
 }
