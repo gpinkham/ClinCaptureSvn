@@ -248,15 +248,15 @@
 		</sql>
 	</query>
     <query>
-        <name>findAllUsersByStudyOrSite</name>
+        <name>findAllAvailableOrLockedOrRemovedUsersByStudyOrSite</name>
         <sql>
             SELECT
                 ua.user_name
                 , ua.first_name
                 , ua.last_name
+				, ua.status_id
                 , sur.role_name
                 , sur.study_id
-                , sur.status_id
                 , sur.date_updated
                 , sur.update_id
                 , s.name
@@ -267,13 +267,13 @@
                 , study_user_role sur
                 , study s
             WHERE ua.user_name=sur.user_name
-                AND (sur.study_id=s.study_id)
-                AND ua.status_id=1
-                AND sur.status_id=1
+                AND sur.study_id=s.study_id
+                AND ua.status_id in (1,5,6)
+                AND sur.status_id in (1,5,7)
                 AND (s.study_id=? OR s.study_id=?
 			        OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
                 )
-                ORDER BY ua.last_name ASC
+            ORDER BY ua.last_name ASC
         </sql>
     </query>
     <query>

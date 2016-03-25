@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -679,22 +680,29 @@ public class DiscrepancyNoteUtil {
 																	UserAccountDAO udao, StudyDAO studyDAO, EventCRFBean ecb, EventDefinitionCRFDAO eddao) {
 		StudyBean subjectStudy = studyDAO.findByStudySubjectId(studySubjectId);
 		int studyId = currentStudy.getId();
-		ArrayList<StudyUserRoleBean> userAccounts;
+		ArrayList<StudyUserRoleBean> surbs;
+		ArrayList<StudyUserRoleBean> userBeans = new ArrayList();
 		if (currentStudy.getParentStudyId() > 0) {
-			userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), studySubjectId);
+			surbs = udao.findAllAvailableOrLockedOrRemovedUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), studySubjectId);
 		} else if (subjectStudy.getParentStudyId() > 0) {
-			userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(),
-					studySubjectId);
+			surbs = udao.findAllAvailableOrLockedOrRemovedUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(), studySubjectId);
 		} else {
-			userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, studySubjectId);
+			surbs = udao.findAllAvailableOrLockedOrRemovedUsersByStudyOrSite(studyId, 0, studySubjectId);
 		}
+		
+		for (StudyUserRoleBean surb : surbs){
+			if (surb.getStatus().isAvailable() || surb.getUserAccountId() == ecb.getOwnerId()) {
+				userBeans.add(surb);
+			}
+		}
+		
 		UserAccountBean rootUserAccount = (UserAccountBean) udao.findByPK(1);
 		if (!rootUserAccount.getStatus().isLocked() && !rootUserAccount.getStatus().isDeleted()) {
 			StudyUserRoleBean rootStudyUserRole = createRootUserRole(rootUserAccount, studyId);
-			userAccounts.add(rootStudyUserRole);
+			userBeans.add(rootStudyUserRole);
 		}
-		removeEvaluatorsBasedOnCrfStage(userAccounts, ecb, eddao, subjectStudy);
-		return userAccounts;
+		removeEvaluatorsBasedOnCrfStage(userBeans, ecb, eddao, subjectStudy);
+		return userBeans;
 	}
 
 	private static void removeEvaluatorsBasedOnCrfStage(List<StudyUserRoleBean> userAccounts, EventCRFBean ecb,

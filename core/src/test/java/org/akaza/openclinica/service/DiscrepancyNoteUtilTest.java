@@ -70,7 +70,7 @@ public class DiscrepancyNoteUtilTest {
 		generateUserAccounts(1, Role.STUDY_MONITOR);
 		generateUserAccounts(2, Role.STUDY_EVALUATOR);
 
-		Mockito.when(udao.findAllUsersByStudyOrSite(1, 0, 1)).thenReturn(userAccounts);
+		Mockito.when(udao.findAllAvailableOrLockedOrRemovedUsersByStudyOrSite(1, 0, 1)).thenReturn(userAccounts);
 		Mockito.when(studyDAO.findByStudySubjectId(1)).thenReturn(study);
 		Mockito.when(udao.findByPK(1)).thenReturn(rootUserAccount);
 		Mockito.when(edcdao.findForStudyByStudyEventIdAndCRFVersionId(1, 1)).thenReturn(edcb);

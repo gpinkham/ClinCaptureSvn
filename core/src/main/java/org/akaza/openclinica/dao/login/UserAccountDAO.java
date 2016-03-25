@@ -1023,14 +1023,14 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	 *            the study subject ID to search by.
 	 * @return the ArrayList of the UserAccountBeans.
 	 */
-	public ArrayList findAllUsersByStudyOrSite(int studyId, int parentStudyId, int studySubjectId) {
+	public ArrayList<StudyUserRoleBean> findAllAvailableOrLockedOrRemovedUsersByStudyOrSite(int studyId, int parentStudyId, int studySubjectId) {
 		this.unsetTypeExpected();
 		int index = 1;
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.STRING);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
@@ -1038,13 +1038,13 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index, TypeNames.INT);
 
-		ArrayList answer = new ArrayList();
+		ArrayList<StudyUserRoleBean> answer = new ArrayList();
 		int index2 = 1;
 		HashMap variables = new HashMap();
 		variables.put(index2++, studyId);
 		variables.put(index2++, parentStudyId);
 		variables.put(index2, studySubjectId);
-		ArrayList alist = this.select(digester.getQuery("findAllUsersByStudyOrSite"), variables);
+		ArrayList alist = this.select(digester.getQuery("findAllAvailableOrLockedOrRemovedUsersByStudyOrSite"), variables);
 		for (Object anAlist : alist) {
 			HashMap hm = (HashMap) anAlist;
 			StudyUserRoleBean surb = new StudyUserRoleBean();
@@ -1065,7 +1065,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		}
 		return answer;
 	}
-
+	
 	/**
 	 * Find all privileges by role ID.
 	 *
@@ -1458,5 +1458,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		variables.put(ind, studyId);
 		ArrayList resultList = this.select(digester.getQuery("isUserPresentInStudy"), variables);
 		return resultList.size() > 0;
+	}
+
+	public Object findAllAvailableAndLockedUsersByStudyOrSite(int i, int j,
+			int k) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
