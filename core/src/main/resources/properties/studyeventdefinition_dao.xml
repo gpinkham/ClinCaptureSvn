@@ -231,7 +231,7 @@
 			AND defs.study_event_definition_id NOT IN 
 			(SELECT study_event_definition_id FROM dynamic_event 
 			INNER JOIN study_group_class ON study_group_class.study_group_class_id = dynamic_event.study_group_class_id 
-			WHERE study_group_class.status_id = 1 AND study_group_class.study_id = defs.study_id)
+			WHERE study_group_class.study_id = defs.study_id)
 		</sql>
 	</query>
 	<query>

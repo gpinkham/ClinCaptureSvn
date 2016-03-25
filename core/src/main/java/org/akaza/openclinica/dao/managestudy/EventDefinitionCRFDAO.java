@@ -834,7 +834,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public Collection findAllActiveParentsByEventDefinitionId(int definitionId) {
+	public List<EventDefinitionCRFBean> findAllActiveParentsByEventDefinitionId(int definitionId) {
 		this.setTypesExpected();
 		int index = 1;
 		HashMap variables = new HashMap();
@@ -842,7 +842,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 		String sql = digester.getQuery("findAllActiveParentsByEventDefinitionId");
 		List<HashMap> aList = this.select(sql, variables);
-		ArrayList al = new ArrayList();
+		ArrayList<EventDefinitionCRFBean> al = new ArrayList();
 		for (HashMap anAList : aList) {
 			EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap(anAList);
 			al.add(eb);

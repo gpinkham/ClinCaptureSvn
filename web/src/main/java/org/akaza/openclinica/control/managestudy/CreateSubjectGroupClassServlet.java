@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
@@ -48,6 +50,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -110,15 +113,14 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-			ArrayList allDefsFromStudy = seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId());
+			ArrayList<StudyEventDefinitionBean> allDefsFromStudy = seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId());
 			HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
 
-			for (Object anAllDefsFromStudy : allDefsFromStudy) {
-				StudyEventDefinitionBean def = (StudyEventDefinitionBean) anAllDefsFromStudy;
-				ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
-				def.setCrfNum(crfs.size());
-				if (def.getStatus().isAvailable()) {
-					definitions.put(def, false);
+			for (StudyEventDefinitionBean sedb : allDefsFromStudy) {
+				List<EventDefinitionCRFBean> crfs = edcdao.findAllActiveParentsByEventDefinitionId(sedb.getId());
+				sedb.setCrfNum(crfs.size());
+				if (sedb.getStatus().isAvailable()) {
+					definitions.put(sedb, false);
 				}
 			}
 
