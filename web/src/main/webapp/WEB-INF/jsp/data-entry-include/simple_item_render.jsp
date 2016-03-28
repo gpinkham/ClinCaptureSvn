@@ -100,7 +100,7 @@
 			<c:param name="side" value="left"/>
 		</c:import>
 	</td>
-	<td valign="top" nowrap="nowrap">
+	<td valign="top" nowrap="nowrap" id="itemHolderId_input${displayItemWithGroup.singleItem.item.id}">
 		<c:set var="displayItem" scope="request" value="${displayItemWithGroup.singleItem}" />
 		<c:import url="../submit/showItemInput.jsp">
 			<c:param name="key" value="${numOfDate}" />

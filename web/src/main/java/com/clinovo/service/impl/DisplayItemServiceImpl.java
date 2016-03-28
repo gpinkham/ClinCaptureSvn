@@ -212,17 +212,14 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 		ItemDataDAO iddao = new ItemDataDAO(dataSource);
 		ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(dataSource);
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
-		List<String> nullValuesList = new ArrayList<String>();
+		List<String> nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, dataSource);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, dataSource);
 		ArrayList items = dsb.getItems();
 
 		for (Object item1 : items) {
 			DisplayItemBean item = (DisplayItemBean) item1;
 			DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
-			EDCItemMetadata edcItemMetadata = edcItemMetadataService.findByEventCRFAndItemID(dsb.getEventCRF().getId(), item.getItem().getId());
-			item.setEdcItemMetadata(edcItemMetadata);
 			newOne.setSingleItem(DataEntryUtil.runDynamicsItemCheck(getDynamicsMetadataService(), item, ecb));
 			newOne.setOrdinal(item.getMetadata().getOrdinal());
 			newOne.setInGroup(false);
@@ -253,8 +250,7 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 						sb.getCRFVersionId());
 
 				boolean hasData = false;
-				for (ItemDataBean aData : data) {
-					ItemDataBean idb = (ItemDataBean) aData;
+				for (ItemDataBean idb : data) {
 					if (idb.getItemId() == firstItem.getItem().getId()) {
 						hasData = true;
 						DisplayItemGroupBean digb = new DisplayItemGroupBean();
@@ -273,8 +269,7 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 					session.setAttribute(GROUP_HAS_DATA, Boolean.TRUE);
 					for (DisplayItemGroupBean displayGroup : groupRows) {
 						for (DisplayItemBean dib : displayGroup.getItems()) {
-							for (ItemDataBean aData : data) {
-								ItemDataBean idb = aData;
+							for (ItemDataBean idb : data) {
 								if (idb.getItemId() == dib.getItem().getId()
 										&& idb.getOrdinal() == dib.getData().getOrdinal() && !idb.isSelected()) {
 									idb.setSelected(true);
@@ -304,7 +299,24 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 			}
 		}
 		Collections.sort(displayItemWithGroups);
+		populateItemsWithEDCMetadata(displayItemWithGroups, dsb);
 		return displayItemWithGroups;
+	}
+
+	private void populateItemsWithEDCMetadata(List<DisplayItemWithGroupBean> displayItemWithGroups, DisplaySectionBean dsb) {
+		for (DisplayItemWithGroupBean displayWithGroup : displayItemWithGroups) {
+			if (displayWithGroup.isInGroup()) {
+				for (DisplayItemGroupBean displayItemGroupBean : displayWithGroup.getItemGroups()) {
+					for (DisplayItemBean displayItemBean : displayItemGroupBean.getItems()) {
+						EDCItemMetadata edcItemMetadata = edcItemMetadataService.findByEventCRFAndItemID(dsb.getEventCRF().getId(), displayItemBean.getItem().getId());
+						displayItemBean.setEdcItemMetadata(edcItemMetadata);
+					}
+				}
+			} else {
+				EDCItemMetadata edcItemMetadata = edcItemMetadataService.findByEventCRFAndItemID(dsb.getEventCRF().getId(), displayWithGroup.getSingleItem().getItem().getId());
+				displayWithGroup.getSingleItem().setEdcItemMetadata(edcItemMetadata);
+			}
+		}
 	}
 
 	private List<DisplayItemGroupBean> setEditFlagsAndPopulateGroupItemsWithData(List<DisplayItemGroupBean> dbGroups,

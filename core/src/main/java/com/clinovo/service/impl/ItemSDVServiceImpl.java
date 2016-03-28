@@ -145,33 +145,30 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 	 */
 	public List<DisplayItemBean> getListOfItemsToSDV(int eventCrfId) {
 		List<DisplayItemBean> result = new ArrayList<DisplayItemBean>();
-		List<EDCItemMetadata> edcItemMetadataList = edcItemMetadataService.findAllByEventCRFId(eventCrfId);
 		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
 		ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
 		ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
 
-		for (EDCItemMetadata edcItemMetadata : edcItemMetadataList) {
-			if (!edcItemMetadata.sdvRequired()) {
+		ArrayList<ItemDataBean> itemDataList = itemDataDAO.findAllByEventCRFId(eventCrfId);
+		for (ItemDataBean itemData : itemDataList) {
+			if (itemData.isSdv()) {
 				continue;
 			}
-			int itemId = edcItemMetadata.getItemId();
-			int crfVersionId = edcItemMetadata.getCrfVersionId();
+			EDCItemMetadata edcItemMetadata = edcItemMetadataService.findByEventCRFAndItemID(eventCrfId, itemData.getItemId());
+			if (edcItemMetadata == null || !edcItemMetadata.sdvRequired()) {
+				continue;
+			}
+			ItemFormMetadataBean itemFormMetadata = itemFormMetadataDAO.findAllByCRFVersionIdAndItemId(edcItemMetadata.getCrfVersionId(), itemData.getItemId());
+			if (!itemFormMetadata.isShowItem()) {
+				continue;
+			}
+			ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) itemGroupMetadataDAO
+					.findByItemAndCrfVersion(itemData.getItemId(), edcItemMetadata.getCrfVersionId());
 			DisplayItemBean displayItemBean = new DisplayItemBean();
 			displayItemBean.setEdcItemMetadata(edcItemMetadata);
-			ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFId(itemId, eventCrfId);
-			if (itemDataBean.isSdv()) {
-				continue;
-			}
-			displayItemBean.setData(itemDataBean);
-			ItemFormMetadataBean itemFormMetadataBean = itemFormMetadataDAO
-					.findAllByCRFVersionIdAndItemId(crfVersionId, itemId);
-			if (!itemFormMetadataBean.isShowItem()) {
-				continue;
-			}
-			displayItemBean.setMetadata(itemFormMetadataBean);
-			ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) itemGroupMetadataDAO
-					.findByItemAndCrfVersion(itemId, crfVersionId);
+			displayItemBean.setData(itemData);
 			displayItemBean.setGroupMetadata(itemGroupMetadataBean);
+			displayItemBean.setMetadata(itemFormMetadata);
 			result.add(displayItemBean);
 		}
 		return result;
