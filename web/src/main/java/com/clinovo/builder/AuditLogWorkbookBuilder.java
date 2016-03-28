@@ -52,6 +52,8 @@ public class AuditLogWorkbookBuilder {
 	public static final int AUDIT_EVENT_TYPE_32 = 32;
 	public static final int AUDIT_EVENT_TYPE_12 = 12;
 
+	public static final String SUBJECT_INFO_SHEET = "Subject Information";
+
 	/**
 	 * Default constructor.
 	 *
@@ -90,7 +92,7 @@ public class AuditLogWorkbookBuilder {
 										  List<StudyEventBean> events, ArrayList allDeletedEventCRFs, ArrayList studyEventAudits,
 										  ArrayList eventCRFAudits, List<AuditLogRandomization> randomizationAudits) throws WriteException {
 
-		workbook.createSheet("Subject Information", 0);
+		workbook.createSheet(SUBJECT_INFO_SHEET, 0);
 		currentSheet = workbook.getSheet(0);
 
 		createSubjectInfoTable(studySubject, studySubjectAudits);
@@ -386,7 +388,8 @@ public class AuditLogWorkbookBuilder {
 		return list;
 	}
 
-	private String dateFormat(Date date) {		if (date == null) {
+	private String dateFormat(Date date) {
+		if (date == null) {
 			return "";
 		} else {
 			return DateUtil.printDate(date, RequestUtil.getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE,
@@ -490,7 +493,13 @@ public class AuditLogWorkbookBuilder {
 		row += TWO;
 	}
 
-	private String getEventSheetName(StudyEventBean eventBean) {
+	/**
+	 * Get event name with ordinal.
+	 * Was added to set different name for each occurrence of repeating event.
+	 * @param eventBean StudyEventBean.
+	 * @return String.
+	 */
+	public static String getEventSheetName(StudyEventBean eventBean) {
 		return eventBean.getStudyEventDefinition().getName().replace("/", ".") + "_" + eventBean.getSampleOrdinal();
 	}
 }
