@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -74,7 +75,7 @@ public class RemoveCRFFromDefinitionServlet extends SpringServlet {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpSession session = request.getSession();
 		String idString = request.getParameter("id");
-		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = getExistingEventDefinitionCRFs(session);
+		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = EventDefinitionCRFUtil.getExistingEventDefinitionCRFs(session);
 		ArrayList<EventDefinitionCRFBean> updateEventDefinitionCRFs = new ArrayList<EventDefinitionCRFBean>();
 		ArrayList<EventDefinitionCRFBean> childEdcs = (ArrayList<EventDefinitionCRFBean>) session.getAttribute("childEventDefCRFs");
 		if (StringUtil.isBlank(idString)) {
@@ -89,14 +90,15 @@ public class RemoveCRFFromDefinitionServlet extends SpringServlet {
 					edc.setStatus(Status.DELETED);
 					// Update children if any
 					setChildEdcsToRemoved(childEdcs, edc);
-					this.processEventDefinitionCRFs(session, edc);
+					EventDefinitionCRFUtil.removeEventDefinitionCRFFromListOfAdded(session, edc);
 				}
 				if (edc.getId() > 0 || !edc.getStatus().equals(Status.DELETED)) {
 					updateEventDefinitionCRFs.add(edc);
 				}
 			}
 			session.setAttribute("childEventDefCRFs", childEdcs);
-			session.setAttribute(EVENT_DEFINITION_CRFS_LABEL, mergeEventDefinitions(session, updateEventDefinitionCRFs));
+			session.setAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL,
+					EventDefinitionCRFUtil.mergeEventDefinitions(session, updateEventDefinitionCRFs));
 			addPageMessage(getResPage().getString("has_been_removed_need_confirmation"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}

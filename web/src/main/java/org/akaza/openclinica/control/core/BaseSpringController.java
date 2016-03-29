@@ -144,9 +144,6 @@ public abstract class BaseSpringController {
 	public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
 	public static final String COOKIE_NAME = "lastAccessedInstanceType";
 
-	protected static final String EVENT_DEFINITION_CRFS_LABEL = "eventDefinitionCRFs";
-	protected static final String ADDED_EVENT_DEFINITION_CRFS_LABEL = "addedEventDefinitionCRFs";
-
 	public static final String BR = "<br/>";
 	public static final String STUDY = "study";
 	public static final String MODULE = "module";

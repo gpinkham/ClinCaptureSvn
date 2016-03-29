@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -113,9 +114,7 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 			if (StringUtil.isBlank(actionName)) {
 				request.setAttribute("table", createTable(request, crfs));
 				forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
-
 			} else if (actionName.equalsIgnoreCase("next")) {
-
 				confirmDefinition(request, response);
 			}
 		}
@@ -123,8 +122,9 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 
 	private ArrayList<EventDefinitionCRFBean> getEventDefinitionCRFsFromRequest(HttpServletRequest request) {
 		ArrayList eventCRFs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
-		if (eventCRFs == null)
+		if (eventCRFs == null) {
 			eventCRFs = new ArrayList<EventDefinitionCRFBean>();
+		}
 		return eventCRFs;
 	}
 
@@ -228,8 +228,8 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		} else {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-			ArrayList eventDefinitionCRFs = (ArrayList) session.getAttribute(EVENT_DEFINITION_CRFS_LABEL);
-			ArrayList<EventDefinitionCRFBean> addedEventDefinitions = getAddedEventDefinitionCRFs(session);
+			ArrayList eventDefinitionCRFs = (ArrayList) session.getAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
+			ArrayList<EventDefinitionCRFBean> addedEventDefinitions = EventDefinitionCRFUtil.getAddedEventDefinitionCRFs(session);
 			int ordinalForNewCRF = eventDefinitionCRFs.size();
 			for (Object aCrfArray : crfArray) {
 				CRFBean crf = (CRFBean) aCrfArray;

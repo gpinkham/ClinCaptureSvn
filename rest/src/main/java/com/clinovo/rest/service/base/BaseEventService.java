@@ -32,7 +32,6 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
@@ -285,7 +284,7 @@ public abstract class BaseEventService extends BaseService {
 				.getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
 		Map<Integer, SignStateRestorer> signStateRestorerMap = eventDefinitionService
 				.prepareSignStateRestorer(studyEventDefinitionBean);
-		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs);
+		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = cloneList(eventDefinitionCRFs);
 
 		for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 			if (edc.getId() == eventDefinitionCRFBean.getId()) {
@@ -352,5 +351,14 @@ public abstract class BaseEventService extends BaseService {
 			selectedVersionIds.add(defaultVersion);
 		}
 		eventDefinitionCRFBean.setSelectedVersionIds(listAsCommaSeparatedString(selectedVersionIds));
+	}
+
+	private ArrayList<EventDefinitionCRFBean> cloneList(List<EventDefinitionCRFBean> originalList) {
+		ArrayList<EventDefinitionCRFBean> clonedList = new ArrayList<EventDefinitionCRFBean>();
+		for (EventDefinitionCRFBean edc : originalList) {
+			EventDefinitionCRFBean clone = new EventDefinitionCRFBean(edc);
+			clonedList.add(clone);
+		}
+		return clonedList;
 	}
 }

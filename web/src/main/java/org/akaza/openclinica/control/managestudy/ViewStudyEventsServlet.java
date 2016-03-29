@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -107,7 +108,7 @@ public class ViewStudyEventsServlet extends RememberLastPage {
 		request.setAttribute(MODULE, fp.getString(MODULE));
 		String startDateString = fp.getString(INPUT_STARTDATE);
 		String endDateString = fp.getString(INPUT_ENDDATE);
-		this.resetAddedEvents(request.getSession());
+		EventDefinitionCRFUtil.resetAddedEvents(request.getSession());
 		request.setAttribute(SED_ID, sedId);
 		request.setAttribute(INPUT_STATUS_ID, statusId);
 		request.setAttribute(INPUT_DEF_ID, definitionId);

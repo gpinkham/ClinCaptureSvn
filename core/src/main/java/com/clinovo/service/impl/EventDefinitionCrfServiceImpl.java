@@ -640,6 +640,24 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setDefaultCRFVersionInsteadOfDeleted(int deletedCRFVersionId) {
+		EventDefinitionCRFDAO eventCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
+		ArrayList<EventDefinitionCRFBean> crfs = eventCRFDAO.findByDefaultVersion(deletedCRFVersionId);
+
+		for (EventDefinitionCRFBean crf : crfs) {
+			CRFVersionBean latestVersion = crfVersionDAO.findLatestAfterDeleted(deletedCRFVersionId);
+			if (latestVersion != null) {
+				crf.setDefaultVersionId(latestVersion.getId());
+				crf.setDefaultVersionName(latestVersion.getName());
+				eventCRFDAO.update(crf);
+			}
+		}
+	}
+
 	private boolean shouldResetCRFStatus(EventCRFBean eventCRF, boolean updateItemData) {
 		return updateItemData || (itemSDVService.getCountOfItemsToSDV(eventCRF.getId()) != 0);
 	}

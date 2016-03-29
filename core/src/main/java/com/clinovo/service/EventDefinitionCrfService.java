@@ -252,4 +252,11 @@ public interface EventDefinitionCrfService {
 	 */
 	boolean saveEDCItemMetadataMapToDatabaseAndCheckIfNewItemsWereAdded(
 			HashMap<Integer, ArrayList<EDCItemMetadata>> edcItemMetadataMap, EventDefinitionCRFBean edcBean);
+
+	/**
+	 * Method that will update default version of CRF if current is assigned to event.
+	 *
+	 * @param deletedCRFVersionId int
+	 */
+	void setDefaultCRFVersionInsteadOfDeleted(int deletedCRFVersionId);
 }

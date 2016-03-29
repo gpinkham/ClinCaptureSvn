@@ -40,7 +40,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.util.EventDefinitionCRFUtil;
+import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -148,7 +148,8 @@ public class InitUpdateEventDefinitionServlet extends SpringServlet {
 			session.setAttribute("signStateRestorerMap", signStateRestorerMap);
 			session.setAttribute("edcSDVMap", EventDefinitionCRFUtil.getEDCSDVMap(eventDefinitionCRFs));
 			session.setAttribute("oldEventDefinitionCRFs", EventDefinitionCRFUtil.cloneList(eventDefinitionCRFs));
-			session.setAttribute(EVENT_DEFINITION_CRFS_LABEL, mergeEventDefinitions(session, eventDefinitionCRFs));
+			session.setAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL,
+					EventDefinitionCRFUtil.mergeEventDefinitions(session, eventDefinitionCRFs));
 
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}

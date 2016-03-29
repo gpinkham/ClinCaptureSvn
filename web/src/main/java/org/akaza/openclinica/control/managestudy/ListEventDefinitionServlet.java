@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -107,7 +108,7 @@ public class ListEventDefinitionServlet extends SpringServlet {
 		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
 		ArrayList studyEventDefinitions = edao.findAllByStudy(currentStudy);
-		this.resetAddedEvents(request.getSession());
+		EventDefinitionCRFUtil.resetAddedEvents(request.getSession());
 		for (Object sed1 : studyEventDefinitions) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
 			Collection eventDefinitionCRFlist = edcdao.findAllParentsByDefinition(sed.getId());

@@ -9,10 +9,8 @@
 <jsp:include page="../include/managestudy-header.jsp"/>
 <script type="text/javascript" language="javascript">
     jQuery(window).load(function(){
-
     	highlightLastAccessedObject();
     });
-    
 </script>
 
 
@@ -29,7 +27,7 @@
 	</td>
 </tr>
 
-<tr id="sidebar_Instructions_closed" style="display: all">
+<tr id="sidebar_Instructions_closed">
 	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
@@ -125,7 +123,7 @@
 			<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/>&nbsp;</td>
 			<td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
 			<td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
-			<c:if test="${study.studyParameterConfig.studyEvaluator == 'yes' || crf.evaluatedCRF == true}">
+			<c:if test="${showEvaluationColumn}">
 				<td valign="top" class="table_header_row"><fmt:message key="crf_evaluation" bundle="${resword}"/></td>
 			</c:if>
 			<td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
@@ -191,7 +189,7 @@
 				</c:choose>
 			</td>
 
-			<c:if test="${study.studyParameterConfig.studyEvaluator == 'yes' || crf.evaluatedCRF == true}">
+			<c:if test="${showEvaluationColumn}">
 				<td class="table_cell">
 					<c:choose>
 						<c:when test="${crf.evaluatedCRF == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>

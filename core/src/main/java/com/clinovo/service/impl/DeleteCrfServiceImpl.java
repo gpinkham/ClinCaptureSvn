@@ -25,11 +25,11 @@ import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
+import com.clinovo.service.EventDefinitionCrfService;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.util.EventDefinitionCRFUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +48,9 @@ public class DeleteCrfServiceImpl implements DeleteCrfService {
 	@Autowired
 	private RuleSetDao ruleSetDao;
 
+	@Autowired
+	private EventDefinitionCrfService eventDefinitionCrfService;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -63,7 +66,7 @@ public class DeleteCrfServiceImpl implements DeleteCrfService {
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfVersionId);
 		if (crfVersionBean.getId() > 0) {
 			ArrayList items = crfVersionDao.findNotSharedItemsByVersion(crfVersionBean.getId());
-			EventDefinitionCRFUtil.setDefaultCRFVersionInsteadOfDeleted(dataSource, crfVersionBean.getId());
+			eventDefinitionCrfService.setDefaultCRFVersionInsteadOfDeleted(crfVersionBean.getId());
 			ruleSetDao.deleteRuleStudioMetadataByCRFVersionOID(crfVersionBean.getOid());
 			crfVersionDao.deleteCrfVersion(crfVersionBean, items);
 		}

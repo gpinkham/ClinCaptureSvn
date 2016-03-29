@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -60,9 +61,6 @@ import com.clinovo.validator.EventDefinitionValidator;
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateEventDefinitionServlet extends SpringServlet {
-
-	public static final int VALIDATION_MAX_DIGIT_NUMBER = 3;
-	public static final int VALIDATION_MAX_CHARACTERS_NUMBER = 2000;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -162,7 +160,7 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 		StudyBean currentStudy = getCurrentStudy(request);
 		UserAccountBean updater = getUserAccountBean(request);
 		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request.getSession()
-				.getAttribute(EVENT_DEFINITION_CRFS_LABEL);
+				.getAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
 		List<EventDefinitionCRFBean> childEventDefinitionCRFsToUpdate = (List<EventDefinitionCRFBean>) request
 				.getSession().getAttribute("childEventDefCRFs");
 		List<EventDefinitionCRFBean> oldEventDefinitionCRFs = (List<EventDefinitionCRFBean>) request.getSession()
@@ -203,7 +201,7 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 	private void saveEventDefinitionCRFsToSession(FormProcessor fp) {
 
 		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
-		ArrayList eventDefinitionCRFs = (ArrayList) fp.getRequest().getSession().getAttribute(EVENT_DEFINITION_CRFS_LABEL);
+		ArrayList eventDefinitionCRFs = (ArrayList) fp.getRequest().getSession().getAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
 
 		for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
 			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
@@ -293,7 +291,7 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 			}
 
 		}
-		fp.getRequest().getSession().setAttribute(EVENT_DEFINITION_CRFS_LABEL, eventDefinitionCRFs);
+		fp.getRequest().getSession().setAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL, eventDefinitionCRFs);
 	}
 
 	private void saveEventDefinitionToSession(StudyEventDefinitionBean sed, FormProcessor fp) {
@@ -335,7 +333,7 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 		session.removeAttribute("userNameInsteadEmail");
 		session.removeAttribute("oldEventDefinitionCRFs");
 		session.removeAttribute("showCalendaredVisitBox");
-		session.removeAttribute(EVENT_DEFINITION_CRFS_LABEL);
+		session.removeAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
 		RequestUtil.getRequest().removeAttribute("formWithStateFlag");
 		session.removeAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);
 	}
