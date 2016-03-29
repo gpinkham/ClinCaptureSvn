@@ -107,7 +107,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * ImportCRFDataService.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class ImportCRFDataService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImportCRFDataService.class);

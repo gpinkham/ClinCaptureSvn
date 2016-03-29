@@ -3,9 +3,11 @@ package com.clinovo.builder;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.AuditLogRandomization;
 import com.clinovo.util.RequestUtil;
+
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,6 +42,7 @@ import static junit.framework.Assert.assertTrue;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LocaleResolver.class, RequestUtil.class})
+@SuppressWarnings("deprecation")
 public class AuditLogWorkbookBuilderTest {
 
 	private AuditLogWorkbookBuilder builder;
