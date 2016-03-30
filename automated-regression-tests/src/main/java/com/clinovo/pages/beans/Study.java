@@ -411,9 +411,6 @@ public class Study {
     	if (row.get("Study System Status") != null) {
     		study.setStudySystemStatus(row.get("Study System Status"));
     	}
-    	if (row.get("Brief Summary") != null) {
-    		study.setBriefSummary(row.get("Brief Summary"));
-    	}
     	if (row.get("Detailed Description") != null) {
     		study.setDetailedDescription(row.get("Detailed Description"));
     	}

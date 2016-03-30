@@ -29,7 +29,7 @@ public class UpdateStudyDetailsPage extends BasePage {
 	@FindBy(id = "excl_section7")
 	private WebElementFacade lStudyParameterConfiguration;
 
-	@FindBy(name = "description")
+	@FindBy(name = "summary")
 	private WebElementFacade tBriefSummary;
 
 	@FindBy(name = "expectedTotalEnrollment")
