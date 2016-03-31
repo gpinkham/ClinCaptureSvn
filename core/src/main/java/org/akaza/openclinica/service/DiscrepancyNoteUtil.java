@@ -691,7 +691,7 @@ public class DiscrepancyNoteUtil {
 		}
 		
 		for (StudyUserRoleBean surb : surbs){
-			if (surb.getStatus().isAvailable() || surb.getUserAccountId() == ecb.getOwnerId()) {
+			if (surb.getStatus().isAvailable() || ( ecb != null && surb.getUserAccountId() == ecb.getOwnerId())) {
 				userBeans.add(surb);
 			}
 		}
