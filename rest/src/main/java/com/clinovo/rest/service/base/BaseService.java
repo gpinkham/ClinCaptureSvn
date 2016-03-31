@@ -15,6 +15,7 @@
 package com.clinovo.rest.service.base;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,9 +33,11 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.RequestUtil;
 
 /**
@@ -78,6 +81,12 @@ public abstract class BaseService {
 		parameterValue = parameterValue != null ? parameterValue : objectValue;
 		requestWrapper.addParameter(parameterName, parameterValue);
 		return parameterValue;
+	}
+
+	protected static String prepareForValidation(String parameterName, Date objectValue) {
+		return prepareForValidation(parameterName, objectValue != null
+				? DateUtil.printDate(objectValue, DateUtil.DatePattern.ISO_DATE, LocaleResolver.getLocale())
+				: "");
 	}
 
 	protected static String prepareForValidation(String parameterName, Boolean objectValue) {

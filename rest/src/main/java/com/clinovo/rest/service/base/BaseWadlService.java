@@ -71,6 +71,8 @@ public abstract class BaseWadlService extends BaseService {
 			nm = new QName(XS_NAMESPACE, "int", "xs");
 		} else if (className.contains("boolean") || className.contains("Boolean")) {
 			nm = new QName(XS_NAMESPACE, "boolean", "xs");
+		} else if (className.contains("java.util.Date")) {
+			nm = new QName(XS_NAMESPACE, "Date", "xs");
 		}
 		return nm;
 	}

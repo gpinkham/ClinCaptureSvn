@@ -15,28 +15,24 @@
 package com.clinovo.enums;
 
 /**
- * StudyFeatures.
+ * StudyParameter.
  */
-public enum StudyFeatures {
+public enum StudyParameter {
 
-	CRF_ANNOTATION("crfAnnotation", "crf_annotation"), DYNAMIC_GROUP("dynamicGroup", "dynamic_group"), CALENDARED_VISITS("calendaredVisits", "calendared_visits"),
-	INTERACTIVE_DASHBOARDS("interactiveDashboards", "interactive_dashboards"), ITEM_LEVEL_SDV("itemLevelSDV", "item_level_sdv"),
-	SUBJECT_CASEBOOK_IN_PDF("subjectCasebookInPDF", "subject_casebook_in_pdf"), CRF_MASKING("crfMasking", "crfs_masking"), SAS_EXTRACTS("sasExtracts", "sas_extracts"),
-	STUDY_EVALUATOR("studyEvaluator", "study_evaluator"), RANDOMIZATION("randomization", "randomization_cap"), MEDICAL_CODING("medicalCoding", "medical_coding");
+	PROTOCOL_ID("protocolId"), STUDY_NAME("studyName"), OFFICIAL_TITLE("officialTitle"), SECOND_PRO_ID("secondProId"), SUMMARY("summary"),
+	DESCRIPTION("description"), SPONSOR("sponsor"), COLLABORATORS("collaborators"), PRINCIPAL_INVESTIGATOR("principalInvestigator"),
+	PHASE("phase"), PROTOCOL_TYPE("protocolType"), TOTAL_ENROLLMENT("totalEnrollment"),
+	START_DATE("startDate"), END_DATE("endDate"), APPROVAL_DATE("approvalDate"), PURPOSE("purpose"),
+	ALLOCATION("allocation"), MASKING("masking"), CONTROL("control"), ASSIGNMENT("assignment"), END_POINT("endPoint"),
+	DURATION("duration"), SELECTION("selection"), TIMING("timing");
 
 	private String name;
-	private String code;
 
-	StudyFeatures(String name, String code) {
+	StudyParameter(String name) {
 		this.name = name;
-		this.code = code;
 	}
 
 	public String getName() {
 		return name;
-	}
-
-	public String getCode() {
-		return code;
 	}
 }

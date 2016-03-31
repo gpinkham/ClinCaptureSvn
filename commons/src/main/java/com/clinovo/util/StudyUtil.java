@@ -19,9 +19,9 @@ import java.util.Map;
 
 import org.akaza.openclinica.control.form.FormProcessor;
 
-import com.clinovo.enums.StudyConfigurationParameters;
-import com.clinovo.enums.StudyFeatures;
-import com.clinovo.enums.StudyParameterNames;
+import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyFeature;
+import com.clinovo.enums.StudyParameter;
 
 /**
  * StudyUtil.
@@ -34,7 +34,7 @@ public final class StudyUtil {
 	public static Map<String, String> getStudyFeaturesMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyFeatures studyFeature : StudyFeatures.values()) {
+		for (StudyFeature studyFeature : StudyFeature.values()) {
 			String featureName = studyFeature.getName();
 			map.put(featureName, fp.getString(featureName));
 		}
@@ -44,8 +44,8 @@ public final class StudyUtil {
 	public static Map<String, String> getStudyParametersMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyParameterNames studyParameterName : StudyParameterNames.values()) {
-			String parameterName = studyParameterName.getName();
+		for (StudyParameter studyParameter : StudyParameter.values()) {
+			String parameterName = studyParameter.getName();
 			map.put(parameterName, fp.getString(parameterName));
 		}
 		return map;
@@ -54,7 +54,7 @@ public final class StudyUtil {
 	public static Map<String, String> getStudyConfigurationParametersMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyConfigurationParameters studyConfigurationParameter : StudyConfigurationParameters.values()) {
+		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
 			String parameterName = studyConfigurationParameter.getName();
 			map.put(parameterName, fp.getString(parameterName));
 		}

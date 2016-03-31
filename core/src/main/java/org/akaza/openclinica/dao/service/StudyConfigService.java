@@ -171,6 +171,17 @@ public class StudyConfigService {
 		}
 	}
 
+	public String getParameter(String parameterName, StudyParameterConfig spc) {
+		String parameterValue = "";
+		try {
+			Method method = getMethod(spc.getClass(), parameterName);
+			parameterValue = (String) method.invoke(spc);
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return parameterValue;
+	}
+
 	public void updateParameter(String parameterName, StudyParameterConfig spc, StudyParameterValueBean spv,
 			StudyParameterValueDAO spvdao) {
 		try {

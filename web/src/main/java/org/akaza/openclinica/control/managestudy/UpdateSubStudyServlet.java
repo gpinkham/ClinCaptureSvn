@@ -103,7 +103,6 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		String action = request.getParameter("action");
 
 		if (StringUtil.isBlank(action)) {
-			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 			FormProcessor fp = new FormProcessor(request);
 			if (study.getDatePlannedEnd() != null) {
@@ -240,7 +239,6 @@ public class UpdateSubStudyServlet extends SpringServlet {
 			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			setPresetValues(fp.getPresetValues(), request);
 			request.setAttribute("formMessages", errors);
-			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		}

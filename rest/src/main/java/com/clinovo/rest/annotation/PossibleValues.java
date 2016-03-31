@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RestParameterPossibleValues {
+public @interface PossibleValues {
 
 	/**
 	 * Method that returns name.
@@ -40,6 +40,11 @@ public @interface RestParameterPossibleValues {
 	 * Method that returns values.
 	 */
 	String values();
+
+	/**
+	 * Method that returns dependent on.
+	 */
+	String dependentOn() default "";
 
 	/**
 	 * Method that returns value descriptions.

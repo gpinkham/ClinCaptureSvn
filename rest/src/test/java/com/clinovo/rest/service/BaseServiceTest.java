@@ -52,6 +52,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -72,6 +73,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	// Managed services
 	public static final String API_STUDY_CREATE = "/study/create";
+	public static final String API_STUDY_EDIT = "/study/edit";
 	public static final String API_CRF_JSON_IMPORT_CRF = "/crf/json/importCrf";
 	public static final String API_CRF_JSON_IMPORT_CRF_VERSION = "/crf/json/importCrfVersion";
 	public static final String API_EVENT = "/event";
@@ -257,7 +259,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		return crfVersionBean;
 	}
 
-	protected void createNewStudyUser(UserType userType, Role role) throws Exception {
+	private void createNewUser(UserType userType, Role role, String siteName) throws Exception {
 		if (role.equals(Role.STUDY_EVALUATOR)) {
 			setStudyParameter("studyEvaluator", "yes");
 		} else if (role.equals(Role.STUDY_CODER)) {
@@ -269,11 +271,15 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		String email = "email@gmail.com";
 		String phone = "+375232345678";
 		String company = "home";
-		MvcResult result = this.mockMvc.perform(post(API_USER_CREATE_USER).accept(mediaType).param("userName", userName)
-				.param("firstName", firstName).param("lastName", lastName).param("email", email).param("phone", phone)
-				.param("company", company).param("userType", Integer.toString(userType.getId()))
-				.param("allowSoap", "true").param("displayPassword", "true")
-				.param("role", Integer.toString(role.getId())).secure(true).session(session)).andExpect(status().isOk())
+		MockHttpServletRequestBuilder requestBuilder = post(API_USER_CREATE_USER).accept(mediaType)
+				.param("userName", userName).param("firstName", firstName).param("lastName", lastName)
+				.param("email", email).param("phone", phone).param("company", company)
+				.param("userType", Integer.toString(userType.getId())).param("allowSoap", "true")
+				.param("displayPassword", "true").param("role", Integer.toString(role.getId()));
+		if (siteName != null) {
+			requestBuilder.param("siteName", siteName);
+		}
+		MvcResult result = mockMvc.perform(requestBuilder.secure(true).session(session)).andExpect(status().isOk())
 				.andReturn();
 		String password = mediaType.equals(MediaType.APPLICATION_JSON)
 				? (String) new JSONObject(result.getResponse().getContentAsString()).get("password")
@@ -281,6 +287,14 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		newUser = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		assertTrue(newUser.getId() > 0);
 		newUser.setPasswd(password);
+	}
+
+	protected void createNewStudyUser(UserType userType, Role role) throws Exception {
+		createNewUser(userType, role, null);
+	}
+
+	protected void createNewUser(StudyBean studyBean, UserType userType, Role role) throws Exception {
+		createNewUser(userType, role, studyBean.isSite() ? studyBean.getName() : null);
 	}
 
 	protected void createUserWithoutRole(UserType userType, int studyId) throws Exception {
@@ -317,9 +331,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		} else if (!currentScope.isSite()) {
 			studyConfigService.setParametersForStudy(currentScope);
 		}
-		this.mockMvc
-				.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("userName", userName)
-						.param("password", password).param("studyName", studyName).session(session))
+		mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("userName", userName)
+				.param("password", password).param("studyName", studyName).session(session))
 				.andExpect(status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.request()
@@ -423,7 +436,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 		setTestProperties();
 
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(new RestFilter()).build();
+		mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(new RestFilter()).build();
 
 		ResourceBundleProvider.updateLocale(LOCALE);
 

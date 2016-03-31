@@ -15,6 +15,7 @@ package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.sql.DataSource;
@@ -22,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -31,7 +33,9 @@ import org.akaza.openclinica.bean.service.StudyFeatureConfig;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -41,8 +45,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "summary", "detailedDescription", "sponsor",
-		"collaborators", "officialTitle", "secondaryIDs", "principalInvestigator", "status", "parameters", "features"})
+@JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "summary", "startDate", "endDate",
+		"approvalDate", "detailedDescription", "phase", "totalEnrollment", "sponsor", "collaborators", "officialTitle",
+		"secondaryIDs", "principalInvestigator", "purpose", "allocation", "masking", "control", "interventionModel",
+		"classification", "duration", "selection", "timing", "status", "parameters", "features"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyBean extends AuditableEntityBean {
 
@@ -72,8 +78,15 @@ public class StudyBean extends AuditableEntityBean {
 	@JsonProperty("summary")
 	@XmlElement(name = "Summary", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String summary = ""; // need to be removed
-
+	@JsonProperty("startDate")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateUtil.ISO_DATE)
+	@XmlJavaTypeAdapter(XmlDateAdapter.class)
+	@XmlElement(name = "StartDate", namespace = "http://www.cdisc.org/ns/odm/v1.3", nillable = true)
 	private Date datePlannedStart;
+	@JsonProperty("endDate")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateUtil.ISO_DATE)
+	@XmlJavaTypeAdapter(XmlDateAdapter.class)
+	@XmlElement(name = "EndDate", namespace = "http://www.cdisc.org/ns/odm/v1.3", nillable = true)
 	private Date datePlannedEnd;
 
 	// to designate genetic/non-genetic:
@@ -109,9 +122,16 @@ public class StudyBean extends AuditableEntityBean {
 	@JsonProperty("detailedDescription")
 	@XmlElement(name = "DetailedDescription", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String protocolDescription = "";
-
+	@JsonProperty("approvalDate")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateUtil.ISO_DATE)
+	@XmlJavaTypeAdapter(XmlDateAdapter.class)
+	@XmlElement(name = "ApprovalDate", namespace = "http://www.cdisc.org/ns/odm/v1.3", nillable = true)
 	private Date protocolDateVerification;
+	@JsonProperty("phase")
+	@XmlElement(name = "Phase", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String phase = "";
+	@JsonProperty("totalEnrollment")
+	@XmlElement(name = "TotalEnrollment", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int expectedTotalEnrollment = 0;
 	@JsonProperty("sponsor")
 	@XmlElement(name = "Sponsor", namespace = "http://www.cdisc.org/ns/odm/v1.3")
@@ -122,6 +142,44 @@ public class StudyBean extends AuditableEntityBean {
 
 	private String medlineIdentifier = "";
 	private boolean resultsReference = false;
+
+	private String url = "";
+	private String urlDescription = "";
+	private String conditions = "";
+	private String keywords = "";
+	private String eligibility = "";
+	private String gender = "both";
+	private String ageMax = "";
+	private String ageMin = "";
+	private boolean healthyVolunteerAccepted = false;
+	@JsonProperty("purpose")
+	@XmlElement(name = "Purpose", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String purpose = "";
+	@JsonProperty("allocation")
+	@XmlElement(name = "Allocation", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String allocation = "";
+	@JsonProperty("masking")
+	@XmlElement(name = "Masking", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String masking = "";
+	@JsonProperty("control")
+	@XmlElement(name = "Control", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String control = "";
+	@JsonProperty("interventionModel")
+	@XmlElement(name = "InterventionModel", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String assignment = "";
+	@JsonProperty("classification")
+	@XmlElement(name = "Classification", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String endpoint = "";
+	private String interventions = "";
+	@JsonProperty("duration")
+	@XmlElement(name = "Duration", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String duration = "";
+	@JsonProperty("selection")
+	@XmlElement(name = "Selection", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String selection = "";
+	@JsonProperty("timing")
+	@XmlElement(name = "Timing", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String timing = "";
 
 	@JsonProperty("oid")
 	@XmlElement(name = "Oid", namespace = "http://www.cdisc.org/ns/odm/v1.3")
@@ -189,26 +247,6 @@ public class StudyBean extends AuditableEntityBean {
 	public void setResultsReference(boolean resultsReference) {
 		this.resultsReference = resultsReference;
 	}
-
-	private String url = "";
-	private String urlDescription = "";
-	private String conditions = "";
-	private String keywords = "";
-	private String eligibility = "";
-	private String gender = "both";
-	private String ageMax = "";
-	private String ageMin = "";
-	private boolean healthyVolunteerAccepted = false;
-	private String purpose = "";
-	private String allocation = "";
-	private String masking = "";
-	private String control = "";
-	private String assignment = "";
-	private String endpoint = "";
-	private String interventions = "";
-	private String duration = "";
-	private String selection = "";
-	private String timing = "";
 
 	/**
 	 * @return Returns the ageMax.
@@ -350,6 +388,8 @@ public class StudyBean extends AuditableEntityBean {
 	public void setDatePlannedEnd(Date datePlannedEnd) {
 		this.datePlannedEnd = datePlannedEnd;
 	}
+
+
 
 	/**
 	 * @return Returns the datePlannedStart.

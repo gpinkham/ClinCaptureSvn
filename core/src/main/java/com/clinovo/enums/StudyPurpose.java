@@ -58,7 +58,7 @@ public enum StudyPurpose {
 	}
 
 	public static StudyPurpose get(String value) {
-		StudyPurpose result = null;
+		StudyPurpose result = EMPTY_VALUE;
 		for (StudyPurpose studyPurpose : StudyPurpose.values()) {
 			if (studyPurpose.getValue().equals(value)) {
 				result = studyPurpose;

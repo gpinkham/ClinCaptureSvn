@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
+import com.clinovo.rest.annotation.PossibleValues;
+import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.service.base.BaseUserService;
 import com.clinovo.service.UserAccountService;
 
@@ -82,9 +82,9 @@ public class UserService extends BaseUserService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "userType", values = "1,2", valueDescriptions = "rest.userType.valueDescription"),
-			@RestParameterPossibleValues(name = "role", values = "2,4,5,6,7,8,9,10", valueDescriptions = "rest.roles.valueDescription")})
+	@PossibleValuesHolder({
+			@PossibleValues(name = "userType", values = "1,2", valueDescriptions = "rest.userType.valueDescription"),
+			@PossibleValues(name = "role", values = "2,4,5,6,7,8,9,10", valueDescriptions = "rest.roles.valueDescription")})
 	@RequestMapping(value = "/createUser", method = RequestMethod.POST)
 	public UserAccountBean createUser(@RequestParam("userName") String userName,
 			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName,

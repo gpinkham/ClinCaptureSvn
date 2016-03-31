@@ -20,10 +20,15 @@
  */
 package org.akaza.openclinica.bean.core;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -38,6 +43,24 @@ public class EntityBean extends ExcelRowAware implements java.io.Serializable {
 	public static final int INT_1231 = 1231;
 
 	public static final int INT_1237 = 1237;
+
+	public static class XmlDateAdapter extends XmlAdapter<String, Date> {
+
+		private SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.ISO_DATE);
+
+		public XmlDateAdapter() {
+		}
+
+		@Override
+		public String marshal(Date v) throws Exception {
+			return dateFormat.format(v);
+		}
+
+		@Override
+		public Date unmarshal(String v) throws Exception {
+			return dateFormat.parse(v);
+		}
+	}
 
 	// ss - changed visibility of these fields so Term could see them
 	// think we should change all fields to protected here

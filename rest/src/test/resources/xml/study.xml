@@ -9,11 +9,25 @@
             <ProtocolId>UN_TEST1</ProtocolId>
             <SecondaryIDs></SecondaryIDs>
             <Summary>test!</Summary>
+            <StartDate>2015-01-23</StartDate>
+            <EndDate>2016-06-28</EndDate>
             <PrincipalInvestigator>test</PrincipalInvestigator>
-            <ProtocolType>Interventional</ProtocolType>
+            <ProtocolType>interventional</ProtocolType>
             <DetailedDescription></DetailedDescription>
+            <ApprovalDate>2015-04-20</ApprovalDate>
+            <Phase>phaseII_III</Phase>
+            <TotalEnrollment>11</TotalEnrollment>
             <Sponsor></Sponsor>
             <Collaborators></Collaborators>
+            <Purpose>treatment</Purpose>
+            <Allocation>non_randomized</Allocation>
+            <Masking>double_blind</Masking>
+            <Control>dose_comparison</Control>
+            <InterventionModel>expanded_access</InterventionModel>
+            <Classification>pharmacodynamics</Classification>
+            <Duration>cross_sectional</Duration>
+            <Selection>defined_population</Selection>
+            <Timing>retrospective</Timing>
             <Oid>OC_TEST1</Oid>
             <Features>
                 <CRFAnnotation>yes</CRFAnnotation>

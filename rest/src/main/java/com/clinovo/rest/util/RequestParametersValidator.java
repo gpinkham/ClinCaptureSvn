@@ -34,9 +34,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.method.HandlerMethod;
 
-import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
-import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
+import com.clinovo.rest.annotation.PossibleValues;
+import com.clinovo.rest.annotation.PossibleValuesHolder;
+import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.service.AuthenticationService;
@@ -81,29 +81,35 @@ public final class RequestParametersValidator {
 		Annotation[] annotationArray = handler.getMethod().getAnnotations();
 		if (annotationArray != null) {
 			for (Annotation annotation : annotationArray) {
-				if (annotation instanceof RestParameterPossibleValuesHolder) {
-					for (RestParameterPossibleValues restParameterPossibleValues : ((RestParameterPossibleValuesHolder) annotation)
-							.value()) {
-						String parameterName = restParameterPossibleValues.name();
+				if (annotation instanceof PossibleValuesHolder) {
+					for (PossibleValues possibleValues : ((PossibleValuesHolder) annotation).value()) {
+						String parameterName = possibleValues.name();
 						String parameterValue = request.getParameter(parameterName);
-						if (restParameterPossibleValues.canBeNotSpecified()
+						if (possibleValues.canBeNotSpecified()
 								&& (parameterValue == null || nullParameters.contains(parameterName))) {
 							continue;
 						}
-						if (parameterValue != null && restParameterPossibleValues.multiValue()
-								? !Arrays.asList(restParameterPossibleValues.values().split(","))
+						String values = possibleValues.values();
+						String dependentOn = possibleValues.dependentOn();
+						String valueDescriptions = possibleValues.valueDescriptions();
+						if (!dependentOn.isEmpty()) {
+							String dependentOnValue = request.getParameter(dependentOn);
+							values = messageSource.getMessage(values.replace("{#}", dependentOnValue), null,
+									CoreResources.getSystemLocale());
+							valueDescriptions = valueDescriptions.replace("{#}", dependentOnValue);
+						}
+						if (parameterValue != null && possibleValues.multiValue()
+								? !Arrays.asList(values.split(","))
 										.containsAll(Arrays.asList(parameterValue.split(",")))
-								: !Arrays.asList(restParameterPossibleValues.values().split(","))
-										.contains(parameterValue)) {
+								: !Arrays.asList(values.split(",")).contains(parameterValue)) {
 							throw new RestException(messageSource,
-									restParameterPossibleValues.valueDescriptions().isEmpty()
+									valueDescriptions.isEmpty()
 											? "rest.possibleValuesAre"
 											: "rest.possibleValuesWithDescriptionsAre",
-									restParameterPossibleValues.valueDescriptions().isEmpty()
-											? new Object[]{parameterName, restParameterPossibleValues.values()}
-											: new Object[]{parameterName, restParameterPossibleValues.values(),
-													messageSource.getMessage(
-															restParameterPossibleValues.valueDescriptions(), null,
+									valueDescriptions.isEmpty()
+											? new Object[]{parameterName, values}
+											: new Object[]{parameterName, values,
+													messageSource.getMessage(valueDescriptions, null,
 															CoreResources.getSystemLocale())},
 									HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 						}
@@ -139,7 +145,7 @@ public final class RequestParametersValidator {
 		Map<String, String> declaredParams = new HashMap<String, String>();
 		Annotation[][] annotationsHolder = handler.getMethod().getParameterAnnotations();
 		boolean atLeastOneNotRequiredShouldBeProvided = handler.getMethod()
-				.getAnnotation(RestProvideAtLeastOneNotRequired.class) != null;
+				.getAnnotation(ProvideAtLeastOneNotRequired.class) != null;
 		for (String paramName : ((Map<String, String>) request.getParameterMap()).keySet()) {
 			declaredParams.put(paramName.toLowerCase(), paramName);
 		}

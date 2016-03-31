@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-import com.clinovo.enums.StudyConfigurationParameters;
-import com.clinovo.enums.StudyFeatures;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -123,6 +121,19 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.clinovo.enums.StudyAllocation;
+import com.clinovo.enums.StudyAssignment;
+import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyControl;
+import com.clinovo.enums.StudyDuration;
+import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyFacRecruitStatus;
+import com.clinovo.enums.StudyFeature;
+import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyPhase;
+import com.clinovo.enums.StudyPurpose;
+import com.clinovo.enums.StudySelection;
+import com.clinovo.enums.StudyTiming;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.RequestUtil;
 
@@ -345,8 +356,8 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 		String newThemeColor = CoreResources.getField("themeColor");
 		session.setAttribute(SpringController.THEME_COLOR, newThemeColor);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
-		request.setAttribute(STUDY_FEATURES, StudyFeatures.values());
-		request.setAttribute(STUDY_CONFIGURATION_PARAMETERS, StudyConfigurationParameters.values());
+		request.setAttribute(STUDY_FEATURES, StudyFeature.values());
+		request.setAttribute(STUDY_CONFIGURATION_PARAMETERS, StudyConfigurationParameter.values());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
 		} catch (NumberFormatException nfe) {
@@ -413,25 +424,9 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			if (currentStudy == null || currentStudy.getId() <= 0) {
 				StudyBean parentStudy = null;
 				if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
-					StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 					currentStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
 					parentStudy = currentStudy;
-					ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
-
-					currentStudy.setStudyParameters(studyParameters);
-
-					StudyConfigService scs = getStudyConfigService();
-					if (currentStudy.getParentStudyId() <= 0) {
-						// top study
-						scs.setParametersForStudy(currentStudy);
-
-					} else {
-						parentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
-						currentStudy.setParentStudyName(parentStudy.getName());
-						currentStudy.setParentStudyOid(parentStudy.getOid());
-						scs.setParametersForSite(currentStudy);
-					}
-
+					getStudyService().prepareStudyBeanConfiguration(currentStudy);
 					// set up the panel here
 					StudyInfoPanel panel = getStudyInfoPanel(request);
 					panel.reset();
@@ -539,8 +534,8 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
-			logger.warn(
-					"InsufficientPermissionException: org.akaza.openclinica.control.SpringServlet: " + ipe.getMessage());
+			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SpringServlet: "
+					+ ipe.getMessage());
 			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean) {
 				SpringServlet.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			}
@@ -729,84 +724,39 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 
 	private void initMaps() {
 		RequestUtil.getRequest().getSession().setAttribute(CURRENT_MAPS_HOLDER, new MapsHolder());
-		getMapsHolder().getFacRecruitStatusMap().put("not_yet_recruiting",
-				getResAdmin().getString("not_yet_recruiting"));
-		getMapsHolder().getFacRecruitStatusMap().put("recruiting", getResAdmin().getString("recruiting"));
-		getMapsHolder().getFacRecruitStatusMap().put("no_longer_recruiting",
-				getResAdmin().getString("no_longer_recruiting"));
-		getMapsHolder().getFacRecruitStatusMap().put("completed", getResAdmin().getString("completed"));
-		getMapsHolder().getFacRecruitStatusMap().put("suspended", getResAdmin().getString("suspended"));
-		getMapsHolder().getFacRecruitStatusMap().put("terminated", getResAdmin().getString("terminated"));
 
-		getMapsHolder().getStudyPhaseMap().put("n_a", getResAdmin().getString("n_a"));
-		getMapsHolder().getStudyPhaseMap().put("phaseI", getResAdmin().getString("phaseI"));
-		getMapsHolder().getStudyPhaseMap().put("phaseI_II", getResAdmin().getString("phaseI_II"));
-		getMapsHolder().getStudyPhaseMap().put("phaseII", getResAdmin().getString("phaseII"));
-		getMapsHolder().getStudyPhaseMap().put("phaseII_III", getResAdmin().getString("phaseII_III"));
-		getMapsHolder().getStudyPhaseMap().put("phaseIII", getResAdmin().getString("phaseIII"));
-		getMapsHolder().getStudyPhaseMap().put("phaseIII_IV", getResAdmin().getString("phaseIII_IV"));
-		getMapsHolder().getStudyPhaseMap().put("phaseIV", getResAdmin().getString("phaseIV"));
+		getMapsHolder().getFacRecruitStatusList().addAll(Arrays.asList(StudyFacRecruitStatus.values()));
 
-		getMapsHolder().getInterPurposeMap().put("treatment", getResAdmin().getString("treatment"));
-		getMapsHolder().getInterPurposeMap().put("prevention", getResAdmin().getString("prevention"));
-		getMapsHolder().getInterPurposeMap().put("diagnosis", getResAdmin().getString("diagnosis"));
-		// getMapsHolder().getInterPurposeMap().put("educ_couns_train", getResAdmin().getString("educ_couns_train"));
-		getMapsHolder().getInterPurposeMap().put("supportive_care", getResAdmin().getString("supportive_care"));
-		getMapsHolder().getInterPurposeMap().put("screening", getResAdmin().getString("screening"));
-		getMapsHolder().getInterPurposeMap().put("health_services_research",
-				getResAdmin().getString("health_services_research"));
-		getMapsHolder().getInterPurposeMap().put("basic_science", getResAdmin().getString("basic_science"));
-		getMapsHolder().getInterPurposeMap().put("other", getResAdmin().getString("other"));
+		// if StudyProtocolType is INTERVENTIONAL
 
-		getMapsHolder().getAllocationMap().put("randomized", getResAdmin().getString("randomized"));
-		getMapsHolder().getAllocationMap().put("non_randomized", getResAdmin().getString("non_randomized"));
-		getMapsHolder().getAllocationMap().put("n_a", getResAdmin().getString("n_a"));
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.EMPTY_VALUE);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.TREATMENT);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.PREVENTION);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.DIAGNOSIS);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.SUPPORTIVE_CARE);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.SCREENING);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.HEALTH_SERVICES_RESEARCH);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.BASIC_SCIENCE);
+		getMapsHolder().getInterPurposeList().add(StudyPurpose.OTHER);
 
-		getMapsHolder().getMaskingMap().put("open", getResAdmin().getString("open"));
-		getMapsHolder().getMaskingMap().put("single_blind", getResAdmin().getString("single_blind"));
-		getMapsHolder().getMaskingMap().put("double_blind", getResAdmin().getString("double_blind"));
+		getMapsHolder().getStudyPhaseList().addAll(Arrays.asList(StudyPhase.values()));
 
-		getMapsHolder().getControlMap().put("placebo", getResAdmin().getString("placebo"));
-		getMapsHolder().getControlMap().put("active", getResAdmin().getString("active"));
-		getMapsHolder().getControlMap().put("uncontrolled", getResAdmin().getString("uncontrolled"));
-		getMapsHolder().getControlMap().put("historical", getResAdmin().getString("historical"));
-		getMapsHolder().getControlMap().put("dose_comparison", getResAdmin().getString("dose_comparison"));
+		getMapsHolder().getAllocationList().addAll(Arrays.asList(StudyAllocation.values()));
+		getMapsHolder().getMaskingList().addAll(Arrays.asList(StudyMasking.values()));
+		getMapsHolder().getControlList().addAll(Arrays.asList(StudyControl.values()));
+		getMapsHolder().getAssignmentList().addAll(Arrays.asList(StudyAssignment.values()));
+		getMapsHolder().getEndPointList().addAll(Arrays.asList(StudyEndPoint.values()));
 
-		getMapsHolder().getAssignmentMap().put("single_group", getResAdmin().getString("single_group"));
-		getMapsHolder().getAssignmentMap().put("parallel", getResAdmin().getString("parallel"));
-		getMapsHolder().getAssignmentMap().put("cross_over", getResAdmin().getString("cross_over"));
-		getMapsHolder().getAssignmentMap().put("factorial", getResAdmin().getString("factorial"));
-		getMapsHolder().getAssignmentMap().put("expanded_access", getResAdmin().getString("expanded_access"));
+		// if StudyProtocolType is OBSERVATIONAL
 
-		getMapsHolder().getEndpointMap().put("safety", getResAdmin().getString("safety"));
-		getMapsHolder().getEndpointMap().put("efficacy", getResAdmin().getString("efficacy"));
-		getMapsHolder().getEndpointMap().put("safety_efficacy", getResAdmin().getString("safety_efficacy"));
-		getMapsHolder().getEndpointMap().put("bio_equivalence", getResAdmin().getString("bio_equivalence"));
-		getMapsHolder().getEndpointMap().put("bio_availability", getResAdmin().getString("bio_availability"));
-		getMapsHolder().getEndpointMap().put("pharmacokinetics", getResAdmin().getString("pharmacokinetics"));
-		getMapsHolder().getEndpointMap().put("pharmacodynamics", getResAdmin().getString("pharmacodynamics"));
-		getMapsHolder().getEndpointMap().put("pharmacokinetics_pharmacodynamics",
-				getResAdmin().getString("pharmacokinetics_pharmacodynamics"));
+		getMapsHolder().getObserPurposeList().add(StudyPurpose.EMPTY_VALUE);
+		getMapsHolder().getObserPurposeList().add(StudyPurpose.NATURAL_HISTORY);
+		getMapsHolder().getObserPurposeList().add(StudyPurpose.SCREENING);
+		getMapsHolder().getObserPurposeList().add(StudyPurpose.PSYCHOSOCIAL);
 
-		getMapsHolder().getInterTypeMap().put("drug", getResAdmin().getString("drug"));
-		getMapsHolder().getInterTypeMap().put("gene_transfer", getResAdmin().getString("gene_transfer"));
-		getMapsHolder().getInterTypeMap().put("vaccine", getResAdmin().getString("vaccine"));
-		getMapsHolder().getInterTypeMap().put("behavior", getResAdmin().getString("behavior"));
-		getMapsHolder().getInterTypeMap().put("device", getResAdmin().getString("device"));
-		getMapsHolder().getInterTypeMap().put("procedure", getResAdmin().getString("procedure"));
-		getMapsHolder().getInterTypeMap().put("other", getResAdmin().getString("other"));
-
-		getMapsHolder().getObserPurposeMap().put("natural_history", getResAdmin().getString("natural_history"));
-		getMapsHolder().getObserPurposeMap().put("screening", getResAdmin().getString("screening"));
-		getMapsHolder().getObserPurposeMap().put("psychosocial", getResAdmin().getString("psychosocial"));
-
-		getMapsHolder().getSelectionMap().put("convenience_sample", getResAdmin().getString("convenience_sample"));
-		getMapsHolder().getSelectionMap().put("defined_population", getResAdmin().getString("defined_population"));
-		getMapsHolder().getSelectionMap().put("random_sample", getResAdmin().getString("random_sample"));
-		getMapsHolder().getSelectionMap().put("case_control", getResAdmin().getString("case_control"));
-
-		getMapsHolder().getTimingMap().put("retrospective", getResAdmin().getString("retrospective"));
-		getMapsHolder().getTimingMap().put("prospective", getResAdmin().getString("prospective"));
+		getMapsHolder().getDurationList().addAll(Arrays.asList(StudyDuration.values()));
+		getMapsHolder().getSelectionList().addAll(Arrays.asList(StudySelection.values()));
+		getMapsHolder().getTimingList().addAll(Arrays.asList(StudyTiming.values()));
 	}
 
 	/**

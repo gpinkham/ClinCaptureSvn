@@ -22,17 +22,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Rest parameter possible values annotation holder.
- * 
- * Allows to specify possible values for certain request parameter.
+ * ProvideAtLeastOneNotRequired method annotation.
+ *
+ * Typically is used for edit methods when at least one not required parameter should be provided.
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RestParameterPossibleValuesHolder {
+public @interface ProvideAtLeastOneNotRequired {
 
-	/**
-	 * Method that returns annotation value.
-	 */
-	RestParameterPossibleValues[]value();
 }

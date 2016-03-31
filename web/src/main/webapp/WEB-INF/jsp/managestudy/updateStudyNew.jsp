@@ -25,25 +25,9 @@
 
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
-<jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
-<jsp:useBean scope ="request" id="studyPhaseMap" class="java.util.HashMap"/>
 <jsp:useBean scope ="request" id="studyTypes" class="java.util.ArrayList"/>
 
-<jsp:useBean scope ="request" id="interPurposeMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="allocationMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="maskingMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="controlMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="assignmentMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="endpointMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="interTypeMap" class="java.util.HashMap"/>
-<jsp:useBean scope ="request" id="interventions" class="java.util.ArrayList"/>
-<jsp:useBean scope ="request" id="interventionError" class="java.lang.String"/>
-
-<jsp:useBean scope="request" id="obserPurposeMap" class ="java.util.HashMap"/>
-<jsp:useBean scope="request" id="durationMap" class ="java.util.HashMap"/>
-<jsp:useBean scope="request" id="selectionMap" class ="java.util.HashMap"/>
-<jsp:useBean scope="request" id="timingMap" class ="java.util.HashMap"/>
 <jsp:useBean scope="request" id="isInterventional" class ="java.lang.String"/>
 <jsp:useBean scope="request" id="studyId" class ="java.lang.String"/>
 
@@ -85,7 +69,7 @@
 
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
-<c:set var="protocolDateVerification" value="" />
+<c:set var="approvalDate" value="" />
 <c:forEach var="presetValue" items="${presetValues}">
 	<c:if test='${presetValue.key == "startDate"}'>
 		<c:set var="startDate" value="${presetValue.value}" />
@@ -93,8 +77,8 @@
 	<c:if test='${presetValue.key == "endDate"}'>
 		<c:set var="endDate" value="${presetValue.value}" />
 	</c:if>
-	<c:if test='${presetValue.key == "protocolDateVerification"}'>
-		<c:set var="protocolDateVerification" value="${presetValue.value}" />
+	<c:if test='${presetValue.key == "approvalDate"}'>
+		<c:set var="approvalDate" value="${presetValue.value}" />
 	</c:if>
 </c:forEach>
 
@@ -211,18 +195,6 @@
 
 <tr valign="top">
 	<td class="formlabel">
-		<fmt:message key="principal_investigator" bundle="${resword}"/>:
-	</td>
-	<td>
-		<input type="text" name="principalInvestigator" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.principalInvestigator}"/>" class="formfieldXL h15 bw2">
-		<br>
-		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="principalInvestigator"/></jsp:include>
-	</td>
-	<td class="alert">*</td>
-</tr>
-
-<tr valign="top">
-	<td class="formlabel">
 		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary'); return false;">
 			<fmt:message key="brief_summary" bundle="${resword}"/>:
 		</a>
@@ -280,27 +252,36 @@
 	</td>
 </tr>
 
+<tr valign="top">
+	<td class="formlabel">
+		<fmt:message key="principal_investigator" bundle="${resword}"/>:
+	</td>
+	<td>
+		<input type="text" name="principalInvestigator" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.principalInvestigator}"/>" class="formfieldXL h15 bw2">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="principalInvestigator"/></jsp:include>
+	</td>
+	<td class="alert">*</td>
+</tr>
+
 <!-- section B-->
 <tr valign="top">
 	<td class="formlabel">
 		<fmt:message key="study_phase" bundle="${resword}"/>:
 	</td>
 	<td>
-		<c:set var="phase1" value="${studyToView.phase}"/>
+		<c:set var="phase1" value="${studyToView.phaseKey}"/>
 		<select name="phase" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
-			<c:forEach var="phase" items="${studyPhaseMap}">
-			<c:set var="phasekey">
-				<fmt:message key="${phase.key}" bundle="${resadmin}"/>
-			</c:set>
-			<c:choose>
-			<c:when test="${phase1 == phasekey}">
-			<option value="<c:out value="${phase.key}"/>" selected><c:out value="${phase.value}"/>
-				</c:when>
-				<c:otherwise>
-			<option value="<c:out value="${phase.key}"/>"><c:out value="${phase.value}"/>
-				</c:otherwise>
+			<c:forEach var="phase" items="${currentMapHolder.studyPhaseList}">
+				<c:choose>
+					<c:when test="${phase1 == phase.value}">
+						<option value="${phase.id}" selected><fmt:message key="${phase.code}" bundle="${resadmin}"/></option>
+					</c:when>
+					<c:otherwise>
+						<option value="${phase.id}"><fmt:message key="${phase.code}" bundle="${resadmin}"/></option>
+					</c:otherwise>
 				</c:choose>
-				</c:forEach>
+			</c:forEach>
 		</select>
 	</td>
 	<td class="alert">
@@ -316,10 +297,12 @@
 		<c:set var="type1" value="observational"/>
 		<c:choose>
 			<c:when test="${studyToView.protocolTypeKey == type1}">
-				<input type="radio" onchange="javascript:changeIcon()" checked name="protocolType" value="observational" disabled><fmt:message key="observational" bundle="${resword}"/>
+				<input type="hidden" name="protocolType" value="1"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked value="observational" disabled><fmt:message key="observational" bundle="${resword}"/>
 			</c:when>
 			<c:otherwise>
-				<input type="radio" onchange="javascript:changeIcon()" checked name="protocolType" value="interventional" disabled><fmt:message key="interventional" bundle="${resword}"/>
+				<input type="hidden" name="protocolType" value="0"/>
+				<input type="radio" onchange="javascript:changeIcon()" checked value="interventional" disabled><fmt:message key="interventional" bundle="${resword}"/>
 			</c:otherwise>
 		</c:choose>
 	</td>
@@ -328,18 +311,14 @@
 
 <tr valign="top">
 	<td class="formlabel">
-		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/>:</a>
+		<fmt:message key="expected_total_enrollment" bundle="${resword}"/>:
 	</td>
-	<td>
-		<input type="text" name="protocolDateVerification" onchange="javascript:changeIcon()" value="<c:out value="${protocolDateVerification}"/>" class="formfieldXL bw2 h15" id="protocolDateVerificationField">
+	<td class="pb10">
+		<input type="text" name="totalEnrollment" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.expectedTotalEnrollment}"/>" class="formfieldXL h15 bw2">
 		<br>
-		<jsp:include page="../showMessage.jsp">
-			<jsp:param name="key" value="protocolDateVerification"/>
-		</jsp:include>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="totalEnrollment"/></jsp:include>
 	</td>
-	<td>
-		<ui:calendarIcon onClickSelector="'#protocolDateVerificationField'"/>
-	</td>
+	<td class="alert">*</td>
 </tr>
 
 <tr valign="top">
@@ -371,6 +350,22 @@
 	</td>
 </tr>
 
+<tr valign="top">
+	<td class="formlabel">
+		<a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/>:</a>
+	</td>
+	<td>
+		<input type="text" name="approvalDate" onchange="javascript:changeIcon()" value="${approvalDate}" class="formfieldXL bw2 h15" id="protocolDateVerificationField">
+		<br>
+		<jsp:include page="../showMessage.jsp">
+			<jsp:param name="key" value="approvalDate"/>
+		</jsp:include>
+	</td>
+	<td>
+		<ui:calendarIcon onClickSelector="'#protocolDateVerificationField'"/>
+	</td>
+</tr>
+
 <!-- From Update Page 3 -->
 
 <c:if test='${isInterventional==1}'>
@@ -380,21 +375,18 @@
 				<fmt:message key="purpose" bundle="${resword}"/></a>:
 		</td>
 		<td>
-			<c:set var="purpose1" value="${studyToView.purpose}"/>
-			<select name="purpose" class="formfieldXL bw1 h20 w250" onchange="javascript:changeIcon()">
-				<c:forEach var="purpose" items="${interPurposeMap}">
-				<c:set var="purposekey">
-					<fmt:message key="${purpose.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${purpose1 == purposekey}">
-				<option value="<c:out value="${purpose.key}"/>" selected><c:out value="${purpose.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${purposekey}"/>"><c:out value="${purpose.value}"/>
-					</c:otherwise>
+			<c:set var="purpose1" value="${studyToView.purposeKey}"/>
+			<select name="purpose" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="purpose" items="${currentMapHolder.interPurposeList}">
+					<c:choose>
+						<c:when test="${purpose1 == purpose.value}">
+							<option value="${purpose.id}" selected><fmt:message key="${purpose.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${purpose.id}"><fmt:message key="${purpose.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 			<br>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
@@ -406,22 +398,18 @@
 				<fmt:message key="allocation" bundle="${resword}"/></a>:
 		</td>
 		<td>
-			<c:set var="allocation1" value="${studyToView.allocation}"/>
-			<select name="allocation" class="formfieldXL w250 h20 bw1" onchange="javascript:changeIcon()">
-				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-				<c:forEach var="allocation" items="${allocationMap}">
-				<c:set var="allocationkey">
-					<fmt:message key="${allocation.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${allocation1 == allocationkey}">
-				<option value="<c:out value="${allocation.key}"/>" selected><c:out value="${allocation.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${allocation.key}"/>"><c:out value="${allocation.value}"/>
-					</c:otherwise>
+			<c:set var="allocation1" value="${studyToView.allocationKey}"/>
+			<select name="allocation" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="allocation" items="${currentMapHolder.allocationList}">
+					<c:choose>
+						<c:when test="${allocation1 == allocation.value}">
+							<option value="${allocation.id}" selected><fmt:message key="${allocation.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${allocation.id}"><fmt:message key="${allocation.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 		</td>
 	</tr>
@@ -432,22 +420,18 @@
 				<fmt:message key="masking" bundle="${resword}"/></a>:
 		</td>
 		<td>
-			<c:set var="masking1" value="${studyToView.masking}"/>
-			<select name="masking" class="formfieldXL w250 h20 bw1" onchange="javascript:changeIcon()">
-				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-				<c:forEach var="masking" items="${maskingMap}">
-				<c:set var="maskingkey">
-					<fmt:message key="${masking.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${masking1 == maskingkey}">
-				<option value="<c:out value="${masking.key}"/>" selected><c:out value="${masking.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${masking.key}"/>"><c:out value="${masking.value}"/>
-					</c:otherwise>
+			<c:set var="masking1" value="${studyToView.maskingKey}"/>
+			<select name="masking" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="masking" items="${currentMapHolder.maskingList}">
+					<c:choose>
+						<c:when test="${masking1 == masking.value}">
+							<option value="${masking.id}" selected><fmt:message key="${masking.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${masking.id}"><fmt:message key="${masking.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 		</td>
 	</tr>
@@ -456,22 +440,18 @@
 			<fmt:message key="control" bundle="${resword}"/>:
 		</td>
 		<td>
-			<c:set var="control1" value="${studyToView.control}"/>
-			<select name="control" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
-				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-				<c:forEach var="control" items="${controlMap}">
-				<c:set var="controlkey">
-					<fmt:message key="${control.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${control1 == controlkey}">
-				<option value="<c:out value="${control.key}"/>" selected><c:out value="${control.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${control.key}"/>"><c:out value="${control.value}"/>
-					</c:otherwise>
+			<c:set var="control1" value="${studyToView.controlKey}"/>
+			<select name="control" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="control" items="${currentMapHolder.controlList}">
+					<c:choose>
+						<c:when test="${control1 == control.value}">
+							<option value="${control.id}" selected><fmt:message key="${control.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${control.id}"><fmt:message key="${control.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 		</td>
 	</tr>
@@ -481,48 +461,39 @@
 				<fmt:message key="intervention_model" bundle="${resword}"/></a>:
 		</td>
 		<td>
-				<%-- was assignment, tbh --%>
-			<c:set var="assignment1" value="${studyToView.assignment}"/>
-			<select name="assignment" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
-				<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-				<c:forEach var="assignment" items="${assignmentMap}">
-				<c:set var="assignmentkey">
-					<fmt:message key="${assignment.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${assignment1 == assignmentkey}">
-				<option value="<c:out value="${assignment.key}"/>" selected><c:out value="${assignment.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${assignment.key}"/>"><c:out value="${assignment.value}"/>
-					</c:otherwise>
+			<c:set var="assignment1" value="${studyToView.assignmentKey}"/>
+			<select name="assignment" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="assignment" items="${currentMapHolder.assignmentList}">
+					<c:choose>
+						<c:when test="${assignment1 == assignment.value}">
+							<option value="${assignment.id}" selected><fmt:message key="${assignment.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${assignment.id}"><fmt:message key="${assignment.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 		</td>
 	</tr>
 	<tr valign="top">
 		<td class="formlabel">
 			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints'); return false;">
-				<fmt:message key="study_classification" bundle="${resword}"/></a>:</td><td>
-			<%-- was endpoint, tbh --%>
-		<c:set var="endpoint1" value="${studyToView.endpoint}"/>
-		<select name="endpoint" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
-			<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-			<c:forEach var="endpoint" items="${endpointMap}">
-			<c:set var="endpointkey">
-				<fmt:message key="${endpoint.key}" bundle="${resadmin}"/>
-			</c:set>
-			<c:choose>
-			<c:when test="${endpoint1 == endpointkey}">
-			<option value="<c:out value="${endpoint.key}"/>" selected><c:out value="${endpoint.value}"/>
-				</c:when>
-				<c:otherwise>
-			<option value="<c:out value="${endpoint.key}"/>"><c:out value="${endpoint.value}"/>
-				</c:otherwise>
-				</c:choose>
+				<fmt:message key="study_classification" bundle="${resword}"/></a>:</td>
+		<td>
+			<c:set var="endpoint1" value="${studyToView.endpointKey}"/>
+			<select name="endPoint" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="endpoint" items="${currentMapHolder.endPointList}">
+					<c:choose>
+						<c:when test="${endpoint1 == endpoint.value}">
+							<option value="${endpoint.id}" selected><fmt:message key="${endpoint.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${endpoint.id}"><fmt:message key="${endpoint.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
+					</c:choose>
 				</c:forEach>
-		</select>
+			</select>
 	</td>
 	</tr>
 </c:if>
@@ -536,47 +507,42 @@
 			<fmt:message key="purpose" bundle="${resword}"/>:
 		</td>
 		<td>
-			<c:set var="purpose1" value="${studyToView.purpose}"/>
-			<select name="purpose" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
-				<c:forEach var="purpose" items="${obserPurposeMap}">
-				<c:set var="purposekey">
-					<fmt:message key="${purpose.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${purpose1 == purposekey}">
-				<option value="<c:out value="${purpose.key}"/>" selected><c:out value="${purpose.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${purpose.key}"/>"><c:out value="${purpose.value}"/>
-					</c:otherwise>
+			<c:set var="purpose1" value="${studyToView.purposeKey}"/>
+			<select name="purpose" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="purpose" items="${currentMapHolder.obserPurposeList}">
+					<c:choose>
+						<c:when test="${purpose1 == purpose.value}">
+							<option value="${purpose.id}" selected><fmt:message key="${purpose.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${purpose.id}"><fmt:message key="${purpose.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="purpose"/></jsp:include>
 		</td>
-		<td valign="top" class="alert">
-			*
-		</td>
+		<td>&nbsp;</td>
 	</tr>
 
 	<tr valign="bottom">
 		<td class="formlabel">
-			<fmt:message key="duration" bundle="${resword}"/>:
+			<fmt:message key="duration" bundle="${resword}"/>
 		</td>
-		<td class="pb10">
-			<c:set var="longitudinal">
-				<fmt:message key="longitudinal" bundle="${resadmin}"/>
-			</c:set>
-			<c:choose>
-				<c:when test="${studyToView.duration ==longitudinal}">
-					<input type="radio" onchange="javascript:changeIcon()" checked name="duration" value="longitudinal"><fmt:message key="longitudinal" bundle="${resword}"/>:
-					<input type="radio" onchange="javascript:changeIcon()" name="duration" value="cross-sectional"><fmt:message key="cross_sectional" bundle="${resword}"/>:
-				</c:when>
-				<c:otherwise>
-					<input type="radio" onchange="javascript:changeIcon()" name="duration" value="longitudinal"><fmt:message key="longitudinal" bundle="${resword}"/>:
-					<input type="radio" onchange="javascript:changeIcon()" checked name="duration" value="cross-sectional"><fmt:message key="cross_sectional" bundle="${resword}"/>:
-				</c:otherwise>
-			</c:choose>
+		<td>
+			<c:set var="duration1" value="${studyToView.durationKey}"/>
+			<select name="duration" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="duration" items="${currentMapHolder.durationList}">
+					<c:choose>
+						<c:when test="${duration1 == duration.value}">
+							<option value="${duration.id}" selected><fmt:message key="${duration.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${duration.id}"><fmt:message key="${duration.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+			</select>
 		</td>
 		<td>&nbsp;</td>
 	</tr>
@@ -587,21 +553,18 @@
 				<fmt:message key="selection" bundle="${resword}"/></a>
 		</td>
 		<td>
-			<c:set var="selection1" value="${studyToView.selection}"/>
-			<select name="selection" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
-				<c:forEach var="selection" items="${selectionMap}">
-				<c:set var="selectionkey">
-					<fmt:message key="${selection.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${selection1 == selectionkey}">
-				<option value="<c:out value="${selection.key}"/>" selected><c:out value="${selection.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${selection.key}"/>"><c:out value="${selection.value}"/>
-					</c:otherwise>
+			<c:set var="selection1" value="${studyToView.selectionKey}"/>
+			<select name="selection" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="selection" items="${currentMapHolder.selectionList}">
+					<c:choose>
+						<c:when test="${selection1 == selection.value}">
+							<option value="${selection.id}" selected><fmt:message key="${selection.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${selection.id}"><fmt:message key="${selection.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 		</td>
 		<td>&nbsp;</td>
@@ -612,21 +575,18 @@
 			<fmt:message key="timing" bundle="${resword}"/>
 		</td>
 		<td>
-			<c:set var="timing1" value="${studyToView.timing}"/>
-			<select name="timing" class="formfieldXL bw1 w250 h20" onchange="javascript:changeIcon()">
-				<c:forEach var="timing" items="${timingMap}">
-				<c:set var="timingkey">
-					<fmt:message key="${timing.key}" bundle="${resadmin}"/>
-				</c:set>
-				<c:choose>
-				<c:when test="${timing1 == timingkey}">
-				<option value="<c:out value="${timing.key}"/>" selected><c:out value="${timing.value}"/>
-					</c:when>
-					<c:otherwise>
-				<option value="<c:out value="${timing.key}"/>"><c:out value="${timing.value}"/>
-					</c:otherwise>
+			<c:set var="timing1" value="${studyToView.timingKey}"/>
+			<select name="timing" class="formfieldXL h20 bw1 w250" onchange="javascript:changeIcon()">
+				<c:forEach var="timing" items="${currentMapHolder.timingList}">
+					<c:choose>
+						<c:when test="${timing1 == timing.value}">
+							<option value="${timing.id}" selected><fmt:message key="${timing.code}" bundle="${resadmin}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${timing.id}"><fmt:message key="${timing.code}" bundle="${resadmin}"/></option>
+						</c:otherwise>
 					</c:choose>
-					</c:forEach>
+				</c:forEach>
 			</select>
 		</td>
 		<td>&nbsp;</td>
@@ -646,9 +606,9 @@
 <div style="font-family: Tahoma, Arial, Helvetica, Sans-Serif;font-size:17px;">
 	<fmt:message key="expand_each_section" bundle="${restext}"/>
 </div>
-<br>
 
-<a href="javascript:leftnavExpand('section3');">
+<br class="hidden">
+<a href="javascript:leftnavExpand('section3');" class="hidden">
 	<img id="excl_section3" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
          <fmt:message key="conditions_and_eligibility" bundle="${resword}"/></span></a>
 <div id="section3" style="display:none ">
@@ -763,18 +723,6 @@
 								</c:choose>
 							</select>
 						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="expected_total_enrollment" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="expectedTotalEnrollment" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.expectedTotalEnrollment}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
-						</td>
-						<td class="alert">*</td>
 					</tr>
 				</table>
 			</div>

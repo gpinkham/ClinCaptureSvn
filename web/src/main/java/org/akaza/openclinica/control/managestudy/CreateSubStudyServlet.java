@@ -175,7 +175,6 @@ public class CreateSubStudyServlet extends SpringServlet {
 				request.getSession().setAttribute("paramsMap", paramsMap);
 				request.getSession().setAttribute("newStudy", newStudy);
 				request.getSession().setAttribute("definitions", this.initDefinitions(newStudy));
-				request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 				request.setAttribute("statuses", Status.toActiveArrayList());
 				forwardPage(Page.CREATE_SUB_STUDY, request, response);
 			}
@@ -205,7 +204,6 @@ public class CreateSubStudyServlet extends SpringServlet {
 					fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
 				}
 				setPresetValues(fp.getPresetValues(), request);
-				request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 				request.setAttribute("statuses", Status.toActiveArrayList());
 				forwardPage(Page.CREATE_SUB_STUDY, request, response);
 			} else if ("submit".equalsIgnoreCase(action)) {

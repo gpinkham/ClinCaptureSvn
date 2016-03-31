@@ -14,21 +14,47 @@
  *******************************************************************************/
 package com.clinovo.rest.service.base;
 
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
+import com.clinovo.enums.StudyAllocation;
+import com.clinovo.enums.StudyAssignment;
+import com.clinovo.enums.StudyControl;
+import com.clinovo.enums.StudyDuration;
+import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyFeature;
+import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyParameter;
+import com.clinovo.enums.StudyPhase;
+import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.enums.StudySelection;
+import com.clinovo.enums.StudyTiming;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudyService;
+import com.clinovo.util.DateUtil;
+import com.clinovo.util.RequestUtil;
 import com.clinovo.util.StudyUtil;
+import com.clinovo.validator.StudyValidator;
 
 /**
  * BaseStudyService.
  */
+@SuppressWarnings("rawtypes")
 public abstract class BaseStudyService extends BaseService {
 
 	@Autowired
@@ -37,12 +63,23 @@ public abstract class BaseStudyService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	protected StudyBean prepareStudyBean() {
-		return studyService.prepareStudyBean(new StudyBean(), StudyUtil.getStudyParametersMap(),
-				StudyUtil.getStudyFeaturesMap());
+	@Autowired
+	private ConfigurationDao configurationDao;
+
+	@Autowired
+	private StudyConfigService studyConfigService;
+
+	@Autowired
+	private DiscrepancyDescriptionService discrepancyDescriptionService;
+
+	private void validate(StudyBean studyBean) throws Exception {
+		HashMap errors = StudyValidator.validate(getStudyDAO(), configurationDao, studyBean, null,
+				DateUtil.DatePattern.ISO_DATE);
+		ValidatorUtil.checkForErrors(errors);
 	}
 
-	protected StudyBean saveStudyBean(String userName, StudyBean studyBean) {
+	protected StudyBean saveStudyBean(String userName) throws Exception {
+		validate(null);
 		int userId = 0;
 		if (userName != null) {
 			UserAccountBean userAccountBean = (UserAccountBean) getUserAccountDAO().findByUserName(userName);
@@ -50,13 +87,93 @@ public abstract class BaseStudyService extends BaseService {
 				throw new RestException(messageSource, "rest.studyservice.createstudy.userDoesNotExist",
 						new Object[]{userName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} else {
+				if (userAccountBean.hasSiteLevelRoles()) {
+					throw new RestException(messageSource, "rest.studyservice.createstudy.userHasSiteLevelRoles",
+							new Object[]{userName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				}
 				userId = userAccountBean.getId();
 			}
 		}
+		StudyBean studyBean = studyService.prepareStudyBean(new StudyBean(), getCurrentUser(),
+				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE,
+				LocaleResolver.getLocale());
 		studyService.saveStudyBean(userId, studyBean, getCurrentUser(), ResourceBundleProvider.getPageMessagesBundle());
 		if (studyBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.studyservice.createstudy.operationFailed");
 		}
+		return studyBean;
+	}
+
+	protected StudyBean updateStudyBean(int studyId) throws Exception {
+		HttpServletRequest request = RequestUtil.getRequest();
+		FormProcessor fp = new FormProcessor(request);
+
+		StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(studyId);
+		studyService.prepareStudyBeanConfiguration(studyBean);
+
+		if (studyBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.studyservice.editstudy.studyDoesNotExist",
+					new Object[]{studyId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (studyBean.getParentStudyId() > 0) {
+			throw new RestException(messageSource, "rest.studyservice.editstudy.studyIsSite", new Object[]{studyId},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+
+		StudyUserRoleBean studyUserRoleBean = getCurrentUser().getRoleByStudy(studyBean.getId());
+		if (!(studyUserRoleBean.getId() > 0
+				&& (studyUserRoleBean.isSysAdmin() || studyUserRoleBean.isStudyAdministrator()))) {
+			throw new RestException(messageSource, "rest.studyservice.editstudy.youDoNotHaveRightsToEditThisStudy");
+		}
+
+		prepareForValidation(StudyParameter.STUDY_NAME.getName(), studyBean.getName());
+		prepareForValidation(StudyParameter.PROTOCOL_ID.getName(), studyBean.getIdentifier());
+		prepareForValidation(StudyParameter.PROTOCOL_TYPE.getName(),
+				StudyProtocolType.get(studyBean.getProtocolTypeKey()).getId());
+		prepareForValidation(StudyParameter.SECOND_PRO_ID.getName(), studyBean.getSecondaryIdentifier());
+		prepareForValidation(StudyParameter.OFFICIAL_TITLE.getName(), studyBean.getOfficialTitle());
+		prepareForValidation(StudyParameter.SUMMARY.getName(), studyBean.getSummary());
+		prepareForValidation(StudyParameter.DESCRIPTION.getName(), studyBean.getProtocolDescription());
+		prepareForValidation(StudyParameter.PRINCIPAL_INVESTIGATOR.getName(), studyBean.getPrincipalInvestigator());
+		prepareForValidation(StudyParameter.SPONSOR.getName(), studyBean.getSponsor());
+		prepareForValidation(StudyParameter.COLLABORATORS.getName(), studyBean.getCollaborators());
+		prepareForValidation(StudyParameter.TOTAL_ENROLLMENT.getName(), studyBean.getExpectedTotalEnrollment());
+		prepareForValidation(StudyParameter.PHASE.getName(), StudyPhase.get(studyBean.getPhaseKey()).getId());
+		prepareForValidation(StudyParameter.START_DATE.getName(), studyBean.getDatePlannedStart());
+		prepareForValidation(StudyParameter.END_DATE.getName(), studyBean.getDatePlannedEnd());
+		prepareForValidation(StudyParameter.APPROVAL_DATE.getName(), studyBean.getProtocolDateVerification());
+		prepareForValidation(StudyParameter.PURPOSE.getName(),
+				StudyProtocolType.get(studyBean.getProtocolTypeKey()).getId());
+
+		StudyProtocolType protocolType = StudyProtocolType.get(fp.getInt(StudyParameter.PROTOCOL_TYPE.getName()));
+		if (protocolType == StudyProtocolType.INTERVENTIONAL) {
+			prepareForValidation(StudyParameter.ALLOCATION.getName(),
+					StudyAllocation.get(studyBean.getAllocationKey()).getId());
+			prepareForValidation(StudyParameter.MASKING.getName(), StudyMasking.get(studyBean.getMaskingKey()).getId());
+			prepareForValidation(StudyParameter.CONTROL.getName(), StudyControl.get(studyBean.getControlKey()).getId());
+			prepareForValidation(StudyParameter.ASSIGNMENT.getName(),
+					StudyAssignment.get(studyBean.getAssignmentKey()).getId());
+			prepareForValidation(StudyParameter.END_POINT.getName(),
+					StudyEndPoint.get(studyBean.getEndpointKey()).getId());
+		} else if (protocolType == StudyProtocolType.OBSERVATIONAL) {
+			prepareForValidation(StudyParameter.DURATION.getName(),
+					StudyDuration.get(studyBean.getDurationKey()).getId());
+			prepareForValidation(StudyParameter.SELECTION.getName(),
+					StudySelection.get(studyBean.getSelectionKey()).getId());
+			prepareForValidation(StudyParameter.TIMING.getName(), StudyTiming.get(studyBean.getTimingKey()).getId());
+		}
+
+		for (StudyFeature studyFeature : StudyFeature.values()) {
+			prepareForValidation(studyFeature.getName(),
+					studyConfigService.getParameter(studyFeature.getName(), studyBean.getStudyParameterConfig()));
+		}
+
+		validate(studyBean);
+
+		studyService.prepareStudyBean(studyBean, getCurrentUser(), StudyUtil.getStudyParametersMap(),
+				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE, LocaleResolver.getLocale());
+
+		studyService.updateStudy(studyBean, null, getCurrentUser());
+
 		return studyBean;
 	}
 }

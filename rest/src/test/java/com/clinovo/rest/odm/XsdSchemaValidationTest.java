@@ -20,6 +20,17 @@ import org.junit.Test;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
 
+import com.clinovo.enums.StudyAllocation;
+import com.clinovo.enums.StudyAssignment;
+import com.clinovo.enums.StudyControl;
+import com.clinovo.enums.StudyDuration;
+import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyPhase;
+import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.enums.StudyPurpose;
+import com.clinovo.enums.StudySelection;
+import com.clinovo.enums.StudyTiming;
 import com.clinovo.rest.model.RestData;
 import com.clinovo.rest.serializer.OdmXmlSerializer;
 
@@ -153,7 +164,8 @@ public class XsdSchemaValidationTest {
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getName(), "TEST1");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getOid(), "OC_TEST1");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getIdentifier(), "UN_TEST1");
-		assertEquals(restOdmContainer.getRestData().getStudyBean().getProtocolTypeKey(), "Interventional");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getProtocolTypeKey(),
+				StudyProtocolType.INTERVENTIONAL.getValue());
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getOfficialTitle(), "");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getSecondaryIdentifier(), "");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getSummary(), "test!");
@@ -163,6 +175,28 @@ public class XsdSchemaValidationTest {
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getCollaborators(), "");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getStatusCode(), "avaliable");
 		assertNotNull(restOdmContainer.getRestData().getStudyBean().getStudyFeatureConfig());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getPhaseKey(), StudyPhase.PHASE2_3.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getExpectedTotalEnrollment(), 11);
+		assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedStart());
+		assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedEnd());
+		assertNotNull(restOdmContainer.getRestData().getStudyBean().getProtocolDateVerification());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getPurposeKey(), StudyPurpose.TREATMENT.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getAllocationKey(),
+				StudyAllocation.NON_RANDOMIZED.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getMaskingKey(),
+				StudyMasking.DOUBLE_BLIND.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getControlKey(),
+				StudyControl.DOSE_COMPARISON.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getAssignmentKey(),
+				StudyAssignment.EXPANDED_ACCESS.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getEndpointKey(),
+				StudyEndPoint.PHARMACODYNAMICS.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getDurationKey(),
+				StudyDuration.CROSS_SECTIONAL.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getSelectionKey(),
+				StudySelection.DEFINED_POPULATION.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getTimingKey(),
+				StudyTiming.RETROSPECTIVE.getValue());
 		marshal(restOdmContainer.getRestData().getStudyBean());
 	}
 }

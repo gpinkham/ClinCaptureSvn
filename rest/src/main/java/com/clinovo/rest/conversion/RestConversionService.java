@@ -15,6 +15,8 @@
 
 package com.clinovo.rest.conversion;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,9 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.util.DateUtil;
 
 /**
  * RestConversionService.
@@ -36,16 +40,37 @@ public class RestConversionService extends DefaultConversionService {
 
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		String targetTypeName = targetType.getType().getName();
 		try {
-			return super.convert(source, sourceType, targetType);
+			if (targetTypeName.equals("java.util.Date")) {
+				return convertDate(source, sourceType, targetType);
+			} else {
+				return super.convert(source, sourceType, targetType);
+			}
 		} catch (ConversionFailedException ex) {
-			String targetTypeName = targetType.getType().getName();
+			Object[] args;
+			String errorMessageKey = "rest.wrongParameterType";
 			targetTypeName = targetTypeName.equals("java.lang.Boolean") ? "boolean" : targetTypeName;
 			targetTypeName = targetTypeName.equals("java.lang.Integer") ? "int" : targetTypeName;
 			targetTypeName = targetTypeName.equals("[Ljava.lang.Integer;") ? "Integer[]" : targetTypeName;
-			throw new RestException(messageSource, "rest.wrongParameterType",
-					new Object[]{targetType.getAnnotation(RequestParam.class).value(), targetTypeName},
-					HttpServletResponse.SC_BAD_REQUEST);
+			if (targetTypeName.equals("java.util.Date")) {
+				errorMessageKey = "rest.wrongDateParameterType";
+				args = new Object[]{targetType.getAnnotation(RequestParam.class).value(), DateUtil.ISO_DATE};
+			} else {
+				args = new Object[]{targetType.getAnnotation(RequestParam.class).value(), targetTypeName};
+			}
+			throw new RestException(messageSource, errorMessageKey, args, HttpServletResponse.SC_BAD_REQUEST);
 		}
+	}
+
+	private Date convertDate(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		Date result;
+		try {
+			result = DateUtil.parseDateString(source.toString(), DateUtil.DatePattern.ISO_DATE,
+					LocaleResolver.getLocale());
+		} catch (Exception ex) {
+			throw new ConversionFailedException(sourceType, targetType, source, ex);
+		}
+		return result;
 	}
 }

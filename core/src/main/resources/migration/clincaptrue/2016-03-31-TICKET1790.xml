@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
+ 	<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" 
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd"> 
+  
+		<changeSet author="skirpichenok" id="2016-03-31-TICKET1790-01">
+			<comment>fix some values</comment>
+			<sql splitStatements="false">
+				update study set purpose = 'prevention' where purpose= 'Prevention';
+				update study set purpose = 'diagnosis' where purpose= 'Diagnosis';
+				update study set purpose = 'supportive_care' where purpose= 'Supportive Care';
+				update study set purpose = 'screening' where purpose= 'Screening';
+				update study set purpose = 'health_services_research' where purpose= 'Health Services Research';
+				update study set purpose = 'basic_science' where purpose= 'Basic Science';
+				update study set purpose = 'other' where purpose= 'Other';
+
+				update study set duration = 'cross_sectional' where duration = 'cross-sectional';
+
+				update study_parameter_value set value = 'pre-populated' where value = 're-populated' and parameter in ('interviewDateDefault', 'interviewerNameDefault');
+			</sql>
+ 	    </changeSet>
+
+</databaseChangeLog>

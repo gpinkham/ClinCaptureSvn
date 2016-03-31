@@ -73,7 +73,6 @@ public class InitUpdateStudyServlet extends SpringServlet {
 			logger.info("protocol Type:" + study.getProtocolType());
 
 			request.getSession().setAttribute("newStudy", study);
-			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toActiveArrayList());
 
 			StudyInfoPanel panel = getStudyInfoPanel(request);

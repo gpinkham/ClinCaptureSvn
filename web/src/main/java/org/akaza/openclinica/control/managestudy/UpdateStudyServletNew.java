@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,9 +33,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -49,10 +45,11 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyParameter;
 import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.model.DiscrepancyDescriptionType;
-import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.StudyUtil;
 import com.clinovo.util.ValidatorHelper;
@@ -64,10 +61,6 @@ import com.clinovo.validator.StudyValidator;
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Component
 public class UpdateStudyServletNew extends SpringServlet {
-
-	public static final String INPUT_END_DATE = "endDate";
-	public static final String INPUT_START_DATE = "startDate";
-	public static final String INPUT_VER_DATE = "protocolDateVerification";
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -103,10 +96,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 		studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
 		String action = fp.getString("action");
 		StudyDAO sdao = new StudyDAO(getDataSource());
-		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess
-				.getApplicationContext(getServletContext()).getBean("discrepancyDescriptionService");
 
-		Map<String, List<DiscrepancyDescription>> dDescriptionsMap = dDescriptionService
+		Map<String, List<DiscrepancyDescription>> dDescriptionsMap = getDiscrepancyDescriptionService()
 				.findAllSortedDescriptionsFromStudy(studyId);
 
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
@@ -125,14 +116,13 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 		request.setAttribute("studyToView", study);
 		request.setAttribute("studyId", studyId + "");
-		request.setAttribute("studyPhaseMap", getMapsHolder().getStudyPhaseMap());
 		ArrayList statuses = Status.toStudyUpdateMembersList();
 		statuses.add(Status.PENDING);
 		request.setAttribute("statuses", statuses);
 
 		String protocolType = study.getProtocolTypeKey();
 
-		boolean isInterventional = StudyProtocolType.INTERVENTIONAL.getName().equals(protocolType);
+		boolean isInterventional = StudyProtocolType.INTERVENTIONAL.getValue().equals(protocolType);
 		request.setAttribute("isInterventional", isInterventional ? "1" : "0");
 
 		if (study.getParentStudyId() > 0) {
@@ -140,39 +130,32 @@ public class UpdateStudyServletNew extends SpringServlet {
 			request.setAttribute("parentStudy", parentStudy);
 		}
 
-		ArrayList interventionArray = new ArrayList();
-		if (isInterventional) {
-			interventionArray = parseInterventions((study));
-		}
-		setMaps(request, isInterventional, interventionArray);
-
 		if (!action.equals("submit")) {
 
 			// First Load First Form
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(INPUT_START_DATE, DateUtil.printDate(study.getDatePlannedStart(),
+				fp.addPresetValue(StudyParameter.START_DATE.getName(), DateUtil.printDate(study.getDatePlannedStart(),
 						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getDatePlannedEnd() != null) {
-				fp.addPresetValue(INPUT_END_DATE, DateUtil.printDate(study.getDatePlannedEnd(),
+				fp.addPresetValue(StudyParameter.END_DATE.getName(), DateUtil.printDate(study.getDatePlannedEnd(),
 						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getProtocolDateVerification() != null) {
-				fp.addPresetValue(INPUT_VER_DATE, DateUtil.printDate(study.getProtocolDateVerification(),
-						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
+				fp.addPresetValue(StudyParameter.APPROVAL_DATE.getName(),
+						DateUtil.printDate(study.getProtocolDateVerification(),
+								getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			setPresetValues(fp.getPresetValues(), request);
 			// first load 2nd form
 		}
 		if (action.equals("submit")) {
 
-			validateStudy1(fp, study, errors, v);
+			validateStudy1(fp, study, errors, v, dDescriptionsMap);
 			validateStudy2(fp, study, v);
-			validateStudy3(fp, study, v, isInterventional);
 			validateStudy4(fp, study, errors, v);
 			validateStudy5(fp, study, errors, v);
 			validateStudy6(fp, study, errors, v);
-			validateStudy7(fp, errors, v, study.getId(), dDescriptionsMap);
 			confirmWholeStudy(fp, study, errors, v);
 
 			request.setAttribute("studyToView", study);
@@ -198,50 +181,34 @@ public class UpdateStudyServletNew extends SpringServlet {
 		}
 	}
 
-	private void validateStudy1(FormProcessor fp, StudyBean study, HashMap errors, Validator validator) {
+	private void validateStudy1(FormProcessor fp, StudyBean study, HashMap errors, Validator validator,
+			Map<String, List<DiscrepancyDescription>> dDescriptionsMap) {
 		study.setId(fp.getInt("studyId"));
-		errors.putAll(StudyValidator.validate(validator, getStudyDAO(), study));
-		getStudyService().prepareStudyBean(study, StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFeaturesMap());
+
+		validator.addValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(), Validator.NO_BLANKS);
+		validator.addValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(),
+				Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				StudyValidator.VALIDATION_NUM1);
+		validator.addValidation(StudyConfigurationParameter.STUDY_SUBJECT_ID_LABEL.getName(), Validator.NO_BLANKS);
+		validator.addValidation(StudyConfigurationParameter.SECONDARY_ID_LABEL.getName(), Validator.NO_BLANKS);
+		validator.addValidation(StudyConfigurationParameter.DATE_OF_ENROLLMENT_FOR_STUDY_LABEL.getName(),
+				Validator.NO_BLANKS);
+		validator.addValidation(StudyConfigurationParameter.GENDER_LABEL.getName(), Validator.NO_BLANKS);
+		validator.addValidation(StudyConfigurationParameter.START_DATE_TIME_LABEL.getName(), Validator.NO_BLANKS);
+		validator.addValidation(StudyConfigurationParameter.END_DATE_TIME_LABEL.getName(), Validator.NO_BLANKS);
+
+		errors.putAll(
+				StudyValidator.validate(validator, getStudyDAO(), study, dDescriptionsMap, DateUtil.DatePattern.DATE));
+		getStudyService().prepareStudyBean(study, getUserAccountBean(), StudyUtil.getStudyParametersMap(),
+				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale());
 	}
 
 	private void validateStudy2(FormProcessor fp, StudyBean study, Validator v) {
-
-		v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
-		if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-			v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
-		}
-		if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
-		}
-		fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-		fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-		fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
+		fp.addPresetValue(StudyParameter.START_DATE.getName(), fp.getString(StudyParameter.START_DATE.getName()));
+		fp.addPresetValue(StudyParameter.END_DATE.getName(), fp.getString(StudyParameter.END_DATE.getName()));
+		fp.addPresetValue(StudyParameter.APPROVAL_DATE.getName(), fp.getString(StudyParameter.APPROVAL_DATE.getName()));
 		updateStudy2(fp, study);
 		setPresetValues(fp.getPresetValues(), fp.getRequest());
-	}
-
-	private void validateStudy3(FormProcessor fp, StudyBean study, Validator v, boolean isInterventional) {
-
-		v.addValidation("purpose", Validator.NO_BLANKS);
-		final int counter = 10;
-		for (int i = 0; i < counter; i++) {
-			String type = fp.getString("interType" + i);
-			String name = fp.getString("interName" + i);
-			if (!StringUtil.isBlank(type) && StringUtil.isBlank(name)) {
-				v.addValidation("interName", Validator.NO_BLANKS);
-				fp.getRequest().setAttribute("interventionError",
-						getResPage().getString("name_cannot_be_blank_if_type"));
-				break;
-			}
-			if (!StringUtil.isBlank(name) && StringUtil.isBlank(type)) {
-				v.addValidation("interType", Validator.NO_BLANKS);
-				fp.getRequest().setAttribute("interventionError",
-						getResPage().getString("name_cannot_be_blank_if_name"));
-				break;
-			}
-		}
-		updateStudy3(study, isInterventional, fp);
-
 	}
 
 	private void validateStudy4(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
@@ -253,10 +220,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 		v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM6);
 		errors.putAll(v.validate());
-		if (fp.getInt("expectedTotalEnrollment") <= 0) {
-			Validator.addError(errors, "expectedTotalEnrollment",
-					getResPage().getString("expected_total_enrollment_must_be_a_positive_number"));
-		}
 
 		study.setConditions(fp.getString("conditions"));
 		study.setKeywords(fp.getString("keywords"));
@@ -270,8 +233,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 		study.setAgeMin(fp.getString("ageMin"));
 		study.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
-		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
-		fp.getRequest().setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 	}
 
 	private void validateStudy5(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
@@ -313,7 +274,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 		if (!errors.isEmpty()) {
 			fp.getRequest().setAttribute("formMessages", errors);
-			fp.getRequest().setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 		}
 	}
 
@@ -336,63 +296,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 		}
 	}
 
-	private void validateStudy7(FormProcessor fp, HashMap errors, Validator v, int studyId,
-			Map<String, List<DiscrepancyDescription>> dDescriptionsMap) {
-		validateSpecifiedDescriptions(fp, errors, v, studyId, dDescriptionsMap.get("dnUpdateDescriptions"),
-				"updateName", "updateVisibilityLevel", "updateDescriptionId", "updateDescriptionError",
-				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId());
-		validateSpecifiedDescriptions(fp, errors, v, studyId, dDescriptionsMap.get("dnCloseDescriptions"), "closeName",
-				"closeVisibilityLevel", "closeDescriptionId", "closeDescriptionError",
-				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId());
-		validateSpecifiedDescriptions(fp, errors, v, studyId, dDescriptionsMap.get("dnRFCDescriptions"), "dnRFCName",
-				"dnRFCVisibilityLevel", "dnRFCDescriptionId", "dnRFCDescriptionError",
-				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
-	}
-
-	private void validateSpecifiedDescriptions(FormProcessor fp, HashMap errors, Validator v, int studyId,
-			List<DiscrepancyDescription> newDescriptions, String descriptionName, String visibilityLevel,
-			String descriptionId, String descriptionError, int typeId) {
-		newDescriptions.clear();
-		final int counter = 25;
-		for (int i = 0; i < counter; i++) {
-			v.addValidation(descriptionName + i, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
-			// set list of dn descriptions for specified type here
-			if (!"".equals(fp.getString(descriptionName + i))) {
-				DiscrepancyDescription dDescription = new DiscrepancyDescription();
-				dDescription.setTypeId(typeId);
-				dDescription.setName(fp.getString(descriptionName + i));
-				switch (fp.getInt(visibilityLevel + i)) {
-					case 1 :
-						dDescription.setVisibilityLevel("Study");
-						break;
-					case 2 :
-						dDescription.setVisibilityLevel("Site");
-						break;
-					default :
-						dDescription.setVisibilityLevel("Study and Site");
-				}
-				if (fp.getInt(descriptionId + i) != 0) {
-					dDescription.setId(fp.getInt(descriptionId + i));
-				}
-				dDescription.setStudyId(studyId);
-				newDescriptions.add(dDescription);
-			}
-		}
-		errors.putAll(v.validate());
-		for (int i = 0; i < newDescriptions.size(); i++) {
-			DiscrepancyDescription rfcTerm1 = newDescriptions.get(i);
-			for (int j = 0; j < i; j++) {
-				DiscrepancyDescription rfcTerm2 = newDescriptions.get(j);
-				if (rfcTerm1.getName().equals(rfcTerm2.getName())) {
-					Validator.addError(errors, descriptionError + i,
-							getResPage().getString("please_correct_the_duplicate_description_found_in_row") + " "
-									+ (j + 1));
-				}
-			}
-		}
-	}
-
 	private void confirmWholeStudy(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 		errors.putAll(v.validate());
 		getStudyService().prepareStudyBeanConfiguration(study, StudyUtil.getStudyConfigurationParametersMap());
@@ -402,18 +305,8 @@ public class UpdateStudyServletNew extends SpringServlet {
 	}
 
 	private boolean updateStudy2(FormProcessor fp, StudyBean study) {
-
 		study.setOldStatus(study.getStatus());
 		study.setStatus(Status.get(fp.getInt("status")));
-		try {
-			study.setProtocolDateVerification(
-					fp.getUpdatedDateProperty(INPUT_VER_DATE, study.getProtocolDateVerification()));
-			study.setDatePlannedStart(fp.getUpdatedDateProperty(INPUT_START_DATE, study.getDatePlannedStart()));
-			study.setDatePlannedEnd(fp.getUpdatedDateProperty(INPUT_END_DATE, study.getDatePlannedEnd()));
-		} catch (IllegalArgumentException ex) {
-			//
-		}
-		study.setPhase(fp.getString("phase"));
 		if (fp.getInt("genetic") == 1) {
 			study.setGenetic(true);
 		} else {
@@ -421,79 +314,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 		}
 		String interventional = getResAdmin().getString("interventional");
 		return interventional.equalsIgnoreCase(study.getProtocolType());
-	}
-
-	private void updateStudy3(StudyBean study, boolean isInterventional, FormProcessor fp) {
-
-		study.setPurpose(fp.getString("purpose"));
-		ArrayList interventionArray = new ArrayList();
-		if (isInterventional) {
-			study.setAllocation(fp.getString("allocation"));
-			study.setMasking(fp.getString("masking"));
-			study.setControl(fp.getString("control"));
-			study.setAssignment(fp.getString("assignment"));
-			study.setEndpoint(fp.getString("endpoint"));
-
-			StringBuilder interventions = new StringBuilder();
-			final int counter = 10;
-			for (int i = 0; i < counter; i++) {
-				String type = fp.getString("interType" + i);
-				String name = fp.getString("interName" + i);
-				if (!StringUtil.isBlank(type) && !StringUtil.isBlank(name)) {
-					InterventionBean ib = new InterventionBean(fp.getString("interType" + i),
-							fp.getString("interName" + i));
-					interventionArray.add(ib);
-					interventions.append(ib.toString()).append(",");
-				}
-			}
-			study.setInterventions(interventions.toString());
-
-		} else {
-			study.setDuration(fp.getString("duration"));
-			study.setSelection(fp.getString("selection"));
-			study.setTiming(fp.getString("timing"));
-		}
-		fp.getRequest().setAttribute("interventions", interventionArray);
-	}
-
-	private ArrayList parseInterventions(StudyBean sb) {
-		ArrayList inters = new ArrayList();
-		String interventions = sb.getInterventions();
-		try {
-			if (!StringUtil.isBlank(interventions)) {
-				StringTokenizer st = new StringTokenizer(interventions, ",");
-				while (st.hasMoreTokens()) {
-					String s = st.nextToken();
-					StringTokenizer st1 = new StringTokenizer(s, "/");
-					String type = st1.nextToken();
-					String name = st1.nextToken();
-					InterventionBean ib = new InterventionBean(type, name);
-					inters.add(ib);
-
-				}
-			}
-		} catch (NoSuchElementException nse) {
-			return new ArrayList();
-		}
-		return inters;
-
-	}
-
-	private void setMaps(HttpServletRequest request, boolean isInterventional, ArrayList interventionArray) {
-		if (isInterventional) {
-			request.setAttribute("interPurposeMap", getMapsHolder().getInterPurposeMap());
-			request.setAttribute("allocationMap", getMapsHolder().getAllocationMap());
-			request.setAttribute("maskingMap", getMapsHolder().getMaskingMap());
-			request.setAttribute("controlMap", getMapsHolder().getControlMap());
-			request.setAttribute("assignmentMap", getMapsHolder().getAssignmentMap());
-			request.setAttribute("endpointMap", getMapsHolder().getEndpointMap());
-			request.setAttribute("interTypeMap", getMapsHolder().getInterTypeMap());
-			request.getSession().setAttribute("interventions", interventionArray);
-		} else {
-			request.setAttribute("obserPurposeMap", getMapsHolder().getObserPurposeMap());
-			request.setAttribute("selectionMap", getMapsHolder().getSelectionMap());
-			request.setAttribute("timingMap", getMapsHolder().getTimingMap());
-		}
 	}
 
 	@Override

@@ -23,16 +23,13 @@ public class UpdateStudyDetailsPage extends BasePage {
 	@FindBy(id = "excl_section1")
 	private WebElementFacade lStudyDescriptionAndStatus;
 
-	@FindBy(id = "excl_section3")
-	private WebElementFacade lConditionsAndEligibility;
-
 	@FindBy(id = "excl_section7")
 	private WebElementFacade lStudyParameterConfiguration;
 
 	@FindBy(name = "summary")
 	private WebElementFacade tBriefSummary;
 
-	@FindBy(name = "expectedTotalEnrollment")
+	@FindBy(name = "totalEnrollment")
 	private WebElementFacade iExpectedTotalEnrollment;
 
 	@FindBy(name = "autoCodeDictionaryName")
@@ -199,7 +196,6 @@ public class UpdateStudyDetailsPage extends BasePage {
 	 */
 	public void fillInStudyDetailsPage(Study study) {
 		//lStudyDescriptionAndStatus.click();
-		lConditionsAndEligibility.click();
 		defineRadioButtons();
 
 		if (!study.getBriefSummary().equals("")) {

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -40,11 +41,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.clinovo.enums.StudyAllocation;
+import com.clinovo.enums.StudyAssignment;
+import com.clinovo.enums.StudyConfigurationParameter;
 import com.clinovo.enums.StudyConfigurationParameterType;
-import com.clinovo.enums.StudyConfigurationParameters;
-import com.clinovo.enums.StudyFeatures;
-import com.clinovo.enums.StudyParameterNames;
+import com.clinovo.enums.StudyControl;
+import com.clinovo.enums.StudyDuration;
+import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyFeature;
+import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyParameter;
+import com.clinovo.enums.StudyPhase;
 import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.enums.StudyPurpose;
+import com.clinovo.enums.StudySelection;
+import com.clinovo.enums.StudyTiming;
 import com.clinovo.exception.CodeException;
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.model.DiscrepancyDescriptionType;
@@ -56,6 +67,7 @@ import com.clinovo.service.EventDefinitionService;
 import com.clinovo.service.StudyService;
 import com.clinovo.service.StudySubjectService;
 import com.clinovo.service.UserAccountService;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.ParameterUtil;
 
 /**
@@ -271,27 +283,78 @@ public class StudyServiceImpl implements StudyService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public StudyBean prepareStudyBean(StudyBean studyBean, Map<String, String> parametersMap,
-			Map<String, String> featuresMap) {
-		studyBean.setName(parametersMap.get(StudyParameterNames.STUDY_NAME.getName()));
-		studyBean.setSummary(parametersMap.get(StudyParameterNames.SUMMARY.getName()));
-		studyBean.setSponsor(parametersMap.get(StudyParameterNames.SPONSOR.getName()));
-		studyBean.setIdentifier(parametersMap.get(StudyParameterNames.PROTOCOL_ID.getName()));
-		if (parametersMap.get(StudyParameterNames.PROTOCOL_TYPE.getName()) != null) {
-			studyBean.setProtocolType(StudyProtocolType
-					.getStudyProtocolType(
-							ParameterUtil.getIntValue(parametersMap, StudyParameterNames.PROTOCOL_TYPE.getName(), 0))
-					.getName());
+	public StudyBean prepareStudyBean(StudyBean studyBean, UserAccountBean currentUser,
+			Map<String, String> parametersMap, Map<String, String> featuresMap, DateUtil.DatePattern datePattern,
+			Locale locale) {
+		studyBean.setName(parametersMap.get(StudyParameter.STUDY_NAME.getName()));
+		studyBean.setSummary(parametersMap.get(StudyParameter.SUMMARY.getName()));
+		studyBean.setSponsor(parametersMap.get(StudyParameter.SPONSOR.getName()));
+		studyBean.setIdentifier(parametersMap.get(StudyParameter.PROTOCOL_ID.getName()));
+		StudyProtocolType studyProtocolType = StudyProtocolType
+				.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.PROTOCOL_TYPE.getName(), 0));
+		studyBean.setProtocolType(studyProtocolType.getValue());
+		studyBean.setCollaborators(parametersMap.get(StudyParameter.COLLABORATORS.getName()));
+		studyBean.setProtocolDescription(parametersMap.get(StudyParameter.DESCRIPTION.getName()));
+		studyBean.setPrincipalInvestigator(parametersMap.get(StudyParameter.PRINCIPAL_INVESTIGATOR.getName()));
+		studyBean.setOfficialTitle(parametersMap.get(StudyParameter.OFFICIAL_TITLE.getName()));
+		studyBean.setSecondaryIdentifier(parametersMap.get(StudyParameter.SECOND_PRO_ID.getName()));
+		studyBean.setExpectedTotalEnrollment(
+				ParameterUtil.getIntValue(parametersMap, StudyParameter.TOTAL_ENROLLMENT.getName(), 0));
+
+		studyBean.setPhase(
+				StudyPhase.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.PHASE.getName(), 0)).getValue());
+
+		studyBean.setDatePlannedStart(parseDate(currentUser, StudyParameter.START_DATE.getName(), parametersMap,
+				studyBean.getDatePlannedStart(), datePattern, locale));
+		studyBean.setDatePlannedEnd(parseDate(currentUser, StudyParameter.END_DATE.getName(), parametersMap,
+				studyBean.getDatePlannedEnd(), datePattern, locale));
+		studyBean.setProtocolDateVerification(parseDate(currentUser, StudyParameter.APPROVAL_DATE.getName(),
+				parametersMap, studyBean.getProtocolDateVerification(), datePattern, locale));
+
+		studyBean.setPurpose(StudyPurpose
+				.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.PURPOSE.getName(), 0)).getValue());
+
+		if (studyProtocolType == StudyProtocolType.OBSERVATIONAL) {
+			studyBean.setDuration(StudyDuration
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.DURATION.getName(), 0)).getValue());
+			studyBean.setSelection(StudySelection
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.SELECTION.getName(), 0)).getValue());
+			studyBean.setTiming(StudyTiming
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.TIMING.getName(), 0)).getValue());
+		} else if (studyProtocolType == StudyProtocolType.INTERVENTIONAL) {
+			studyBean.setAllocation(StudyAllocation
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.ALLOCATION.getName(), 0)).getValue());
+			studyBean.setMasking(StudyMasking
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.MASKING.getName(), 0)).getValue());
+			studyBean.setControl(StudyControl
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.CONTROL.getName(), 0)).getValue());
+			studyBean.setAssignment(StudyAssignment
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.ASSIGNMENT.getName(), 0)).getValue());
+			studyBean.setEndpoint(StudyEndPoint
+					.get(ParameterUtil.getIntValue(parametersMap, StudyParameter.END_POINT.getName(), 0)).getValue());
 		}
-		studyBean.setCollaborators(parametersMap.get(StudyParameterNames.COLLABORATORS.getName()));
-		studyBean.setProtocolDescription(parametersMap.get(StudyParameterNames.DESCRIPTION.getName()));
-		studyBean.setPrincipalInvestigator(parametersMap.get(StudyParameterNames.PRINCIPAL_INVESTIGATOR.getName()));
-		studyBean.setOfficialTitle(parametersMap.get(StudyParameterNames.OFFICIAL_TITLE.getName()));
-		studyBean.setSecondaryIdentifier(parametersMap.get(StudyParameterNames.SECOND_PRO_ID.getName()));
 
 		// Features
 		setFeatures(studyBean, featuresMap);
 
+		return studyBean;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public StudyBean prepareStudyBeanConfiguration(StudyBean studyBean) {
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		ArrayList studyParameters = spvdao.findParamConfigByStudy(studyBean);
+		studyBean.setStudyParameters(studyParameters);
+		if (studyBean.isSite()) {
+			StudyBean parentStudy = (StudyBean) new StudyDAO(dataSource).findByPK(studyBean.getParentStudyId());
+			studyBean.setParentStudyName(parentStudy.getName());
+			studyBean.setParentStudyOid(parentStudy.getOid());
+			studyConfigService.setParametersForSite(studyBean);
+		} else {
+			studyConfigService.setParametersForStudy(studyBean);
+		}
 		return studyBean;
 	}
 
@@ -319,7 +382,9 @@ public class StudyServiceImpl implements StudyService {
 		StudyDAO sdao = getStudyDAO();
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
 
-		submitDescriptions(dDescriptionsMap, studyBean.getId());
+		if (dDescriptionsMap != null) {
+			submitDescriptions(dDescriptionsMap, studyBean.getId());
+		}
 
 		studyBean.setUpdatedDate(new Date());
 		studyBean.setUpdater(currentUser);
@@ -355,6 +420,16 @@ public class StudyServiceImpl implements StudyService {
 		updateSiteParameters(studyBean, currentUser, sdao, spvdao);
 
 		return studyBean;
+	}
+	private Date parseDate(UserAccountBean currentUser, String parameterName, Map<String, String> parametersMap,
+			Date date, DateUtil.DatePattern datePattern, Locale locale) {
+		try {
+			date = DateUtil.parseDateStringToServerDateTime(parametersMap.get(parameterName),
+					currentUser.getUserTimeZoneId(), datePattern, locale, true);
+		} catch (Exception ex) {
+			//
+		}
+		return date;
 	}
 
 	private void updateSiteParameters(StudyBean studyBean, UserAccountBean ub, StudyDAO sdao,
@@ -507,7 +582,7 @@ public class StudyServiceImpl implements StudyService {
 
 	private void updateStudyParameters(StudyBean studyBean, StudyParameterValueBean spv,
 			StudyParameterValueDAO spvdao) {
-		for (StudyConfigurationParameters studyConfigurationParameter : StudyConfigurationParameters.values()) {
+		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
 			if (studyConfigurationParameter.getType() != StudyConfigurationParameterType.DYNAMIC_LABEL
 					&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.GROUP
 					&& !studyConfigurationParameter.isSkip()) {
@@ -518,14 +593,14 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private void updateFeatures(StudyBean studyBean, StudyParameterValueBean spv, StudyParameterValueDAO spvdao) {
-		for (StudyFeatures studyFeature : StudyFeatures.values()) {
+		for (StudyFeature studyFeature : StudyFeature.values()) {
 			studyConfigService.updateParameter(studyFeature.getName(), studyBean.getStudyParameterConfig(), spv,
 					spvdao);
 		}
 	}
 
 	private void setFeatures(StudyBean studyBean, Map<String, String> featuresMap) {
-		for (StudyFeatures studyFeature : StudyFeatures.values()) {
+		for (StudyFeature studyFeature : StudyFeature.values()) {
 			String parameterName = studyFeature.getName();
 			String value = featuresMap.get(parameterName);
 			studyConfigService.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
@@ -533,11 +608,11 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private void setConfigurationParameters(StudyBean studyBean, Map<String, String> configurationParametersMap) {
-		for (StudyConfigurationParameters studyConfigurationParameter : StudyConfigurationParameters.values()) {
+		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
 			if (studyConfigurationParameter.getType() != StudyConfigurationParameterType.GROUP
 					&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.DYNAMIC_LABEL
 					&& !studyConfigurationParameter.isSkip()) {
-				if (studyConfigurationParameter == StudyConfigurationParameters.DISCREPANCY_MANAGEMENT
+				if (studyConfigurationParameter == StudyConfigurationParameter.DISCREPANCY_MANAGEMENT
 						&& studyBean.getStatus().isLocked()) {
 					studyBean.getStudyParameterConfig().setDiscrepancyManagement("false");
 				} else {

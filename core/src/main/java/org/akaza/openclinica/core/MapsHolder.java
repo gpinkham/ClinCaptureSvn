@@ -12,72 +12,84 @@
  ******************************************************************************/
 package org.akaza.openclinica.core;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.clinovo.enums.StudyAllocation;
+import com.clinovo.enums.StudyAssignment;
+import com.clinovo.enums.StudyControl;
+import com.clinovo.enums.StudyDuration;
+import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyFacRecruitStatus;
+import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyPhase;
+import com.clinovo.enums.StudyPurpose;
+import com.clinovo.enums.StudySelection;
+import com.clinovo.enums.StudyTiming;
 
 /**
  * MapsHolder.
  */
 public class MapsHolder {
 
-	private HashMap<String, String> facRecruitStatusMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> studyPhaseMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> interPurposeMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> allocationMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> maskingMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> controlMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> assignmentMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> endpointMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
-	private HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
+	private List<StudyFacRecruitStatus> facRecruitStatusList = new ArrayList<StudyFacRecruitStatus>();
+	private List<StudyPhase> studyPhaseList = new ArrayList<StudyPhase>();
+	private List<StudyPurpose> interPurposeList = new ArrayList<StudyPurpose>();
+	private List<StudyAllocation> allocationList = new ArrayList<StudyAllocation>();
+	private List<StudyMasking> maskingList = new ArrayList<StudyMasking>();
+	private List<StudyControl> controlList = new ArrayList<StudyControl>();
+	private List<StudyAssignment> assignmentList = new ArrayList<StudyAssignment>();
+	private List<StudyEndPoint> endPointList = new ArrayList<StudyEndPoint>();
+	private List<StudyPurpose> obserPurposeList = new ArrayList<StudyPurpose>();
+	private List<StudyDuration> durationList = new ArrayList<StudyDuration>();
+	private List<StudySelection> selectionList = new ArrayList<StudySelection>();
+	private List<StudyTiming> timingList = new ArrayList<StudyTiming>();
 
-	public HashMap<String, String> getFacRecruitStatusMap() {
-		return facRecruitStatusMap;
+	public List<StudyFacRecruitStatus> getFacRecruitStatusList() {
+		return facRecruitStatusList;
 	}
 
-	public HashMap<String, String> getStudyPhaseMap() {
-		return studyPhaseMap;
+	public List<StudyPhase> getStudyPhaseList() {
+		return studyPhaseList;
 	}
 
-	public HashMap<String, String> getInterPurposeMap() {
-		return interPurposeMap;
+	public List<StudyPurpose> getInterPurposeList() {
+		return interPurposeList;
 	}
 
-	public HashMap<String, String> getAllocationMap() {
-		return allocationMap;
+	public List<StudyAllocation> getAllocationList() {
+		return allocationList;
 	}
 
-	public HashMap<String, String> getMaskingMap() {
-		return maskingMap;
+	public List<StudyMasking> getMaskingList() {
+		return maskingList;
 	}
 
-	public HashMap<String, String> getControlMap() {
-		return controlMap;
+	public List<StudyControl> getControlList() {
+		return controlList;
 	}
 
-	public HashMap<String, String> getAssignmentMap() {
-		return assignmentMap;
+	public List<StudyAssignment> getAssignmentList() {
+		return assignmentList;
 	}
 
-	public HashMap<String, String> getEndpointMap() {
-		return endpointMap;
+	public List<StudyEndPoint> getEndPointList() {
+		return endPointList;
 	}
 
-	public HashMap<String, String> getInterTypeMap() {
-		return interTypeMap;
+	public List<StudyPurpose> getObserPurposeList() {
+		return obserPurposeList;
 	}
 
-	public HashMap<String, String> getObserPurposeMap() {
-		return obserPurposeMap;
+	public List<StudySelection> getSelectionList() {
+		return selectionList;
 	}
 
-	public HashMap<String, String> getSelectionMap() {
-		return selectionMap;
+	public List<StudyTiming> getTimingList() {
+		return timingList;
 	}
 
-	public HashMap<String, String> getTimingMap() {
-		return timingMap;
+	public List<StudyDuration> getDurationList() {
+		return durationList;
 	}
 }

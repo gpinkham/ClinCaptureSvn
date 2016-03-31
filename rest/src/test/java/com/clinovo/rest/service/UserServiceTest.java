@@ -18,7 +18,7 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsImpossibleToCreateAStudyUserIfRoleIsSiteRole() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -29,19 +29,17 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsImpossibleToCreateAStudyUserIfUserTypeParameterHasWrongValue() throws Exception {
-		this.mockMvc
-				.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
-						.param("firstName", "firstname_".concat(Long.toString(timestamp)))
-						.param("lastName", "lastname_".concat(Long.toString(timestamp)))
-						.param("email", "test@gmail.com").param("phone", "+375232345678").param("company", "clinovo")
-						.param("userType", "123").param("allowSoap", "true").param("displayPassword", "true")
-						.param("role", Integer.toString(2)).accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
+				.param("phone", "+375232345678").param("company", "clinovo").param("userType", "123")
+				.param("allowSoap", "true").param("displayPassword", "true").param("role", Integer.toString(2))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatItIsImpossibleToCreateAStudyUserIfRoleParameterHasWrongValue() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -56,7 +54,7 @@ public class UserServiceTest extends BaseServiceTest {
 		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", newUser.getName())
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", newUser.getName())
 				.param("firstName", newUser.getFirstName()).param("lastName", newUser.getLastName())
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
 				.param("company", newUser.getInstitutionalAffiliation())
@@ -67,7 +65,7 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsNotPossibleToCreateAStudyUserWithIncorrectEmail() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -82,7 +80,7 @@ public class UserServiceTest extends BaseServiceTest {
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
+		result = mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("allowSoap", "true").param("displayPassword", "true")
@@ -106,7 +104,7 @@ public class UserServiceTest extends BaseServiceTest {
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
-		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
+		result = mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -135,23 +133,23 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
 		String additionalUserName = "new_".concat(newUser.getName());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
 				.param("firstName", newUser.getFirstName()).param("lastName", newUser.getLastName())
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
 				.param("company", newUser.getInstitutionalAffiliation())
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
 				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
 				.accept(mediaType).secure(true).session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", additionalUserName).accept(mediaType).secure(true)
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", additionalUserName).accept(mediaType).secure(true)
 				.session(session)).andExpect(expectStatus);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", additionalUserName).accept(mediaType).secure(true)
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", additionalUserName).accept(mediaType).secure(true)
 				.session(session)).andExpect(expectStatus);
 	}
 
 	@Test
 	public void testThatItIsImpossibleToCreateASiteUserIfRoleIsStudyRole() throws Exception {
 		createNewSite(currentScope.getId());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -164,7 +162,7 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateASiteUserIfUserTypeParameterHasWrongValue() throws Exception {
 		createNewSite(currentScope.getId());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -177,7 +175,7 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsImpossibleToCreateASiteUserIfRoleParameterHasWrongValue() throws Exception {
 		createNewSite(currentScope.getId());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -190,7 +188,7 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsNotPossibleToCreateASiteUserWithIncorrectEmail() throws Exception {
 		createNewSite(currentScope.getId());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
@@ -207,7 +205,7 @@ public class UserServiceTest extends BaseServiceTest {
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		result = mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", additionalUserName).param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("allowSoap", "true").param("displayPassword", "true")
@@ -233,7 +231,7 @@ public class UserServiceTest extends BaseServiceTest {
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
-		result = this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		result = mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", additionalUserName).param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -255,7 +253,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatItIsNotPossibleToCreateASiteUserIfSiteDoesNotBelongToCurrentScope() throws Exception {
 		createNewStudy();
 		createNewSite(newStudy.getId());
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -268,7 +266,7 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsNotPossibleToCreateASiteUserIfSiteDoesNotExist() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", "adsfasdf")
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", "adsfasdf")
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -281,7 +279,7 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsNotPossibleToCreateASiteUserIfSiteNameParameterIsEmpty() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", "")
+		mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", "")
 				.param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
@@ -294,7 +292,7 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatItIsNotPossibleToCreateASiteUserIfSiteNameParameterIsMissing() throws Exception {
-		this.mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
+		mockMvc.perform(post(API_USER_CREATE_USER).param("userName", "new_user_".concat(Long.toString(timestamp)))
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
@@ -306,37 +304,37 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
-		this.mockMvc.perform(post(API_USER_REMOVE).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_REMOVE).secure(true).session(session)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", "").secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
-		this.mockMvc.perform(
+		mockMvc.perform(
 				post(API_USER_REMOVE).param("userName", "test_user").param("xparam", "1").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userNAme", "test_user").secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userNAme", "test_user").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveNonExistingUser() throws Exception {
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", "misterx").secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "misterx").secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveRootUser() throws Exception {
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", "root").secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "root").secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -344,7 +342,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveYourself() throws Exception {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -360,7 +358,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.USER, Role.STUDY_MONITOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
 				defaultStudyName);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -369,7 +367,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
-		this.mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isOk());
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.DELETED);
@@ -377,36 +375,36 @@ public class UserServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
-		this.mockMvc.perform(post(API_USER_RESTORE).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_RESTORE).secure(true).session(session)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", "").secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", "test_user").param("xparam", "1").secure(true)
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "test_user").param("xparam", "1").secure(true)
 				.session(session)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userNAme", "test_user").secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userNAme", "test_user").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreNonExistingUser() throws Exception {
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", "misterx").secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "misterx").secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreRootUser() throws Exception {
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", "root").secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "root").secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -414,7 +412,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreYourself() throws Exception {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -430,7 +428,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
 				defaultStudyName);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -443,7 +441,7 @@ public class UserServiceTest extends BaseServiceTest {
 		userAccountDAO.updateStatus(userAccountBean);
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.DELETED);
-		this.mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isOk());
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
@@ -461,7 +459,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
 				defaultStudyName);
-		this.mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -473,38 +471,36 @@ public class UserServiceTest extends BaseServiceTest {
 		timestamp = new Date().getTime() + 1;
 		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, defaultStudyName);
-		this.mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
 				.andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatGetUserMethodDoesNotSupportHttpPost() throws Exception {
-		this.mockMvc.perform(post(API_USER).param("userName", rootUserName).secure(true).session(session))
+		mockMvc.perform(post(API_USER).param("userName", rootUserName).secure(true).session(session))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
-		this.mockMvc.perform(get(API_USER).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(get(API_USER).secure(true).session(session)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
-		this.mockMvc.perform(get(API_USER).param("userName", "").secure(true).session(session))
+		mockMvc.perform(get(API_USER).param("userName", "").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
-		this.mockMvc.perform(get(API_USER).param("uSerName", "").secure(true).session(session))
+		mockMvc.perform(get(API_USER).param("uSerName", "").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
-		this.mockMvc
-				.perform(
-						get(API_USER).param("userName", "test_user").param("xparam", "1").secure(true).session(session))
+		mockMvc.perform(get(API_USER).param("userName", "test_user").param("xparam", "1").secure(true).session(session))
 				.andExpect(status().isBadRequest());
 	}
 }

@@ -23,14 +23,12 @@ package org.akaza.openclinica.bean.login;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -39,6 +37,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.joda.time.DateTimeZone;
 
 import com.clinovo.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -422,10 +421,8 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public boolean hasUserType(UserType u) {
-		Iterator<UserType> userTypesIt = userTypes.iterator();
 
-		while (userTypesIt.hasNext()) {
-			UserType myType = (UserType) userTypesIt.next();
+		for (UserType myType : userTypes) {
 			if (myType.equals(u)) {
 				return true;
 			}
@@ -450,13 +447,13 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public void addRole(StudyUserRoleBean sur) {
-		Integer key = new Integer(sur.getStudyId());
+		Integer key = sur.getStudyId();
 		if (rolesByStudy.containsKey(key)) {
-			Integer index = (Integer) rolesByStudy.get(key);
-			roles.set(index.intValue(), sur);
+			Integer index = rolesByStudy.get(key);
+			roles.set(index, sur);
 		} else {
 			roles.add(sur);
-			rolesByStudy.put(key, new Integer(roles.size() - 1));
+			rolesByStudy.put(key, roles.size() - 1);
 		}
 	}
 
@@ -491,11 +488,11 @@ public class UserAccountBean extends AuditableEntityBean {
 			return getSysAdminRole();
 		}
 
-		Integer key = new Integer(studyId);
+		Integer key = studyId;
 
 		if (rolesByStudy.containsKey(key)) {
-			Integer index = (Integer) rolesByStudy.get(key);
-			StudyUserRoleBean s = (StudyUserRoleBean) roles.get(index.intValue());
+			Integer index = rolesByStudy.get(key);
+			StudyUserRoleBean s = roles.get(index);
 
 			if (s != null && !s.getStatus().equals(Status.DELETED) && !s.getStatus().equals(Status.AUTO_DELETED)) {
 				return s;
@@ -532,14 +529,13 @@ public class UserAccountBean extends AuditableEntityBean {
 	public void setRoles(ArrayList<?> roles) {
 		this.roles = new ArrayList<StudyUserRoleBean>();
 		rolesByStudy.clear();
-
-		for (int i = 0; i < roles.size(); i++) {
-			StudyUserRoleBean sur = (StudyUserRoleBean) roles.get(i);
+		for (Object role : roles) {
+			StudyUserRoleBean sur = (StudyUserRoleBean) role;
 
 			this.roles.add(sur);
 
-			Integer key = new Integer(sur.getStudyId());
-			Integer value = new Integer(this.roles.size() - 1);
+			Integer key = sur.getStudyId();
+			Integer value = this.roles.size() - 1;
 			rolesByStudy.put(key, value);
 
 			if (sur.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
@@ -548,11 +544,20 @@ public class UserAccountBean extends AuditableEntityBean {
 		}
 	}
 
-	public boolean equals(UserAccountBean ub) {
-		if (ub == null) {
-			return false;
+	public boolean hasSiteLevelRoles() {
+		boolean result = false;
+		for (StudyUserRoleBean studyUserRoleBean : roles) {
+			if (studyUserRoleBean.isClinicalResearchCoordinator() || studyUserRoleBean.isInvestigator()
+					|| studyUserRoleBean.isSiteMonitor()) {
+				result = true;
+				break;
+			}
 		}
-		return id == ub.getId();
+		return result;
+	}
+
+	public boolean equals(UserAccountBean ub) {
+		return ub != null && id == ub.getId();
 	}
 
 	/**

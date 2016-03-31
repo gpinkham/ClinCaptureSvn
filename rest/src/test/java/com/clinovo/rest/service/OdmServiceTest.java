@@ -11,31 +11,31 @@ public class OdmServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatOdmServiceReturnsOkForPostRequest() throws Exception {
-		this.mockMvc.perform(post(API_ODM).secure(true)).andExpect(status().isOk());
+		mockMvc.perform(post(API_ODM).secure(true)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatOdmServiceReturnsOkForPostRequestIfAcceptIsApplicationJson() throws Exception {
-		this.mockMvc.perform(post(API_ODM).accept(MediaType.APPLICATION_JSON).secure(true)).andExpect(status().isOk());
+		mockMvc.perform(post(API_ODM).accept(MediaType.APPLICATION_JSON).secure(true)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatOdmServiceReturnsOkForPostRequestIfAcceptIsApplicationXml() throws Exception {
-		this.mockMvc.perform(post(API_ODM).accept(MediaType.APPLICATION_XML).secure(true)).andExpect(status().isOk());
+		mockMvc.perform(post(API_ODM).accept(MediaType.APPLICATION_XML).secure(true)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatOdmServiceReturnsOkForGetRequestIfAcceptIsNull() throws Exception {
-		this.mockMvc.perform(get(API_ODM).secure(true)).andExpect(status().isOk());
+		mockMvc.perform(get(API_ODM).secure(true)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatOdmServiceReturnsOkForGetRequestIfAcceptIsApplicationJson() throws Exception {
-		this.mockMvc.perform(get(API_ODM).accept(MediaType.APPLICATION_JSON).secure(true)).andExpect(status().isOk());
+		mockMvc.perform(get(API_ODM).accept(MediaType.APPLICATION_JSON).secure(true)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatOdmServiceReturnsOkForGetRequestIfAcceptIsApplicationXml() throws Exception {
-		this.mockMvc.perform(get(API_ODM).accept(MediaType.APPLICATION_XML).secure(true)).andExpect(status().isOk());
+		mockMvc.perform(get(API_ODM).accept(MediaType.APPLICATION_XML).secure(true)).andExpect(status().isOk());
 	}
 }

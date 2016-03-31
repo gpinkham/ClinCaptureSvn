@@ -39,6 +39,8 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.StudyUtil;
 import com.clinovo.validator.StudyValidator;
 
@@ -77,8 +79,8 @@ public class CreateStudyServlet extends SpringServlet {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		HashMap errors = getErrorsHolder(request);
+		FormProcessor fp = new FormProcessor(request);
 
 		String action = request.getParameter("action");
 		StudyInfoPanel panel = getStudyInfoPanel(request);
@@ -91,13 +93,13 @@ public class CreateStudyServlet extends SpringServlet {
 		panel.setIconInfoShown(true);
 		panel.setManageSubject(false);
 
+		request.setAttribute("startDate", fp.getString("startDate"));
+
 		if (StringUtil.isBlank(action)) {
 			request.getSession().setAttribute("newStudy", new StudyBean());
-
 			UserAccountDAO udao = new UserAccountDAO(getDataSource());
 			Collection users = udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getCode(), Role.STUDY_DIRECTOR.getCode());
 			request.setAttribute("users", users);
-
 			forwardPage(Page.CREATE_STUDY1, request, response);
 		} else if ("next".equalsIgnoreCase(action)) {
 			confirmStudy1(request, response, errors);
@@ -120,14 +122,14 @@ public class CreateStudyServlet extends SpringServlet {
 		FormProcessor fp = new FormProcessor(request);
 		UserAccountBean currentUser = getUserAccountBean();
 
-		errors.putAll(StudyValidator.validate(getStudyDAO(), getConfigurationDao()));
+		errors.putAll(StudyValidator.validate(getStudyDAO(), getConfigurationDao(), DateUtil.DatePattern.DATE));
 
-		StudyBean studyBean = getStudyService().prepareStudyBean(new StudyBean(), StudyUtil.getStudyParametersMap(),
-				StudyUtil.getStudyFeaturesMap());
+		StudyBean studyBean = getStudyService().prepareStudyBean(new StudyBean(), currentUser,
+				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.DATE,
+				LocaleResolver.getLocale());
 
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");
-			request.setAttribute("studyPhaseMap", getMapsHolder().getStudyPhaseMap());
 			request.setAttribute("statuses", Status.toActiveArrayList());
 			logger.info("setting arrays to request, size of list: " + Status.toArrayList().size());
 			if (request.getParameter("Save") != null && request.getParameter("Save").length() > 0) {

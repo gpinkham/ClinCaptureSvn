@@ -136,7 +136,6 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 			request.setAttribute("parentStudy", parent);
 			request.getSession().setAttribute("parentName", parentStudyName);
 			request.getSession().setAttribute("newStudy", study);
-			request.setAttribute("facRecruitStatusMap", getMapsHolder().getFacRecruitStatusMap());
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 
 			FormProcessor fp = new FormProcessor(request);

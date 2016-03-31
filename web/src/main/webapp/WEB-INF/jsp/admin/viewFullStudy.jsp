@@ -225,53 +225,56 @@
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
+<c:choose>
+    <c:when test="${studyToView.parentStudyId == 0}">
+        <c:set var="key" value="study_system_status"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="key" value="site_system_status"/>
+    </c:otherwise>
+</c:choose>
+
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+ <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
+     <c:choose>
+         <c:when test="${studyToView.status.locked}">
+             <strong><c:out value="${studyToView.status.name}"/></strong>
+         </c:when>
+         <c:otherwise>
+             <c:out value="${studyToView.status.name}"/>
+         </c:otherwise>
+     </c:choose>
+ </td></tr>
+
  <tr valign="top"><td class="table_header_column"><fmt:message key="study_phase" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.phase}"/>
-  </td></tr>
+ <c:out value="${studyToView.phase}"/>
+ </td></tr>
 
  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#StudyType" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#StudyType'); return false;"><fmt:message key="protocol_type" bundle="${resword}"/></a>:</td><td class="table_cell">
  <c:out value="${studyToView.protocolType}"/>
  </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <cc-fmt:formatDate value="${studyToView.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}"/>
-  </td></tr>
+ <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
+ <c:out value="${studyToView.expectedTotalEnrollment}"/>&nbsp;
+ </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
-   <cc-fmt:formatDate value="${studyToView.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}"/>
-  </td></tr>
+ <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
+ <cc-fmt:formatDate value="${studyToView.datePlannedStart}" dateTimeZone="${userBean.userTimeZoneId}"/>
+ </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="estimated_completion_date" bundle="${resword}"/>:</td><td class="table_cell">
-   <cc-fmt:formatDate value="${studyToView.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
-  </td></tr>
+ <tr valign="top"><td class="table_header_column"><fmt:message key="estimated_completion_date" bundle="${resword}"/>:</td><td class="table_cell">
+ <cc-fmt:formatDate value="${studyToView.datePlannedEnd}" dateTimeZone="${userBean.userTimeZoneId}"/>&nbsp;
+ </td></tr>
 
-    <c:choose>
-     <c:when test="${studyToView.parentStudyId == 0}">
-        <c:set var="key" value="study_system_status"/>
-     </c:when>
-     <c:otherwise>
-         <c:set var="key" value="site_system_status"/>
-     </c:otherwise>
-    </c:choose>
+ <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/></a>:</td><td class="table_cell">
+ <cc-fmt:formatDate value="${studyToView.protocolDateVerification}" dateTimeZone="${userBean.userTimeZoneId}"/>
+ </td></tr>
 
-    <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-
-  <c:choose>
-    <c:when test="${studyToView.status.locked}">
-        <strong><c:out value="${studyToView.status.name}"/></strong>
-    </c:when>
-    <c:otherwise>
-        <c:out value="${studyToView.status.name}"/>
-    </c:otherwise>
-  </c:choose>
-   </td></tr>
-
-
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose'); return false;"><fmt:message key="purpose" bundle="${resword}"/></a>:</td><td class="table_cell">
-   <c:out value="${studyToView.purpose}"/>
-  </td></tr>
+ <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntPurpose'); return false;"><fmt:message key="purpose" bundle="${resword}"/></a>:</td><td class="table_cell">
+ <c:out value="${studyToView.purpose}"/>
+ </td></tr>
 
   <c:choose>
   <c:when test="${studyToView.protocolTypeKey=='interventional'}">
@@ -336,7 +339,6 @@
 </div></div></div></div></div></div></div></div>
 </div>
 </div>
-<br>
 
 <c:set var="genderShow" value="${true}"/>
 <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>
@@ -345,7 +347,8 @@
     <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
 </c:if>
 
-<a href="javascript:leftnavExpand('sectionc');">
+<br class="hidden">
+<a href="javascript:leftnavExpand('sectionc');" class="hidden">
     <img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> C: <fmt:message key="conditions_and_eligibility" bundle="${resword}"/>]</span></a>
 <div id="sectionc" style="display:none ">
 <div style="width: 600px">
@@ -389,10 +392,6 @@
     </c:otherwise>
    </c:choose>
  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.expectedTotalEnrollment}"/>&nbsp;
-  </td></tr>
   </table>
 </div>
 </div></div></div></div></div></div></div></div>

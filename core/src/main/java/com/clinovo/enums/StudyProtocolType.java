@@ -19,28 +19,45 @@ package com.clinovo.enums;
  */
 public enum StudyProtocolType {
 
-	INTERVENTIONAL(0, "interventional"), OBSERVATIONAL(1, "observational");
+	INTERVENTIONAL(0, "interventional", "interventional"), OBSERVATIONAL(1, "observational", "observational");
 
 	private int id;
-	private String name;
+	private String code;
+	private String value;
 
-	StudyProtocolType(int id, String name) {
+	StudyProtocolType(int id, String value, String code) {
 		this.id = id;
-		this.name = name;
+		this.code = code;
+		this.value = value;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public String getCode() {
+		return code;
 	}
 
-	public static StudyProtocolType getStudyProtocolType(int id) {
+	public String getValue() {
+		return value;
+	}
+
+	public static StudyProtocolType get(int id) {
 		StudyProtocolType result = INTERVENTIONAL;
 		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
 			if (studyProtocolType.getId() == id) {
+				result = studyProtocolType;
+				break;
+			}
+		}
+		return result;
+	}
+
+	public static StudyProtocolType get(String value) {
+		StudyProtocolType result = INTERVENTIONAL;
+		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
+			if (studyProtocolType.getValue().equals(value)) {
 				result = studyProtocolType;
 				break;
 			}

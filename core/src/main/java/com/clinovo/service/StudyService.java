@@ -16,6 +16,7 @@
 package com.clinovo.service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -25,6 +26,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 
 import com.clinovo.exception.CodeException;
 import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.util.DateUtil;
 
 /**
  * StudyService.
@@ -119,16 +121,32 @@ public interface StudyService {
 	 * 
 	 * @param studyBean
 	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
 	 * @param parametersMap
 	 *            Map
 	 * @param featuresMap
 	 *            map
+	 * @param datePattern
+	 *            DateUtil.DatePattern
+	 * @param locale
+	 *            Locale
 	 * @return StudyBean
 	 */
-	StudyBean prepareStudyBean(StudyBean studyBean, Map<String, String> parametersMap, Map<String, String> featuresMap);
+	StudyBean prepareStudyBean(StudyBean studyBean, UserAccountBean currentUser, Map<String, String> parametersMap,
+			Map<String, String> featuresMap, DateUtil.DatePattern datePattern, Locale locale);
 
 	/**
-	 * Prepares study bean configuration and fills it.
+	 * Prepares study bean configuration parameters.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @return StudyBean
+	 */
+	StudyBean prepareStudyBeanConfiguration(StudyBean studyBean);
+
+	/**
+	 * Prepares study bean configuration parameters and fills it.
 	 * 
 	 * @param studyBean
 	 *            StudyBean

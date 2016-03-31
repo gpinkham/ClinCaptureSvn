@@ -194,6 +194,20 @@
     <xs:element name="PrincipalInvestigator" type="xs:string"/>
     <xs:element name="Sponsor" type="xs:string"/>
     <xs:element name="Collaborators" type="xs:string"/>
+    <xs:element name="Phase" type="xs:string"/>
+    <xs:element name="TotalEnrollment" type="xs:string"/>
+    <xs:element name="StartDate" type="xs:string" nillable="true"/>
+    <xs:element name="EndDate" type="xs:string" nillable="true"/>
+    <xs:element name="ApprovalDate" type="xs:string" nillable="true"/>
+    <xs:element name="Purpose" type="xs:string"/>
+    <xs:element name="Allocation" type="xs:string"/>
+    <xs:element name="Masking" type="xs:string"/>
+    <xs:element name="Control" type="xs:string"/>
+    <xs:element name="InterventionModel" type="xs:string"/>
+    <xs:element name="Classification" type="xs:string"/>
+    <xs:element name="Duration" type="xs:string"/>
+    <xs:element name="Selection" type="xs:string"/>
+    <xs:element name="Timing" type="xs:string"/>
 
     <xs:complexType name="studyBean">
         <xs:sequence>
@@ -204,11 +218,25 @@
             <xs:element ref="ProtocolId" minOccurs="0"/>
             <xs:element ref="SecondaryIDs" minOccurs="0"/>
             <xs:element ref="Summary" minOccurs="0"/>
+            <xs:element ref="StartDate" minOccurs="0"/>
+            <xs:element ref="EndDate" minOccurs="0"/>
             <xs:element ref="PrincipalInvestigator" minOccurs="0"/>
             <xs:element ref="ProtocolType" minOccurs="0"/>
             <xs:element ref="DetailedDescription" minOccurs="0"/>
+            <xs:element ref="ApprovalDate" minOccurs="0"/>
+            <xs:element ref="Phase" minOccurs="0"/>
+            <xs:element ref="TotalEnrollment" minOccurs="0"/>
             <xs:element ref="Sponsor" minOccurs="0"/>
             <xs:element ref="Collaborators" minOccurs="0"/>
+            <xs:element ref="Purpose" minOccurs="0"/>
+            <xs:element ref="Allocation" minOccurs="0"/>
+            <xs:element ref="Masking" minOccurs="0"/>
+            <xs:element ref="Control" minOccurs="0"/>
+            <xs:element ref="InterventionModel" minOccurs="0"/>
+            <xs:element ref="Classification" minOccurs="0"/>
+            <xs:element ref="Duration" minOccurs="0"/>
+            <xs:element ref="Selection" minOccurs="0"/>
+            <xs:element ref="Timing" minOccurs="0"/>
             <xs:element ref="Oid" minOccurs="0"/>
             <xs:element ref="Parameters" minOccurs="0"/>
             <xs:element ref="Features" minOccurs="0"/>

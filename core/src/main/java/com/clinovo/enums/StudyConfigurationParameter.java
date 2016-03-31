@@ -15,9 +15,9 @@
 package com.clinovo.enums;
 
 /**
- * StudyConfigurationParameters.
+ * StudyConfigurationParameter.
  */
-public enum StudyConfigurationParameters {
+public enum StudyConfigurationParameter {
 	
 	// Study Parameters
 	STUDY_PARAMETERS("studyParameters", "studyParameters", StudyConfigurationParameterType.GROUP),
@@ -67,10 +67,10 @@ public enum StudyConfigurationParameters {
 	DATA_ENTRY_PARAMETERS("dataEntryParameters", "dataEntryParameters", StudyConfigurationParameterType.GROUP),
 
 	INTERVIEWER_NAME_REQUIRED("interviewerNameRequired", "when_entering_data_entry_interviewer", new String[] {"yes", "no", "not_used"}, new String[] {"required", "optional", "not_used"}, "interviewer1 interviewer2", "not_used", StudyConfigurationParameterType.RADIO),
-	INTERVIEWER_NAME_DEFAULT("interviewerNameDefault", "interviewer_name_default_as_blank", new String[] {"blank", "re-populated"}, new String[] {"blank", "pre_populated_from_active_user"}, "interviewer2", "blank", "interviewer1 simulateRadioOnClick", StudyConfigurationParameterType.RADIO),
+	INTERVIEWER_NAME_DEFAULT("interviewerNameDefault", "interviewer_name_default_as_blank", new String[] {"blank", "pre-populated"}, new String[] {"blank", "pre_populated_from_active_user"}, "interviewer2", "blank", "interviewer1 simulateRadioOnClick", StudyConfigurationParameterType.RADIO),
 	INTERVIEWER_NAME_EDITABLE("interviewerNameEditable", "interviewer_name_editable", new String[] {"true", "false"}, new String[] {"yes", "no"}, StudyConfigurationParameterType.RADIO, "interviewer2"),
 	INTERVIEW_DATE_REQUIRED("interviewDateRequired", "interviewer_date_required", new String[] {"yes", "no", "not_used"}, new String[] {"required", "optional", "not_used"}, "interviewDate1 interviewDate2", "not_used", StudyConfigurationParameterType.RADIO),
-	INTERVIEW_DATE_DEFAULT("interviewDateDefault", "interviewer_date_default_as_blank", new String[] {"blank", "re-populated"}, new String[] {"blank", "pre_populated_from_SE"}, "interviewDate2", "blank", "interviewDate1 simulateRadioOnClick", StudyConfigurationParameterType.RADIO),
+	INTERVIEW_DATE_DEFAULT("interviewDateDefault", "interviewer_date_default_as_blank", new String[] {"blank", "pre-populated"}, new String[] {"blank", "pre_populated_from_SE"}, "interviewDate2", "blank", "interviewDate1 simulateRadioOnClick", StudyConfigurationParameterType.RADIO),
 	INTERVIEW_DATE_EDITABLE("interviewDateEditable", "interviewer_date_editable", new String[] {"true", "false"}, new String[] {"yes", "no"}, StudyConfigurationParameterType.RADIO, "interviewDate2"),
 	AUTO_TABBING("autoTabbing", "useAutoTabbing", new String[] {"yes", "no"}, new String[] {"yes", "no"}, StudyConfigurationParameterType.RADIO),
 
@@ -125,15 +125,15 @@ public enum StudyConfigurationParameters {
 	private String hideDependentRowsIfSelectedValueIs;
 	private String selectValueIfThereIsNothingIsSelected;
 	private String showAdditionalStudyConfigurationParameterIfSelectedValueIs;
-	private StudyConfigurationParameters additionalStudyConfigurationParameter;
+	private StudyConfigurationParameter additionalStudyConfigurationParameter;
 
-	StudyConfigurationParameters(String name, String code, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, String code, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
 	}
 
-	StudyConfigurationParameters(String objectsSelector, String rowClassName, String name, String code, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String objectsSelector, String rowClassName, String name, String code, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -141,21 +141,21 @@ public enum StudyConfigurationParameters {
 		this.objectsSelector = objectsSelector;
 	}
 
-	StudyConfigurationParameters(String name, String code, String maxLength, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, String code, String maxLength, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
 		this.maxLength = maxLength;
 	}
 
-	StudyConfigurationParameters(String name, boolean skip, String maxLength, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, boolean skip, String maxLength, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.type = type;
 		this.skip = skip;
 		this.maxLength = maxLength;
 	}
 
-	StudyConfigurationParameters(String name, String code, String maxLength, StudyConfigurationParameterType type, String rowClassName) {
+	StudyConfigurationParameter(String name, String code, String maxLength, StudyConfigurationParameterType type, String rowClassName) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -163,7 +163,7 @@ public enum StudyConfigurationParameters {
 		this.rowClassName = rowClassName;
 	}
 
-	StudyConfigurationParameters(String name, boolean skip, String maxLength, String dynamicLabelId, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, boolean skip, String maxLength, String dynamicLabelId, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.type = type;
 		this.skip = skip;
@@ -172,7 +172,7 @@ public enum StudyConfigurationParameters {
 	}
 
 
-	StudyConfigurationParameters(String name, String code, String[] values, String[] valueCodes, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -180,7 +180,7 @@ public enum StudyConfigurationParameters {
 		this.valueCodes = valueCodes;
 	}
 
-	StudyConfigurationParameters(boolean disabled, String name, String code, String[] values, String[] valueCodes, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(boolean disabled, String name, String code, String[] values, String[] valueCodes, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -189,7 +189,7 @@ public enum StudyConfigurationParameters {
 		this.valueCodes = valueCodes;
 	}
 
-	StudyConfigurationParameters(String name, String code, String[] values, String[] valueCodes, StudyConfigurationParameterType type, String rowClassName) {
+	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes, StudyConfigurationParameterType type, String rowClassName) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -198,7 +198,7 @@ public enum StudyConfigurationParameters {
 		this.rowClassName = rowClassName;
 	}
 
-	StudyConfigurationParameters(String name, String code, String[] values, String[] valueCodes, String dynamicLabelId, String processorMode, StudyConfigurationParameterType type, String rowClassName) {
+	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes, String dynamicLabelId, String processorMode, StudyConfigurationParameterType type, String rowClassName) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -209,7 +209,7 @@ public enum StudyConfigurationParameters {
 		this.dynamicLabelId = dynamicLabelId;
 	}
 
-	StudyConfigurationParameters(String name, String code, String[] values, String[] valueCodes, String dependentRowsClassName, String hideDependentRowsIfSelectedValueIs, String rowClassName, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes, String dependentRowsClassName, String hideDependentRowsIfSelectedValueIs, String rowClassName, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -220,7 +220,7 @@ public enum StudyConfigurationParameters {
 		this.hideDependentRowsIfSelectedValueIs = hideDependentRowsIfSelectedValueIs;
 	}
 
-	StudyConfigurationParameters(String name, String code, String[] values, String[] valueCodes, String dependentRowsClassName, String hideDependentRowsIfSelectedValueIs, StudyConfigurationParameterType type) {
+	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes, String dependentRowsClassName, String hideDependentRowsIfSelectedValueIs, StudyConfigurationParameterType type) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -230,7 +230,7 @@ public enum StudyConfigurationParameters {
 		this.hideDependentRowsIfSelectedValueIs = hideDependentRowsIfSelectedValueIs;
 	}
 
-	StudyConfigurationParameters(boolean ignoreName, String name, String code, String[] values, String[] valueCodes, String selectValueIfThereIsNothingIsSelected, StudyConfigurationParameterType type, String showAdditionalStudyConfigurationParameterIfSelectedValueIs, StudyConfigurationParameters additionalStudyConfigurationParameter) {
+	StudyConfigurationParameter(boolean ignoreName, String name, String code, String[] values, String[] valueCodes, String selectValueIfThereIsNothingIsSelected, StudyConfigurationParameterType type, String showAdditionalStudyConfigurationParameterIfSelectedValueIs, StudyConfigurationParameter additionalStudyConfigurationParameter) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -242,7 +242,7 @@ public enum StudyConfigurationParameters {
 		this.showAdditionalStudyConfigurationParameterIfSelectedValueIs = showAdditionalStudyConfigurationParameterIfSelectedValueIs;
 	}
 
-	StudyConfigurationParameters(boolean ignoreName, String name, String code, String[] values, String[] valueCodes, String rowClassName, String selectValueIfThereIsNothingIsSelected, StudyConfigurationParameterType type, String showAdditionalStudyConfigurationParameterIfSelectedValueIs, StudyConfigurationParameters additionalStudyConfigurationParameter, String dynamicLabelId) {
+	StudyConfigurationParameter(boolean ignoreName, String name, String code, String[] values, String[] valueCodes, String rowClassName, String selectValueIfThereIsNothingIsSelected, StudyConfigurationParameterType type, String showAdditionalStudyConfigurationParameterIfSelectedValueIs, StudyConfigurationParameter additionalStudyConfigurationParameter, String dynamicLabelId) {
 		this.name = name;
 		this.code = code;
 		this.type = type;
@@ -324,7 +324,7 @@ public enum StudyConfigurationParameters {
 		return showAdditionalStudyConfigurationParameterIfSelectedValueIs;
 	}
 
-	public StudyConfigurationParameters getAdditionalStudyConfigurationParameter() {
+	public StudyConfigurationParameter getAdditionalStudyConfigurationParameter() {
 		return additionalStudyConfigurationParameter;
 	}
 

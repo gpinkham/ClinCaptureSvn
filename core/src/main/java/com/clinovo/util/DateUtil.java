@@ -45,6 +45,8 @@ public final class DateUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
 
+	public static final String ISO_DATE = "yyyy-MM-dd";
+
 	private static ResourceBundle resformat;
 
 	private static Map<String, String> timeZoneIDsSortedMap;
@@ -390,7 +392,7 @@ public final class DateUtil {
 		DATE_AND_HOUR("dd-MMM-yyyy HH"),
 		YEAR_AND_MONTH("MMM-yyyy"),
 		YEAR("yyyy"),
-		ISO_DATE("yyyy-MM-dd"),
+		ISO_DATE(DateUtil.ISO_DATE),
 		ISO_TIMESTAMP("yyyy-MM-dd'T'HH:mm:ss");
 
 		private String pattern;

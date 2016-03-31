@@ -41,7 +41,6 @@
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
-<jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap"/>
 
@@ -463,7 +462,7 @@
 				</c:when>
 				<c:otherwise>
 					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewDateEditable', 'true');" name="interviewDateDefault" value="blank" data-cc-action="hide" data-row-class="interviewDateEditable"><fmt:message key="blank" bundle="${resword}"/>
-					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" checked name="interviewDateDefault" value="re-populated" data-cc-action="show" data-row-class="interviewDateEditable"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+					<input type="radio" onchange="javascript:changeIcon()" onclick="hideUnhideStudyParamRow(this);" checked name="interviewDateDefault" value="pre-populated" data-cc-action="show" data-row-class="interviewDateEditable"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
 				</c:otherwise>
 			</c:choose>
 		  </td>
@@ -506,7 +505,7 @@
 				   </c:when>
 				   <c:otherwise>
 					    <input type="radio" name="interviewerNameDefault" value="blank" onclick="hideUnhideStudyParamRow(this); changeParameterForStudy('interviewerNameEditable', 'true');" data-cc-action="hide" data-row-class="interviewerEditable"><fmt:message key="blank" bundle="${resword}"/>
-					    <input type="radio" checked name="interviewerNameDefault" value="re-populated" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewerEditable"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+					    <input type="radio" checked name="interviewerNameDefault" value="pre-populated" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewerEditable"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
 				   </c:otherwise>
 			  </c:choose>
 		  </td>

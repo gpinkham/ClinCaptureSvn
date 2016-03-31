@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.clinovo.rest.annotation.RestParameterPossibleValues;
-import com.clinovo.rest.annotation.RestParameterPossibleValuesHolder;
-import com.clinovo.rest.annotation.RestProvideAtLeastOneNotRequired;
+import com.clinovo.rest.annotation.PossibleValues;
+import com.clinovo.rest.annotation.PossibleValuesHolder;
+import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
 import com.clinovo.rest.model.Response;
 import com.clinovo.rest.service.base.BaseEventService;
 import com.clinovo.rest.util.ValidatorUtil;
@@ -121,8 +121,8 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
+	@PossibleValuesHolder({
+			@PossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST)
 	public StudyEventDefinitionBean createEvent(@RequestParam("name") String name,
 			@RequestParam(value = "type") String type,
@@ -176,9 +176,9 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestProvideAtLeastOneNotRequired
-	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
+	@ProvideAtLeastOneNotRequired
+	@PossibleValuesHolder({
+			@PossibleValues(name = "type", canBeNotSpecified = true, values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/event/edit", method = RequestMethod.POST)
 	public StudyEventDefinitionBean editEvent(@RequestParam(value = "id") int eventId,
 			@RequestParam(value = "name", required = false) String name,
@@ -275,11 +275,11 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourceDataVerification", values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataEntryQuality.valueDescription"),
-			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailWhen.valueDescription"),
-			@RestParameterPossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
+	@PossibleValuesHolder({
+			@PossibleValues(name = "sourceDataVerification", values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
+			@PossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation", valueDescriptions = "rest.dataEntryQuality.valueDescription"),
+			@PossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign", valueDescriptions = "rest.emailWhen.valueDescription"),
+			@PossibleValues(name = "tabbing", values = "leftToRight,topToBottom")})
 	@RequestMapping(value = "/event/addCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean addCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName, @RequestParam("defaultVersion") String defaultVersion,
@@ -340,13 +340,13 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestProvideAtLeastOneNotRequired
-	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
-			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
-			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom"),
-			@RestParameterPossibleValues(name = "propagateChange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagateChange.valueDescription")})
+	@ProvideAtLeastOneNotRequired
+	@PossibleValuesHolder({
+			@PossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
+			@PossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
+			@PossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
+			@PossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom"),
+			@PossibleValues(name = "propagateChange", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.propagateChange.valueDescription")})
 	@RequestMapping(value = "/event/editStudyCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean editStudyCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName,
@@ -408,12 +408,12 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RestProvideAtLeastOneNotRequired
-	@RestParameterPossibleValuesHolder({
-			@RestParameterPossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
-			@RestParameterPossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
-			@RestParameterPossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
-			@RestParameterPossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom")})
+	@ProvideAtLeastOneNotRequired
+	@PossibleValuesHolder({
+			@PossibleValues(name = "sourceDataVerification", canBeNotSpecified = true, values = "1,2,3", valueDescriptions = "rest.sourceDataVerification.valueDescription"),
+			@PossibleValues(name = "dataEntryQuality", canBeNotSpecified = true, values = "dde,evaluation,none", valueDescriptions = "rest.dataEntryQualityWithNone.valueDescription"),
+			@PossibleValues(name = "emailWhen", canBeNotSpecified = true, values = "complete,sign,none", valueDescriptions = "rest.emailWhenWithNone.valueDescription"),
+			@PossibleValues(name = "tabbing", canBeNotSpecified = true, values = "leftToRight,topToBottom")})
 	@RequestMapping(value = "/event/editSiteCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean editSiteCrf(@RequestParam(value = "eventId") int eventId,
 			@RequestParam("crfName") String crfName, @RequestParam("siteName") String siteName,
