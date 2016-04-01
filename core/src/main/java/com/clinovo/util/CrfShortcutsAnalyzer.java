@@ -65,6 +65,7 @@ public class CrfShortcutsAnalyzer {
 	public static final String ANNOTATION_DN = "annotationDn_";
 
 	public static final int RES_STATUS_OPEN = 1;
+	public static final int RES_STATUS_OPEN_WITH_DCF = 6;
 	public static final int RES_STATUS_UPDATED = 2;
 	public static final int RES_STATUS_RESOLVED = 3;
 	public static final int RES_STATUS_CLOSED = 4;
@@ -548,7 +549,8 @@ public class CrfShortcutsAnalyzer {
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
 					incTotalUpdated();
 					key = FIRST_UPDATED_DN;
-				} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())) {
+				} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())
+						|| ResolutionStatus.OPEN_DCF.equals(tempBean.getResStatus())) {
 					key = FIRST_NEW_DN;
 					incTotalNew();
 				} else if (ResolutionStatus.CLOSED.equals(tempBean.getResStatus())) {
@@ -663,7 +665,7 @@ public class CrfShortcutsAnalyzer {
 					}
 				}
 				switch (tempBean.getResolutionStatusId()) {
-					case RES_STATUS_OPEN :
+					case RES_STATUS_OPEN : case RES_STATUS_OPEN_WITH_DCF :
 						incSectionTotalNew();
 						dib.getNewDn().add(NEW_DN.concat(Integer.toString(getSectionTotalNew())));
 						break;

@@ -541,7 +541,7 @@
                                         ${studyEvent.studyEventDefinition.name}</td>
                                 <td class="table_cell">${displayEventCRFBean.eventCRF.crf.name}</td>
                                 <td class="table_cell">
-                                    <c:set var="discNoteCount" value="${discNoteMap['New']}"/>
+                                    <c:set var="discNoteCount" value="${discNoteMap['New'] + discNoteMap['New (DCF)']}"/>
                                     <c:if test="${discNoteCount > 0}">
                                         <img
                                           name="icon_Note" src="images/icon_Note.gif" border="0"

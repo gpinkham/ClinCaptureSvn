@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import com.clinovo.util.RegexpUtil;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Custom discrepancy notes table filter.
@@ -215,17 +216,20 @@ public class ListNotesFilter implements CriteriaCommand {
 		return criteria;
 	}
 
-	private String parseResolutionStatus(String stringValue) {
-		StringBuilder result = new StringBuilder();
-		if (stringValue.length() > 0) {
-			result.append(" and (");
-			for (int i = 0; i < stringValue.length(); i++) {
-				result.append(" or " + "dn.resolution_status_id = ").append(stringValue.charAt(i));
+	private String parseResolutionStatus(String resolutionStatuses) {
+
+		StringBuilder result = new StringBuilder("");
+		if (!StringUtils.isEmpty(resolutionStatuses)) {
+			result.append(" and dn.resolution_status_id in (");
+			int resolutionStatusesLength = resolutionStatuses.length();
+			boolean isLastStatus;
+			for (int i = 0; i < resolutionStatusesLength; i++) {
+				isLastStatus = i == resolutionStatusesLength - 1;
+				result.append(resolutionStatuses.charAt(i)).append(isLastStatus ? "" : ",");
 			}
 			result.append(")");
 		}
-
-		return result.toString().replaceFirst(" or ", "");
+		return result.toString();
 	}
 
 	private String parseUserAccountName(String property, String stringValue) {

@@ -190,22 +190,6 @@ public class ListNoteTableFactoryTest {
 	}
 
 	@Test
-	public void testGetFilterStatusNewAndUpdated() {
-		FilterSet statusFilterSet = new FilterSetImpl();
-
-		statusFilterSet.addFilter(ListNotesTableFactory.DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS,
-				resterm.getString(ListNotesTableFactory.NEW_AND_UPDATED_KEY));
-
-		statusLimit.setFilterSet(statusFilterSet);
-		ListNotesFilter notesFilter = factory.getListNoteFilter(statusLimit);
-		List<ListNotesFilter.Filter> filterList = notesFilter.getFilters();
-
-		assertTrue(filterList.size() == 1);
-		ListNotesFilter.Filter filter = filterList.get(0);
-		assertEquals(filter.getProperty(), ListNotesTableFactory.DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS);
-	}
-
-	@Test
 	public void testNotesStatisticsOpen() {
 		Map<String, String> openNotes = notesStatistic.get(ResolutionStatus.OPEN.getName());
 		assertEquals("10", openNotes.get(DiscrepancyNoteType.FAILEDVAL.getName()));

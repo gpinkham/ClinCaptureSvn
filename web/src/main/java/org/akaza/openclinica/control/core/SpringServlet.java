@@ -37,6 +37,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -2018,7 +2019,9 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	/* Determining the resolution status that will be shown in color flag for an item. */
 	protected int getDiscrepancyNoteResolutionStatus(HttpServletRequest request, DiscrepancyNoteDAO dndao,
 			int itemDataId, List<DiscrepancyNoteBean> list) {
-		int resolutionStatus = 0;
+
+		int resolutionStatus = ResolutionStatus.INVALID.getId();
+		int resolutionStatusDisplayPriority = ResolutionStatus.INVALID.getDisplayPriority();
 		boolean hasOtherThread = false;
 
 		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForItemData(itemDataId);
@@ -2031,11 +2034,13 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			 */
 			if (note.getParentDnId() == 0) {
 				if (hasOtherThread) {
-					if (resolutionStatus > note.getResolutionStatusId()) {
+					if (resolutionStatusDisplayPriority > note.getResStatus().getDisplayPriority()) {
 						resolutionStatus = note.getResolutionStatusId();
+						resolutionStatusDisplayPriority = note.getResStatus().getDisplayPriority();
 					}
 				} else {
 					resolutionStatus = note.getResolutionStatusId();
+					resolutionStatusDisplayPriority = note.getResStatus().getDisplayPriority();
 				}
 				hasOtherThread = true;
 			}
@@ -2049,16 +2054,17 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
 			if (note.getParentDnId() == 0) {
 				if (hasOtherThread) {
-					if (resolutionStatus > note.getResolutionStatusId()) {
+					if (resolutionStatusDisplayPriority > note.getResStatus().getDisplayPriority()) {
 						resolutionStatus = note.getResolutionStatusId();
+						resolutionStatusDisplayPriority = note.getResStatus().getDisplayPriority();
 					}
 				} else {
 					resolutionStatus = note.getResolutionStatusId();
+					resolutionStatusDisplayPriority = note.getResStatus().getDisplayPriority();
 				}
 				hasOtherThread = true;
 			}
 		}
-
 		return resolutionStatus;
 	}
 

@@ -104,11 +104,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public static final String DISCREPANCY_NOTE_BEAN_DIS_TYPE = "discrepancyNoteBean.disType";
 	public static final String DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS = "discrepancyNoteBean.resolutionStatus";
 	public static final String QUERY_AND_FAILED_VALIDATION_CHECK_KEY = "Query_and_Failed_Validation_Check";
-	public static final String NEW_AND_UPDATED_KEY = "New_and_Updated";
+	public static final String NEW_KEY = "New";
 	public static final String NOT_CLOSED_KEY = "Not_Closed";
 	public static final String QUERY_AND_FAILED_VALIDATION_CHECK_VALUE = "31";
-	public static final String NEW_AND_UPDATED_VALUE = "21";
-	public static final String NOT_CLOSED_VALUE = "321";
+	public static final String NEW_AND_NEW_WITH_DCF_VALUE = "16";
+	public static final String NOT_CLOSED_VALUE = "6321";
 	public static final String DCF_CHECKBOX_NAME = "dcfcheck";
 
 	private AuditUserLoginDao auditUserLoginDao;
@@ -258,9 +258,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "days"), new AgeDaysFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, DISCREPANCY_NOTE_BEAN_DIS_TYPE),
-				new DNTypeFilterMatcher());
+				new GenericFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS),
-				new DNResolutionStatusFilterMatcher());
+				new GenericFilterMatcher());
 	}
 
 	@Override
@@ -596,6 +596,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	 * @return list with filtered notes.
 	 */
 	public ListNotesFilter getListNoteFilter(Limit limit) {
+
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		FilterSet filterSet = limit.getFilterSet();
 		Collection<Filter> filters = filterSet.getFilters();
@@ -612,13 +613,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			} else if (DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS.equalsIgnoreCase(property)) {
 				if (reterm.getString(NOT_CLOSED_KEY).equalsIgnoreCase(value)) {
 					value = NOT_CLOSED_VALUE;
+				} else if (reterm.getString(NEW_KEY).equalsIgnoreCase(value)) {
+					value = NEW_AND_NEW_WITH_DCF_VALUE;
 				} else {
 					value = Integer.toString(ResolutionStatus.getByName(value).getId());
 				}
 			}
 			listNotesFilter.addFilter(property, value);
 		}
-
 		return listNotesFilter;
 	}
 
@@ -775,31 +777,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		}
 	}
 
-	private class DNTypeFilterMatcher implements FilterMatcher {
-		public boolean evaluate(Object itemValue, String filterValue) {
-			int itemDNTypeId = ((DiscrepancyNoteType) itemValue).getId();
-			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-			if (reterm.getString(QUERY_AND_FAILED_VALIDATION_CHECK_KEY).equals(filterValue)) {
-				return itemDNTypeId == ITEM_DN_TYPE_FAILED_VALIDATION_CHECK || itemDNTypeId == ITEM_DN_TYPE_QUERY;
-			} else {
-				return itemDNTypeId == DiscrepancyNoteType.getByName(filterValue).getId();
-			}
-		}
-	}
-
-	private class DNResolutionStatusFilterMatcher implements FilterMatcher {
-		public boolean evaluate(Object itemValue, String filterValue) {
-			int itemDNTypeId = ((ResolutionStatus) itemValue).getId();
-			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-			if (reterm.getString(NOT_CLOSED_KEY).equals(filterValue)) {
-				return itemDNTypeId == STATUS_NEW || itemDNTypeId == STATUS_UPDATED
-						|| itemDNTypeId == STATUS_RESOLUTION_PROPOSED;
-			} else {
-				return itemDNTypeId == ResolutionStatus.getByName(filterValue).getId();
-			}
-		}
-	}
-
 	private class ResolutionStatusCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 			String value = "";
@@ -899,18 +876,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		}
 	}
 
-	private boolean shouldDnHaveDcfIcon(DiscrepancyNoteBean discrepancyNote) {
+	private boolean shouldDnHaveDcfIcon(DiscrepancyNoteBean dn) {
+
 		if (!enableDcf) {
 			return false;
 		}
-		if (discrepancyNote.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId()
-				|| discrepancyNote.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
-			if (discrepancyNote.getResolutionStatusId() == ResolutionStatus.OPEN.getId()
-					|| discrepancyNote.getResolutionStatusId() == ResolutionStatus.UPDATED.getId()) {
-				return true;
-			}
-		}
-		return false;
+		boolean dnTypeAllowsDCF = DiscrepancyNoteType.QUERY.equals(dn.getDisType())
+				|| DiscrepancyNoteType.FAILEDVAL.equals(dn.getDisType());
+		boolean dnResolutionStatusAllowsDCF = dn.getResStatus().isOpen() || dn.getResStatus().isOpenWithDCF()
+				|| dn.getResStatus().isUpdated();
+		return dnTypeAllowsDCF && dnResolutionStatusAllowsDCF;
 	}
 
 	private class DcfCellEditor implements CellEditor {
@@ -930,14 +905,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 
-		private boolean isEligibleForDCF(DiscrepancyNoteBean dnb) {
-			DiscrepancyNoteType dnType = DiscrepancyNoteType.get(dnb.getDiscrepancyNoteTypeId());
-			ResolutionStatus dnStatus = ResolutionStatus.get(dnb.getResolutionStatusId());
-			if ((dnType.equals(DiscrepancyNoteType.QUERY) || dnType.equals(DiscrepancyNoteType.FAILEDVAL))
-					&& dnStatus.isOpen()) {
-				return true;
-			}
-			return false;
+		private boolean isEligibleForDCF(DiscrepancyNoteBean dn) {
+
+			boolean dnTypeAllowsDCF = DiscrepancyNoteType.QUERY.equals(dn.getDisType())
+					|| DiscrepancyNoteType.FAILEDVAL.equals(dn.getDisType());
+			return dnTypeAllowsDCF && dn.getResStatus().isOpen();
 		}
 	}
 

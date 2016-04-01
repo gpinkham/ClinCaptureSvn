@@ -781,7 +781,7 @@ public class ViewDiscrepancyNoteServlet extends SpringServlet {
 				request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
 				request.setAttribute(DIS_TYPES2, DiscrepancyNoteType.simpleList);
 			}
-			request.setAttribute(RES_STATUSES2, ResolutionStatus.simpleList);
+			request.setAttribute(RES_STATUSES2, ResolutionStatus.SIMPLE_LIST);
 		}
 	}
 
@@ -811,7 +811,7 @@ public class ViewDiscrepancyNoteServlet extends SpringServlet {
 			types2.add(DiscrepancyNoteType.QUERY);
 			request.setAttribute(DIS_TYPES2, types2);
 		} else {
-			request.setAttribute(RES_STATUSES, ResolutionStatus.simpleList);
+			request.setAttribute(RES_STATUSES, ResolutionStatus.SIMPLE_LIST);
 			// it's for parentDNId is null or 0 and FVC
 			request.setAttribute(WHICH_RES_STATUSES, "2");
 			ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();

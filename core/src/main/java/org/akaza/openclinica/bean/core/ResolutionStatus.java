@@ -20,45 +20,58 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * A type-safe enumeration class for resolution status of discrepancy notes
- * 
- * @author Jun Xu
- * 
+ * A type-safe enumeration class for resolution status of discrepancy notes.
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ResolutionStatus extends Term {
+public final class ResolutionStatus extends Term {
 
-	protected static final Logger logger = LoggerFactory.getLogger(ResolutionStatus.class.getName());
+	protected static final Logger LOGGER = LoggerFactory.getLogger(ResolutionStatus.class.getName());
 
-	public static final ResolutionStatus INVALID = new ResolutionStatus(0, "invalid", null, null);
+	public static final ResolutionStatus INVALID = new ResolutionStatus(0, "invalid", null, 1);
 
-	public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "images/icon_Note.gif");
+	public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", "images/icon_Note.gif", 2);
 
-	public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null,
-			"images/icon_flagYellow.gif");
+	public static final ResolutionStatus OPEN_DCF = new ResolutionStatus(6, "new_dcf", "images/icon_Note.gif", 3);
 
-	public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null,
-			"images/icon_flagBlack.gif");
+	public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", "images/icon_flagYellow.gif", 4);
 
-	public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", null, "images/icon_flagGreen.gif");
+	public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed",
+			"images/icon_flagBlack.gif", 5);
 
-	public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null,
-			"images/icon_flagWhite.gif");
+	public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", "images/icon_flagGreen.gif", 6);
 
-	public static final List<ResolutionStatus> simpleList = Arrays.asList(OPEN, UPDATED, CLOSED);
+	public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable",
+			"images/icon_flagWhite.gif", 7);
+
+	public static final List<ResolutionStatus> SIMPLE_LIST = Arrays.asList(OPEN, UPDATED, CLOSED);
+
+	private static final ResolutionStatus[] MEMBERS = { OPEN, OPEN_DCF, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE };
+
+	private static final List<ResolutionStatus> MEMBERS_TO_DISPLAY_DNS_STATISTICS
+			= Arrays.asList(OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE);
+
+	public static final List MEMBERS_LIST = Arrays.asList(MEMBERS);
 
 	private String iconFilePath;
+
+	private int displayPriority;
+
+	private ResolutionStatus() {
+	}
+
+	private ResolutionStatus(int id, String name, String path, int displayPriority) {
+		super(id, name);
+		this.iconFilePath = path;
+		this.displayPriority = displayPriority;
+	}
 
 	public boolean isInvalid() {
 		return this == ResolutionStatus.INVALID;
@@ -66,6 +79,10 @@ public class ResolutionStatus extends Term {
 
 	public boolean isOpen() {
 		return this == ResolutionStatus.OPEN;
+	}
+
+	public boolean isOpenWithDCF() {
+		return this == ResolutionStatus.OPEN_DCF;
 	}
 
 	public boolean isClosed() {
@@ -84,36 +101,45 @@ public class ResolutionStatus extends Term {
 		return this == ResolutionStatus.NOT_APPLICABLE;
 	}
 
-	private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE };
-
 	public static ResolutionStatus[] getMembers() {
-		return members;
+		return MEMBERS;
 	}
 
-	public static final List list = Arrays.asList(members);
-
-	private List privileges;
-
-	private ResolutionStatus(int id, String name, Privilege[] myPrivs, String path) {
-		super(id, name);
-		this.iconFilePath = path;
+	public static List<ResolutionStatus> getMembersForDisplayStatistics() {
+		return MEMBERS_TO_DISPLAY_DNS_STATISTICS;
 	}
 
-	private ResolutionStatus() {
-	}
-
+	/**
+	 * Determines if a resolution status with specified ID exists.
+	 *
+	 * @param id ID to search by
+	 * @return <code>true</code> if the resolution status exists;
+	 * <code>false</code> - otherwise
+	 */
 	public static boolean contains(int id) {
-		return Term.contains(id, list);
+		return Term.contains(id, MEMBERS_LIST);
 	}
 
+	/**
+	 * Returns a resolution status entity by its ID.
+	 *
+	 * @param id ID to search by
+	 * @return resolution status entity; if a resolution status was not found - returns <code>null</code>
+	 */
 	public static ResolutionStatus get(int id) {
-		Term term = Term.get(id, list);
+		Term term = Term.get(id, MEMBERS_LIST);
 		return (term instanceof ResolutionStatus) ? (ResolutionStatus) term : null;
 	}
 
+	/**
+	 * Returns a resolution status entity by its name.
+	 *
+	 * @param name resolution status name
+	 * @return resolution status entity; if a resolution status was not found - returns the resolution status INVALID
+	 */
 	public static ResolutionStatus getByName(String name) {
-		for (int i = 0; i < list.size(); i++) {
-			ResolutionStatus temp = (ResolutionStatus) list.get(i);
+		for (Object aList : MEMBERS_LIST) {
+			ResolutionStatus temp = (ResolutionStatus) aList;
 			if (temp.getName().equals(name)) {
 				return temp;
 			}
@@ -121,20 +147,13 @@ public class ResolutionStatus extends Term {
 		return INVALID;
 	}
 
-	public boolean hasPrivilege(Privilege p) {
-		Iterator it = privileges.iterator();
-
-		while (it.hasNext()) {
-			Privilege myPriv = (Privilege) it.next();
-			if (myPriv.equals(p)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
+	/**
+	 * Returns full list of resolution statuses.
+	 *
+	 * @return full list of resolution statuses
+	 */
 	public static ArrayList toArrayList() {
-		return new ArrayList(list);
+		return new ArrayList(MEMBERS_LIST);
 	}
 
 	public String getIconFilePath() {
@@ -145,11 +164,7 @@ public class ResolutionStatus extends Term {
 		this.iconFilePath = iconFilePath;
 	}
 
-	public static void main(String[] args) {
-		ResourceBundleProvider.updateLocale(new Locale("en"));
-
-		ResolutionStatus test = new ResolutionStatus(1, "New", null, null);
-		logger.info("Test id : " + test.getId());
-		logger.info(test.getName());
+	public int getDisplayPriority() {
+		return displayPriority;
 	}
 }

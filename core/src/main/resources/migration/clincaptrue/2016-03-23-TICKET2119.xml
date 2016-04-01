@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="aram" id="2016-03-23-TICKET2119">
+		<comment>Adding new resolution status "New (DCF)" for DNs</comment>
+		<insert tableName="resolution_status">
+			<column name="resolution_status_id" value="6"/>
+			<column name="name" value="new_dcf"/>
+			<column name="description" value=""/>
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>

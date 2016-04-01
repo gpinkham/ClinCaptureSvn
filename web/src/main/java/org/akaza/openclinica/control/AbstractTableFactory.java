@@ -282,42 +282,6 @@ public abstract class AbstractTableFactory {
 	}
 
 	/**
-	 * Returns DN Flag icon name.
-	 * 
-	 * @param dnResolutionStatusId
-	 *            int
-	 * @return String
-	 */
-	public static String getDNFlagIconName(int dnResolutionStatusId) {
-		String name = "";
-		switch (dnResolutionStatusId) {
-			case 0 :
-				name = "icon_noNote";
-				break;
-			case 1 :
-				name = "icon_Note";
-				break;
-			case 2 :
-				name = "icon_flagYellow";
-				break;
-			case 3 :
-				name = "icon_flagBlack";
-				break;
-			case 4 :
-				name = "icon_flagGreen";
-				break;
-			case 5 :
-				name = "icon_flagWhite";
-				break;
-			default :
-				name = "icon_noNote";
-				break;
-		}
-
-		return name;
-	}
-
-	/**
 	 * Returns paginated data.
 	 * 
 	 * @param list

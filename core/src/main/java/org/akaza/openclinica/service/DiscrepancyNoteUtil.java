@@ -15,6 +15,7 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -71,6 +72,7 @@ public class DiscrepancyNoteUtil {
 	public static final int FAILED_VALIDATION_ID = 1;
 	public static final int QUERY_ID = 3;
 	public static final int NEW_ID = 1;
+	public static final int NEW_WITH_DCF_ID = 6;
 	public static final int UPDATED_ID = 2;
 	public static final int RESOLUTION_PROPOSED_ID = 3;
 	public static final int CLOSED_ID = 4;
@@ -87,6 +89,7 @@ public class DiscrepancyNoteUtil {
 
 	static {
 		RESOLUTION_STATUS.put("New", NEW_ID);
+		RESOLUTION_STATUS.put("New (DCF)", NEW_WITH_DCF_ID);
 		RESOLUTION_STATUS.put("Updated", UPDATED_ID);
 		RESOLUTION_STATUS.put("Resolution Proposed", RESOLUTION_PROPOSED_ID);
 		RESOLUTION_STATUS.put("Closed", CLOSED_ID);
@@ -521,7 +524,7 @@ public class DiscrepancyNoteUtil {
 	public static String getImageFileNameForFlagByResolutionStatusId(int resolutionStatusId) {
 		String result;
 		switch (resolutionStatusId) {
-			case NEW_ID:
+			case NEW_ID: case NEW_WITH_DCF_ID:
 				result = "icon_Note";
 				break;
 			case UPDATED_ID:
@@ -549,7 +552,9 @@ public class DiscrepancyNoteUtil {
 	 * @return int
 	 */
 	public static int getDiscrepancyNoteResolutionStatus(List existingNotes) {
-		int resolutionStatus = 0;
+
+		int resolutionStatus = ResolutionStatus.INVALID.getId();
+		int resolutionStatusDisplayPriority = ResolutionStatus.INVALID.getDisplayPriority();
 		boolean hasOtherThread = false;
 		for (Object obj : existingNotes) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
@@ -559,11 +564,13 @@ public class DiscrepancyNoteUtil {
 			 */
 			if (note.getParentDnId() == 0) {
 				if (hasOtherThread) {
-					if (resolutionStatus > note.getResolutionStatusId()) {
+					if (resolutionStatusDisplayPriority > note.getResStatus().getDisplayPriority()) {
 						resolutionStatus = note.getResolutionStatusId();
+						resolutionStatusDisplayPriority = note.getResStatus().getDisplayPriority();
 					}
 				} else {
 					resolutionStatus = note.getResolutionStatusId();
+					resolutionStatusDisplayPriority = note.getResStatus().getDisplayPriority();
 				}
 				hasOtherThread = true;
 			}

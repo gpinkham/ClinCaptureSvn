@@ -258,7 +258,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public DiscrepancyNoteStatisticBean getStatisticEntityFromHashMap(Map hm) {
 		DiscrepancyNoteStatisticBean statisticBean = new DiscrepancyNoteStatisticBean();
 
-		statisticBean.setDiscrepancyNotesCount((Integer) hm.get("sum"));
+		statisticBean.setDiscrepancyNotesCount((Integer) hm.get("count"));
 		statisticBean.setDiscrepancyNoteTypeId((Integer) hm.get("discrepancy_note_type_id"));
 		statisticBean.setResolutionStatusId((Integer) hm.get("resolution_status_id"));
 
@@ -671,15 +671,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 *
 	 * @param currentStudy
 	 *            StudyBean
-	 * @param filter
-	 *            ListNotesFilter
 	 * @param ub
 	 *            UserAccountBean
 	 * @return Map
 	 */
-	public Map<String, Map<ResolutionStatus, Integer>> countDNsByCRFs(StudyBean currentStudy, ListNotesFilter filter,
-			UserAccountBean ub) {
-		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap = new HashMap<String, Map<ResolutionStatus, Integer>>();
+	public Map<String, Map<ResolutionStatus, Integer>> countDNsByCRFs(StudyBean currentStudy, UserAccountBean ub) {
+
+		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap
+				= new HashMap<String, Map<ResolutionStatus, Integer>>();
 		int activeUserId = ub == null ? 0 : ub.getId();
 		int index = 1;
 		unsetTypeExpected();
@@ -692,28 +691,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(i, currentStudy.getId());
 		}
 
+		ListNotesFilter filter = new ListNotesFilter();
 		StringBuilder sql = new StringBuilder(
 				"select count(discrepancy_note_id), resolution_status_id, crf_name from (");
-
-		String filterPart = filter.execute("");
-
-		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
+		sql.append(digester.getQuery("findAllEventCrfDNByStudyForNdsPerCrfWidget"));
 		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
-		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+		if (currentStudy.isSite()) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(filterPart).append(UNION_OP);
-		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
+		sql.append(UNION_OP);
+		sql.append(digester.getQuery("findAllItemDataDNByStudyForNdsPerCrfWidget"));
 		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
-		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+		if (currentStudy.isSite()) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(filterPart);
-		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
-				.append(filter.addUserFilter()).append(filter.getAdditionalFilter());
-		sql.append(" group by crf_name, dns.resolution_status_id order by crf_name, resolution_status_id");
+		sql.append(") dns ");
+		sql.append(" group by crf_name, resolution_status_id");
+		sql.append(" order by crf_name, resolution_status_id");
+
 		List<Map> rows = select(sql.toString(), variables);
 		for (Map map : rows) {
 			Map<ResolutionStatus, Integer> rsToDNCountMap = crfNameToRSToDNCountMap.get(map.get("crf_name"));
@@ -903,15 +900,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(i, currentStudy.getId());
 		}
 		StringBuilder sql = new StringBuilder(
-				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id, count(id) FROM (");
+				"SELECT count(discrepancy_note_id), discrepancy_note_type_id, resolution_status_id FROM (");
 		sql.append(digester.getQuery("countAllSubjectDNByStudyForStat"));
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudySubjectDNByStudyForStat"));
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudyEventDNByStudyForStat"));
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
 		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
@@ -919,7 +913,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
 		sql.append(filter.getFilterForMaskedCRFs(activeUserId));
@@ -927,7 +920,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
 		ArrayList rows = select(sql.toString(), variables);
 		Iterator it = rows.iterator();
@@ -957,18 +949,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(i, currentUser.getId());
 		}
 		StringBuilder sql = new StringBuilder(
-				"SELECT sum(count), discrepancy_note_type_id, resolution_status_id, count(id) FROM (");
+				"SELECT count(discrepancy_note_id), discrepancy_note_type_id, resolution_status_id FROM (");
 		sql.append(digester.getQuery("countAllSubjectDNByStudyForStat"));
 		sql.append(digester.getQuery("countUsersDNForStatFilter"));
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudySubjectDNByStudyForStat"));
 		sql.append(digester.getQuery("countUsersDNForStatFilter"));
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllStudyEventDNByStudyForStat"));
 		sql.append(digester.getQuery("countUsersDNForStatFilter"));
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
 		sql.append(digester.getQuery("countUsersDNForStatFilter"));
@@ -976,7 +965,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
 		sql.append(digester.getQuery("countUsersDNForStatFilter"));
@@ -984,7 +972,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
 					.append(" ) ");
 		}
-		sql.append(digester.getQuery("countDNGroupBySuffix"));
 		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
 		ArrayList rows = select(sql.toString(), variables);
 		Iterator it = rows.iterator();
@@ -2576,7 +2563,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveNewDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
-		return doesSubjectHaveDNsInStudy(study, subjectLabel, "1", userAccount);
+		return doesSubjectHaveDNsInStudy(study, subjectLabel, "16", userAccount);
 	}
 
 	/**
@@ -2589,7 +2576,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveUnclosedDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
-		return doesSubjectHaveDNsInStudy(study, subjectLabel, "123", userAccount);
+		return doesSubjectHaveDNsInStudy(study, subjectLabel, "1236", userAccount);
 	}
 
 	/**
@@ -2620,7 +2607,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyNewDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
-		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "1", userAccount);
+		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "16", userAccount);
 	}
 
 	/**
@@ -2643,7 +2630,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
-		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "123", userAccount);
+		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "1236", userAccount);
 	}
 
 	/**
@@ -2693,7 +2680,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return boolean
 	 */
 	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel, UserAccountBean userAccount) {
-		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "1", userAccount);
+		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "16", userAccount);
 	}
 
 	/**
@@ -2723,7 +2710,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 */
 	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, UserAccountBean userAccount) {
-		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "123", userAccount);
+		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "1236", userAccount);
 	}
 
 	/**
@@ -2781,7 +2768,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 */
 	public boolean doesCRFHaveNewDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName, UserAccountBean userAccount) {
-		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1", userAccount);
+		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "16", userAccount);
 	}
 
 	/**
@@ -2814,7 +2801,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 */
 	public boolean doesCRFHaveUnclosedDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName, UserAccountBean userAccount) {
-		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123", userAccount);
+		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1236", userAccount);
 	}
 
 	/**

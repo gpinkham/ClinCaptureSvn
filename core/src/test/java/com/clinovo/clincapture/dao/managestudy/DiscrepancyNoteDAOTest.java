@@ -622,8 +622,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatCountDNsByCRFsMethodReturnsCorrectValues() {
-		Map<String, Map<ResolutionStatus, Integer>> result = discrepancyNoteDAO.countDNsByCRFs(study,
-				new ListNotesFilter(), user);
+		Map<String, Map<ResolutionStatus, Integer>> result = discrepancyNoteDAO.countDNsByCRFs(study, user);
 		assertEquals(result.keySet().size(), 0);
 	}
 }

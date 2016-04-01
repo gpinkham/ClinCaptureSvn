@@ -52,7 +52,6 @@ import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
 import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
-import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -270,7 +269,7 @@ public class WidgetsLayoutController extends SpringController {
 		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(datasource);
 
 		Integer newDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
-				+ " AND dn.resolution_status_id = 1", currentStudy, currentUser);
+				+ " AND dn.resolution_status_id IN (1,6)", currentStudy, currentUser);
 
 		if (newDns == null) {
 			newDns = 0;
@@ -655,8 +654,7 @@ public class WidgetsLayoutController extends SpringController {
 				ResolutionStatus.NOT_APPLICABLE};
 		LinkedHashMap<String, List<Integer>> dataColumns = new LinkedHashMap<String, List<Integer>>();
 		LinkedHashMap<String, List<Integer>> crfNameToDataColumns = new LinkedHashMap<String, List<Integer>>();
-		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap = dnDao.countDNsByCRFs(sb,
-				new ListNotesFilter(), ub);
+		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap = dnDao.countDNsByCRFs(sb, ub);
 		for (CRFBean crf : crfs) {
 			int total = 0;
 			NDsPerCRFDisplay currentDisplay = new NDsPerCRFDisplay();

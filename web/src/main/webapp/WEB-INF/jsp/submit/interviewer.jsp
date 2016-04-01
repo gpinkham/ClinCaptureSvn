@@ -119,7 +119,7 @@
         var row = '';
         var noteType = '';
         for (var x = 0; x < i; x++) {
-            if (resStatus[x] == '1') {
+            if (resStatus[x] == '1' || resStatus[x] == '6') {
                 if (parentDnIds[x] == '0') {
                     row += '<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;' + detailedNotes[x].substring(0, 60) + '...</td></tr>';
                 }
@@ -445,7 +445,7 @@
                     <c:when test="${nameNoteResStatus == 0}">
                         <c:set var="imageFileName" value="icon_noNote" />
                     </c:when>
-                    <c:when test="${nameNoteResStatus == 1}">
+                    <c:when test="${nameNoteResStatus == 1 || nameNoteResStatus == 6}">
                         <c:set var="imageFileName" value="icon_Note" />
                     </c:when>
                     <c:when test="${nameNoteResStatus == 2}">
@@ -539,7 +539,7 @@
                 <c:when test="${IntrvDateNoteResStatus == 0}">
                     <c:set var="imageFileName" value="icon_noNote" />
                 </c:when>
-                <c:when test="${IntrvDateNoteResStatus == 1}">
+                <c:when test="${IntrvDateNoteResStatus == 1 || IntrvDateNoteResStatus == 6}">
                     <c:set var="imageFileName" value="icon_Note" />
                 </c:when>
                 <c:when test="${IntrvDateNoteResStatus == 2}">

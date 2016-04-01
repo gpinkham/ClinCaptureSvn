@@ -226,7 +226,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		factory.setEnableDcf(allowDcf);
 		factory.setDataSource(getDataSource());
 		factory.setCurrentUser(ub);
-		factory.setUserRole(getCurrentRole(request));;
+		factory.setUserRole(getCurrentRole(request));
 		TableFacade tf = factory.createTable(request, response);
 		if ("yes".equalsIgnoreCase(print)) {
 			request.setAttribute("allNotes", factory.getNotesForPrintPop(tf.getLimit(), ub));
@@ -251,7 +251,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		Map<String, Map<String, String>> customStat = ListNotesTableFactory.getNotesStatistics(statisticBeans);
 		request.setAttribute("summaryMap", customStat);
 		request.setAttribute("typeKeys", customTotalMap);
-		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
+		request.setAttribute("mapKeys", ResolutionStatus.getMembersForDisplayStatistics());
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(getResTerm()));
 		request.setAttribute("grandTotal", customTotalMap.get("Total"));
 		if (request.getSession().getAttribute(PRINT_DCF) != null) {

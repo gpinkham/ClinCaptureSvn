@@ -1179,7 +1179,7 @@ public class CreateDiscrepancyNoteServlet extends SpringServlet {
 				request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
 			}
 			request.setAttribute("showStatus", true);
-			request.setAttribute(RES_STATUSES, ResolutionStatus.simpleList);
+			request.setAttribute(RES_STATUSES, ResolutionStatus.SIMPLE_LIST);
 			request.setAttribute(WHICH_RES_STATUSES, "1");
 		}
 	}

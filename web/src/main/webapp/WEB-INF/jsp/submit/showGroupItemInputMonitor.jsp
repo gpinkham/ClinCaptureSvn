@@ -310,7 +310,7 @@
     <c:when test="${displayItem.discrepancyNoteStatus == 0}">
         <c:set var="imageFileName" value="icon_noNote" />
     </c:when>
-    <c:when test="${displayItem.discrepancyNoteStatus == 1}">
+    <c:when test="${displayItem.discrepancyNoteStatus == 1 || displayItem.discrepancyNoteStatus == 6}">
         <c:set var="imageFileName" value="icon_Note" />
     </c:when>
     <c:when test="${displayItem.discrepancyNoteStatus == 2}">
