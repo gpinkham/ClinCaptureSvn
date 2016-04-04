@@ -40,8 +40,10 @@ public class StudyService extends BaseStudyService {
 
 	/**
 	 * Create study.
-	 * 
+	 *
 	 * @param studyName
+	 *            String
+	 * @param briefTitle
 	 *            String
 	 * @param protocolId
 	 *            int
@@ -119,7 +121,7 @@ public class StudyService extends BaseStudyService {
 	 */
 	@PossibleValuesHolder({
 			@PossibleValues(name = "protocolType", values = "0,1", valueDescriptions = "rest.protocolType.valueDescription"),
-			@PossibleValues(name = "phase", values = "0,1,2,3,4,5,6,7", valueDescriptions = "rest.phase.valueDescription"),
+			@PossibleValues(name = "phase", values = "0,1,2,3,4,5,6,7,8,9,10,11,12,13", valueDescriptions = "rest.phase.valueDescription"),
 			@PossibleValues(name = "purpose", values = "rest.purpose.{#}.values", valueDescriptions = "rest.purpose.{#}.valueDescription", dependentOn = "protocolType"),
 			@PossibleValues(name = "duration", canBeNotSpecified = true, values = "0,1,2", valueDescriptions = "rest.duration.valueDescription"),
 			@PossibleValues(name = "selection", canBeNotSpecified = true, values = "0,1,2,3,4", valueDescriptions = "rest.selection.valueDescription"),
@@ -141,7 +143,8 @@ public class StudyService extends BaseStudyService {
 			@PossibleValues(name = "randomization", values = "yes,no"),
 			@PossibleValues(name = "medicalCoding", values = "yes,no")})
 	@RequestMapping(value = "/study/create", method = RequestMethod.POST)
-	public StudyBean createStudy(@RequestParam("studyName") String studyName,
+	public StudyBean createStudy(@RequestParam(value = "studyName") String studyName,
+			@RequestParam(value = "briefTitle", required = false, defaultValue = "") String briefTitle,
 			@RequestParam("protocolId") String protocolId, @RequestParam(value = "protocolType") int protocolType,
 			@RequestParam(value = "secondProId", required = false, defaultValue = "") String secondProId,
 			@RequestParam(value = "officialTitle", required = false, defaultValue = "") String officialTitle,
@@ -186,6 +189,8 @@ public class StudyService extends BaseStudyService {
 	 * @param studyId
 	 *            int
 	 * @param studyName
+	 *            String
+	 * @param briefTitle
 	 *            String
 	 * @param protocolId
 	 *            Integer
@@ -262,7 +267,7 @@ public class StudyService extends BaseStudyService {
 	@ProvideAtLeastOneNotRequired
 	@PossibleValuesHolder({
 			@PossibleValues(name = "protocolType", canBeNotSpecified = true, values = "0,1", valueDescriptions = "rest.protocolType.valueDescription"),
-			@PossibleValues(name = "phase", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7", valueDescriptions = "rest.phase.valueDescription"),
+			@PossibleValues(name = "phase", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8,9,10,11,12,13", valueDescriptions = "rest.phase.valueDescription"),
 			@PossibleValues(name = "purpose", canBeNotSpecified = true, values = "rest.purpose.{#}.values", valueDescriptions = "rest.purpose.{#}.valueDescription", dependentOn = "protocolType"),
 			@PossibleValues(name = "duration", canBeNotSpecified = true, values = "0,1,2", valueDescriptions = "rest.duration.valueDescription"),
 			@PossibleValues(name = "selection", canBeNotSpecified = true, values = "0,1,2,3,4", valueDescriptions = "rest.selection.valueDescription"),
@@ -286,6 +291,7 @@ public class StudyService extends BaseStudyService {
 	@RequestMapping(value = "/study/edit", method = RequestMethod.POST)
 	public StudyBean editStudy(@RequestParam("studyId") int studyId,
 			@RequestParam(value = "studyName", required = false) String studyName,
+			@RequestParam(value = "briefTitle", required = false) String briefTitle,
 			@RequestParam(value = "protocolId", required = false) String protocolId,
 			@RequestParam(value = "protocolType", required = false) Integer protocolType,
 			@RequestParam(value = "secondProId", required = false) String secondProId,

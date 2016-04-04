@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -53,14 +52,17 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.enums.StudyOrigin;
+import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.StudyValidator;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class UpdateSubStudyServlet extends SpringServlet {
 
 	public static final String INPUT_START_DATE = "startDate";
-	public static final String INPUT_VER_DATE = "protocolDateVerification";
+	public static final String INPUT_APPROVAL_DATE = "approvalDate";
 	public static final String INPUT_END_DATE = "endDate";
 	public static final String YES = "yes";
 	public static final String NEW_STUDY = "newStudy";
@@ -82,10 +84,10 @@ public class UpdateSubStudyServlet extends SpringServlet {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.STUDY_LIST, getResException().getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.STUDY_LIST, getResException().getString("not_study_director"),
+				"1");
 	}
 
 	@Override
@@ -114,7 +116,7 @@ public class UpdateSubStudyServlet extends SpringServlet {
 						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getProtocolDateVerification() != null) {
-				fp.addPresetValue(INPUT_VER_DATE, DateUtil.printDate(study.getProtocolDateVerification(),
+				fp.addPresetValue(INPUT_APPROVAL_DATE, DateUtil.printDate(study.getProtocolDateVerification(),
 						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			setPresetValues(fp.getPresetValues(), request);
@@ -142,12 +144,12 @@ public class UpdateSubStudyServlet extends SpringServlet {
 	 */
 	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors,
 			StudyBean parentStudy) throws Exception {
-
+		StudyBean oldStudy = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("uniqueProId", Validator.NO_BLANKS);
-		v.addValidation("prinInvestigator", Validator.NO_BLANKS);
+		v.addValidation("siteName", Validator.NO_BLANKS);
+		v.addValidation("protocolId", Validator.NO_BLANKS);
+		v.addValidation("principalInvestigator", Validator.NO_BLANKS);
 
 		if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
 			v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
@@ -155,18 +157,18 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
 			v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
 		}
-		if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
+		if (!StringUtil.isBlank(fp.getString(INPUT_APPROVAL_DATE))) {
+			v.addValidation(INPUT_APPROVAL_DATE, Validator.IS_A_DATE);
 		}
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
 		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				255);
+		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				255);
 		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
 		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -181,34 +183,27 @@ public class UpdateSubStudyServlet extends SpringServlet {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("siteName", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				oldStudy.getOrigin().equals(StudyOrigin.STUDIO.getName()) ? 20 : 100);
 
 		errors.putAll(v.validate());
 
-		StudyDAO studyDAO = getStudyDAO();
-		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
-		StudyBean oldStudy = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
-		for (StudyBean thisBean : allStudies) {
-			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())
-					&& thisBean.getId() != oldStudy.getId()) {
-				Validator.addError(errors, "uniqueProId", getResException().getString("unique_protocol_id_existed"));
-			}
-		}
+		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(),
+				oldStudy);
 
-		if (fp.getString("name").trim().length() > 100) {
-			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
+		if (fp.getString("protocolId").trim().length() > 30) {
+			Validator.addError(errors, "protocolId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
-		if (fp.getString("uniqueProId").trim().length() > 30) {
-			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
+		if (fp.getString("summary").trim().length() > 2000) {
+			Validator.addError(errors, "summary", getResException().getString("maximum_lenght_brief_summary_2000"));
 		}
-		if (fp.getString("description").trim().length() > 2000) {
-			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
-		}
-		if (fp.getString("prinInvestigator").trim().length() > 255) {
-			Validator.addError(errors, "prinInvestigator",
+		if (fp.getString("principalInvestigator").trim().length() > 255) {
+			Validator.addError(errors, "principalInvestigator",
 					getResException().getString("maximum_lenght_principal_investigator_255"));
 		}
-		if (fp.getInt("expectedTotalEnrollment") <= 0) {
-			Validator.addError(errors, "expectedTotalEnrollment",
+		if (fp.getInt("totalEnrollment") <= 0) {
+			Validator.addError(errors, "totalEnrollment",
 					getResPage().getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
@@ -235,7 +230,7 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		} else {
 			logger.info("has validation errors");
 			fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-			fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+			fp.addPresetValue(INPUT_APPROVAL_DATE, fp.getString(INPUT_APPROVAL_DATE));
 			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			setPresetValues(fp.getPresetValues(), request);
 			request.setAttribute("formMessages", errors);
@@ -247,21 +242,22 @@ public class UpdateSubStudyServlet extends SpringServlet {
 	/**
 	 * Constructs study bean from request
 	 *
-	 * @param request the incoming request
+	 * @param request
+	 *            the incoming request
 	 * @return <code>StudyBean</code> bean that will be displayed on UX
 	 */
 	private StudyBean createStudyBean(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean study = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
-		study.setName(fp.getString("name"));
-		study.setIdentifier(fp.getString("uniqueProId"));
+		study.setName(fp.getString("siteName"));
+		study.setIdentifier(fp.getString("protocolId"));
 		study.setSecondaryIdentifier(fp.getString("secondProId"));
-		study.setSummary(fp.getString("description"));
-		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
-		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
+		study.setSummary(fp.getString("summary"));
+		study.setPrincipalInvestigator(fp.getString("principalInvestigator"));
+		study.setExpectedTotalEnrollment(fp.getInt("totalEnrollment"));
 		try {
-			study.setProtocolDateVerification(fp.getUpdatedDateProperty(INPUT_VER_DATE,
-					study.getProtocolDateVerification()));
+			study.setProtocolDateVerification(
+					fp.getUpdatedDateProperty(INPUT_APPROVAL_DATE, study.getProtocolDateVerification()));
 			study.setDatePlannedStart(fp.getUpdatedDateProperty(INPUT_START_DATE, study.getDatePlannedStart()));
 			study.setDatePlannedEnd(fp.getUpdatedDateProperty(INPUT_END_DATE, study.getDatePlannedEnd()));
 		} catch (IllegalArgumentException ex) {
@@ -292,8 +288,8 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
 		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
-				fp.getString("replaceExisitingDataDuringImport"));
+		study.getStudyParameterConfig()
+				.setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 		study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 
@@ -309,7 +305,7 @@ public class UpdateSubStudyServlet extends SpringServlet {
 			scg.getValue().setValue(value);
 			paramsMap.put(scg.getParameter().getHandle(), scg.getValue().getValue());
 		}
-		
+
 		request.setAttribute("paramsMap", paramsMap);
 
 		return study;
@@ -457,7 +453,8 @@ public class UpdateSubStudyServlet extends SpringServlet {
 	/**
 	 * Saves study bean from session
 	 *
-	 * @param request the incoming request
+	 * @param request
+	 *            the incoming request
 	 */
 	public void submitStudy(HttpServletRequest request) {
 		UserAccountBean ub = getUserAccountBean(request);

@@ -51,6 +51,7 @@ import org.springframework.stereotype.Component;
 
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
+import com.clinovo.validator.StudyValidator;
 
 /**
  * The servlet for creating sub study of user's current active study.
@@ -60,7 +61,7 @@ import com.clinovo.util.ValidatorHelper;
 @Component
 public class CreateSubStudyServlet extends SpringServlet {
 
-	public static final String INPUT_VER_DATE = "protocolDateVerification";
+	public static final String INPUT_APPROVAL_DATE = "approvalDate";
 	public static final String INPUT_START_DATE = "startDate";
 	public static final String INPUT_END_DATE = "endDate";
 	public static final String YES = "yes";
@@ -84,11 +85,10 @@ public class CreateSubStudyServlet extends SpringServlet {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study") + "\n"
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET, getResException().getString("not_study_director"),
-				"1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study") + "\n"
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.SITE_LIST_SERVLET,
+				getResException().getString("not_study_director"), "1");
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class CreateSubStudyServlet extends SpringServlet {
 				newStudy.setStudyParameterConfig(currentStudy.getStudyParameterConfig());
 
 				HashMap<String, String> paramsMap = new HashMap<String, String>();
-				
+
 				for (StudyParamsConfig scg : parentConfigs) {
 
 					if (scg != null) {
@@ -142,9 +142,11 @@ public class CreateSubStudyServlet extends SpringServlet {
 								scg.getValue().setValue(fp.getString("interviewDateDefault"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("markImportedCRFAsCompleted")) {
 								scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
-							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoScheduleEventDuringImport")) {
+							} else if (scg.getParameter().getHandle()
+									.equalsIgnoreCase("autoScheduleEventDuringImport")) {
 								scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
-							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+							} else if (scg.getParameter().getHandle()
+									.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
 								scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
 								scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
@@ -163,8 +165,7 @@ public class CreateSubStudyServlet extends SpringServlet {
 								scg.getValue().setValue(fp.getString("autoTabbing"));
 							}
 							configs.add(scg);
-							paramsMap.put(scg.getParameter().getHandle(), scg
-									.getValue().getValue());
+							paramsMap.put(scg.getParameter().getHandle(), scg.getValue().getValue());
 						}
 					}
 				}
@@ -198,10 +199,10 @@ public class CreateSubStudyServlet extends SpringServlet {
 					fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 				}
 				try {
-					fp.addPresetValue(INPUT_VER_DATE, DateUtil.printDate(newStudy.getProtocolDateVerification(),
+					fp.addPresetValue(INPUT_APPROVAL_DATE, DateUtil.printDate(newStudy.getProtocolDateVerification(),
 							getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 				} catch (Exception pe) {
-					fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+					fp.addPresetValue(INPUT_APPROVAL_DATE, fp.getString(INPUT_APPROVAL_DATE));
 				}
 				setPresetValues(fp.getPresetValues(), request);
 				request.setAttribute("statuses", Status.toActiveArrayList());
@@ -230,10 +231,10 @@ public class CreateSubStudyServlet extends SpringServlet {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("uniqueProId", Validator.NO_BLANKS);
+		v.addValidation("siteName", Validator.NO_BLANKS);
+		v.addValidation("protocolId", Validator.NO_BLANKS);
 
-		v.addValidation("prinInvestigator", Validator.NO_BLANKS);
+		v.addValidation("principalInvestigator", Validator.NO_BLANKS);
 		if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
 			v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
 		}
@@ -243,16 +244,16 @@ public class CreateSubStudyServlet extends SpringServlet {
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
-		if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
+		if (!StringUtil.isBlank(fp.getString(INPUT_APPROVAL_DATE))) {
+			v.addValidation(INPUT_APPROVAL_DATE, Validator.IS_A_DATE);
 		}
 
 		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
+		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				INT_255);
+		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				INT_255);
 		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_20);
 		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -270,29 +271,23 @@ public class CreateSubStudyServlet extends SpringServlet {
 
 		errors.putAll(v.validate());
 
-		StudyDAO studyDAO = getStudyDAO();
-		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
-		for (StudyBean thisBean : allStudies) {
-			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())) {
-				Validator.addError(errors, "uniqueProId", getResException().getString("unique_protocol_id_existed"));
-			}
-		}
+		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(), null);
 
-		if (fp.getString("name").trim().length() > INT_100) {
-			Validator.addError(errors, "name", getResException().getString("maximum_lenght_name_100"));
+		if (fp.getString("siteName").trim().length() > INT_100) {
+			Validator.addError(errors, "siteName", getResException().getString("maximum_lenght_name_100"));
 		}
-		if (fp.getString("uniqueProId").trim().length() > INT_30) {
-			Validator.addError(errors, "uniqueProId", getResException().getString("maximum_lenght_unique_protocol_30"));
+		if (fp.getString("protocolId").trim().length() > INT_30) {
+			Validator.addError(errors, "protocolId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
 		if (fp.getString("description").trim().length() > INT_2000) {
 			Validator.addError(errors, "description", getResException().getString("maximum_lenght_brief_summary_2000"));
 		}
-		if (fp.getString("prinInvestigator").trim().length() > INT_255) {
-			Validator.addError(errors, "prinInvestigator",
+		if (fp.getString("principalInvestigator").trim().length() > INT_255) {
+			Validator.addError(errors, "principalInvestigator",
 					getResException().getString("maximum_lenght_principal_investigator_255"));
 		}
-		if (fp.getInt("expectedTotalEnrollment") <= 0) {
-			Validator.addError(errors, "expectedTotalEnrollment",
+		if (fp.getInt("totalEnrollment") <= 0) {
+			Validator.addError(errors, "totalEnrollment",
 					getResPage().getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
@@ -318,7 +313,7 @@ public class CreateSubStudyServlet extends SpringServlet {
 
 	/**
 	 * Constructs study bean from request.
-	 * 
+	 *
 	 * @param request
 	 *            the incoming request
 	 * @return <code>StudyBean</code> bean that will be displayed on UX
@@ -328,12 +323,12 @@ public class CreateSubStudyServlet extends SpringServlet {
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean study = (StudyBean) request.getSession().getAttribute("newStudy");
 
-		study.setName(fp.getString("name"));
-		study.setIdentifier(fp.getString("uniqueProId"));
+		study.setName(fp.getString("siteName"));
+		study.setIdentifier(fp.getString("protocolId"));
 		study.setSecondaryIdentifier(fp.getString("secondProId"));
 		study.setSummary(fp.getString("description"));
-		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
-		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
+		study.setPrincipalInvestigator(fp.getString("principalInvestigator"));
+		study.setExpectedTotalEnrollment(fp.getInt("totalEnrollment"));
 		try {
 			if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
 				study.setDatePlannedStart(fp.getDateInputWithServerTimeOfDay(INPUT_START_DATE));
@@ -341,8 +336,8 @@ public class CreateSubStudyServlet extends SpringServlet {
 			if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
 				study.setDatePlannedEnd(fp.getDateInputWithServerTimeOfDay(INPUT_END_DATE));
 			}
-			if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-				study.setProtocolDateVerification(fp.getDateInputWithServerTimeOfDay(INPUT_VER_DATE));
+			if (!StringUtil.isBlank(fp.getString(INPUT_APPROVAL_DATE))) {
+				study.setProtocolDateVerification(fp.getDateInputWithServerTimeOfDay(INPUT_APPROVAL_DATE));
 			}
 		} catch (IllegalArgumentException ex) {
 			//
@@ -396,18 +391,18 @@ public class CreateSubStudyServlet extends SpringServlet {
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("markImportedCRFAsCompleted")
 						&& !fp.getString("markImportedCRFAsCompleted").isEmpty()) {
 					scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
-					study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(
-							fp.getString("markImportedCRFAsCompleted"));
+					study.getStudyParameterConfig()
+							.setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoScheduleEventDuringImport")
 						&& !fp.getString("autoScheduleEventDuringImport").isEmpty()) {
 					scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
-					study.getStudyParameterConfig().setAutoScheduleEventDuringImport(
-							fp.getString("autoScheduleEventDuringImport"));
+					study.getStudyParameterConfig()
+							.setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")
 						&& !fp.getString("autoCreateSubjectDuringImport").isEmpty()) {
 					scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
-					study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
-							fp.getString("autoCreateSubjectDuringImport"));
+					study.getStudyParameterConfig()
+							.setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")
 						&& !fp.getString("allowSdvWithOpenQueries").isEmpty()) {
 					scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
@@ -415,8 +410,8 @@ public class CreateSubStudyServlet extends SpringServlet {
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("replaceExisitingDataDuringImport")
 						&& !fp.getString("replaceExisitingDataDuringImport").isEmpty()) {
 					scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
-					study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
-							fp.getString("replaceExisitingDataDuringImport"));
+					study.getStudyParameterConfig()
+							.setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultBioontologyURL")
 						&& !fp.getString("defaultBioontologyURL").isEmpty()) {
 					scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
@@ -432,8 +427,8 @@ public class CreateSubStudyServlet extends SpringServlet {
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("assignRandomizationResultTo")
 						&& !fp.getString("assignRandomizationResultTo").isEmpty()) {
 					scg.getValue().setValue(fp.getString("assignRandomizationResultTo"));
-					study.getStudyParameterConfig().setAutoCodeDictionaryName(
-							fp.getString("assignRandomizationResultTo"));
+					study.getStudyParameterConfig()
+							.setAutoCodeDictionaryName(fp.getString("assignRandomizationResultTo"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("randomizationTrialId")
 						&& !fp.getString("randomizationTrialId").isEmpty()) {
 					scg.getValue().setValue(fp.getString("randomizationTrialId"));
@@ -443,11 +438,10 @@ public class CreateSubStudyServlet extends SpringServlet {
 					scg.getValue().setValue(fp.getString("autoTabbing"));
 					study.getStudyParameterConfig().setAutoTabbing(fp.getString("autoTabbing"));
 				}
-				paramsMap.put(scg.getParameter().getHandle(), scg.getValue()
-						.getValue());
+				paramsMap.put(scg.getParameter().getHandle(), scg.getValue().getValue());
 			}
 		}
-		
+
 		request.setAttribute("paramsMap", paramsMap);
 
 		return study;
@@ -584,8 +578,10 @@ public class CreateSubStudyServlet extends SpringServlet {
 						edcBean.setHideCrf(isHide);
 					}
 					if ((!StringUtil.isBlank(selectedVersionIds)
-							&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds()) && (edcBean.getParentId() > 0))
-							|| (selectedVersionIdListSize != edcBean.getVersions().size() && !(edcBean.getParentId() > 0))) {
+							&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds())
+							&& (edcBean.getParentId() > 0))
+							|| (selectedVersionIdListSize != edcBean.getVersions().size()
+									&& !(edcBean.getParentId() > 0))) {
 						String[] ids = selectedVersionIds.split(",");
 						ArrayList<Integer> idList = new ArrayList<Integer>();
 						for (String id : ids) {
@@ -668,8 +664,8 @@ public class CreateSubStudyServlet extends SpringServlet {
 				CRFBean crf = (CRFBean) cdao.findByPK(edcBean.getCrfId());
 				int crfStatusId = crf.getStatusId();
 				if (!(crfStatusId == Status.DELETED.getId() || crfStatusId == Status.AUTO_DELETED.getId())) {
-					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean
-							.getCrfId());
+					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao
+							.findAllActiveByCRF(edcBean.getCrfId());
 					edcBean.setVersions(versions);
 					edcBean.setCrfName(crf.getName());
 					CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
@@ -698,7 +694,7 @@ public class CreateSubStudyServlet extends SpringServlet {
 	private void addPresetValues(FormProcessor fp) {
 		fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
 		fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-		fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+		fp.addPresetValue(INPUT_APPROVAL_DATE, fp.getString(INPUT_APPROVAL_DATE));
 	}
 
 	@Override

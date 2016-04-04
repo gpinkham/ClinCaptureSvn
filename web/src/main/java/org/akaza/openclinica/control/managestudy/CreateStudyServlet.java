@@ -119,14 +119,15 @@ public class CreateStudyServlet extends SpringServlet {
 	 */
 	private void confirmStudy1(HttpServletRequest request, HttpServletResponse response, HashMap errors)
 			throws Exception {
+		StudyBean studyBean = new StudyBean();
 		FormProcessor fp = new FormProcessor(request);
 		UserAccountBean currentUser = getUserAccountBean();
 
-		errors.putAll(StudyValidator.validate(getStudyDAO(), getConfigurationDao(), DateUtil.DatePattern.DATE));
+		errors.putAll(StudyValidator.validate(getStudyDAO(), getConfigurationDao(), studyBean, null,
+				DateUtil.DatePattern.DATE));
 
-		StudyBean studyBean = getStudyService().prepareStudyBean(new StudyBean(), currentUser,
-				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.DATE,
-				LocaleResolver.getLocale());
+		getStudyService().prepareStudyBean(studyBean, currentUser, StudyUtil.getStudyParametersMap(),
+				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale());
 
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");

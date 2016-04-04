@@ -14,22 +14,22 @@ public class CreateNewSitePage extends BasePage {
 	public static final String PAGE_NAME = "Create a New Site page";
 	public static final String PAGE_URL = "CreateSubStudy";
 	
-	@FindBy(name = "name")
+	@FindBy(name = "siteName")
     private WebElementFacade iSiteName;
 
-    @FindBy(name = "uniqueProId")
+    @FindBy(name = "protocolId")
     private WebElementFacade iUniqueProtocolID;
 
     @FindBy(name = "secondProId")
     private WebElementFacade tSecondaryIDs;
 
-    @FindBy(name = "prinInvestigator")
+    @FindBy(name = "principalInvestigator")
     private WebElementFacade iPrincipalInvestigator;
 
-    @FindBy(name = "description")
+    @FindBy(name = "summary")
     private WebElementFacade tBriefSummary;
 
-    @FindBy(name = "protocolDateVerification")
+    @FindBy(name = "approvalDate")
     private WebElementFacade iProtocolDateVerification;
 
     @FindBy(name = "startDate")
@@ -38,7 +38,7 @@ public class CreateNewSitePage extends BasePage {
     @FindBy(name = "endDate")
     private WebElementFacade iEstimatedCompletionDate;
     
-    @FindBy(name = "expectedTotalEnrollment")
+    @FindBy(name = "totalEnrollment")
     private WebElementFacade iExpectedTotalEnrollment;
     
     @FindBy(name = "facName")

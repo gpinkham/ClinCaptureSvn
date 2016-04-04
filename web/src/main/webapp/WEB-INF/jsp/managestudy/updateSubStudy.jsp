@@ -22,7 +22,7 @@
 
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
-<c:set var="protocolDateVerification" value="" />
+<c:set var="approvalDate" value="" />
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 
 <c:forEach var="presetValue" items="${presetValues}">
@@ -32,8 +32,8 @@
 	<c:if test='${presetValue.key == "endDate"}'>
 		<c:set var="endDate" value="${presetValue.value}" />
 	</c:if>
-    <c:if test='${presetValue.key == "protocolDateVerification"}'>
-		<c:set var="protocolDateVerification" value="${presetValue.value}" />	
+    <c:if test='${presetValue.key == "approvalDate"}'>
+		<c:set var="approvalDate" value="${presetValue.value}" />
 	</c:if>	
 </c:forEach>
 
@@ -123,12 +123,12 @@ function updateThis(multiSelEle, count) {
  </div></td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td style="width: 45%;">
-  <div class="formfieldXL_BG"><input type="text" name="name" value="<c:out value="${newStudy.name}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td class="alert" style="width: 14%;">*</td></tr>
+  <div class="formfieldXL_BG"><input type="text" name="siteName" value="<c:out value="${newStudy.name}"/>" class="formfieldXL" ${newStudy.origin eq 'studio' ? 'maxlength="20"' : 'maxlength="100"'}></div>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="siteName"/></jsp:include></td><td class="alert" style="width: 14%;">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="alert">*</td></tr>
+  <div class="formfieldXL_BG"><input type="text" name="protocolId" value="<c:out value="${newStudy.identifier}"/>"  class="formfieldXL"></div>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolId"/></jsp:include></td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</a><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>)</td>
   <td><div class="formtextareaXL4_BG">
@@ -138,18 +138,18 @@ function updateThis(multiSelEle, count) {
 
 
   <tr valign="top"><td class="formlabel"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="prinInvestigator" value="<c:out value="${newStudy.principalInvestigator}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="prinInvestigator"/></jsp:include></td><td class="alert">*</td></tr>
+  <div class="formfieldXL_BG"><input type="text" name="principalInvestigator" value="<c:out value="${newStudy.principalInvestigator}"/>"  class="formfieldXL"></div>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="principalInvestigator"/></jsp:include></td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td>
-  <div class="formtextareaXL4_BG"><textarea class="formtextareaXL4" name="description" rows="4" cols="50" maxlength="2000"><c:out value="${newStudy.summary}"/></textarea></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include></td><td class="formlabel"></td></tr>
+  <div class="formtextareaXL4_BG"><textarea class="formtextareaXL4" name="summary" rows="4" cols="50" maxlength="2000"><c:out value="${newStudy.summary}"/></textarea></div>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="summary"/></jsp:include></td><td class="formlabel"></td></tr>
   
   <tr valign="top"><td class="formlabel">
   	<fmt:message key="protocol_verification" bundle="${resword}"/>:
   </td><td><div class="formfieldXL_BG">
-  <input type="text" name="protocolDateVerification" value="<c:out value="${protocolDateVerification}" />" class="formfieldXL" id="protocolDateVerificationField"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolDateVerification"/></jsp:include></td>
+  <input type="text" name="approvalDate" value="<c:out value="${approvalDate}" />" class="formfieldXL" id="protocolDateVerificationField"></div>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="approvalDate"/></jsp:include></td>
   <td>
 	  <ui:calendarIcon onClickSelector="'#protocolDateVerificationField'"/>
   </td>
@@ -173,8 +173,8 @@ function updateThis(multiSelEle, count) {
   </td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="expectedTotalEnrollment" value="<c:out value="${newStudy.expectedTotalEnrollment}"/>" class="formfieldXL"></div>
-   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="expectedTotalEnrollment"/></jsp:include>
+  <div class="formfieldXL_BG"><input type="text" name="totalEnrollment" value="<c:out value="${newStudy.expectedTotalEnrollment}"/>" class="formfieldXL"></div>
+   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="totalEnrollment"/></jsp:include>
   </td><td class="alert">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="facility_name" bundle="${resword}"/>:</td><td>

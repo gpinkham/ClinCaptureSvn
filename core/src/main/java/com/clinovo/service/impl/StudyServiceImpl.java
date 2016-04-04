@@ -12,7 +12,6 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.service.impl;
 
 import java.util.ArrayList;
@@ -287,6 +286,7 @@ public class StudyServiceImpl implements StudyService {
 			Map<String, String> parametersMap, Map<String, String> featuresMap, DateUtil.DatePattern datePattern,
 			Locale locale) {
 		studyBean.setName(parametersMap.get(StudyParameter.STUDY_NAME.getName()));
+		studyBean.setBriefTitle(parametersMap.get(StudyParameter.BRIEF_TITLE.getName()));
 		studyBean.setSummary(parametersMap.get(StudyParameter.SUMMARY.getName()));
 		studyBean.setSponsor(parametersMap.get(StudyParameter.SPONSOR.getName()));
 		studyBean.setIdentifier(parametersMap.get(StudyParameter.PROTOCOL_ID.getName()));

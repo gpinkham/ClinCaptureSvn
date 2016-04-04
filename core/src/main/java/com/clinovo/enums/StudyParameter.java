@@ -19,12 +19,11 @@ package com.clinovo.enums;
  */
 public enum StudyParameter {
 
-	PROTOCOL_ID("protocolId"), STUDY_NAME("studyName"), OFFICIAL_TITLE("officialTitle"), SECOND_PRO_ID("secondProId"), SUMMARY("summary"),
-	DESCRIPTION("description"), SPONSOR("sponsor"), COLLABORATORS("collaborators"), PRINCIPAL_INVESTIGATOR("principalInvestigator"),
-	PHASE("phase"), PROTOCOL_TYPE("protocolType"), TOTAL_ENROLLMENT("totalEnrollment"),
-	START_DATE("startDate"), END_DATE("endDate"), APPROVAL_DATE("approvalDate"), PURPOSE("purpose"),
-	ALLOCATION("allocation"), MASKING("masking"), CONTROL("control"), ASSIGNMENT("assignment"), END_POINT("endPoint"),
-	DURATION("duration"), SELECTION("selection"), TIMING("timing");
+	PROTOCOL_ID("protocolId"), STUDY_NAME("studyName"), BRIEF_TITLE("briefTitle"), OFFICIAL_TITLE("officialTitle"), SECOND_PRO_ID("secondProId"),
+	SUMMARY("summary"), DESCRIPTION("description"), SPONSOR("sponsor"), COLLABORATORS("collaborators"), PRINCIPAL_INVESTIGATOR("principalInvestigator"),
+	PHASE("phase"), PROTOCOL_TYPE("protocolType"), TOTAL_ENROLLMENT("totalEnrollment"), START_DATE("startDate"), END_DATE("endDate"), APPROVAL_DATE("approvalDate"),
+	PURPOSE("purpose"), ALLOCATION("allocation"), MASKING("masking"), CONTROL("control"), ASSIGNMENT("assignment"), END_POINT("endPoint"), DURATION("duration"),
+	SELECTION("selection"), TIMING("timing");
 
 	private String name;
 

@@ -126,7 +126,9 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		this.setTypeExpected(index++, TypeNames.STRING); // official_title
 		this.setTypeExpected(index++, TypeNames.BOOL); // results_reference
 		this.setTypeExpected(index++, TypeNames.STRING); // oc oid
-		this.setTypeExpected(index, TypeNames.INT);
+		this.setTypeExpected(index++, TypeNames.INT); // old_status_id
+		this.setTypeExpected(index++, TypeNames.STRING); // brief_title
+		this.setTypeExpected(index, TypeNames.STRING); // origin
 	}
 
 	/**
@@ -203,6 +205,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(index++, sb.getStatus().getId()); // status
 		variables.put(index++, sb.getUpdaterId()); // owner
 		variables.put(index++, sb.getOldStatus().getId()); // study id
+		variables.put(index++, sb.getBriefTitle()); // brief_title
+		variables.put(index++, sb.getOrigin()); // origin
 		variables.put(index, sb.getId()); // study id
 		this.execute(digester.getQuery("updateStepOne"), variables, nullVars);
 		return sb;
@@ -309,7 +313,9 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(index++, sb.getFacilityContactEmail());
 		variables.put(index++, sb.getStatus().getId());
 		variables.put(index++, sb.getOwnerId());
-		variables.put(index, getValidOid(sb));
+		variables.put(index++, getValidOid(sb));
+		variables.put(index++, sb.getBriefTitle());
+		variables.put(index, sb.getOrigin());
 		// replace this with the owner id
 		this.execute(digester.getQuery("createStepOne"), variables, nullVars);
 		return sb;
@@ -586,6 +592,10 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		eb.setOid((String) hm.get("oc_oid"));
 		Integer oldStatusId = (Integer) hm.get("old_status_id");
 		eb.setOldStatus(Status.get(oldStatusId));
+
+		eb.setBriefTitle((String) hm.get("brief_title"));
+		eb.setOrigin((String) hm.get("origin"));
+
 		return eb;
 	}
 

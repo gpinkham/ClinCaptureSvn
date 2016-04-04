@@ -15,7 +15,6 @@ package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.sql.DataSource;
@@ -33,6 +32,7 @@ import org.akaza.openclinica.bean.service.StudyFeatureConfig;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import com.clinovo.enums.StudyOrigin;
 import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -45,16 +45,25 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "summary", "startDate", "endDate",
-		"approvalDate", "detailedDescription", "phase", "totalEnrollment", "sponsor", "collaborators", "officialTitle",
-		"secondaryIDs", "principalInvestigator", "purpose", "allocation", "masking", "control", "interventionModel",
-		"classification", "duration", "selection", "timing", "status", "parameters", "features"})
+@JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "origin", "briefTitle", "summary",
+		"startDate", "endDate", "approvalDate", "detailedDescription", "phase", "totalEnrollment", "sponsor",
+		"collaborators", "officialTitle", "secondaryIDs", "principalInvestigator", "purpose", "allocation", "masking",
+		"control", "interventionModel", "classification", "duration", "selection", "timing", "status", "parameters",
+		"features"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyBean extends AuditableEntityBean {
 
 	@JsonProperty("studyName")
 	@XmlElement(name = "StudyName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String name = "";
+
+	@JsonProperty("origin")
+	@XmlElement(name = "Origin", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String origin = StudyOrigin.GUI.getName();
+
+	@JsonProperty("briefTitle")
+	@XmlElement(name = "BriefTitle", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String briefTitle = "";
 
 	private int parentStudyId = 0;
 
@@ -388,8 +397,6 @@ public class StudyBean extends AuditableEntityBean {
 	public void setDatePlannedEnd(Date datePlannedEnd) {
 		this.datePlannedEnd = datePlannedEnd;
 	}
-
-
 
 	/**
 	 * @return Returns the datePlannedStart.
@@ -1222,5 +1229,21 @@ public class StudyBean extends AuditableEntityBean {
 
 	public void setStudyFeatureConfig(StudyFeatureConfig studyFeatureConfig) {
 		studyParameterConfig.setStudyFeatureConfig(studyFeatureConfig);
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public String getBriefTitle() {
+		return briefTitle;
+	}
+
+	public void setBriefTitle(String briefTitle) {
+		this.briefTitle = briefTitle;
 	}
 }

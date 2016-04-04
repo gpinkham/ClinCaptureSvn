@@ -26,6 +26,7 @@ import com.clinovo.enums.StudyControl;
 import com.clinovo.enums.StudyDuration;
 import com.clinovo.enums.StudyEndPoint;
 import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyOrigin;
 import com.clinovo.enums.StudyPhase;
 import com.clinovo.enums.StudyProtocolType;
 import com.clinovo.enums.StudyPurpose;
@@ -162,6 +163,8 @@ public class XsdSchemaValidationTest {
 		assertNotNull(restOdmContainer.getRestData().getStudyBean());
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getId(), 1);
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getName(), "TEST1");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getBriefTitle(), "Test Brief Title");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getOrigin(), StudyOrigin.GUI.getName());
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getOid(), "OC_TEST1");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getIdentifier(), "UN_TEST1");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getProtocolTypeKey(),

@@ -5,6 +5,8 @@
             <Id>1</Id>
             <Status>avaliable</Status>
             <StudyName>TEST1</StudyName>
+            <Origin>gui</Origin>
+            <BriefTitle>Test Brief Title</BriefTitle>
             <OfficialTitle></OfficialTitle>
             <ProtocolId>UN_TEST1</ProtocolId>
             <SecondaryIDs></SecondaryIDs>

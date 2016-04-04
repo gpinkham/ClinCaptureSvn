@@ -185,6 +185,8 @@
 
     <xs:element name="StudyBean" type="studyBean"/>
 
+    <xs:element name="Origin" type="xs:string"/>
+    <xs:element name="BriefTitle" type="xs:string"/>
     <xs:element name="ProtocolId" type="xs:string"/>
     <xs:element name="ProtocolType" type="xs:string"/>
     <xs:element name="SecondaryIDs" type="xs:string"/>
@@ -214,6 +216,8 @@
             <xs:element ref="Id" minOccurs="0"/>
             <xs:element ref="Status" minOccurs="0"/>
             <xs:element ref="StudyName" minOccurs="0"/>
+            <xs:element ref="Origin" minOccurs="0"/>
+            <xs:element ref="BriefTitle" minOccurs="0"/>
             <xs:element ref="OfficialTitle" minOccurs="0"/>
             <xs:element ref="ProtocolId" minOccurs="0"/>
             <xs:element ref="SecondaryIDs" minOccurs="0"/>

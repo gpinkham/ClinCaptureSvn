@@ -120,16 +120,28 @@
 
 <tr valign="top">
 	<td class="formlabel">
-		<b><fmt:message key="brief_title" bundle="${resword}"/></b>:
+		<b><fmt:message key="study_name" bundle="${resword}"/></b>:
 	</td>
 	<td>
-		<input type="text" name="studyName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.name}"/>" class="formfieldXL h15 bw2">
+		<input type="text" name="studyName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.name}"/>" class="formfieldXL h15 bw2" ${studyToView.origin eq 'studio' ? 'maxlength="20"' : 'maxlength="100"'}>
 		<br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyName"/></jsp:include>
 	</td>
 	<td class="alert">
 		*
 	</td>
+</tr>
+
+<tr valign="top">
+	<td class="formlabel">
+		<b><fmt:message key="brief_title" bundle="${resword}"/></b>:
+	</td>
+	<td>
+		<input type="text" name="briefTitle" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.briefTitle}"/>" class="formfieldXL h15 bw2" maxlength="100">
+		<br>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="briefTitle"/></jsp:include>
+	</td>
+	<td class="alert">&nbsp;</td>
 </tr>
 
 <tr valign="top">
@@ -267,7 +279,7 @@
 <!-- section B-->
 <tr valign="top">
 	<td class="formlabel">
-		<fmt:message key="study_phase" bundle="${resword}"/>:
+		<fmt:message key="study_type" bundle="${resword}"/>:
 	</td>
 	<td>
 		<c:set var="phase1" value="${studyToView.phaseKey}"/>

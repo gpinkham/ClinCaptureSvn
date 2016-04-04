@@ -196,7 +196,7 @@
 
 <%-- Inserted by Clinovo --%>
                 <c:choose>
-                    <c:when test="${currentStudy.status.id == 4}">
+                    <c:when test="${currentStudy.status.id == 4 and (currentStudy.origin == 'gui' or userBean.name == 'root')}">
                         <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0" title="<fmt:message key="edit" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:otherwise>

@@ -26,7 +26,6 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.DateUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -52,6 +51,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.enums.StudyOrigin;
+import com.clinovo.util.DateUtil;
+
 /**
  * InitUpdateSubStudyServlet.
  */
@@ -60,8 +62,8 @@ import org.springframework.stereotype.Component;
 public class InitUpdateSubStudyServlet extends SpringServlet {
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -74,10 +76,10 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 			return;
 		}
 
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 	}
 
 	@Override
@@ -95,6 +97,11 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 			int studyId = Integer.valueOf(idString.trim());
 			StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
+			if (!study.getOrigin().equals(StudyOrigin.GUI.getName()) && !getUserAccountBean().isRoot()) {
+				response.sendRedirect(request.getContextPath().concat(Page.SITE_LIST_SERVLET.getFileName()));
+				return;
+			}
+
 			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 			String parentStudyName = "";
@@ -105,7 +112,7 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 				// at this time, this feature is only available for site
 				createEventDefinitions(request, parent);
 			}
-			
+
 			HashMap<String, String> paramsMap = new HashMap<String, String>();
 
 			if (currentStudy.getId() != study.getId()) {
@@ -117,15 +124,14 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 					if (scg != null) {
 						// find the one that sub study can change
 						if (scg.getValue().getId() > 0 && scg.getParameter().isOverridable()) {
-							StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getId(), scg
-									.getParameter().getHandle());
+							StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getId(),
+									scg.getParameter().getHandle());
 							if (spvb.getId() > 0) {
 								// the sub study itself has the parameter
 								scg.setValue(spvb);
 							}
 							configs.add(scg);
-							paramsMap.put(scg.getParameter().getHandle(), scg
-									.getValue().getValue());
+							paramsMap.put(scg.getParameter().getHandle(), scg.getValue().getValue());
 						}
 					}
 				}
@@ -144,13 +150,14 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getDatePlannedStart() != null) {
-				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, DateUtil.printDate(study.getDatePlannedStart(),
-						getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
+				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE,
+						DateUtil.printDate(study.getDatePlannedStart(), getUserAccountBean().getUserTimeZoneId(),
+								DateUtil.DatePattern.DATE, getLocale()));
 			}
 			if (study.getProtocolDateVerification() != null) {
-				fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE,
-						DateUtil.printDate(study.getProtocolDateVerification(), getUserAccountBean().getUserTimeZoneId(),
-								DateUtil.DatePattern.DATE, getLocale()));
+				fp.addPresetValue(UpdateSubStudyServlet.INPUT_APPROVAL_DATE,
+						DateUtil.printDate(study.getProtocolDateVerification(),
+								getUserAccountBean().getUserTimeZoneId(), DateUtil.DatePattern.DATE, getLocale()));
 			}
 			setPresetValues(fp.getPresetValues(), request);
 			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
@@ -177,8 +184,8 @@ public class InitUpdateSubStudyServlet extends SpringServlet {
 				int crfStatusId = crf.getStatusId();
 				if (!(edcStatusId == Status.DELETED.getId() || edcStatusId == Status.AUTO_DELETED.getId()
 						|| crfStatusId == Status.DELETED.getId() || crfStatusId == Status.AUTO_DELETED.getId())) {
-					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean
-							.getCrfId());
+					ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao
+							.findAllActiveByCRF(edcBean.getCrfId());
 					edcBean.setVersions(versions);
 					edcBean.setCrfName(crf.getName());
 					CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());

@@ -414,6 +414,15 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	/**
+	 * Returns true if user is 'root'.
+	 * 
+	 * @return boolean
+	 */
+	public boolean isRoot() {
+		return name != null && name.equals(ROOT);
+	}
+
+	/**
 	 * @return Returns the techAdmin flag, for technical administrators.
 	 */
 	public boolean isTechAdmin() {

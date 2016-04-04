@@ -15,53 +15,44 @@
 package com.clinovo.enums;
 
 /**
- * StudyPhase / StudyType.
+ * StudyOrigin.
  */
-public enum StudyPhase {
+public enum StudyOrigin {
 
-	N_A(0, "n_a", "n_a"), PHASE1(1, "phaseI", "phaseI"), PHASE1_2(2, "phaseI_II", "phaseI_II"), PHASE2(3, "phaseII", "phaseII"),
-	PHASE2_3(4, "phaseII_III", "phaseII_III"), PHASE3(5, "phaseIII", "phaseIII"), PHASE3_4(6, "phaseIII_IV", "phaseIII_IV"), PHASE4(7, "phaseIV", "phaseIV"),
-	MEDICAL_DEVICE(8, "medicalDevice", "medicalDevice"), PATIENT_REGISTRY(9, "patientRegistry", "patientRegistry"), INVESTIGATORS_STUDY(10, "investigatorsStudy", "investigatorsStudy"),
-	NUTRACEUTICALS(11, "nutraceuticals", "nutraceuticals"), COSMETICS(12, "cosmetics", "cosmetics"), OTHER(13, "otherType", "otherType");
+	GUI(0, "gui"), STUDIO(1, "studio");
 
 	private int id;
-	private String code;
-	private String value;
+	private String name;
 
-	StudyPhase(int id, String value, String code) {
+	StudyOrigin(int id, String name) {
 		this.id = id;
-		this.code = code;
-		this.value = value;
+		this.name = name;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public String getValue() {
-		return value;
+	public String getName() {
+		return name;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public static StudyPhase get(int id) {
-		StudyPhase result = N_A;
-		for (StudyPhase studyPhase : StudyPhase.values()) {
-			if (studyPhase.getId() == id) {
-				result = studyPhase;
+	public static StudyOrigin get(int id) {
+		StudyOrigin result = GUI;
+		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
+			if (studyOrigin.getId() == id) {
+				result = studyOrigin;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyPhase get(String value) {
-		StudyPhase result = N_A;
-		for (StudyPhase studyPhase : StudyPhase.values()) {
-			if (studyPhase.getValue().equals(value)) {
-				result = studyPhase;
+	public static StudyOrigin get(String name) {
+		StudyOrigin result = GUI;
+		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
+			if (studyOrigin.getName().equals(name)) {
+				result = studyOrigin;
 				break;
 			}
 		}

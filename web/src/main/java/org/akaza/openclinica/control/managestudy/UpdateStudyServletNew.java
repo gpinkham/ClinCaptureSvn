@@ -46,6 +46,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyOrigin;
 import com.clinovo.enums.StudyParameter;
 import com.clinovo.enums.StudyProtocolType;
 import com.clinovo.i18n.LocaleResolver;
@@ -85,6 +86,11 @@ public class UpdateStudyServletNew extends SpringServlet {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		StudyBean currentStudy = getCurrentStudy(request);
+
+		if (!currentStudy.getOrigin().equals(StudyOrigin.GUI.getName()) && !getUserAccountBean().isRoot()) {
+			response.sendRedirect(request.getContextPath().concat("/pages/studymodule"));
+			return;
+		}
 
 		HashMap errors = getErrorsHolder(request);
 		StudyInfoPanel panel = getStudyInfoPanel(request);
@@ -188,7 +194,7 @@ public class UpdateStudyServletNew extends SpringServlet {
 		validator.addValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(), Validator.NO_BLANKS);
 		validator.addValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(),
 				Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM1);
+				StudyValidator.VALIDATION_NUM_20);
 		validator.addValidation(StudyConfigurationParameter.STUDY_SUBJECT_ID_LABEL.getName(), Validator.NO_BLANKS);
 		validator.addValidation(StudyConfigurationParameter.SECONDARY_ID_LABEL.getName(), Validator.NO_BLANKS);
 		validator.addValidation(StudyConfigurationParameter.DATE_OF_ENROLLMENT_FOR_STUDY_LABEL.getName(),
@@ -214,11 +220,11 @@ public class UpdateStudyServletNew extends SpringServlet {
 	private void validateStudy4(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 
 		v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM6);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_500);
 		v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM6);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_500);
 		errors.putAll(v.validate());
 
 		study.setConditions(fp.getString("conditions"));
@@ -241,23 +247,23 @@ public class UpdateStudyServletNew extends SpringServlet {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
 		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM5);
+				StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM5);
+				StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM1);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_20);
 		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM3);
+				StudyValidator.VALIDATION_NUM_64);
 		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM3);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_64);
 		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 
 		errors.putAll(v.validate());
 
@@ -279,11 +285,11 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 	private void validateStudy6(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
 		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM5);
+				StudyValidator.VALIDATION_NUM_255);
 		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM5);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 
 		errors.putAll(v.validate());
 

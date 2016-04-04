@@ -14,6 +14,7 @@
  *******************************************************************************/
 package com.clinovo.rest.service.base;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ import com.clinovo.enums.StudyDuration;
 import com.clinovo.enums.StudyEndPoint;
 import com.clinovo.enums.StudyFeature;
 import com.clinovo.enums.StudyMasking;
+import com.clinovo.enums.StudyOrigin;
 import com.clinovo.enums.StudyParameter;
 import com.clinovo.enums.StudyPhase;
 import com.clinovo.enums.StudyProtocolType;
@@ -79,7 +81,9 @@ public abstract class BaseStudyService extends BaseService {
 	}
 
 	protected StudyBean saveStudyBean(String userName) throws Exception {
-		validate(null);
+		StudyBean studyBean = new StudyBean();
+		studyBean.setOrigin(StudyOrigin.STUDIO.getName());
+		validate(studyBean);
 		int userId = 0;
 		if (userName != null) {
 			UserAccountBean userAccountBean = (UserAccountBean) getUserAccountDAO().findByUserName(userName);
@@ -94,9 +98,8 @@ public abstract class BaseStudyService extends BaseService {
 				userId = userAccountBean.getId();
 			}
 		}
-		StudyBean studyBean = studyService.prepareStudyBean(new StudyBean(), getCurrentUser(),
-				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE,
-				LocaleResolver.getLocale());
+		studyService.prepareStudyBean(studyBean, getCurrentUser(), StudyUtil.getStudyParametersMap(),
+				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE, LocaleResolver.getLocale());
 		studyService.saveStudyBean(userId, studyBean, getCurrentUser(), ResourceBundleProvider.getPageMessagesBundle());
 		if (studyBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.studyservice.createstudy.operationFailed");
@@ -125,7 +128,13 @@ public abstract class BaseStudyService extends BaseService {
 			throw new RestException(messageSource, "rest.studyservice.editstudy.youDoNotHaveRightsToEditThisStudy");
 		}
 
+		// start date is required field now but old studies may have null values
+		if (studyBean.getDatePlannedStart() == null) {
+			studyBean.setDatePlannedStart(studyBean.getCreatedDate() != null ? studyBean.getCreatedDate() : new Date());
+		}
+
 		prepareForValidation(StudyParameter.STUDY_NAME.getName(), studyBean.getName());
+		prepareForValidation(StudyParameter.BRIEF_TITLE.getName(), studyBean.getBriefTitle());
 		prepareForValidation(StudyParameter.PROTOCOL_ID.getName(), studyBean.getIdentifier());
 		prepareForValidation(StudyParameter.PROTOCOL_TYPE.getName(),
 				StudyProtocolType.get(studyBean.getProtocolTypeKey()).getId());

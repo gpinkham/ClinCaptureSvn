@@ -87,9 +87,13 @@
   <input type="text" name="protocolId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolId"/></jsp:include></td><td class="alert">&nbsp;*</td></tr>
 
-  <tr valign="top"><td class="formlabel w150"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle'); return false;"><b><fmt:message key="brief_title" bundle="${resword}"/></b></a>:</td><td class="w250"><div class="formfieldXL_BG">
-  <input type="text" name="studyName" value="<c:out value="${newStudy.name}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
+  <tr valign="top"><td class="formlabel w150"><b><fmt:message key="study_name" bundle="${resword}"/></b>:</td><td class="w250"><div class="formfieldXL_BG">
+  <input type="text" name="studyName" value="<c:out value="${newStudy.name}"/>" class="formfieldXL" onchange="javascript:changeIcon();" maxlength="100"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyName"/></jsp:include></td><td class="alert">&nbsp;*</td></tr>
+
+  <tr valign="top"><td class="formlabel w150"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle'); return false;"><b><fmt:message key="brief_title" bundle="${resword}"/></b></a>:</td><td class="w250"><div class="formfieldXL_BG">
+  <input type="text" name="briefTitle" value="<c:out value="${newStudy.briefTitle}"/>" class="formfieldXL" onchange="javascript:changeIcon();" maxlength="100"></div>
+  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="briefTitle"/></jsp:include></td><td class="alert">&nbsp;</td></tr>
 
   <tr valign="top"><td class="formlabel w150"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle'); return false;"><b><fmt:message key="official_title" bundle="${resword}"/></b></a>:</td><td class="w250"><div class="formfieldXL_BG">
   <input type="text" name="officialTitle" value="<c:out value="${newStudy.officialTitle}"/>" class="formfieldXL" onchange="javascript:changeIcon();"></div>
@@ -107,7 +111,7 @@
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="principalInvestigator"/></jsp:include></td><td class="alert">&nbsp;*</td></tr>
 
   <tr valign="top">
-      <td class="formlabel w150"><fmt:message key="study_phase" bundle="${resword}"/>:</td>
+      <td class="formlabel w150"><fmt:message key="study_type" bundle="${resword}"/>:</td>
       <td class="w250"><div class="formfieldXL_BG">
               <c:set var="phase1" value="${newStudy.phaseKey}"/>
               <select name="phase" class="formfieldXL" onchange="javascript:changeIcon()">

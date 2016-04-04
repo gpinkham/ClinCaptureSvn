@@ -44,7 +44,7 @@
 		</td>
 	  <c:if test="${readOnly != 'true' && userRoleId ne 10}">	       
       <c:choose>
-       <c:when test="${!currRow.bean.status.deleted and !currRow.bean.status.locked}">
+       <c:when test="${!currRow.bean.status.deleted and !currRow.bean.status.locked and (currRow.bean.origin == 'gui' || userBean.name == 'root')}">
           <c:if test="${!study.status.locked}">
           <td><a href="InitUpdateSubStudy?id=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"

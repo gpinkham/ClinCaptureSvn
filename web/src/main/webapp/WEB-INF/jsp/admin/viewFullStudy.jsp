@@ -101,13 +101,21 @@
 <div class="tablebox_center">
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed; word-wrap:break-word">
-	<tr valign="top">
-		<td class="table_header_column" width="25%">
-			<fmt:message key="name" bundle="${resword}" />:</td>
-		<td class="table_cell">
-			<c:out value="${studyToView.name}" />
-		</td>
-	</tr>
+    <tr valign="top">
+        <td class="table_header_column">
+            <fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell">
+            <c:out value="${studyToView.name}" /></td>
+    </tr>
+
+    <tr valign="top">
+        <td class="table_header_column">
+            <a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle'); return false;">
+                <fmt:message key="brief_title" bundle="${resword}"/>
+            </a>:</td>
+        <td class="table_cell">
+            <c:out value="${studyToView.briefTitle}" /></td>
+    </tr>
 
 	<tr valign="top">
 		<td class="table_header_column">
@@ -175,8 +183,12 @@
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed; word-wrap:break-word">
-  <tr valign="top"><td class="table_header_column" width="25%"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle'); return false;"><fmt:message key="brief_title" bundle="${resword}"/></a>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column" width="25%"><fmt:message key="study_name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.name}"/>
+  </td></tr>
+
+  <tr valign="top"><td class="table_header_column" width="25%"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefTitle'); return false;"><fmt:message key="brief_title" bundle="${resword}"/></a>:</td><td class="table_cell">
+  <c:out value="${studyToView.briefTitle}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle'); return false;"><fmt:message key="official_title" bundle="${resword}"/></a>:</td><td class="table_cell">
