@@ -61,6 +61,7 @@ public class RequestParametersValidatorTest {
 		request = new MockHttpServletRequest();
 		session = new MockHttpSession();
 		request.setSession(session);
+		request.addParameter("version", "2.2");
 
 		Locale locale = Locale.ENGLISH;
 		PowerMockito.mockStatic(CoreResources.class);
@@ -123,6 +124,19 @@ public class RequestParametersValidatorTest {
 	public void testThatRequestParametersValidatorThrowsRestExceptionIfParameterValueWesNotSpecifiedAndTheCanBeNotSpecifiedIsFalse()
 			throws Exception {
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
+		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+	}
+
+	@Test(expected = RestException.class)
+	public void testThatRequestParametersValidatorThrowsRestExceptionIfVersionParameterIsEmpty() throws Exception {
+		request.removeParameter("version");
+		request.addParameter("version", "");
+		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+	}
+
+	@Test(expected = RestException.class)
+	public void testThatRequestParametersValidatorThrowsRestExceptionIfVersionParameterIsmissing() throws Exception {
+		request.removeParameter("version");
 		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
 	}
 }

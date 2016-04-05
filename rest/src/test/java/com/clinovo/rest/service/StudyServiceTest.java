@@ -1,7 +1,5 @@
 package com.clinovo.rest.service;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -23,8 +21,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("purpose", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("purpose", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -33,8 +30,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "1").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("purpose", "7").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("purpose", "7")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -43,8 +39,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("duration", "2").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("duration", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -53,8 +48,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("selection", "1").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("selection", "1")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -62,8 +56,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("timing", "1").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("timing", "1")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -72,8 +65,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "1").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("allocation", "2").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("allocation", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -81,8 +73,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "1").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("masking", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("masking", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -90,8 +81,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "1").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("control", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("control", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -100,8 +90,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "1").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("assignment", "2").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("assignment", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -109,8 +98,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study").param("briefTitle", "test_study")
 				.param("protocolId", "X_study_1").param("protocolType", "1").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "25")
-				.param("startDate", "2016-01-20").param("endPoint", "2").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("endPoint", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -118,11 +106,11 @@ public class StudyServiceTest extends BaseServiceTest {
 		int newTotalEnrollment = 12;
 		String newStudyName = "s_".concat(Long.toString(timestamp));
 		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
-		result = mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName)
-				.param("protocolId", newProtocolId).param("protocolType", "0").param("summary", "bla bla")
-				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20")
-				.param("endDate", "2017-01-20").accept(mediaType).secure(true).session(session))
+		result = mockMvc
+				.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("protocolId", newProtocolId)
+						.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
+						.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+						.param("startDate", "2016-01-20").param("endDate", "2017-01-20"))
 				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
@@ -147,16 +135,14 @@ public class StudyServiceTest extends BaseServiceTest {
 		int newTotalEnrollment = 12;
 		String newStudyName = "s_".concat(Long.toString(timestamp));
 		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
-		result = mockMvc
-				.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("briefTitle", newStudyName)
-						.param("protocolId", newProtocolId).param("protocolType", "0").param("summary", "bla bla")
-						.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-						.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20")
-						.param("approvalDate", "2017-01-20").param("crfAnnotation", "no").param("dynamicGroup", "no")
-						.param("calendaredVisits", "no").param("interactiveDashboards", "no")
-						.param("itemLevelSDV", "no").param("subjectCasebookInPDF", "no").param("crfMasking", "no")
-						.param("sasExtracts", "no").param("studyEvaluator", "no").param("randomization", "no")
-						.param("medicalCoding", "no").accept(mediaType).secure(true).session(session))
+		result = mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName)
+				.param("briefTitle", newStudyName).param("protocolId", newProtocolId).param("protocolType", "0")
+				.param("summary", "bla bla").param("principalInvestigator", "test").param("sponsor", "test_study_1")
+				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20")
+				.param("approvalDate", "2017-01-20").param("crfAnnotation", "no").param("dynamicGroup", "no")
+				.param("calendaredVisits", "no").param("interactiveDashboards", "no").param("itemLevelSDV", "no")
+				.param("subjectCasebookInPDF", "no").param("crfMasking", "no").param("sasExtracts", "no")
+				.param("studyEvaluator", "no").param("randomization", "no").param("medicalCoding", "no"))
 				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
@@ -180,8 +166,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2014-02-20").param("crfAnnotation", "xno").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2014-02-20").param("crfAnnotation", "xno"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -189,8 +175,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "20-Jan-2014").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "20-Jan-2014")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -198,8 +183,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").param("approvalDate", "08-Jan-2017").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20").param("approvalDate", "08-Jan-2017"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -207,8 +192,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").param("endDate", "10-Jan-2016").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20").param("endDate", "10-Jan-2016")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -216,8 +200,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(get(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -225,8 +208,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -234,8 +216,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -243,8 +224,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", "blabla").param("startDate", "2016-01-20").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+				.param("totalEnrollment", "blabla").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -252,16 +233,15 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("toTalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfStartDateParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
-				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -269,8 +249,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -278,8 +257,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "blabla").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "blabla")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -287,32 +265,30 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("stArtDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("stArtDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfStudyNameParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("protocolId", "X_study_1").param("protocolType", "0")
 				.param("summary", "bla bla").param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", "1").param("startDate", "2016-01-20").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+				.param("totalEnrollment", "1").param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfStudyNameParameterIsEmpty() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "").param("protocolId", "X_study_1")
 				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfStudyNameParameterHasTypo() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("stUdyName", "test_study_1").param("protocolId", "X_study_1")
 				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -320,56 +296,53 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("brIefTitle", "xxxxx")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfProtocolIdParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("protocolType", "0")
 				.param("summary", "bla bla").param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", "1").param("startDate", "2016-01-20").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+				.param("totalEnrollment", "1").param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfProtocolIdParameterIsEmpty() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("protocolId", "")
 				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfProtocolIdParameterHasTypo() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("proTocolId", "X_study_1")
 				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfProtocolTypeParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("protocolId", "X_study_1")
 				.param("summary", "bla bla").param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", "1").param("startDate", "2016-01-20").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+				.param("totalEnrollment", "1").param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfProtocolTypeParameterIsEmpty() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("protocolId", "X_study_1")
 				.param("protocolType", "").param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfProtocolTypeParameterHasTypo() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("protocolId", "X_study_1")
 				.param("proTocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -377,16 +350,15 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "13").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfSummaryParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -394,8 +366,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -403,16 +374,15 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("sUmmary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfPrincipalInvestigatorParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -420,8 +390,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -429,16 +398,15 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("princiPalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatCreateStudyMethodThrowsExceptionIfSponsorParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
-				.param("principalInvestigator", "test").param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+				.param("principalInvestigator", "test").param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -446,8 +414,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -455,8 +422,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("spoNsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+				.param("startDate", "2016-01-20")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -464,8 +430,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").param("userName", "wrong_userName_x1").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20").param("userName", "wrong_userName_x1"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -473,13 +439,11 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isOk());
+				.param("startDate", "2016-01-20")).andExpect(status().isOk());
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "XX_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -487,13 +451,11 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isOk());
+				.param("startDate", "2016-01-20")).andExpect(status().isOk());
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "X_test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -501,8 +463,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", getSymbols(21)).param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -510,8 +471,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", getSymbols(101))
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -519,8 +479,7 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", getSymbols(31)).param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -528,8 +487,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("collaborators", getSymbols(1001)).param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("collaborators", getSymbols(1001)).param("totalEnrollment", "1")
+				.param("startDate", "2016-01-20")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -537,8 +496,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("description", getSymbols(1001)).param("totalEnrollment", "1").param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("description", getSymbols(1001)).param("totalEnrollment", "1").param("startDate", "2016-01-20"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -548,59 +507,55 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", "test_study_1").param("briefTitle", "test_study_1")
 				.param("protocolId", "X_study_1").param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "1")
-				.param("startDate", "2016-01-20").param("userName", newUser.getName()).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatEditStudyMethodDoesNotSupportHTTPGetMethod() throws Exception {
-		mockMvc.perform(get(API_STUDY_EDIT).param("studyId", "1").param("studyName", "test_study_1").accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
-	}
-
-	@Test
-	public void testThatAtLeastOneNotRequiredParameterShouldBeSpecifiedForEditStudyMethod() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").accept(mediaType).secure(true).session(session))
+				.param("startDate", "2016-01-20").param("userName", newUser.getName()))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
+	public void testThatEditStudyMethodDoesNotSupportHTTPGetMethod() throws Exception {
+		mockMvc.perform(get(API_STUDY_EDIT).param("studyId", "1").param("studyName", "test_study_1"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatAtLeastOneNotRequiredParameterShouldBeSpecifiedForEditStudyMethod() throws Exception {
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfTotalEnrollmentParameterIsMissing() throws Exception {
-		mockMvc.perform(
-				post(API_STUDY_EDIT).param("studyName", "test_study_1").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyName", "test_study_1")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfTotalEnrollmentParameterIsEmpty() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "").param("studyName", "test_study_1").accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "").param("studyName", "test_study_1"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfTotalEnrollmentParameterHasWrongData() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "blabla").param("studyName", "test_study_1")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "blabla").param("studyName", "test_study_1"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfTotalEnrollmentParameterHasTypo() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("stUdyId", "1").param("studyName", "test_study_1").accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("stUdyId", "1").param("studyName", "test_study_1"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfStudyDoesNotExist() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "99991").param("studyName", "test_study_1")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "99991").param("studyName", "test_study_1"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatItIsImpossibleToEditASiteUsingTheEditStudyMethod() throws Exception {
 		createNewSite(currentScope.getId());
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newSite.getId()))
-				.param("studyName", "test_study_1").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newSite.getId())).param("studyName",
+				"test_study_1")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -610,8 +565,8 @@ public class StudyServiceTest extends BaseServiceTest {
 		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
 		createNewUser(newStudy, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(studyId))
-				.param("studyName", "test_study_1").accept(mediaType).secure(true).session(session))
+		mockMvc.perform(
+				post(API_STUDY_EDIT).param("studyId", String.valueOf(studyId)).param("studyName", "test_study_1"))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -621,15 +576,17 @@ public class StudyServiceTest extends BaseServiceTest {
 		int newTotalEnrollment = 15;
 		String newStudyName = "s_".concat(Long.toString(timestamp));
 		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
-		result = mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
-				.param("studyName", newStudyName).param("briefTitle", newStudyName).param("protocolId", newProtocolId)
-				.param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("endDate", "2016-04-20")
-				.param("crfAnnotation", "yes").param("dynamicGroup", "yes").param("calendaredVisits", "yes")
-				.param("interactiveDashboards", "yes").param("itemLevelSDV", "yes").param("subjectCasebookInPDF", "yes")
-				.param("crfMasking", "yes").param("sasExtracts", "yes").param("studyEvaluator", "yes")
-				.param("randomization", "yes").param("medicalCoding", "yes").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isOk()).andReturn();
+		result = mockMvc
+				.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+						.param("studyName", newStudyName).param("briefTitle", newStudyName)
+						.param("protocolId", newProtocolId).param("summary", "bla bla")
+						.param("principalInvestigator", "test")
+						.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("endDate", "2016-04-20")
+						.param("crfAnnotation", "yes").param("dynamicGroup", "yes").param("calendaredVisits", "yes")
+						.param("interactiveDashboards", "yes").param("itemLevelSDV", "yes")
+						.param("subjectCasebookInPDF", "yes").param("crfMasking", "yes").param("sasExtracts", "yes")
+						.param("studyEvaluator", "yes").param("randomization", "yes").param("medicalCoding", "yes"))
+				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getName(), newStudyName);
@@ -652,17 +609,14 @@ public class StudyServiceTest extends BaseServiceTest {
 		int newTotalEnrollment = 12;
 		String newStudyName = "s_".concat(Long.toString(timestamp));
 		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
-		result = mockMvc
-				.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
-						.param("studyName", newStudyName).param("protocolId", newProtocolId).param("summary", "bla bla")
-						.param("principalInvestigator", "test")
-						.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-04-20")
-						.param("approvalDate", "2017-02-10").param("crfAnnotation", "no").param("dynamicGroup", "no")
-						.param("calendaredVisits", "no").param("interactiveDashboards", "no")
-						.param("itemLevelSDV", "no").param("subjectCasebookInPDF", "no").param("crfMasking", "no")
-						.param("sasExtracts", "no").param("studyEvaluator", "no").param("randomization", "no")
-						.param("medicalCoding", "no").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isOk()).andReturn();
+		result = mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+				.param("studyName", newStudyName).param("protocolId", newProtocolId).param("summary", "bla bla")
+				.param("principalInvestigator", "test").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-04-20").param("approvalDate", "2017-02-10").param("crfAnnotation", "no")
+				.param("dynamicGroup", "no").param("calendaredVisits", "no").param("interactiveDashboards", "no")
+				.param("itemLevelSDV", "no").param("subjectCasebookInPDF", "no").param("crfMasking", "no")
+				.param("sasExtracts", "no").param("studyEvaluator", "no").param("randomization", "no")
+				.param("medicalCoding", "no")).andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getName(), newStudyName);
@@ -682,26 +636,26 @@ public class StudyServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfStartDateIsInWrongFormat() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("startDate", "01-Jan-2016").accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("startDate", "01-Jan-2016"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfProtocolDateVerificationIsInWrongFormat() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("approvalDate", "01-Jan-2016")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("approvalDate", "01-Jan-2016"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfEndDateIsInWrongFormat() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("endDate", "01-Jan-2016").accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("endDate", "01-Jan-2016"))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfCrfAnnotationHasWrongDate() throws Exception {
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("crfAnnotation", "01-Jan-2016")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("crfAnnotation", "01-Jan-2016"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -709,8 +663,7 @@ public class StudyServiceTest extends BaseServiceTest {
 			throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "0").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("purpose", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("purpose", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -718,16 +671,14 @@ public class StudyServiceTest extends BaseServiceTest {
 			throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "1").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("purpose", "7").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("purpose", "7")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfDurationIsUsedForInterventionalProtocolType() throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "0").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("duration", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("duration", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -735,16 +686,14 @@ public class StudyServiceTest extends BaseServiceTest {
 			throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "0").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("selection", "1").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("selection", "1")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfTimingIsUsedForInterventionalProtocolType() throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "0").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("timing", "1").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("timing", "1")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -752,24 +701,21 @@ public class StudyServiceTest extends BaseServiceTest {
 			throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "1").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("allocation", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("allocation", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfMaskingIsUsedForObservationalProtocolType() throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "1").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("masking", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("masking", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfControlIsUsedForObservationalProtocolType() throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "1").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("control", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("control", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -777,16 +723,14 @@ public class StudyServiceTest extends BaseServiceTest {
 			throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "1").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("assignment", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("assignment", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfEndPointUsedForObservationalProtocolType() throws Exception {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolType", "1").param("summary", "blabla")
 				.param("startDate", "2016-04-20").param("principalInvestigator", "test").param("totalEnrollment", "12")
-				.param("endPoint", "2").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("endPoint", "2")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -797,12 +741,13 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("briefTitle", newStudyName)
 				.param("protocolId", newProtocolId).param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20")
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20"))
+				.andExpect(status().isOk());
 		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
 		assertEquals(studyBean.getProtocolTypeKey(), StudyProtocolType.INTERVENTIONAL.getValue());
-		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(studyBean.getId()))
-				.param("protocolType", "1").accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		mockMvc.perform(
+				post(API_STUDY_EDIT).param("studyId", String.valueOf(studyBean.getId())).param("protocolType", "1"))
+				.andExpect(status().isOk());
 		studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
 		assertEquals(studyBean.getProtocolTypeKey(), StudyProtocolType.OBSERVATIONAL.getValue());
 	}
@@ -814,12 +759,11 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("briefTitle", newStudyName)
 				.param("protocolId", newProtocolId).param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "12")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isOk());
+				.param("startDate", "2016-01-20")).andExpect(status().isOk());
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("studyName", newStudyName)
 				.param("briefTitle", newStudyName).param("summary", "bla bla").param("principalInvestigator", "test")
-				.param("sponsor", "test_study_1").param("totalEnrollment", "12").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("sponsor", "test_study_1").param("totalEnrollment", "12"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -829,11 +773,9 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("briefTitle", newStudyName)
 				.param("protocolId", newProtocolId).param("protocolType", "0").param("summary", "bla bla")
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1").param("totalEnrollment", "12")
-				.param("startDate", "2016-01-20").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isOk());
+				.param("startDate", "2016-01-20")).andExpect(status().isOk());
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolId", newProtocolId)
 				.param("summary", "bla bla").param("principalInvestigator", "test").param("sponsor", "test_study_1")
-				.param("totalEnrollment", "12").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+				.param("totalEnrollment", "12")).andExpect(status().isInternalServerError());
 	}
 }

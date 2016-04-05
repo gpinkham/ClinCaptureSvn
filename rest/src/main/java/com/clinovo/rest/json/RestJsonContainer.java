@@ -12,49 +12,37 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.rest.model;
+package com.clinovo.rest.json;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.clinovo.rest.model.Server;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * Response.
+ * RestJsonContainer.
  */
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "Response", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"status"})
-public class Response {
+@JsonPropertyOrder({"server", "response"})
+public class RestJsonContainer {
 
-	@JsonProperty("status")
-	@XmlElement(name = "Status", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private String status;
+	@JsonProperty("server")
+	private Server server;
 
-	/**
-	 * Response default constructor.
-	 */
-	public Response() {
+	@JsonProperty("response")
+	private Object object;
+
+	public Server getServer() {
+		return server;
 	}
 
-	/**
-	 * Response constructor.
-	 *
-	 * @param status
-	 *            String
-	 */
-	public Response(String status) {
-		this.status = status;
+	public void setServer(Server server) {
+		this.server = server;
 	}
 
-	public String getStatus() {
-		return status;
+	public Object getObject() {
+		return object;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setObject(Object object) {
+		this.object = object;
 	}
 }

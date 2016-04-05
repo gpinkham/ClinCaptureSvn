@@ -1,7 +1,5 @@
 package com.clinovo.rest.service;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -31,93 +29,86 @@ public class CrfServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatImportCrfServiceWorksFine() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isOk());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")))
+				.andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceWorksFine() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isOk());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")))
+				.andExpect(status().isOk());
 		String newCrfVersion = "v2.0";
 		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
 		jsonObject.put("version", newCrfVersion);
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isOk());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()))
+				.andExpect(status().isOk());
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(newCrfVersion, CRF_NAME);
 		assertTrue(crfVersionBean.getId() > 0);
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceDoesNotAllowToImportSameCrfVersionTwice() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isOk());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")))
+				.andExpect(status().isOk());
 		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceDoesNotAllowToImportCrfVersionIfCrfDoesNotExist() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", getJsonData("testCrf.json")))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceThrowsExceptionIfJsonDataIsEmpty() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", "").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceThrowsExceptionIfJsonDataIsWrongData() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", "wrong data").accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", "wrong data"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceThrowsExceptionIfJsonDataIsMissing() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatImportCrfServiceThrowsExceptionIfJsonDataIsEmpty() throws Exception {
-		mockMvc.perform(
-				post(API_CRF_JSON_IMPORT_CRF).param("jsonData", "").accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatImportCrfServiceThrowsExceptionIfJsonDataIsWrongData() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", "wrong data").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", "wrong data"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfServiceThrowsExceptionIfJsonDataIsMissing() throws Exception {
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).accept(mediaType).secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceThrowsExceptionIfCrfNameIsEmpty() throws Exception {
 		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
 		jsonObject.put("name", "");
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfServiceDoesNotSupportHttpGet() throws Exception {
-		mockMvc.perform(get(API_CRF_JSON_IMPORT_CRF).accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(get(API_CRF_JSON_IMPORT_CRF)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfVersionServiceDoesNotSupportHttpGet() throws Exception {
-		mockMvc.perform(get(API_CRF_JSON_IMPORT_CRF_VERSION).accept(mediaType).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(get(API_CRF_JSON_IMPORT_CRF_VERSION)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -126,12 +117,12 @@ public class CrfServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(),
 				currentScope.getName());
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")).accept(mediaType)
-				.secure(true).session(session)).andExpect(expectStatus);
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")))
+				.andExpect(expectStatus);
 		String newCrfVersion = "v2.0";
 		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
 		jsonObject.put("version", newCrfVersion);
-		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()).accept(mediaType)
-				.secure(true).session(session)).andExpect(expectStatus);
+		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()))
+				.andExpect(expectStatus);
 	}
 }

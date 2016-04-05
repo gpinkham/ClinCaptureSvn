@@ -5,10 +5,19 @@
         <xs:group name="ODMElementExtension">
             <xs:sequence>
                 <xs:group ref="ODMElementExtension"/>
+                <xs:element ref="Server" minOccurs="0"/>
                 <xs:element ref="RestData" minOccurs="0"/>
             </xs:sequence>
         </xs:group>
     </xs:redefine>
+
+    <xs:element name="Server" type="server"/>
+
+    <xs:complexType name="server">
+        <xs:sequence>
+            <xs:element ref="Version" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:element name="RestData" type="restData"/>
 

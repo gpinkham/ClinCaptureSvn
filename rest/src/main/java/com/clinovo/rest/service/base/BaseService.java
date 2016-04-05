@@ -36,6 +36,7 @@ import org.springframework.context.MessageSource;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
+import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.RequestUtil;
@@ -69,6 +70,10 @@ public abstract class BaseService {
 		StudyBean currentStudy = UserDetails.getCurrentUserDetails().getCurrentStudy(dataSource);
 		studyConfigService.setParametersForStudy(currentStudy);
 		return currentStudy;
+	}
+
+	protected String getClientVersion() {
+		return RequestUtil.getRequest().getParameter(PermissionChecker.CLIENT_VERSION);
 	}
 
 	protected UserAccountBean getCurrentUser() {

@@ -1,6 +1,5 @@
 package com.clinovo.rest.service;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +69,8 @@ import com.clinovo.rest.security.PermissionChecker;
 public class BaseServiceTest extends DefaultAppContextTest {
 
 	public static final Locale LOCALE = new Locale("en");
+
+	public static final String DEFAULT_CLIENT_VERSION = "1.0";
 
 	// Managed services
 	public static final String API_STUDY_CREATE = "/study/create";
@@ -271,18 +272,18 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		String email = "email@gmail.com";
 		String phone = "+375232345678";
 		String company = "home";
-		MockHttpServletRequestBuilder requestBuilder = post(API_USER_CREATE_USER).accept(mediaType)
-				.param("userName", userName).param("firstName", firstName).param("lastName", lastName)
-				.param("email", email).param("phone", phone).param("company", company)
-				.param("userType", Integer.toString(userType.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(role.getId()));
+		MockHttpServletRequestBuilder requestBuilder = post(API_USER_CREATE_USER).param("userName", userName)
+				.param("firstName", firstName).param("lastName", lastName).param("email", email).param("phone", phone)
+				.param("company", company).param("userType", Integer.toString(userType.getId()))
+				.param("allowSoap", "true").param("displayPassword", "true")
+				.param("role", Integer.toString(role.getId()));
 		if (siteName != null) {
 			requestBuilder.param("siteName", siteName);
 		}
-		MvcResult result = mockMvc.perform(requestBuilder.secure(true).session(session)).andExpect(status().isOk())
-				.andReturn();
+		MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
 		String password = mediaType.equals(MediaType.APPLICATION_JSON)
-				? (String) new JSONObject(result.getResponse().getContentAsString()).get("password")
+				? (String) ((JSONObject) new JSONObject(result.getResponse().getContentAsString()).get("response"))
+						.get("password")
 				: result.getResponse().getContentAsString().split("<Password>")[1].split("</Password>")[0];
 		newUser = (UserAccountBean) userAccountDAO.findByUserName(userName);
 		assertTrue(newUser.getId() > 0);
@@ -331,8 +332,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		} else if (!currentScope.isSite()) {
 			studyConfigService.setParametersForStudy(currentScope);
 		}
-		mockMvc.perform(post(API_AUTHENTICATION).accept(mediaType).secure(true).param("userName", userName)
-				.param("password", password).param("studyName", studyName).session(session))
+		mockMvc.perform(post(API_AUTHENTICATION).param("userName", userName).param("password", password)
+				.param("studyName", studyName))
 				.andExpect(status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.request()
@@ -472,5 +473,15 @@ public class BaseServiceTest extends DefaultAppContextTest {
 			mailSender.setHost(mailSenderHost);
 		}
 		unmarshalResult();
+	}
+
+	protected MockHttpServletRequestBuilder get(String url) {
+		return org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(url)
+				.param("version", DEFAULT_CLIENT_VERSION).secure(true).session(session).accept(mediaType);
+	}
+
+	protected MockHttpServletRequestBuilder post(String url) {
+		return org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(url)
+				.param("version", DEFAULT_CLIENT_VERSION).secure(true).session(session).accept(mediaType);
 	}
 }

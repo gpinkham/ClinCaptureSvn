@@ -139,6 +139,7 @@ public final class RequestParametersValidator {
 				&& !(handler.getBean() instanceof AuthenticationService)) {
 			return;
 		}
+		validateClientVersion(request, messageSource);
 		int countOfProvidedNotRequiredParameters = 0;
 		Set<String> nullParameters = new HashSet<String>();
 		Set<String> declaredFields = new HashSet<String>();
@@ -201,7 +202,8 @@ public final class RequestParametersValidator {
 		}
 		if (declaredFields.size() > 0) {
 			for (String parameterName : declaredParams.values()) {
-				if (!declaredFields.contains(parameterName)) {
+				if (!parameterName.equals(PermissionChecker.CLIENT_VERSION)
+						&& !declaredFields.contains(parameterName)) {
 					throw new RestException(messageSource, "rest.parameterIsNotSupported", new Object[]{parameterName},
 							HttpServletResponse.SC_BAD_REQUEST);
 				}
@@ -212,4 +214,14 @@ public final class RequestParametersValidator {
 		}
 		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
 	}
+
+	private static void validateClientVersion(HttpServletRequest request, MessageSource messageSource)
+			throws RestException {
+		String clientVersion = request.getParameter(PermissionChecker.CLIENT_VERSION);
+		if (clientVersion == null || clientVersion.trim().isEmpty()) {
+			throw new RestException(messageSource, "rest.eachRequestMustHaveVersionParameter",
+					new Object[]{PermissionChecker.CLIENT_VERSION}, HttpServletResponse.SC_BAD_REQUEST);
+		}
+	}
+
 }

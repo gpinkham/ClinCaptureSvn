@@ -43,7 +43,9 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PermissionChecker.class);
 
+	public static final String CLIENT_VERSION = "version";
 	public static final String AUTHENTICATE = "authenticate";
+	public static final String CLIENT_VERSION_PATTERN = "\\d{1,}.*\\d{1,}";
 	public static final String API_AUTHENTICATED_USER_DETAILS = "API_AUTHENTICATED_USER_DETAILS";
 
 	@Autowired

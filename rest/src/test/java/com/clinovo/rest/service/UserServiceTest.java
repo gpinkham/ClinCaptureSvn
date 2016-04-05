@@ -1,7 +1,5 @@
 package com.clinovo.rest.service;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Date;
@@ -23,8 +21,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -33,8 +31,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo").param("userType", "123")
-				.param("allowSoap", "true").param("displayPassword", "true").param("role", Integer.toString(2))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("allowSoap", "true").param("displayPassword", "true").param("role", Integer.toString(2)))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -44,8 +42,7 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", "123123").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", "123123")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -59,8 +56,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
 				.param("company", newUser.getInstitutionalAffiliation())
 				.param("userType", Integer.toString(UserType.SYSADMIN.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -70,8 +67,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId()))
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_MONITOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -80,13 +77,15 @@ public class UserServiceTest extends BaseServiceTest {
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		result = mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
-				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("allowSoap", "true").param("displayPassword", "true")
-				.param("company", "clinovo").param("userType", Integer.toString(UserType.SYSADMIN.getId()))
-				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).param("timeZone", timeZone)
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk()).andReturn();
+		result = mockMvc
+				.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
+						.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+						.param("lastName", "lastname_".concat(Long.toString(timestamp)))
+						.param("email", "test@gmail.com").param("phone", "+375232345678").param("allowSoap", "true")
+						.param("displayPassword", "true").param("company", "clinovo")
+						.param("userType", Integer.toString(UserType.SYSADMIN.getId()))
+						.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).param("timeZone", timeZone))
+				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
@@ -104,13 +103,14 @@ public class UserServiceTest extends BaseServiceTest {
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
-		result = mockMvc.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
-				.param("firstName", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("userType", Integer.toString(UserType.USER.getId()))
-				.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isOk()).andReturn();
+		result = mockMvc
+				.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
+						.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+						.param("lastName", "lastname_".concat(Long.toString(timestamp)))
+						.param("email", "test@gmail.com").param("phone", "+375232345678").param("company", "clinovo")
+						.param("userType", Integer.toString(UserType.USER.getId()))
+						.param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())))
+				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertTrue(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
@@ -138,12 +138,10 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("email", newUser.getEmail()).param("phone", newUser.getPhone())
 				.param("company", newUser.getInstitutionalAffiliation())
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(expectStatus);
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", additionalUserName).accept(mediaType).secure(true)
-				.session(session)).andExpect(expectStatus);
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_ADMINISTRATOR.getId())))
+				.andExpect(expectStatus);
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", additionalUserName)).andExpect(expectStatus);
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", additionalUserName)).andExpect(expectStatus);
 	}
 
 	@Test
@@ -155,8 +153,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_CODER.getId()))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", Integer.toString(Role.STUDY_CODER.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -168,8 +166,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo").param("userType", "123")
 				.param("allowSoap", "true").param("displayPassword", "true")
-				.param("role", Integer.toString(Role.INVESTIGATOR.getId())).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("role", Integer.toString(Role.INVESTIGATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -181,8 +179,7 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", "123123").accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", "123123")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -194,8 +191,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "testgmailcom")
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
-				.param("displayPassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId()))
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("displayPassword", "true").param("role", Integer.toString(Role.INVESTIGATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -205,14 +202,16 @@ public class UserServiceTest extends BaseServiceTest {
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		result = mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
-				.param("userName", additionalUserName).param("firstName", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("allowSoap", "true").param("displayPassword", "true")
-				.param("company", "clinovo").param("timeZone", timeZone)
-				.param("userType", Integer.toString(UserType.SYSADMIN.getId()))
-				.param("role", Integer.toString(Role.SITE_MONITOR.getId())).accept(mediaType).secure(true)
-				.session(session)).andExpect(status().isOk()).andReturn();
+		result = mockMvc
+				.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+						.param("userName", additionalUserName)
+						.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+						.param("lastName", "lastname_".concat(Long.toString(timestamp)))
+						.param("email", "test@gmail.com").param("phone", "+375232345678").param("allowSoap", "true")
+						.param("displayPassword", "true").param("company", "clinovo").param("timeZone", timeZone)
+						.param("userType", Integer.toString(UserType.SYSADMIN.getId()))
+						.param("role", Integer.toString(Role.SITE_MONITOR.getId())))
+				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getUserTypeCode()
@@ -231,13 +230,15 @@ public class UserServiceTest extends BaseServiceTest {
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		mailSenderHost = mailSender.getHost();
 		mailSender.setHost("");
-		result = mockMvc.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
-				.param("userName", additionalUserName).param("firstName", "firstname_".concat(Long.toString(timestamp)))
-				.param("lastName", "lastname_".concat(Long.toString(timestamp))).param("email", "test@gmail.com")
-				.param("phone", "+375232345678").param("company", "clinovo")
-				.param("userType", Integer.toString(UserType.USER.getId()))
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isOk()).andReturn();
+		result = mockMvc
+				.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())
+						.param("userName", additionalUserName)
+						.param("firstName", "firstname_".concat(Long.toString(timestamp)))
+						.param("lastName", "lastname_".concat(Long.toString(timestamp)))
+						.param("email", "test@gmail.com").param("phone", "+375232345678").param("company", "clinovo")
+						.param("userType", Integer.toString(UserType.USER.getId()))
+						.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())))
+				.andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
 			assertFalse(restOdmContainer.getRestData().getUserAccountBean().getRunWebservices());
@@ -260,8 +261,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
 				.param("displayPassword", "true")
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -273,8 +274,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
 				.param("displayPassword", "true")
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -286,8 +287,8 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
 				.param("displayPassword", "true")
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -298,51 +299,46 @@ public class UserServiceTest extends BaseServiceTest {
 				.param("phone", "+375232345678").param("company", "clinovo")
 				.param("userType", Integer.toString(UserType.USER.getId())).param("allowSoap", "true")
 				.param("displayPassword", "true")
-				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.param("role", Integer.toString(Role.CLINICAL_RESEARCH_COORDINATOR.getId())))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
-		mockMvc.perform(post(API_USER_REMOVE).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_REMOVE)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", "").secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
-		mockMvc.perform(
-				post(API_USER_REMOVE).param("userName", "test_user").param("xparam", "1").secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "test_user").param("xparam", "1"))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
-		mockMvc.perform(post(API_USER_REMOVE).param("userNAme", "test_user").secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_REMOVE).param("userNAme", "test_user")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveNonExistingUser() throws Exception {
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", "misterx").secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "misterx")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveRootUser() throws Exception {
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", "root").secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", "root")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRemoveUserMethodThrowsExceptionIfYouAreTryingToRemoveYourself() throws Exception {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -358,7 +354,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.USER, Role.STUDY_MONITOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
 				defaultStudyName);
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -367,52 +363,48 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
-		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()).secure(true).session(session))
-				.andExpect(status().isOk());
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName())).andExpect(status().isOk());
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.DELETED);
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
-		mockMvc.perform(post(API_USER_RESTORE).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_RESTORE)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", "").secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", "test_user").param("xparam", "1").secure(true)
-				.session(session)).andExpect(status().isBadRequest());
-	}
-
-	@Test
-	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
-		mockMvc.perform(post(API_USER_RESTORE).param("userNAme", "test_user").secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "test_user").param("xparam", "1"))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
+	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
+		mockMvc.perform(post(API_USER_RESTORE).param("userNAme", "test_user")).andExpect(status().isBadRequest());
+	}
+
+	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreNonExistingUser() throws Exception {
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", "misterx").secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "misterx"))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreRootUser() throws Exception {
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", "root").secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", "root")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfYouAreTryingToRestoreYourself() throws Exception {
 		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
 		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), defaultStudyName);
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -428,7 +420,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
 				defaultStudyName);
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()))
 				.andExpect(status().isInternalServerError());
 	}
 
@@ -441,8 +433,7 @@ public class UserServiceTest extends BaseServiceTest {
 		userAccountDAO.updateStatus(userAccountBean);
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.DELETED);
-		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()).secure(true).session(session))
-				.andExpect(status().isOk());
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName())).andExpect(status().isOk());
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
 	}
@@ -459,8 +450,7 @@ public class UserServiceTest extends BaseServiceTest {
 		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(additionalUserName, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, additionalUserPassword,
 				defaultStudyName);
-		mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(get(API_USER).param("userName", newUser.getName())).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -471,36 +461,32 @@ public class UserServiceTest extends BaseServiceTest {
 		timestamp = new Date().getTime() + 1;
 		createNewStudyUser(UserType.USER, Role.STUDY_ADMINISTRATOR);
 		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, defaultStudyName);
-		mockMvc.perform(get(API_USER).param("userName", newUser.getName()).secure(true).session(session))
-				.andExpect(status().isOk());
+		mockMvc.perform(get(API_USER).param("userName", newUser.getName())).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatGetUserMethodDoesNotSupportHttpPost() throws Exception {
-		mockMvc.perform(post(API_USER).param("userName", rootUserName).secure(true).session(session))
-				.andExpect(status().isInternalServerError());
+		mockMvc.perform(post(API_USER).param("userName", rootUserName)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
-		mockMvc.perform(get(API_USER).secure(true).session(session)).andExpect(status().isBadRequest());
+		mockMvc.perform(get(API_USER)).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterIsEmpty() throws Exception {
-		mockMvc.perform(get(API_USER).param("userName", "").secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(get(API_USER).param("userName", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfUserNameParameterHasATypo() throws Exception {
-		mockMvc.perform(get(API_USER).param("uSerName", "").secure(true).session(session))
-				.andExpect(status().isBadRequest());
+		mockMvc.perform(get(API_USER).param("uSerName", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void testThatGetUserMethodThrowsExceptionIfWePassParameterThatIsNotSupported() throws Exception {
-		mockMvc.perform(get(API_USER).param("userName", "test_user").param("xparam", "1").secure(true).session(session))
+		mockMvc.perform(get(API_USER).param("userName", "test_user").param("xparam", "1"))
 				.andExpect(status().isBadRequest());
 	}
 }

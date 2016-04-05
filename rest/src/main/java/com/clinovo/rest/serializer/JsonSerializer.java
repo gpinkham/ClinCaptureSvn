@@ -14,14 +14,23 @@
  *******************************************************************************/
 package com.clinovo.rest.serializer;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.clinovo.enums.RestServerVersion;
+import com.clinovo.rest.json.RestJsonContainer;
+import com.clinovo.rest.model.Server;
 
 /**
  * JsonSerializer.
@@ -48,5 +57,15 @@ public class JsonSerializer extends MappingJackson2HttpMessageConverter {
 			LOGGER.error("Error has occurred.", ex);
 		}
 		return (accept == null || !accept.contains(MediaType.APPLICATION_XML_VALUE)) && proceed;
+	}
+
+	@Override
+	protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
+			throws IOException, HttpMessageNotWritableException {
+		RestJsonContainer restJsonContainer = new RestJsonContainer();
+		restJsonContainer.setServer(new Server());
+		restJsonContainer.getServer().setVersion(RestServerVersion.VERSION_2_2.getValue());
+		restJsonContainer.setObject(object);
+		super.writeInternal(restJsonContainer, type, outputMessage);
 	}
 }

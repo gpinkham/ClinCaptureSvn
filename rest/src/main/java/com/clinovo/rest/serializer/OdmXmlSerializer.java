@@ -40,7 +40,9 @@ import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConvert
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.clinovo.enums.RestServerVersion;
 import com.clinovo.rest.model.RestData;
+import com.clinovo.rest.model.Server;
 import com.clinovo.rest.odm.RestOdmContainer;
 
 /**
@@ -89,6 +91,8 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 			} else {
 				try {
 					RestOdmContainer restOdmContainer = new RestOdmContainer();
+					restOdmContainer.setServer(new Server());
+					restOdmContainer.getServer().setVersion(RestServerVersion.VERSION_2_2.getValue());
 					restOdmContainer.setRestData(new RestData());
 					Method method = getSetterMethod(RestData.class.getMethods(), o);
 					method.invoke(restOdmContainer.getRestData(), o);

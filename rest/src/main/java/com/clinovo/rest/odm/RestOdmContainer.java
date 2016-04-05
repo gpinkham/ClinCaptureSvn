@@ -12,7 +12,6 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.rest.odm;
 
 import java.text.DecimalFormat;
@@ -29,6 +28,7 @@ import org.cdisc.ns.odm.v130.FileType;
 import org.cdisc.ns.odm.v130.ODM;
 
 import com.clinovo.rest.model.RestData;
+import com.clinovo.rest.model.Server;
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 
 /**
@@ -40,6 +40,17 @@ public class RestOdmContainer extends ODM {
 
 	public static final int MILLISEC_IN_HOUR = 3600000;
 	public static final int MILLISEC_IN_MINUTES = 60000;
+
+	@XmlElement(name = "Server", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private Server server;
+
+	public Server getServer() {
+		return server;
+	}
+
+	public void setServer(Server server) {
+		this.server = server;
+	}
 
 	@XmlElement(name = "RestData", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private RestData restData;
@@ -71,9 +82,9 @@ public class RestOdmContainer extends ODM {
 		DecimalFormat twoDigits = new DecimalFormat("00");
 		setFileOID("REST-Data".concat(new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime)));
 		setDescription("REST Data");
-		setCreationDateTime(XMLGregorianCalendarImpl.parse(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss".concat(sign)
-				.concat(twoDigits.format(hours)).concat(":").concat(twoDigits.format(minutes)))
-				.format(creationDatetime)));
+		setCreationDateTime(XMLGregorianCalendarImpl
+				.parse(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss".concat(sign).concat(twoDigits.format(hours))
+						.concat(":").concat(twoDigits.format(minutes))).format(creationDatetime)));
 		setODMVersion("1.3");
 		setFileType(FileType.SNAPSHOT);
 	}

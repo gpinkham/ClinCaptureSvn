@@ -23,38 +23,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * Response.
+ * Server.
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "Response", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"status"})
-public class Response {
+@XmlRootElement(name = "Server", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonPropertyOrder({"version"})
+public class Server {
 
-	@JsonProperty("status")
-	@XmlElement(name = "Status", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private String status;
-
-	/**
-	 * Response default constructor.
-	 */
-	public Response() {
-	}
+	@JsonProperty("version")
+	@XmlElement(name = "Version", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String version;
 
 	/**
-	 * Response constructor.
-	 *
-	 * @param status
-	 *            String
+	 * Server default constructor.
 	 */
-	public Response(String status) {
-		this.status = status;
+	public Server() {
 	}
 
-	public String getStatus() {
-		return status;
+	public String getVersion() {
+		return version;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setVersion(String version) {
+		this.version = version;
 	}
 }
