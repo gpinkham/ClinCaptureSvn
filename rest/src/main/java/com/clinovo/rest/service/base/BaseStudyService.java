@@ -80,6 +80,24 @@ public abstract class BaseStudyService extends BaseService {
 		ValidatorUtil.checkForErrors(errors);
 	}
 
+	protected StudyBean getStudy(int studyId) throws Exception {
+		StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(studyId);
+		if (!(studyBean.getId() > 0)) {
+			throw new RestException(messageSource, "rest.studyservice.studyDoesNotExist", new Object[]{studyId},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (studyBean.isSite()) {
+			throw new RestException(messageSource, "rest.studyservice.studyIsSite", new Object[]{studyId},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		StudyUserRoleBean studyUserRoleBean = getCurrentUser().getRoleByStudy(studyBean.getId());
+		if (!(studyUserRoleBean.getId() > 0
+				&& (studyUserRoleBean.isSysAdmin() || studyUserRoleBean.isStudyAdministrator()))) {
+			throw new RestException(messageSource, "rest.studyservice.youDoNotHaveRightsToAccessThisStudy");
+		}
+		studyService.prepareStudyBeanConfiguration(studyBean);
+		return studyBean;
+	}
+
 	protected StudyBean saveStudyBean(String userName) throws Exception {
 		StudyBean studyBean = new StudyBean();
 		studyBean.setOrigin(StudyOrigin.STUDIO.getName());
@@ -111,22 +129,7 @@ public abstract class BaseStudyService extends BaseService {
 		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);
 
-		StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(studyId);
-		studyService.prepareStudyBeanConfiguration(studyBean);
-
-		if (studyBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.studyservice.editstudy.studyDoesNotExist",
-					new Object[]{studyId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (studyBean.getParentStudyId() > 0) {
-			throw new RestException(messageSource, "rest.studyservice.editstudy.studyIsSite", new Object[]{studyId},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-
-		StudyUserRoleBean studyUserRoleBean = getCurrentUser().getRoleByStudy(studyBean.getId());
-		if (!(studyUserRoleBean.getId() > 0
-				&& (studyUserRoleBean.isSysAdmin() || studyUserRoleBean.isStudyAdministrator()))) {
-			throw new RestException(messageSource, "rest.studyservice.editstudy.youDoNotHaveRightsToEditThisStudy");
-		}
+		StudyBean studyBean = getStudy(studyId);
 
 		// start date is required field now but old studies may have null values
 		if (studyBean.getDatePlannedStart() == null) {
@@ -183,6 +186,26 @@ public abstract class BaseStudyService extends BaseService {
 
 		studyService.updateStudy(studyBean, null, getCurrentUser());
 
+		return studyBean;
+	}
+
+	protected StudyBean removeStudy(int studyId) throws Exception {
+		StudyBean studyBean = getStudy(studyId);
+		if (studyBean.getStatus().isLocked()) {
+			throw new RestException(messageSource, "rest.studyservice.youCannotRemoveLockedStudy");
+		} else if (!studyBean.getStatus().isDeleted()) {
+			studyService.removeStudy(studyBean, getCurrentUser());
+		}
+		return studyBean;
+	}
+
+	protected StudyBean restoreStudy(int studyId) throws Exception {
+		StudyBean studyBean = getStudy(studyId);
+		if (!studyBean.getStatus().isDeleted()) {
+			throw new RestException(messageSource, "rest.studyservice.studyIsNotInRemovedState");
+		} else {
+			studyService.restoreStudy(studyBean, getCurrentUser());
+		}
 		return studyBean;
 	}
 }

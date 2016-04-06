@@ -19,6 +19,7 @@ import java.util.Date;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +38,9 @@ import com.clinovo.rest.service.base.BaseStudyService;
 public class StudyService extends BaseStudyService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyService.class);
+
+	@Autowired
+	private com.clinovo.service.StudyService studyService;
 
 	/**
 	 * Create study.
@@ -327,5 +331,33 @@ public class StudyService extends BaseStudyService {
 			@RequestParam(value = "randomization", required = false) String randomization,
 			@RequestParam(value = "medicalCoding", required = false) String medicalCoding) throws Exception {
 		return updateStudyBean(studyId);
+	}
+
+	/**
+	 * Method removes the study.
+	 *
+	 * @param studyId
+	 *            int
+	 * @return StudyBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/study/remove", method = RequestMethod.POST)
+	public StudyBean remove(@RequestParam(value = "id") int studyId) throws Exception {
+		return removeStudy(studyId);
+	}
+
+	/**
+	 * Method restores the study.
+	 *
+	 * @param studyId
+	 *            int
+	 * @return StudyBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/study/restore", method = RequestMethod.POST)
+	public StudyBean restore(@RequestParam(value = "id") int studyId) throws Exception {
+		return restoreStudy(studyId);
 	}
 }

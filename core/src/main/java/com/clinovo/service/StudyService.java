@@ -40,10 +40,11 @@ public interface StudyService {
 	 *            StudyBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return StudyBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void removeStudy(StudyBean study, UserAccountBean updater) throws Exception;
+	StudyBean removeStudy(StudyBean studyBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Restores study.
@@ -52,10 +53,11 @@ public interface StudyService {
 	 *            StudyBean
 	 * @param updater
 	 *            UserAccountBean
+	 * @return StudyBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	void restoreStudy(StudyBean study, UserAccountBean updater) throws Exception;
+	StudyBean restoreStudy(StudyBean studyBean, UserAccountBean updater) throws Exception;
 
 	/**
 	 * Removes site.

@@ -73,6 +73,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String DEFAULT_CLIENT_VERSION = "1.0";
 
 	// Managed services
+	public static final String API_STUDY_REMOVE = "/study/remove";
+	public static final String API_STUDY_RESTORE = "/study/restore";
 	public static final String API_STUDY_CREATE = "/study/create";
 	public static final String API_STUDY_EDIT = "/study/edit";
 	public static final String API_CRF_JSON_IMPORT_CRF = "/crf/json/importCrf";

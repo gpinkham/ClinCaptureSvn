@@ -64,7 +64,7 @@ public class JsonSerializer extends MappingJackson2HttpMessageConverter {
 			throws IOException, HttpMessageNotWritableException {
 		RestJsonContainer restJsonContainer = new RestJsonContainer();
 		restJsonContainer.setServer(new Server());
-		restJsonContainer.getServer().setVersion(RestServerVersion.VERSION_2_2.getValue());
+		restJsonContainer.getServer().setVersion(RestServerVersion.VERSION_1_0.getValue());
 		restJsonContainer.setObject(object);
 		super.writeInternal(restJsonContainer, type, outputMessage);
 	}

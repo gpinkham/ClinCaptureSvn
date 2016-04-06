@@ -92,7 +92,7 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 				try {
 					RestOdmContainer restOdmContainer = new RestOdmContainer();
 					restOdmContainer.setServer(new Server());
-					restOdmContainer.getServer().setVersion(RestServerVersion.VERSION_2_2.getValue());
+					restOdmContainer.getServer().setVersion(RestServerVersion.VERSION_1_0.getValue());
 					restOdmContainer.setRestData(new RestData());
 					Method method = getSetterMethod(RestData.class.getMethods(), o);
 					method.invoke(restOdmContainer.getRestData(), o);

@@ -19,7 +19,7 @@ package com.clinovo.enums;
  */
 public enum RestServerVersion {
 
-	VERSION_2_2("2.2");
+	VERSION_1_0("1.0");
 
 	private String value;
 

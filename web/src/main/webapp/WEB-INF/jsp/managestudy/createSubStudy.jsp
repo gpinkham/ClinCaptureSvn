@@ -142,7 +142,7 @@
   </div></td></tr>
   
   <tr valign="top"><td class="formlabel"><fmt:message key="site_name" bundle="${resword}"/>:</td><td style="width: 45%;"><div class="formfieldXL_BG">
-  <input type="text" name="siteName" value="<c:out value="${newStudy.name}"/>" class="formfieldXL" maxlength="100"></div>
+  <input type="text" name="siteName" value="<c:out value="${newStudy.name}"/>" class="formfieldXL" ${newStudy.origin eq 'studio' ? 'maxlength="20"' : 'maxlength="100"'}></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="siteName"/></jsp:include></td><td class="alert" style="width: 14%;"> *</td></tr>
 
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td><div class="formfieldXL_BG">

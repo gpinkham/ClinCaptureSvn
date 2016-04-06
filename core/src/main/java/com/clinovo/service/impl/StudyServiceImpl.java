@@ -209,15 +209,17 @@ public class StudyServiceImpl implements StudyService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
+	public StudyBean removeStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
 		disableStudyAndItsSites(studyBean, updater, Status.DELETED);
+		return studyBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void restoreStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
+	public StudyBean restoreStudy(StudyBean studyBean, UserAccountBean updater) throws Exception {
 		enableStudyAndItsSites(studyBean, updater, true);
+		return studyBean;
 	}
 
 	/**

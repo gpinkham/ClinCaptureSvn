@@ -3,6 +3,7 @@ package com.clinovo.rest.service;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -777,5 +778,151 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", "1").param("protocolId", newProtocolId)
 				.param("summary", "bla bla").param("principalInvestigator", "test").param("sponsor", "test_study_1")
 				.param("totalEnrollment", "12")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRemoveMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_STUDY_REMOVE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatStudyRemoveMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_STUDY_REMOVE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatStudyRemoveMethodThrowsExceptionIfStudyDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_STUDY_REMOVE).param("id", "11111")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRemoveMethodThrowsExceptionIfStudyIsSite() throws Exception {
+		createNewSite(currentScope.getId());
+		mockMvc.perform(post(API_STUDY_REMOVE).param("id", Integer.toString(newSite.getId())))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRemoveMethodWorksFine() throws Exception {
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		int studyId = currentScope.getId();
+		createNewSite(studyId);
+
+		StudyBean studyBean = (StudyBean) studyDao.findByPK(studyId);
+		studyBean.setStatus(Status.AVAILABLE);
+		studyDao.update(studyBean);
+		studyBean = (StudyBean) studyDao.findByPK(studyId);
+		assertTrue(studyBean.getStatus().isAvailable());
+
+		StudyBean siteBean = (StudyBean) studyDao.findByPK(newSite.getId());
+		siteBean.setStatus(Status.AVAILABLE);
+		studyDao.update(siteBean);
+		assertTrue(siteBean.getStatus().isAvailable());
+
+		mockMvc.perform(post(API_STUDY_REMOVE).param("id", Integer.toString(studyId))).andExpect(status().isOk());
+
+		studyBean = (StudyBean) studyDao.findByPK(studyId);
+		assertTrue(studyBean.getStatus().isDeleted());
+
+		siteBean = (StudyBean) studyDao.findByPK(newSite.getId());
+		assertTrue(siteBean.getStatus().isDeleted());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRemoveLockedStudy() throws Exception {
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		int studyId = currentScope.getId();
+
+		StudyBean studyBean = (StudyBean) studyDao.findByPK(studyId);
+		studyBean.setStatus(Status.LOCKED);
+		studyDao.update(studyBean);
+		studyBean = (StudyBean) studyDao.findByPK(studyId);
+		assertTrue(studyBean.getStatus().isLocked());
+
+		mockMvc.perform(post(API_STUDY_REMOVE).param("id", Integer.toString(studyId)))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRemoveMethodThrowsExceptionIfUserDoesNotHaveRightsToAccessStudy() throws Exception {
+		createNewStudy();
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		createNewUser(newStudy, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
+		mockMvc.perform(post(API_STUDY_REMOVE).param("id", Integer.toString(defaultStudy.getId())))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRestoreMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_STUDY_RESTORE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatStudyRestoreMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_STUDY_RESTORE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatStudyRestoreMethodThrowsExceptionIfStudyDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_STUDY_RESTORE).param("id", "11111")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRestoreMethodThrowsExceptionIfStudyIsSite() throws Exception {
+		createNewSite(currentScope.getId());
+		mockMvc.perform(post(API_STUDY_RESTORE).param("id", Integer.toString(newSite.getId())))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatStudyRestoreMethodWorksFine() throws Exception {
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		int studyId = currentScope.getId();
+		createNewSite(studyId);
+
+		StudyBean studyBean = (StudyBean) studyDao.findByPK(studyId);
+		studyBean.setStatus(Status.DELETED);
+		studyDao.update(studyBean);
+		studyBean = (StudyBean) studyDao.findByPK(studyId);
+		assertTrue(studyBean.getStatus().isDeleted());
+
+		StudyBean siteBean = (StudyBean) studyDao.findByPK(newSite.getId());
+		siteBean.setStatus(Status.DELETED);
+		studyDao.update(siteBean);
+		assertTrue(siteBean.getStatus().isDeleted());
+
+		mockMvc.perform(post(API_STUDY_RESTORE).param("id", Integer.toString(studyId))).andExpect(status().isOk());
+
+		studyBean = (StudyBean) studyDao.findByPK(studyId);
+		assertTrue(studyBean.getStatus().isAvailable());
+
+		siteBean = (StudyBean) studyDao.findByPK(newSite.getId());
+		assertTrue(siteBean.getStatus().isAvailable());
+	}
+
+	@Test
+	public void testThatStudyRestoreMethodThrowsExceptionIfUserDoesNotHaveRightsToAccessStudy() throws Exception {
+		createNewStudy();
+		login(rootUserName, UserType.SYSADMIN, Role.SYSTEM_ADMINISTRATOR, rootUserPassword, newStudy.getName());
+		createNewUser(newStudy, UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+		login(newUser.getName(), UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR, newUser.getPasswd(), newStudy.getName());
+		mockMvc.perform(post(API_STUDY_RESTORE).param("id", Integer.toString(defaultStudy.getId())))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreNotRemovedStudy() throws Exception {
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		int studyId = currentScope.getId();
+
+		StudyBean studyBean = (StudyBean) studyDao.findByPK(studyId);
+		studyBean.setStatus(Status.AVAILABLE);
+		studyDao.update(studyBean);
+		studyBean = (StudyBean) studyDao.findByPK(studyId);
+		assertTrue(studyBean.getStatus().isAvailable());
+
+		mockMvc.perform(post(API_STUDY_RESTORE).param("id", Integer.toString(studyId)))
+				.andExpect(status().isInternalServerError());
 	}
 }

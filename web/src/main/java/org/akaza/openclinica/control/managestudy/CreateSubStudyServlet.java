@@ -49,6 +49,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.enums.StudyOrigin;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
 import com.clinovo.validator.StudyValidator;
@@ -106,6 +107,7 @@ public class CreateSubStudyServlet extends SpringServlet {
 				forwardPage(Page.SITE_LIST_SERVLET, request, response);
 			} else {
 				StudyBean newStudy = new StudyBean();
+				newStudy.setOrigin(currentStudy.getOrigin());
 				newStudy.setParentStudyId(currentStudy.getId());
 				// get default facility info from property file
 				newStudy.setFacilityName(SQLInitServlet.getField(CreateStudyServlet.FAC_NAME));
@@ -227,8 +229,8 @@ public class CreateSubStudyServlet extends SpringServlet {
 	 */
 	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, HashMap errors)
 			throws Exception {
-
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("siteName", Validator.NO_BLANKS);
@@ -268,14 +270,14 @@ public class CreateSubStudyServlet extends SpringServlet {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
+		v.addValidation("siteName", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+				newStudy.getOrigin().equals(StudyOrigin.STUDIO.getName()) ? 20 : 100);
 
 		errors.putAll(v.validate());
 
 		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(), null);
 
-		if (fp.getString("siteName").trim().length() > INT_100) {
-			Validator.addError(errors, "siteName", getResException().getString("maximum_lenght_name_100"));
-		}
 		if (fp.getString("protocolId").trim().length() > INT_30) {
 			Validator.addError(errors, "protocolId", getResException().getString("maximum_lenght_unique_protocol_30"));
 		}
