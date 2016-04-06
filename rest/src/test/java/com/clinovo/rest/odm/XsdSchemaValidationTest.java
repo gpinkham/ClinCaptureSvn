@@ -96,8 +96,8 @@ public class XsdSchemaValidationTest {
 		RestOdmContainer restOdmContainer = unmarshal(
 				new FileSystemResourceLoader().getResource("classpath:xml/studyeventdefinition3.xml"));
 		assertNull(restOdmContainer.getRestData().getStudyEventDefinitionBean());
-		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitions().size(), 2);
-		marshal(restOdmContainer.getRestData().getStudyEventDefinitions());
+		assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionList().size(), 2);
+		marshal(restOdmContainer.getRestData().getStudyEventDefinitionList());
 	}
 
 	@Test

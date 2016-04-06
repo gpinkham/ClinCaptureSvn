@@ -131,7 +131,7 @@ public class OdmXmlSerializer extends Jaxb2RootElementHttpMessageConverter {
 	public static Method getSetterMethod(Method[] methods, Object o) {
 		String simpleName = o.getClass().getSimpleName().toLowerCase();
 		if (o instanceof List && ((List) o).size() > 0) {
-			simpleName = ((List) o).get(0).getClass().getSimpleName().toLowerCase().replace("bean", "s");
+			simpleName = ((List) o).get(0).getClass().getSimpleName().toLowerCase().replace("bean", "list");
 		}
 		for (Method method : methods) {
 			if (method.getName().equalsIgnoreCase("set".concat(simpleName))) {

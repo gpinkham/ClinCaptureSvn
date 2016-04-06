@@ -13,9 +13,9 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 
 	@Test
 	public void testThatRestAPIReturns404IfRequestIsNotMapped() throws Exception {
-		mockMvc.perform(post(API_WRONG_MAPPING).accept(MediaType.APPLICATION_XML)
-				.param("userName", rootUserName.concat(Long.toString(timestamp))).param("password", rootUserPassword)
-				.param("studyName", defaultStudyName)).andExpect(status().isNotFound());
+		mockMvc.perform(post(API_WRONG_MAPPING).param("userName", rootUserName.concat(Long.toString(timestamp)))
+				.param("password", rootUserPassword).param("studyName", defaultStudyName))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -74,18 +74,6 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationMethodReturnsBadRequestIfStudyNameParameterHasATypo() throws Exception {
 		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword)
 				.param("stUdyName", defaultStudyName)).andExpect(status().isBadRequest());
-	}
-
-	@Test
-	public void testThatAuthenticationMethodReturnsBadRequestIfStudyNameIsMissing() throws Exception {
-		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword))
-				.andExpect(status().isBadRequest());
-	}
-
-	@Test
-	public void testThatAuthenticationMethodReturnsBadRequestIfStudyNameIsEmpty() throws Exception {
-		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword)
-				.param("studyName", "")).andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -166,6 +154,18 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatAuthenticationMethodReturnsErrorIfStudyDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword)
+				.param("studyName", "wrong study name!")).andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	public void testThatAuthenticationWithoutScopeIsPossible() throws Exception {
+		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword))
+				.andExpect(status().isOk());
+	}
+
+	@Test
 	public void testThatChangeScopeMethodReturnsErrorIfStudyNameIsSite() throws Exception {
 		createNewSite(currentScope.getId());
 		mockMvc.perform(post(API_CHANGE_SCOPE).param("studyName", newSite.getName()))
@@ -202,5 +202,12 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatChangeScopeMethodReturnsBadRequestIfStudyNameParameterHasATypo() throws Exception {
 		mockMvc.perform(post(API_CHANGE_SCOPE).param("stuDyName", currentScope.getName()))
 				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatChangeScopeMethodWorksFineIfScopeWasNotPreviouslySet() throws Exception {
+		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword))
+				.andExpect(status().isOk());
+		mockMvc.perform(post(API_CHANGE_SCOPE).param("studyName", currentScope.getName())).andExpect(status().isOk());
 	}
 }

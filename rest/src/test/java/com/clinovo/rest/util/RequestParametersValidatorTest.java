@@ -73,6 +73,7 @@ public class RequestParametersValidatorTest {
 
 		currentStudy = new StudyBean();
 		currentStudy.setId(1);
+		Mockito.when(userDetails.getStudyName()).thenReturn(currentStudy.getName());
 		Mockito.when(userDetails.getCurrentStudy(dataSource)).thenReturn(currentStudy);
 		session.setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS, userDetails);
 	}

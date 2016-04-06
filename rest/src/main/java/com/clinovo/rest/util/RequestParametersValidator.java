@@ -37,7 +37,9 @@ import org.springframework.web.method.HandlerMethod;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
+import com.clinovo.rest.annotation.ScopeIsNotRequired;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.service.AuthenticationService;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
@@ -60,6 +62,38 @@ public final class RequestParametersValidator {
 	public static final String MISSING = ".missing.";
 
 	private RequestParametersValidator() {
+	}
+
+	/**
+	 * Method that validates ScopeIsNotRequired annotation.
+	 *
+	 * @param userDetails
+	 *            UserDetails
+	 * @param messageSource
+	 *            MessageSource
+	 * @param handler
+	 *            HandlerMethod
+	 * @throws RestException
+	 *             the RestException
+	 */
+	public static void validateScopeRequirement(UserDetails userDetails, MessageSource messageSource,
+			HandlerMethod handler) throws RestException {
+		if (userDetails != null && userDetails.getStudyName() == null
+				&& !(handler.getBean() instanceof AuthenticationService)) {
+			boolean scopeIsRequired = true;
+			Annotation[] annotationArray = handler.getMethod().getAnnotations();
+			if (annotationArray != null) {
+				for (Annotation annotation : annotationArray) {
+					if (annotation instanceof ScopeIsNotRequired) {
+						scopeIsRequired = false;
+						break;
+					}
+				}
+			}
+			if (scopeIsRequired) {
+				throw new RestException(messageSource, "rest.scopeIsRequired");
+			}
+		}
 	}
 
 	/**
@@ -135,8 +169,9 @@ public final class RequestParametersValidator {
 	 */
 	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
 			HandlerMethod handler) throws RestException {
-		if (request.getSession().getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS) == null
-				&& !(handler.getBean() instanceof AuthenticationService)) {
+		UserDetails userDetails = (UserDetails) request.getSession()
+				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
+		if (userDetails == null && !(handler.getBean() instanceof AuthenticationService)) {
 			return;
 		}
 		validateClientVersion(request, messageSource);
@@ -213,6 +248,7 @@ public final class RequestParametersValidator {
 			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
 		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
+		validateScopeRequirement(userDetails, messageSource, handler);
 	}
 
 	private static void validateClientVersion(HttpServletRequest request, MessageSource messageSource)

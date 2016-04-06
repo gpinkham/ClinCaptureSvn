@@ -23,7 +23,7 @@
 
     <xs:complexType name="restData">
         <xs:sequence>
-            <xs:element ref="StudyBean" minOccurs="0"/>
+            <xs:element ref="StudyBean" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="CrfVersion" minOccurs="0"/>
             <xs:element ref="EventDefinitionCrf" minOccurs="0"/>
             <xs:element ref="StudyEventDefinition" minOccurs="0" maxOccurs="unbounded"/>

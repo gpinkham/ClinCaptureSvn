@@ -15,6 +15,7 @@
 package com.clinovo.rest.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.slf4j.Logger;
@@ -28,13 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
+import com.clinovo.rest.annotation.ScopeIsNotRequired;
 import com.clinovo.rest.service.base.BaseStudyService;
 
 /**
  * StudyService.
  */
 @RestController("restStudyService")
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "unchecked"})
 public class StudyService extends BaseStudyService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyService.class);
@@ -359,5 +361,18 @@ public class StudyService extends BaseStudyService {
 	@RequestMapping(value = "/study/restore", method = RequestMethod.POST)
 	public StudyBean restore(@RequestParam(value = "id") int studyId) throws Exception {
 		return restoreStudy(studyId);
+	}
+
+	/**
+	 * Method returns available studies.
+	 *
+	 * @return StudyBean list
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@ScopeIsNotRequired
+	@RequestMapping(value = "/studies", method = RequestMethod.GET)
+	public List<StudyBean> studies() throws Exception {
+		return (List<StudyBean>) getStudyDAO().findAllParents();
 	}
 }

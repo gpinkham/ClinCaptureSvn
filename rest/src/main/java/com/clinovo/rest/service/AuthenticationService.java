@@ -76,21 +76,25 @@ public class AuthenticationService extends BaseAuthenticationService {
 	 */
 	@RequestMapping(value = "/authentication", method = RequestMethod.POST)
 	public UserDetails authenticate(@RequestParam("userName") String userName,
-			@RequestParam("password") String password, @RequestParam("studyName") String studyName)
-					throws RestException {
+			@RequestParam("password") String password,
+			@RequestParam(value = "studyName", required = false) String studyName) throws RestException {
 		UserAccountBean userAccountBean = authenticateUser(userName, password);
-		StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
-		StudyUserRoleBean surBean = getStudyUserRole(studyBean, userAccountBean, HttpServletResponse.SC_UNAUTHORIZED);
 		UserDetails userDetails = new UserDetails();
 		userDetails.setUserId(userAccountBean.getId());
 		userDetails.setUserName(userName);
 		userDetails.setPassword(password);
 		userDetails.setUserStatus(userAccountBean.getStatus().getCode());
-		userDetails.setStudyName(studyName);
-		userDetails.setStudyStatus(studyBean.getStatus().getCode());
-		userDetails.setStudyOid(studyBean.getOid());
-		userDetails.setRoleCode(surBean.getRole().getCode());
-		userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
+		if (studyName != null) {
+			StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
+			StudyUserRoleBean surBean = getStudyUserRole(studyBean, userAccountBean,
+					HttpServletResponse.SC_UNAUTHORIZED);
+
+			userDetails.setStudyName(studyName);
+			userDetails.setStudyStatus(studyBean.getStatus().getCode());
+			userDetails.setStudyOid(studyBean.getOid());
+			userDetails.setRoleCode(surBean.getRole().getCode());
+			userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
+		}
 		RequestUtil.getRequest().getSession().setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS,
 				userDetails);
 		return userDetails;

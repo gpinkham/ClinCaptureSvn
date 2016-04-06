@@ -48,7 +48,7 @@ public class RestData {
 	private UserAccountBean userAccountBean;
 
 	@XmlElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private List<StudyEventDefinitionBean> studyEventDefinitions = new ArrayList<StudyEventDefinitionBean>();
+	private List<StudyEventDefinitionBean> studyEventDefinitionList = new ArrayList<StudyEventDefinitionBean>();
 
 	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private EventDefinitionCRFBean eventDefinitionCRFBean;
@@ -57,7 +57,7 @@ public class RestData {
 	private CRFVersionBean crfVersionBean;
 
 	@XmlElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private StudyBean studyBean;
+	private List<StudyBean> studyList = new ArrayList<StudyBean>();
 
 	public Error getError() {
 		return error;
@@ -92,11 +92,11 @@ public class RestData {
 	}
 
 	public StudyEventDefinitionBean getStudyEventDefinitionBean() {
-		return studyEventDefinitions.size() == 1 ? studyEventDefinitions.get(0) : null;
+		return studyEventDefinitionList.size() == 1 ? studyEventDefinitionList.get(0) : null;
 	}
 
 	public void setStudyEventDefinitionBean(StudyEventDefinitionBean studyEventDefinitionBean) {
-		studyEventDefinitions.add(studyEventDefinitionBean);
+		studyEventDefinitionList.add(studyEventDefinitionBean);
 	}
 
 	public EventDefinitionCRFBean getEventDefinitionCRFBean() {
@@ -115,19 +115,27 @@ public class RestData {
 		this.crfVersionBean = crfVersionBean;
 	}
 
-	public List<StudyEventDefinitionBean> getStudyEventDefinitions() {
-		return studyEventDefinitions;
+	public List<StudyEventDefinitionBean> getStudyEventDefinitionList() {
+		return studyEventDefinitionList;
 	}
 
-	public void setStudyEventDefinitions(List<StudyEventDefinitionBean> studyEventDefinitions) {
-		this.studyEventDefinitions = studyEventDefinitions;
+	public void setStudyEventDefinitionList(List<StudyEventDefinitionBean> studyEventDefinitionList) {
+		this.studyEventDefinitionList = studyEventDefinitionList;
+	}
+
+	public List<StudyBean> getStudyList() {
+		return studyList;
+	}
+
+	public void setStudyList(List<StudyBean> studyList) {
+		this.studyList = studyList;
 	}
 
 	public StudyBean getStudyBean() {
-		return studyBean;
+		return studyList.size() == 1 ? studyList.get(0) : null;
 	}
 
 	public void setStudyBean(StudyBean studyBean) {
-		this.studyBean = studyBean;
+		studyList.add(studyBean);
 	}
 }

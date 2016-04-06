@@ -2287,7 +2287,7 @@ public class EventServiceTest extends BaseServiceTest {
 		result = mockMvc.perform(get(API_EVENTS)).andExpect(status().isOk()).andReturn();
 		unmarshalResult();
 		if (mediaType == MediaType.APPLICATION_XML) {
-			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitions().size(), 9);
+			assertEquals(restOdmContainer.getRestData().getStudyEventDefinitionList().size(), 9);
 		}
 	}
 
