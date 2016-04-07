@@ -195,20 +195,20 @@ public final class CommonValidator {
 		if (crfBuilder.getCurrentItem().getResponseSet().getResponseType().getResponseTypeId() != ResponseType.TEXT
 				.getId()
 				&& crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() != ResponseType.TEXTAREA.getId()
+				.getResponseTypeId() != ResponseType.TEXTAREA.getId()
 				&& crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() != ResponseType.INSTANT_CALCULATION.getId()
+				.getResponseTypeId() != ResponseType.INSTANT_CALCULATION.getId()
 				&& crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() != ResponseType.GROUP_CALCULATION.getId()
+				.getResponseTypeId() != ResponseType.GROUP_CALCULATION.getId()
 				&& crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() != ResponseType.CALCULATION.getId()
+				.getResponseTypeId() != ResponseType.CALCULATION.getId()
 				&& crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() != ResponseType.FILE.getId()) {
+				.getResponseTypeId() != ResponseType.FILE.getId()) {
 			// set the stored options text for the same label & response type if it's is empty
 			if (StringUtil.isBlank(crfBuilder.getCurrentItem().getResponseSet().getOptionsText())
 					&& crfBuilder.getOptionsTextMap().keySet()
-							.contains(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
-									+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE))) {
+					.contains(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
+							+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE))) {
 				crfBuilder.getCurrentItem().getResponseSet()
 						.setOptionsText(crfBuilder.getOptionsTextMap()
 								.get(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
@@ -217,8 +217,8 @@ public final class CommonValidator {
 			// set the stored options values for the same label & response type if it's is empty
 			if (StringUtil.isBlank(crfBuilder.getCurrentItem().getResponseSet().getOptionsValues())
 					&& crfBuilder.getOptionsValuesMap().keySet()
-							.contains(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
-									+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE))) {
+					.contains(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
+							+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE))) {
 				crfBuilder.getCurrentItem().getResponseSet()
 						.setOptionsValues(crfBuilder.getOptionsValuesMap()
 								.get(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
@@ -300,12 +300,12 @@ public final class CommonValidator {
 					crfBuilder.getResNames().add(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase());
 					crfBuilder.getOptionsTextMap()
 							.put(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
-									+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE),
-							crfBuilder.getCurrentItem().getResponseSet().getOptionsText());
+											+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE),
+									crfBuilder.getCurrentItem().getResponseSet().getOptionsText());
 					crfBuilder.getOptionsValuesMap()
 							.put(crfBuilder.getCurrentItem().getResponseSet().getLabel().toLowerCase() + "_"
-									+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE),
-							crfBuilder.getCurrentItem().getResponseSet().getOptionsValues());
+											+ crfBuilder.getCurrentItem().getRealValue(RealValueKey.RESPONSE_TYPE),
+									crfBuilder.getCurrentItem().getResponseSet().getOptionsValues());
 				} else {
 					crfBuilder.getErrorMessageProducer().responseLabelHasBeenUsedForAnotherResponseType();
 				}
@@ -320,7 +320,7 @@ public final class CommonValidator {
 		if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
 				.getResponseTypeId() == ResponseType.CALCULATION.getId()
 				|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()) {
+				.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()) {
 			if (crfBuilder.getCurrentItem().getResponseSet().getOptionsValues().contains(":")) {
 				String[] s = crfBuilder.getCurrentItem().getResponseSet().getOptionsValues().split(":");
 				if (s.length > 0 && !FUNC.equalsIgnoreCase(s[0].trim())) {
@@ -344,11 +344,10 @@ public final class CommonValidator {
 					if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
 							.getResponseTypeId() == ResponseType.CALCULATION.getId()
 							&& !crfBuilder.getSheetContainer().getAllItems().get(variable)
-									.equalsIgnoreCase(groupLabel)) {
+							.equalsIgnoreCase(groupLabel)) {
 						crfBuilder.getErrorMessageProducer().itemsMustHaveTheSameGroup();
-					} else
-						if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-								.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()) {
+					} else if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
+							.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()) {
 						String g = crfBuilder.getSheetContainer().getAllItems().get(variable);
 						if (!g.equalsIgnoreCase(UNGROUPED) && g.equalsIgnoreCase(groupLabel)) {
 							crfBuilder.getErrorMessageProducer().itemsShouldNotHaveTheSameGroup();
@@ -356,9 +355,8 @@ public final class CommonValidator {
 					}
 				}
 			}
-		} else
-			if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-					.getResponseTypeId() == ResponseType.INSTANT_CALCULATION.getId()) {
+		} else if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
+				.getResponseTypeId() == ResponseType.INSTANT_CALCULATION.getId()) {
 			int row = crfBuilder.getCurrentItem().getRowNumber();
 			int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
 			OnChangeSheetValidationCell onChangeCell = new OnChangeSheetValidationCell(OnChangeSheetValidationType.ALL,
@@ -381,9 +379,8 @@ public final class CommonValidator {
 			if (crfBuilder.getCurrentItem().getResponseSet().getResponseType().getResponseTypeId() == ResponseType.FILE
 					.getId() && crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.FILE.getId()) {
 				crfBuilder.getErrorMessageProducer().itemDataTypeShouldBeFile();
-			} else
-				if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() == ResponseType.INSTANT_CALCULATION.getId()) {
+			} else if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
+					.getResponseTypeId() == ResponseType.INSTANT_CALCULATION.getId()) {
 				int row = crfBuilder.getCurrentItem().getRowNumber();
 				int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
 				OnChangeSheetValidationCell onChangeCell = new OnChangeSheetValidationCell(
@@ -402,11 +399,11 @@ public final class CommonValidator {
 		if (crfBuilder.getCurrentItem().getResponseSet().getResponseType().getResponseTypeId() == ResponseType.CHECKBOX
 				.getId()
 				|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() == ResponseType.RADIO.getId()
+				.getResponseTypeId() == ResponseType.RADIO.getId()
 				|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() == ResponseType.SELECT.getId()
+				.getResponseTypeId() == ResponseType.SELECT.getId()
 				|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-						.getResponseTypeId() == ResponseType.SELECTMULTI.getId()) {
+				.getResponseTypeId() == ResponseType.SELECTMULTI.getId()) {
 			if (crfBuilder.getLabelWithType().containsKey(crfBuilder.getCurrentItem().getResponseSet().getLabel())) {
 				// make sure same responseLabels have same data type
 				if (!crfBuilder.getCurrentItem().getRealValue(RealValueKey.ITEM_DATA_TYPE).equalsIgnoreCase(
@@ -493,7 +490,7 @@ public final class CommonValidator {
 			// we expect no more than one hit
 			if (itemGroupCrvVersion.getItemName().equals(crfBuilder.getCurrentItem().getName())
 					&& !(crfBuilder.getCurrentItem().getItemMeta().getGroupLabel().isEmpty()
-							&& itemGroupCrvVersion.getGroupName().equalsIgnoreCase(UNGROUPED))) {
+					&& itemGroupCrvVersion.getGroupName().equalsIgnoreCase(UNGROUPED))) {
 				if (!crfBuilder.getCurrentItem().getItemMeta().getGroupLabel()
 						.equals(itemGroupCrvVersion.getGroupName()) && itemGroupCrvVersion.getCrfVersionStatus() == 1) {
 					crfBuilder.getCurrentMessage().append(crfBuilder.getMessage("verifyUniqueItemPlacementInGroups_4"))
@@ -613,17 +610,17 @@ public final class CommonValidator {
 			if (crfBuilder.getCurrentItem().getResponseSet().getResponseType()
 					.getResponseTypeId() == ResponseType.CHECKBOX.getId()
 					|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-							.getResponseTypeId() == ResponseType.RADIO.getId()
+					.getResponseTypeId() == ResponseType.RADIO.getId()
 					|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-							.getResponseTypeId() == ResponseType.SELECT.getId()
+					.getResponseTypeId() == ResponseType.SELECT.getId()
 					|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-							.getResponseTypeId() == ResponseType.SELECTMULTI.getId()) {
+					.getResponseTypeId() == ResponseType.SELECTMULTI.getId()) {
 				crfBuilder.getErrorMessageProducer().widthDecimalIsNotAvailable();
 			} else {
 				boolean isCalc = crfBuilder.getCurrentItem().getResponseSet().getResponseType()
 						.getResponseTypeId() == ResponseType.GROUP_CALCULATION.getId()
 						|| crfBuilder.getCurrentItem().getResponseSet().getResponseType()
-								.getResponseTypeId() == ResponseType.CALCULATION.getId();
+						.getResponseTypeId() == ResponseType.CALCULATION.getId();
 				crfBuilder.setCurrentMessage(Validator.validateWidthDecimalSetting(
 						crfBuilder.getCurrentItem().getItemMeta().getWidthDecimal(),
 						crfBuilder.getCurrentItem().getRealValue(RealValueKey.ITEM_DATA_TYPE), isCalc,
@@ -688,10 +685,9 @@ public final class CommonValidator {
 					&& !ONE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.REQUIRED))) {
 				crfBuilder.getErrorMessageProducer().requiredIsNotValid();
 			}
-		} else
-			if (crfBuilder.isJsonCrfBuilder()
-					&& crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.LABEL.getId()
-					&& crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.DIVIDER.getId()) {
+		} else if (crfBuilder.isJsonCrfBuilder()
+				&& crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.LABEL.getId()
+				&& crfBuilder.getCurrentItem().getItemDataTypeId() != ItemDataType.DIVIDER.getId()) {
 			if (!(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI).isEmpty()
 					|| TRUE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI))
 					|| FALSE.equals(crfBuilder.getCurrentItem().getRealValue(RealValueKey.PHI)))) {
@@ -731,7 +727,10 @@ public final class CommonValidator {
 			}
 			// validate availability of item_label
 			if (crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean() != null) {
-				if (crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getControlItemName().length() > 0
+				if (crfBuilder.getCurrentItem().getParentItemBean() != null && ((ItemBeanExt) crfBuilder
+						.getCurrentItem().getParentItemBean()).getSimpleConditionalDisplayBean() != null) {
+					crfBuilder.getErrorMessageProducer().simpleConditionalDisplayPresentForParentAndChild();
+				} else if (crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getControlItemName().length() > 0
 						&& crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getOptionValue().length() > 0
 						&& crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getMessage().length() > 0) {
 					if (crfBuilder.getItemNames().contains(

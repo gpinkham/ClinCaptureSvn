@@ -697,4 +697,12 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	public void crfShouldHaveAtLeastOneItem() throws CRFReadingException {
 		throw new CRFReadingException(crfBuilder.getMessage("importcrf.crfShouldHaveAtLeastOneItem"));
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void simpleConditionalDisplayPresentForParentAndChild() {
+		crfBuilder.getErrorsList().add(crfBuilder.getMessage("importcrf.parentAndChildHasConditionalLogic",
+				new Object[]{crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem().getParentItemBean().getName()}));
+	}
 }

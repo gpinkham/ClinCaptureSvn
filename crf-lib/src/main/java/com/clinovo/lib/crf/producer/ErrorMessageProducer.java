@@ -453,4 +453,9 @@ public interface ErrorMessageProducer {
 	 *             the CRFReadingException
 	 */
 	void crfShouldHaveAtLeastOneItem() throws CRFReadingException;
+
+	/**
+	 * Generate error message if parent and child items, both, have SDC logic.
+	 */
+	void simpleConditionalDisplayPresentForParentAndChild();
 }
