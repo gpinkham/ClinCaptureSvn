@@ -12,50 +12,29 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.rest.advice;
+package com.clinovo.rest.annotation;
 
-import javax.servlet.http.HttpServletResponse;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.Error;
-import com.clinovo.rest.security.PermissionChecker;
-import com.clinovo.util.RequestUtil;
+import com.clinovo.enums.BaseEnum;
 
 /**
- * RestAdvice.
+ * EnumBasedParameters method annotation.
+ *
+ * Typically is used for methods where scope is not required.
  */
-@ControllerAdvice
-public class RestAdvice {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RestAdvice.class);
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@SuppressWarnings("rawtypes")
+public @interface EnumBasedParameters {
 
 	/**
-	 * Exception handler for rest api.
-	 * 
-	 * @param ex
-	 *            Exception
-	 * @param response
-	 *            HttpServletResponse
-	 * @return ExceptionWrapper
+	 * Method that returns enumClass.
 	 */
-	@ExceptionHandler(Exception.class)
-	@ResponseBody
-	public Error handleException(Exception ex, HttpServletResponse response) {
-		LOGGER.error("Error has occurred.", ex);
-		int code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-		if (ex instanceof RestException) {
-			code = ((RestException) ex).getCode();
-		}
-		if (code == HttpServletResponse.SC_UNAUTHORIZED) {
-			RequestUtil.getRequest().getSession().removeAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
-		}
-		response.setStatus(code);
-		return new Error(ex, String.valueOf(code));
-	}
+	Class<? extends BaseEnum> enumClass();
 }

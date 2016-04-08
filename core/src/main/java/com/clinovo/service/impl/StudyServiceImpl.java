@@ -620,7 +620,9 @@ public class StudyServiceImpl implements StudyService {
 				} else {
 					String parameterName = studyConfigurationParameter.getName();
 					String value = configurationParametersMap.get(parameterName);
-					studyConfigService.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
+					if (value != null) {
+						studyConfigService.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
+					}
 				}
 			}
 		}

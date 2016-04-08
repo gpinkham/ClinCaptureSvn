@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
@@ -36,7 +38,7 @@ import com.clinovo.rest.service.base.BaseStudyService;
  * StudyService.
  */
 @RestController("restStudyService")
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings({"unused"})
 public class StudyService extends BaseStudyService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyService.class);
@@ -271,6 +273,7 @@ public class StudyService extends BaseStudyService {
 	 *             an Exception
 	 */
 	@ProvideAtLeastOneNotRequired
+	@EnumBasedParameters(enumClass = StudyConfigurationParameter.class)
 	@PossibleValuesHolder({
 			@PossibleValues(name = "protocolType", canBeNotSpecified = true, values = "0,1", valueDescriptions = "rest.protocolType.valueDescription"),
 			@PossibleValues(name = "phase", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8,9,10,11,12,13", valueDescriptions = "rest.phase.valueDescription"),
@@ -373,6 +376,6 @@ public class StudyService extends BaseStudyService {
 	@ScopeIsNotRequired
 	@RequestMapping(value = "/studies", method = RequestMethod.GET)
 	public List<StudyBean> studies() throws Exception {
-		return (List<StudyBean>) getStudyDAO().findAllParents();
+		return getStudies();
 	}
 }

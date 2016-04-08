@@ -12,57 +12,25 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.util;
+package com.clinovo.rest.model.wadl;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import javax.servlet.http.HttpServletRequest;
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "doc")
+public class Doc {
 
-import org.akaza.openclinica.control.form.FormProcessor;
+	@XmlAttribute(name = "title")
+	private String title;
 
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFeature;
-import com.clinovo.enums.StudyParameter;
-
-/**
- * StudyUtil.
- */
-public final class StudyUtil {
-
-	private StudyUtil() {
+	public String getTitle() {
+		return title;
 	}
 
-	public static Map<String, String> getStudyFeaturesMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyFeature studyFeature : StudyFeature.values()) {
-			String featureName = studyFeature.getName();
-			map.put(featureName, fp.getString(featureName));
-		}
-		return map;
-	}
-
-	public static Map<String, String> getStudyParametersMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyParameter studyParameter : StudyParameter.values()) {
-			String parameterName = studyParameter.getName();
-			map.put(parameterName, fp.getString(parameterName));
-		}
-		return map;
-	}
-
-	public static Map<String, String> getStudyConfigurationParametersMap() {
-		HttpServletRequest request = RequestUtil.getRequest();
-		FormProcessor fp = new FormProcessor(request);
-		Map<String, String> map = new HashMap<String, String>();
-		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-			String parameterName = studyConfigurationParameter.getName();
-			if (request.getParameter(parameterName) != null) {
-				map.put(parameterName, fp.getString(parameterName));
-			}
-		}
-		return map;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }

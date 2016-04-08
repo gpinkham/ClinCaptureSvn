@@ -12,57 +12,98 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.util;
+package com.clinovo.rest.model.wadl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.akaza.openclinica.control.form.FormProcessor;
-
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFeature;
-import com.clinovo.enums.StudyParameter;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * StudyUtil.
+ * Param.
  */
-public final class StudyUtil {
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "request")
+public class Param {
 
-	private StudyUtil() {
+	@XmlAttribute(name = "xmlns:xs")
+	private String xmlnsXs;
+
+	@XmlAttribute(name = "name")
+	private String name;
+
+	@XmlAttribute(name = "style")
+	private String style;
+
+	@XmlAttribute(name = "type")
+	private String type;
+
+	@XmlAttribute(name = "default")
+	private String defaultValue;
+
+	@XmlAttribute(name = "required")
+	private Boolean required;
+
+	@XmlElement(name = "values")
+	private List<Values> valuesList = new ArrayList<Values>();
+
+	public String getXmlnsXs() {
+		return xmlnsXs;
 	}
 
-	public static Map<String, String> getStudyFeaturesMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyFeature studyFeature : StudyFeature.values()) {
-			String featureName = studyFeature.getName();
-			map.put(featureName, fp.getString(featureName));
-		}
-		return map;
+	public void setXmlnsXs(String xmlnsXs) {
+		this.xmlnsXs = xmlnsXs;
 	}
 
-	public static Map<String, String> getStudyParametersMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyParameter studyParameter : StudyParameter.values()) {
-			String parameterName = studyParameter.getName();
-			map.put(parameterName, fp.getString(parameterName));
-		}
-		return map;
+	public String getName() {
+		return name;
 	}
 
-	public static Map<String, String> getStudyConfigurationParametersMap() {
-		HttpServletRequest request = RequestUtil.getRequest();
-		FormProcessor fp = new FormProcessor(request);
-		Map<String, String> map = new HashMap<String, String>();
-		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-			String parameterName = studyConfigurationParameter.getName();
-			if (request.getParameter(parameterName) != null) {
-				map.put(parameterName, fp.getString(parameterName));
-			}
-		}
-		return map;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public Boolean getRequired() {
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
+	}
+
+	public List<Values> getValuesList() {
+		return valuesList;
+	}
+
+	public void setValuesList(List<Values> valuesList) {
+		this.valuesList = valuesList;
 	}
 }

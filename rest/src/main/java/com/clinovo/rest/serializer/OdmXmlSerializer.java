@@ -30,7 +30,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.jvnet.ws.wadl.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResourceLoader;
@@ -43,6 +42,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.clinovo.enums.RestServerVersion;
 import com.clinovo.rest.model.RestData;
 import com.clinovo.rest.model.Server;
+import com.clinovo.rest.model.wadl.Application;
 import com.clinovo.rest.odm.RestOdmContainer;
 
 /**

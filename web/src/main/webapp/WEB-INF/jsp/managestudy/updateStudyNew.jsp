@@ -1397,7 +1397,7 @@
 								<c:set var="additionalStudyConfigurationParameterClass" value=""/>
 							</c:if>
 							<c:if test="${studyConfigurationParameter.additionalStudyConfigurationParameter ne null && studyConfigurationParameter.additionalStudyConfigurationParameter.type == 'TEXT'}">
-								<input type="text" id="additionalStudyConfigurationParameter-${studyConfigurationParameterStatus.index}" name="${studyConfigurationParameter.additionalStudyConfigurationParameter.name}" value="${studyToView.studyParameterConfig[studyConfigurationParameter.name]}" onchange="changeIcon(); ${dynamicLabelBuilder}" maxlength="${studyConfigurationParameter.additionalStudyConfigurationParameter.maxLength}" class="w150 ${additionalStudyConfigurationParameterClass}"/>
+								<input type="text" id="additionalStudyConfigurationParameter-${studyConfigurationParameterStatus.index}" name="${studyConfigurationParameter.additionalStudyConfigurationParameter.name}" value="${studyToView.studyParameterConfig[studyConfigurationParameter.name]}" validationPattern="${studyConfigurationParameter.additionalStudyConfigurationParameter.validationPattern}" onchange="changeIcon(); ${dynamicLabelBuilder}" maxlength="${studyConfigurationParameter.additionalStudyConfigurationParameter.maxLength}" class="w150 ${additionalStudyConfigurationParameterClass}"/>
 								<br>
 								<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${studyConfigurationParameter.additionalStudyConfigurationParameter.name}"/></jsp:include>
 							</c:if>

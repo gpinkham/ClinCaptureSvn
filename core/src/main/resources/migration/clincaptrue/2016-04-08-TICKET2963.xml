@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
+ 	<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" 
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd"> 
+  
+		<changeSet author="skirpichenok" id="2016-04-08-TICKET2963-01">
+			<comment>fix some values</comment>
+			<sql splitStatements="false">
+				update study_parameter_value set value = 'auto-editable' where value = 'auto editable' and parameter = 'subjectIdGeneration';
+				update study_parameter_value set value = 'auto-non-editable' where value = 'auto non-editable' and parameter = 'subjectIdGeneration';
+				update study_parameter_value set value = 'not_used' where value = 'not used' and parameter = 'subjectPersonIdRequired';
+			</sql>
+ 	    </changeSet>
+
+</databaseChangeLog>

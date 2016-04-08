@@ -12,57 +12,62 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.util;
+package com.clinovo.rest.model.wadl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.akaza.openclinica.control.form.FormProcessor;
-
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFeature;
-import com.clinovo.enums.StudyParameter;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
- * StudyUtil.
+ * ParamValues.
  */
-public final class StudyUtil {
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "values")
+public class Values {
 
-	private StudyUtil() {
+	@XmlValue
+	private String value;
+
+	@XmlAttribute(name = "dependOn")
+	private String dependOn;
+
+	@XmlAttribute(name = "dependOnValue")
+	private String dependOnValue;
+
+	@XmlAttribute(name = "description")
+	private String description;
+
+	public String getValue() {
+		return value;
 	}
 
-	public static Map<String, String> getStudyFeaturesMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyFeature studyFeature : StudyFeature.values()) {
-			String featureName = studyFeature.getName();
-			map.put(featureName, fp.getString(featureName));
-		}
-		return map;
+	public void setValue(String value) {
+		this.value = value;
 	}
 
-	public static Map<String, String> getStudyParametersMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyParameter studyParameter : StudyParameter.values()) {
-			String parameterName = studyParameter.getName();
-			map.put(parameterName, fp.getString(parameterName));
-		}
-		return map;
+	public String getDependOn() {
+		return dependOn;
 	}
 
-	public static Map<String, String> getStudyConfigurationParametersMap() {
-		HttpServletRequest request = RequestUtil.getRequest();
-		FormProcessor fp = new FormProcessor(request);
-		Map<String, String> map = new HashMap<String, String>();
-		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-			String parameterName = studyConfigurationParameter.getName();
-			if (request.getParameter(parameterName) != null) {
-				map.put(parameterName, fp.getString(parameterName));
-			}
-		}
-		return map;
+	public void setDependOn(String dependOn) {
+		this.dependOn = dependOn;
+	}
+
+	public String getDependOnValue() {
+		return dependOnValue;
+	}
+
+	public void setDependOnValue(String dependOnValue) {
+		this.dependOnValue = dependOnValue;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

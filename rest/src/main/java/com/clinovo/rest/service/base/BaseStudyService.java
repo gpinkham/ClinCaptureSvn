@@ -16,6 +16,7 @@ package com.clinovo.rest.service.base;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +57,7 @@ import com.clinovo.validator.StudyValidator;
 /**
  * BaseStudyService.
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class BaseStudyService extends BaseService {
 
 	@Autowired
@@ -184,6 +185,8 @@ public abstract class BaseStudyService extends BaseService {
 		studyService.prepareStudyBean(studyBean, getCurrentUser(), StudyUtil.getStudyParametersMap(),
 				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE, LocaleResolver.getLocale());
 
+		studyService.prepareStudyBeanConfiguration(studyBean, StudyUtil.getStudyConfigurationParametersMap());
+
 		studyService.updateStudy(studyBean, null, getCurrentUser());
 
 		return studyBean;
@@ -207,5 +210,13 @@ public abstract class BaseStudyService extends BaseService {
 			studyService.restoreStudy(studyBean, getCurrentUser());
 		}
 		return studyBean;
+	}
+
+	protected List<StudyBean> getStudies() throws Exception {
+		List<StudyBean> studyBeanList = (List<StudyBean>) getStudyDAO().findAllParents();
+		for (StudyBean studyBean : studyBeanList) {
+			studyService.prepareStudyBeanConfiguration(studyBean);
+		}
+		return studyBeanList;
 	}
 }

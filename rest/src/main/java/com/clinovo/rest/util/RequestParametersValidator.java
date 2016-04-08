@@ -12,11 +12,11 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.rest.util;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.method.HandlerMethod;
 
+import com.clinovo.enums.BaseEnum;
+import com.clinovo.enums.StudyConfigurationParameterType;
+import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
@@ -50,7 +53,7 @@ import com.clinovo.rest.wrapper.RestRequestWrapper;
  * Method processes controller's annotations before the request finds an entry point. Method adds new parameters with
  * default values if it's necessary and if parameters were not specified.
  */
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings({"unused", "unchecked", "rawtypes"})
 public final class RequestParametersValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestParametersValidator.class);
@@ -64,20 +67,17 @@ public final class RequestParametersValidator {
 	private RequestParametersValidator() {
 	}
 
-	/**
-	 * Method that validates ScopeIsNotRequired annotation.
-	 *
-	 * @param userDetails
-	 *            UserDetails
-	 * @param messageSource
-	 *            MessageSource
-	 * @param handler
-	 *            HandlerMethod
-	 * @throws RestException
-	 *             the RestException
-	 */
-	public static void validateScopeRequirement(UserDetails userDetails, MessageSource messageSource,
-			HandlerMethod handler) throws RestException {
+	private static void validateClientVersion(HttpServletRequest request, MessageSource messageSource)
+			throws Exception {
+		String clientVersion = request.getParameter(PermissionChecker.CLIENT_VERSION);
+		if (clientVersion == null || clientVersion.trim().isEmpty()) {
+			throw new RestException(messageSource, "rest.eachRequestMustHaveVersionParameter",
+					new Object[]{PermissionChecker.CLIENT_VERSION}, HttpServletResponse.SC_BAD_REQUEST);
+		}
+	}
+
+	private static void validateScopeRequirement(UserDetails userDetails, MessageSource messageSource,
+			HandlerMethod handler) throws Exception {
 		if (userDetails != null && userDetails.getStudyName() == null
 				&& !(handler.getBean() instanceof AuthenticationService)) {
 			boolean scopeIsRequired = true;
@@ -96,22 +96,8 @@ public final class RequestParametersValidator {
 		}
 	}
 
-	/**
-	 * Method that validates RestParameterPossibleValues annotation.
-	 *
-	 * @param request
-	 *            HttpServletRequest
-	 * @param messageSource
-	 *            MessageSource
-	 * @param nullParameters
-	 *            Set<String>
-	 * @param handler
-	 *            HandlerMethod
-	 * @throws RestException
-	 *             the RestException
-	 */
-	public static void validateRestParametersPossibleValues(HttpServletRequest request, MessageSource messageSource,
-			Set<String> nullParameters, HandlerMethod handler) throws RestException {
+	private static void validateRestParametersPossibleValues(HttpServletRequest request, MessageSource messageSource,
+			Set<String> nullParameters, HandlerMethod handler) throws Exception {
 		Annotation[] annotationArray = handler.getMethod().getAnnotations();
 		if (annotationArray != null) {
 			for (Annotation annotation : annotationArray) {
@@ -153,38 +139,55 @@ public final class RequestParametersValidator {
 		}
 	}
 
-	/**
-	 * Method that validates request parameters.
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param dataSource
-	 *            DataSource
-	 * @param messageSource
-	 *            MessageSource
-	 * @param handler
-	 *            HandlerMethod
-	 * @throws RestException
-	 *             the RestException
-	 */
-	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
-			HandlerMethod handler) throws RestException {
-		UserDetails userDetails = (UserDetails) request.getSession()
-				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
-		if (userDetails == null && !(handler.getBean() instanceof AuthenticationService)) {
-			return;
+	private static int validateEnumBasedParameters(HttpServletRequest request, MessageSource messageSource,
+			HandlerMethod handler, Set<String> declaredFields, Map<String, String> declaredParams,
+			int countOfProvidedNotRequiredParameters) throws Exception {
+		Class<? extends BaseEnum> enumClass = null;
+		EnumBasedParameters enumBasedParametersAnnotation = handler.getMethod()
+				.getAnnotation(EnumBasedParameters.class);
+		if (enumBasedParametersAnnotation != null) {
+			enumClass = enumBasedParametersAnnotation.enumClass();
 		}
-		validateClientVersion(request, messageSource);
-		int countOfProvidedNotRequiredParameters = 0;
-		Set<String> nullParameters = new HashSet<String>();
-		Set<String> declaredFields = new HashSet<String>();
-		Map<String, String> declaredParams = new HashMap<String, String>();
+		for (String parameterName : declaredParams.values()) {
+			if (!parameterName.equals(PermissionChecker.CLIENT_VERSION) && !declaredFields.contains(parameterName)) {
+				if (enumClass != null) {
+					BaseEnum baseEnum;
+					countOfProvidedNotRequiredParameters++;
+					String parameterValue = request.getParameter(parameterName);
+					boolean hasTypo = (Boolean) enumClass.getMethod("hasTypo", String.class)
+							.invoke(enumClass.getEnumConstants()[0], parameterName);
+					if (hasTypo) {
+						throw new RestException(messageSource, "rest.thereIsTypoInTheParameter",
+								new Object[]{parameterName}, HttpServletResponse.SC_BAD_REQUEST);
+					}
+					baseEnum = (BaseEnum) enumClass.getMethod("find", String.class)
+							.invoke(enumClass.getEnumConstants()[0], parameterName);
+					if (baseEnum == null) {
+						throw new RestException(messageSource, "rest.parameterIsNotSupported",
+								new Object[]{parameterName}, HttpServletResponse.SC_BAD_REQUEST);
+					}
+					if (baseEnum.getType() == StudyConfigurationParameterType.SELECT
+							|| baseEnum.getType() == StudyConfigurationParameterType.RADIO) {
+						if (!Arrays.asList(baseEnum.getValues()).contains(parameterValue)) {
+							throw new RestException(messageSource, "rest.possibleValuesAre",
+									new Object[]{parameterName,
+											Arrays.asList(baseEnum.getValues()).toString().replaceAll("\\]|\\[", "")},
+									HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+						}
+					}
+				} else if (declaredFields.size() > 0) {
+					throw new RestException(messageSource, "rest.parameterIsNotSupported", new Object[]{parameterName},
+							HttpServletResponse.SC_BAD_REQUEST);
+				}
+			}
+		}
+		return countOfProvidedNotRequiredParameters;
+	}
+
+	private static int validateMethodParameterAnnotations(HttpServletRequest request, MessageSource messageSource,
+			HandlerMethod handler, Set<String> declaredFields, Map<String, String> declaredParams,
+			Set<String> nullParameters, int countOfProvidedNotRequiredParameters) {
 		Annotation[][] annotationsHolder = handler.getMethod().getParameterAnnotations();
-		boolean atLeastOneNotRequiredShouldBeProvided = handler.getMethod()
-				.getAnnotation(ProvideAtLeastOneNotRequired.class) != null;
-		for (String paramName : ((Map<String, String>) request.getParameterMap()).keySet()) {
-			declaredParams.put(paramName.toLowerCase(), paramName);
-		}
 		if (annotationsHolder != null) {
 			for (Annotation[] annotations : annotationsHolder) {
 				if (annotations != null) {
@@ -235,29 +238,53 @@ public final class RequestParametersValidator {
 				}
 			}
 		}
-		if (declaredFields.size() > 0) {
-			for (String parameterName : declaredParams.values()) {
-				if (!parameterName.equals(PermissionChecker.CLIENT_VERSION)
-						&& !declaredFields.contains(parameterName)) {
-					throw new RestException(messageSource, "rest.parameterIsNotSupported", new Object[]{parameterName},
-							HttpServletResponse.SC_BAD_REQUEST);
-				}
-			}
+		return countOfProvidedNotRequiredParameters;
+	}
+
+	private static void fillDeclaredParams(HttpServletRequest request, Map<String, String> declaredParams) {
+		Enumeration<String> enumeration = request.getParameterNames();
+		while (enumeration.hasMoreElements()) {
+			String paramName = enumeration.nextElement();
+			declaredParams.put(paramName.toLowerCase(), paramName);
 		}
-		if (atLeastOneNotRequiredShouldBeProvided && countOfProvidedNotRequiredParameters == 0) {
+	}
+
+	/**
+	 * Method that validates request parameters.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param dataSource
+	 *            DataSource
+	 * @param messageSource
+	 *            MessageSource
+	 * @param handler
+	 *            HandlerMethod
+	 * @throws RestException
+	 *             the RestException
+	 */
+	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
+			HandlerMethod handler) throws Exception {
+		int countOfProvidedNotRequiredParameters = 0;
+		Set<String> nullParameters = new HashSet<String>();
+		Set<String> declaredFields = new HashSet<String>();
+		Map<String, String> declaredParams = new HashMap<String, String>();
+		UserDetails userDetails = (UserDetails) request.getSession()
+				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
+		if (userDetails == null && !(handler.getBean() instanceof AuthenticationService)) {
+			return;
+		}
+		fillDeclaredParams(request, declaredParams);
+		validateClientVersion(request, messageSource);
+		countOfProvidedNotRequiredParameters = validateMethodParameterAnnotations(request, messageSource, handler,
+				declaredFields, declaredParams, nullParameters, countOfProvidedNotRequiredParameters);
+		validateScopeRequirement(userDetails, messageSource, handler);
+		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
+		countOfProvidedNotRequiredParameters = validateEnumBasedParameters(request, messageSource, handler,
+				declaredFields, declaredParams, countOfProvidedNotRequiredParameters);
+		if (handler.getMethod().getAnnotation(ProvideAtLeastOneNotRequired.class) != null
+				&& countOfProvidedNotRequiredParameters == 0) {
 			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
-		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
-		validateScopeRequirement(userDetails, messageSource, handler);
 	}
-
-	private static void validateClientVersion(HttpServletRequest request, MessageSource messageSource)
-			throws RestException {
-		String clientVersion = request.getParameter(PermissionChecker.CLIENT_VERSION);
-		if (clientVersion == null || clientVersion.trim().isEmpty()) {
-			throw new RestException(messageSource, "rest.eachRequestMustHaveVersionParameter",
-					new Object[]{PermissionChecker.CLIENT_VERSION}, HttpServletResponse.SC_BAD_REQUEST);
-		}
-	}
-
 }

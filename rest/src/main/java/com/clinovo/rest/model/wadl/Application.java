@@ -12,57 +12,51 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO'S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.util;
+package com.clinovo.rest.model.wadl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.akaza.openclinica.control.form.FormProcessor;
-
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFeature;
-import com.clinovo.enums.StudyParameter;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * StudyUtil.
+ * Application.
  */
-public final class StudyUtil {
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "application")
+public class Application {
 
-	private StudyUtil() {
+	@XmlAttribute(name = "xmlns")
+	private String xmlns;
+
+	@XmlElement(name = "doc")
+	private Doc doc;
+
+	@XmlElement(name = "resources")
+	private Resources resources;
+
+	public String getXmlns() {
+		return xmlns;
 	}
 
-	public static Map<String, String> getStudyFeaturesMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyFeature studyFeature : StudyFeature.values()) {
-			String featureName = studyFeature.getName();
-			map.put(featureName, fp.getString(featureName));
-		}
-		return map;
+	public void setXmlns(String xmlns) {
+		this.xmlns = xmlns;
 	}
 
-	public static Map<String, String> getStudyParametersMap() {
-		Map<String, String> map = new HashMap<String, String>();
-		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
-		for (StudyParameter studyParameter : StudyParameter.values()) {
-			String parameterName = studyParameter.getName();
-			map.put(parameterName, fp.getString(parameterName));
-		}
-		return map;
+	public Doc getDoc() {
+		return doc;
 	}
 
-	public static Map<String, String> getStudyConfigurationParametersMap() {
-		HttpServletRequest request = RequestUtil.getRequest();
-		FormProcessor fp = new FormProcessor(request);
-		Map<String, String> map = new HashMap<String, String>();
-		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-			String parameterName = studyConfigurationParameter.getName();
-			if (request.getParameter(parameterName) != null) {
-				map.put(parameterName, fp.getString(parameterName));
-			}
-		}
-		return map;
+	public void setDoc(Doc doc) {
+		this.doc = doc;
+	}
+
+	public Resources getResources() {
+		return resources;
+	}
+
+	public void setResources(Resources resources) {
+		this.resources = resources;
 	}
 }

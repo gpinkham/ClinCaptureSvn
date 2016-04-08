@@ -178,6 +178,7 @@ public class XsdSchemaValidationTest {
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getCollaborators(), "");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getStatusCode(), "avaliable");
 		assertNotNull(restOdmContainer.getRestData().getStudyBean().getStudyFeatureConfig());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getStudyFeatureConfig().getCrfAnnotation(), "yes");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getPhaseKey(), StudyPhase.PHASE2_3.getValue());
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getExpectedTotalEnrollment(), 11);
 		assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedStart());
@@ -201,5 +202,9 @@ public class XsdSchemaValidationTest {
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getTimingKey(),
 				StudyTiming.RETROSPECTIVE.getValue());
 		marshal(restOdmContainer.getRestData().getStudyBean());
+		assertNotNull(restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig());
+		assertEquals(
+				restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig().getAdminForcedReasonForChange(),
+				"true");
 	}
 }
