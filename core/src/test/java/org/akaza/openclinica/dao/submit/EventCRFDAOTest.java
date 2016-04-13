@@ -65,7 +65,7 @@ public class EventCRFDAOTest extends DefaultAppContextTest {
 		int rowStart = 0;
 		int rowEnd = 15;
 		assertNotNull(eventCRFDAO.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart, rowEnd, userId));
-		assertEquals(0, eventCRFDAO
+		assertEquals(1, eventCRFDAO
 				.getAvailableWithFilterAndSort(studyId, filter, sort, true, rowStart, rowEnd, userId).size());
 	}
 

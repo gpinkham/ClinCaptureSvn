@@ -21,6 +21,8 @@ import java.util.Map;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -107,6 +109,8 @@ public class CrfShortcutsAnalyzer {
 
 	private ItemSDVService itemSDVService;
 
+	private StudyParameterConfig studyParamConfig;
+
 	/**
 	 * CrfShortcutsAnalyzer constructor.
 	 * @param scheme String
@@ -116,9 +120,11 @@ public class CrfShortcutsAnalyzer {
 	 * @param domainName String
 	 * @param attributes Map<String, Object>
 	 * @param itemSDVService ItemSDVService
+	 * @param studyParamConfig StudyParameterConfig
 	 */
 	public CrfShortcutsAnalyzer(String scheme, String requestMethod, String requestURI, String servletPath,
-			String domainName, Map<String, Object> attributes, ItemSDVService itemSDVService) {
+			String domainName, Map<String, Object> attributes, ItemSDVService itemSDVService,
+			StudyParameterConfig studyParamConfig) {
 		this.scheme = scheme;
 		this.requestURI = requestURI;
 		this.domainName = domainName;
@@ -126,6 +132,7 @@ public class CrfShortcutsAnalyzer {
 		this.servletPath = servletPath;
 		this.requestMethod = requestMethod;
 		this.itemSDVService = itemSDVService;
+		this.studyParamConfig = studyParamConfig;
 	}
 
 	private DisplayItemBean interviewerDisplayItemBean = new DisplayItemBean();
@@ -472,12 +479,12 @@ public class CrfShortcutsAnalyzer {
 		return link;
 	}
 
-	private void prepareItemsToSDVShortcutLink(EventCRFBean eventCrfBean, int eventDefinitionCRFId,
+	private void prepareItemsToSDVShortcutLink(EventCRFBean eventCrfBean, EventDefinitionCRFBean eventDefCRF,
 			List<SectionBean> allSections) {
 		List<DisplayItemBean> displayItemBeanList = itemSDVService.getListOfItemsToSDV(eventCrfBean.getId());
 		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
 		for (DisplayItemBean dib : displayItemBeanList) {
-			prepareItemsToSDVShortcutLink(dib, eventCrfBean, eventDefinitionCRFId, allSections, deltaMap);
+			prepareItemsToSDVShortcutLink(dib, eventCrfBean, eventDefCRF, allSections, deltaMap);
 		}
 	}
 
@@ -488,19 +495,23 @@ public class CrfShortcutsAnalyzer {
 	 *            DisplayItemBean
 	 * @param eventCrfBean
 	 *            EventCRFBean
-	 * @param eventDefinitionCRFId
-	 *            int
+	 * @param eventDefCRF
+	 *            EventDefinitionCRFBean
 	 * @param sections
 	 *            List<SectionBean>
 	 * @param deltaMap
 	 *            Map<String, Integer>
 	 */
-	public void prepareItemsToSDVShortcutLink(DisplayItemBean dib, EventCRFBean eventCrfBean, int eventDefinitionCRFId,
-			List<SectionBean> sections, Map<String, Integer> deltaMap) {
+	public void prepareItemsToSDVShortcutLink(DisplayItemBean dib, EventCRFBean eventCrfBean,
+			EventDefinitionCRFBean eventDefCRF, List<SectionBean> sections, Map<String, Integer> deltaMap) {
+
+		boolean itemIsRequiredForSDV = "yes".equals(this.studyParamConfig.getItemLevelSDV())
+				&& eventDefCRF.getSourceDataVerification().isPartialRequired()
+				&& dib.getEdcItemMetadata().sdvRequired();
 		if (dib.getMetadata() != null && dib.getMetadata().getId() > 0 && dib.getMetadata().isShowItem()
-				&& dib.getEdcItemMetadata().sdvRequired()) {
+				&& itemIsRequiredForSDV) {
 			CurrentSectionInfo currentSectionInfo = new CurrentSectionInfo(sections);
-			String link = buildLink(dib.getMetadata().getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
+			String link = buildLink(dib.getMetadata().getSectionId(), eventCrfBean, eventDefCRF.getId(), sections);
 			analyze(currentSectionInfo, deltaMap, link, FIRST_ITEM_TO_SDV, dib.getMetadata().getSectionId());
 			incTotalItemsToSDV();
 			if (currentSectionInfo.currentSectionId == dib.getMetadata().getSectionId()) {
@@ -516,15 +527,15 @@ public class CrfShortcutsAnalyzer {
 	 *            the event crf bean for current crf.
 	 * @param ifmdao
 	 *            the item metadata bean for current crf.
-	 * @param eventDefinitionCRFId
-	 *            the event crf definition id.
+	 * @param eventDefCRF
+	 *            the event crf definition.
 	 * @param sections
 	 *            the list of event crf sections.
 	 * @param noteThreads
 	 *            the list of discrepancy notes group.
 	 */
 	public void prepareCrfShortcutLinks(EventCRFBean eventCrfBean, ItemFormMetadataDAO ifmdao,
-			int eventDefinitionCRFId, List<SectionBean> sections, List<DiscrepancyNoteThread> noteThreads) {
+			EventDefinitionCRFBean eventDefCRF, List<SectionBean> sections, List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
 		Map<String, Integer> deltaMap = new HashMap<String, Integer>();
 		if (requestMethod.equalsIgnoreCase(POST) && attributes.get(SECTION) == null) {
@@ -534,7 +545,7 @@ public class CrfShortcutsAnalyzer {
 		StudyUserRoleBean studyUserRoleBean = (StudyUserRoleBean) attributes.get(USER_ROLE);
 		setUserIsAbleToSDVItems(eventCrfBean.getStage().isDoubleDE_Complete()
 				&& (studyUserRoleBean.isStudyAdministrator() || studyUserRoleBean.isMonitor()));
-		prepareItemsToSDVShortcutLink(eventCrfBean, eventDefinitionCRFId, sections);
+		prepareItemsToSDVShortcutLink(eventCrfBean, eventDefCRF, sections);
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null
@@ -544,7 +555,7 @@ public class CrfShortcutsAnalyzer {
 				ItemFormMetadataBean ifmbean = ifmdao.findByItemIdAndCRFVersionId(tempBean.getItemId(),
 						eventCrfBean.getCRFVersionId());
 				String link = tempBean.getEntityType().equalsIgnoreCase(EVENT_CRF) ? "" : buildLink(
-						ifmbean.getSectionId(), eventCrfBean, eventDefinitionCRFId, sections);
+						ifmbean.getSectionId(), eventCrfBean, eventDefCRF.getId(), sections);
 				String key = null;
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
 					incTotalUpdated();

@@ -1,7 +1,5 @@
 package com.clinovo.service;
 
-import java.util.*;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -10,6 +8,12 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 
 import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.util.SignStateRestorer;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * EventDefinitionService.
@@ -254,4 +258,13 @@ public interface EventDefinitionService {
 	 */
 	void deleteStudyEventDefinition(StudyEventDefinitionBean studyEventDefinitionBean, StudyBean studyBean,
 			Locale locale) throws Exception;
+
+	/**
+	 * Drops Item Level SDV configuration for the specific study event definition.
+	 * All the event definition CRFs, which have SDV state set to Item Level SDV, will be dropped to Entire CRF.
+	 * All the related event CRFs with status SDVed/Signed will preserve status.
+	 *
+	 * @param eventDefBean study event definition bean
+	 */
+	void dropItemLevelSDVConfig(StudyEventDefinitionBean eventDefBean);
 }

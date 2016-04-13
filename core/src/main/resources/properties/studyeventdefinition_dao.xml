@@ -50,6 +50,15 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllByStudyId</name>
+		<sql>
+			SELECT sed.*
+			FROM study_event_definition sed
+			WHERE sed.study_id = ?
+			order by ordinal
+		</sql>
+	</query>
+	<query>
 		<name>findAllAvailableByStudy</name>
 		<sql>
 			SELECT sed.*
@@ -109,16 +118,6 @@
 				AND (st.study_id=? or st.parent_study_id=?)
 				AND sed.status_id=1
 				order by sed.ordinal asc
-		</sql>
-	</query>
-	<query>
-		<name>findAllByStudyAndLimit</name>
-		<sql>
-			SELECT sed.*
-			FROM STUDY_EVENT_DEFINITION sed, study st
-			WHERE sed.study_id = st.study_id
-			AND (st.study_id=? or st.parent_study_id=?)
-			order by sed.date_updated desc limit 5
 		</sql>
 	</query>
 	<query>

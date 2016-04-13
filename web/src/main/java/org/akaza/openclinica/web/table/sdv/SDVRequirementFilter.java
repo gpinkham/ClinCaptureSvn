@@ -24,16 +24,33 @@ import java.util.List;
  */
 public class SDVRequirementFilter extends DroplistFilterEditor {
 
+	private boolean isItemLevelSDVAllowed;
+
+	/**
+	 * public constructor.
+	 *
+	 * @param isItemLevelSDVAllowed defines if the Item Level SDV feature is enabled for the study
+	 */
+	public SDVRequirementFilter(boolean isItemLevelSDVAllowed) {
+		this.isItemLevelSDVAllowed = isItemLevelSDVAllowed;
+	}
+
 	@Override
 	protected List<Option> getOptions() {
+
 		List<Option> options = new ArrayList<Option>();
-		String optionA = SourceDataVerification.AllREQUIRED.toString() + " & "
-				+ SourceDataVerification.PARTIALREQUIRED.toString();
-		options.add(new Option(optionA, optionA));
+		if (isItemLevelSDVAllowed) {
+			String optionA = SourceDataVerification.AllREQUIRED.toString() + " & "
+					+ SourceDataVerification.PARTIALREQUIRED.toString();
+			options.add(new Option(optionA, optionA));
+		}
 		for (SourceDataVerification sdv : SourceDataVerification.values()) {
 			options.add(new Option(sdv.toString(), sdv.toString()));
 		}
-
+		if (!isItemLevelSDVAllowed) {
+			String partialRequiredOption = SourceDataVerification.PARTIALREQUIRED.toString();
+			options.remove(new Option(partialRequiredOption, partialRequiredOption));
+		}
 		return options;
 	}
 }

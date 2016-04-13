@@ -759,7 +759,8 @@ public abstract class BaseSpringController {
 
 			crfShortcutsAnalyzer = new CrfShortcutsAnalyzer(request.getScheme(), request.getMethod(),
 					request.getRequestURI(), request.getServletPath(),
-					(String) request.getSession().getAttribute(DOMAIN_NAME), attributes, itemSDVService);
+					(String) request.getSession().getAttribute(DOMAIN_NAME), attributes, itemSDVService,
+					RequestUtil.getCurrentStudy().getStudyParameterConfig());
 
 			crfShortcutsAnalyzer.getInterviewerDisplayItemBean().setField(CrfShortcutsAnalyzer.INTERVIEWER_NAME);
 			crfShortcutsAnalyzer.getInterviewDateDisplayItemBean().setField(CrfShortcutsAnalyzer.DATE_INTERVIEWED);

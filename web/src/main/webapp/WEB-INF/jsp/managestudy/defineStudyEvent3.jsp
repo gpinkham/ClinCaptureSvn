@@ -96,7 +96,7 @@
                     		
                             <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>" onchange="javascript:changeIcon();">
-                                    <c:forEach var="sdv" items="${crf.sdvOptions}">
+                                    <c:forEach var="sdv" items="${sdvStates}">
                                         <option ${edc.sourceDataVerification.code == sdv.code ? 'selected' : ''} value="${sdv.code}"><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
                                     </c:forEach>
 					        	</select>

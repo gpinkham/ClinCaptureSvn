@@ -8,8 +8,13 @@
 <c:set var="itemId" value="${param.itemId}" />
 <c:set var="rowCount" value="${param.rowCount}" />
 <c:set var="inputName" value="${param.inputName}" />
+<c:set var="itemIsRequiredForSDV" value="${study.studyParameterConfig.itemLevelSDV == 'yes'
+		&& section.eventDefinitionCRF.sourceDataVerification.partialRequired
+		&& displayItem.edcItemMetadata.sdvRequired()}" />
 
-<c:if test="${displayItem.data.id > 0 && section.eventCRF.stage.doubleDE_Complete && displayItem.metadata.showItem && displayItem.edcItemMetadata.sdvRequired() && (userRole.studyAdministrator || userRole.monitor)}">
+<c:if test="${displayItem.data.id > 0 && section.eventCRF.stage.doubleDE_Complete
+	&& displayItem.metadata.showItem && itemIsRequiredForSDV
+	&& (userRole.studyAdministrator || userRole.monitor)}">
     <c:set var="sdvItemLinkAdditionalClass" value="${study.studyParameterConfig.allowSdvWithOpenQueries == 'no' && !eventCrfDoesNotHaveOutstandingDNs ? 'hidden' : ''}"/>
     <a class="sdvItemLink ${sdvItemLinkAdditionalClass}">
         <fmt:message key="sdv_item" bundle="${resword}" var="sdvItemTitle"/>

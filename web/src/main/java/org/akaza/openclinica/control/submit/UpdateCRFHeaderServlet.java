@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -16,9 +17,6 @@ import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -59,13 +57,8 @@ public class UpdateCRFHeaderServlet extends SpringServlet {
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		List<SectionBean> allSections = new ArrayList<SectionBean>();
 
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-
-		request.setAttribute(SECTION, new SectionDAO(getDataSource()).findByPK(fp.getInt(SECTION_ID)));
+		SectionDAO sdao = getSectionDAO();
+		request.setAttribute(SECTION, sdao.findByPK(fp.getInt(SECTION_ID)));
 
 		EventCRFBean ecb = new EventCRFBean();
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
@@ -86,7 +79,8 @@ public class UpdateCRFHeaderServlet extends SpringServlet {
 		}
 
 		if (eventCRFId > 0) {
-			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+			ecb = (EventCRFBean) getEventCRFDAO().findByPK(eventCRFId);
+			DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 			allNotes.addAll(dndao.findAllTopNotesByEventCRF(eventCRFId));
 			allNotes.addAll(dndao.findEventCRFDNotesFromEventCRF(ecb));
 			allNotes = filterNotesByUserRole(allNotes, request);
@@ -96,7 +90,8 @@ public class UpdateCRFHeaderServlet extends SpringServlet {
 		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, currentStudy, null, -1);
 
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
-		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
+		EventDefinitionCRFBean eventDefCRF = (EventDefinitionCRFBean) getEventDefinitionCRFDAO().findByPK(eventDefinitionCRFId);
+		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, getItemFormMetadataDAO(), eventDefCRF, allSections, noteThreads);
 
 		JSONArray jsonArray = new JSONArray();
 		int totalItems = fp.getInt("totalItems");

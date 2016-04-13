@@ -350,12 +350,12 @@
 
 				<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 					<select onchange="javascript:changeIcon(); checkItemLevelSDV(this);" name="sdvOption<c:out value="${count}"/>" initial-value="${edcSDVMap[edc.id]}">
-						<c:forEach var="sdv" items="${edc.sdvOptions}">
+						<c:forEach var="sdv" items="${sdvStates}">
 							<option value="${sdv.code}" ${edc.sourceDataVerification.code == sdv.code ? "selected" : ""}><fmt:message key="${sdv.description}" bundle="${resterms}"/></option>
 						</c:forEach>
 					</select>
 
-					<c:if test="${edc.id != 0}">
+					<c:if test="${edc.id != 0 && study.studyParameterConfig.itemLevelSDV == 'yes'}">
 						<c:set var="display" value="${edc.sourceDataVerification.code != 2 ? 'none' : 'inline-block'}"/>
 						<img name="bt_edit_edc_sdv" class="bt_edit_edc_sdv_${edcStatus.index}" src="images/bt_Edit.gif" border="0"
 							 alt="<fmt:message key="configure_items_for_sdv" bundle="${resword}"/>"

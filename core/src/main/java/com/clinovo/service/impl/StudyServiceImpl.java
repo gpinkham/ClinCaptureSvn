@@ -29,10 +29,12 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.slf4j.Logger;
@@ -111,6 +113,10 @@ public class StudyServiceImpl implements StudyService {
 
 	private UserAccountDAO getUserAccountDAO() {
 		return new UserAccountDAO(dataSource);
+	}
+
+	private StudyEventDefinitionDAO getStudyEventDefDAO() {
+		return new StudyEventDefinitionDAO(dataSource);
 	}
 
 	private void autoRemoveStudyUserRole(StudyBean studyBean, UserAccountBean updater) throws Exception {
@@ -268,6 +274,17 @@ public class StudyServiceImpl implements StudyService {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void dropItemLevelSDVConfig(int studyId) {
+
+		List<StudyEventDefinitionBean> studyEventDefBeans = getStudyEventDefDAO().findAllByStudy(studyId);
+		for (StudyEventDefinitionBean eventDefinition: studyEventDefBeans) {
+			eventDefinitionService.dropItemLevelSDVConfig(eventDefinition);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public StudyBean saveStudyBean(int userId, StudyBean studyBean, UserAccountBean currentUser,
 			ResourceBundle pageMessagesBundle) {
 		StudyDAO studyDao = getStudyDAO();
@@ -379,6 +396,9 @@ public class StudyServiceImpl implements StudyService {
 		return studyBean;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public StudyBean updateStudy(StudyBean studyBean, Map<String, List<DiscrepancyDescription>> dDescriptionsMap,
 			UserAccountBean currentUser) throws CodeException {
 		StudyDAO sdao = getStudyDAO();
@@ -404,6 +424,15 @@ public class StudyServiceImpl implements StudyService {
 		updateStudyParameters(studyBean, spv, spvdao);
 
 		if (currentUser.isSysAdmin()) {
+
+			String itemLevelSDVToSet = studyBean.getStudyParameterConfig().getItemLevelSDV();
+			if ("no".equals(itemLevelSDVToSet)) {
+				StudyParameterValueBean itemLevelSDVCurrent = spvdao.findByHandleAndStudy(studyBean.getId(),
+						StudyFeature.ITEM_LEVEL_SDV.getName());
+				if ("yes".equals(itemLevelSDVCurrent.getValue())) {
+					dropItemLevelSDVConfig(studyBean.getId());
+				}
+			}
 			updateFeatures(studyBean, spv, spvdao);
 		}
 

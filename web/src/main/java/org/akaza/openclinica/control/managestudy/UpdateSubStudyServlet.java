@@ -68,7 +68,6 @@ public class UpdateSubStudyServlet extends SpringServlet {
 	public static final String NEW_STUDY = "newStudy";
 	public static final String DEFINITIONS = "definitions";
 	public static final String PARENT_NAME = "parentName";
-	public static final String SDV_OPTIONS = "sdvOptions";
 	public static final String DDE = "dde";
 	public static final String EVALUATION = "evaluation";
 
@@ -490,7 +489,6 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		httpSession.removeAttribute(NEW_STUDY);
 		httpSession.removeAttribute(PARENT_NAME);
 		httpSession.removeAttribute(DEFINITIONS);
-		httpSession.removeAttribute(SDV_OPTIONS);
 	}
 
 	@Override

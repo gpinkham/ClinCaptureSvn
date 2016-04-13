@@ -638,7 +638,6 @@ public class CreateSubStudyServlet extends SpringServlet {
 			}
 		}
 		request.getSession().removeAttribute("definitions");
-		request.getSession().removeAttribute("sdvOptions");
 	}
 
 	/**
@@ -681,7 +680,6 @@ public class CreateSubStudyServlet extends SpringServlet {
 						}
 					}
 					edcBean.setSelectedVersionIdList(idList);
-					SourceDataVerification.fillSDVStatuses(edcBean.getSdvOptions());
 					defCrfs.add(edcBean);
 				}
 			}

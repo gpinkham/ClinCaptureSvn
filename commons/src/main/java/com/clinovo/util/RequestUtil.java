@@ -18,6 +18,7 @@ package com.clinovo.util;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -32,6 +33,7 @@ public final class RequestUtil {
 
 	public static final String PAGE_MESSAGE = "pageMessages";
 	public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
+	public static final String CURRENT_STUDY_ATTR = "study";
 
 	private RequestUtil() {
 	}
@@ -103,6 +105,10 @@ public final class RequestUtil {
 	 */
 	public static UserAccountBean getUserAccountBean() {
 		return (UserAccountBean) getRequest().getSession().getAttribute("userBean");
+	}
+
+	public static StudyBean getCurrentStudy() {
+		return (StudyBean) getRequest().getSession().getAttribute(CURRENT_STUDY_ATTR);
 	}
 
 	/**

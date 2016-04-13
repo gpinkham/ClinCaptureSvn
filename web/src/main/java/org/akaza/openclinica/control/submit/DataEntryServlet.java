@@ -115,7 +115,6 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -427,27 +426,26 @@ public abstract class DataEntryServlet extends SpringServlet {
 		}
 
 		List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
 		CrfShortcutsAnalyzer crfShortcutsAnalyzer = getCrfShortcutsAnalyzer(request, getItemSDVService(), true);
-		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, ifmdao, eventDefinitionCRFId, allSections, noteThreads);
+		crfShortcutsAnalyzer.prepareCrfShortcutLinks(ecb, ifmdao, edcb, allSections, noteThreads);
 		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
 		logMe("Entering some Study EVENT DEF CRF CHECK  " + System.currentTimeMillis());
 		StudyEventDAO seDao = new StudyEventDAO(getDataSource());
-		EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
 		// JN:Putting the event_def_crf_bean in the request attribute.
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 
 		StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPK(ecb.getStudyEventId());
-		edcBean.setId(eventDefinitionCRFId);
+		edcb.setId(eventDefinitionCRFId);
 
 		request.setAttribute("studyEvent", studyEventBean);
 		request.setAttribute("studyEventId", studyEventBean.getId());
 		request.setAttribute("eventDefinitionCRFId", eventDefinitionCRFId);
 
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
-		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByPK(edcBean
+		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByPK(edcb
 				.getStudyEventDefinitionId());
 
 		CRFDAO cdao = new CRFDAO(getDataSource());
@@ -1163,13 +1161,12 @@ public abstract class DataEntryServlet extends SpringServlet {
 					ssb.setUpdatedDate(new Date());
 					studySubjectDao.update(ssb);
 					ecb.setSdvUpdateId(ub.getId());
-					if (edcBean.getSourceDataVerification().equals(SourceDataVerification.AllREQUIRED)
-							|| (edcBean.getSourceDataVerification().equals(SourceDataVerification.PARTIALREQUIRED) && getItemSDVService()
-							.hasChangedSDVRequiredItems(changedItemsList))) {
+					if (edcb.getSourceDataVerification().isAllRequired()
+							|| (edcb.getSourceDataVerification().isPartialRequired()
+							&& getItemSDVService().hasChangedSDVRequiredItems(changedItemsList))) {
 						ecb.setSdvStatus(false);
 						resetSDVForItems = true;
-					}
-				}
+					}				}
 
 				ecb = (EventCRFBean) ecdao.update(ecb);
 

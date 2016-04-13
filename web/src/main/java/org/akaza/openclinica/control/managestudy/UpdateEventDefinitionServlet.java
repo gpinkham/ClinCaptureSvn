@@ -62,6 +62,8 @@ import com.clinovo.validator.EventDefinitionValidator;
 @Component
 public class UpdateEventDefinitionServlet extends SpringServlet {
 
+	public static final String SDV_STATES = "sdvStates";
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -322,7 +324,7 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 	public static void clearSession(HttpSession session) {
 		session.removeAttribute("definition");
 		session.removeAttribute("edcSDVMap");
-		session.removeAttribute("sdvOptions");
+		session.removeAttribute(SDV_STATES);
 		session.removeAttribute("tmpCRFIdMap");
 		session.removeAttribute("crfNameToEdcMap");
 		session.removeAttribute("crfsWithVersion");

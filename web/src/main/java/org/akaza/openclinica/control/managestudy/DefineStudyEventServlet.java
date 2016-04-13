@@ -490,7 +490,6 @@ public class DefineStudyEventServlet extends SpringServlet {
 				// only find active versions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions());
 				crfArray.add(cb);
 				if (crfNameToEdcMap.get(cb.getName()) == null) {
 					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());
@@ -520,7 +519,6 @@ public class DefineStudyEventServlet extends SpringServlet {
 
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
-				SourceDataVerification.fillSDVStatuses(cb.getSdvOptions());
 				crfArray.add(cb);
 				if (crfNameToEdcMap.get(cb.getName()) == null) {
 					crfNameToEdcMap.put(cb.getName(), new EventDefinitionCRFBean());
@@ -544,6 +542,9 @@ public class DefineStudyEventServlet extends SpringServlet {
 			sed.setCrfs(crfArray);
 
 			request.getSession().setAttribute("definition", sed);
+			boolean isItemLevelSDVAllowed = getCurrentStudy().getStudyParameterConfig().getItemLevelSDV().equals("yes");
+			request.setAttribute(UpdateEventDefinitionServlet.SDV_STATES,
+					SourceDataVerification.getAvailableSDVStates(isItemLevelSDVAllowed));
 
 			logger.info("forwarding to defineStudyEvent3.jsp");
 			forwardPage(Page.DEFINE_STUDY_EVENT3, request, response);

@@ -97,7 +97,6 @@ public class UpdateSubStudyServletTest {
 				one(session).removeAttribute(UpdateSubStudyServlet.NEW_STUDY);
 				one(session).removeAttribute(UpdateSubStudyServlet.PARENT_NAME);
 				one(session).removeAttribute(UpdateSubStudyServlet.DEFINITIONS);
-				one(session).removeAttribute(UpdateSubStudyServlet.SDV_OPTIONS);
 			}
 		});
 

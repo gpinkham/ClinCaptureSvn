@@ -18,6 +18,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -25,8 +26,7 @@ import java.util.ResourceBundle;
  */
 public enum SourceDataVerification implements CodedEnum {
 
-	AllREQUIRED(1, "entireCRF"), PARTIALREQUIRED(2, "specificItems"), NOTREQUIRED(3, "not_required"), NOTAPPLICABLE(4,
-			"not_applicable");
+	AllREQUIRED(1, "entireCRF"), PARTIALREQUIRED(2, "specificItems"), NOTREQUIRED(3, "not_required");
 
 	private int code;
 	private String description;
@@ -124,15 +124,31 @@ public enum SourceDataVerification implements CodedEnum {
 	}
 
 	/**
-	 * Method that fills sdv statuses.
+	 * Returns filtered list of SDV states.
 	 * 
-	 * @param sdvOptions
-	 *            ArrayList<SourceDataVerification>
+	 * @param isItemLevelSDVAllowed defines if the Item Level SDV option have to be included
+	 * @return list of SDV states
 	 */
-	public static void fillSDVStatuses(ArrayList<SourceDataVerification> sdvOptions) {
-		sdvOptions.clear();
-		sdvOptions.add(SourceDataVerification.AllREQUIRED);
-		sdvOptions.add(SourceDataVerification.NOTREQUIRED);
-		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED);
+	public static List<SourceDataVerification> getAvailableSDVStates(boolean isItemLevelSDVAllowed) {
+
+		List<SourceDataVerification> sdvStates = new ArrayList<SourceDataVerification>();
+		sdvStates.add(SourceDataVerification.AllREQUIRED);
+		sdvStates.add(SourceDataVerification.NOTREQUIRED);
+		if (isItemLevelSDVAllowed) {
+			sdvStates.add(SourceDataVerification.PARTIALREQUIRED);
+		}
+		return sdvStates;
+	}
+
+	public boolean isAllRequired() {
+		return this.equals(SourceDataVerification.AllREQUIRED);
+	}
+
+	public boolean isNotRequired() {
+		return this.equals(SourceDataVerification.NOTREQUIRED);
+	}
+
+	public boolean isPartialRequired() {
+		return this.equals(SourceDataVerification.PARTIALREQUIRED);
 	}
 }

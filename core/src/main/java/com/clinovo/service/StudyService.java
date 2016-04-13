@@ -36,7 +36,7 @@ public interface StudyService {
 	/**
 	 * Removes study.
 	 *
-	 * @param study
+	 * @param studyBean
 	 *            StudyBean
 	 * @param updater
 	 *            UserAccountBean
@@ -49,7 +49,7 @@ public interface StudyService {
 	/**
 	 * Restores study.
 	 *
-	 * @param study
+	 * @param studyBean
 	 *            StudyBean
 	 * @param updater
 	 *            UserAccountBean
@@ -189,4 +189,13 @@ public interface StudyService {
 	 */
 	StudyBean updateStudy(StudyBean studyBean, Map<String, List<DiscrepancyDescription>> dDescriptionsMap,
 			UserAccountBean currentUser) throws CodeException;
+
+	/**
+	 * Drops Item Level SDV configuration for the specific study.
+	 * All the event definition CRFs, which have SDV state set to Item Level SDV, will be dropped to Entire CRF.
+	 * All the related event CRFs with status SDVed/Signed will preserve status.
+	 *
+	 * @param studyId study ID
+	 */
+	void dropItemLevelSDVConfig(int studyId);
 }

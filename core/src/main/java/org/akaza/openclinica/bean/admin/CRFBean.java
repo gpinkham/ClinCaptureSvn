@@ -42,7 +42,6 @@ public class CRFBean extends AuditableEntityBean {
 	private String oid;
 	private OidGenerator oidGenerator;
 	private int studyId;
-	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
 	private ArrayList<StudyBean> studiesWhereUsed;
 
 	/**
@@ -170,14 +169,6 @@ public class CRFBean extends AuditableEntityBean {
 	 */
 	public void setAutoLayout(boolean autoLayout) {
 		this.autoLayout = autoLayout;
-	}
-
-	public ArrayList<SourceDataVerification> getSdvOptions() {
-		return sdvOptions;
-	}
-
-	public void setSdvOptions(ArrayList<SourceDataVerification> sdvOptions) {
-		this.sdvOptions = sdvOptions;
 	}
 
 	/**

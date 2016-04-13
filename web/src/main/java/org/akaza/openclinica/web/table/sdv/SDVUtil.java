@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.util.RequestUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -61,7 +62,6 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -550,7 +550,9 @@ public class SDVUtil {
 		sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
 
 		HtmlColumn sdvRequirementDefinition = row.getColumn("sdvRequirementDefinition");
-		sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter());
+		boolean isItemLevelSDVAllowed
+				= "yes".equals(RequestUtil.getCurrentStudy().getStudyParameterConfig().getItemLevelSDV());
+		sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter(isItemLevelSDVAllowed));
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyDAO sdao = new StudyDAO(dataSource);
@@ -740,16 +742,16 @@ public class SDVUtil {
 		SubjectSDVContainer tempSDVBean;
 		StringBuilder actions;
 
-		for (EventCRFBean crfBean : eventCRFBeans) {
+		for (EventCRFBean eventCRF : eventCRFBeans) {
 			tempSDVBean = new SubjectSDVContainer();
 
-			studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(crfBean.getStudySubjectId());
-			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(crfBean.getStudyEventId());
+			studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCRF.getStudySubjectId());
+			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRF.getStudyEventId());
 			subjectBean = (SubjectBean) subjectDAO.findByPK(studySubjectBean.getSubjectId());
 			// find out the study's identifier
 			studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
 			eventDefinitionCRFBean = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean,
-					studyEventBean.getId(), crfBean.getCRFVersionId());
+					studyEventBean.getId(), eventCRF.getCRFVersionId());
 
 			tempSDVBean.setStudyIdentifier(studyBean.getIdentifier());
 
@@ -760,16 +762,16 @@ public class SDVUtil {
 				tempSDVBean.setSdvRequirementDefinition("");
 			}
 
-			tempSDVBean.setCrfNameVersion(getCRFName(crfBean.getCRFVersionId()) + "/ "
-					+ getCRFVersionName(crfBean.getCRFVersionId()));
+			tempSDVBean.setCrfNameVersion(getCRFName(eventCRF.getCRFVersionId()) + "/ "
+					+ getCRFVersionName(eventCRF.getCRFVersionId()));
 
 			boolean doNotAllowToSDV = studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED
 					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
 					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED;
 
-			if (crfBean.getStatus() != null) {
+			if (eventCRF.getStatus() != null) {
 
-				Integer status = crfBean.getStage().getId();
+				Integer status = eventCRF.getStage().getId();
 
 				if (doNotAllowToSDV) {
 					status = DataEntryStage.LOCKED.getId();
@@ -786,22 +788,22 @@ public class SDVUtil {
 						LocaleResolver.getLocale(request)));
 			}
 
-			if (crfBean.getCreatedDate() != null) {
-				tempSDVBean.setEventDate(DateUtil.printDate(crfBean.getCreatedDate(), getCurrentUser(request)
+			if (eventCRF.getCreatedDate() != null) {
+				tempSDVBean.setEventDate(DateUtil.printDate(eventCRF.getCreatedDate(), getCurrentUser(request)
 						.getUserTimeZoneId(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request)));
 			}
-			tempSDVBean.setEventName(crfBean.getEventName());
+			tempSDVBean.setEventName(eventCRF.getEventName());
 			// The checkbox is next to the study subject id
 			StringBuilder sdvStatus = new StringBuilder("");
-			if (crfBean.isSdvStatus()) {
+			if (eventCRF.isSdvStatus()) {
 				sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm, ");
-				sdvStatus.append(crfBean.getId());
+				sdvStatus.append(eventCRF.getId());
 				sdvStatus.append(", this)'>");
 				sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 						.append("</a></center>");
 			} else if (!doNotAllowToSDV) {
 				sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
-						.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
+						.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(eventCRF.getId())
 						.append("' onclick='setAccessedObjected(this)' /></center>");
 			}
 			tempSDVBean.setSdvStatus(sdvStatus.toString());
@@ -820,30 +822,31 @@ public class SDVUtil {
 				tempSDVBean.setStudySubjectStatus(statusName);
 			}
 
-			if (crfBean.getUpdatedDate() != null) {
-				tempSDVBean.setLastUpdatedDate(DateUtil.printDate(crfBean.getUpdatedDate(), getCurrentUser(request)
+			if (eventCRF.getUpdatedDate() != null) {
+				tempSDVBean.setLastUpdatedDate(DateUtil.printDate(eventCRF.getUpdatedDate(), getCurrentUser(request)
 						.getUserTimeZoneId(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale(request)));
 			} else {
 				tempSDVBean.setLastUpdatedDate("unknown");
 
 			}
 
-			if (crfBean.getUpdater() != null) {
+			if (eventCRF.getUpdater() != null) {
 
-				tempSDVBean.setLastUpdatedBy(crfBean.getUpdater().getFirstName() + " "
-						+ crfBean.getUpdater().getLastName());
+				tempSDVBean.setLastUpdatedBy(eventCRF.getUpdater().getFirstName() + " "
+						+ eventCRF.getUpdater().getLastName());
 
 			}
 
 			actions = new StringBuilder("");
-			actions.append(getViewCrfIcon(request, crfBean.getId(), studySubjectBean.getId()));
-			if (!crfBean.isSdvStatus() && !doNotAllowToSDV) {
+			actions.append(getViewCrfIcon(request, eventCRF.getId(), eventDefinitionCRFBean.getId(),
+					studySubjectBean.getId()));
+			if (!eventCRF.isSdvStatus() && !doNotAllowToSDV) {
 				actions.append("<input type=\"image\" name=\"sdvSubmit\" ").append("src=\"")
 						.append((request.getContextPath())).append("/images/icon_DoubleCheck_Action")
 						.append(ICON_FORSVN_SUFFIX).append("onclick=\"")
 						.append("this.form.method='GET'; this.form.action='").append(request.getContextPath())
 						.append("/pages/handleSDVGet").append("';").append("this.form.crfId.value='")
-						.append(crfBean.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);")
+						.append(eventCRF.getId()).append("';").append("this.form.submit(); setAccessedObjected(this);")
 						.append("\" />");
 			}
 
@@ -855,16 +858,15 @@ public class SDVUtil {
 		return allRows;
 	}
 
-	private String getViewCrfIcon(HttpServletRequest request, int eventDefinitionCRFId, int studySubjectId) {
+	private String getViewCrfIcon(HttpServletRequest request, int eventCRFId, int eventDefinitionCRFId,
+			int studySubjectId) {
+
 		HtmlBuilder html = new HtmlBuilder();
-		html.a()
-				.onclick(
-						"openDocWindow('" + request.getContextPath()
-								+ "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId=" + eventDefinitionCRFId
-								+ "&tabId=1&studySubjectId=" + studySubjectId + "'); setAccessedObjected(this);")
-				.append(" data-cc-sdvCrfId='").append(eventDefinitionCRFId).append("'");
-		html.href("#").close().img().append(" hspace=\"4px\" src=\"../images/bt_View.gif\" border=\"0\"").close()
-				.aEnd();
+		html.a().onclick("openDocWindow('" + request.getContextPath() + "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId="
+						+ eventDefinitionCRFId + "&eventCRFId=" + eventCRFId + "&tabId=1&studySubjectId="
+						+ studySubjectId + "'); setAccessedObjected(this);").append(" data-cc-sdvCrfId='")
+				.append(eventDefinitionCRFId).append("'").href("#").close().img()
+				.append(" hspace=\"4px\" src=\"../images/bt_View.gif\" border=\"0\"").close().aEnd();
 		return html.toString();
 	}
 
@@ -1042,14 +1044,7 @@ public class SDVUtil {
 	public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, UserAccountBean userAccountBean,
 			boolean isSdvWithOpenQueriesAllowed, boolean setVerification, ItemSDVService itemSDVService) {
 
-		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
-		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		StudyDAO studyDAO = new StudyDAO(dataSource);
-		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
-		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
 		DAOWrapper daoWrapper = new DAOWrapper(dataSource);
 
 		if (studySubjectIds == null || studySubjectIds.isEmpty()) {
@@ -1062,9 +1057,10 @@ public class SDVUtil {
 				exceptedEventCrfIdForSubjectList = dndao.findAllEvCRFIdsWithUnclosedDNsByStSubId(studySubjectId);
 			}
 			Set<Integer> ignoredStudyEvents = new HashSet<Integer>();
-			ArrayList<EventCRFBean> eventCrfs = eventCRFDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
-			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
-			List<StudyEventBean> studyEvents = studyEventDAO.findAllByStudySubject(studySubject);
+			ArrayList<EventCRFBean> eventCrfs = daoWrapper.getEcdao()
+					.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
+			StudySubjectBean studySubject = (StudySubjectBean) daoWrapper.getSsdao().findByPK(studySubjectId);
+			List<StudyEventBean> studyEvents = daoWrapper.getSedao().findAllByStudySubject(studySubject);
 			Iterator<StudyEventBean> iterator = studyEvents.iterator();
 			while (iterator.hasNext()) {
 				StudyEventBean studyEventBean = iterator.next();
@@ -1077,21 +1073,29 @@ public class SDVUtil {
 			}
 			for (EventCRFBean eventCRFBean : eventCrfs) {
 				if (ignoredStudyEvents.contains(eventCRFBean.getStudyEventId())
-						|| (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean
-								.getId())) || maskingService.isEventCRFMasked(eventCRFBean.getId(), userAccountBean.getId(), userAccountBean.getActiveStudyId())) {
+						|| (!isSdvWithOpenQueriesAllowed && exceptedEventCrfIdForSubjectList.contains(eventCRFBean.getId()))
+						|| maskingService.isEventCRFMasked(eventCRFBean.getId(), userAccountBean.getId(),
+						userAccountBean.getActiveStudyId())) {
 					continue;
 				}
 				try {
-					itemSDVService.sdvCrfItems(eventCRFBean.getId(), userAccountBean.getId(), setVerification);
-					eventCRFDAO.setSDVStatus(setVerification, userAccountBean.getId(), eventCRFBean.getId());
+					EventDefinitionCRFBean eventDefCRF = daoWrapper.getEdcdao()
+							.findForStudyByStudyEventIdAndCRFVersionId(eventCRFBean.getStudyEventId(),
+									eventCRFBean.getCRFVersionId());
+					boolean isCRFMarkedForItemLevelSDV =
+							"yes".equals(RequestUtil.getCurrentStudy().getStudyParameterConfig().getItemLevelSDV())
+									&& eventDefCRF.getSourceDataVerification().isPartialRequired();
+					if (isCRFMarkedForItemLevelSDV || !setVerification) {
+						itemSDVService.sdvCrfItems(eventCRFBean.getId(), userAccountBean.getId(), setVerification);
+					}
+					daoWrapper.getEcdao().setSDVStatus(setVerification, userAccountBean.getId(), eventCRFBean.getId());
 				} catch (Exception exc) {
 					System.out.println(exc.getMessage());
 					return false;
 				}
 
 			}
-			studySubjectDAO.update(studySubject);
-
+			daoWrapper.getSsdao().update(studySubject);
 			SubjectEventStatusUtil.determineSubjectEventStates(studyEvents, userAccountBean, daoWrapper, null);
 		}
 
@@ -1119,34 +1123,33 @@ public class SDVUtil {
 		if (eventCRFIds == null || eventCRFIds.isEmpty()) {
 			return true;
 		}
-
-		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
-		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
-		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-		StudyDAO studyDAO = new StudyDAO(dataSource);
-		CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
-		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		DAOWrapper daoWrapper = new DAOWrapper(dataSource);
 
 		for (Integer eventCrfId : eventCRFIds) {
 			try {
-				itemSDVService.sdvCrfItems(eventCrfId, userAccountBean.getId(), setVerification);
-				eventCRFDAO.setSDVStatus(setVerification, userAccountBean.getId(), eventCrfId);
-				EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
-				StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(ec.getStudyEventId());
-				StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(se.getStudySubjectId());
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(se
-						.getStudyEventDefinitionId());
+				EventCRFBean ec = (EventCRFBean) daoWrapper.getEcdao().findByPK(eventCrfId);
+				CRFVersionBean crfVersion = (CRFVersionBean) daoWrapper.getCvdao().findByPK(ec.getCRFVersionId());
+				StudyEventBean se = (StudyEventBean) daoWrapper.getSedao().findByPK(ec.getStudyEventId());
+				StudySubjectBean ss = (StudySubjectBean) daoWrapper.getSsdao().findByPK(se.getStudySubjectId());
+				StudyEventDefinitionBean sed =
+						(StudyEventDefinitionBean) daoWrapper.getSeddao().findByPK(se.getStudyEventDefinitionId());
+				EventDefinitionCRFBean eventDefCRF = daoWrapper.getEdcdao()
+						.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crfVersion.getCrfId(),
+								sed.getStudyId());
+
+				boolean isCRFMarkedForItemLevelSDV =
+						"yes".equals(RequestUtil.getCurrentStudy().getStudyParameterConfig().getItemLevelSDV())
+						&& eventDefCRF.getSourceDataVerification().isPartialRequired();
+				if (isCRFMarkedForItemLevelSDV || !setVerification) {
+					itemSDVService.sdvCrfItems(eventCrfId, userAccountBean.getId(), setVerification);
+				}
+				daoWrapper.getEcdao().setSDVStatus(setVerification, userAccountBean.getId(), eventCrfId);
 				SubjectEventStatusUtil.determineSubjectEventStates(sed, ss, userAccountBean, daoWrapper);
 			} catch (Exception exc) {
 				System.out.println(exc.getMessage());
 				return false;
 			}
 		}
-
 		return true;
 	}
 

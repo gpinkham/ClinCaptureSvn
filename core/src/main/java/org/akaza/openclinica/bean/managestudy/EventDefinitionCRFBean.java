@@ -146,8 +146,6 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	private HashMap nullFlags = new LinkedHashMap(); // not in DB
 
-	private ArrayList<SourceDataVerification> sdvOptions = new ArrayList<SourceDataVerification>();
-
 	private int propagateChange; // not in DB
 
 	@Override
@@ -624,14 +622,6 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		this.evaluatedCRF = evaluatedCRF;
 	}
 
-	public ArrayList<SourceDataVerification> getSdvOptions() {
-		return sdvOptions;
-	}
-
-	public void setSdvOptions(ArrayList<SourceDataVerification> sdvOptions) {
-		this.sdvOptions = sdvOptions;
-	}
-
 	public String getTabbingMode() {
 		return tabbingMode;
 	}
@@ -671,7 +661,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	}
 
 	/**
-	 * Clone constructor
+	 * Clone constructor.
 	 * 
 	 * @param instance
 	 *            from which all parameters will be cloned.
@@ -705,7 +695,6 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		this.crf = instance.getCrf();
 		this.versions = instance.getVersions();
 		this.selectedVersionIdList = instance.getSelectedVersionIdList();
-		this.sdvOptions = instance.getSdvOptions();
 		this.propagateChange = instance.getPropagateChange();
 		this.id = instance.getId();
 	}

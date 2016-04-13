@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * StudyEventDefinitionDAO.
@@ -353,7 +354,11 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		}
 	}
 
+	/**
+	 * @deprecated replaced by {@link #findAllByStudy(int)}
+	 */
 	@Override
+	@Deprecated
 	public ArrayList findAllByStudy(StudyBean study) {
 
 		StudyDAO studyDao = new StudyDAO(this.getDs());
@@ -367,6 +372,27 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		} else {
 			return super.findAllByStudy(study);
 		}
+	}
+
+	/**
+	 * Returns all by the study (with no filters on status).
+	 *
+	 * @param studyId study ID
+	 * @return list of event definitions
+	 */
+	public List<StudyEventDefinitionBean> findAllByStudy(int studyId) {
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		List<Map<String, Object>> dbRecords = this.select(digester.getQuery("findAllByStudyId"), variables);
+		List<StudyEventDefinitionBean> eventDefinitions = new ArrayList<StudyEventDefinitionBean>();
+		for (Map<String, Object> record : dbRecords) {
+			StudyEventDefinitionBean eb
+					= (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap<String, Object>) record);
+			eventDefinitions.add(eb);
+		}
+		return eventDefinitions;
 	}
 
 	/**
@@ -726,28 +752,6 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		}
 
 		return answer;
-	}
-
-	/**
-	 * Returns all by Study and limit.
-	 * 
-	 * @param studyId
-	 *            int
-	 * @return Collection
-	 */
-	public Collection findAllByStudyAndLimit(int studyId) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
-		ArrayList alist = this.select(digester.getQuery("findAllByStudyAndLimit"), variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-
 	}
 
 	/**

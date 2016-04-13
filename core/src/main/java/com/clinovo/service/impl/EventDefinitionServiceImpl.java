@@ -1,7 +1,5 @@
 package com.clinovo.service.impl;
 
-import java.util.*;
-
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Status;
@@ -14,6 +12,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.util.EventDefinitionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -27,6 +26,14 @@ import com.clinovo.service.StudyEventService;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SignStateRestorer;
 import com.clinovo.util.SubjectEventStatusUtil;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * EventDefinitionServiceImpl.
@@ -357,6 +364,20 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 			createdEdc.setStudyId(siteId);
 			createdEdc.setParentId(parentId);
 			eventDefinitionCrfDao.create(createdEdc);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void dropItemLevelSDVConfig(StudyEventDefinitionBean eventDefBean) {
+
+		List<EventDefinitionCRFBean> eventDefCRFBeans
+				= getEventDefinitionCRFDAO().findAllParentsByEventDefinitionId(eventDefBean.getId());
+		for (EventDefinitionCRFBean eventDefCRF: eventDefCRFBeans) {
+			if (SourceDataVerification.PARTIALREQUIRED.equals(eventDefCRF.getSourceDataVerification())) {
+				eventDefinitionCrfService.dropItemLevelSDVConfig(eventDefCRF);
+			}
 		}
 	}
 

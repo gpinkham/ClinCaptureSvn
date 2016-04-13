@@ -212,8 +212,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 
-			getCrfShortcutsAnalyzer(request, getItemSDVService(), true).prepareCrfShortcutLinks(ecb, ifmdao,
-					eventDefinitionCRFId, allSections, noteThreads);
+			getCrfShortcutsAnalyzer(request, getItemSDVService(), true).prepareCrfShortcutLinks(ecb, ifmdao, edcb,
+					allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
 

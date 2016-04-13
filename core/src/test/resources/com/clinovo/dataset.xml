@@ -193,8 +193,8 @@
     <event_definition_crf event_definition_crf_id="1" study_event_definition_id="1" study_id="1" crf_id="1"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="1" status_id="1" owner_id="1"
-                          date_created="2008-07-02" ordinal="1" electronic_signature="false" hide_crf="false" evaluated_crf="true"
-						  selected_version_ids=""/>
+                          date_created="2008-07-02" ordinal="1" electronic_signature="false" hide_crf="false"
+						  evaluated_crf="true" source_data_verification_code="2" selected_version_ids=""/>
     <event_definition_crf event_definition_crf_id="2" study_event_definition_id="1" study_id="1" crf_id="2"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"

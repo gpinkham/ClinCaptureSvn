@@ -41,6 +41,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import com.clinovo.util.EventDefinitionCRFUtil;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -143,6 +144,9 @@ public class InitUpdateEventDefinitionServlet extends SpringServlet {
 			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService().getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
 			List<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionService().getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
 
+			boolean isItemLevelSDVAllowed = getCurrentStudy().getStudyParameterConfig().getItemLevelSDV().equals("yes");
+			request.getSession().setAttribute(UpdateEventDefinitionServlet.SDV_STATES,
+					SourceDataVerification.getAvailableSDVStates(isItemLevelSDVAllowed));
 			session.setAttribute("definition", studyEventDefinitionBean);
 			session.setAttribute("childEventDefCRFs", childEventDefCRFs);
 			session.setAttribute("signStateRestorerMap", signStateRestorerMap);

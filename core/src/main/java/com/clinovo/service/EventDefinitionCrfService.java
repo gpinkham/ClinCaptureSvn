@@ -259,4 +259,13 @@ public interface EventDefinitionCrfService {
 	 * @param deletedCRFVersionId int
 	 */
 	void setDefaultCRFVersionInsteadOfDeleted(int deletedCRFVersionId);
+
+	/**
+	 * Drops Item Level SDV configuration for the specific event definition CRF.
+	 * SDV state will be set to Entire CRF.
+	 * All the related event CRFs with status SDVed/Signed will preserve status.
+	 *
+	 * @param edcBean event definition CRF bean
+	 */
+	void dropItemLevelSDVConfig(EventDefinitionCRFBean edcBean);
 }

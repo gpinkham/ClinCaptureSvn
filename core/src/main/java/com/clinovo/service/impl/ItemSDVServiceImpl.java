@@ -21,6 +21,7 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -76,10 +78,12 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
 		EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
 		StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
+		EventDefinitionCRFDAO eventDefCRFDAO = new EventDefinitionCRFDAO(dataSource);
 
 		ItemDataBean itemDataBean = (ItemDataBean) itemDataDao.findByPK(itemDataId);
 		List<SectionBean> sections = sectionDao.findAllByCRFVersionId(itemDataBean.getEventCRFId());
 		EventCRFBean eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(itemDataBean.getEventCRFId());
+		EventDefinitionCRFBean eventDefCRF = (EventDefinitionCRFBean) eventDefCRFDAO.findByPK(eventDefinitionCrfId);
 
 		itemDataBean.setSdv(action.equalsIgnoreCase(SDV));
 		itemDataBean.setUpdater(userAccountBean);
@@ -87,8 +91,7 @@ public class ItemSDVServiceImpl implements ItemSDVService {
 		itemDataDao.update(itemDataBean);
 
 		for (DisplayItemBean dib : getListOfItemsToSDV(eventCrfBean.getId())) {
-			crfShortcutsAnalyzer.prepareItemsToSDVShortcutLink(dib, eventCrfBean, eventDefinitionCrfId, sections,
-					deltaMap);
+			crfShortcutsAnalyzer.prepareItemsToSDVShortcutLink(dib, eventCrfBean, eventDefCRF, sections, deltaMap);
 			if (sectionId == dib.getMetadata().getSectionId()) {
 				boolean repeating = dib.getGroupMetadata().isRepeatingGroup();
 				JSONObject jsonObj = new JSONObject();

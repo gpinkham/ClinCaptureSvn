@@ -22,6 +22,8 @@ import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -39,7 +41,6 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 	public static final int THREE = 3;
 	public static final int FOUR = 4;
 	public static final int FIVE = 5;
-	public static final int SIX = 6;
 	private DisplayItemBean displayItemBean;
 	private DiscrepancyNoteBean discrepancyNoteBean;
 	private List<DiscrepancyNoteThread> noteThreads;
@@ -75,7 +76,7 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 		attributes.put(CrfShortcutsAnalyzer.SECTION_ID, 0);
 		attributes.put(CrfShortcutsAnalyzer.SERVLET_PATH, "");
 		crfShortcutsAnalyzer = new CrfShortcutsAnalyzer("http", "post", "/uri", "/clincapture", "http", attributes,
-				itemSDVService);
+				itemSDVService, new StudyParameterConfig());
 	}
 
 	@Test
@@ -146,6 +147,9 @@ public class CrfShortcutsAnalyzerTest extends DefaultAppContextTest {
 		section.setId(FOUR);
 		List<SectionBean> sectionBeans = new ArrayList<SectionBean>();
 		sectionBeans.add(section);
-		crfShortcutsAnalyzer.prepareCrfShortcutLinks(eventCRFBean, itemFormMetadataDAO, SIX, sectionBeans, noteThreads);
+		EventDefinitionCRFBean eventDefCRF = new EventDefinitionCRFBean();
+		eventDefCRF.setId(6);
+		crfShortcutsAnalyzer.prepareCrfShortcutLinks(eventCRFBean, itemFormMetadataDAO, eventDefCRF, sectionBeans,
+				noteThreads);
 	}
 }

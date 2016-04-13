@@ -4,8 +4,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyFeatureConfig;
 import org.akaza.openclinica.control.core.SpringController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -21,19 +24,20 @@ public class SDVItemControllerTest extends BaseControllerTest {
 
 	@Before
 	public void before() throws Exception {
+
+		StudyBean currentStudy = (StudyBean)  new StudyDAO(dataSource).findByPK(1);
+		currentStudy.setStudyFeatureConfig(new StudyFeatureConfig());
 		session.setAttribute(SpringController.USER_BEAN_NAME, new UserAccountDAO(dataSource).findByPK(1));
+		session.setAttribute(SpringController.STUDY, currentStudy);
 	}
 
 	@Test
 	public void testThatGetRequestReturnsJsonObject() throws Exception {
-		this.mockMvc
-				.perform(
-						get(SDV_ITEM_CONTROLLER).param(EVENT_DEFINITION_CRF_ID, "1").param(SECTION_ID, "1")
-								.param(ITEM_DATA_ID, "1").param(ACTION, "sdv").session(session))
+		this.mockMvc.perform(get(SDV_ITEM_CONTROLLER).param(EVENT_DEFINITION_CRF_ID, "1").param(SECTION_ID, "1")
+				.param(ITEM_DATA_ID, "1").param(ACTION, "sdv").session(session))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(
-						content()
-								.string("{\"crf\":\"\",\"totalItemsToSDV\":\"1\",\"item\":\"sdv\",\"itemDataItems\":[{\"itemDataId\":2,\"rowCount\":0,\"itemId\":2}],\"totalSectionItemsToSDV\":\"1\"}"));
+				.andExpect(content()
+						.string("{\"crf\":\"\",\"totalItemsToSDV\":\"1\",\"item\":\"sdv\",\"itemDataItems\":[{\"itemDataId\":2,\"rowCount\":0,\"itemId\":2}],\"totalSectionItemsToSDV\":\"1\"}"));
 	}
 }

@@ -16,7 +16,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	public void testGetRequiredEventCRFDefIdsThatShouldBeSDVd() throws OpenClinicaException {
 		StudyBean studyBean = (StudyBean) studyDAO.findByPK(1);
 		List<Integer> result = eventDefinitionCRFDAO.getRequiredEventCRFDefIdsThatShouldBeSDVd(studyBean);
-		assertEquals(result.size(), 0);
+		assertEquals(1, result.size());
 	}
 
 	@Test

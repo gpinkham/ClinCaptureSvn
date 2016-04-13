@@ -483,7 +483,6 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 		CRFBean crfBean = (CRFBean) crfDao.findByPK(eventDefinitionCRFBean.getCrfId());
 		ArrayList versions = (ArrayList) crfVersionDao.findAllActiveByCRF(eventDefinitionCRFBean.getCrfId());
 		eventDefinitionCRFBean.setNullFlags(processNullValues(eventDefinitionCRFBean));
-		SourceDataVerification.fillSDVStatuses(eventDefinitionCRFBean.getSdvOptions());
 		eventDefinitionCRFBean.setEventName(studyEventDefinitionBean.getName());
 		eventDefinitionCRFBean.setDefaultVersionName(crfBeanVersion.getName());
 		eventDefinitionCRFBean.setCrfName(crfBean.getName());
@@ -660,5 +659,22 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 
 	private boolean shouldResetCRFStatus(EventCRFBean eventCRF, boolean updateItemData) {
 		return updateItemData || (itemSDVService.getCountOfItemsToSDV(eventCRF.getId()) != 0);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void dropItemLevelSDVConfig(EventDefinitionCRFBean edcBean) {
+
+		if (SourceDataVerification.PARTIALREQUIRED.equals(edcBean.getSourceDataVerification())) {
+
+			List<EventDefinitionCRFBean> recordsToUpdate
+					= getEventDefinitionCRFDAO().findAllChildrenByParentId(edcBean.getId());
+			recordsToUpdate.add(edcBean);
+			for (EventDefinitionCRFBean eventDefCRF: recordsToUpdate) {
+				eventDefCRF.setSourceDataVerification(SourceDataVerification.AllREQUIRED);
+				getEventDefinitionCRFDAO().update(eventDefCRF);
+			}
+		}
 	}
 }
