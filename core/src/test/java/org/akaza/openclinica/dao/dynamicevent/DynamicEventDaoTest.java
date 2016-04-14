@@ -121,7 +121,7 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatDeleteAllFromStudyGroupClassRemoveAllDynamicEventsAttachedToStudy() throws OpenClinicaException {
-		dynamicEventDao.deleteAllFromStudyGroupClass(1);
+		dynamicEventDao.deleteAllByStudyGroupClassId(1);
 		assertEquals(2, ((DynamicEventBean) dynamicEventDao.findByPK(2)).getStudyEventDefinitionId());
 	}
 
@@ -136,4 +136,6 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 		final int studyEventDefinitionId = 5;
 		assertNotNull(dynamicEventDao.findByStudyEventDefinitionId(studyEventDefinitionId));
 	}
+	
+	
 }

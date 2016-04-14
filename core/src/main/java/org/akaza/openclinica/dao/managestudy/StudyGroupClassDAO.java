@@ -30,6 +30,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -479,5 +480,17 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		}
 
 		return resultSetOfBeans;
+	}
+	
+	/**
+	 * Deletes the study group class with specific id.
+	 *
+	 * @param groupId the group id, to search on.
+	 * if no records, matching the SQL query, were found, do nothing.
+	 */
+	public void deleteByPK(int groupId) {
+		HashMap variables = new HashMap();
+		variables.put(1, groupId);
+		this.execute(digester.getQuery("deleteByPK"), variables);
 	}
 }

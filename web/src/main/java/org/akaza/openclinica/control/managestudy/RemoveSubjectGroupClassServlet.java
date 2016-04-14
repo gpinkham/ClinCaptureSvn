@@ -129,8 +129,7 @@ public class RemoveSubjectGroupClassServlet extends SpringServlet {
 							.findAllByGroupClass(group);
 
 					for (StudyGroupBean sg : studyGroups) {
-						ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
-						sg.setSubjectMaps(subjectMaps);
+						sg.setSubjectMaps(sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId()));
 					}
 					request.setAttribute("studyGroups", studyGroups);
 				}

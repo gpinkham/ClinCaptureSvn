@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,7 +111,7 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 		for (Object group1 : groups) {
 			StudyGroupClassBean group = (StudyGroupClassBean) group1;
 			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
-				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao
+				List<StudyEventDefinitionBean> orderedDefinitions = seddao
 						.findAllAvailableAndOrderedByStudyGroupClassId(group.getId());
 				group.setEventDefinitions(orderedDefinitions);
 				StringBuilder strOfEventsNames = new StringBuilder("");
@@ -122,8 +123,7 @@ public class ListSubjectGroupClassServlet extends RememberLastPage {
 					availableDynGroups.add(group);
 				}
 			} else {
-				ArrayList studyGroups = sgdao.findAllByGroupClass(group);
-				group.setStudyGroups(studyGroups);
+				group.setStudyGroups(sgdao.findAllByGroupClass(group));
 			}
 		}
 		Collections.sort(availableDynGroups, StudyGroupClassBean.comparatorForDynGroupClasses);

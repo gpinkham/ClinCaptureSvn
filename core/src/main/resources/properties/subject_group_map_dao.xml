@@ -84,8 +84,12 @@
 		<name>getCurrentPK</name>
 		<sql>SELECT currval('subject_group_map_subject_group_map_id_seq') AS key;</sql>
 	</query>
-  <query>
+  	<query>
 		<name>deleteTestGroupMap</name>
 		<sql>delete from subject_group_map WHERE subject_group_map_id=?</sql>
+	</query>
+	<query>
+		<name>deleteAllByStudyGroupClassId</name>
+		<sql>delete from subject_group_map WHERE study_group_class_id=?</sql>
 	</query>
 </queries>

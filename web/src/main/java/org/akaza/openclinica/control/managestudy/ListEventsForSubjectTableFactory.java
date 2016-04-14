@@ -776,7 +776,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		protected List<Option> getOptions() {
 			List<Option> options = new ArrayList<Option>();
 			StudyGroupDAO studyGroupDAO = getStudyGroupDAO();
-			ArrayList<StudyGroupBean> groups = studyGroupDAO.findAllByGroupClass(this.studyGroupClass);
+			List<StudyGroupBean> groups = studyGroupDAO.findAllByGroupClass(this.studyGroupClass);
 			for (Object subjectStudyGroup : groups) {
 				options.add(new Option(((StudyGroupBean) subjectStudyGroup).getName(),
 						((StudyGroupBean) subjectStudyGroup).getName()));

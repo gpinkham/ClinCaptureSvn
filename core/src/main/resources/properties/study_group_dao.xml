@@ -87,8 +87,12 @@
 	<query>
 		<name>findByNameAndGroupClassId</name>
 		<sql>
-			select sg.* from study_group sg
-			where sg.name = ? and sg.study_group_class_id = ?
+			SELECT sg.* FROM study_group sg
+			WHERE sg.name = ? and sg.study_group_class_id = ?
 		</sql>
+	</query>
+	<query>
+		<name>deleteAllByStudyGroupClassId</name>
+		<sql>DELETE FROM study_group WHERE study_group_class_id=?</sql>
 	</query>
 </queries>

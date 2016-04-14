@@ -744,9 +744,9 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 	 *
 	 * @param id
 	 *            study subject id
-	 * @return EntityBean study subject bean
+	 * @return StudySubjectBean study subject bean
 	 */
-	public EntityBean findByPK(int id) {
+	public StudySubjectBean findByPK(int id) {
 		StudySubjectBean eb = new StudySubjectBean();
 		this.setTypesExpected();
 
@@ -1847,5 +1847,20 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 				.select(digester.getQuery("getCountOfStudySubjectsByStudyIdAndDynamicGroupClassId"), queryParameters);
 
 		return (Integer) recordsFromDB.get(0).get("count");
+	}
+	
+	/**
+	 * Method that updates a DynamicGroupClassId for the study subjects.
+	 *
+	 * @param oldClassId
+	 *            Integer
+	 * @param newClassId
+	 *            Integer           
+	 */
+	public void updateDynamicGroupClassId(int oldClassId, int newClassId) {
+		HashMap variables = new HashMap();
+		variables.put(1, newClassId);
+		variables.put(2, oldClassId);
+		this.execute(digester.getQuery("updateDynamicGroupClassId"), variables);
 	}
 }

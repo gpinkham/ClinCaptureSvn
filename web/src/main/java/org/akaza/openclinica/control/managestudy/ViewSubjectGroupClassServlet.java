@@ -50,7 +50,6 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class ViewSubjectGroupClassServlet extends SpringServlet {
 	@Override
@@ -110,8 +109,7 @@ public class ViewSubjectGroupClassServlet extends SpringServlet {
 				ArrayList<StudyGroupBean> studyGroups = (ArrayList<StudyGroupBean>) sgdao.findAllByGroupClass(group);
 
 				for (StudyGroupBean sg : studyGroups) {
-					ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
-					sg.setSubjectMaps(subjectMaps);
+					sg.setSubjectMaps(sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId()));
 				}
 
 				request.setAttribute("studyGroups", studyGroups);

@@ -25,7 +25,7 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 /**
  * StudyEventUtil.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked"})
 public final class StudyEventUtil {
 
 	private StudyEventUtil() {
@@ -40,15 +40,15 @@ public final class StudyEventUtil {
 	 *            StudyEventDefinitionDAO
 	 * @param sgcdao
 	 *            StudyGroupClassDAO
-	 * @return ArrayList of StudyEventDefinitionBean
+	 * @return List of StudyEventDefinitionBean
 	 */
-	public static ArrayList<StudyEventDefinitionBean> selectStudyEventsSortedLikeOnSubjectMatrix(int parentStudyId,
+	public static List<StudyEventDefinitionBean> selectStudyEventsSortedLikeOnSubjectMatrix(int parentStudyId,
 			StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao) {
 		/*
 		 * available eventDefs ordered like on Subject Matrix
 		 */
 
-		ArrayList<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
+		List<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
 
 		List<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
 		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
@@ -58,7 +58,7 @@ public final class StudyEventUtil {
 			result.addAll(seddao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId()));
 		}
 
-		ArrayList eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
+		List<StudyEventDefinitionBean> eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
 		// sort by study event definition ordinal
 		Collections.sort(eventDefinitionsNotFromDynGroup);
 

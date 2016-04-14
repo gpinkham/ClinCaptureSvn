@@ -41,7 +41,7 @@
 
 <h1>
 	<span class="first_level_header">
-		<fmt:message key="confirm_to_restore_a_subject_group_class" bundle="${resword}"/>
+		<fmt:message key="confirm_to_restore_the_subject_group_class" bundle="${resword}"/>
 	</span>
 </h1>
 

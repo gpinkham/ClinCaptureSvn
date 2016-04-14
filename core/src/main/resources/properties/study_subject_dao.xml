@@ -538,4 +538,10 @@
 			WHERE (st.study_id = ? OR st.parent_study_id = ?) AND ss.dynamic_group_class_id = ?
 		</sql>
 	</query>
+	<query>
+		<name>updateDynamicGroupClassId</name>
+		<sql>
+			UPDATE study_subject SET dynamic_group_class_id=? WHERE dynamic_group_class_id = ?
+	    </sql>
+	</query>
 </queries>

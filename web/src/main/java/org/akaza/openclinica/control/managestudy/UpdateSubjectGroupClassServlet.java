@@ -111,7 +111,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 					EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 					// if you want to see all event definitions from study use next line:
 					// ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
-					ArrayList allDefsFromStudy = seddao.findAllActiveOrderedByStudyGroupClassId(classId);
+					List<StudyEventDefinitionBean> allDefsFromStudy = seddao.findAllActiveOrderedByStudyGroupClassId(classId);
 					allDefsFromStudy.addAll(seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId()));
 
 					HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
@@ -160,7 +160,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 					request.getSession().setAttribute("studyEventDefinitionIdToPK", studyEventDefinitionIdToPK);
 					request.getSession().setAttribute("idToStudyEventDefinition", idToStudyEventDefinition);
 
-					ArrayList studyGroups = sgdao.findAllByGroupClass(oldGroup);
+					List<StudyGroupBean> studyGroups = sgdao.findAllByGroupClass(oldGroup);
 					request.getSession().setAttribute("studyGroups", studyGroups);
 
 					request.getSession().setAttribute("groupTypes", GroupClassType.toArrayList());

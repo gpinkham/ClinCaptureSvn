@@ -23,6 +23,7 @@ package org.akaza.openclinica.bean.managestudy;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyGroupBean extends AuditableEntityBean {
@@ -31,13 +32,13 @@ public class StudyGroupBean extends AuditableEntityBean {
 	// UPDATE_ID
 	private String description = "";
 	private int studyGroupClassId;
-	private ArrayList subjectMaps = new ArrayList(); // not in DB
+	private List subjectMaps = new ArrayList(); // not in DB
 
-	public ArrayList getSubjectMaps() {
+	public List getSubjectMaps() {
 		return subjectMaps;
 	}
 
-	public void setSubjectMaps(ArrayList subjectMaps) {
+	public void setSubjectMaps(List subjectMaps) {
 		this.subjectMaps = subjectMaps;
 	}
 

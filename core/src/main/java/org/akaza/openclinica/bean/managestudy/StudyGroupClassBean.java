@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Object for study group class
@@ -42,8 +43,8 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	private String groupClassTypeName = ""; // not in db
 	private String subjectAssignment = "";
 
-	private ArrayList<StudyGroupBean> studyGroups = new ArrayList<StudyGroupBean>();// not in DB
-	private ArrayList<StudyEventDefinitionBean> eventDefinitions = new ArrayList<StudyEventDefinitionBean>();// not in DB, show events which is in Dynamic Group, for Dynamic Group only
+	private List<StudyGroupBean> studyGroups = new ArrayList<StudyGroupBean>();// not in DB
+	private List<StudyEventDefinitionBean> eventDefinitions = new ArrayList<StudyEventDefinitionBean>();// not in DB, show events which is in Dynamic Group, for Dynamic Group only
 	private int studyGroupId = 0;// not in DB, indicates which group a
 	// subject is in
 	private String groupNotes = "";// not in DB
@@ -148,7 +149,7 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	/**
 	 * @return Returns the eventDefinitions for Dynamic Group.
 	 */
-	public ArrayList<StudyEventDefinitionBean> getEventDefinitions() {
+	public List<StudyEventDefinitionBean> getEventDefinitions() {
 		return eventDefinitions;
 	}
 
@@ -156,14 +157,14 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	 * @param eventDefinitions 
 	 *            The eventDefinitions to set for Dynamic Group.
 	 */
-	public void setEventDefinitions(ArrayList<StudyEventDefinitionBean> eventDefinitions) {
+	public void setEventDefinitions(List<StudyEventDefinitionBean> eventDefinitions) {
 		this.eventDefinitions = eventDefinitions;
 	}
 	
 	/**
 	 * @return Returns the studyGroups.
 	 */
-	public ArrayList<StudyGroupBean> getStudyGroups() {
+	public List<StudyGroupBean> getStudyGroups() {
 		return studyGroups;
 	}
 
@@ -171,7 +172,7 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	 * @param studyGroups
 	 *            The studyGroups to set.
 	 */
-	public void setStudyGroups(ArrayList<StudyGroupBean> studyGroups) {
+	public void setStudyGroups(List<StudyGroupBean> studyGroups) {
 		this.studyGroups = studyGroups;
 	}
 

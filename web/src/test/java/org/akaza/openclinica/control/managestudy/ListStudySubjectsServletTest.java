@@ -147,7 +147,7 @@ public class ListStudySubjectsServletTest {
 				.thenReturn((ArrayList) studyEventDefinitionBeanList);
 		Mockito.when(studyEventDefinitionDAO.findByPK(Mockito.anyInt())).thenReturn(studyEventDefinitionBean);
 		Mockito.when(dynamicEventDao.findAllDefIdsInActiveDynGroupsByStudyId(Mockito.anyInt()))
-				.thenReturn(new ArrayList<StudyEventDefinitionBean>());
+				.thenReturn(new ArrayList<Integer>());
 		Mockito.when(servletContext.getRequestDispatcher(Mockito.any(String.class))).thenReturn(requestDispatcher);
 
 		Mockito.doReturn(servletContext).when(listStudySubjectsServlet).getServletContext();

@@ -69,11 +69,16 @@
 
     <subject subject_id="1" status_id="1" date_of_birth="2008-07-01" gender="m" unique_identifier="pID1"
              date_created="2008-07-02" owner_id="1" update_id="1" dob_collected="true"/>
+	<subject subject_id="2" status_id="1" date_of_birth="2000-06-01" gender="m" unique_identifier="pID2"
+             date_created="2008-06-02" owner_id="1" update_id="1" dob_collected="true"/>
 
     <study_subject study_subject_id="1" label="ssID1" secondary_label="" subject_id="1" study_id="1" status_id="1"
                    enrollment_date="2008-07-01" date_created="2008-07-02 00:00:00.0" owner_id="1" update_id="1"
                    oc_oid="SS_SSID1" dynamic_group_class_id="4" randomization_date="2013-12-17" randomization_result="Surgery"/>
-
+	<study_subject study_subject_id="2" label="ssID2" secondary_label="" subject_id="2" study_id="1" status_id="1"
+                   enrollment_date="2008-07-02" date_created="2008-06-02 00:00:00.0" owner_id="1" update_id="1"
+                   oc_oid="SS_SSID2" dynamic_group_class_id="3" randomization_date="2013-12-18"/>
+	
     <study_event_definition study_event_definition_id="1" study_id="1" name="ED-1-NonRepeating" description=""
                             repeating="false" type="scheduled" category="" owner_id="1" status_id="1"
                             date_created="2008-07-02" ordinal="1" oc_oid="SE_ED1NONRE" reference_visit="false"
@@ -1015,7 +1020,14 @@
 	<study_group_class study_group_class_id="4" name="study group 4" study_id="1" owner_id="1" date_created="2013-11-29"
 					   group_class_type_id="4" status_id="1" is_default="true"
 					   dynamic_ordinal="2"/>
+	<study_group_class study_group_class_id="5" name="study group 5" study_id="1" owner_id="1" date_created="2016-02-29"
+					   group_class_type_id="3" status_id="1" is_default="false"/>
 
+	<study_group study_group_id="1" name="study group 1" description="abcd" study_group_class_id="2"/>
+	<study_group study_group_id="2" name="study group 2" description="abcde" study_group_class_id="1"/>
+
+	<subject_group_map subject_group_map_id="1" study_group_id="2" study_group_class_id="2" study_subject_id="1" notes="subject group map notes 1"/>
+	
     <dynamic_event dynamic_event_id="1" study_group_class_id="3" study_event_definition_id="1" study_id="1" ordinal="1"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 1"
                    description="test dynamic event 1"/>

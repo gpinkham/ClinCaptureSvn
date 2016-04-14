@@ -47,7 +47,7 @@
 		<sql>DELETE FROM DYNAMIC_EVENT WHERE DYNAMIC_EVENT_ID=?</sql>
 	</query>
 	<query>
-		<name>deleteAllFromStudyGroupClass</name>
+		<name>deleteAllByStudyGroupClassId</name>
 		<sql>DELETE FROM DYNAMIC_EVENT WHERE STUDY_GROUP_CLASS_ID=?</sql>
 	</query>
 	<query>

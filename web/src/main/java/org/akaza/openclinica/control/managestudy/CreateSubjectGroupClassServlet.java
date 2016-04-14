@@ -113,7 +113,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-			ArrayList<StudyEventDefinitionBean> allDefsFromStudy = seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId());
+			List<StudyEventDefinitionBean> allDefsFromStudy = seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId());
 			HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
 
 			for (StudyEventDefinitionBean sedb : allDefsFromStudy) {

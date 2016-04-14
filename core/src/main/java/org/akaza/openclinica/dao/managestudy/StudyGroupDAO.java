@@ -30,10 +30,12 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyGroupDAO extends AuditableEntityDAO {
@@ -98,8 +100,8 @@ public class StudyGroupDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public ArrayList findAllByGroupClass(StudyGroupClassBean group) {
-		ArrayList answer = new ArrayList();
+	public List<StudyGroupBean> findAllByGroupClass(StudyGroupClassBean group) {
+		List<StudyGroupBean> answer = new ArrayList();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
@@ -144,7 +146,7 @@ public class StudyGroupDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public EntityBean findByPK(int id) {
+	public StudyGroupBean findByPK(int id) {
 		StudyGroupBean eb = new StudyGroupBean();
 		this.setTypesExpected();
 
@@ -309,5 +311,17 @@ public class StudyGroupDAO extends AuditableEntityDAO {
 		}
 
 		return eb;
+	}
+
+	/**
+	 * Deletes all SubjectGroups by StudyGroupClassId id.
+	 *
+	 * @param groupId the study group class id, to search on.
+	 * if no records, matching the SQL query, were found, do nothing.
+	 */
+	public void deleteAllByStudyGroupClassId(int groupId) {
+		HashMap variables = new HashMap();
+		variables.put(1, groupId);
+		this.execute(digester.getQuery("deleteAllByStudyGroupClassId"), variables);
 	}
 }

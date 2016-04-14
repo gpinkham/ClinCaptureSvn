@@ -34,6 +34,16 @@ public class SubjectGroupMapDaoTest extends DefaultAppContextTest {
 		assertTrue(subjectGroupMapBean.getId() > 0);
 	}
 	
+	@Test
+	public void testThatDeleteAllByStudyGroupClassIdDeletesStudyGroupMapBeans() {
+		int subjectGroupMapId = 1;
+		int studyGroupClassId = 2;
+		String notes = "subject group map notes 1";
+		assertEquals(notes, subjectGroupMapDAO.findByPK(subjectGroupMapId).getNotes());
+		subjectGroupMapDAO.deleteAllByStudyGroupClassId(studyGroupClassId);
+		assertEquals("", subjectGroupMapDAO.findByPK(subjectGroupMapId).getNotes());
+	}
+	
 	@After
 	public void tearDown() {
 		if (subjectGroupMapBean != null && subjectGroupMapBean.getId() > 0) {

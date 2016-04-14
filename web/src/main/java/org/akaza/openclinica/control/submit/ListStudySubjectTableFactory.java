@@ -569,7 +569,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private List<StudyGroupClassBean> getDynamicGroupClasses() {
-		ArrayList<StudyEventDefinitionBean> studyEventDefinitionsList;
+		List<StudyEventDefinitionBean> studyEventDefinitionsList;
 		StudyGroupClassBean sgcb;
 		// need to filter by events that are not in dynamic groups #done
 		// and yet, at the same time, add them to the beginning of the list

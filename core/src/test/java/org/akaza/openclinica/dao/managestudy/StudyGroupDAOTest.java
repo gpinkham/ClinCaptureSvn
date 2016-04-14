@@ -16,4 +16,14 @@ public class StudyGroupDAOTest extends DefaultAppContextTest {
 		studyGroupBean = (StudyGroupBean) studyGroupDAO.create(studyGroupBean);
 		assertTrue(studyGroupBean.getId() > 0);
 	}
+	
+	@Test
+	public void testThatDeleteAllByStudyGroupClassIdDeletesStudyGroupBeans() {
+		int groupId = 1;
+		int studyGroupClassId = 2;
+		String name = "study group 1";
+		assertEquals(name, studyGroupDAO.findByPK(groupId).getName());
+		studyGroupDAO.deleteAllByStudyGroupClassId(studyGroupClassId);
+		assertEquals("", studyGroupDAO.findByPK(groupId).getName());
+	}
 }

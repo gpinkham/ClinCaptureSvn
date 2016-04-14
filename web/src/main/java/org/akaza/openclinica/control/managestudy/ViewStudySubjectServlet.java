@@ -189,7 +189,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			} else {
 				subjDynGroup = sgcdao.findByPK(studySub.getDynamicGroupClassId());
 			}
-			ArrayList<StudyEventDefinitionBean> listSEDBeans = seddao
+			List<StudyEventDefinitionBean> listSEDBeans = seddao
 					.findAllActiveOrderedByStudyGroupClassId(subjDynGroup.getId());
 			for (StudyEventDefinitionBean sedBean : listSEDBeans) {
 				studyEventDefinitionsString = studyEventDefinitionsString + ", " + sedBean.getName();

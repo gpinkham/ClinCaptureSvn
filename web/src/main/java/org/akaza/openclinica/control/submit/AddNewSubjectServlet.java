@@ -823,9 +823,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 		request.setAttribute(BEAN_MOTHERS, dsMothers);
 
 		for (StudyGroupClassBean group : classes) {
-
-			ArrayList studyGroups = sgdao.findAllByGroupClass(group);
-			group.setStudyGroups(studyGroups);
+			group.setStudyGroups(sgdao.findAllByGroupClass(group));
 		}
 
 		request.setAttribute(BEAN_GROUPS, classes);

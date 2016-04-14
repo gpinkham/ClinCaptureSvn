@@ -31,7 +31,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testFindAllActiveNotClassGroupedByStudyId() throws OpenClinicaException {
 		int studyId = 1;
-		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveNotClassGroupedByStudyId(studyId);
 		assertEquals(1, result.size());
 	}
@@ -41,7 +41,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
 		ssb.setDynamicGroupClassId(3);
-		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectAndStudyId(ssb,
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectAndStudyId(ssb,
 				studyId);
 		assertEquals(6, result.size());
 	}
@@ -51,7 +51,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
 		ssb.setDynamicGroupClassId(3);
-		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
 		assertEquals(6, result.size());
 	}
@@ -61,7 +61,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
 		ssb.setDynamicGroupClassId(4);
-		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
 		assertEquals(4, result.size());
 	}
@@ -95,7 +95,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 			throws OpenClinicaException {
 		final int studyGroupClassId = 3;
 		final int expactedSize = 4;
-		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
 		assertEquals(expactedSize, result.size());
 	}
@@ -105,7 +105,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 			throws OpenClinicaException {
 		final int studyGroupClassId = 4;
 		final int expactedSize = 1;
-		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
 		assertEquals(expactedSize, result.size());
 	}

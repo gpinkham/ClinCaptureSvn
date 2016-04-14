@@ -86,8 +86,7 @@ public class SelectItemsServlet extends SpringServlet {
 
 			for (int i = 0; i < sgclasses.size(); i++) {
 				StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclasses.get(i);
-				ArrayList studyGroups = sgdao.findAllByGroupClass(sgclass);
-				sgclass.setStudyGroups(studyGroups);
+				sgclass.setStudyGroups(sgdao.findAllByGroupClass(sgclass));
 				// hmm, set it back into the array list? tbh
 			}
 		}

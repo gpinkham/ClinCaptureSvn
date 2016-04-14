@@ -44,7 +44,9 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Restores a removed subject group class
@@ -52,7 +54,6 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class RestoreSubjectGroupClassServlet extends SpringServlet {
 	/**
@@ -128,8 +129,7 @@ public class RestoreSubjectGroupClassServlet extends SpringServlet {
 							.findAllByGroupClass(group);
 
 					for (StudyGroupBean sg : studyGroups) {
-						ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
-						sg.setSubjectMaps(subjectMaps);
+						sg.setSubjectMaps(sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId()));
 					}
 					request.setAttribute("studyGroups", studyGroups);
 				}
@@ -143,8 +143,7 @@ public class RestoreSubjectGroupClassServlet extends SpringServlet {
 				group.setUpdater(ub);
 				sgcdao.update(group);
 
-				ArrayList<SubjectGroupMapBean> subjectMaps = (ArrayList<SubjectGroupMapBean>) sgmdao
-						.findAllByStudyGroupClassId(group.getId());
+				List<SubjectGroupMapBean> subjectMaps = sgmdao.findAllByStudyGroupClassId(group.getId());
 				for (SubjectGroupMapBean sgmb : subjectMaps) {
 					if (sgmb.getStatus().equals(Status.AUTO_DELETED)) {
 						sgmb.setStatus(Status.AVAILABLE);

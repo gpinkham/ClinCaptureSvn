@@ -28,7 +28,7 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 		studyGroupClassBean.setUpdater(new UserAccountBean());
 
 		studyGroupClassDAO.update(studyGroupClassBean);
-
+		
 		assertEquals(name, studyGroupClassDAO.findByPK(1).getName());
 	}
 
@@ -179,5 +179,15 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 				studyGroupClassDAO.findAllActiveDynamicGroupClassesByStudyId(studyId);
 
 		assertEquals(expectedNumberOfStudyGroupClasses, studyGroupClassBeansList.size());
+	}
+	
+	@Test
+	public void testThatDeleteByPKDeletesStudyGroupClassBean() {
+
+		int groupId = 5;
+		String name = "study group 5";
+		assertEquals(name, studyGroupClassDAO.findByPK(groupId).getName());
+		studyGroupClassDAO.deleteByPK(groupId);
+		assertEquals("", studyGroupClassDAO.findByPK(groupId).getName());
 	}
 }

@@ -112,4 +112,8 @@
 			WHERE study_id = ? AND group_class_type_id = 4 AND status_id = 1 AND is_default = FALSE
 		</sql>
 	</query>
+	<query>
+		<name>deleteByPK</name>
+		<sql>DELETE FROM study_group_class WHERE study_group_class_id=?</sql>
+	</query>
 </queries>

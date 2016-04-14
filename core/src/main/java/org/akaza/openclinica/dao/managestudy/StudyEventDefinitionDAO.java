@@ -509,14 +509,14 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
-	public ArrayList<StudyEventDefinitionBean> findAllOrderedByStudyGroupClassId(int id) {
-		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
+	public List<StudyEventDefinitionBean> findAllOrderedByStudyGroupClassId(int id) {
+		List<StudyEventDefinitionBean> answer = new ArrayList();
 
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, id);
 
-		ArrayList alist = this.select(digester.getQuery("findAllOrderedByStudyGroupClassId"), variables);
+		List alist = this.select(digester.getQuery("findAllOrderedByStudyGroupClassId"), variables);
 
 		for (Object anAlist : alist) {
 			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
@@ -533,14 +533,14 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
-	public ArrayList<StudyEventDefinitionBean> findAllAvailableAndOrderedByStudyGroupClassId(int id) {
-		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
+	public List<StudyEventDefinitionBean> findAllAvailableAndOrderedByStudyGroupClassId(int id) {
+		List<StudyEventDefinitionBean> answer = new ArrayList();
 
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, id);
 
-		ArrayList alist = this.select(digester.getQuery("findAllAvailableAndOrderedByStudyGroupClassId"), variables);
+		List alist = this.select(digester.getQuery("findAllAvailableAndOrderedByStudyGroupClassId"), variables);
 
 		for (Object anAlist : alist) {
 			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
@@ -559,8 +559,8 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList findAllActiveBySubjectFromActiveDynGroupAndStudyId(StudySubjectBean ssb, int studyId) {
-		ArrayList<StudyEventDefinitionBean> defsFromActiveGroup = new ArrayList();
+	public List findAllActiveBySubjectFromActiveDynGroupAndStudyId(StudySubjectBean ssb, int studyId) {
+		List<StudyEventDefinitionBean> defsFromActiveGroup = new ArrayList();
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
 		if (ssb.getDynamicGroupClassId() == 0) {
 			StudyGroupClassBean sgc = sgcdao.findDefaultByStudyId(studyId);
@@ -573,7 +573,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 				defsFromActiveGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
 			}
 		}
-		ArrayList<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
+		List<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
 		defsFromActiveGroup.addAll(nonGroupDefs);
 
 		return defsFromActiveGroup;
@@ -588,8 +588,8 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList
 	 */
-	public ArrayList findAllActiveBySubjectAndStudyId(StudySubjectBean ssb, int studyId) {
-		ArrayList<StudyEventDefinitionBean> defsFromGroup = new ArrayList();
+	public List findAllActiveBySubjectAndStudyId(StudySubjectBean ssb, int studyId) {
+		List<StudyEventDefinitionBean> defsFromGroup = new ArrayList();
 		if (ssb.getDynamicGroupClassId() == 0) {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
 			StudyGroupClassBean sgc = sgcdao.findDefaultByStudyId(studyId);
@@ -599,7 +599,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		} else {
 			defsFromGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
 		}
-		ArrayList<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
+		List<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
 		defsFromGroup.addAll(nonGroupDefs);
 
 		return defsFromGroup;
@@ -612,14 +612,14 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
-	public ArrayList<StudyEventDefinitionBean> findAllActiveNotClassGroupedByStudyId(int id) {
-		ArrayList answer = new ArrayList();
+	public List<StudyEventDefinitionBean> findAllActiveNotClassGroupedByStudyId(int id) {
+		List answer = new ArrayList();
 
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, id);
 
-		ArrayList alist = this.select(digester.getQuery("findAllActiveNotClassGroupedByStudyId"), variables);
+		List alist = this.select(digester.getQuery("findAllActiveNotClassGroupedByStudyId"), variables);
 
 		for (Object anAlist : alist) {
 			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
@@ -636,9 +636,9 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
-	public ArrayList<StudyEventDefinitionBean> findAllActiveOrderedByStudyGroupClassId(int id) {
-		ArrayList<StudyEventDefinitionBean> temp = findAllOrderedByStudyGroupClassId(id);
-		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
+	public List<StudyEventDefinitionBean> findAllActiveOrderedByStudyGroupClassId(int id) {
+		List<StudyEventDefinitionBean> temp = findAllOrderedByStudyGroupClassId(id);
+		List<StudyEventDefinitionBean> answer = new ArrayList();
 		for (StudyEventDefinitionBean def : temp) {
 			if (def.isActive()) {
 				answer.add(def);
@@ -652,8 +652,8 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 */
 	public Collection findAll() {
 		this.setTypesExpected();
-		ArrayList alist = this.select(digester.getQuery("findAll"));
-		ArrayList al = new ArrayList();
+		List alist = this.select(digester.getQuery("findAll"));
+		List al = new ArrayList();
 		for (Object anAlist : alist) {
 			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
@@ -761,7 +761,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            int
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
-	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId) {
+	public List<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId) {
 		return findAllActiveByParentStudyId(parentStudyId, false);
 	}
 
@@ -774,12 +774,12 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 *            boolean
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
-	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId, boolean filterOnCalendar) {
+	public List<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId, boolean filterOnCalendar) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, parentStudyId);
-		ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
-		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
+		List alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
+		List<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
 		for (Object anAlist : alist) {
 			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
 			if (filterOnCalendar && eb.getType().equalsIgnoreCase("calendared_visit")) {
@@ -821,7 +821,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
 	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId,
-			ArrayList<Integer> idsToHide) {
+			List<Integer> idsToHide) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, parentStudyId);

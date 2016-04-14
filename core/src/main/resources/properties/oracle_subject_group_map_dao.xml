@@ -85,7 +85,11 @@
                 <sql>SELECT subject_group_map_id_seq.currval AS key from dual</sql>
         </query>
         <query>
-		<name>deleteTestGroupMap</name>
-		<sql>delete from subject_group_map WHERE subject_group_map_id=?</sql>
-	</query>
+			<name>deleteTestGroupMap</name>
+			<sql>delete from subject_group_map WHERE subject_group_map_id=?</sql>
+		</query>
+		<query>
+			<name>deleteAllByStudyGroupClassId</name>
+			<sql>delete from subject_group_map WHERE study_group_class_id=?</sql>
+		</query>
 </queries>

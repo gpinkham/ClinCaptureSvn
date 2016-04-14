@@ -1066,7 +1066,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 
 		for (Object studyGroupClass : studyGroupClasses) {
 			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
-			ArrayList groups = studyGroupDAO.findAllByGroupClass(sgc);
+			List groups = studyGroupDAO.findAllByGroupClass(sgc);
 			sgc.setStudyGroups(groups);
 		}
 
@@ -2103,7 +2103,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 		// ordered eventDefs from dynGroups
 		if (defaultStudyGroupClassBeanExist || ssb.getDynamicGroupClassId() != 0) {
 			for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
-				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
+				List<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
 						.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
 				for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
 					if (dynGroup.isDefault() || (ssb.getDynamicGroupClassId() != 0
@@ -2127,7 +2127,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			}
 		}
 
-		ArrayList eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
+		List<StudyEventDefinitionBean> eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
 		// sort by study event definition ordinal
 		Collections.sort(eventDefinitionsNotFromDynGroup);
 		// filter notStarted and repeating eventDefs
