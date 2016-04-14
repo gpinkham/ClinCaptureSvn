@@ -62,7 +62,7 @@ import com.clinovo.validator.EventDefinitionValidator;
  * The servlet for creating event definition of user's current active study.
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 @Component
 public class DefineStudyEventServlet extends SpringServlet {
 

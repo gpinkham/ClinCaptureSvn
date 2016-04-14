@@ -61,7 +61,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class ExtractBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

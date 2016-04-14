@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
  *         restored
  */
 @Component
+@SuppressWarnings({"deprecation"})
 public class RestoreStudyServlet extends SpringServlet {
 	/**
 	 *

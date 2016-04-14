@@ -39,7 +39,7 @@ import java.util.Map;
  * EventDefinitionServiceImpl.
  */
 @Service
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class EventDefinitionServiceImpl implements EventDefinitionService {
 
 	@Autowired

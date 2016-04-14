@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.clinovo.util.EventDefinitionCRFUtil;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -55,7 +56,7 @@ import org.springframework.stereotype.Component;
 /**
  * Processes user request to generate study event definition list.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 @Component
 public class ListEventDefinitionServlet extends SpringServlet {
 

@@ -37,7 +37,6 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RequestUtil.class})
-@SuppressWarnings("static-access")
 public class UpdateCRFHeaderServletTest {
 
 	private CrfShortcutsAnalyzer crfShortcutsAnalyzer;

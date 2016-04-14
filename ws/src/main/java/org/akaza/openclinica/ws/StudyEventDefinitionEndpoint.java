@@ -54,7 +54,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 @Endpoint
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "deprecation"})
 public class StudyEventDefinitionEndpoint {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

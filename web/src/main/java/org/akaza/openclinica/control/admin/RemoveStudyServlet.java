@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
+@SuppressWarnings({"deprecation"})
 public class RemoveStudyServlet extends SpringServlet {
 	/**
 	 *

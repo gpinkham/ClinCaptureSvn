@@ -17,7 +17,6 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.CrfOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
-import org.akaza.openclinica.domain.SourceDataVerification;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;

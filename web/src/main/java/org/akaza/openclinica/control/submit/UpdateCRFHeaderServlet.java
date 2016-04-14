@@ -30,7 +30,7 @@ import com.clinovo.util.CrfShortcutsAnalyzer;
 /**
  * UpdateCRFHeaderServlet.
  */
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unchecked"})
 @Component
 public class UpdateCRFHeaderServlet extends SpringServlet {
 

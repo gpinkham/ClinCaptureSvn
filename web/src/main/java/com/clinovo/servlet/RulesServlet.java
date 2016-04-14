@@ -63,6 +63,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -72,7 +73,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings({ "unchecked", "serial", "deprecation"})
 public class RulesServlet extends HttpServlet {
 
 	@Override
