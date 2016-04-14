@@ -23,7 +23,7 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 /**
  * StudyEventDefinitionUtil class.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked"})
 public final class StudyEventDefinitionUtil {
 
 	private StudyEventDefinitionUtil() {

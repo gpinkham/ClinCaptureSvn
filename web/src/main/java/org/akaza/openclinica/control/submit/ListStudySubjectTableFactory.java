@@ -95,7 +95,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
 /**
  * ListStudySubjectTableFactory class.
  */
-@SuppressWarnings({"unchecked", "rawtypes", "unused"})
+@SuppressWarnings({"unchecked", "unused"})
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(ListStudySubjectTableFactory.class);

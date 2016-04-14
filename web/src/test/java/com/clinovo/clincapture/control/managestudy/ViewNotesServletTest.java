@@ -31,7 +31,7 @@ import com.clinovo.service.DcfService;
 import com.clinovo.service.impl.DcfServiceImpl;
 import com.clinovo.util.DcfRenderType;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class ViewNotesServletTest extends DefaultAppContextTest {
 
 	public static final int FIVE = 5;

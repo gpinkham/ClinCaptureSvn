@@ -53,7 +53,6 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class RemoveSubjectGroupClassServlet extends SpringServlet {
 	/**

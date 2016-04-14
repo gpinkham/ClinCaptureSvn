@@ -134,7 +134,7 @@ import com.clinovo.service.WidgetsLayoutService;
 		"classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
 		"classpath*:org/akaza/openclinica/applicationContext-security.xml"})
-@SuppressWarnings({"rawtypes", "deprecation"})
+@SuppressWarnings({"deprecation"})
 public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCase {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractContextSentiveTest.class);

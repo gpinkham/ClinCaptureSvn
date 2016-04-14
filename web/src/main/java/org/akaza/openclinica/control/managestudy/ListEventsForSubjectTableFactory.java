@@ -87,7 +87,7 @@ import com.clinovo.util.SignUtil;
 /**
  * ListEventsForSubjectTableFactory class.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+@SuppressWarnings({"unchecked", "unused"})
 public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	public static final int TEN = 10;
