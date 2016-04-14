@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
 	<changeSet author="aram" id="2015-06-02-TICKET2329-01">
 		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table study_subject</comment>
-		<modifyColumn tableName="study_subject">
-			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
-			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
-			<column name="enrollment_date" type="TIMESTAMP WITH TIME ZONE"/>
-			<column name="randomization_date" type="TIMESTAMP WITH TIME ZONE"/>
-		</modifyColumn>
+		<modifyDataType tableName="study_subject" columnName="date_created" newDataType="TIMESTAMP WITH TIME ZONE"/>
+		<modifyDataType tableName="study_subject" columnName="date_updated" newDataType="TIMESTAMP WITH TIME ZONE"/>
+		<modifyDataType tableName="study_subject" columnName="enrollment_date" newDataType="TIMESTAMP WITH TIME ZONE"/>
+		<modifyDataType tableName="study_subject" columnName="randomization_date" newDataType="TIMESTAMP WITH TIME ZONE"/>
 	</changeSet>
 
 	<changeSet author="aram" id="2015-06-02-TICKET2329-02">
 		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table subject</comment>
-		<modifyColumn tableName="subject">
-			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
-			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
-			<column name="date_of_birth" type="TIMESTAMP WITH TIME ZONE"/>
-		</modifyColumn>
+		<modifyDataType tableName="subject" columnName="date_created" newDataType="TIMESTAMP WITH TIME ZONE"/>
+		<modifyDataType tableName="subject" columnName="date_updated" newDataType="TIMESTAMP WITH TIME ZONE"/>
+		<modifyDataType tableName="subject" columnName="date_of_birth" newDataType="TIMESTAMP WITH TIME ZONE"/>
 	</changeSet>
 
 </databaseChangeLog>

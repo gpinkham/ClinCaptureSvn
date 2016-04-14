@@ -30,14 +30,12 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.service.DcfService;
 import com.clinovo.service.impl.DcfServiceImpl;
 import com.clinovo.util.DcfRenderType;
-import com.google.common.collect.Iterables;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ViewNotesServletTest extends DefaultAppContextTest {
 
 	public static final int FIVE = 5;
-	public static final int THREE = 3;
-	public static final int FOUR = 4;
+
 	private MockHttpServletRequest request;
 	private MockHttpServletResponse response;
 	private ViewNotesServlet viewNotesServlet;
@@ -122,16 +120,11 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
-		Map.Entry entry0 = Iterables.get(customStat.entrySet(), 0);
-		Map.Entry entry1 = Iterables.get(customStat.entrySet(), 1);
-		Map.Entry entry2 = Iterables.get(customStat.entrySet(), 2);
-		Map.Entry entry3 = Iterables.get(customStat.entrySet(), THREE);
-		Map.Entry entry4 = Iterables.get(customStat.entrySet(), FOUR);
-		assertEquals("Updated", entry0.getKey());
-		assertEquals("Not Applicable", entry1.getKey());
-		assertEquals("Closed", entry2.getKey());
-		assertEquals("New", entry3.getKey());
-		assertEquals("Resolution Proposed", entry4.getKey());
+		assertTrue(customStat.keySet().contains("Updated"));
+		assertTrue(customStat.keySet().contains("Not Applicable"));
+		assertTrue(customStat.keySet().contains("Closed"));
+		assertTrue(customStat.keySet().contains("New"));
+		assertTrue(customStat.keySet().contains("Resolution Proposed"));
 	}
 
 	@Test
@@ -139,12 +132,9 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
-		Map.Entry updatedItems = Iterables.get(customStat.entrySet(), 0);
-		Map<String, String> statusItems = (Map<String, String>) updatedItems.getValue();
-		assertEquals("Query", Iterables.get(statusItems.entrySet(), 0).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 0).getValue());
-		assertEquals("Total", Iterables.get(statusItems.entrySet(), 1).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 1).getValue());
+		Map<String, String> statusItems = customStat.get("Updated");
+		assertEquals("1", statusItems.get("Total"));
+		assertEquals("1", statusItems.get("Query"));
 	}
 
 	@Test
@@ -152,12 +142,9 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
-		Map.Entry updatedItems = Iterables.get(customStat.entrySet(), 1);
-		Map<String, String> statusItems = (Map<String, String>) updatedItems.getValue();
-		assertEquals("Annotation", Iterables.get(statusItems.entrySet(), 0).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 0).getValue());
-		assertEquals("Total", Iterables.get(statusItems.entrySet(), 1).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 1).getValue());
+		Map<String, String> statusItems = customStat.get("Not Applicable");
+		assertEquals("1", statusItems.get("Total"));
+		assertEquals("1", statusItems.get("Annotation"));
 	}
 
 	@Test
@@ -165,12 +152,9 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
-		Map.Entry updatedItems = Iterables.get(customStat.entrySet(), 2);
-		Map<String, String> statusItems = (Map<String, String>) updatedItems.getValue();
-		assertEquals("Total", Iterables.get(statusItems.entrySet(), 0).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 0).getValue());
-		assertEquals("Failed Validation Check", Iterables.get(statusItems.entrySet(), 1).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 1).getValue());
+		Map<String, String> statusItems = customStat.get("Closed");
+		assertEquals("1", statusItems.get("Total"));
+		assertEquals("1", statusItems.get("Failed Validation Check"));
 	}
 
 	@Test
@@ -178,14 +162,10 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
-		Map.Entry updatedItems = Iterables.get(customStat.entrySet(), THREE);
-		Map<String, String> statusItems = (Map<String, String>) updatedItems.getValue();
-		assertEquals("Query", Iterables.get(statusItems.entrySet(), 0).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 0).getValue());
-		assertEquals("Total", Iterables.get(statusItems.entrySet(), 1).getKey());
-		assertEquals("2", Iterables.get(statusItems.entrySet(), 1).getValue());
-		assertEquals("Failed Validation Check", Iterables.get(statusItems.entrySet(), 2).getKey());
-		assertEquals("1", Iterables.get(statusItems.entrySet(), 2).getValue());
+		Map<String, String> statusItems = customStat.get("New");
+		assertEquals("1", statusItems.get("Query"));
+		assertEquals("2", statusItems.get("Total"));
+		assertEquals("1", statusItems.get("Failed Validation Check"));
 	}
 
 	@Test
@@ -193,10 +173,8 @@ public class ViewNotesServletTest extends DefaultAppContextTest {
 		viewNotesServlet.processRequest(request, response);
 		Map<String, Map<String, String>> customStat = (Map<String, Map<String, String>>) request
 				.getAttribute("summaryMap");
-		Map.Entry updatedItems = Iterables.get(customStat.entrySet(), FOUR);
-		Map<String, String> statusItems = (Map<String, String>) updatedItems.getValue();
-		assertEquals("Total", Iterables.get(statusItems.entrySet(), 0).getKey());
-		assertEquals("0", Iterables.get(statusItems.entrySet(), 0).getValue());
+		Map<String, String> statusItems = customStat.get("Resolution Proposed");
+		assertEquals("0", statusItems.get("Total"));
 	}
 
 	@Test

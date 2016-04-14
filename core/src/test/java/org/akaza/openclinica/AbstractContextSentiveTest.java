@@ -69,6 +69,7 @@ import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.hibernate.SessionFactory;
@@ -324,6 +325,12 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 			ds.setUrl(dbUrl);
 			dataSource = ds;
 		}
+	}
+
+	@Override
+	protected void setUpDatabaseConfig(DatabaseConfig config) {
+		config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, true);
+		super.setUpDatabaseConfig(config);
 	}
 
 	@Override

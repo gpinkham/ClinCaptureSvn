@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
 	<changeSet author="aram" id="2015-05-25-TICKET2330-01" dbms="oracle">
 		<comment>drop view dn_age_days before change type of column date_created in the table discrepancy_note</comment>
@@ -10,9 +10,7 @@
 
 	<changeSet author="aram" id="2015-05-25-TICKET2330-02" dbms="oracle">
 		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table discrepancy_note</comment>
-		<modifyColumn tableName="discrepancy_note">
-			<column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
-		</modifyColumn>
+		<modifyDataType tableName="discrepancy_note" columnName="date_created" newDataType="TIMESTAMP WITH TIME ZONE"/>
 	</changeSet>
 
 	<changeSet author="aram" id="2015-05-25-TICKET2330-03" dbms="oracle">
@@ -45,9 +43,7 @@
 
 	<changeSet author="aram" id="2015-05-25-TICKET2330-04" dbms="oracle">
 		<comment>update dates type to TIMESTAMP WITH TIME ZONE in the table audit_log_event</comment>
-		<modifyColumn tableName="audit_log_event">
-			<column name="date_interviewed" type="TIMESTAMP WITH TIME ZONE"/>
-		</modifyColumn>
+		<modifyDataType tableName="audit_log_event" columnName="date_interviewed" newDataType="TIMESTAMP WITH TIME ZONE"/>
 	</changeSet>
 
 </databaseChangeLog>

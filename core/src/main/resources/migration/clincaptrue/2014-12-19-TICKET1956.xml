@@ -1,15 +1,11 @@
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <changeSet author="vitaly" id="2014-12-19-TICKET1956">
         <comment>crf_version and item group columns update for long oid names</comment>
-        <modifyColumn tableName="crf_version">
-            <column name="oc_oid" type="VARCHAR(120)"></column>
-        </modifyColumn>
-        <modifyColumn tableName="item_group">
-            <column name="oc_oid" type="VARCHAR(120)"></column>
-        </modifyColumn>
+        <modifyDataType tableName="crf_version" columnName="oc_oid" newDataType="VARCHAR(120)"/>
+        <modifyDataType tableName="item_group" columnName="oc_oid" newDataType="VARCHAR(120)"/>
     </changeSet>
 </databaseChangeLog>
 

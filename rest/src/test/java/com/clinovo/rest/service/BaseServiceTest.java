@@ -1,6 +1,5 @@
 package com.clinovo.rest.service;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
@@ -34,7 +33,6 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.cdisc.ns.odm.v130.ODM;
 import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.StringContains;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -62,7 +60,7 @@ import com.clinovo.rest.odm.RestOdmContainer;
 import com.clinovo.rest.security.PermissionChecker;
 
 @Ignore
-@WebAppConfiguration
+@WebAppConfiguration("/")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:servlet-context.xml")
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -335,23 +333,26 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		} else if (!currentScope.isSite()) {
 			studyConfigService.setParametersForStudy(currentScope);
 		}
-		mockMvc.perform(post(API_AUTHENTICATION).param("userName", userName).param("password", password)
-				.param("studyName", studyName))
+		String response = mockMvc
+				.perform(post(API_AUTHENTICATION).param("userName", userName).param("password", password)
+						.param("studyName", studyName))
 				.andExpect(status().isOk())
-				.andExpect(
-						MockMvcResultMatchers.request()
-								.sessionAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS,
-										IsInstanceOf
-												.any(UserDetails.class)))
-				.andExpect(
-						content().string(mediaType.equals(MediaType.APPLICATION_JSON)
-								? StringContains.containsString("{\"userName\":\"".concat(userName)
-										.concat("\",\"userStatus\":\"").concat(rootUser.getStatus().getName())
-										.concat("\",\"studyName\":\"").concat(studyName).concat("\",\"studyStatus\":\"")
-										.concat(currentScope.getStatus().getName()).concat("\",\"role\":\"")
-										.concat(role.getCode()).concat("\",\"userType\":\"").concat(userType.getCode())
-										.concat("\"}"))
-								: StringContains.containsString("<ODM Description=\"REST Data\"")));
+				.andExpect(MockMvcResultMatchers.request().sessionAttribute(
+						PermissionChecker.API_AUTHENTICATED_USER_DETAILS, IsInstanceOf.any(UserDetails.class)))
+				.andReturn().getResponse().getContentAsString();
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			JSONObject jsonObject = new JSONObject(response);
+			assertTrue(jsonObject.getJSONObject("response").getString("userName").equals(userName));
+			assertTrue(jsonObject.getJSONObject("response").getString("studyName").equals(studyName));
+			assertTrue(jsonObject.getJSONObject("response").getString("role").equals(role.getCode()));
+			assertTrue(jsonObject.getJSONObject("response").getString("userType").equals(userType.getCode()));
+			assertTrue(jsonObject.getJSONObject("response").getString("userStatus")
+					.equals(rootUser.getStatus().getName()));
+			assertTrue(jsonObject.getJSONObject("response").getString("studyStatus")
+					.equals(currentScope.getStatus().getName()));
+		} else {
+			assertTrue(response.contains("<ODM Description=\"REST Data\""));
+		}
 	}
 
 	private void backupEntities() {

@@ -357,7 +357,7 @@ public final class CodingFieldsUtil {
 		if (ontologyName.toUpperCase().contains(WHODC) && !ontologyNumber.isEmpty()) {
 			final int monthNumE = 4;
 			final int monthCounter = 9;
-			Date date = new SimpleDateFormat("MMM").parse(ontologyName.substring(ontologyName.indexOf(" ") + 1, ontologyName.indexOf(" ") + monthNumE));
+			Date date = new SimpleDateFormat("MMM", Locale.ENGLISH).parse(ontologyName.substring(ontologyName.indexOf(" ") + 1, ontologyName.indexOf(" ") + monthNumE));
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(date);
 			int monthNumber = cal.get(Calendar.MONTH) + 1;

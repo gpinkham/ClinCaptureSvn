@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
 	<changeSet author="denis" id="2016-01-05-TICKET2766-0">
 		<comment>Change length of user_name column in "study_user_role" table.</comment>
-		<modifyColumn tableName="study_user_role">
-			<column name="user_name" type="VARCHAR(64)"/>
-		</modifyColumn>
+		<modifyDataType tableName="study_user_role" columnName="user_name" newDataType="VARCHAR(64)"/>
 	</changeSet>
 
 	<changeSet author="denis" id="2016-01-05-TICKET2766-1">
 		<comment>Change length of user_name column in "authorities" table.</comment>
-		<modifyColumn tableName="authorities">
-			<column name="username" type="VARCHAR(64)"/>
-		</modifyColumn>
+		<modifyDataType tableName="authorities" columnName="username" newDataType="VARCHAR(64)"/>
 	</changeSet>
 
 </databaseChangeLog>

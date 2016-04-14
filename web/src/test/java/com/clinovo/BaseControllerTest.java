@@ -25,7 +25,7 @@ import com.clinovo.i18n.LocaleResolver;
  * BaseControllerTest class.
  */
 @Ignore
-@WebAppConfiguration
+@WebAppConfiguration("/")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:servlet-context.xml")
 public class BaseControllerTest extends AbstractContextSentiveTest {

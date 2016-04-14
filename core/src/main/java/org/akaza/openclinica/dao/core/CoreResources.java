@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
-import liquibase.spring.SpringLiquibase;
+import liquibase.integration.spring.SpringLiquibase;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;

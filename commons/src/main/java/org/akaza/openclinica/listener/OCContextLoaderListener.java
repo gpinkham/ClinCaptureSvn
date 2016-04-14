@@ -20,12 +20,9 @@ import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
 
-import liquibase.log.LogFactory;
-
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.context.ContextLoaderListener;
@@ -108,7 +105,6 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 			}
 		}
 		MDC.put("HOSTNAME", hostName);
-		LogFactory.getLogger().addHandler(new SLF4JBridgeHandler());
 		super.contextInitialized(event);
 	}
 

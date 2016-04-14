@@ -148,7 +148,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-plugin</artifactId>
+			<artifactId>liquibase-maven-plugin</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.liquibase</groupId>
@@ -269,7 +269,7 @@
 			<artifactId>jxl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
 		<dependency>
@@ -360,7 +360,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.liquibase</groupId>
-				<artifactId>liquibase-plugin</artifactId>
+				<artifactId>liquibase-maven-plugin</artifactId>
 				<configuration>
 					<propertyFile>${config.file}</propertyFile>
 				</configuration>

@@ -36,7 +36,7 @@
             <artifactId>selenium-ie-driver</artifactId>
         </dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
         <dependency>
@@ -135,7 +135,7 @@
                 <!-- database configuration properties, specifically required by sql-maven-plugin to drop/create
 				test data base before tests will run -->
                 <sql-maven-plugin.database.driver>org.postgresql.Driver</sql-maven-plugin.database.driver>
-                <sql-maven-plugin.database.host.url>jdbc:postgresql://localhost:5432</sql-maven-plugin.database.host.url>
+                <sql-maven-plugin.database.host.url>jdbc:postgresql://localhost:5432/</sql-maven-plugin.database.host.url>
                 <sql-maven-plugin.test.database.name>clincapture-regression-test</sql-maven-plugin.test.database.name>
                 <sql-maven-plugin.user>clincapture</sql-maven-plugin.user>
                 <sql-maven-plugin.password>clincapture</sql-maven-plugin.password>
@@ -178,7 +178,7 @@
                         </configuration>
                         <dependencies>
                             <dependency>
-                                <groupId>postgresql</groupId>
+                                <groupId>org.postgresql</groupId>
                                 <artifactId>postgresql</artifactId>
                                 <version>${postgresql.version}</version>
                             </dependency>

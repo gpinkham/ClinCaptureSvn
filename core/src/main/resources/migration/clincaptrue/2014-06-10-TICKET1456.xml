@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
 	<changeSet author="denis" id="2014-06-10-TICKET1456-1">
 		<preConditions onFail="MARK_RAN">
 			<dbms type="postgresql" />
 		</preConditions>
 		<comment> Update data type for the column 'instructions' in the table 'section'</comment>
-		<modifyColumn tableName="section">
-			<column name="instructions" type="text"></column>
-		</modifyColumn>
+		<modifyDataType tableName="section" columnName="instructions" newDataType="text"/>
 	</changeSet>
 
 	<changeSet author="denis" id="2014-06-10-TICKET1456-2">
@@ -18,8 +16,6 @@
 			<dbms type="oracle" />
 		</preConditions>
 		<comment>Update data type for the column 'instructions' in the table 'section'</comment>
-		<modifyColumn tableName="section">
-			<column name="instructions" type="clob"></column>
-		</modifyColumn>
+		<modifyDataType tableName="section" columnName="instructions" newDataType="clob"/>
 	</changeSet>
 </databaseChangeLog> 

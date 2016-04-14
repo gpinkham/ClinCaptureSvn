@@ -3,12 +3,11 @@
     <changeSet author="pgawade (generated)" id="1235684743487-0">
 		<validCheckSum>6077be15943c12e7ae9a2a647dd2ff2</validCheckSum>
 		<validCheckSum>30d56b8377711e93debdac333aa217d</validCheckSum>
+        <validCheckSum>7:197452898d6d9ec395bda95be69964ae</validCheckSum>
    		<preConditions onFail="MARK_RAN">
    			<dbms type="postgresql" />
    		</preConditions>
 		<sql splitStatements="false">
-			DROP LANGUAGE IF EXISTS plpgsql;
-			CREATE PROCEDURAL LANGUAGE plpgsql;
 			SET check_function_bodies = false;
 			SET client_min_messages = error;
 			SET default_tablespace = '';
