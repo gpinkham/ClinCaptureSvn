@@ -888,10 +888,12 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	public String getWebAppName(String servletCtxRealPath) {
-		String webAppName = null;
+		String webAppName = "";
 		if (null != servletCtxRealPath) {
 			String[] tokens = servletCtxRealPath.split("/");
-			webAppName = tokens[(tokens.length - 1)].trim();
+			if (tokens.length > 0) {
+				webAppName = tokens[(tokens.length - 1)].trim();
+			}
 		}
 		return webAppName;
 	}
