@@ -459,49 +459,8 @@
 </div></div></div></div></div></div></div></div>
 </div>
 </div>
+
 <br>
-
-
- <a href="javascript:leftnavExpand('sectione');">
-     <img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="related_infomation" bundle="${resword}"/>]</span></a>
-<div id="sectione" style="display:none ">
-<div style="width: 600px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-<div class="tablebox_center">
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="medline_identifier_references" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.medlineIdentifier}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="results_reference" bundle="${resword}"/></td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.resultsReference == true}">
-  <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-    </c:otherwise>
-   </c:choose>
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="URL_reference" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.url}"/>&nbsp;
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="URL_description" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.urlDescription}"/>&nbsp;
-  </td></tr>
-
-</table>
-
-</div>
-</div></div></div></div></div></div></div></div>
-
-</div>
-</div>
-<br>
-
 <a href="javascript:leftnavExpand('sectionee');">
 	<img id="excl_sectionee" src="images/bt_Expand.gif" border="0"> 
 		<span class="table_title_Admin">

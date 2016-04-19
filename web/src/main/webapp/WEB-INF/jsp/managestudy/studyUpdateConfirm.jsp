@@ -392,7 +392,7 @@
    <c:when test="${newStudy.studyParameterConfig.subjectIdGeneration == 'manual'}">
     <fmt:message key="manual_entry" bundle="${resword}"/>
    </c:when>
-    <c:when test="${newStudy.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
+    <c:when test="${newStudy.studyParameterConfig.subjectIdGeneration == 'auto-editable'}">
     <fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
    </c:when>
    <c:otherwise>

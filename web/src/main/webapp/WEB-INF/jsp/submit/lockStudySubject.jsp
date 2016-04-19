@@ -130,7 +130,7 @@
         </c:if>
     </td>
 	<c:choose>
-		<c:when test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+		<c:when test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not_used'}">
 			<td class="table_cell_top"><c:out value="${subject.uniqueIdentifier}"/></td>
 		</c:when>
 		<c:otherwise>

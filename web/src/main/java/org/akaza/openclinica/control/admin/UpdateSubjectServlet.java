@@ -164,7 +164,7 @@ public class UpdateSubjectServlet extends SpringServlet {
 				String dateToDisplay = "";
 
 				if (!"".equals(personId)) {
-					if (!"not used".equals(subjectStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+					if (!"not_used".equals(subjectStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 						personIdToDisplay = personId;
 					}
 				}
@@ -218,7 +218,7 @@ public class UpdateSubjectServlet extends SpringServlet {
 				StudyBean subjectsStudy = (StudyBean) request.getSession().getAttribute(SUBJECTS_STUDY);
 
 				subject.setUpdater(ub);
-				if (!"not used".equals(subjectsStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+				if (!"not_used".equals(subjectsStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 					subject.setUniqueIdentifier(fields.get("personId"));
 				}
 
@@ -282,7 +282,7 @@ public class UpdateSubjectServlet extends SpringServlet {
 		StudySubjectValidator studySubjectValidator = new StudySubjectValidator();
 		HashMap errors = studySubjectValidator.validate(request, getConfigurationDao(), subjectsStudy, false);
 
-		if (!"not used".equals(subjectsStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+		if (!"not_used".equals(subjectsStudy.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 			if (!fp.getString("uniqueIdentifier").isEmpty()) {
 				String uid = fp.getString("uniqueIdentifier").trim();
 				SubjectDAO sdao = new SubjectDAO(getDataSource());
@@ -320,7 +320,7 @@ public class UpdateSubjectServlet extends SpringServlet {
 		Map<String, String> fields = (HashMap<String, String>) request.getSession().getAttribute("fields");
 		FormProcessor fp = new FormProcessor(request);
 
-		if (!"not used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+		if (!"not_used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 			fields.put("personId", fp.getString("uniqueIdentifier"));
 		}
 		if ("1".equals(study.getStudyParameterConfig().getCollectDob())) {

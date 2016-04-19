@@ -22,42 +22,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Rest parameter possible values annotation.
+ * Rest EnumBasedParameters annotation holder.
  * 
- * Allows to specify possible values for certain request parameter.
+ * Allows to specify request parameters that are described in enums.
  */
-@Target({ElementType.ANNOTATION_TYPE})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface PossibleValues {
+public @interface EnumBasedParametersHolder {
 
 	/**
-	 * Method that returns name.
+	 * Method that returns annotation value.
 	 */
-	String name();
-
-	/**
-	 * Method that returns values.
-	 */
-	String values();
-
-	/**
-	 * Method that returns dependent on.
-	 */
-	String dependentOn() default "";
-
-	/**
-	 * Method that returns value descriptions.
-	 */
-	String valueDescriptions() default "";
-
-	/**
-	 * Method that returns multiValue.
-	 */
-	boolean multiValue() default false;
-
-	/**
-	 * Method that returns canBeNotSpecified.
-	 */
-	boolean canBeNotSpecified() default false;
+	EnumBasedParameters[] value();
 }

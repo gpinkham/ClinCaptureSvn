@@ -33,10 +33,11 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.BaseEnum;
 import com.clinovo.enums.StudyConfigurationParameterType;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.annotation.EnumBasedParameters;
+import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.model.wadl.Application;
@@ -51,6 +52,7 @@ import com.clinovo.rest.model.wadl.Values;
 /**
  * BaseWadlService.
  */
+@SuppressWarnings("unchecked")
 public abstract class BaseWadlService extends BaseService {
 
 	public static final String QUERY = "query";
@@ -66,9 +68,9 @@ public abstract class BaseWadlService extends BaseService {
 	private MessageSource messageSource;
 
 	private class PossibleValuesInfo {
-		String values;
-		String dependOn;
-		String valueDescriptions;
+		private String values;
+		private String dependOn;
+		private String valueDescriptions;
 	}
 
 	private String convertJavaToXMLType(Class<?> type) {
@@ -211,23 +213,28 @@ public abstract class BaseWadlService extends BaseService {
 	}
 
 	private void processMethodAnnotations(HandlerMethod handlerMethod, Method method) {
-		if (handlerMethod.getMethod().getAnnotation(EnumBasedParameters.class) != null) {
-			for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-				if (!studyConfigurationParameter.isDisabled() && !studyConfigurationParameter.isIgnoreName()
-						&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.DYNAMIC_LABEL
-						&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.GROUP) {
+		EnumBasedParametersHolder enumBasedParametersHolder = handlerMethod.getMethod()
+				.getAnnotation(EnumBasedParametersHolder.class);
+		EnumBasedParameters[] enumBasedParameters = enumBasedParametersHolder != null
+				? enumBasedParametersHolder.value()
+				: null;
+		if (enumBasedParameters != null && enumBasedParameters.length > 0) {
+			for (EnumBasedParameters enumBasedParameter : enumBasedParameters) {
+				Class<? extends BaseEnum> enumClass = enumBasedParameter.enumClass();
+				boolean useDefaultValues = enumBasedParameter.useDefaultValues();
+				for (BaseEnum baseEnum : (List<BaseEnum>) enumClass.getEnumConstants()[0].asArray()) {
 					String type = convertJavaToXMLType(String.class);
 					Param param = new Param();
-					param.setName(studyConfigurationParameter.getName());
+					param.setName(baseEnum.getName());
 					param.setStyle(QUERY);
-					param.setRequired(false);
+					param.setRequired(baseEnum.isRequired());
 					param.setType(type);
-					param.setDefaultValue(NOT_USED);
+					param.setDefaultValue(useDefaultValues ? baseEnum.getDefaultValue() : NOT_USED);
 					param.setXmlnsXs(HTTP_WWW_W3_ORG_2001_XMLSCHEMA);
-					if (studyConfigurationParameter.getType() == StudyConfigurationParameterType.SELECT
-							|| studyConfigurationParameter.getType() == StudyConfigurationParameterType.RADIO) {
+					if (baseEnum.getType() == StudyConfigurationParameterType.SELECT
+							|| baseEnum.getType() == StudyConfigurationParameterType.RADIO) {
 						Values values = new Values();
-						values.setValue(getValues(studyConfigurationParameter.getValues()));
+						values.setValue(getValues(baseEnum.getValues()));
 						param.getValuesList().add(values);
 					}
 					method.getRequest().getParamList().add(param);

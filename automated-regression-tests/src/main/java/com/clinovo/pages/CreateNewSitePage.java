@@ -41,31 +41,31 @@ public class CreateNewSitePage extends BasePage {
     @FindBy(name = "totalEnrollment")
     private WebElementFacade iExpectedTotalEnrollment;
     
-    @FindBy(name = "facName")
+    @FindBy(name = "facilityName")
     private WebElementFacade iFacilityName;
     
-    @FindBy(name = "facCity")
+    @FindBy(name = "facilityCity")
     private WebElementFacade iFacilityCity;
     
-    @FindBy(name = "facState")
+    @FindBy(name = "facilityState")
     private WebElementFacade iFacilityState;
     
-    @FindBy(name = "facZip")
+    @FindBy(name = "facilityZip")
     private WebElementFacade iFacilityZIP;
     
-    @FindBy(name = "facCountry")
+    @FindBy(name = "facilityCountry")
     private WebElementFacade iFacilityCountry;
     
-    @FindBy(name = "facConName")
+    @FindBy(name = "facilityContactName")
     private WebElementFacade iFacilityContactName;
     
-    @FindBy(name = "facConDegree")
+    @FindBy(name = "facilityContactDegree")
     private WebElementFacade iFacilityContactDegree;
     
-    @FindBy(name = "facConPhone")
+    @FindBy(name = "facilityContactPhone")
     private WebElementFacade iFacilityContactPhone;
     
-	@FindBy(name = "facConEmail")
+	@FindBy(name = "facilityContactEmail")
     private WebElementFacade iFacilityContactEmail;
     
     @FindBy(name = "statusName")

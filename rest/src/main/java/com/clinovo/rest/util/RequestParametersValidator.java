@@ -37,6 +37,7 @@ import org.springframework.web.method.HandlerMethod;
 import com.clinovo.enums.BaseEnum;
 import com.clinovo.enums.StudyConfigurationParameterType;
 import com.clinovo.rest.annotation.EnumBasedParameters;
+import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
@@ -53,7 +54,7 @@ import com.clinovo.rest.wrapper.RestRequestWrapper;
  * Method processes controller's annotations before the request finds an entry point. Method adds new parameters with
  * default values if it's necessary and if parameters were not specified.
  */
-@SuppressWarnings({"unused", "unchecked", "rawtypes"})
+@SuppressWarnings({"unused", "unchecked"})
 public final class RequestParametersValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestParametersValidator.class);
@@ -139,33 +140,36 @@ public final class RequestParametersValidator {
 		}
 	}
 
-	private static int validateEnumBasedParameters(HttpServletRequest request, MessageSource messageSource,
+	private static int validateRequestParameters(HttpServletRequest request, MessageSource messageSource,
 			HandlerMethod handler, Set<String> declaredFields, Map<String, String> declaredParams,
 			int countOfProvidedNotRequiredParameters) throws Exception {
-		Class<? extends BaseEnum> enumClass = null;
-		EnumBasedParameters enumBasedParametersAnnotation = handler.getMethod()
-				.getAnnotation(EnumBasedParameters.class);
-		if (enumBasedParametersAnnotation != null) {
-			enumClass = enumBasedParametersAnnotation.enumClass();
-		}
+		EnumBasedParametersHolder enumBasedParametersHolder = handler.getMethod()
+				.getAnnotation(EnumBasedParametersHolder.class);
+		EnumBasedParameters[] enumBasedParameters = enumBasedParametersHolder != null
+				? enumBasedParametersHolder.value()
+				: null;
 		for (String parameterName : declaredParams.values()) {
 			if (!parameterName.equals(PermissionChecker.CLIENT_VERSION) && !declaredFields.contains(parameterName)) {
-				if (enumClass != null) {
-					BaseEnum baseEnum;
-					countOfProvidedNotRequiredParameters++;
-					String parameterValue = request.getParameter(parameterName);
-					boolean hasTypo = (Boolean) enumClass.getMethod("hasTypo", String.class)
-							.invoke(enumClass.getEnumConstants()[0], parameterName);
-					if (hasTypo) {
-						throw new RestException(messageSource, "rest.thereIsTypoInTheParameter",
-								new Object[]{parameterName}, HttpServletResponse.SC_BAD_REQUEST);
+				BaseEnum baseEnum = null;
+				countOfProvidedNotRequiredParameters++;
+				String parameterValue = request.getParameter(parameterName);
+				if (enumBasedParameters != null && enumBasedParameters.length > 0) {
+					for (EnumBasedParameters enumBasedParameter : enumBasedParameters) {
+						Class<? extends BaseEnum> enumClass = enumBasedParameter.enumClass();
+						boolean hasTypo = (Boolean) enumClass.getMethod("hasTypo", String.class)
+								.invoke(enumClass.getEnumConstants()[0], parameterName);
+						if (hasTypo) {
+							throw new RestException(messageSource, "rest.thereIsTypoInTheParameter",
+									new Object[]{parameterName}, HttpServletResponse.SC_BAD_REQUEST);
+						}
+						baseEnum = (BaseEnum) enumClass.getMethod("find", String.class)
+								.invoke(enumClass.getEnumConstants()[0], parameterName);
+						if (baseEnum != null) {
+							break;
+						}
 					}
-					baseEnum = (BaseEnum) enumClass.getMethod("find", String.class)
-							.invoke(enumClass.getEnumConstants()[0], parameterName);
-					if (baseEnum == null) {
-						throw new RestException(messageSource, "rest.parameterIsNotSupported",
-								new Object[]{parameterName}, HttpServletResponse.SC_BAD_REQUEST);
-					}
+				}
+				if (baseEnum != null) {
 					if (baseEnum.getType() == StudyConfigurationParameterType.SELECT
 							|| baseEnum.getType() == StudyConfigurationParameterType.RADIO) {
 						if (!Arrays.asList(baseEnum.getValues()).contains(parameterValue)) {
@@ -182,6 +186,27 @@ public final class RequestParametersValidator {
 			}
 		}
 		return countOfProvidedNotRequiredParameters;
+	}
+
+	private static void processEnumBasedParameters(HttpServletRequest request, HandlerMethod handler) throws Exception {
+		EnumBasedParametersHolder enumBasedParametersHolder = handler.getMethod()
+				.getAnnotation(EnumBasedParametersHolder.class);
+		EnumBasedParameters[] enumBasedParameters = enumBasedParametersHolder != null
+				? enumBasedParametersHolder.value()
+				: null;
+		if (enumBasedParameters != null && enumBasedParameters.length > 0) {
+			for (EnumBasedParameters enumBasedParameter : enumBasedParameters) {
+				if (enumBasedParameter.useDefaultValues()) {
+					for (BaseEnum baseEnum : enumBasedParameter.enumClass().getEnumConstants()) {
+						String parameterName = baseEnum.getName();
+						String defaultValue = baseEnum.getDefaultValue();
+						if (request.getParameter(parameterName) == null) {
+							((RestRequestWrapper) request).addParameter(parameterName, defaultValue);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private static int validateMethodParameterAnnotations(HttpServletRequest request, MessageSource messageSource,
@@ -260,8 +285,8 @@ public final class RequestParametersValidator {
 	 *            MessageSource
 	 * @param handler
 	 *            HandlerMethod
-	 * @throws RestException
-	 *             the RestException
+	 * @throws Exception
+	 *             the Exception
 	 */
 	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
 			HandlerMethod handler) throws Exception {
@@ -276,11 +301,12 @@ public final class RequestParametersValidator {
 		}
 		fillDeclaredParams(request, declaredParams);
 		validateClientVersion(request, messageSource);
+		processEnumBasedParameters(request, handler);
 		countOfProvidedNotRequiredParameters = validateMethodParameterAnnotations(request, messageSource, handler,
 				declaredFields, declaredParams, nullParameters, countOfProvidedNotRequiredParameters);
 		validateScopeRequirement(userDetails, messageSource, handler);
 		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
-		countOfProvidedNotRequiredParameters = validateEnumBasedParameters(request, messageSource, handler,
+		countOfProvidedNotRequiredParameters = validateRequestParameters(request, messageSource, handler,
 				declaredFields, declaredParams, countOfProvidedNotRequiredParameters);
 		if (handler.getMethod().getAnnotation(ProvideAtLeastOneNotRequired.class) != null
 				&& countOfProvidedNotRequiredParameters == 0) {

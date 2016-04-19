@@ -309,7 +309,7 @@ public class AuditLogWorkbookBuilder {
 		list.add(studySubject.getDateOfBirth() != null
 				? DateUtil.printDate(studySubject.getDateOfBirth(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale())
 				: null);
-		if (!"not used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+		if (!"not_used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 			list.add(studySubject.getUniqueIdentifier());
 		}
 		list.add(studySubject.getOwner().getName());
@@ -323,7 +323,7 @@ public class AuditLogWorkbookBuilder {
 		list.add("study_subject_ID");
 		list.add("secondary_subject_ID");
 		list.add("date_of_birth");
-		if (!"not used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
+		if (!"not_used".equals(study.getStudyParameterConfig().getSubjectPersonIdRequired())) {
 			list.add("person_ID");
 		}
 		list.add("created_by");

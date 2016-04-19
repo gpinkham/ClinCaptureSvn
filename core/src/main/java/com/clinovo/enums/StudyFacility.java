@@ -14,20 +14,18 @@
  *******************************************************************************/
 package com.clinovo.enums;
 
-import com.clinovo.enums.BaseEnum;
-
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * StudyFeature.
+ * StudyFacility.
  */
-public enum StudyFeature implements BaseEnum {
+public enum StudyFacility implements BaseEnum {
 
-	CRF_ANNOTATION("crfAnnotation", "crf_annotation"), DYNAMIC_GROUP("dynamicGroup", "dynamic_group"), CALENDARED_VISITS("calendaredVisits", "calendared_visits"),
-	INTERACTIVE_DASHBOARDS("interactiveDashboards", "interactive_dashboards"), ITEM_LEVEL_SDV("itemLevelSDV", "item_level_sdv"),
-	SUBJECT_CASEBOOK_IN_PDF("subjectCasebookInPDF", "subject_casebook_in_pdf"), CRF_MASKING("crfMasking", "crfs_masking"), SAS_EXTRACTS("sasExtracts", "sas_extracts"),
-	STUDY_EVALUATOR("studyEvaluator", "study_evaluator"), RANDOMIZATION("randomization", "randomization_cap"), MEDICAL_CODING("medicalCoding", "medical_coding");
+	FACILITY_NAME("facilityName", "facility_name"), FACILITY_CITY("facilityCity", "facility_city"), FACILITY_STATE("facilityState", "facility_state_province"),
+	FACILITY_ZIP("facilityZip", "facility_ZIP"), FACILITY_COUNTRY("facilityCountry", "facility_country"),
+	FACILITY_CONTACT_NAME("facilityContactName", "facility_contact_name"), FACILITY_CONTACT_DEGREE("facilityContactDegree", "facility_contact_degree"),
+	FACILITY_CONTACT_PHONE("facilityContactPhone", "facility_contact_phone"), FACILITY_CONTACT_EMAIL("facilityContactEmail", "facility_contact_email");
 
 	private String name;
 	private String code;
@@ -36,12 +34,11 @@ public enum StudyFeature implements BaseEnum {
 	private String defaultValue;
 	private StudyConfigurationParameterType type;
 
-	StudyFeature(String name, String code) {
+	StudyFacility(String name, String code) {
 		this.name = name;
 		this.code = code;
-		defaultValue = "yes";
-		values = new String[]{"yes", "no"};
-		type = StudyConfigurationParameterType.RADIO;
+		defaultValue = "";
+		type = StudyConfigurationParameterType.TEXT;
 	}
 
 	/**
@@ -75,18 +72,18 @@ public enum StudyFeature implements BaseEnum {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<StudyFeature> asArray() {
-		return Arrays.asList(StudyFeature.values());
+	public List<StudyFacility> asArray() {
+		return Arrays.asList(StudyFacility.values());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public Object find(String name) {
-		StudyFeature result = null;
-		for (StudyFeature sttudyFeature : asArray()) {
-			if (sttudyFeature.getName().equals(name)) {
-				result = sttudyFeature;
+		StudyFacility result = null;
+		for (StudyFacility studyFacility : asArray()) {
+			if (studyFacility.getName().equals(name)) {
+				result = studyFacility;
 				break;
 			}
 		}
@@ -98,8 +95,8 @@ public enum StudyFeature implements BaseEnum {
 	 */
 	public boolean hasTypo(String name) {
 		boolean result = false;
-		for (StudyFeature studyFeature : asArray()) {
-			if (studyFeature.getName().equalsIgnoreCase(name) && !studyFeature.getName().equals(name)) {
+		for (StudyFacility studyFacility : asArray()) {
+			if (studyFacility.getName().equalsIgnoreCase(name) && !studyFacility.getName().equals(name)) {
 				result = true;
 				break;
 			}

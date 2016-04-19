@@ -31,11 +31,13 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
+import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.enums.StudyAllocation;
 import com.clinovo.enums.StudyAssignment;
 import com.clinovo.enums.StudyControl;
 import com.clinovo.enums.StudyDuration;
 import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyFacility;
 import com.clinovo.enums.StudyFeature;
 import com.clinovo.enums.StudyMasking;
 import com.clinovo.enums.StudyOrigin;
@@ -47,7 +49,6 @@ import com.clinovo.enums.StudyTiming;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.util.ValidatorUtil;
-import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudyService;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.RequestUtil;
@@ -72,12 +73,9 @@ public abstract class BaseStudyService extends BaseService {
 	@Autowired
 	private StudyConfigService studyConfigService;
 
-	@Autowired
-	private DiscrepancyDescriptionService discrepancyDescriptionService;
-
 	private void validate(StudyBean studyBean) throws Exception {
 		HashMap errors = StudyValidator.validate(getStudyDAO(), configurationDao, studyBean, null,
-				DateUtil.DatePattern.ISO_DATE);
+				DateUtil.DatePattern.ISO_DATE, true);
 		ValidatorUtil.checkForErrors(errors);
 	}
 
@@ -117,12 +115,22 @@ public abstract class BaseStudyService extends BaseService {
 				userId = userAccountBean.getId();
 			}
 		}
-		studyService.prepareStudyBean(studyBean, getCurrentUser(), StudyUtil.getStudyParametersMap(),
-				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE, LocaleResolver.getLocale());
+
+		StudyMapsHolder studyMapsHolder = new StudyMapsHolder(StudyUtil.getStudyFeaturesMap(),
+				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFacilitiesMap(),
+				StudyUtil.getStudyConfigurationParametersMap());
+
+		studyService.prepareStudyBean(studyBean, getCurrentUser(), studyMapsHolder, DateUtil.DatePattern.ISO_DATE,
+				LocaleResolver.getLocale());
+
+		studyService.prepareStudyBeanConfiguration(studyBean, studyMapsHolder.getStudyConfigurationParametersMap());
+
 		studyService.saveStudyBean(userId, studyBean, getCurrentUser(), ResourceBundleProvider.getPageMessagesBundle());
+
 		if (studyBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.studyservice.createstudy.operationFailed");
 		}
+
 		return studyBean;
 	}
 
@@ -180,12 +188,21 @@ public abstract class BaseStudyService extends BaseService {
 					studyConfigService.getParameter(studyFeature.getName(), studyBean.getStudyParameterConfig()));
 		}
 
+		for (StudyFacility studyFacility : StudyFacility.values()) {
+			prepareForValidation(studyFacility.getName(),
+					studyConfigService.getParameter(studyFacility.getName(), studyBean));
+		}
+
 		validate(studyBean);
 
-		studyService.prepareStudyBean(studyBean, getCurrentUser(), StudyUtil.getStudyParametersMap(),
-				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.ISO_DATE, LocaleResolver.getLocale());
+		StudyMapsHolder studyMapsHolder = new StudyMapsHolder(StudyUtil.getStudyFeaturesMap(),
+				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFacilitiesMap(),
+				StudyUtil.getStudyConfigurationParametersMap());
 
-		studyService.prepareStudyBeanConfiguration(studyBean, StudyUtil.getStudyConfigurationParametersMap());
+		studyService.prepareStudyBean(studyBean, getCurrentUser(), studyMapsHolder, DateUtil.DatePattern.ISO_DATE,
+				LocaleResolver.getLocale());
+
+		studyService.prepareStudyBeanConfiguration(studyBean, studyMapsHolder.getStudyConfigurationParametersMap());
 
 		studyService.updateStudy(studyBean, null, getCurrentUser());
 

@@ -158,7 +158,7 @@ public class ChangeStudyServlet extends SpringServlet {
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 		current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 		String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
-		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+		if (idSetting.equals("auto-editable") || idSetting.equals("auto-non-editable")) {
 			int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
 			request.setAttribute("label", Integer.toString(nextLabel));
 		}

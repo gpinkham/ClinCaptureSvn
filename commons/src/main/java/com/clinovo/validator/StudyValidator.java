@@ -28,11 +28,13 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyFacility;
 import com.clinovo.enums.StudyOrigin;
 import com.clinovo.enums.StudyParameter;
 import com.clinovo.enums.StudyProtocolType;
@@ -58,6 +60,23 @@ public class StudyValidator {
 	public static final int VALIDATION_NUM_1000 = 1000;
 	public static final int VALIDATION_NUM_2000 = 2000;
 
+	/**
+	 * Checks that study fields are unique.
+	 * 
+	 * @param fp
+	 *            FormProcessor
+	 * @param errors
+	 *            HashMap
+	 * @param studyDAO
+	 *            StudyDAO
+	 * @param respage
+	 *            ResourceBundle
+	 * @param resexception
+	 *            ResourceBundle
+	 * @param studyBean
+	 *            ResourceBundle
+	 * @return boolean
+	 */
 	public static boolean checkIfStudyFieldsAreUnique(FormProcessor fp, HashMap errors, StudyDAO studyDAO,
 			ResourceBundle respage, ResourceBundle resexception, StudyBean studyBean) {
 		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
@@ -93,12 +112,15 @@ public class StudyValidator {
 	 *            Map
 	 * @param datePattern
 	 *            DateUtil.DatePattern
+	 * @param validateFacilities
+	 *            boolean
 	 * @return HashMap
 	 */
 	public static HashMap validate(StudyDAO studyDao, ConfigurationDao configurationDao, StudyBean studyBean,
-			Map<String, List<DiscrepancyDescription>> dDescriptionsMap, DateUtil.DatePattern datePattern) {
+			Map<String, List<DiscrepancyDescription>> dDescriptionsMap, DateUtil.DatePattern datePattern,
+			boolean validateFacilities) {
 		return validate(new Validator(new ValidatorHelper(RequestUtil.getRequest(), configurationDao)), studyDao,
-				studyBean, dDescriptionsMap, datePattern);
+				studyBean, dDescriptionsMap, datePattern, validateFacilities);
 	}
 
 	/**
@@ -114,10 +136,13 @@ public class StudyValidator {
 	 *            Map
 	 * @param datePattern
 	 *            DateUtil.DatePattern
+	 * @param validateFacilities
+	 *            boolean
 	 * @return HashMap
 	 */
 	public static HashMap validate(Validator validator, StudyDAO studyDao, StudyBean studyBean,
-			Map<String, List<DiscrepancyDescription>> dDescriptionsMap, DateUtil.DatePattern datePattern) {
+			Map<String, List<DiscrepancyDescription>> dDescriptionsMap, DateUtil.DatePattern datePattern,
+			boolean validateFacilities) {
 		HttpServletRequest request = RequestUtil.getRequest();
 
 		HashMap errors = new HashMap();
@@ -166,6 +191,31 @@ public class StudyValidator {
 						"dnRFCDescriptionId", "dnRFCDescriptionError",
 						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 			}
+		}
+
+		if (validateFacilities) {
+			if (!StringUtil.isBlank(fp.getString(StudyFacility.FACILITY_CONTACT_EMAIL.getName()))) {
+				validator.addValidation(StudyFacility.FACILITY_CONTACT_EMAIL.getName(), Validator.IS_A_EMAIL);
+			}
+			validator.addValidation(StudyFacility.FACILITY_NAME.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
+			validator.addValidation(StudyFacility.FACILITY_CITY.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
+			validator.addValidation(StudyFacility.FACILITY_STATE.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_20);
+			validator.addValidation(StudyFacility.FACILITY_ZIP.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_64);
+			validator.addValidation(StudyFacility.FACILITY_COUNTRY.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_64);
+			validator.addValidation(StudyFacility.FACILITY_CONTACT_NAME.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
+			validator.addValidation(StudyFacility.FACILITY_CONTACT_DEGREE.getName(),
+					Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+					StudyValidator.VALIDATION_NUM_255);
+			validator.addValidation(StudyFacility.FACILITY_CONTACT_PHONE.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
+			validator.addValidation(StudyFacility.FACILITY_CONTACT_EMAIL.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 		}
 
 		if (protocolType == StudyProtocolType.INTERVENTIONAL) {

@@ -30,6 +30,15 @@
             <Duration>cross_sectional</Duration>
             <Selection>defined_population</Selection>
             <Timing>retrospective</Timing>
+            <FacilityName>NPMedic</FacilityName>
+            <FacilityCity>Austin</FacilityCity>
+            <FacilityState>TX</FacilityState>
+            <FacilityZip>54567</FacilityZip>
+            <FacilityCountry>USA</FacilityCountry>
+            <FacilityContactName>Dr. Tony Kane</FacilityContactName>
+            <FacilityContactDegree>MD</FacilityContactDegree>
+            <FacilityContactPhone>(843) 678-2390</FacilityContactPhone>
+            <FacilityContactEmail>tony.kane@npmedic.com</FacilityContactEmail>
             <Oid>OC_TEST1</Oid>
             <Parameters>
                 <CollectDob>1</CollectDob>

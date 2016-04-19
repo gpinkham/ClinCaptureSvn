@@ -319,7 +319,7 @@ public class UpdateStudySubjectServlet extends SpringServlet {
 
 	private void updateSubjectLabel(FormProcessor fp, StudySubjectBean subjectToUpdate, StudyBean currentStudy, HashMap<String, Object> errors) {
 
-		if (currentStudy.getStudyParameterConfig().getSubjectIdGeneration().equals("auto non-editable")) {
+		if (currentStudy.getStudyParameterConfig().getSubjectIdGeneration().equals("auto-non-editable")) {
 			return;
 		}
 

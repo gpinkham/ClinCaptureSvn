@@ -193,7 +193,7 @@ public class MainMenuServlet extends SpringServlet {
 				currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 				String idSetting = parentSPV.getValue();
 
-				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+				if (idSetting.equals("auto-editable") || idSetting.equals("auto-non-editable")) {
 					request.setAttribute("label", getResWord().getString("id_generated_Save_Add"));
 				}
 

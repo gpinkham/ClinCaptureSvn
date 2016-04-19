@@ -34,5 +34,5 @@ public @interface PossibleValuesHolder {
 	/**
 	 * Method that returns annotation value.
 	 */
-	PossibleValues[]value();
+	PossibleValues[] value();
 }

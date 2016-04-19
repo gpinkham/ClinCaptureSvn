@@ -162,20 +162,20 @@ public class StudyConfigService {
 		return method;
 	}
 
-	public void setParameter(String parameterName, String value, StudyParameterConfig spc) {
+	public void setParameter(String parameterName, String value, Object object) {
 		try {
-			Method method = setMethod(spc.getClass(), parameterName);
-			method.invoke(spc, value);
+			Method method = setMethod(object.getClass(), parameterName);
+			method.invoke(object, value);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
 	}
 
-	public String getParameter(String parameterName, StudyParameterConfig spc) {
+	public String getParameter(String parameterName, Object object) {
 		String parameterValue = "";
 		try {
-			Method method = getMethod(spc.getClass(), parameterName);
-			parameterValue = (String) method.invoke(spc);
+			Method method = getMethod(object.getClass(), parameterName);
+			parameterValue = (String) method.invoke(object);
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}

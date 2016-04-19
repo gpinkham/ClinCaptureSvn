@@ -74,7 +74,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 		}
 
 		if (currentStudy != null) {
-			if (!currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("not used")) {
+			if (!currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("not_used")) {
 				columnsList = "subject.uniqueIdentifier,studySubjectIdAndStudy," + columnsList;
 			} else {
 				columnsList = "studySubjectIdAndStudy," + columnsList;
@@ -89,7 +89,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
 		if (currentStudy != null
-				&& !currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("not used")) {
+				&& !currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("not_used")) {
 			configureColumn(row.getColumn("subject.uniqueIdentifier"), resword.getString("person_ID"), null, null);
 		}
 

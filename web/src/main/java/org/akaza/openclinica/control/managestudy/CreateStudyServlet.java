@@ -39,6 +39,7 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.StudyUtil;
@@ -124,10 +125,13 @@ public class CreateStudyServlet extends SpringServlet {
 		UserAccountBean currentUser = getUserAccountBean();
 
 		errors.putAll(StudyValidator.validate(getStudyDAO(), getConfigurationDao(), studyBean, null,
-				DateUtil.DatePattern.DATE));
+				DateUtil.DatePattern.DATE, false));
 
-		getStudyService().prepareStudyBean(studyBean, currentUser, StudyUtil.getStudyParametersMap(),
-				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale());
+		StudyMapsHolder studyMapsHolder = new StudyMapsHolder(StudyUtil.getStudyFeaturesMap(),
+				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFacilitiesMap());
+
+		getStudyService().prepareStudyBean(studyBean, currentUser, studyMapsHolder, DateUtil.DatePattern.DATE,
+				LocaleResolver.getLocale());
 
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");

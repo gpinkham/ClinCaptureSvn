@@ -37,7 +37,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
@@ -45,6 +44,7 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.enums.StudyConfigurationParameter;
 import com.clinovo.enums.StudyOrigin;
 import com.clinovo.enums.StudyParameter;
@@ -160,8 +160,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 			validateStudy1(fp, study, errors, v, dDescriptionsMap);
 			validateStudy2(fp, study, v);
 			validateStudy4(fp, study, errors, v);
-			validateStudy5(fp, study, errors, v);
-			validateStudy6(fp, study, errors, v);
 			confirmWholeStudy(fp, study, errors, v);
 
 			request.setAttribute("studyToView", study);
@@ -203,10 +201,14 @@ public class UpdateStudyServletNew extends SpringServlet {
 		validator.addValidation(StudyConfigurationParameter.START_DATE_TIME_LABEL.getName(), Validator.NO_BLANKS);
 		validator.addValidation(StudyConfigurationParameter.END_DATE_TIME_LABEL.getName(), Validator.NO_BLANKS);
 
-		errors.putAll(
-				StudyValidator.validate(validator, getStudyDAO(), study, dDescriptionsMap, DateUtil.DatePattern.DATE));
-		getStudyService().prepareStudyBean(study, getUserAccountBean(), StudyUtil.getStudyParametersMap(),
-				StudyUtil.getStudyFeaturesMap(), DateUtil.DatePattern.DATE, LocaleResolver.getLocale());
+		errors.putAll(StudyValidator.validate(validator, getStudyDAO(), study, dDescriptionsMap,
+				DateUtil.DatePattern.DATE, true));
+
+		StudyMapsHolder studyMapsHolder = new StudyMapsHolder(StudyUtil.getStudyFeaturesMap(),
+				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFacilitiesMap());
+
+		getStudyService().prepareStudyBean(study, getUserAccountBean(), studyMapsHolder, DateUtil.DatePattern.DATE,
+				LocaleResolver.getLocale());
 	}
 
 	private void validateStudy2(FormProcessor fp, StudyBean study, Validator v) {
@@ -239,67 +241,6 @@ public class UpdateStudyServletNew extends SpringServlet {
 
 		study.setAgeMin(fp.getString("ageMin"));
 		study.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
-	}
-
-	private void validateStudy5(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
-
-		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
-			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
-		}
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_20);
-		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM_64);
-		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_64);
-		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-
-		errors.putAll(v.validate());
-
-		study.setFacilityCity(fp.getString("facCity"));
-		study.setFacilityContactDegree(fp.getString("facConDrgree"));
-		study.setFacilityName(fp.getString("facName"));
-		study.setFacilityContactEmail(fp.getString("facConEmail"));
-		study.setFacilityContactPhone(fp.getString("facConPhone"));
-		study.setFacilityContactName(fp.getString("facConName"));
-		study.setFacilityCountry(fp.getString("facCountry"));
-		study.setFacilityContactDegree(fp.getString("facConDegree"));
-		study.setFacilityState(fp.getString("facState"));
-		study.setFacilityZip(fp.getString("facZip"));
-
-		if (!errors.isEmpty()) {
-			fp.getRequest().setAttribute("formMessages", errors);
-		}
-	}
-
-	private void validateStudy6(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {
-		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				StudyValidator.VALIDATION_NUM_255);
-		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-
-		errors.putAll(v.validate());
-
-		study.setMedlineIdentifier(fp.getString("medlineIdentifier"));
-		study.setResultsReference(fp.getBoolean("resultsReference"));
-		study.setUrl(fp.getString("url"));
-		study.setUrlDescription(fp.getString("urlDescription"));
-		if (!errors.isEmpty()) {
-			fp.getRequest().setAttribute("formMessages", errors);
-		}
 	}
 
 	private void confirmWholeStudy(FormProcessor fp, StudyBean study, HashMap errors, Validator v) {

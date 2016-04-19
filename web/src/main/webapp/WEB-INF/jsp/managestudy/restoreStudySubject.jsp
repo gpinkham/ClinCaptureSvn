@@ -59,7 +59,7 @@
 		<td class="table_cell"><c:out value="${studySub.label}"/></td>
 	</tr>
 
-	<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+	<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not_used'}">
 		<tr valign="top">
 			<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
         	<td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>

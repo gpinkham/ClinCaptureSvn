@@ -204,7 +204,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 				// set up auto study subject id
 				// If idSetting is auto, do not calculate the next
 				// available ID (label) for now
-				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+				if (idSetting.equals("auto-editable") || idSetting.equals("auto-non-editable")) {
 					String nextLabel = ssd.findNextLabel(currentStudy, studyToSearchOn);
 					fp.addPresetValue(INPUT_LABEL, nextLabel);
 				}
@@ -694,7 +694,7 @@ public class AddNewSubjectServlet extends SpringServlet {
 
 					logger.info("subject id setting :" + idSetting);
 					// set up auto study subject id
-					if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+					if (idSetting.equals("auto-editable") || idSetting.equals("auto-non-editable")) {
 						String nextLabel = ssd.findNextLabel(currentStudy, studyToSearchOn);
 						fp.addPresetValue(INPUT_LABEL, nextLabel);
 					}

@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.enums.StudyAllocation;
 import com.clinovo.enums.StudyAssignment;
 import com.clinovo.enums.StudyConfigurationParameter;
@@ -49,6 +50,7 @@ import com.clinovo.enums.StudyConfigurationParameterType;
 import com.clinovo.enums.StudyControl;
 import com.clinovo.enums.StudyDuration;
 import com.clinovo.enums.StudyEndPoint;
+import com.clinovo.enums.StudyFacility;
 import com.clinovo.enums.StudyFeature;
 import com.clinovo.enums.StudyMasking;
 import com.clinovo.enums.StudyParameter;
@@ -277,7 +279,7 @@ public class StudyServiceImpl implements StudyService {
 	public void dropItemLevelSDVConfig(int studyId) {
 
 		List<StudyEventDefinitionBean> studyEventDefBeans = getStudyEventDefDAO().findAllByStudy(studyId);
-		for (StudyEventDefinitionBean eventDefinition: studyEventDefBeans) {
+		for (StudyEventDefinitionBean eventDefinition : studyEventDefBeans) {
 			eventDefinitionService.dropItemLevelSDVConfig(eventDefinition);
 		}
 	}
@@ -301,9 +303,12 @@ public class StudyServiceImpl implements StudyService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public StudyBean prepareStudyBean(StudyBean studyBean, UserAccountBean currentUser,
-			Map<String, String> parametersMap, Map<String, String> featuresMap, DateUtil.DatePattern datePattern,
-			Locale locale) {
+	public StudyBean prepareStudyBean(StudyBean studyBean, UserAccountBean currentUser, StudyMapsHolder studyMapsHolder,
+			DateUtil.DatePattern datePattern, Locale locale) {
+		Map<String, String> featuresMap = studyMapsHolder.getStudyFeaturesMap();
+		Map<String, String> facilitiesMap = studyMapsHolder.getStudyFacilitiesMap();
+		Map<String, String> parametersMap = studyMapsHolder.getStudyParametersMap();
+
 		studyBean.setName(parametersMap.get(StudyParameter.STUDY_NAME.getName()));
 		studyBean.setBriefTitle(parametersMap.get(StudyParameter.BRIEF_TITLE.getName()));
 		studyBean.setSummary(parametersMap.get(StudyParameter.SUMMARY.getName()));
@@ -355,6 +360,9 @@ public class StudyServiceImpl implements StudyService {
 
 		// Features
 		setFeatures(studyBean, featuresMap);
+
+		// Facilities
+		setFacilities(studyBean, facilitiesMap);
 
 		return studyBean;
 	}
@@ -638,13 +646,20 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
+	private void setFacilities(StudyBean studyBean, Map<String, String> facilitiesMap) {
+		for (StudyFacility studyFacility : StudyFacility.values()) {
+			studyConfigService.setParameter(studyFacility.getName(), facilitiesMap.get(studyFacility.getName()),
+					studyBean);
+		}
+	}
+
 	private void setConfigurationParameters(StudyBean studyBean, Map<String, String> configurationParametersMap) {
 		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
 			if (studyConfigurationParameter.getType() != StudyConfigurationParameterType.GROUP
 					&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.DYNAMIC_LABEL
 					&& !studyConfigurationParameter.isSkip()) {
 				if (studyConfigurationParameter == StudyConfigurationParameter.DISCREPANCY_MANAGEMENT
-						&& studyBean.getStatus().isLocked()) {
+						&& studyBean.getStatus() != null && studyBean.getStatus().isLocked()) {
 					studyBean.getStudyParameterConfig().setDiscrepancyManagement("false");
 				} else {
 					String parameterName = studyConfigurationParameter.getName();

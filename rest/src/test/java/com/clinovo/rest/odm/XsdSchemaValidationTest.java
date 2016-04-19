@@ -201,6 +201,15 @@ public class XsdSchemaValidationTest {
 				StudySelection.DEFINED_POPULATION.getValue());
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getTimingKey(),
 				StudyTiming.RETROSPECTIVE.getValue());
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), "NPMedic");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCity(), "Austin");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityState(), "TX");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityZip(), "54567");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCountry(), "USA");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactName(), "Dr. Tony Kane");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactDegree(), "MD");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), "(843) 678-2390");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), "tony.kane@npmedic.com");
 		marshal(restOdmContainer.getRestData().getStudyBean());
 		assertNotNull(restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig());
 		assertEquals(

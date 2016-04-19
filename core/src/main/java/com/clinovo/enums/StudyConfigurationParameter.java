@@ -14,13 +14,14 @@
  *******************************************************************************/
 package com.clinovo.enums;
 
+import com.clinovo.enums.BaseEnum;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * StudyConfigurationParameter.
  */
-@SuppressWarnings("rawtypes")
 public enum StudyConfigurationParameter implements BaseEnum {
 
 	// Study Parameters
@@ -116,8 +117,10 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	private String code;
 	private boolean skip;
 	private String[] values;
+	private boolean required;
 	private boolean disabled;
 	private boolean ignoreName;
+	private String defaultValue;
 	private String[] valueCodes;
 	private String dynamicLabelId;
 	private String maxLength = "";
@@ -287,6 +290,9 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		return name;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getCode() {
 		return code;
 	}
@@ -388,6 +394,9 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		return list;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public StudyConfigurationParameter find(String name) {
 		StudyConfigurationParameter result = null;
 		for (StudyConfigurationParameter studyConfigurationParameter : asArray()) {
@@ -399,6 +408,9 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean hasTypo(String name) {
 		boolean result = false;
 		for (StudyConfigurationParameter studyConfigurationParameter : asArray()) {
@@ -409,5 +421,19 @@ public enum StudyConfigurationParameter implements BaseEnum {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isRequired() {
+		return required;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getDefaultValue() {
+		return defaultValue;
 	}
 }

@@ -19,17 +19,73 @@ import java.util.List;
 /**
  * BaseEnum.
  */
-public interface BaseEnum<T> {
+@SuppressWarnings("rawtypes")
+public interface BaseEnum {
 
-	T getType();
+	/**
+	 * Returns StudyConfigurationParameterType.
+	 * 
+	 * @return StudyConfigurationParameterType
+	 */
+	StudyConfigurationParameterType getType();
 
+	/**
+	 * Returns enum name.
+	 * 
+	 * @return String
+	 */
 	String getName();
 
-	List<T> asArray();
+	/**
+	 * Returns enum code for translation.
+	 * 
+	 * @return String
+	 */
+	String getCode();
 
-	T find(String name);
+	/**
+	 * Returns list of enum objects.
+	 * 
+	 * @return List
+	 */
+	List asArray();
 
+	/**
+	 * Finds enum object by name.
+	 * 
+	 * @param name
+	 *            String
+	 * @return Object
+	 */
+	Object find(String name);
+
+	/**
+	 * Retusn enum object values.
+	 * 
+	 * @return String[]
+	 */
 	String[] getValues();
 
+	/**
+	 * Returns true if name has typo.
+	 * 
+	 * @param name
+	 *            String
+	 * @return boolean
+	 */
 	boolean hasTypo(String name);
+
+	/**
+	 * Returns true if it is required.
+	 * 
+	 * @return boolean
+	 */
+	boolean isRequired();
+
+	/**
+	 * Returns default value.
+	 * 
+	 * @return String
+	 */
+	String getDefaultValue();
 }

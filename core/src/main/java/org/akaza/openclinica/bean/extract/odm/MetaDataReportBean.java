@@ -1240,7 +1240,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 + nls);
         xml.append(currentIndent + indent + indent + "</Decode>" + nls);
         xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
-        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not used"
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used"
                 + "\">" + nls);
         xml.append(currentIndent + indent + indent + "<Decode>" + nls);
         xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Not Used" + "</TranslatedText>"
@@ -1275,14 +1275,14 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(currentIndent + indent + indent + "</Decode>" + nls);
         xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
         xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\""
-                + "auto editable" + "\">" + nls);
+                + "auto-editable" + "\">" + nls);
         xml.append(currentIndent + indent + indent + "<Decode>" + nls);
         xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Auto-generated and Editable"
                 + "</TranslatedText>" + nls);
         xml.append(currentIndent + indent + indent + "</Decode>" + nls);
         xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
         xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\""
-                + "auto non-editable" + "\">" + nls);
+                + "auto-non-editable" + "\">" + nls);
         xml.append(currentIndent + indent + indent + "<Decode>" + nls);
         xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Auto-generated and Non-editable"
                 + "</TranslatedText>" + nls);

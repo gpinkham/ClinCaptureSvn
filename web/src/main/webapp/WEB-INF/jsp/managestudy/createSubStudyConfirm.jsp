@@ -327,7 +327,7 @@
 							<c:when test="${config.value.value == 'manual'}">
 								<fmt:message key="manual_entry" bundle="${resword}" />
 							</c:when>
-							<c:when test="${config.value.value == 'auto editable'}">
+							<c:when test="${config.value.value == 'auto-editable'}">
 								<fmt:message key="auto_generated_and_editable" bundle="${resword}" />
 							</c:when>
 							<c:otherwise>

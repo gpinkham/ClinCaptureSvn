@@ -121,7 +121,7 @@ public class CasebooksController extends SpringController {
 				.getValue().equalsIgnoreCase("true");
 		boolean personIdRequired = !studyParameterValueDao
 				.findByHandleAndStudy(studyBean.getId(), "subjectPersonIdRequired").getValue()
-				.equalsIgnoreCase("not used")
+				.equalsIgnoreCase("not_used")
 				&& !studyParameterValueDao.findByHandleAndStudy(studyBean.getId(), "subjectPersonIdRequired").getValue()
 						.isEmpty();
 		boolean copyPersonIdFromStudySubId = studyParameterValueDao

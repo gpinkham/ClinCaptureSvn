@@ -165,6 +165,7 @@ public abstract class BaseSpringController {
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String STUDY_FEATURES = "studyFeatures";
 	public static final String SESSION_MANAGER = "sessionManager";
+	public static final String STUDY_FACILITIES= "studyFacilities";
 	public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
 	public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
 	public static final String RESTORE_SESSION_FLAG = "restoreSessionFlag";

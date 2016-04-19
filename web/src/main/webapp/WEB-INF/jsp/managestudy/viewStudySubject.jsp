@@ -241,7 +241,7 @@
 							</td>
 							<td class="table_cell_br">
 								<c:choose>
-									<c:when test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+									<c:when test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not_used'}">
 										<c:out value="${subject.uniqueIdentifier}"/>
 									</c:when>
 									<c:otherwise>

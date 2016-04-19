@@ -159,28 +159,28 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		if (!StringUtil.isBlank(fp.getString(INPUT_APPROVAL_DATE))) {
 			v.addValidation(INPUT_APPROVAL_DATE, Validator.IS_A_DATE);
 		}
-		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
-			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
+		if (!StringUtil.isBlank(fp.getString("facilityContactEmail"))) {
+			v.addValidation("facilityContactEmail", Validator.IS_A_EMAIL);
 		}
 		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				255);
-		v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				255);
-		v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON,
+		v.addValidation("facilityName", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facilityCity", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("facilityState", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
-		v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				64);
-		v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON,
+		v.addValidation("facilityZip", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-		v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON,
+		v.addValidation("facilityCountry", Validator.LENGTH_NUMERIC_COMPARISON,
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
+		v.addValidation("facilityContactName", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON,
+		v.addValidation("facilityContactDegree", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON,
+		v.addValidation("facilityContactPhone", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
+		v.addValidation("facilityContactEmail", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("siteName", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -262,17 +262,16 @@ public class UpdateSubStudyServlet extends SpringServlet {
 		} catch (IllegalArgumentException ex) {
 			//
 		}
-		study.setFacilityCity(fp.getString("facCity"));
-		study.setFacilityContactDegree(fp.getString("facConDrgree"));
-		study.setFacilityName(fp.getString("facName"));
-		study.setFacilityContactEmail(fp.getString("facConEmail"));
-		study.setFacilityContactPhone(fp.getString("facConPhone"));
-		study.setFacilityContactName(fp.getString("facConName"));
-		study.setFacilityContactDegree(fp.getString("facConDegree"));
-		study.setFacilityCountry(fp.getString("facCountry"));
+		study.setFacilityCity(fp.getString("facilityCity"));
+		study.setFacilityName(fp.getString("facilityName"));
+		study.setFacilityContactEmail(fp.getString("facilityContactEmail"));
+		study.setFacilityContactPhone(fp.getString("facilityContactPhone"));
+		study.setFacilityContactName(fp.getString("facilityContactName"));
+		study.setFacilityContactDegree(fp.getString("facilityContactDegree"));
+		study.setFacilityCountry(fp.getString("facilityCountry"));
 		study.setFacilityRecruitmentStatus(fp.getString("facRecStatus"));
-		study.setFacilityState(fp.getString("facState"));
-		study.setFacilityZip(fp.getString("facZip"));
+		study.setFacilityState(fp.getString("facilityState"));
+		study.setFacilityZip(fp.getString("facilityZip"));
 		study.setStatus(Status.get(fp.getInt("statusId")));
 
 		study.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));

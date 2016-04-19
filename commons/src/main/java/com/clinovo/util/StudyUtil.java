@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.akaza.openclinica.control.form.FormProcessor;
 
 import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyFacility;
 import com.clinovo.enums.StudyFeature;
 import com.clinovo.enums.StudyParameter;
 
@@ -33,6 +34,11 @@ public final class StudyUtil {
 	private StudyUtil() {
 	}
 
+	/**
+	 * Returns study features map.
+	 * 
+	 * @return Map
+	 */
 	public static Map<String, String> getStudyFeaturesMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
@@ -43,6 +49,26 @@ public final class StudyUtil {
 		return map;
 	}
 
+	/**
+	 * Returns study facilities map.
+	 *
+	 * @return Map
+	 */
+	public static Map<String, String> getStudyFacilitiesMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
+		for (StudyFacility studyFacility : StudyFacility.values()) {
+			String facilityName = studyFacility.getName();
+			map.put(facilityName, fp.getString(facilityName));
+		}
+		return map;
+	}
+
+	/**
+	 * Returns study parameters map.
+	 * 
+	 * @return Map
+	 */
 	public static Map<String, String> getStudyParametersMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		FormProcessor fp = new FormProcessor(RequestUtil.getRequest());
@@ -53,6 +79,11 @@ public final class StudyUtil {
 		return map;
 	}
 
+	/**
+	 * Returns study configuration parameters map.
+	 * 
+	 * @return Map
+	 */
 	public static Map<String, String> getStudyConfigurationParametersMap() {
 		HttpServletRequest request = RequestUtil.getRequest();
 		FormProcessor fp = new FormProcessor(request);

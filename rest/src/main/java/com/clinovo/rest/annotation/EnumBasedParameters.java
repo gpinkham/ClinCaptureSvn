@@ -27,14 +27,18 @@ import com.clinovo.enums.BaseEnum;
  *
  * Typically is used for methods where scope is not required.
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@SuppressWarnings("rawtypes")
 public @interface EnumBasedParameters {
 
 	/**
 	 * Method that returns enumClass.
 	 */
 	Class<? extends BaseEnum> enumClass();
+
+	/**
+	 * Method that returns useDefaultValues.
+	 */
+	boolean useDefaultValues() default false;
 }

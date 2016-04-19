@@ -20,14 +20,16 @@ import java.util.List;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clinovo.enums.StudyConfigurationParameter;
+import com.clinovo.enums.StudyFacility;
+import com.clinovo.enums.StudyFeature;
 import com.clinovo.rest.annotation.EnumBasedParameters;
+import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
@@ -42,9 +44,6 @@ import com.clinovo.rest.service.base.BaseStudyService;
 public class StudyService extends BaseStudyService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyService.class);
-
-	@Autowired
-	private com.clinovo.service.StudyService studyService;
 
 	/**
 	 * Create study.
@@ -101,32 +100,13 @@ public class StudyService extends BaseStudyService {
 	 *            Integer
 	 * @param userName
 	 *            String
-	 * @param crfAnnotation
-	 *            String
-	 * @param dynamicGroup
-	 *            String
-	 * @param calendaredVisits
-	 *            String
-	 * @param interactiveDashboards
-	 *            String
-	 * @param itemLevelSDV
-	 *            String
-	 * @param subjectCasebookInPDF
-	 *            String
-	 * @param crfMasking
-	 *            String
-	 * @param sasExtracts
-	 *            String
-	 * @param studyEvaluator
-	 *            String
-	 * @param randomization
-	 *            String
-	 * @param medicalCoding
-	 *            String
 	 * @return StudyBean
 	 * @throws Exception
 	 *             an Exception
 	 */
+	@EnumBasedParametersHolder({@EnumBasedParameters(enumClass = StudyFacility.class, useDefaultValues = true),
+			@EnumBasedParameters(enumClass = StudyFeature.class, useDefaultValues = true),
+			@EnumBasedParameters(enumClass = StudyConfigurationParameter.class)})
 	@PossibleValuesHolder({
 			@PossibleValues(name = "protocolType", values = "0,1", valueDescriptions = "rest.protocolType.valueDescription"),
 			@PossibleValues(name = "phase", values = "0,1,2,3,4,5,6,7,8,9,10,11,12,13", valueDescriptions = "rest.phase.valueDescription"),
@@ -138,18 +118,7 @@ public class StudyService extends BaseStudyService {
 			@PossibleValues(name = "masking", canBeNotSpecified = true, values = "0,1,2,3", valueDescriptions = "rest.masking.valueDescription"),
 			@PossibleValues(name = "control", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.control.valueDescription"),
 			@PossibleValues(name = "assignment", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.assignment.valueDescription"),
-			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription"),
-			@PossibleValues(name = "crfAnnotation", values = "yes,no"),
-			@PossibleValues(name = "dynamicGroup", values = "yes,no"),
-			@PossibleValues(name = "calendaredVisits", values = "yes,no"),
-			@PossibleValues(name = "interactiveDashboards", values = "yes,no"),
-			@PossibleValues(name = "itemLevelSDV", values = "yes,no"),
-			@PossibleValues(name = "subjectCasebookInPDF", values = "yes,no"),
-			@PossibleValues(name = "crfMasking", values = "yes,no"),
-			@PossibleValues(name = "sasExtracts", values = "yes,no"),
-			@PossibleValues(name = "studyEvaluator", values = "yes,no"),
-			@PossibleValues(name = "randomization", values = "yes,no"),
-			@PossibleValues(name = "medicalCoding", values = "yes,no")})
+			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription")})
 	@RequestMapping(value = "/study/create", method = RequestMethod.POST)
 	public StudyBean createStudy(@RequestParam(value = "studyName") String studyName,
 			@RequestParam(value = "briefTitle", required = false, defaultValue = "") String briefTitle,
@@ -175,19 +144,7 @@ public class StudyService extends BaseStudyService {
 			@RequestParam(value = "control", required = false) Integer control,
 			@RequestParam(value = "assignment", required = false) Integer assignment,
 			@RequestParam(value = "endPoint", required = false) Integer endPoint,
-			@RequestParam(value = "userName", required = false) String userName,
-			@RequestParam(value = "crfAnnotation", required = false, defaultValue = "yes") String crfAnnotation,
-			@RequestParam(value = "dynamicGroup", required = false, defaultValue = "yes") String dynamicGroup,
-			@RequestParam(value = "calendaredVisits", required = false, defaultValue = "yes") String calendaredVisits,
-			@RequestParam(value = "interactiveDashboards", required = false, defaultValue = "yes") String interactiveDashboards,
-			@RequestParam(value = "itemLevelSDV", required = false, defaultValue = "yes") String itemLevelSDV,
-			@RequestParam(value = "subjectCasebookInPDF", required = false, defaultValue = "yes") String subjectCasebookInPDF,
-			@RequestParam(value = "crfMasking", required = false, defaultValue = "yes") String crfMasking,
-			@RequestParam(value = "sasExtracts", required = false, defaultValue = "yes") String sasExtracts,
-			@RequestParam(value = "studyEvaluator", required = false, defaultValue = "yes") String studyEvaluator,
-			@RequestParam(value = "randomization", required = false, defaultValue = "yes") String randomization,
-			@RequestParam(value = "medicalCoding", required = false, defaultValue = "yes") String medicalCoding)
-					throws Exception {
+			@RequestParam(value = "userName", required = false) String userName) throws Exception {
 		return saveStudyBean(userName);
 	}
 
@@ -246,34 +203,14 @@ public class StudyService extends BaseStudyService {
 	 *            Integer
 	 * @param endPoint
 	 *            Integer
-	 * @param crfAnnotation
-	 *            String
-	 * @param dynamicGroup
-	 *            String
-	 * @param calendaredVisits
-	 *            String
-	 * @param interactiveDashboards
-	 *            String
-	 * @param itemLevelSDV
-	 *            String
-	 * @param subjectCasebookInPDF
-	 *            String
-	 * @param crfMasking
-	 *            String
-	 * @param sasExtracts
-	 *            String
-	 * @param studyEvaluator
-	 *            String
-	 * @param randomization
-	 *            String
-	 * @param medicalCoding
-	 *            String
 	 * @return StudyBean
 	 * @throws Exception
 	 *             an Exception
 	 */
 	@ProvideAtLeastOneNotRequired
-	@EnumBasedParameters(enumClass = StudyConfigurationParameter.class)
+	@EnumBasedParametersHolder({@EnumBasedParameters(enumClass = StudyFacility.class),
+			@EnumBasedParameters(enumClass = StudyFeature.class),
+			@EnumBasedParameters(enumClass = StudyConfigurationParameter.class)})
 	@PossibleValuesHolder({
 			@PossibleValues(name = "protocolType", canBeNotSpecified = true, values = "0,1", valueDescriptions = "rest.protocolType.valueDescription"),
 			@PossibleValues(name = "phase", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8,9,10,11,12,13", valueDescriptions = "rest.phase.valueDescription"),
@@ -285,18 +222,7 @@ public class StudyService extends BaseStudyService {
 			@PossibleValues(name = "masking", canBeNotSpecified = true, values = "0,1,2,3", valueDescriptions = "rest.masking.valueDescription"),
 			@PossibleValues(name = "control", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.control.valueDescription"),
 			@PossibleValues(name = "assignment", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.assignment.valueDescription"),
-			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription"),
-			@PossibleValues(name = "crfAnnotation", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "dynamicGroup", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "calendaredVisits", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "interactiveDashboards", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "itemLevelSDV", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "subjectCasebookInPDF", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "crfMasking", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "sasExtracts", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "studyEvaluator", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "randomization", canBeNotSpecified = true, values = "yes,no"),
-			@PossibleValues(name = "medicalCoding", canBeNotSpecified = true, values = "yes,no")})
+			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription")})
 	@RequestMapping(value = "/study/edit", method = RequestMethod.POST)
 	public StudyBean editStudy(@RequestParam("studyId") int studyId,
 			@RequestParam(value = "studyName", required = false) String studyName,
@@ -323,18 +249,7 @@ public class StudyService extends BaseStudyService {
 			@RequestParam(value = "masking", required = false) Integer masking,
 			@RequestParam(value = "control", required = false) Integer control,
 			@RequestParam(value = "assignment", required = false) Integer assignment,
-			@RequestParam(value = "endPoint", required = false) Integer endPoint,
-			@RequestParam(value = "crfAnnotation", required = false) String crfAnnotation,
-			@RequestParam(value = "dynamicGroup", required = false) String dynamicGroup,
-			@RequestParam(value = "calendaredVisits", required = false) String calendaredVisits,
-			@RequestParam(value = "interactiveDashboards", required = false) String interactiveDashboards,
-			@RequestParam(value = "itemLevelSDV", required = false) String itemLevelSDV,
-			@RequestParam(value = "subjectCasebookInPDF", required = false) String subjectCasebookInPDF,
-			@RequestParam(value = "crfMasking", required = false) String crfMasking,
-			@RequestParam(value = "sasExtracts", required = false) String sasExtracts,
-			@RequestParam(value = "studyEvaluator", required = false) String studyEvaluator,
-			@RequestParam(value = "randomization", required = false) String randomization,
-			@RequestParam(value = "medicalCoding", required = false) String medicalCoding) throws Exception {
+			@RequestParam(value = "endPoint", required = false) Integer endPoint) throws Exception {
 		return updateStudyBean(studyId);
 	}
 

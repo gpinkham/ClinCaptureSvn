@@ -102,7 +102,7 @@ public class StudySubjectValidator {
 		if (study.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")) {
 			v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.NO_BLANKS);
 		}
-		if (!study.getStudyParameterConfig().getSubjectPersonIdRequired().equals("not used")) {
+		if (!study.getStudyParameterConfig().getSubjectPersonIdRequired().equals("not_used")) {
 			v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
 		}

@@ -93,7 +93,7 @@ public class SubjectTransferValidator implements Validator {
 		StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(
 				handleStudyId, "subjectIdGeneration");
 		idSetting = subjectIdGenerationParameter.getValue();
-		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+		if (idSetting.equals("auto-editable") || idSetting.equals("auto-non-editable")) {
 			int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
 			subjectTransferBean.setStudySubjectId(Integer.toString(nextLabel));
 		}

@@ -48,8 +48,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "origin", "briefTitle", "summary",
 		"startDate", "endDate", "approvalDate", "detailedDescription", "phase", "totalEnrollment", "sponsor",
 		"collaborators", "officialTitle", "secondaryIDs", "principalInvestigator", "purpose", "allocation", "masking",
-		"control", "interventionModel", "classification", "duration", "selection", "timing", "status", "parameters",
-		"features"})
+		"control", "interventionModel", "classification", "duration", "selection", "timing", "facilityName",
+		"facilityCity", "facilityState", "facilityZip", "facilityCountry", "facilityContactName",
+		"facilityContactDegree", "facilityContactPhone", "facilityContactEmail", "status", "parameters", "features"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyBean extends AuditableEntityBean {
 
@@ -114,17 +115,6 @@ public class StudyBean extends AuditableEntityBean {
 	@JsonProperty("principalInvestigator")
 	@XmlElement(name = "PrincipalInvestigator", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String principalInvestigator = "";
-
-	private String facilityName = "";
-	private String facilityCity = "";
-	private String facilityState = "";
-	private String facilityZip = "";
-	private String facilityCountry = "";
-	private String facilityRecruitmentStatus = "";
-	private String facilityContactName = "";
-	private String facilityContactDegree = "";
-	private String facilityContactPhone = "";
-	private String facilityContactEmail = "";
 	@JsonProperty("protocolType")
 	@XmlElement(name = "ProtocolType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String protocolType = "";
@@ -189,6 +179,35 @@ public class StudyBean extends AuditableEntityBean {
 	@JsonProperty("timing")
 	@XmlElement(name = "Timing", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String timing = "";
+
+	@JsonProperty("facilityName")
+	@XmlElement(name = "FacilityName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityName = "";
+	@JsonProperty("facilityCity")
+	@XmlElement(name = "FacilityCity", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityCity = "";
+	@JsonProperty("facilityState")
+	@XmlElement(name = "FacilityState", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityState = "";
+	@JsonProperty("facilityZip")
+	@XmlElement(name = "FacilityZip", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityZip = "";
+	@JsonProperty("facilityCountry")
+	@XmlElement(name = "FacilityCountry", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityCountry = "";
+	@JsonProperty("facilityContactName")
+	@XmlElement(name = "FacilityContactName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityContactName = "";
+	@JsonProperty("facilityContactDegree")
+	@XmlElement(name = "FacilityContactDegree", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityContactDegree = "";
+	@JsonProperty("facilityContactPhone")
+	@XmlElement(name = "FacilityContactPhone", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityContactPhone = "";
+	@JsonProperty("facilityContactEmail")
+	@XmlElement(name = "FacilityContactEmail", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String facilityContactEmail = "";
+	private String facilityRecruitmentStatus = "";
 
 	@JsonProperty("oid")
 	@XmlElement(name = "Oid", namespace = "http://www.cdisc.org/ns/odm/v1.3")

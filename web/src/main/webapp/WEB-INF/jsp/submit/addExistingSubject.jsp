@@ -135,7 +135,7 @@
 				<tr>
 					<td valign="top"><div class="formfieldXL_BG">
 					  <c:choose>
-						 <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+						 <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto-non-editable'}">
 						  <input type="text" value="<c:out value="${label}"/>" size="45" class="formfield" disabled>
 						  <input type="hidden" name="label" value="<c:out value="${label}"/>">
 						 </c:when>

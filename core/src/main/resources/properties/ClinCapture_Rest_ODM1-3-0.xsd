@@ -219,6 +219,15 @@
     <xs:element name="Duration" type="xs:string"/>
     <xs:element name="Selection" type="xs:string"/>
     <xs:element name="Timing" type="xs:string"/>
+    <xs:element name="FacilityName" type="xs:string"/>
+    <xs:element name="FacilityCity" type="xs:string"/>
+    <xs:element name="FacilityState" type="xs:string"/>
+    <xs:element name="FacilityZip" type="xs:string"/>
+    <xs:element name="FacilityCountry" type="xs:string"/>
+    <xs:element name="FacilityContactName" type="xs:string"/>
+    <xs:element name="FacilityContactDegree" type="xs:string"/>
+    <xs:element name="FacilityContactPhone" type="xs:string"/>
+    <xs:element name="FacilityContactEmail" type="xs:string"/>
 
     <xs:complexType name="studyBean">
         <xs:sequence>
@@ -250,6 +259,15 @@
             <xs:element ref="Duration" minOccurs="0"/>
             <xs:element ref="Selection" minOccurs="0"/>
             <xs:element ref="Timing" minOccurs="0"/>
+            <xs:element ref="FacilityName" minOccurs="0"/>
+            <xs:element ref="FacilityCity" minOccurs="0"/>
+            <xs:element ref="FacilityState" minOccurs="0"/>
+            <xs:element ref="FacilityZip" minOccurs="0"/>
+            <xs:element ref="FacilityCountry" minOccurs="0"/>
+            <xs:element ref="FacilityContactName" minOccurs="0"/>
+            <xs:element ref="FacilityContactDegree" minOccurs="0"/>
+            <xs:element ref="FacilityContactPhone" minOccurs="0"/>
+            <xs:element ref="FacilityContactEmail" minOccurs="0"/>
             <xs:element ref="Oid" minOccurs="0"/>
             <xs:element ref="Parameters" minOccurs="0"/>
             <xs:element ref="Features" minOccurs="0"/>

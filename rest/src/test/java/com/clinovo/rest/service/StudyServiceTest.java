@@ -103,6 +103,70 @@ public class StudyServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatCreateStudyMethodThrowsExceptionIfFacilityNameParameterHasATypo() throws Exception {
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("protocolId", newProtocolId)
+				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
+				.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-01-20").param("endDate", "2017-01-20").param("fAcilityName", "bla bla"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCreateStudyMethodThrowsExceptionIfFacilityContactEmailParameterHasWrongValue()
+			throws Exception {
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("protocolId", newProtocolId)
+				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
+				.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-01-20").param("endDate", "2017-01-20")
+				.param("facilityContactEmail", "blaX!#@")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCreateStudyMethodThrowsExceptionIfSubjectPersonIdRequiredHasATypo() throws Exception {
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("protocolId", newProtocolId)
+				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
+				.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-01-20").param("endDate", "2017-01-20")
+				.param("subjectPersONIdRequired", "copyFromSSID")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCreateStudyMethodThrowsExceptionIfSubjectPersonIdRequiredHasWrongValue() throws Exception {
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("protocolId", newProtocolId)
+				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
+				.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-01-20").param("endDate", "2017-01-20")
+				.param("subjectPersonIdRequired", "xxx")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCreateStudyMethodIsAbleToSetSubjectPersonIdRequiredParameter() throws Exception {
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName).param("protocolId", newProtocolId)
+				.param("protocolType", "0").param("summary", "bla bla").param("principalInvestigator", "test")
+				.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-01-20").param("endDate", "2017-01-20")
+				.param("subjectPersonIdRequired", "copyFromSSID")).andExpect(status().isOk());
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		studyConfigService.setParametersForStudy(studyBean);
+		studyBean.getStudyParameterConfig().getSubjectPersonIdRequired().equals("copyFromSSID");
+	}
+
+	@Test
 	public void testThatCreateStudyMethodWorksFine() throws Exception {
 		int newTotalEnrollment = 12;
 		String newStudyName = "s_".concat(Long.toString(timestamp));
@@ -127,7 +191,65 @@ public class StudyServiceTest extends BaseServiceTest {
 				assertEquals(studyConfigService.getParameter(studyFeature.getName(),
 						restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig()), "yes");
 			}
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCity(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityState(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityZip(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCountry(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactName(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactDegree(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), "");
 		}
+	}
+
+	@Test
+	public void testThatCreateStudyMethodisAbleToSetFacilityParametersCorrectly() throws Exception {
+		int newTotalEnrollment = 12;
+		String facilityName = "NPMedic";
+		String facilityCity = "Austin";
+		String facilityState = "TX";
+		String facilityZip = "54567";
+		String facilityCountry = "USA";
+		String facilityContactName = "Dr. Tony Kane";
+		String facilityContactDegree = "MD";
+		String facilityContactPhone = "(843) 678-2390";
+		String facilityContactEmail = "tony.kane@npmedic.com";
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		result = mockMvc.perform(post(API_STUDY_CREATE).param("studyName", newStudyName)
+				.param("protocolId", newProtocolId).param("protocolType", "0").param("summary", "bla bla")
+				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
+				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20")
+				.param("endDate", "2017-01-20").param("facilityName", facilityName).param("facilityCity", facilityCity)
+				.param("facilityState", facilityState).param("facilityZip", facilityZip)
+				.param("facilityCountry", facilityCountry).param("facilityContactName", facilityContactName)
+				.param("facilityContactDegree", facilityContactDegree)
+				.param("facilityContactPhone", facilityContactPhone)
+				.param("facilityContactEmail", facilityContactEmail)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), facilityName);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCity(), facilityCity);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityState(), facilityState);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityZip(), facilityZip);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCountry(), facilityCountry);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactName(), facilityContactName);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactDegree(),
+					facilityContactDegree);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), facilityContactPhone);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), facilityContactEmail);
+		}
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		assertEquals(studyBean.getFacilityName(), facilityName);
+		assertEquals(studyBean.getFacilityCity(), facilityCity);
+		assertEquals(studyBean.getFacilityState(), facilityState);
+		assertEquals(studyBean.getFacilityZip(), facilityZip);
+		assertEquals(studyBean.getFacilityCountry(), facilityCountry);
+		assertEquals(studyBean.getFacilityContactName(), facilityContactName);
+		assertEquals(studyBean.getFacilityContactDegree(), facilityContactDegree);
+		assertEquals(studyBean.getFacilityContactPhone(), facilityContactPhone);
+		assertEquals(studyBean.getFacilityContactEmail(), facilityContactEmail);
 	}
 
 	@Test
@@ -560,6 +682,14 @@ public class StudyServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatEditStudyMethodThrowsExceptionIfFacilityNameParameterHasATypo() throws Exception {
+		createNewSite(currentScope.getId());
+		mockMvc.perform(
+				post(API_STUDY_EDIT).param("studyId", String.valueOf(newSite.getId())).param("fAcilityName", "bla bla"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	public void testThatStudyAdministratorWithoutRightsCannotEditStudy() throws Exception {
 		int studyId = currentScope.getId();
 		createNewStudy();
@@ -601,7 +731,66 @@ public class StudyServiceTest extends BaseServiceTest {
 				assertEquals(studyConfigService.getParameter(studyFeature.getName(),
 						restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig()), "yes");
 			}
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCity(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityState(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityZip(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCountry(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactName(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactDegree(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), "");
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), "");
 		}
+	}
+
+	@Test
+	public void testThatEditStudyMethodisAbleToSetFacilityParametersCorrectly() throws Exception {
+		createNewStudy();
+		int newTotalEnrollment = 15;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		String facilityName = "NPMedic";
+		String facilityCity = "Austin";
+		String facilityState = "TX";
+		String facilityZip = "54567";
+		String facilityCountry = "USA";
+		String facilityContactName = "Dr. Tony Kane";
+		String facilityContactDegree = "MD";
+		String facilityContactPhone = "(843) 678-2390";
+		String facilityContactEmail = "tony.kane@npmedic.com";
+		result = mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+				.param("studyName", newStudyName).param("briefTitle", newStudyName).param("protocolId", newProtocolId)
+				.param("summary", "bla bla").param("principalInvestigator", "test")
+				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("endDate", "2016-04-20")
+				.param("facilityName", facilityName).param("facilityCity", facilityCity)
+				.param("facilityState", facilityState).param("facilityZip", facilityZip)
+				.param("facilityCountry", facilityCountry).param("facilityContactName", facilityContactName)
+				.param("facilityContactDegree", facilityContactDegree)
+				.param("facilityContactPhone", facilityContactPhone)
+				.param("facilityContactEmail", facilityContactEmail)).andExpect(status().isOk()).andReturn();
+		unmarshalResult();
+		if (mediaType == MediaType.APPLICATION_XML) {
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), facilityName);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCity(), facilityCity);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityState(), facilityState);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityZip(), facilityZip);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityCountry(), facilityCountry);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactName(), facilityContactName);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactDegree(),
+					facilityContactDegree);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), facilityContactPhone);
+			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), facilityContactEmail);
+		}
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		assertEquals(studyBean.getFacilityName(), facilityName);
+		assertEquals(studyBean.getFacilityCity(), facilityCity);
+		assertEquals(studyBean.getFacilityState(), facilityState);
+		assertEquals(studyBean.getFacilityZip(), facilityZip);
+		assertEquals(studyBean.getFacilityCountry(), facilityCountry);
+		assertEquals(studyBean.getFacilityContactName(), facilityContactName);
+		assertEquals(studyBean.getFacilityContactDegree(), facilityContactDegree);
+		assertEquals(studyBean.getFacilityContactPhone(), facilityContactPhone);
+		assertEquals(studyBean.getFacilityContactEmail(), facilityContactEmail);
 	}
 
 	@Test
@@ -982,5 +1171,60 @@ public class StudyServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword))
 				.andExpect(status().isOk());
 		mockMvc.perform(post(API_STUDY_REMOVE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEditStudyMethodThrowsExceptionIfSubjectPersonIdRequiredHasATypo() throws Exception {
+		createNewStudy();
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+				.param("studyName", newStudyName).param("protocolId", newProtocolId).param("summary", "bla bla")
+				.param("principalInvestigator", "test").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-04-20").param("subjectPersONIdRequired", "copyFromSSID"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEditStudyMethodThrowsExceptionIfSubjectPersonIdRequiredHasWrongValue() throws Exception {
+		createNewStudy();
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+				.param("studyName", newStudyName).param("protocolId", newProtocolId).param("summary", "bla bla")
+				.param("principalInvestigator", "test").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-04-20").param("subjectPersonIdRequired", "xxxx"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEditStudyMethodIsAbleToSetSubjectPersonIdRequiredParameter() throws Exception {
+		createNewStudy();
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+				.param("studyName", newStudyName).param("protocolId", newProtocolId).param("summary", "bla bla")
+				.param("principalInvestigator", "test").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-04-20").param("subjectPersonIdRequired", "copyFromSSID"))
+				.andExpect(status().isOk());
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		studyConfigService.setParametersForStudy(studyBean);
+		studyBean.getStudyParameterConfig().getSubjectPersonIdRequired().equals("copyFromSSID");
+	}
+
+	@Test
+	public void testThatEditStudyMethodThrowsExceptionIfFacilityContactEmailParameterHasWrongValue() throws Exception {
+		createNewStudy();
+		int newTotalEnrollment = 12;
+		String newStudyName = "s_".concat(Long.toString(timestamp));
+		String newProtocolId = "X_study_1".concat(Long.toString(timestamp));
+		mockMvc.perform(post(API_STUDY_EDIT).param("studyId", String.valueOf(newStudy.getId()))
+				.param("studyName", newStudyName).param("protocolId", newProtocolId).param("summary", "bla bla")
+				.param("principalInvestigator", "test").param("totalEnrollment", Integer.toString(newTotalEnrollment))
+				.param("startDate", "2016-04-20").param("facilityContactEmail", "blaX!#@"))
+				.andExpect(status().isInternalServerError());
 	}
 }

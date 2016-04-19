@@ -244,7 +244,7 @@ public class SubjectTransferValidator implements Validator {
 					"personId is required for the study: " + study.getName());
 			return;
 		}
-		if ("not used".equals(studyParameter.getValue()) && !(personId == null || personId.length() < 1)) {
+		if ("not_used".equals(studyParameter.getValue()) && !(personId == null || personId.length() < 1)) {
 			e.reject("subjectTransferValidator.personId_not_used", new Object[] { study.getName() },
 					"personId is not used for the study: " + study.getName());
 			return;
@@ -271,7 +271,7 @@ public class SubjectTransferValidator implements Validator {
 		StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(
 				handleStudyId, "subjectIdGeneration");
 		idSetting = subjectIdGenerationParameter.getValue();
-		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+		if (idSetting.equals("auto-editable") || idSetting.equals("auto-non-editable")) {
 			int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
 			subjectTransferBean.setStudySubjectId(new Integer(nextLabel).toString());
 		}

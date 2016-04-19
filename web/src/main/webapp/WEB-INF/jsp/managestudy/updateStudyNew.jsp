@@ -752,174 +752,20 @@
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 			<div class="textbox_center">
 				<table border="0" cellpadding="5">
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_name" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityName}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facName"/></jsp:include>
-						</td>
-					</tr>
 
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_city" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facCity" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityCity}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCity"/></jsp:include>
-						</td>
-					</tr>
+					<c:forEach items="${studyFacilities}" var="studyFacility" varStatus="studyFacilitiesStatus">
+						<tr valign="top">
+							<td class="formlabel">
+								<fmt:message key="${studyFacility.code}" bundle="${resword}"/>:
+							</td>
+							<td>
+								<input type="text" name="${studyFacility.name}" onchange="javascript:changeIcon()" value="${studyToView[studyFacility.name]}" class="formfieldXL bw2 h15">
+								<br>
+								<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${studyFacility.name}"/></jsp:include>
+							</td>
+						</tr>
+					</c:forEach>
 
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_state_province" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facState" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityState}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facState"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="postal_code" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facZip" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityZip}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facZip"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_country" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facCountry" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityCountry}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCountry"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_contact_name" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facConName" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactName}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConName"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_contact_degree" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facConDegree" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactDegree}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConDegree"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_contact_phone" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facConPhone" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactPhone}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConPhone"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="facility_contact_email" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="facConEmail" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.facilityContactEmail}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include>
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div></div></div></div></div></div></div></div>
-	</div>
-</div>
-<br>
-
-<a href="javascript:leftnavExpand('section5');">
-	<img id="excl_section5" src="images/bt_Expand.gif" border="0">
-	<span class="table_title_Admin">
-           <fmt:message key="related_infomation" bundle="${resword}"/>
-	</span>
-</a>
-<div id="section5" style="display:none ">
-	<div style="width: 670px">
-		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-			<div class="textbox_center">
-				<table border="0" cellpadding="0">
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="MEDLINE_identifier" bundle="${resword}"/>:
-						</td>
-						<td>
-							<input type="text" name="medlineIdentifier" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.medlineIdentifier}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="medlineIdentifier"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="results_reference" bundle="${resword}"/>:
-						</td>
-						<td>
-							<select name="resultsReference" class="formfieldS bw1 h20" onchange="javascript:changeIcon()">
-								<c:choose>
-									<c:when test="${studyToView.resultsReference == true}">
-										<option value="1" selected><fmt:message key="yes" bundle="${resword}"/></option>
-										<option value="0"><fmt:message key="no" bundle="${resword}"/></option>
-									</c:when>
-									<c:otherwise>
-										<option value="1"><fmt:message key="yes" bundle="${resword}"/></option>
-										<option value="0" selected><fmt:message key="no" bundle="${resword}"/></option>
-									</c:otherwise>
-								</c:choose>
-							</select>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="URL_reference" bundle="${resword}"/>
-						</td>
-						<td>
-							<input type="text" name="url" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.url}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="url"/></jsp:include>
-						</td>
-					</tr>
-
-					<tr valign="top">
-						<td class="formlabel">
-							<fmt:message key="URL_description" bundle="${resword}"/>
-						</td>
-						<td>
-							<input type="text" name="urlDescription" onchange="javascript:changeIcon()" value="<c:out value="${studyToView.urlDescription}"/>" class="formfieldXL bw2 h15">
-							<br>
-							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="urlDescription"/></jsp:include>
-						</td>
-					</tr>
 				</table>
 			</div>
 		</div></div></div></div></div></div></div></div>

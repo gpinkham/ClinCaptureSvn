@@ -56,7 +56,7 @@
 			<td><b>${secondaryIdLabel}</b></td>
 		</c:if>
 		<td><b><fmt:message key="date_of_birth" bundle="${resword}"/></b></td>
-		<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+		<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not_used'}">
 			<td><b><fmt:message key="person_ID" bundle="${resword}"/></b></td>
 		</c:if>
 		<td><b><fmt:message key="created_by" bundle="${resword}"/></b></td>
@@ -68,7 +68,7 @@
 			<td><c:out value="${studySub.secondaryLabel}"/>&nbsp</td>
 		</c:if>
 		<td><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/>&nbsp</td>
-		<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not used'}">
+		<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired != 'not_used'}">
 			<td><c:out value="${subject.uniqueIdentifier}"/>&nbsp;</td>
 		</c:if>
 		<td><c:out value="${studySub.owner.name}"/>&nbsp;</td>

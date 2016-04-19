@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import com.clinovo.enums.StudyFacility;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -358,6 +359,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 		session.setAttribute(SpringController.THEME_COLOR, newThemeColor);
 		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
 		request.setAttribute(STUDY_FEATURES, StudyFeature.values());
+		request.setAttribute(STUDY_FACILITIES, StudyFacility.values());
 		request.setAttribute(STUDY_CONFIGURATION_PARAMETERS, StudyConfigurationParameter.values());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));

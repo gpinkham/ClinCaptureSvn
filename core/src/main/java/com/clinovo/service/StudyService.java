@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 
+import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.exception.CodeException;
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.util.DateUtil;
@@ -125,18 +126,16 @@ public interface StudyService {
 	 *            StudyBean
 	 * @param currentUser
 	 *            UserAccountBean
-	 * @param parametersMap
-	 *            Map
-	 * @param featuresMap
-	 *            map
+	 * @param studyMapsHolder
+	 *            StudyMapsHolder
 	 * @param datePattern
 	 *            DateUtil.DatePattern
 	 * @param locale
 	 *            Locale
 	 * @return StudyBean
 	 */
-	StudyBean prepareStudyBean(StudyBean studyBean, UserAccountBean currentUser, Map<String, String> parametersMap,
-			Map<String, String> featuresMap, DateUtil.DatePattern datePattern, Locale locale);
+	StudyBean prepareStudyBean(StudyBean studyBean, UserAccountBean currentUser, StudyMapsHolder studyMapsHolder,
+			DateUtil.DatePattern datePattern, Locale locale);
 
 	/**
 	 * Prepares study bean configuration parameters.
@@ -191,11 +190,12 @@ public interface StudyService {
 			UserAccountBean currentUser) throws CodeException;
 
 	/**
-	 * Drops Item Level SDV configuration for the specific study.
-	 * All the event definition CRFs, which have SDV state set to Item Level SDV, will be dropped to Entire CRF.
-	 * All the related event CRFs with status SDVed/Signed will preserve status.
+	 * Drops Item Level SDV configuration for the specific study. All the event definition CRFs, which have SDV state
+	 * set to Item Level SDV, will be dropped to Entire CRF. All the related event CRFs with status SDVed/Signed will
+	 * preserve status.
 	 *
-	 * @param studyId study ID
+	 * @param studyId
+	 *            study ID
 	 */
 	void dropItemLevelSDVConfig(int studyId);
 }

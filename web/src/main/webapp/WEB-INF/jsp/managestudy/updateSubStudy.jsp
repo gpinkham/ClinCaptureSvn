@@ -177,55 +177,16 @@ function updateThis(multiSelEle, count) {
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="totalEnrollment"/></jsp:include>
   </td><td class="alert">*</td></tr>
 
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_name" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facName" value="<c:out value="${newStudy.facilityName}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facName"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_city" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facCity" value="<c:out value="${newStudy.facilityCity}"/>"  class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCity"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_state_province" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facState" value="<c:out value="${newStudy.facilityState}"/>"  class="formfieldXL">
-  </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facState"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_ZIP" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facZip" value="<c:out value="${newStudy.facilityZip}"/>"  class="formfieldXL">
-  </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facZip"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_country" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facCountry" value="<c:out value="${newStudy.facilityCountry}"/>"  class="formfieldXL">
-  </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCountry"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_contact_name" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facConName" value="<c:out value="${newStudy.facilityContactName}"/>"  class="formfieldXL">
-  </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConName"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_contact_degree" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facConDegree" value="<c:out value="${newStudy.facilityContactDegree}"/>"  class="formfieldXL">
-  </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConDegree"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_contact_phone" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facConPhone" value="<c:out value="${newStudy.facilityContactPhone}"/>"  class="formfieldXL">
-  </div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConPhone"/></jsp:include>
-  </td></tr>
-
-  <tr valign="top"><td class="formlabel"><fmt:message key="facility_contact_email" bundle="${resword}"/>:</td><td>
-  <div class="formfieldXL_BG"><input type="text" name="facConEmail" value="<c:out value="${newStudy.facilityContactEmail}"/>"  class="formfieldXL">
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include></td></tr>
+  <c:forEach items="${studyFacilities}" var="studyFacility" varStatus="studyFacilitiesStatus">
+	  <tr valign="top">
+		  <td class="formlabel"><fmt:message key="${studyFacility.code}" bundle="${resword}"/>:</td>
+		  <td>
+			  <div class="formfieldXL_BG">
+				  <input type="text" name="${studyFacility.name}" value="${newStudy[studyFacility.name]}" class="formfieldXL">
+			  </div><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${studyFacility.name}"/></jsp:include>
+		  </td>
+	  </tr>
+  </c:forEach>
 
   <c:choose>
    <c:when test="${newStudy.parentStudyId == 0}">
@@ -338,7 +299,7 @@ function updateThis(multiSelEle, count) {
 				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdRequired} name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
 				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdOptional} name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
 				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdCopy} name="subjectPersonIdRequired" value="copyFromSSID"><fmt:message key="copy_from_ssid" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdNotUsed} name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdNotUsed} name="subjectPersonIdRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
 			</td>
 		  </tr>
 	</c:if>
@@ -347,18 +308,18 @@ function updateThis(multiSelEle, count) {
 		   <c:choose>
 		   <c:when test="${paramsMap['subjectIdGeneration'] == 'manual'}">
 		    <input type="radio" checked name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
-		    <input type="radio" name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-		    <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
+		    <input type="radio" name="subjectIdGeneration" value="auto-editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
+		    <input type="radio" name="subjectIdGeneration" value="auto-non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
 		   </c:when>
-		    <c:when test="${paramsMap['subjectIdGeneration'] == 'auto editable'}">
+		    <c:when test="${paramsMap['subjectIdGeneration'] == 'auto-editable'}">
 		    <input type="radio" name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
-		    <input type="radio" checked name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-		    <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
+		    <input type="radio" checked name="subjectIdGeneration" value="auto-editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
+		    <input type="radio" name="subjectIdGeneration" value="auto-non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
 		   </c:when>
 		   <c:otherwise>
 		    <input type="radio" name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
-		    <input type="radio" name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-		    <input type="radio" checked name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
+		    <input type="radio" name="subjectIdGeneration" value="auto-editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
+		    <input type="radio" checked name="subjectIdGeneration" value="auto-non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
 		   </c:otherwise>
 		  </c:choose>
 		  </td>
