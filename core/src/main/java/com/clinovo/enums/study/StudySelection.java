@@ -12,20 +12,21 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyProtocolType.
+ * StudySelection.
  */
-public enum StudyProtocolType {
+public enum StudySelection {
 
-	INTERVENTIONAL(0, "interventional", "interventional"), OBSERVATIONAL(1, "observational", "observational");
+	EMPTY_VALUE(0, "", "select"), CONVENIENCE_SAMPLE(1, "convenience_sample", "convenience_sample"), DEFINED_POPULATION(2, "defined_population", "defined_population"),
+	RANDOM_SAMPLE(3, "random_sample", "random_sample"), CASE_CONTROL(4, "case_control", "case_control");
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudyProtocolType(int id, String value, String code) {
+	StudySelection(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -35,30 +36,30 @@ public enum StudyProtocolType {
 		return id;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
 	public String getValue() {
 		return value;
 	}
 
-	public static StudyProtocolType get(int id) {
-		StudyProtocolType result = INTERVENTIONAL;
-		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
-			if (studyProtocolType.getId() == id) {
-				result = studyProtocolType;
+	public String getCode() {
+		return code;
+	}
+
+	public static StudySelection get(int id) {
+		StudySelection result = EMPTY_VALUE;
+		for (StudySelection studySelection : StudySelection.values()) {
+			if (studySelection.getId() == id) {
+				result = studySelection;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyProtocolType get(String value) {
-		StudyProtocolType result = INTERVENTIONAL;
-		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
-			if (studyProtocolType.getValue().equals(value)) {
-				result = studyProtocolType;
+	public static StudySelection get(String value) {
+		StudySelection result = EMPTY_VALUE;
+		for (StudySelection studySelection : StudySelection.values()) {
+			if (studySelection.getValue().equals(value)) {
+				result = studySelection;
 				break;
 			}
 		}

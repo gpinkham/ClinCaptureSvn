@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFacility;
-import com.clinovo.enums.StudyFeature;
+import com.clinovo.enums.study.StudyConfigurationParameter;
+import com.clinovo.enums.study.StudyFacility;
+import com.clinovo.enums.study.StudyFeature;
 import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;

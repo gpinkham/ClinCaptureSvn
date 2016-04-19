@@ -12,56 +12,112 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
+
+import com.clinovo.enums.BaseEnum;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * StudyTiming.
+ * StudyFeature.
  */
-public enum StudyTiming {
+public enum StudyFeature implements BaseEnum {
 
-	EMPTY_VALUE(0, "", "select"), RETROSPECTIVE(1, "retrospective", "retrospective"), PROSPECTIVE(2, "prospective", "prospective");
+	CRF_ANNOTATION("crfAnnotation", "crf_annotation"), DYNAMIC_GROUP("dynamicGroup", "dynamic_group"), CALENDARED_VISITS("calendaredVisits", "calendared_visits"),
+	INTERACTIVE_DASHBOARDS("interactiveDashboards", "interactive_dashboards"), ITEM_LEVEL_SDV("itemLevelSDV", "item_level_sdv"),
+	SUBJECT_CASEBOOK_IN_PDF("subjectCasebookInPDF", "subject_casebook_in_pdf"), CRF_MASKING("crfMasking", "crfs_masking"), SAS_EXTRACTS("sasExtracts", "sas_extracts"),
+	STUDY_EVALUATOR("studyEvaluator", "study_evaluator"), RANDOMIZATION("randomization", "randomization_cap"), MEDICAL_CODING("medicalCoding", "medical_coding");
 
-	private int id;
+	private String name;
 	private String code;
-	private String value;
+	private String[] values;
+	private boolean required;
+	private String defaultValue;
+	private StudyConfigurationParameterType type;
 
-	StudyTiming(int id, String value, String code) {
-		this.id = id;
+	StudyFeature(String name, String code) {
+		this.name = name;
 		this.code = code;
-		this.value = value;
+		defaultValue = "yes";
+		values = new String[]{"yes", "no"};
+		type = StudyConfigurationParameterType.RADIO;
 	}
 
-	public int getId() {
-		return id;
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getName() {
+		return name;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getCode() {
 		return code;
 	}
 
-	public static StudyTiming get(int id) {
-		StudyTiming result = EMPTY_VALUE;
-		for (StudyTiming studyTiming : StudyTiming.values()) {
-			if (studyTiming.getId() == id) {
-				result = studyTiming;
+	/**
+	 * {@inheritDoc}
+	 */
+	public String[] getValues() {
+		return values;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public StudyConfigurationParameterType getType() {
+		return type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<StudyFeature> asArray() {
+		return Arrays.asList(StudyFeature.values());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Object find(String name) {
+		StudyFeature result = null;
+		for (StudyFeature sttudyFeature : asArray()) {
+			if (sttudyFeature.getName().equals(name)) {
+				result = sttudyFeature;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyTiming get(String value) {
-		StudyTiming result = EMPTY_VALUE;
-		for (StudyTiming studyTiming : StudyTiming.values()) {
-			if (studyTiming.getValue().equals(value)) {
-				result = studyTiming;
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean hasTypo(String name) {
+		boolean result = false;
+		for (StudyFeature studyFeature : asArray()) {
+			if (studyFeature.getName().equalsIgnoreCase(name) && !studyFeature.getName().equals(name)) {
+				result = true;
 				break;
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isRequired() {
+		return required;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getDefaultValue() {
+		return defaultValue;
 	}
 }

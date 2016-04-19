@@ -12,109 +12,57 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
-
-import java.util.Arrays;
-import java.util.List;
+package com.clinovo.enums.study;
 
 /**
- * StudyFacility.
+ * StudyAssignment.
  */
-public enum StudyFacility implements BaseEnum {
+public enum StudyAssignment {
 
-	FACILITY_NAME("facilityName", "facility_name"), FACILITY_CITY("facilityCity", "facility_city"), FACILITY_STATE("facilityState", "facility_state_province"),
-	FACILITY_ZIP("facilityZip", "facility_ZIP"), FACILITY_COUNTRY("facilityCountry", "facility_country"),
-	FACILITY_CONTACT_NAME("facilityContactName", "facility_contact_name"), FACILITY_CONTACT_DEGREE("facilityContactDegree", "facility_contact_degree"),
-	FACILITY_CONTACT_PHONE("facilityContactPhone", "facility_contact_phone"), FACILITY_CONTACT_EMAIL("facilityContactEmail", "facility_contact_email");
+	EMPTY_VALUE(0, "", "select"), SINGLE_GROUP(1, "single_group", "single_group"), PARALLEL(2, "parallel", "parallel"), CROSS_OVER(3, "cross_over", "cross_over"),
+	FACTORIAL(4, "factorial", "factorial"), EXPANDED_ACCESS(5, "expanded_access", "expanded_access");
 
-	private String name;
+	private int id;
 	private String code;
-	private String[] values;
-	private boolean required;
-	private String defaultValue;
-	private StudyConfigurationParameterType type;
+	private String value;
 
-	StudyFacility(String name, String code) {
-		this.name = name;
+	StudyAssignment(int id, String value, String code) {
+		this.id = id;
 		this.code = code;
-		defaultValue = "";
-		type = StudyConfigurationParameterType.TEXT;
+		this.value = value;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getName() {
-		return name;
+	public int getId() {
+		return id;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	public String getValue() {
+		return value;
+	}
+
 	public String getCode() {
 		return code;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String[] getValues() {
-		return values;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public StudyConfigurationParameterType getType() {
-		return type;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<StudyFacility> asArray() {
-		return Arrays.asList(StudyFacility.values());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Object find(String name) {
-		StudyFacility result = null;
-		for (StudyFacility studyFacility : asArray()) {
-			if (studyFacility.getName().equals(name)) {
-				result = studyFacility;
+	public static StudyAssignment get(int id) {
+		StudyAssignment result = EMPTY_VALUE;
+		for (StudyAssignment studyAssignment : StudyAssignment.values()) {
+			if (studyAssignment.getId() == id) {
+				result = studyAssignment;
 				break;
 			}
 		}
 		return result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean hasTypo(String name) {
-		boolean result = false;
-		for (StudyFacility studyFacility : asArray()) {
-			if (studyFacility.getName().equalsIgnoreCase(name) && !studyFacility.getName().equals(name)) {
-				result = true;
+	public static StudyAssignment get(String value) {
+		StudyAssignment result = EMPTY_VALUE;
+		for (StudyAssignment studyAssignment : StudyAssignment.values()) {
+			if (studyAssignment.getValue().equals(value)) {
+				result = studyAssignment;
 				break;
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isRequired() {
-		return required;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getDefaultValue() {
-		return defaultValue;
 	}
 }

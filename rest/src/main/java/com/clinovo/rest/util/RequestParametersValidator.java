@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.enums.BaseEnum;
-import com.clinovo.enums.StudyConfigurationParameterType;
+import com.clinovo.enums.study.StudyConfigurationParameterType;
 import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;

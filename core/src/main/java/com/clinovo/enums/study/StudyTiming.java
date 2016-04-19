@@ -12,26 +12,56 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyParameter.
+ * StudyTiming.
  */
-public enum StudyParameter {
+public enum StudyTiming {
 
-	PROTOCOL_ID("protocolId"), STUDY_NAME("studyName"), BRIEF_TITLE("briefTitle"), OFFICIAL_TITLE("officialTitle"), SECOND_PRO_ID("secondProId"),
-	SUMMARY("summary"), DESCRIPTION("description"), SPONSOR("sponsor"), COLLABORATORS("collaborators"), PRINCIPAL_INVESTIGATOR("principalInvestigator"),
-	PHASE("phase"), PROTOCOL_TYPE("protocolType"), TOTAL_ENROLLMENT("totalEnrollment"), START_DATE("startDate"), END_DATE("endDate"), APPROVAL_DATE("approvalDate"),
-	PURPOSE("purpose"), ALLOCATION("allocation"), MASKING("masking"), CONTROL("control"), ASSIGNMENT("assignment"), END_POINT("endPoint"), DURATION("duration"),
-	SELECTION("selection"), TIMING("timing");
+	EMPTY_VALUE(0, "", "select"), RETROSPECTIVE(1, "retrospective", "retrospective"), PROSPECTIVE(2, "prospective", "prospective");
 
-	private String name;
+	private int id;
+	private String code;
+	private String value;
 
-	StudyParameter(String name) {
-		this.name = name;
+	StudyTiming(int id, String value, String code) {
+		this.id = id;
+		this.code = code;
+		this.value = value;
 	}
 
-	public String getName() {
-		return name;
+	public int getId() {
+		return id;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public static StudyTiming get(int id) {
+		StudyTiming result = EMPTY_VALUE;
+		for (StudyTiming studyTiming : StudyTiming.values()) {
+			if (studyTiming.getId() == id) {
+				result = studyTiming;
+				break;
+			}
+		}
+		return result;
+	}
+
+	public static StudyTiming get(String value) {
+		StudyTiming result = EMPTY_VALUE;
+		for (StudyTiming studyTiming : StudyTiming.values()) {
+			if (studyTiming.getValue().equals(value)) {
+				result = studyTiming;
+				break;
+			}
+		}
+		return result;
 	}
 }

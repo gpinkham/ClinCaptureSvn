@@ -32,7 +32,7 @@ import org.akaza.openclinica.bean.service.StudyFeatureConfig;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import com.clinovo.enums.StudyOrigin;
+import com.clinovo.enums.study.StudyOrigin;
 import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;

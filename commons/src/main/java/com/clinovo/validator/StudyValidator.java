@@ -33,11 +33,11 @@ import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFacility;
-import com.clinovo.enums.StudyOrigin;
-import com.clinovo.enums.StudyParameter;
-import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.enums.study.StudyConfigurationParameter;
+import com.clinovo.enums.study.StudyFacility;
+import com.clinovo.enums.study.StudyOrigin;
+import com.clinovo.enums.study.StudyParameter;
+import com.clinovo.enums.study.StudyProtocolType;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.model.DiscrepancyDescriptionType;

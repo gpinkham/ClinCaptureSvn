@@ -10,9 +10,9 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
-import com.clinovo.enums.StudyFeature;
-import com.clinovo.enums.StudyOrigin;
-import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.enums.study.StudyFeature;
+import com.clinovo.enums.study.StudyOrigin;
+import com.clinovo.enums.study.StudyProtocolType;
 
 public class StudyServiceTest extends BaseServiceTest {
 

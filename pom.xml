@@ -498,6 +498,44 @@
 				<version>${tomcat-dbcp.version}</version>
 				<scope>provided</scope>
 			</dependency>
+			<!-- db unit -->
+			<dependency>
+				<groupId>org.dbunit</groupId>
+				<artifactId>dbunit</artifactId>
+				<version>2.5.1</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-nop</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<!-- liquibase -->
+			<dependency>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>${liquibase.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.maven</groupId>
+						<artifactId>maven-plugin-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.maven</groupId>
+						<artifactId>maven-project</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-core</artifactId>
+				<version>${liquibase.version}</version>
+			</dependency>
 			<!-- other libs -->
 			<dependency>
 				<groupId>httpunit</groupId>
@@ -765,23 +803,6 @@
 				<artifactId>json</artifactId>
 				<version>20090211</version>
 			</dependency>
-			<!-- db unit -->
-			<dependency>
-				<groupId>org.dbunit</groupId>
-				<artifactId>dbunit</artifactId>
-				<version>2.5.1</version>
-				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-nop</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
 			<!-- castor -->
 			<dependency>
 				<groupId>org.codehaus.castor</groupId>
@@ -808,27 +829,6 @@
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-access</artifactId>
 				<version>${logback.version}</version>
-			</dependency>
-			<!-- liquibase -->
-			<dependency>
-				<groupId>org.liquibase</groupId>
-				<artifactId>liquibase-maven-plugin</artifactId>
-				<version>${liquibase.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.apache.maven</groupId>
-						<artifactId>maven-plugin-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.maven</groupId>
-						<artifactId>maven-project</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.liquibase</groupId>
-				<artifactId>liquibase-core</artifactId>
-				<version>${liquibase.version}</version>
 			</dependency>
 			<!-- jmesa -->
 			<dependency>

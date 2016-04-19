@@ -12,23 +12,23 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyPurpose.
+ * StudyPhase / StudyType.
  */
-public enum StudyPurpose {
+public enum StudyPhase {
 
-	EMPTY_VALUE(0, "", "select"), TREATMENT(1, "treatment", "treatment"), PREVENTION(2, "prevention", "prevention"), DIAGNOSIS(3, "diagnosis", "diagnosis"),
-	/*EDUCATION_COUNSELING_TRAINING(4, "educ_couns_train", "educ_couns_train"),*/ SUPPORTIVE_CARE(5, "supportive_care", "supportive_care"), SCREENING(6, "screening", "screening"),
-	NATURAL_HISTORY(7, "natural_history", "natural_history"), PSYCHOSOCIAL(8, "psychosocial", "psychosocial"), HEALTH_SERVICES_RESEARCH(9, "health_services_research", "health_services_research"),
-	BASIC_SCIENCE(10, "basic_science", "basic_science"), OTHER(11, "other", "other");
+	N_A(0, "n_a", "n_a"), PHASE1(1, "phaseI", "phaseI"), PHASE1_2(2, "phaseI_II", "phaseI_II"), PHASE2(3, "phaseII", "phaseII"),
+	PHASE2_3(4, "phaseII_III", "phaseII_III"), PHASE3(5, "phaseIII", "phaseIII"), PHASE3_4(6, "phaseIII_IV", "phaseIII_IV"), PHASE4(7, "phaseIV", "phaseIV"),
+	MEDICAL_DEVICE(8, "medicalDevice", "medicalDevice"), PATIENT_REGISTRY(9, "patientRegistry", "patientRegistry"), INVESTIGATORS_STUDY(10, "investigatorsStudy", "investigatorsStudy"),
+	NUTRACEUTICALS(11, "nutraceuticals", "nutraceuticals"), COSMETICS(12, "cosmetics", "cosmetics"), OTHER(13, "otherType", "otherType");
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudyPurpose(int id, String value, String code) {
+	StudyPhase(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -46,22 +46,22 @@ public enum StudyPurpose {
 		return code;
 	}
 
-	public static StudyPurpose get(int id) {
-		StudyPurpose result = EMPTY_VALUE;
-		for (StudyPurpose studyPurpose : StudyPurpose.values()) {
-			if (studyPurpose.getId() == id) {
-				result = studyPurpose;
+	public static StudyPhase get(int id) {
+		StudyPhase result = N_A;
+		for (StudyPhase studyPhase : StudyPhase.values()) {
+			if (studyPhase.getId() == id) {
+				result = studyPhase;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyPurpose get(String value) {
-		StudyPurpose result = EMPTY_VALUE;
-		for (StudyPurpose studyPurpose : StudyPurpose.values()) {
-			if (studyPurpose.getValue().equals(value)) {
-				result = studyPurpose;
+	public static StudyPhase get(String value) {
+		StudyPhase result = N_A;
+		for (StudyPhase studyPhase : StudyPhase.values()) {
+			if (studyPhase.getValue().equals(value)) {
+				result = studyPhase;
 				break;
 			}
 		}

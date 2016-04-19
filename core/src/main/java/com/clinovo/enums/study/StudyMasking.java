@@ -12,22 +12,20 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyEndPoint.
+ * StudyMasking.
  */
-public enum StudyEndPoint {
+public enum StudyMasking {
 
-	EMPTY_VALUE(0, "", "select"), SAFETY(1, "safety", "safety"), EFFICACY(2, "efficacy", "efficacy"), SAFETY_EFFICACY(3, "safety_efficacy", "safety_efficacy"),
-	BIO_EQUIVALENCE(4, "bio_equivalence", "bio_equivalence"), BIO_AVAILABILITY(5, "bio_availability", "bio_availability"), PHARMACOKINETICS(6, "pharmacokinetics", "pharmacokinetics"),
-	PHARMACODYNAMICS(7, "pharmacodynamics", "pharmacodynamics"), PHARMACOKINETICS_PHARMACODYNAMICS(8, "pharmacokinetics_pharmacodynamics", "pharmacokinetics_pharmacodynamics");
+	EMPTY_VALUE(0, "", "select"), OPEN(1, "open", "open"), SINGLE_BLIND(2, "single_blind", "single_blind"), DOUBLE_BLIND(3, "double_blind", "double_blind");
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudyEndPoint(int id, String value, String code) {
+	StudyMasking(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -45,22 +43,22 @@ public enum StudyEndPoint {
 		return code;
 	}
 
-	public static StudyEndPoint get(int id) {
-		StudyEndPoint result = EMPTY_VALUE;
-		for (StudyEndPoint studyEndPoint : StudyEndPoint.values()) {
-			if (studyEndPoint.getId() == id) {
-				result = studyEndPoint;
+	public static StudyMasking get(int id) {
+		StudyMasking result = EMPTY_VALUE;
+		for (StudyMasking studyMasking : StudyMasking.values()) {
+			if (studyMasking.getId() == id) {
+				result = studyMasking;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyEndPoint get(String value) {
-		StudyEndPoint result = EMPTY_VALUE;
-		for (StudyEndPoint studyEndPoint : StudyEndPoint.values()) {
-			if (studyEndPoint.getValue().equals(value)) {
-				result = studyEndPoint;
+	public static StudyMasking get(String value) {
+		StudyMasking result = EMPTY_VALUE;
+		for (StudyMasking studyMasking : StudyMasking.values()) {
+			if (studyMasking.getValue().equals(value)) {
+				result = studyMasking;
 				break;
 			}
 		}

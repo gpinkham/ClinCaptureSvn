@@ -12,23 +12,22 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyPhase / StudyType.
+ * StudyEndPoint.
  */
-public enum StudyPhase {
+public enum StudyEndPoint {
 
-	N_A(0, "n_a", "n_a"), PHASE1(1, "phaseI", "phaseI"), PHASE1_2(2, "phaseI_II", "phaseI_II"), PHASE2(3, "phaseII", "phaseII"),
-	PHASE2_3(4, "phaseII_III", "phaseII_III"), PHASE3(5, "phaseIII", "phaseIII"), PHASE3_4(6, "phaseIII_IV", "phaseIII_IV"), PHASE4(7, "phaseIV", "phaseIV"),
-	MEDICAL_DEVICE(8, "medicalDevice", "medicalDevice"), PATIENT_REGISTRY(9, "patientRegistry", "patientRegistry"), INVESTIGATORS_STUDY(10, "investigatorsStudy", "investigatorsStudy"),
-	NUTRACEUTICALS(11, "nutraceuticals", "nutraceuticals"), COSMETICS(12, "cosmetics", "cosmetics"), OTHER(13, "otherType", "otherType");
+	EMPTY_VALUE(0, "", "select"), SAFETY(1, "safety", "safety"), EFFICACY(2, "efficacy", "efficacy"), SAFETY_EFFICACY(3, "safety_efficacy", "safety_efficacy"),
+	BIO_EQUIVALENCE(4, "bio_equivalence", "bio_equivalence"), BIO_AVAILABILITY(5, "bio_availability", "bio_availability"), PHARMACOKINETICS(6, "pharmacokinetics", "pharmacokinetics"),
+	PHARMACODYNAMICS(7, "pharmacodynamics", "pharmacodynamics"), PHARMACOKINETICS_PHARMACODYNAMICS(8, "pharmacokinetics_pharmacodynamics", "pharmacokinetics_pharmacodynamics");
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudyPhase(int id, String value, String code) {
+	StudyEndPoint(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -46,22 +45,22 @@ public enum StudyPhase {
 		return code;
 	}
 
-	public static StudyPhase get(int id) {
-		StudyPhase result = N_A;
-		for (StudyPhase studyPhase : StudyPhase.values()) {
-			if (studyPhase.getId() == id) {
-				result = studyPhase;
+	public static StudyEndPoint get(int id) {
+		StudyEndPoint result = EMPTY_VALUE;
+		for (StudyEndPoint studyEndPoint : StudyEndPoint.values()) {
+			if (studyEndPoint.getId() == id) {
+				result = studyEndPoint;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyPhase get(String value) {
-		StudyPhase result = N_A;
-		for (StudyPhase studyPhase : StudyPhase.values()) {
-			if (studyPhase.getValue().equals(value)) {
-				result = studyPhase;
+	public static StudyEndPoint get(String value) {
+		StudyEndPoint result = EMPTY_VALUE;
+		for (StudyEndPoint studyEndPoint : StudyEndPoint.values()) {
+			if (studyEndPoint.getValue().equals(value)) {
+				result = studyEndPoint;
 				break;
 			}
 		}

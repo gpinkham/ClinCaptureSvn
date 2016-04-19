@@ -15,17 +15,17 @@ package org.akaza.openclinica.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.clinovo.enums.StudyAllocation;
-import com.clinovo.enums.StudyAssignment;
-import com.clinovo.enums.StudyControl;
-import com.clinovo.enums.StudyDuration;
-import com.clinovo.enums.StudyEndPoint;
-import com.clinovo.enums.StudyFacRecruitStatus;
-import com.clinovo.enums.StudyMasking;
-import com.clinovo.enums.StudyPhase;
-import com.clinovo.enums.StudyPurpose;
-import com.clinovo.enums.StudySelection;
-import com.clinovo.enums.StudyTiming;
+import com.clinovo.enums.study.StudyAllocation;
+import com.clinovo.enums.study.StudyAssignment;
+import com.clinovo.enums.study.StudyControl;
+import com.clinovo.enums.study.StudyDuration;
+import com.clinovo.enums.study.StudyEndPoint;
+import com.clinovo.enums.study.StudyFacRecruitStatus;
+import com.clinovo.enums.study.StudyMasking;
+import com.clinovo.enums.study.StudyPhase;
+import com.clinovo.enums.study.StudyPurpose;
+import com.clinovo.enums.study.StudySelection;
+import com.clinovo.enums.study.StudyTiming;
 
 /**
  * MapsHolder.

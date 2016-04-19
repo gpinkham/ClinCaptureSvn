@@ -12,54 +12,47 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyAssignment.
+ * StudyOrigin.
  */
-public enum StudyAssignment {
+public enum StudyOrigin {
 
-	EMPTY_VALUE(0, "", "select"), SINGLE_GROUP(1, "single_group", "single_group"), PARALLEL(2, "parallel", "parallel"), CROSS_OVER(3, "cross_over", "cross_over"),
-	FACTORIAL(4, "factorial", "factorial"), EXPANDED_ACCESS(5, "expanded_access", "expanded_access");
+	GUI(0, "gui"), STUDIO(1, "studio");
 
 	private int id;
-	private String code;
-	private String value;
+	private String name;
 
-	StudyAssignment(int id, String value, String code) {
+	StudyOrigin(int id, String name) {
 		this.id = id;
-		this.code = code;
-		this.value = value;
+		this.name = name;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public String getValue() {
-		return value;
+	public String getName() {
+		return name;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public static StudyAssignment get(int id) {
-		StudyAssignment result = EMPTY_VALUE;
-		for (StudyAssignment studyAssignment : StudyAssignment.values()) {
-			if (studyAssignment.getId() == id) {
-				result = studyAssignment;
+	public static StudyOrigin get(int id) {
+		StudyOrigin result = GUI;
+		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
+			if (studyOrigin.getId() == id) {
+				result = studyOrigin;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyAssignment get(String value) {
-		StudyAssignment result = EMPTY_VALUE;
-		for (StudyAssignment studyAssignment : StudyAssignment.values()) {
-			if (studyAssignment.getValue().equals(value)) {
-				result = studyAssignment;
+	public static StudyOrigin get(String name) {
+		StudyOrigin result = GUI;
+		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
+			if (studyOrigin.getName().equals(name)) {
+				result = studyOrigin;
 				break;
 			}
 		}

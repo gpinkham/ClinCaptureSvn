@@ -45,10 +45,10 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.bean.StudyMapsHolder;
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyOrigin;
-import com.clinovo.enums.StudyParameter;
-import com.clinovo.enums.StudyProtocolType;
+import com.clinovo.enums.study.StudyConfigurationParameter;
+import com.clinovo.enums.study.StudyOrigin;
+import com.clinovo.enums.study.StudyParameter;
+import com.clinovo.enums.study.StudyProtocolType;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.util.DateUtil;

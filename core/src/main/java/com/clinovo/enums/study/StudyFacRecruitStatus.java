@@ -12,21 +12,22 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudySelection.
+ * StudyFacRecruitStatus.
  */
-public enum StudySelection {
+public enum StudyFacRecruitStatus {
 
-	EMPTY_VALUE(0, "", "select"), CONVENIENCE_SAMPLE(1, "convenience_sample", "convenience_sample"), DEFINED_POPULATION(2, "defined_population", "defined_population"),
-	RANDOM_SAMPLE(3, "random_sample", "random_sample"), CASE_CONTROL(4, "case_control", "case_control");
+	NOT_YET_RECRUITING(1, "not_yet_recruiting", "not_yet_recruiting"), RECRUITING(2, "recruiting", "recruiting"),
+	NO_LONGER_RECRUITING(3, "no_longer_recruiting", "no_longer_recruiting"), COMPLETED(4, "completed", "completed"), SUSPENDED(5, "suspended", "suspended"),
+	TERMINATED(6, "terminated", "terminated");
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudySelection(int id, String value, String code) {
+	StudyFacRecruitStatus(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -44,22 +45,22 @@ public enum StudySelection {
 		return code;
 	}
 
-	public static StudySelection get(int id) {
-		StudySelection result = EMPTY_VALUE;
-		for (StudySelection studySelection : StudySelection.values()) {
-			if (studySelection.getId() == id) {
-				result = studySelection;
+	public static StudyFacRecruitStatus get(int id) {
+		StudyFacRecruitStatus result = null;
+		for (StudyFacRecruitStatus studyFacRecruitStatus : StudyFacRecruitStatus.values()) {
+			if (studyFacRecruitStatus.getId() == id) {
+				result = studyFacRecruitStatus;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudySelection get(String value) {
-		StudySelection result = EMPTY_VALUE;
-		for (StudySelection studySelection : StudySelection.values()) {
-			if (studySelection.getValue().equals(value)) {
-				result = studySelection;
+	public static StudyFacRecruitStatus get(String value) {
+		StudyFacRecruitStatus result = null;
+		for (StudyFacRecruitStatus studyFacRecruitStatus : StudyFacRecruitStatus.values()) {
+			if (studyFacRecruitStatus.getValue().equals(value)) {
+				result = studyFacRecruitStatus;
 				break;
 			}
 		}

@@ -12,20 +12,21 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyAllocation.
+ * StudyDuration.
  */
-public enum StudyAllocation {
+public enum StudyDuration {
 
-	EMPTY_VALUE(0, "", "select"), RANDOMIZED(1, "randomized", "randomized"), NON_RANDOMIZED(2, "non_randomized", "non_randomized"), N_A(3, "n_a", "n_a");
+	EMPTY_VALUE(0, "", "select"), LONGITUDINAL(1, "longitudinal" , "longitudinal"), CROSS_SECTIONAL(2, "cross_sectional" , "cross_sectional");
+
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudyAllocation(int id, String value, String code) {
+	StudyDuration(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -43,22 +44,22 @@ public enum StudyAllocation {
 		return code;
 	}
 
-	public static StudyAllocation get(int id) {
-		StudyAllocation result = EMPTY_VALUE;
-		for (StudyAllocation studyAllocation : StudyAllocation.values()) {
-			if (studyAllocation.getId() == id) {
-				result = studyAllocation;
+	public static StudyDuration get(int id) {
+		StudyDuration result = EMPTY_VALUE;
+		for (StudyDuration studyDuration : StudyDuration.values()) {
+			if (studyDuration.getId() == id) {
+				result = studyDuration;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyAllocation get(String value) {
-		StudyAllocation result = EMPTY_VALUE;
-		for (StudyAllocation studyAllocation : StudyAllocation.values()) {
-			if (studyAllocation.getValue().equals(value)) {
-				result = studyAllocation;
+	public static StudyDuration get(String value) {
+		StudyDuration result = EMPTY_VALUE;
+		for (StudyDuration studyDuration : StudyDuration.values()) {
+			if (studyDuration.getValue().equals(value)) {
+				result = studyDuration;
 				break;
 			}
 		}

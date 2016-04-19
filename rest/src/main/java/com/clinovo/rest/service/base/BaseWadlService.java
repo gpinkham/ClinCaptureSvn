@@ -34,7 +34,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.clinovo.enums.BaseEnum;
-import com.clinovo.enums.StudyConfigurationParameterType;
+import com.clinovo.enums.study.StudyConfigurationParameterType;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.EnumBasedParametersHolder;

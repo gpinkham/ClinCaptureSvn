@@ -12,20 +12,23 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyMasking.
+ * StudyPurpose.
  */
-public enum StudyMasking {
+public enum StudyPurpose {
 
-	EMPTY_VALUE(0, "", "select"), OPEN(1, "open", "open"), SINGLE_BLIND(2, "single_blind", "single_blind"), DOUBLE_BLIND(3, "double_blind", "double_blind");
+	EMPTY_VALUE(0, "", "select"), TREATMENT(1, "treatment", "treatment"), PREVENTION(2, "prevention", "prevention"), DIAGNOSIS(3, "diagnosis", "diagnosis"),
+	/*EDUCATION_COUNSELING_TRAINING(4, "educ_couns_train", "educ_couns_train"),*/ SUPPORTIVE_CARE(5, "supportive_care", "supportive_care"), SCREENING(6, "screening", "screening"),
+	NATURAL_HISTORY(7, "natural_history", "natural_history"), PSYCHOSOCIAL(8, "psychosocial", "psychosocial"), HEALTH_SERVICES_RESEARCH(9, "health_services_research", "health_services_research"),
+	BASIC_SCIENCE(10, "basic_science", "basic_science"), OTHER(11, "other", "other");
 
 	private int id;
 	private String code;
 	private String value;
 
-	StudyMasking(int id, String value, String code) {
+	StudyPurpose(int id, String value, String code) {
 		this.id = id;
 		this.code = code;
 		this.value = value;
@@ -43,22 +46,22 @@ public enum StudyMasking {
 		return code;
 	}
 
-	public static StudyMasking get(int id) {
-		StudyMasking result = EMPTY_VALUE;
-		for (StudyMasking studyMasking : StudyMasking.values()) {
-			if (studyMasking.getId() == id) {
-				result = studyMasking;
+	public static StudyPurpose get(int id) {
+		StudyPurpose result = EMPTY_VALUE;
+		for (StudyPurpose studyPurpose : StudyPurpose.values()) {
+			if (studyPurpose.getId() == id) {
+				result = studyPurpose;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyMasking get(String value) {
-		StudyMasking result = EMPTY_VALUE;
-		for (StudyMasking studyMasking : StudyMasking.values()) {
-			if (studyMasking.getValue().equals(value)) {
-				result = studyMasking;
+	public static StudyPurpose get(String value) {
+		StudyPurpose result = EMPTY_VALUE;
+		for (StudyPurpose studyPurpose : StudyPurpose.values()) {
+			if (studyPurpose.getValue().equals(value)) {
+				result = studyPurpose;
 				break;
 			}
 		}

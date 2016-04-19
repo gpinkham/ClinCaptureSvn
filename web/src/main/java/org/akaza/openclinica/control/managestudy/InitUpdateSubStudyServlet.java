@@ -50,7 +50,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.enums.StudyOrigin;
+import com.clinovo.enums.study.StudyOrigin;
 import com.clinovo.util.DateUtil;
 
 /**

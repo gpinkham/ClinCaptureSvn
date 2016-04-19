@@ -12,12 +12,57 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyConfigurationParameterType.
+ * StudyControl.
  */
-public enum StudyConfigurationParameterType {
+public enum StudyControl {
 
-	GROUP, DYNAMIC_LABEL, SELECT, RADIO, TEXT;
+	EMPTY_VALUE(0, "", "select"), PLACEBO(1, "placebo", "placebo"), ACTIVE(2, "active", "active"), UNCONTROLLED(3, "uncontrolled", "uncontrolled"),
+	HISTORICAL(4, "historical", "historical"), DOSE_COMPARISON(5, "dose_comparison", "dose_comparison");
+
+	private int id;
+	private String code;
+	private String value;
+
+	StudyControl(int id, String value, String code) {
+		this.id = id;
+		this.code = code;
+		this.value = value;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public static StudyControl get(int id) {
+		StudyControl result = EMPTY_VALUE;
+		for (StudyControl studyControl : StudyControl.values()) {
+			if (studyControl.getId() == id) {
+				result = studyControl;
+				break;
+			}
+		}
+		return result;
+	}
+
+	public static StudyControl get(String value) {
+		StudyControl result = EMPTY_VALUE;
+		for (StudyControl studyControl : StudyControl.values()) {
+			if (studyControl.getValue().equals(value)) {
+				result = studyControl;
+				break;
+			}
+		}
+		return result;
+	}
 }

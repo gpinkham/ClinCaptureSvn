@@ -14,6 +14,8 @@
  *******************************************************************************/
 package com.clinovo.enums;
 
+import com.clinovo.enums.study.StudyConfigurationParameterType;
+
 import java.util.List;
 
 /**

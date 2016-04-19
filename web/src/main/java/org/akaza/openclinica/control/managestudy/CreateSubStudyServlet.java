@@ -48,7 +48,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.enums.StudyOrigin;
+import com.clinovo.enums.study.StudyOrigin;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.ValidatorHelper;
 import com.clinovo.validator.StudyValidator;

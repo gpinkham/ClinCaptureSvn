@@ -12,58 +12,12 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyFacRecruitStatus.
+ * StudyConfigurationParameterType.
  */
-public enum StudyFacRecruitStatus {
+public enum StudyConfigurationParameterType {
 
-	NOT_YET_RECRUITING(1, "not_yet_recruiting", "not_yet_recruiting"), RECRUITING(2, "recruiting", "recruiting"),
-	NO_LONGER_RECRUITING(3, "no_longer_recruiting", "no_longer_recruiting"), COMPLETED(4, "completed", "completed"), SUSPENDED(5, "suspended", "suspended"),
-	TERMINATED(6, "terminated", "terminated");
-
-	private int id;
-	private String code;
-	private String value;
-
-	StudyFacRecruitStatus(int id, String value, String code) {
-		this.id = id;
-		this.code = code;
-		this.value = value;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public static StudyFacRecruitStatus get(int id) {
-		StudyFacRecruitStatus result = null;
-		for (StudyFacRecruitStatus studyFacRecruitStatus : StudyFacRecruitStatus.values()) {
-			if (studyFacRecruitStatus.getId() == id) {
-				result = studyFacRecruitStatus;
-				break;
-			}
-		}
-		return result;
-	}
-
-	public static StudyFacRecruitStatus get(String value) {
-		StudyFacRecruitStatus result = null;
-		for (StudyFacRecruitStatus studyFacRecruitStatus : StudyFacRecruitStatus.values()) {
-			if (studyFacRecruitStatus.getValue().equals(value)) {
-				result = studyFacRecruitStatus;
-				break;
-			}
-		}
-		return result;
-	}
+	GROUP, DYNAMIC_LABEL, SELECT, RADIO, TEXT;
 }

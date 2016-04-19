@@ -12,47 +12,53 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums;
+package com.clinovo.enums.study;
 
 /**
- * StudyOrigin.
+ * StudyProtocolType.
  */
-public enum StudyOrigin {
+public enum StudyProtocolType {
 
-	GUI(0, "gui"), STUDIO(1, "studio");
+	INTERVENTIONAL(0, "interventional", "interventional"), OBSERVATIONAL(1, "observational", "observational");
 
 	private int id;
-	private String name;
+	private String code;
+	private String value;
 
-	StudyOrigin(int id, String name) {
+	StudyProtocolType(int id, String value, String code) {
 		this.id = id;
-		this.name = name;
+		this.code = code;
+		this.value = value;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public String getCode() {
+		return code;
 	}
 
-	public static StudyOrigin get(int id) {
-		StudyOrigin result = GUI;
-		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
-			if (studyOrigin.getId() == id) {
-				result = studyOrigin;
+	public String getValue() {
+		return value;
+	}
+
+	public static StudyProtocolType get(int id) {
+		StudyProtocolType result = INTERVENTIONAL;
+		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
+			if (studyProtocolType.getId() == id) {
+				result = studyProtocolType;
 				break;
 			}
 		}
 		return result;
 	}
 
-	public static StudyOrigin get(String name) {
-		StudyOrigin result = GUI;
-		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
-			if (studyOrigin.getName().equals(name)) {
-				result = studyOrigin;
+	public static StudyProtocolType get(String value) {
+		StudyProtocolType result = INTERVENTIONAL;
+		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
+			if (studyProtocolType.getValue().equals(value)) {
+				result = studyProtocolType;
 				break;
 			}
 		}

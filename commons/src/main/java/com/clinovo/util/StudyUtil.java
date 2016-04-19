@@ -21,10 +21,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.control.form.FormProcessor;
 
-import com.clinovo.enums.StudyConfigurationParameter;
-import com.clinovo.enums.StudyFacility;
-import com.clinovo.enums.StudyFeature;
-import com.clinovo.enums.StudyParameter;
+import com.clinovo.enums.study.StudyConfigurationParameter;
+import com.clinovo.enums.study.StudyFacility;
+import com.clinovo.enums.study.StudyFeature;
+import com.clinovo.enums.study.StudyParameter;
 
 /**
  * StudyUtil.
