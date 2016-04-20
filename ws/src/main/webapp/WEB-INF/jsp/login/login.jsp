@@ -31,7 +31,7 @@
 							<p><fmt:message key="successfully_installed_ws" bundle="${restext}"/>.</p>
 							<p>
 								<fmt:message key="please_use" bundle="${restext}"/> 
-								<a href="<c:url value='/help/index.html'/>" target="_blank"><fmt:message key="user_manual" bundle="${resword}"/></a> 
+								<a href="#" target="_blank"><fmt:message key="user_manual" bundle="${resword}"/></a>
 								<fmt:message key="get_additional_info" bundle="${restext}"/>. 
 								<fmt:message key="list_of_ws" bundle="${restext}"/> 
 								<a href="#" target="_blank"><fmt:message key="here" bundle="${resword}"/>.</a>
