@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.enums.BaseEnum;
-import com.clinovo.enums.study.StudyConfigurationParameterType;
+import com.clinovo.enums.ParameterType;
 import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
@@ -170,8 +170,8 @@ public final class RequestParametersValidator {
 					}
 				}
 				if (baseEnum != null) {
-					if (baseEnum.getType() == StudyConfigurationParameterType.SELECT
-							|| baseEnum.getType() == StudyConfigurationParameterType.RADIO) {
+					if (baseEnum.getType() == ParameterType.SELECT
+							|| baseEnum.getType() == ParameterType.RADIO) {
 						if (!Arrays.asList(baseEnum.getValues()).contains(parameterValue)) {
 							throw new RestException(messageSource, "rest.possibleValuesAre",
 									new Object[]{parameterName,

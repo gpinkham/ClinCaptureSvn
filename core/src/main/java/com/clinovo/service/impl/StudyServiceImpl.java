@@ -46,7 +46,7 @@ import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.enums.study.StudyAllocation;
 import com.clinovo.enums.study.StudyAssignment;
 import com.clinovo.enums.study.StudyConfigurationParameter;
-import com.clinovo.enums.study.StudyConfigurationParameterType;
+import com.clinovo.enums.ParameterType;
 import com.clinovo.enums.study.StudyControl;
 import com.clinovo.enums.study.StudyDuration;
 import com.clinovo.enums.study.StudyEndPoint;
@@ -622,8 +622,8 @@ public class StudyServiceImpl implements StudyService {
 	private void updateStudyParameters(StudyBean studyBean, StudyParameterValueBean spv,
 			StudyParameterValueDAO spvdao) {
 		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-			if (studyConfigurationParameter.getType() != StudyConfigurationParameterType.DYNAMIC_LABEL
-					&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.GROUP
+			if (studyConfigurationParameter.getType() != ParameterType.DYNAMIC_LABEL
+					&& studyConfigurationParameter.getType() != ParameterType.GROUP
 					&& !studyConfigurationParameter.isSkip()) {
 				studyConfigService.updateParameter(studyConfigurationParameter.getName(),
 						studyBean.getStudyParameterConfig(), spv, spvdao);
@@ -655,8 +655,8 @@ public class StudyServiceImpl implements StudyService {
 
 	private void setConfigurationParameters(StudyBean studyBean, Map<String, String> configurationParametersMap) {
 		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
-			if (studyConfigurationParameter.getType() != StudyConfigurationParameterType.GROUP
-					&& studyConfigurationParameter.getType() != StudyConfigurationParameterType.DYNAMIC_LABEL
+			if (studyConfigurationParameter.getType() != ParameterType.GROUP
+					&& studyConfigurationParameter.getType() != ParameterType.DYNAMIC_LABEL
 					&& !studyConfigurationParameter.isSkip()) {
 				if (studyConfigurationParameter == StudyConfigurationParameter.DISCREPANCY_MANAGEMENT
 						&& studyBean.getStatus() != null && studyBean.getStatus().isLocked()) {

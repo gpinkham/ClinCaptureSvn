@@ -34,7 +34,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.clinovo.enums.BaseEnum;
-import com.clinovo.enums.study.StudyConfigurationParameterType;
+import com.clinovo.enums.ParameterType;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.EnumBasedParametersHolder;
@@ -231,8 +231,8 @@ public abstract class BaseWadlService extends BaseService {
 					param.setType(type);
 					param.setDefaultValue(useDefaultValues ? baseEnum.getDefaultValue() : NOT_USED);
 					param.setXmlnsXs(HTTP_WWW_W3_ORG_2001_XMLSCHEMA);
-					if (baseEnum.getType() == StudyConfigurationParameterType.SELECT
-							|| baseEnum.getType() == StudyConfigurationParameterType.RADIO) {
+					if (baseEnum.getType() == ParameterType.SELECT
+							|| baseEnum.getType() == ParameterType.RADIO) {
 						Values values = new Values();
 						values.setValue(getValues(baseEnum.getValues()));
 						param.getValuesList().add(values);

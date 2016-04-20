@@ -15,6 +15,7 @@
 package com.clinovo.enums.study;
 
 import com.clinovo.enums.BaseEnum;
+import com.clinovo.enums.ParameterType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,14 +34,14 @@ public enum StudyFacility implements BaseEnum {
 	private String code;
 	private String[] values;
 	private boolean required;
+	private ParameterType type;
 	private String defaultValue;
-	private StudyConfigurationParameterType type;
 
 	StudyFacility(String name, String code) {
 		this.name = name;
 		this.code = code;
 		defaultValue = "";
-		type = StudyConfigurationParameterType.TEXT;
+		type = ParameterType.TEXT;
 	}
 
 	/**
@@ -67,7 +68,7 @@ public enum StudyFacility implements BaseEnum {
 	/**
 	 * {@inheritDoc}
 	 */
-	public StudyConfigurationParameterType getType() {
+	public ParameterType getType() {
 		return type;
 	}
 

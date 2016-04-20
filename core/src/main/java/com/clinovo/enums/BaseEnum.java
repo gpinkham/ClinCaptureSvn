@@ -14,8 +14,6 @@
  *******************************************************************************/
 package com.clinovo.enums;
 
-import com.clinovo.enums.study.StudyConfigurationParameterType;
-
 import java.util.List;
 
 /**
@@ -25,11 +23,11 @@ import java.util.List;
 public interface BaseEnum {
 
 	/**
-	 * Returns StudyConfigurationParameterType.
+	 * Returns ParameterType.
 	 * 
-	 * @return StudyConfigurationParameterType
+	 * @return ParameterType
 	 */
-	StudyConfigurationParameterType getType();
+	ParameterType getType();
 
 	/**
 	 * Returns enum name.
