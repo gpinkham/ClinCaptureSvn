@@ -623,16 +623,21 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	 * {@inheritDoc}
 	 */
 	public void controlResponseValueIsNotValid() {
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage("importcrf.controlResponseValueIsNotValid",
-				new Object[]{crfBuilder.getCurrentItem().getName()}));
+		crfBuilder.getErrorsList()
+				.add(crfBuilder.getMessage("importcrf.controlResponseValueIsNotValid",
+						new Object[]{crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getOptionValue(),
+								crfBuilder.getCurrentItem().getName(),
+								crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getControlItemName()}));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void controlItemNameIsNotValid() {
-		crfBuilder.getErrorsList().add(crfBuilder.getMessage("importcrf.controlItemNameIsNotValid",
-				new Object[]{crfBuilder.getCurrentItem().getName()}));
+		crfBuilder.getErrorsList()
+				.add(crfBuilder.getMessage("importcrf.controlItemNameIsNotValid",
+						new Object[]{crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getControlItemName(),
+								crfBuilder.getCurrentItem().getName()}));
 	}
 
 	/**
