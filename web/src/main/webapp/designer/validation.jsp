@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="shortcut icon" href="https://www.clinovo.com/favicon.ico"> 
+    <link rel="shortcut icon" href="http://www.clincapture.com/favicon.ico">
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">

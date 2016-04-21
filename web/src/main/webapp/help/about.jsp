@@ -47,8 +47,8 @@
 			<a href="http://www.openclinica.com/trademark" target="_blank">trademark</a>
 			of OpenClinica, LLC.</p>
 		<p>ClinCapture is made possible by the OpenClinica open source project and other open source software.</p>
-		<p>ClinCapture&#0153; is a Trademark of Clinovo Inc. <a href="http://www.clinovo.com/" target="_blank">www.clinovo.com</a></p>
-		<p>Copyright 2010-<fmt:formatDate value="${date}" pattern="yyyy"/> Clinovo Inc. All rights reserved.</p>
+		<p>ClinCapture&#0153; is a Trademark of ClinCapture Inc. <a href="http://www.clincapture.com/" target="_blank">www.clincapture.com</a></p>
+		<p>Copyright 2010-<fmt:formatDate value="${date}" pattern="yyyy"/> ClinCapture Inc. All rights reserved.</p>
 		<br /><input class="button_medium" type="submit" id="CloaseWindow" name="BTN_Close" value="Close Window" onclick="javascript:window.close()"/> 
 </div>
 <!--end content-->

@@ -79,7 +79,7 @@ Ideally, you will want to download the JDBC4 jar file from the site http://jdbc.
 
 We have been testing ClinCapture with Tomcat 7, but have encountered technical issues with its implementation, and hope to fix this in a future release.
 
-The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit http://www.clinovo.com/clincapture/community.
+The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit http://www.clincapture.com/clincapture/community.
 
 2. OVERALL FEATURES SET:
 The main functionality includes:
@@ -100,7 +100,7 @@ Some key features of ClinCapture include:
 * A robust and scalable technology infrastructure developed using the Java J2EE framework interoperable with relational databases including PostgreSQL (open source) and Oracle 10G, to support the needs of the clinical research enterprise. 
 
 3. KNOWN ISSUES: 
-Known issues that are currently being fixed can be viewed in the Trac issue manager, available through http://www.clinovo.com/clincapture/community.
+Known issues that are currently being fixed can be viewed in the Trac issue manager, available through http://www.clincapture.com/clincapture/community.
 
 Currently known issues include the following:
 
@@ -111,14 +111,14 @@ Currently known issues include the following:
 
 4. INSTALLING CLINCAPTURE:
 Installation procedures are documented in the ClinCapture Administrator’s Guide.
-Please visit http://www.clinovo.com/clincapture/community to download it.
+Please visit http://www.clincapture.com/clincapture/community to download it.
 
 5. UPGRADING FROM OPENCLINICA 3.1.X TO CLINCAPTURE 1.0.2:
 Installation procedures are documented in the ClinCapture Administrator’s Guide.
-Please visit http://www.clinovo.com/clincapture/community to download it.
+Please visit http://www.clincapture.com/clincapture/community to download it.
 
 6. TECHNICAL ISSUES AND TROUBLESHOOTING:
-If you don't see an issue that is addressed below, we certainly recommend posting a question to the forums through http://www.clinovo.com/clincapture/forum.
+If you don't see an issue that is addressed below, we certainly recommend posting a question to the forums through http://www.clincapture.com/clincapture/forum.
 
 - Starting up the application
 
@@ -157,7 +157,7 @@ Clinovo can assist you with all these points, and more.
 
 7. CONTACTING CLINOVO INC.
 
-Please feel free to reach out to us either through the Contact page within ClinCapture, or our website at http://www.clinovo.com.
+Please feel free to reach out to us either through the Contact page within ClinCapture, or our website at http://www.clincapture.com.
 
 Our mailing address and phone are the following:
 1208 East Arques Avenue

@@ -9,7 +9,7 @@ public class EmailUtilTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetEmailFooterReturnsFooter() {
-		assertTrue(EmailUtil.getEmailFooter(Locale.ENGLISH).contains("href='https://www.clinovo.com/Privacy-Policy"));
+		assertTrue(EmailUtil.getEmailFooter(Locale.ENGLISH).contains("href='http://www.clincapture.com/Privacy-Policy"));
 	}
 
 	@Test

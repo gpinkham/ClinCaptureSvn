@@ -22,11 +22,11 @@
 									<fmt:message key="nav_support" bundle="${resword}"/></a>
 							</td>
 							<td class="footer" style="width: 20%;">
-								<a href="http://www.clinovo.com/clincapture/forum/" target="_blank">
+								<a href="http://www.clincapture.com/clincapture/forum/" target="_blank">
 									<fmt:message key="forums" bundle="${resword}"/></a>
 							</td>
 							<td class="footer" style="width: 20%;">
-								<a href="http://www.clinovo.com/clincapture/community/" target="_blank">
+								<a href="http://www.clincapture.com/clincapture/community/" target="_blank">
 									<fmt:message key="community" bundle="${resword}"/></a>
 							</td>
 							<td class="footer" style="text-align: right; white-space: nowrap;">
@@ -37,7 +37,7 @@
 					</table>
 				</td>
 				<td style="padding-left: 10px; padding-right: 10px; vertical-align: bottom; text-align: right">
-					<a href="http://www.clinovo.com/" target="_blank">
+					<a href="http://www.clincapture.com/" target="_blank">
 						<img src="<c:url value='${logoUrl}'/>" border="0" style="max-height: 150px;">
 					</a>
 				</td>

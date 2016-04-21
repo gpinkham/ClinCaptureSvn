@@ -10,7 +10,7 @@ public class CoreResourceTest extends AbstractContextSentiveTest {
 	public static final String WEBAPP_NAME = "clincapture";
 	public static final String $_WEBAPP_LOWER = "${webapp}";
 	public static final String $_WEBAPP_UPPER = "${WEBAPP}";
-	public static final String HTTP_WWW_CLINOVO_COM = "http://www.clinovo.com/";
+	public static final String HTTP_WWW_CLINOVO_COM = "http://www.clincapture.com/";
 	public static final String CURRENT_WEB_APP_NAME = "currentWebAppName";
 
 	@Before

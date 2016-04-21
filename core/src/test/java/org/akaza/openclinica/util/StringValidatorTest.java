@@ -36,7 +36,7 @@ public class StringValidatorTest {
 	 */
 	@Test
 	public void testUrlValidatorWithValidUrl() {
-		assertTrue(StringValidator.isValidURL("http://www.clinovo.com"));
+		assertTrue(StringValidator.isValidURL("http://www.clincapture.com"));
 	}
 
 	/**

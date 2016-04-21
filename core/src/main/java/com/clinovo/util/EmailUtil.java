@@ -54,7 +54,7 @@ public final class EmailUtil {
 				.concat(" Clinovo, 1208 E Arques Ave Suite 114, Sunnyvale, 94085 CA</font></td></tr>")
 				.concat("<tr><td style='height:60px; color:#333333;'> <font face='helvetica' color='#454545'>")
 				.concat(resword.getString("mail.respect_privacy"))
-				.concat("<a style='color:#0088CF' target'_blank' href='https://www.clinovo.com/Privacy-Policy'> ")
+				.concat("<a style='color:#0088CF' target'_blank' href='http://www.clincapture.com/Privacy-Policy'> ")
 				.concat(resword.getString("mail.privacy_policy")).concat(" </a>")
 				.concat(resword.getString("mail.more_information")).concat(" <br />Copyright&copy; ")
 				.concat(Integer.toString(year))
