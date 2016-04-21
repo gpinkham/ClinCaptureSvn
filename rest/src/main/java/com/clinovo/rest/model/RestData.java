@@ -54,7 +54,7 @@ public class RestData {
 	private EventDefinitionCRFBean eventDefinitionCRFBean;
 
 	@XmlElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private CRFVersionBean crfVersionBean;
+	private List<CRFVersionBean> crfVersionList = new ArrayList<CRFVersionBean>();
 
 	@XmlElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private List<StudyBean> studyList = new ArrayList<StudyBean>();
@@ -107,14 +107,6 @@ public class RestData {
 		this.eventDefinitionCRFBean = eventDefinitionCRFBean;
 	}
 
-	public CRFVersionBean getCrfVersionBean() {
-		return crfVersionBean;
-	}
-
-	public void setCrfVersionBean(CRFVersionBean crfVersionBean) {
-		this.crfVersionBean = crfVersionBean;
-	}
-
 	public List<StudyEventDefinitionBean> getStudyEventDefinitionList() {
 		return studyEventDefinitionList;
 	}
@@ -137,5 +129,21 @@ public class RestData {
 
 	public void setStudyBean(StudyBean studyBean) {
 		studyList.add(studyBean);
+	}
+
+	public List<CRFVersionBean> getCrfVersionList() {
+		return crfVersionList;
+	}
+
+	public void setCrfVersionList(List<CRFVersionBean> crfVersionList) {
+		this.crfVersionList = crfVersionList;
+	}
+
+	public CRFVersionBean getCrfVersionBean() {
+		return crfVersionList.size() == 1 ? crfVersionList.get(0) : null;
+	}
+
+	public void setCrfVersionBean(CRFVersionBean crfVersionBean) {
+		crfVersionList.add(crfVersionBean);
 	}
 }

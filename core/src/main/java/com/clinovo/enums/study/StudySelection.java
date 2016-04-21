@@ -44,6 +44,13 @@ public enum StudySelection {
 		return code;
 	}
 
+	/**
+	 * Finds StudySelection by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudySelection
+	 */
 	public static StudySelection get(int id) {
 		StudySelection result = EMPTY_VALUE;
 		for (StudySelection studySelection : StudySelection.values()) {
@@ -55,6 +62,13 @@ public enum StudySelection {
 		return result;
 	}
 
+	/**
+	 * Finds StudySelection by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudySelection
+	 */
 	public static StudySelection get(String value) {
 		StudySelection result = EMPTY_VALUE;
 		for (StudySelection studySelection : StudySelection.values()) {

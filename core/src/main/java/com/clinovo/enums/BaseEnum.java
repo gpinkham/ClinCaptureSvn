@@ -48,7 +48,7 @@ public interface BaseEnum {
 	 * 
 	 * @return List
 	 */
-	List asArray();
+	List asList();
 
 	/**
 	 * Finds enum object by name.

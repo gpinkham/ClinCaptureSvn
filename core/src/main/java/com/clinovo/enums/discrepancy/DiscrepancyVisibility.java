@@ -12,113 +12,28 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums.study;
-
-import com.clinovo.enums.BaseEnum;
-import com.clinovo.enums.ParameterType;
-
-import java.util.Arrays;
-import java.util.List;
+package com.clinovo.enums.discrepancy;
 
 /**
- * StudyFeature.
+ * DiscrepancyVisibility.
  */
-public enum StudyFeature implements BaseEnum {
+public enum DiscrepancyVisibility {
 
-	CRF_ANNOTATION("crfAnnotation", "crf_annotation"), DYNAMIC_GROUP("dynamicGroup", "dynamic_group"), CALENDARED_VISITS("calendaredVisits", "calendared_visits"),
-	INTERACTIVE_DASHBOARDS("interactiveDashboards", "interactive_dashboards"), ITEM_LEVEL_SDV("itemLevelSDV", "item_level_sdv"),
-	SUBJECT_CASEBOOK_IN_PDF("subjectCasebookInPDF", "subject_casebook_in_pdf"), CRF_MASKING("crfMasking", "crfs_masking"), SAS_EXTRACTS("sasExtracts", "sas_extracts"),
-	STUDY_EVALUATOR("studyEvaluator", "study_evaluator"), RANDOMIZATION("randomization", "randomization_cap"), MEDICAL_CODING("medicalCoding", "medical_coding");
+	SITE("site", "site_level"), STUDY("study", "study_level"), BOTH("both", "both");
 
 	private String name;
 	private String code;
-	private String[] values;
-	private boolean required;
-	private ParameterType type;
-	private String defaultValue;
 
-	StudyFeature(String name, String code) {
+	DiscrepancyVisibility(String name, String code) {
 		this.name = name;
 		this.code = code;
-		defaultValue = "yes";
-		type = ParameterType.RADIO;
-		values = new String[]{"yes", "no"};
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getCode() {
 		return code;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String[] getValues() {
-		return values;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public ParameterType getType() {
-		return type;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<StudyFeature> asList() {
-		return Arrays.asList(StudyFeature.values());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Object find(String name) {
-		StudyFeature result = null;
-		for (StudyFeature sttudyFeature : asList()) {
-			if (sttudyFeature.getName().equals(name)) {
-				result = sttudyFeature;
-				break;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean hasTypo(String name) {
-		boolean result = false;
-		for (StudyFeature studyFeature : asList()) {
-			if (studyFeature.getName().equalsIgnoreCase(name) && !studyFeature.getName().equals(name)) {
-				result = true;
-				break;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isRequired() {
-		return required;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getDefaultValue() {
-		return defaultValue;
 	}
 }

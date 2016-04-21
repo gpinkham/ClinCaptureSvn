@@ -2,6 +2,7 @@ package com.clinovo.rest.service;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.clinovo.util.ReflectionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -188,7 +189,7 @@ public class StudyServiceTest extends BaseServiceTest {
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedStart());
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedEnd());
 			for (StudyFeature studyFeature : StudyFeature.values()) {
-				assertEquals(studyConfigService.getParameter(studyFeature.getName(),
+				assertEquals(ReflectionUtil.getParameter(studyFeature.getName(),
 						restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig()), "yes");
 			}
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), "");
@@ -278,7 +279,7 @@ public class StudyServiceTest extends BaseServiceTest {
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedStart());
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getProtocolDateVerification());
 			for (StudyFeature studyFeature : StudyFeature.values()) {
-				assertEquals(studyConfigService.getParameter(studyFeature.getName(),
+				assertEquals(ReflectionUtil.getParameter(studyFeature.getName(),
 						restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig()), "no");
 			}
 		}
@@ -728,7 +729,7 @@ public class StudyServiceTest extends BaseServiceTest {
 					newTotalEnrollment);
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedEnd());
 			for (StudyFeature studyFeature : StudyFeature.values()) {
-				assertEquals(studyConfigService.getParameter(studyFeature.getName(),
+				assertEquals(ReflectionUtil.getParameter(studyFeature.getName(),
 						restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig()), "yes");
 			}
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityName(), "");
@@ -818,7 +819,7 @@ public class StudyServiceTest extends BaseServiceTest {
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getProtocolDateVerification());
 			assertNotNull(restOdmContainer.getRestData().getStudyBean().getDatePlannedStart());
 			for (StudyFeature studyFeature : StudyFeature.values()) {
-				assertEquals(studyConfigService.getParameter(studyFeature.getName(),
+				assertEquals(ReflectionUtil.getParameter(studyFeature.getName(),
 						restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig()), "no");
 			}
 		}

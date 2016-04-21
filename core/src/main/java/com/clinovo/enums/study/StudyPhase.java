@@ -46,6 +46,13 @@ public enum StudyPhase {
 		return code;
 	}
 
+	/**
+	 * Finds StudyPhase by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyPhase
+	 */
 	public static StudyPhase get(int id) {
 		StudyPhase result = N_A;
 		for (StudyPhase studyPhase : StudyPhase.values()) {
@@ -57,6 +64,13 @@ public enum StudyPhase {
 		return result;
 	}
 
+	/**
+	 * Finds StudyPhase by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyPhase
+	 */
 	public static StudyPhase get(String value) {
 		StudyPhase result = N_A;
 		for (StudyPhase studyPhase : StudyPhase.values()) {

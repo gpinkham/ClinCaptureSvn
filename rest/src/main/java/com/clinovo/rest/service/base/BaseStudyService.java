@@ -21,6 +21,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.util.ReflectionUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -185,12 +186,12 @@ public abstract class BaseStudyService extends BaseService {
 
 		for (StudyFeature studyFeature : StudyFeature.values()) {
 			prepareForValidation(studyFeature.getName(),
-					studyConfigService.getParameter(studyFeature.getName(), studyBean.getStudyParameterConfig()));
+					ReflectionUtil.getParameter(studyFeature.getName(), studyBean.getStudyParameterConfig()));
 		}
 
 		for (StudyFacility studyFacility : StudyFacility.values()) {
 			prepareForValidation(studyFacility.getName(),
-					studyConfigService.getParameter(studyFacility.getName(), studyBean));
+					ReflectionUtil.getParameter(studyFacility.getName(), studyBean));
 		}
 
 		validate(studyBean);

@@ -24,6 +24,8 @@ import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
+import com.clinovo.util.ReflectionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -512,7 +514,8 @@ public class StudyServiceImpl implements StudyService {
 				if (!dDescription.getName().equals(dDescriptionOld.getName())
 						|| !dDescription.getVisibilityLevel().equals(dDescriptionOld.getVisibilityLevel())) {
 					// description was changed
-					discrepancyDescriptionService.saveDiscrepancyDescription(dDescription);
+					dDescriptionOld.setVisibilityLevel(dDescription.getVisibilityLevel());
+					discrepancyDescriptionService.saveDiscrepancyDescription(dDescriptionOld);
 					idToDnDescriptionMap.remove(dDescription.getId());
 				} else {
 					// description wasn't changed
@@ -532,50 +535,50 @@ public class StudyServiceImpl implements StudyService {
 	private void createDefaultDiscrepancyDescriptions(StudyBean studyBean, ResourceBundle pageMessagesBundle) {
 		int studyId = studyBean.getId();
 
-		int dnFailedValidationCheckTypeId = 1;
-		int dnAnnotationTypeId = 2;
-		int dnQueryTypeId = 3;
+		int dnFailedValidationCheckTypeId = DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId();
+		int dnAnnotationTypeId = DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId();
+		int dnQueryTypeId = DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId();
 
 		// create default update discrepancy descriptions
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("corrected_CRF_data"), "", studyId,
-						"Study and Site", dnFailedValidationCheckTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("CRF_data_was_correctly_entered"), "", studyId,
-						"Study and Site", dnFailedValidationCheckTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("need_additional_clarification"), "", studyId,
-						"Study and Site", dnFailedValidationCheckTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("requested_information_is_provided"), "",
-						studyId, "Study and Site", dnFailedValidationCheckTypeId));
+						studyId, DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
 
 		// create default close discrepancy descriptions
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("query_response_monitored"), "", studyId,
-						"Study and Site", dnAnnotationTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("CRF_data_change_monitored"), "", studyId,
-						"Study and Site", dnAnnotationTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("calendared_event_monitored"), "", studyId,
-						"Study and Site", dnAnnotationTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("failed_edit_check_monitored"), "", studyId,
-						"Study and Site", dnAnnotationTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
 
 		// create default RFC discrepancy descriptions
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("corrected_CRF_data_entry_error"), "", studyId,
-						"Study and Site", dnQueryTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(
-				pageMessagesBundle.getString("source_data_was_missing"), "", studyId, "Study and Site", dnQueryTypeId));
+				pageMessagesBundle.getString("source_data_was_missing"), "", studyId, DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("source_data_was_incorrect"), "", studyId,
-						"Study and Site", dnQueryTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
 		discrepancyDescriptionService.saveDiscrepancyDescription(
 				new DiscrepancyDescription(pageMessagesBundle.getString("information_was_not_available"), "", studyId,
-						"Study and Site", dnQueryTypeId));
+						DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
 	}
 
 	private void submitStudyParameters(StudyBean studyBean) {
@@ -642,13 +645,13 @@ public class StudyServiceImpl implements StudyService {
 		for (StudyFeature studyFeature : StudyFeature.values()) {
 			String parameterName = studyFeature.getName();
 			String value = featuresMap.get(parameterName);
-			studyConfigService.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
+			ReflectionUtil.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
 		}
 	}
 
 	private void setFacilities(StudyBean studyBean, Map<String, String> facilitiesMap) {
 		for (StudyFacility studyFacility : StudyFacility.values()) {
-			studyConfigService.setParameter(studyFacility.getName(), facilitiesMap.get(studyFacility.getName()),
+			ReflectionUtil.setParameter(studyFacility.getName(), facilitiesMap.get(studyFacility.getName()),
 					studyBean);
 		}
 	}
@@ -665,7 +668,7 @@ public class StudyServiceImpl implements StudyService {
 					String parameterName = studyConfigurationParameter.getName();
 					String value = configurationParametersMap.get(parameterName);
 					if (value != null) {
-						studyConfigService.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
+						ReflectionUtil.setParameter(parameterName, value, studyBean.getStudyParameterConfig());
 					}
 				}
 			}

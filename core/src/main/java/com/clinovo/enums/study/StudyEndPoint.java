@@ -45,6 +45,13 @@ public enum StudyEndPoint {
 		return code;
 	}
 
+	/**
+	 * Finds StudyEndPoint by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyEndPoint
+	 */
 	public static StudyEndPoint get(int id) {
 		StudyEndPoint result = EMPTY_VALUE;
 		for (StudyEndPoint studyEndPoint : StudyEndPoint.values()) {
@@ -56,6 +63,13 @@ public enum StudyEndPoint {
 		return result;
 	}
 
+	/**
+	 * Finds StudyEndPoint by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyEndPoint
+	 */
 	public static StudyEndPoint get(String value) {
 		StudyEndPoint result = EMPTY_VALUE;
 		for (StudyEndPoint studyEndPoint : StudyEndPoint.values()) {

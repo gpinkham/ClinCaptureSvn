@@ -222,7 +222,7 @@ public abstract class BaseWadlService extends BaseService {
 			for (EnumBasedParameters enumBasedParameter : enumBasedParameters) {
 				Class<? extends BaseEnum> enumClass = enumBasedParameter.enumClass();
 				boolean useDefaultValues = enumBasedParameter.useDefaultValues();
-				for (BaseEnum baseEnum : (List<BaseEnum>) enumClass.getEnumConstants()[0].asArray()) {
+				for (BaseEnum baseEnum : (List<BaseEnum>) enumClass.getEnumConstants()[0].asList()) {
 					String type = convertJavaToXMLType(String.class);
 					Param param = new Param();
 					param.setName(baseEnum.getName());

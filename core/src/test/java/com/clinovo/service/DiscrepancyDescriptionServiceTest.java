@@ -13,6 +13,7 @@
 
 package com.clinovo.service;
 
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class DiscrepancyDescriptionServiceTest extends DefaultAppContextTest {
 	
 	@Test
 	public void testThatFindDDescriptionReturnVisibilityLevel() {
-		assertEquals("Study", discrepancyDescriptionService.findById(2).getVisibilityLevel());
+		assertEquals(DiscrepancyVisibility.STUDY.getName(), discrepancyDescriptionService.findById(2).getVisibilityLevel());
 	}
 	
 	@Test

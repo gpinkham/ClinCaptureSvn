@@ -76,6 +76,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_STUDY_RESTORE = "/study/restore";
 	public static final String API_STUDY_CREATE = "/study/create";
 	public static final String API_STUDY_EDIT = "/study/edit";
+	public static final String API_CRFS = "/crfs";
 	public static final String API_CRF_JSON_IMPORT_CRF = "/crf/json/importCrf";
 	public static final String API_CRF_JSON_IMPORT_CRF_VERSION = "/crf/json/importCrfVersion";
 	public static final String API_EVENT = "/event";

@@ -44,6 +44,13 @@ public enum StudyAssignment {
 		return code;
 	}
 
+	/**
+	 * Finds StudyAssignment by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyAssignment
+	 */
 	public static StudyAssignment get(int id) {
 		StudyAssignment result = EMPTY_VALUE;
 		for (StudyAssignment studyAssignment : StudyAssignment.values()) {
@@ -55,6 +62,13 @@ public enum StudyAssignment {
 		return result;
 	}
 
+	/**
+	 * Finds StudyAssignment by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyAssignment
+	 */
 	public static StudyAssignment get(String value) {
 		StudyAssignment result = EMPTY_VALUE;
 		for (StudyAssignment studyAssignment : StudyAssignment.values()) {

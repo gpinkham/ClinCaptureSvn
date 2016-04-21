@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,11 +97,11 @@ public class DiscrepancyDescriptionServiceImpl implements DiscrepancyDescription
 		int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
 		ArrayList<DiscrepancyDescription> rfcDescriptions = (ArrayList<DiscrepancyDescription>) discrepancyDescriptionDAO.findAllByStudyIdAndTypeId(parentStudyId, typeId);
 		for (DiscrepancyDescription rfcTerm : rfcDescriptions) {
-			if ("Site".equals(rfcTerm.getVisibilityLevel())) {
+			if (DiscrepancyVisibility.SITE.getName().equals(rfcTerm.getVisibilityLevel())) {
 				siteVisibleDescs.add(rfcTerm);
-			} else if ("Study".equals(rfcTerm.getVisibilityLevel())) {
+			} else if (DiscrepancyVisibility.STUDY.getName().equals(rfcTerm.getVisibilityLevel())) {
 				studyVisibleDescs.add(rfcTerm);
-			} else if ("Study and Site".equals(rfcTerm.getVisibilityLevel())) {
+			} else if (DiscrepancyVisibility.BOTH.getName().equals(rfcTerm.getVisibilityLevel())) {
 				studyVisibleDescs.add(rfcTerm);
 				siteVisibleDescs.add(rfcTerm);
 			}

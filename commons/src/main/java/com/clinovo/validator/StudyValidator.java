@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -179,15 +180,15 @@ public class StudyValidator {
 		if (editMode) {
 			if (dDescriptionsMap != null) {
 				validateSpecifiedDescriptions(fp, pageMessagesBundle, errors, validator, studyBean.getId(),
-						dDescriptionsMap.get("dnUpdateDescriptions"), "updateName", "updateVisibilityLevel",
-						"updateDescriptionId", "updateDescriptionError",
+						dDescriptionsMap.get("dnUpdateDescriptions"), "dnUpdateDescription", "dnUpdateVisibilityLevel",
+						"dnUpdateDescriptionId", "dnUpdateDescriptionError",
 						DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId());
 				validateSpecifiedDescriptions(fp, pageMessagesBundle, errors, validator, studyBean.getId(),
-						dDescriptionsMap.get("dnCloseDescriptions"), "closeName", "closeVisibilityLevel",
-						"closeDescriptionId", "closeDescriptionError",
+						dDescriptionsMap.get("dnCloseDescriptions"), "dnCloseDescription", "dnCloseVisibilityLevel",
+						"dnCloseDescriptionId", "dnCloseDescriptionError",
 						DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId());
 				validateSpecifiedDescriptions(fp, pageMessagesBundle, errors, validator, studyBean.getId(),
-						dDescriptionsMap.get("dnRFCDescriptions"), "dnRFCName", "dnRFCVisibilityLevel",
+						dDescriptionsMap.get("dnRFCDescriptions"), "dnRFCDescription", "dnRFCVisibilityLevel",
 						"dnRFCDescriptionId", "dnRFCDescriptionError",
 						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 			}
@@ -351,13 +352,13 @@ public class StudyValidator {
 				dDescription.setName(fp.getString(descriptionName + i));
 				switch (fp.getInt(visibilityLevel + i)) {
 					case 1 :
-						dDescription.setVisibilityLevel("Study");
+						dDescription.setVisibilityLevel(DiscrepancyVisibility.STUDY.getName());
 						break;
 					case 2 :
-						dDescription.setVisibilityLevel("Site");
+						dDescription.setVisibilityLevel(DiscrepancyVisibility.SITE.getName());
 						break;
 					default :
-						dDescription.setVisibilityLevel("Study and Site");
+						dDescription.setVisibilityLevel(DiscrepancyVisibility.BOTH.getName());
 				}
 				if (fp.getInt(descriptionId + i) != 0) {
 					dDescription.setId(fp.getInt(descriptionId + i));

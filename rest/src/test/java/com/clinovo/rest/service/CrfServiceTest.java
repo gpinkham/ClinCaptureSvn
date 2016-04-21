@@ -125,4 +125,14 @@ public class CrfServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()))
 				.andExpect(expectStatus);
 	}
+
+	@Test
+	public void testCrfsMethodDoesNotSupportPostMethod() throws Exception {
+		mockMvc.perform(post(API_CRFS)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testCrfsMethodWorksFine() throws Exception {
+		mockMvc.perform(get(API_CRFS)).andExpect(status().isOk());
+	}
 }

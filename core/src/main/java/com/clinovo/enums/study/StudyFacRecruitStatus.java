@@ -45,6 +45,13 @@ public enum StudyFacRecruitStatus {
 		return code;
 	}
 
+	/**
+	 * Finds StudyFacRecruitStatus by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyFacRecruitStatus
+	 */
 	public static StudyFacRecruitStatus get(int id) {
 		StudyFacRecruitStatus result = null;
 		for (StudyFacRecruitStatus studyFacRecruitStatus : StudyFacRecruitStatus.values()) {
@@ -56,6 +63,13 @@ public enum StudyFacRecruitStatus {
 		return result;
 	}
 
+	/**
+	 * Finds StudyFacRecruitStatus by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyFacRecruitStatus
+	 */
 	public static StudyFacRecruitStatus get(String value) {
 		StudyFacRecruitStatus result = null;
 		for (StudyFacRecruitStatus studyFacRecruitStatus : StudyFacRecruitStatus.values()) {

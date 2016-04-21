@@ -804,23 +804,23 @@
 								<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
 									<tr>
 										<td>
-											<input type="text" name="updateName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
+											<input type="text" name="dnUpdateDescription${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnUpdateDescription${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnUpdateDescriptionError${count}"/></jsp:include></p>
 										</td>
 									</tr>
 									<tr>
 										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
 
-											<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" ${term.visibilityLevel == 'Site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" ${term.visibilityLevel == 'Study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon()" name="updateVisibilityLevel${count}" ${term.visibilityLevel == 'Study and Site' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
-											<input type=hidden name="updateDescriptionId${count}" value="${term.id}">
+											<input type="radio" onchange="javascript:changeIcon()" name="dnUpdateVisibilityLevel${count}" ${term.visibilityLevel == 'site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnUpdateVisibilityLevel${count}" ${term.visibilityLevel == 'study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnUpdateVisibilityLevel${count}" ${term.visibilityLevel == 'both' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
+											<input type=hidden name="dnUpdateDescriptionId${count}" value="${term.id}">
 											<c:set var="count" value="${count+1}"/>
 											<br></br>
 										</td>
@@ -840,21 +840,21 @@
 								<c:forEach begin="${count}" end="${count+delta}">
 									<tr id="dnUpdateDescriptionRow_a${count}">
 										<td>
-											<input type="text" name="updateName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL bw2 h15">
+											<input type="text" name="dnUpdateDescription${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
 									<tr id="dnUpdateDescriptionRow_b${count}">
 										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnUpdateDescription${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnUpdateDescriptionError${count}"/></jsp:include></p>
 										</td>
 									</tr>
 									<tr id="dnUpdateDescriptionRow_c${count}">
 										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
-											<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon();" name="dnUpdateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon();" name="dnUpdateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon();" name="dnUpdateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 											<br></br>
 										</td>
 									</tr>
@@ -864,21 +864,21 @@
 									<c:forEach begin="${count}" end="24">
 										<tr style="display: none" id="dnUpdateDescriptionRow_a${count}">
 											<td>
-												<input type="text" name="updateName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL bw2 h15">
+												<input type="text" name="dnUpdateDescription${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'updateDescriptions');" value="" class="formfieldXL bw2 h15">
 											</td>
 										</tr>
 										<tr style="display: none" id="dnUpdateDescriptionRow_b${count}">
 											<td>
-												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateName${count}"/></jsp:include></p>
-												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="updateDescriptionError${count}"/></jsp:include></p>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnUpdateDescription${count}"/></jsp:include></p>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnUpdateDescriptionError${count}"/></jsp:include></p>
 											</td>
 										</tr>
 										<tr style="display: none" id="dnUpdateDescriptionRow_c${count}">
 											<td>
 												<fmt:message key="visibility" bundle="${resword}"/>:
-												<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon();" name="updateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="dnUpdateVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="dnUpdateVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="dnUpdateVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 												<br></br>
 											</td>
 										</tr>
@@ -915,23 +915,23 @@
 								<c:forEach var="term" items="${dDescriptionsMap['dnCloseDescriptions']}">
 									<tr>
 										<td>
-											<input type="text" name="closeName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
+											<input type="text" name="dnCloseDescription${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnCloseDescription${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnCloseDescriptionError${count}"/></jsp:include></p>
 										</td>
 									</tr>
 									<tr>
 										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
-											<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" ${term.visibilityLevel == 'Site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" ${term.visibilityLevel == 'Study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon()" name="closeVisibilityLevel${count}" ${term.visibilityLevel == 'Study and Site' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnCloseVisibilityLevel${count}" ${term.visibilityLevel == 'site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnCloseVisibilityLevel${count}" ${term.visibilityLevel == 'study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnCloseVisibilityLevel${count}" ${term.visibilityLevel == 'both' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
 
-											<input type=hidden name="closeDescriptionId${count}" value="${term.id}">
+											<input type=hidden name="dnCloseDescriptionId${count}" value="${term.id}">
 											<c:set var="count" value="${count+1}"/>
 											<br></br>
 										</td>
@@ -951,21 +951,21 @@
 								<c:forEach begin="${count}" end="${count+delta}">
 									<tr id="dnCloseDescriptionRow_a${count}">
 										<td>
-											<input type="text" name="closeName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL bw2 h15">
+											<input type="text" name="dnCloseDescription${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
 									<tr id="dnCloseDescriptionRow_b${count}">
 										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>											</td>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnCloseDescription${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnCloseDescriptionError${count}"/></jsp:include></p>											</td>
 										</td>
 									</tr>
 									<tr id="dnCloseDescriptionRow_c${count}">
 										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
-											<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon();" name="dnCloseVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon();" name="dnCloseVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon();" name="dnCloseVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 											<br></br>
 										</td>
 									</tr>
@@ -975,21 +975,21 @@
 									<c:forEach begin="${count}" end="24">
 										<tr style="display: none" id="dnCloseDescriptionRow_a${count}">
 											<td>
-												<input type="text" name="closeName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL bw2 h15">
+												<input type="text" name="dnCloseDescription${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'closeDescriptions');" value="" class="formfieldXL bw2 h15">
 											</td>
 										</tr>
 										<tr style="display: none" id="dnCloseDescriptionRow_b${count}">
 											<td>
-												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeName${count}"/></jsp:include></p>
-												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="closeDescriptionError${count}"/></jsp:include></p>												</td>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnCloseDescription${count}"/></jsp:include></p>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnCloseDescriptionError${count}"/></jsp:include></p>												</td>
 											</td>
 										</tr>
 										<tr style="display: none" id="dnCloseDescriptionRow_c${count}">
 											<td>
 												<fmt:message key="visibility" bundle="${resword}"/>:
-												<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
-												<input type="radio" onchange="javascript:changeIcon();" name="closeVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="dnCloseVisibilityLevel${count}" value="2"><fmt:message key="site_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="dnCloseVisibilityLevel${count}" value="1"><fmt:message key="study_level" bundle="${resword}"/>
+												<input type="radio" onchange="javascript:changeIcon();" name="dnCloseVisibilityLevel${count}" checked value="0"><fmt:message key="both" bundle="${resword}"/>
 												<br></br>
 											</td>
 										</tr>
@@ -1025,12 +1025,12 @@
 								<c:forEach var="term" items="${dDescriptionsMap['dnRFCDescriptions']}">
 									<tr>
 										<td>
-											<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
+											<input type="text" name="dnRFCDescription${count}" onchange="javascript:changeIcon()" value="${term.name}" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCName${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCDescription${count}"/></jsp:include></p>
 											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCDescriptionError${count}"/></jsp:include></p>
 										</td>
 									</tr>
@@ -1038,9 +1038,9 @@
 										<td>
 											<fmt:message key="visibility" bundle="${resword}"/>:
 
-											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'Site'} value="2"><fmt:message key="site_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'Study'} value="1"><fmt:message key="study_level" bundle="${resword}"/>
-											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}"  ${term.visibilityLevel == 'Study and Site'}value="0"><fmt:message key="both" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'site' ? 'checked' : ''} value="2"><fmt:message key="site_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'study' ? 'checked' : ''} value="1"><fmt:message key="study_level" bundle="${resword}"/>
+											<input type="radio" onchange="javascript:changeIcon()" name="dnRFCVisibilityLevel${count}" ${term.visibilityLevel == 'both' ? 'checked' : ''} value="0"><fmt:message key="both" bundle="${resword}"/>
 
 											<input type=hidden name="dnRFCDescriptionId${count}" value="${term.id}">
 											<c:set var="count" value="${count+1}"/>
@@ -1062,12 +1062,12 @@
 								<c:forEach begin="${count}" end="${count+delta}">
 									<tr id="dnRFCDescriptionRow_a${count}">
 										<td>
-											<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL bw2 h15">
+											<input type="text" name="dnRFCDescription${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL bw2 h15">
 										</td>
 									</tr>
 									<tr id="dnRFCDescriptionRow_b${count}">
 										<td>
-											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCName${count}"/></jsp:include></p>
+											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCDescription${count}"/></jsp:include></p>
 											<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCDescriptionError${count}"/></jsp:include></p>
 										</td>
 									</tr>
@@ -1086,12 +1086,12 @@
 									<c:forEach begin="${count}" end="24">
 										<tr style="display: none" id="dnRFCDescriptionRow_a${count}">
 											<td>
-												<input type="text" name="dnRFCName${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL bw2 h15">
+												<input type="text" name="dnRFCDescription${count}" onchange="javascript:changeIcon();" onfocus="javascript:showMoreFields(${count},'RFC');" value="" class="formfieldXL bw2 h15">
 											</td>
 										</tr>
 										<tr style="display: none" id="dnRFCDescriptionRow_b${count}">
 											<td>
-												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCName${count}"/></jsp:include></p>
+												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCDescription${count}"/></jsp:include></p>
 												<p><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRFCDescriptionError${count}"/></jsp:include></p>
 											</td>
 										</tr>

@@ -15,6 +15,8 @@
 
 package com.clinovo.rest.service;
 
+import java.util.List;
+
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,7 +29,6 @@ import com.clinovo.rest.service.base.BaseCrfService;
  * CrfService.
  */
 @RestController("restCrfService")
-@RequestMapping("/crf")
 public class CrfService extends BaseCrfService {
 
 	/**
@@ -39,7 +40,7 @@ public class CrfService extends BaseCrfService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RequestMapping(value = "/json/importCrf", method = RequestMethod.POST)
+	@RequestMapping(value = "/crf/json/importCrf", method = RequestMethod.POST)
 	public CRFVersionBean importCrf(@RequestParam("jsonData") String jsonData) throws Exception {
 		return importCrf(jsonData, false);
 	}
@@ -53,8 +54,20 @@ public class CrfService extends BaseCrfService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RequestMapping(value = "/json/importCrfVersion", method = RequestMethod.POST)
+	@RequestMapping(value = "/crf/json/importCrfVersion", method = RequestMethod.POST)
 	public CRFVersionBean importCrfVersion(@RequestParam("jsonData") String jsonData) throws Exception {
 		return importCrf(jsonData, true);
+	}
+
+	/**
+	 * Method returns all crf versions.
+	 *
+	 * @return List of CRFVersionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfs", method = RequestMethod.GET)
+	public List<CRFVersionBean> crfs() throws Exception {
+		return getAllCrfVersions();
 	}
 }

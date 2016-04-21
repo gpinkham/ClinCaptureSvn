@@ -51,7 +51,7 @@ public class DiscrepancyDescriptionDAO extends AbstractDomainDao<DiscrepancyDesc
 
 	public List<DiscrepancyDescription> findAllByStudyIdAndTypeId(int studyId, int typeId) {
 		
-		String query = "from " + getDomainClassName() + " dd where dd.studyId = :studyId and typeId = :typeId";
+		String query = "from " + getDomainClassName() + " where studyId = :studyId and typeId = :typeId order by id";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("studyId", studyId);
 		q.setInteger("typeId", typeId);

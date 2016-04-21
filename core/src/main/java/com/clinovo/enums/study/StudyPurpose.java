@@ -46,6 +46,13 @@ public enum StudyPurpose {
 		return code;
 	}
 
+	/**
+	 * Finds StudyPurpose by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyPurpose
+	 */
 	public static StudyPurpose get(int id) {
 		StudyPurpose result = EMPTY_VALUE;
 		for (StudyPurpose studyPurpose : StudyPurpose.values()) {
@@ -57,6 +64,13 @@ public enum StudyPurpose {
 		return result;
 	}
 
+	/**
+	 * Finds StudyPurpose by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyPurpose
+	 */
 	public static StudyPurpose get(String value) {
 		StudyPurpose result = EMPTY_VALUE;
 		for (StudyPurpose studyPurpose : StudyPurpose.values()) {

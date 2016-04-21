@@ -165,7 +165,7 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
 		this.setTypeExpected(index++, TypeNames.INT);
 		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
+		this.setTypeExpected(index, TypeNames.STRING);
 
 	}
 
@@ -183,6 +183,12 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		eb.setRevisionNotes((String) hm.get("revision_notes"));
 		eb.setOid((String) hm.get("oc_oid"));
 		eb.setStatusId((Integer) hm.get("status_id"));
+
+		String crfName = (String) hm.get("crf_name");
+		if (crfName != null) {
+			eb.setCrfName(crfName);
+		}
+
 		return eb;
 	}
 
@@ -604,6 +610,39 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		variables.put(1, crfId);
 
 		return executeFindAllQuery("findAllByCRFId", variables);
+	}
+
+	/**
+	 * Returns all crf versions by study ud.
+	 * 
+	 * @param studyId
+	 *            int
+	 * @return List of CRF Versions
+	 */
+	public List<CRFVersionBean> findAllByStudyId(int studyId) {
+		List<CRFVersionBean> crfVersionList = new ArrayList<CRFVersionBean>();
+		int index = 1;
+		unsetTypeExpected();
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index, TypeNames.STRING);
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		String sql = digester.getQuery("findAllByStudyId");
+		List<HashMap> rows = select(sql, variables);
+		for (HashMap map : rows) {
+			crfVersionList.add((CRFVersionBean) getEntityFromHashMap(map));
+		}
+		return crfVersionList;
 	}
 
 	/**

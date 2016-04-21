@@ -43,6 +43,13 @@ public enum StudyProtocolType {
 		return value;
 	}
 
+	/**
+	 * Finds StudyProtocolType by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyProtocolType
+	 */
 	public static StudyProtocolType get(int id) {
 		StudyProtocolType result = INTERVENTIONAL;
 		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {
@@ -54,6 +61,13 @@ public enum StudyProtocolType {
 		return result;
 	}
 
+	/**
+	 * Finds StudyProtocolType by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyProtocolType
+	 */
 	public static StudyProtocolType get(String value) {
 		StudyProtocolType result = INTERVENTIONAL;
 		for (StudyProtocolType studyProtocolType : StudyProtocolType.values()) {

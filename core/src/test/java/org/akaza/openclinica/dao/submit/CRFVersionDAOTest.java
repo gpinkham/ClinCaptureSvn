@@ -89,9 +89,14 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void TestThatFind() throws OpenClinicaException {
+	public void testThatFindMethodWorksFine() throws OpenClinicaException {
 		int oldVersionId = 5;
 		int newVersionId = 6;
 		assertEquals(newVersionId, crfVersionDao.findLatestAfterDeleted(oldVersionId).getId());
+	}
+
+	@Test
+	public void testThatFindAllByStudyIdReturnsCorrectCollectionSize() throws OpenClinicaException {
+		assertEquals(crfVersionDao.findAllByStudyId(1).size(), 8);
 	}
 }

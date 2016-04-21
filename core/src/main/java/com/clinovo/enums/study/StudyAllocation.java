@@ -43,6 +43,13 @@ public enum StudyAllocation {
 		return code;
 	}
 
+	/**
+	 * Finds StudyAllocation by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyAllocation
+	 */
 	public static StudyAllocation get(int id) {
 		StudyAllocation result = EMPTY_VALUE;
 		for (StudyAllocation studyAllocation : StudyAllocation.values()) {
@@ -54,6 +61,13 @@ public enum StudyAllocation {
 		return result;
 	}
 
+	/**
+	 * Finds StudyAllocation by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyAllocation
+	 */
 	public static StudyAllocation get(String value) {
 		StudyAllocation result = EMPTY_VALUE;
 		for (StudyAllocation studyAllocation : StudyAllocation.values()) {

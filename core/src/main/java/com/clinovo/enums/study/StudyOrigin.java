@@ -37,6 +37,13 @@ public enum StudyOrigin {
 		return name;
 	}
 
+	/**
+	 * Finds StudyOrigin by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyOrigin
+	 */
 	public static StudyOrigin get(int id) {
 		StudyOrigin result = GUI;
 		for (StudyOrigin studyOrigin : StudyOrigin.values()) {
@@ -48,6 +55,13 @@ public enum StudyOrigin {
 		return result;
 	}
 
+	/**
+	 * Finds StudyOrigin by name.
+	 *
+	 * @param name
+	 *            String
+	 * @return StudyOrigin
+	 */
 	public static StudyOrigin get(String name) {
 		StudyOrigin result = GUI;
 		for (StudyOrigin studyOrigin : StudyOrigin.values()) {

@@ -967,19 +967,19 @@
 
     <discrepancy_description id="1"
                              name="Site Removed" description="Site Removed this from the protocol"
-                             study_id="1" visibility_level="Site" type_id="1" version="0"/>
+                             study_id="1" visibility_level="site" type_id="1" version="0"/>
 
     <discrepancy_description id="2"
                              name="test name" description="Standard Protocol Deviation"
-                             study_id="1" visibility_level="Study" type_id="2" version="0"/>
+                             study_id="1" visibility_level="study" type_id="2" version="0"/>
 
     <discrepancy_description id="3"
                              name="test name3" description="Site Removed this from the protocol"
-                             study_id="1" visibility_level="Site" type_id="3" version="0"/>
+                             study_id="1" visibility_level="site" type_id="3" version="0"/>
 
     <discrepancy_description id="4"
                              name="test name4" description="Standard Protocol Deviation"
-                             study_id="1" visibility_level="Study" type_id="2" version="0"/>
+                             study_id="1" visibility_level="study" type_id="2" version="0"/>
 
     <discrepancy_note discrepancy_note_id="1" description="10:00pm bedtime" discrepancy_note_type_id="1"
                       resolution_status_id="4" detailed_notes="[The input you provided is not an integer.]"

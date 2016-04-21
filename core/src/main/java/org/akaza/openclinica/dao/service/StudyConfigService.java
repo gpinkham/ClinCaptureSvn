@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.enums.SystemConfigurationParameters;
+import com.clinovo.util.ReflectionUtil;
 
 /**
  * StudyConfigService class.
@@ -45,9 +46,6 @@ import com.clinovo.enums.SystemConfigurationParameters;
 public class StudyConfigService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyConfigService.class);
-
-	private static final String GET = "get";
-	private static final String SET = "set";
 
 	@Autowired
 	private DataSource ds;
@@ -140,53 +138,23 @@ public class StudyConfigService {
 		return setParametersForStudy(site);
 	}
 
-	public Method getMethod(Class clazz, String parameterName) {
-		Method method = null;
-		for (Method classMethod : clazz.getMethods()) {
-			if (classMethod.getName().equalsIgnoreCase(GET.concat(parameterName))) {
-				method = classMethod;
-				break;
-			}
-		}
-		return method;
-	}
-
-	public Method setMethod(Class clazz, String parameterName) {
-		Method method = null;
-		for (Method classMethod : clazz.getMethods()) {
-			if (classMethod.getName().equalsIgnoreCase(SET.concat(parameterName))) {
-				method = classMethod;
-				break;
-			}
-		}
-		return method;
-	}
-
-	public void setParameter(String parameterName, String value, Object object) {
-		try {
-			Method method = setMethod(object.getClass(), parameterName);
-			method.invoke(object, value);
-		} catch (Exception ex) {
-			LOGGER.error("Error has occurred.", ex);
-		}
-	}
-
-	public String getParameter(String parameterName, Object object) {
-		String parameterValue = "";
-		try {
-			Method method = getMethod(object.getClass(), parameterName);
-			parameterValue = (String) method.invoke(object);
-		} catch (Exception ex) {
-			LOGGER.error("Error has occurred.", ex);
-		}
-		return parameterValue;
-	}
-
+	/**
+	 * Updates study configuration parameter.
+	 * 
+	 * @param parameterName
+	 *            String
+	 * @param spc
+	 *            StudyParameterConfig
+	 * @param spv
+	 *            StudyParameterValueBean
+	 * @param spvdao
+	 *            StudyParameterValueDAO
+	 */
 	public void updateParameter(String parameterName, StudyParameterConfig spc, StudyParameterValueBean spv,
 			StudyParameterValueDAO spvdao) {
 		try {
 			spv.setParameter(parameterName);
-			Method method = getMethod(spc.getClass(), parameterName);
+			Method method = ReflectionUtil.getMethod(spc.getClass(), parameterName);
 			spv.setValue((String) method.invoke(spc));
 			updateParameter(spvdao, spv);
 		} catch (Exception ex) {
@@ -206,7 +174,7 @@ public class StudyConfigService {
 	private void setStudyParameterValues(StudyParameterValueDAO spvdao, StudyParameterConfig spc, String handle,
 			StudyParameterValueBean spv) {
 		if (spv.getId() > 0) {
-			setParameter(handle, spv.getValue(), spc);
+			ReflectionUtil.setParameter(handle, spv.getValue(), spc);
 		} else if (spv.getId() == 0) {
 			setSystemParameterValues(spvdao, spc, handle);
 		}
@@ -223,7 +191,7 @@ public class StudyConfigService {
 		if (systemProp != null) {
 			value = systemProp.getValue();
 			if (SystemConfigurationParameters.isPresent(handle)) {
-				setParameter(handle, value, spc);
+				ReflectionUtil.setParameter(handle, value, spc);
 			}
 		}
 	}

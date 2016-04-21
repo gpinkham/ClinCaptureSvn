@@ -44,6 +44,13 @@ public enum StudyDuration {
 		return code;
 	}
 
+	/**
+	 * Finds StudyDuration by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyDuration
+	 */
 	public static StudyDuration get(int id) {
 		StudyDuration result = EMPTY_VALUE;
 		for (StudyDuration studyDuration : StudyDuration.values()) {
@@ -55,6 +62,13 @@ public enum StudyDuration {
 		return result;
 	}
 
+	/**
+	 * Finds StudyDuration by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyDuration
+	 */
 	public static StudyDuration get(String value) {
 		StudyDuration result = EMPTY_VALUE;
 		for (StudyDuration studyDuration : StudyDuration.values()) {

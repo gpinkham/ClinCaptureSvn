@@ -44,6 +44,13 @@ public enum StudyControl {
 		return code;
 	}
 
+	/**
+	 * Finds StudyControl by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyControl
+	 */
 	public static StudyControl get(int id) {
 		StudyControl result = EMPTY_VALUE;
 		for (StudyControl studyControl : StudyControl.values()) {
@@ -55,6 +62,13 @@ public enum StudyControl {
 		return result;
 	}
 
+	/**
+	 * Finds StudyControl by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyControl
+	 */
 	public static StudyControl get(String value) {
 		StudyControl result = EMPTY_VALUE;
 		for (StudyControl studyControl : StudyControl.values()) {

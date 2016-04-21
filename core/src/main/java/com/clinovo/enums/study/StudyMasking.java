@@ -43,6 +43,13 @@ public enum StudyMasking {
 		return code;
 	}
 
+	/**
+	 * Finds StudyMasking by id.
+	 *
+	 * @param id
+	 *            int
+	 * @return StudyMasking
+	 */
 	public static StudyMasking get(int id) {
 		StudyMasking result = EMPTY_VALUE;
 		for (StudyMasking studyMasking : StudyMasking.values()) {
@@ -54,6 +61,13 @@ public enum StudyMasking {
 		return result;
 	}
 
+	/**
+	 * Finds StudyMasking by value.
+	 *
+	 * @param value
+	 *            String
+	 * @return StudyMasking
+	 */
 	public static StudyMasking get(String value) {
 		StudyMasking result = EMPTY_VALUE;
 		for (StudyMasking studyMasking : StudyMasking.values()) {

@@ -106,7 +106,7 @@ public class StudyService extends BaseStudyService {
 	 */
 	@EnumBasedParametersHolder({@EnumBasedParameters(enumClass = StudyFacility.class, useDefaultValues = true),
 			@EnumBasedParameters(enumClass = StudyFeature.class, useDefaultValues = true),
-			@EnumBasedParameters(enumClass = StudyConfigurationParameter.class)})
+			@EnumBasedParameters(enumClass = StudyConfigurationParameter.class, useDefaultValues = true)})
 	@PossibleValuesHolder({
 			@PossibleValues(name = "protocolType", values = "0,1", valueDescriptions = "rest.protocolType.valueDescription"),
 			@PossibleValues(name = "phase", values = "0,1,2,3,4,5,6,7,8,9,10,11,12,13", valueDescriptions = "rest.phase.valueDescription"),

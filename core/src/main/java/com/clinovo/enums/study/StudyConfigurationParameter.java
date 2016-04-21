@@ -16,6 +16,8 @@ package com.clinovo.enums.study;
 
 import com.clinovo.enums.BaseEnum;
 import com.clinovo.enums.ParameterType;
+import com.clinovo.util.ReflectionUtil;
+import org.akaza.openclinica.bean.service.StudyParameterConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,6 +143,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.name = name;
 		this.code = code;
 		this.type = type;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String objectsSelector, String rowClassName, String name, String code,
@@ -150,6 +153,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.type = type;
 		this.rowClassName = rowClassName;
 		this.objectsSelector = objectsSelector;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String maxLength, ParameterType type) {
@@ -157,6 +161,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.code = code;
 		this.type = type;
 		this.maxLength = maxLength;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, boolean skip, String maxLength, ParameterType type) {
@@ -164,6 +169,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.type = type;
 		this.skip = skip;
 		this.maxLength = maxLength;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String maxLength, ParameterType type,
@@ -173,6 +179,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.type = type;
 		this.maxLength = maxLength;
 		this.rowClassName = rowClassName;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, boolean skip, String maxLength, String dynamicLabelId,
@@ -184,6 +191,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.dynamicLabelId = dynamicLabelId;
 		this.validationPattern = validationPattern;
 		this.validationErrorMessage = validationErrorMessage;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes,
@@ -193,6 +201,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.type = type;
 		this.values = values;
 		this.valueCodes = valueCodes;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(boolean disabled, String name, String code, String[] values, String[] valueCodes,
@@ -203,6 +212,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.values = values;
 		this.disabled = disabled;
 		this.valueCodes = valueCodes;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes,
@@ -213,6 +223,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.values = values;
 		this.valueCodes = valueCodes;
 		this.rowClassName = rowClassName;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes, String dynamicLabelId,
@@ -225,6 +236,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.rowClassName = rowClassName;
 		this.processorMode = processorMode;
 		this.dynamicLabelId = dynamicLabelId;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes,
@@ -238,6 +250,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.rowClassName = rowClassName;
 		this.dependentRowsClassName = dependentRowsClassName;
 		this.hideDependentRowsIfSelectedValueIs = hideDependentRowsIfSelectedValueIs;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(String name, String code, String[] values, String[] valueCodes,
@@ -250,6 +263,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.valueCodes = valueCodes;
 		this.dependentRowsClassName = dependentRowsClassName;
 		this.hideDependentRowsIfSelectedValueIs = hideDependentRowsIfSelectedValueIs;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(boolean ignoreName, String name, String code, String[] values, String[] valueCodes,
@@ -265,6 +279,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.selectValueIfThereIsNothingIsSelected = selectValueIfThereIsNothingIsSelected;
 		this.additionalStudyConfigurationParameter = additionalStudyConfigurationParameter;
 		this.showAdditionalStudyConfigurationParameterIfSelectedValueIs = showAdditionalStudyConfigurationParameterIfSelectedValueIs;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 	}
 
 	StudyConfigurationParameter(boolean ignoreName, String name, String code, String[] values, String[] valueCodes,
@@ -279,6 +294,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 		this.ignoreName = ignoreName;
 		this.rowClassName = rowClassName;
 		this.dynamicLabelId = dynamicLabelId;
+		defaultValue = ReflectionUtil.getParameter(name, new StudyParameterConfig());
 		this.selectValueIfThereIsNothingIsSelected = selectValueIfThereIsNothingIsSelected;
 		this.additionalStudyConfigurationParameter = additionalStudyConfigurationParameter;
 		this.showAdditionalStudyConfigurationParameterIfSelectedValueIs = showAdditionalStudyConfigurationParameterIfSelectedValueIs;
@@ -383,7 +399,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<StudyConfigurationParameter> asArray() {
+	public List<StudyConfigurationParameter> asList() {
 		List<StudyConfigurationParameter> list = new ArrayList<StudyConfigurationParameter>();
 		for (StudyConfigurationParameter studyConfigurationParameter : StudyConfigurationParameter.values()) {
 			if (!studyConfigurationParameter.isDisabled() && !studyConfigurationParameter.isIgnoreName()
@@ -400,7 +416,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	 */
 	public StudyConfigurationParameter find(String name) {
 		StudyConfigurationParameter result = null;
-		for (StudyConfigurationParameter studyConfigurationParameter : asArray()) {
+		for (StudyConfigurationParameter studyConfigurationParameter : asList()) {
 			if (studyConfigurationParameter.getName().equals(name)) {
 				result = studyConfigurationParameter;
 				break;
@@ -414,7 +430,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	 */
 	public boolean hasTypo(String name) {
 		boolean result = false;
-		for (StudyConfigurationParameter studyConfigurationParameter : asArray()) {
+		for (StudyConfigurationParameter studyConfigurationParameter : asList()) {
 			if (studyConfigurationParameter.getName().equalsIgnoreCase(name)
 					&& !studyConfigurationParameter.getName().equals(name)) {
 				result = true;

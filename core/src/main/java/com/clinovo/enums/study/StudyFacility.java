@@ -75,7 +75,7 @@ public enum StudyFacility implements BaseEnum {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<StudyFacility> asArray() {
+	public List<StudyFacility> asList() {
 		return Arrays.asList(StudyFacility.values());
 	}
 
@@ -84,7 +84,7 @@ public enum StudyFacility implements BaseEnum {
 	 */
 	public Object find(String name) {
 		StudyFacility result = null;
-		for (StudyFacility studyFacility : asArray()) {
+		for (StudyFacility studyFacility : asList()) {
 			if (studyFacility.getName().equals(name)) {
 				result = studyFacility;
 				break;
@@ -98,7 +98,7 @@ public enum StudyFacility implements BaseEnum {
 	 */
 	public boolean hasTypo(String name) {
 		boolean result = false;
-		for (StudyFacility studyFacility : asArray()) {
+		for (StudyFacility studyFacility : asList()) {
 			if (studyFacility.getName().equalsIgnoreCase(name) && !studyFacility.getName().equals(name)) {
 				result = true;
 				break;

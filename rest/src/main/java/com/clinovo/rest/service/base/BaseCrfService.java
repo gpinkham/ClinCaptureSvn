@@ -15,6 +15,7 @@
 package com.clinovo.rest.service.base;
 
 import java.net.URLDecoder;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -79,5 +80,9 @@ public abstract class BaseCrfService extends BaseService {
 			crfBuilder.build();
 		}
 		return save(crfBuilder, importCrfVersion);
+	}
+
+	protected List<CRFVersionBean> getAllCrfVersions() throws Exception {
+		return getCRFVersionDAO().findAllByStudyId(getCurrentStudy().getId());
 	}
 }

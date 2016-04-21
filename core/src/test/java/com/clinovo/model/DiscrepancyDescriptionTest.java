@@ -16,9 +16,11 @@ package com.clinovo.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.junit.Test;
 
 public class DiscrepancyDescriptionTest {
+
 	@Test
 	public void testThatNewDDescriptionHasUnknownType() {
 		assertEquals(DiscrepancyDescriptionType.DescriptionType.UNKNOWN.getId(), new DiscrepancyDescription().getTypeId());
@@ -40,9 +42,9 @@ public class DiscrepancyDescriptionTest {
 	@Test
 	public void testThatSetVisibilityLevelWorksCorrect() {
 		DiscrepancyDescription item = new DiscrepancyDescription();
-		item.setVisibilityLevel("Study");
+		item.setVisibilityLevel(DiscrepancyVisibility.STUDY.getName());
 		
-		assertEquals("Study", item.getVisibilityLevel());
+		assertEquals(DiscrepancyVisibility.STUDY.getName(), item.getVisibilityLevel());
 	}
 }
 
