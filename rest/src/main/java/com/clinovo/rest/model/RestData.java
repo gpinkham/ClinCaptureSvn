@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -52,6 +53,9 @@ public class RestData {
 
 	@XmlElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private EventDefinitionCRFBean eventDefinitionCRFBean;
+
+	@XmlElement(name = "Crf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private List<CRFBean> crfList = new ArrayList<CRFBean>();
 
 	@XmlElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private List<CRFVersionBean> crfVersionList = new ArrayList<CRFVersionBean>();
@@ -145,5 +149,21 @@ public class RestData {
 
 	public void setCrfVersionBean(CRFVersionBean crfVersionBean) {
 		crfVersionList.add(crfVersionBean);
+	}
+
+	public List<CRFBean> getCrfList() {
+		return crfList;
+	}
+
+	public void setCrfList(List<CRFBean> crfList) {
+		this.crfList = crfList;
+	}
+
+	public CRFBean getCrfBean() {
+		return crfList.size() == 1 ? crfList.get(0) : null;
+	}
+
+	public void setCrfBean(CRFBean crfBean) {
+		crfList.add(crfBean);
 	}
 }

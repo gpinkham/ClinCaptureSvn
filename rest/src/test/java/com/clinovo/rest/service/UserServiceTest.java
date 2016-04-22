@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -369,6 +370,21 @@ public class UserServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatItIsImpossibleToRemoveLockedUser() throws Exception {
+		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+
+		UserAccountBean userAccountBean = (UserAccountBean) userAccountDao.findByPK(newUser.getId());
+		userAccountBean.setStatus(Status.LOCKED);
+		userAccountDao.update(userAccountBean);
+		userAccountBean = (UserAccountBean) userAccountDao.findByPK(newUser.getId());
+		assertTrue(userAccountBean.getStatus().isLocked());
+
+		mockMvc.perform(post(API_USER_REMOVE).param("userName", newUser.getName()))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatRestoreUserMethodThrowsExceptionIfUserNameParameterIsMissing() throws Exception {
 		mockMvc.perform(post(API_USER_RESTORE)).andExpect(status().isBadRequest());
 	}
@@ -436,6 +452,21 @@ public class UserServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName())).andExpect(status().isOk());
 		userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(newUser.getName());
 		assertEquals(userAccountBean.getStatus(), Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreNotRemovedUser() throws Exception {
+		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+		createNewStudyUser(UserType.SYSADMIN, Role.STUDY_ADMINISTRATOR);
+
+		UserAccountBean userAccountBean = (UserAccountBean) userAccountDao.findByPK(newUser.getId());
+		userAccountBean.setStatus(Status.AVAILABLE);
+		userAccountDao.update(userAccountBean);
+		userAccountBean = (UserAccountBean) userAccountDao.findByPK(newUser.getId());
+		assertTrue(userAccountBean.getStatus().isAvailable());
+
+		mockMvc.perform(post(API_USER_RESTORE).param("userName", newUser.getName()))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test

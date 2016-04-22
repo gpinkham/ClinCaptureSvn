@@ -13,13 +13,25 @@
 
 package org.akaza.openclinica.bean.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.CrfOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * <P>
@@ -30,15 +42,32 @@ import java.util.ArrayList;
  * 
  * 
  */
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "Crf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonPropertyOrder({"id", "oid", "crfName", "crfVersions", "status"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class CRFBean extends AuditableEntityBean {
+
+	@JsonProperty("oid")
+	@XmlElement(name = "Oid", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String oid;
+
+	@JsonProperty("crfName")
+	@XmlElement(name = "CrfName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String name = "";
+
+	@JsonProperty("crfVersions")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	@XmlElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private List<CRFVersionBean> crfVersions = new ArrayList<CRFVersionBean>();
+
 	private int statusId = 1;
 	private String description = "";
 	private String source = "";
 	private ArrayList versions; // not in DB
 	private boolean selected = false; // not in DB
 
-	private String oid;
 	private OidGenerator oidGenerator;
 	private int studyId;
 	private ArrayList<StudyBean> studiesWhereUsed;
@@ -129,6 +158,17 @@ public class CRFBean extends AuditableEntityBean {
 		this.oid = oid;
 	}
 
+	@Override
+	public void setName(String name) {
+		super.name = name;
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
 	/**
 	 * Returns OidGenerator.
 	 * 
@@ -178,7 +218,8 @@ public class CRFBean extends AuditableEntityBean {
 	}
 
 	/**
-	 * @param source - excel or form studio
+	 * @param source
+	 *            - excel or form studio
 	 */
 	public void setSource(String source) {
 		this.source = source;
@@ -190,5 +231,13 @@ public class CRFBean extends AuditableEntityBean {
 
 	public void setStudiesWhereUsed(ArrayList<StudyBean> studiesWhereUsed) {
 		this.studiesWhereUsed = studiesWhereUsed;
+	}
+
+	public List<CRFVersionBean> getCrfVersions() {
+		return crfVersions;
+	}
+
+	public void setCrfVersions(List<CRFVersionBean> crfVersions) {
+		this.crfVersions = crfVersions;
 	}
 }

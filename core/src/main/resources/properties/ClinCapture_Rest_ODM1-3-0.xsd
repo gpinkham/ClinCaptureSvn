@@ -24,6 +24,7 @@
     <xs:complexType name="restData">
         <xs:sequence>
             <xs:element ref="StudyBean" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="Crf" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="CrfVersion" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="EventDefinitionCrf" minOccurs="0"/>
             <xs:element ref="StudyEventDefinition" minOccurs="0" maxOccurs="unbounded"/>
@@ -177,6 +178,18 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:element name="Crf" type="crfBean"/>
+
+    <xs:complexType name="crfBean">
+        <xs:sequence>
+            <xs:element ref="Id" minOccurs="0"/>
+            <xs:element ref="Status" minOccurs="0"/>
+            <xs:element ref="Oid" minOccurs="0"/>
+            <xs:element ref="CrfName" minOccurs="0"/>
+            <xs:element ref="CrfVersion" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:element name="CrfVersion" type="crfVersionBean"/>
 
     <xs:element name="CrfId" type="xs:int"/>
@@ -186,6 +199,7 @@
         <xs:sequence>
             <xs:element ref="Id" minOccurs="0"/>
             <xs:element ref="Status" minOccurs="0"/>
+            <xs:element ref="Oid" minOccurs="0"/>
             <xs:element ref="CrfId" minOccurs="0"/>
             <xs:element ref="CrfName" minOccurs="0"/>
             <xs:element ref="Version" minOccurs="0"/>

@@ -115,6 +115,7 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
 	@Override
 	public void setName(String name) {
+		super.name = name;
 		this.name = name;
 	}
 

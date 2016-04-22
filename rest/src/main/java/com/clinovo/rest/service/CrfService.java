@@ -17,6 +17,7 @@ package com.clinovo.rest.service;
 
 import java.util.List;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,14 +61,138 @@ public class CrfService extends BaseCrfService {
 	}
 
 	/**
+	 * Method returns crf.
+	 *
+	 * @param crfId
+	 *            int
+	 * @return CRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crf", method = RequestMethod.GET)
+	public CRFBean crf(@RequestParam(value = "id") int crfId) throws Exception {
+		return getCRF(crfId);
+	}
+
+	/**
+	 * Method returns crf version.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @return CRFVersionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfVersion", method = RequestMethod.GET)
+	public CRFVersionBean crfVersion(@RequestParam(value = "id") int crfVersionId) throws Exception {
+		return getCRFVersion(crfVersionId);
+	}
+
+	/**
+	 * Method returns all crfs.
+	 *
+	 * @return List of CRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfs", method = RequestMethod.GET)
+	public List<CRFBean> crfs() throws Exception {
+		return getAllCrfs();
+	}
+
+	/**
 	 * Method returns all crf versions.
 	 *
 	 * @return List of CRFVersionBean
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@RequestMapping(value = "/crfs", method = RequestMethod.GET)
-	public List<CRFVersionBean> crfs() throws Exception {
+	@RequestMapping(value = "/crfVersions", method = RequestMethod.GET)
+	public List<CRFVersionBean> crfVersions() throws Exception {
 		return getAllCrfVersions();
+	}
+
+	/**
+	 * Method removes crf.
+	 *
+	 * @param crfId
+	 *            int
+	 * @return CRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crf/remove", method = RequestMethod.POST)
+	public CRFBean removeCrf(@RequestParam("id") int crfId) throws Exception {
+		return removeCRF(crfId);
+	}
+
+	/**
+	 * Method restores crf.
+	 *
+	 * @param crfId
+	 *            int
+	 * @return CRFBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crf/restore", method = RequestMethod.POST)
+	public CRFBean restoreCrf(@RequestParam("id") int crfId) throws Exception {
+		return restoreCRF(crfId);
+	}
+
+	/**
+	 * Method removes crf version.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @return CRFVersionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfVersion/remove", method = RequestMethod.POST)
+	public CRFVersionBean removeCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
+		return removeCRFVersion(crfVersionId);
+	}
+
+	/**
+	 * Method restores crf version.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @return CRFVersionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfVersion/restore", method = RequestMethod.POST)
+	public CRFVersionBean restoreCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
+		return restoreCRFVersion(crfVersionId);
+	}
+
+	/**
+	 * Method locks crf version.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @return CRFVersionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfVersion/lock", method = RequestMethod.POST)
+	public CRFVersionBean lockCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
+		return lockCRFVersion(crfVersionId);
+	}
+
+	/**
+	 * Method unlocks crf version.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @return CRFVersionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfVersion/unlock", method = RequestMethod.POST)
+	public CRFVersionBean unlockCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
+		return unlockCRFVersion(crfVersionId);
 	}
 }

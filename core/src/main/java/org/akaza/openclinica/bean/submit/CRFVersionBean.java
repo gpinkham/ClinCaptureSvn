@@ -21,12 +21,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -39,11 +39,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "CrfVersion", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonPropertyOrder({"id", "crfId", "crfName", "version", "status"})
+@JsonPropertyOrder({"id", "oid", "crfId", "crfName", "version", "status"})
 @SuppressWarnings("serial")
 public class CRFVersionBean extends AuditableEntityBean {
 
-	private String description = "";
+	@JsonProperty("oid")
+	@XmlElement(name = "Oid", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String oid;
 
 	@JsonProperty("crfId")
 	@XmlElement(name = "CrfId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
@@ -55,7 +57,9 @@ public class CRFVersionBean extends AuditableEntityBean {
 
 	@JsonProperty("version")
 	@XmlElement(name = "Version", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-	private String version = "";
+	private String name = "";
+
+	private String description = "";
 
 	private int statusId = 1;
 
@@ -64,8 +68,6 @@ public class CRFVersionBean extends AuditableEntityBean {
 	private Date dateCreated;
 
 	private boolean downloadable = false; // not in DB, tells whether the spreadsheet is downloadable
-
-	private String oid;
 
 	private OidGenerator oidGenerator;
 
@@ -171,8 +173,13 @@ public class CRFVersionBean extends AuditableEntityBean {
 
 	@Override
 	public void setName(String name) {
+		super.name = name;
 		this.name = name;
-		this.version = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -224,10 +231,6 @@ public class CRFVersionBean extends AuditableEntityBean {
 
 	public void setCrfName(String crfName) {
 		this.crfName = crfName;
-	}
-
-	public String getVersion() {
-		return version;
 	}
 
 	public boolean isAvailable() {

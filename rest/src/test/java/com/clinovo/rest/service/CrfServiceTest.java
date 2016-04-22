@@ -4,8 +4,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Test;
@@ -127,12 +131,255 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testCrfsMethodDoesNotSupportPostMethod() throws Exception {
+	public void testThatCrfsMethodDoesNotSupportPostMethod() throws Exception {
 		mockMvc.perform(post(API_CRFS)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testCrfsMethodWorksFine() throws Exception {
+	public void testThatCrfsMethodWorksFine() throws Exception {
 		mockMvc.perform(get(API_CRFS)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatCrfVersionsMethodDoesNotSupportPostMethod() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSIONS)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCrfVersionsMethodWorksFine() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSIONS)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatCrfMethodDoesNotSupportPostMethod() throws Exception {
+		mockMvc.perform(post(API_CRF).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCrfMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(get(API_CRF)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCrfMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(get(API_CRF).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCrfMethodThrowsExceptionIfCrfDoesNotExist() throws Exception {
+		mockMvc.perform(get(API_CRF).param("id", "34234234")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCrfMethodWorksFine() throws Exception {
+		mockMvc.perform(get(API_CRF).param("id", "1")).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatCrfVersionMethodDoesNotSupportPostMethod() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCrfVersionMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCrfVersionMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatCrfVersionMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION).param("id", "34234234")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatCrfVersionMethodWorksFine() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION).param("id", "1")).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_REMOVE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_REMOVE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_REMOVE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_REMOVE).param("id", "34234234")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRemoveCrfMethodWorksFine() throws Exception {
+		mockMvc.perform(post(API_CRF_REMOVE).param("id", "1")).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatRemoveCrfVersionMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION_REMOVE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRemoveCrfVersionMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_REMOVE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfVersionMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_REMOVE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRemoveCrfVersionMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_REMOVE).param("id", "34234234"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRemoveCrfVersionMethodWorksFine() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_REMOVE).param("id", "1")).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_RESTORE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_RESTORE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_RESTORE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_RESTORE).param("id", "34234234")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRestoreCrfMethodWorksFine() throws Exception {
+		UserAccountBean userAccountBean = new UserAccountBean();
+		userAccountBean.setId(1);
+		CRFDAO crfDao = new CRFDAO(dataSource);
+		CRFBean crfBean = (CRFBean) crfDao.findByPK(1);
+		crfBean.setUpdater(userAccountBean);
+		crfBean.setStatus(Status.DELETED);
+		crfDao.update(crfBean);
+		assertTrue(crfBean.getStatus().isDeleted());
+		mockMvc.perform(post(API_CRF_RESTORE).param("id", "1")).andExpect(status().isOk());
+		crfBean = (CRFBean) crfDao.findByPK(1);
+		assertTrue(crfBean.getStatus().isAvailable());
+	}
+
+	@Test
+	public void testThatRestoreCrfVersionMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION_RESTORE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRestoreCrfVersionMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_RESTORE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfVersionMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_RESTORE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatRestoreCrfVersionMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_RESTORE).param("id", "34234234"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatRestoreCrfVersionMethodWorksFine() throws Exception {
+		UserAccountBean userAccountBean = new UserAccountBean();
+		userAccountBean.setId(1);
+		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
+		crfVersionBean.setUpdater(userAccountBean);
+		crfVersionBean.setStatus(Status.DELETED);
+		crfVersionDao.update(crfVersionBean);
+		assertTrue(crfVersionBean.getStatus().isDeleted());
+		mockMvc.perform(post(API_CRF_VERSION_RESTORE).param("id", "1")).andExpect(status().isOk());
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
+		assertTrue(crfVersionBean.getStatus().isAvailable());
+	}
+
+	@Test
+	public void testThatLockCrfVersionMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION_LOCK).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatLockCrfVersionMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_LOCK)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatLockCrfVersionMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_LOCK).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatLockCrfVersionMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_LOCK).param("id", "34234234")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatLockCrfVersionMethodWorksFine() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_LOCK).param("id", "1")).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatUnLockCrfVersionMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION_UNLOCK).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatUnLockCrfVersionMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_UNLOCK)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatUnLockCrfVersionMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_UNLOCK).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatUnLockCrfVersionMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_UNLOCK).param("id", "34234234"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatUnLockCrfVersionMethodWorksFine() throws Exception {
+		UserAccountBean userAccountBean = new UserAccountBean();
+		userAccountBean.setId(1);
+		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
+		crfVersionBean.setUpdater(userAccountBean);
+		crfVersionBean.setStatus(Status.LOCKED);
+		crfVersionDao.update(crfVersionBean);
+		assertTrue(crfVersionBean.getStatus().isLocked());
+		mockMvc.perform(post(API_CRF_VERSION_UNLOCK).param("id", "1")).andExpect(status().isOk());
+		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
+		assertTrue(crfVersionBean.getStatus().isAvailable());
 	}
 }

@@ -113,9 +113,8 @@ public abstract class BaseUserService extends BaseService {
 					&& !studyBean.getStudyParameterConfig().getMedicalCoding().equals(YES)) {
 				throw new RestException(messageSource, "rest.userservice.createuser.codingIsNotAvailable",
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} else
-				if (userAccountRole.equals(Role.STUDY_EVALUATOR)
-						&& !studyBean.getStudyParameterConfig().getStudyEvaluator().equals(YES)) {
+			} else if (userAccountRole.equals(Role.STUDY_EVALUATOR)
+					&& !studyBean.getStudyParameterConfig().getStudyEvaluator().equals(YES)) {
 				throw new RestException(messageSource, "rest.userservice.createuser.evaluationIsNotAvailable",
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
@@ -143,6 +142,26 @@ public abstract class BaseUserService extends BaseService {
 		}
 
 		userAccountBean.setPasswd(displayPassword ? userAccountBean.getRealPassword() : "");
+		return userAccountBean;
+	}
+
+	protected UserAccountBean remove(String userName) throws Exception {
+		UserAccountBean userAccountBean = getUserAccountBean(userName, true);
+		if (userAccountBean.getStatus().isLocked()) {
+			throw new RestException(messageSource, "rest.userservice.youCannotRemoveLockedUser");
+		} else if (!userAccountBean.getStatus().isDeleted()) {
+			userAccountService.removeUser(userAccountBean, getCurrentUser());
+		}
+		return userAccountBean;
+	}
+
+	protected UserAccountBean restore(String userName) throws Exception {
+		UserAccountBean userAccountBean = getUserAccountBean(userName, true);
+		if (!userAccountBean.getStatus().isDeleted()) {
+			throw new RestException(messageSource, "rest.userservice.userIsNotInRemovedState");
+		} else {
+			userAccountService.restoreUser(userAccountBean, getCurrentUser());
+		}
 		return userAccountBean;
 	}
 }

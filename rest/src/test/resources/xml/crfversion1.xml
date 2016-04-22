@@ -4,9 +4,10 @@
         <CrfVersion>
             <Id>1</Id>
             <Status>avaliable</Status>
+            <Oid>test_CRF_5</Oid>
             <CrfId>2</CrfId>
             <CrfName>Test CRF</CrfName>
-            <Version>V 5.0</Version>
+            <Version>5.0</Version>
         </CrfVersion>
     </RestData>
 </ODM>

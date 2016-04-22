@@ -37,7 +37,6 @@ import com.clinovo.rest.model.Response;
 import com.clinovo.rest.service.base.BaseEventService;
 import com.clinovo.rest.util.ValidatorUtil;
 import com.clinovo.service.EDCItemMetadataService;
-import com.clinovo.service.EventDefinitionCrfService;
 import com.clinovo.service.EventDefinitionService;
 import com.clinovo.validator.EventDefinitionValidator;
 
@@ -47,9 +46,6 @@ import com.clinovo.validator.EventDefinitionValidator;
 @RestController("restEventService")
 @SuppressWarnings("rawtypes")
 public class EventService extends BaseEventService {
-
-	@Autowired
-	private EventDefinitionCrfService eventDefinitionCrfService;
 
 	@Autowired
 	private EventDefinitionService eventDefinitionService;
@@ -89,7 +85,8 @@ public class EventService extends BaseEventService {
 	 */
 	@RequestMapping(value = "/event", method = RequestMethod.GET)
 	public StudyEventDefinitionBean getEventDefinition(@RequestParam(value = "id") int eventId) throws Exception {
-		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(eventId), getCurrentStudy());
+		return eventDefinitionService.fillEventDefinitionCrfs(getStudyEventDefinition(eventId, false),
+				getCurrentStudy());
 	}
 
 	/**
@@ -121,8 +118,7 @@ public class EventService extends BaseEventService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@PossibleValuesHolder({
-			@PossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
+	@PossibleValuesHolder({@PossibleValues(name = "type", values = "scheduled,unscheduled,common,calendared_visit")})
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST)
 	public StudyEventDefinitionBean createEvent(@RequestParam("name") String name,
 			@RequestParam(value = "type") String type,
@@ -148,7 +144,7 @@ public class EventService extends BaseEventService {
 	/**
 	 * Method that edits study event definition.
 	 *
-	 * @param id
+	 * @param eventId
 	 *            int
 	 * @param name
 	 *            String
@@ -213,7 +209,7 @@ public class EventService extends BaseEventService {
 	 */
 	@RequestMapping(value = "/event/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int eventId) throws Exception {
-		return eventDefinitionService.removeStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
+		return removeSED(eventId);
 	}
 
 	/**
@@ -227,7 +223,7 @@ public class EventService extends BaseEventService {
 	 */
 	@RequestMapping(value = "/event/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int eventId) throws Exception {
-		return eventDefinitionService.restoreStudyEventDefinition(getStudyEventDefinition(eventId), getCurrentUser());
+		return restoreSED(eventId);
 	}
 
 	/**
@@ -293,7 +289,7 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "tabbing", defaultValue = "leftToRight", required = false) String tabbing,
 			@RequestParam(value = "acceptNewCrfVersions", defaultValue = "false", required = false) boolean acceptNewCrfVersions)
 					throws Exception {
-		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
 
 		EventDefinitionCRFBean eventDefinitionCrfBean = createEventDefinitionCRF(studyEventDefinitionBean,
 				getCurrentUser(), crfName, defaultVersion, required, passwordRequired, hide, sourceDataVerification,
@@ -361,7 +357,7 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "tabbing", required = false) String tabbing,
 			@RequestParam(value = "acceptNewCrfVersions", required = false) Boolean acceptNewCrfVersions,
 			@RequestParam(value = "propagateChange", required = false) Integer propagateChange) throws Exception {
-		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
 
 		EventDefinitionCRFBean eventDefinitionCRFBean = editParentEventDefinitionCRF(eventId, crfName, defaultVersion,
 				required, passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen, email, tabbing,
@@ -427,7 +423,7 @@ public class EventService extends BaseEventService {
 			@RequestParam(value = "emailWhen", required = false) String emailWhen,
 			@RequestParam(value = "email", required = false) String email,
 			@RequestParam(value = "tabbing", required = false) String tabbing) throws Exception {
-		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId);
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
 
 		EventDefinitionCRFBean eventDefinitionCRFBean = editChildEventDefinitionCRF(eventId, crfName, siteName,
 				defaultVersion, required, passwordRequired, hide, sourceDataVerification, dataEntryQuality, emailWhen,
@@ -455,8 +451,7 @@ public class EventService extends BaseEventService {
 	@RequestMapping(value = "/event/removeCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
-		return eventDefinitionCrfService.removeParentEventDefinitionCrf(
-				getEventDefinitionCRF(eventId, crfName, getCurrentStudy(), false), getCurrentUser());
+		return removeEDC(eventId, crfName);
 	}
 
 	/**
@@ -473,8 +468,7 @@ public class EventService extends BaseEventService {
 	@RequestMapping(value = "/event/restoreCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
-		return eventDefinitionCrfService.restoreParentEventDefinitionCrf(
-				getEventDefinitionCRF(eventId, crfName, getCurrentStudy(), false), getCurrentUser());
+		return restoreEDC(eventId, crfName);
 	}
 
 	/**

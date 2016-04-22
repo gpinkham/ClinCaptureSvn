@@ -1166,6 +1166,18 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatItIsImpossibleToRemoveLockedStudyEventDefinition() throws Exception {
+		int studyEventDefinitionId = 1;
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(studyEventDefinitionId);
+		studyEventDefinitionBean.setStatus(Status.LOCKED);
+		studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEventDefinitionId);
+		assertTrue(studyEventDefinitionBean.getStatus().isLocked());
+		mockMvc.perform(post(API_EVENT_REMOVE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatItIsImpossibleToRestoreStudyEventDefinitionThatDoesNotExist() throws Exception {
 		mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1345")).andExpect(status().isInternalServerError());
 	}
@@ -1203,6 +1215,18 @@ public class EventServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1")).andExpect(status().isOk());
 		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(1);
 		assertEquals(studyEventDefinitionBean.getStatus(), Status.AVAILABLE);
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreNotRemovedStudyEventDefinition() throws Exception {
+		int studyEventDefinitionId = 1;
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+				.findByPK(studyEventDefinitionId);
+		studyEventDefinitionBean.setStatus(Status.AVAILABLE);
+		studyEventDefinitionDAO.update(studyEventDefinitionBean);
+		studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEventDefinitionId);
+		assertTrue(studyEventDefinitionBean.getStatus().isAvailable());
+		mockMvc.perform(post(API_EVENT_RESTORE).param("id", "1")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -1329,6 +1353,22 @@ public class EventServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatItIsImpossibleToRemoveLockedEventDefinitionCrf() throws Exception {
+		int eventDefinitionCrfId = 1;
+		UserAccountBean userAccountBean = new UserAccountBean();
+		userAccountBean.setId(1);
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO
+				.findByPK(eventDefinitionCrfId);
+		eventDefinitionCRFBean.setUpdater(userAccountBean);
+		eventDefinitionCRFBean.setStatus(Status.LOCKED);
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(eventDefinitionCrfId);
+		assertTrue(eventDefinitionCRFBean.getStatus().isLocked());
+		mockMvc.perform(post(API_EVENT_REMOVE_CRF).param("eventId", "1").param("crfName", "Agent Administration"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatItIsImpossibleToRestoreEventDefinitionCrfFromStudyEventDefinitionThatDoesNotExist()
 			throws Exception {
 		mockMvc.perform(post(API_EVENT_RESTORE_CRF).param("eventId", "1345").param("crfName", "Agent Administration"))
@@ -1386,6 +1426,22 @@ public class EventServiceTest extends BaseServiceTest {
 	public void testThatRestoreCrfMethodThrowsExceptionIfCrfNameParameterHasATypo() throws Exception {
 		mockMvc.perform(post(API_EVENT_RESTORE_CRF).param("eventId", "1").param("crfNamE", "Agent Administration"))
 				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToRestoreNotRemoveEventDefinitionCrf() throws Exception {
+		int eventDefinitionCrfId = 1;
+		UserAccountBean userAccountBean = new UserAccountBean();
+		userAccountBean.setId(1);
+		EventDefinitionCRFBean eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO
+				.findByPK(eventDefinitionCrfId);
+		eventDefinitionCRFBean.setUpdater(userAccountBean);
+		eventDefinitionCRFBean.setStatus(Status.AVAILABLE);
+		eventDefinitionCRFDAO.update(eventDefinitionCRFBean);
+		eventDefinitionCRFBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(eventDefinitionCrfId);
+		assertTrue(eventDefinitionCRFBean.getStatus().isAvailable());
+		mockMvc.perform(post(API_EVENT_RESTORE_CRF).param("eventId", "1").param("crfName", "Agent Administration"))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test

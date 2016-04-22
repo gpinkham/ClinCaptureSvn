@@ -150,10 +150,24 @@ public class XsdSchemaValidationTest {
 	@Test
 	public void testThatSchemaPassesValidationDuringUnmarshallingTheCrfVersionBean() throws Exception {
 		RestOdmContainer restOdmContainer = unmarshal(
-				new FileSystemResourceLoader().getResource("classpath:xml/crfversion.xml"));
+				new FileSystemResourceLoader().getResource("classpath:xml/crfversion1.xml"));
 		assertNotNull(restOdmContainer.getRestData().getCrfVersionBean());
+		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getId(), 1);
+		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getCrfId(), 2);
+		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getOid(), "test_CRF_5");
 		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getCrfName(), "Test CRF");
+		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getName(), "5.0");
+		assertEquals(restOdmContainer.getRestData().getCrfVersionBean().getStatusCode(), "avaliable");
 		marshal(restOdmContainer.getRestData().getCrfVersionBean());
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheCrfVersionBeans() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/crfversion2.xml"));
+		assertNull(restOdmContainer.getRestData().getCrfVersionBean());
+		assertEquals(restOdmContainer.getRestData().getCrfVersionList().size(), 2);
+		marshal(restOdmContainer.getRestData().getCrfVersionList());
 	}
 
 	@Test
@@ -215,5 +229,39 @@ public class XsdSchemaValidationTest {
 		assertEquals(
 				restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig().getAdminForcedReasonForChange(),
 				"true");
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheCrfBean() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/crf1.xml"));
+		assertNotNull(restOdmContainer.getRestData().getCrfBean());
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getId(), 1);
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getOid(), "test_CRF_1");
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getName(), "Test CRF 1");
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getStatusCode(), "avaliable");
+		marshal(restOdmContainer.getRestData().getCrfBean());
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheCrfBeanWithCrfVersionBeans() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/crf2.xml"));
+		assertNotNull(restOdmContainer.getRestData().getCrfBean());
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getId(), 1);
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getOid(), "test_CRF");
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getName(), "Test CRF");
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getStatusCode(), "avaliable");
+		assertEquals(restOdmContainer.getRestData().getCrfBean().getCrfVersions().size(), 2);
+		marshal(restOdmContainer.getRestData().getCrfBean());
+	}
+
+	@Test
+	public void testThatSchemaPassesValidationDuringUnmarshallingTheCrfBeans() throws Exception {
+		RestOdmContainer restOdmContainer = unmarshal(
+				new FileSystemResourceLoader().getResource("classpath:xml/crf3.xml"));
+		assertNull(restOdmContainer.getRestData().getCrfBean());
+		assertEquals(restOdmContainer.getRestData().getCrfList().size(), 2);
+		marshal(restOdmContainer.getRestData().getCrfList());
 	}
 }

@@ -189,6 +189,7 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	@Override
 	public void setName(String name) {
+		super.name = name;
 		this.name = name;
 	}
 

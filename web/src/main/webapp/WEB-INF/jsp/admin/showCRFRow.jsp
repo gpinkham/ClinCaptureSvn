@@ -165,7 +165,7 @@
                 name="bt_Lock1" src="images/bt__Lock.png" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
 		  </c:if>
-		  <c:if test="${version.status.locked}">
+		  <c:if test="${!currRow.bean.status.deleted && version.status.locked}">
              <td><a href="UnlockCRFVersion?id=<c:out value="${version.id}"/>"
 			  onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
 			  onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"
@@ -184,7 +184,7 @@
                   name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </td>                
               </c:when>
-              <c:when test="${version.status.id eq 5}">
+              <c:when test="${!currRow.bean.status.deleted && version.status.id eq 5}">
 			  
 			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
@@ -195,16 +195,23 @@
                   name="bt_Restore1" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </td>
              </c:when>
+             <c:when test="${currRow.bean.status.deleted && version.status.id eq 5}">
+                <td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
+                <td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
+             </c:when>
             </c:choose>
           </c:if>
+          <c:if test="${currRow.bean.status.deleted && version.status.locked}">
+                <td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
+          </c:if>
 		  <c:if test="${version.status.id eq 7}">
-		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
+		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
 			</td>
-			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
+			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
 			</td>
 		  </c:if>
 		  <c:if test="${version.status.id eq 5 && !(userRole.manageStudy)}">
-		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
+		  	<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
 			</td>
 		  </c:if>
 		  <c:if test="${version.status.locked}">

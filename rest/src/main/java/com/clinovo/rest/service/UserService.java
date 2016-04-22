@@ -16,7 +16,6 @@
 package com.clinovo.rest.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.service.base.BaseUserService;
-import com.clinovo.service.UserAccountService;
 
 /**
  * UserService.
@@ -33,9 +31,6 @@ import com.clinovo.service.UserAccountService;
 @RestController("restUserService")
 @RequestMapping("/user")
 public class UserService extends BaseUserService {
-
-	@Autowired
-	private UserAccountService userAccountService;
 
 	/**
 	 * Method returns info about user.
@@ -110,7 +105,7 @@ public class UserService extends BaseUserService {
 	 */
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	public UserAccountBean removeUser(@RequestParam("userName") String userName) throws Exception {
-		return userAccountService.removeUser(getUserAccountBean(userName, true), getCurrentUser());
+		return remove(userName);
 	}
 
 	/**
@@ -124,6 +119,6 @@ public class UserService extends BaseUserService {
 	 */
 	@RequestMapping(value = "/restore", method = RequestMethod.POST)
 	public UserAccountBean restoreUser(@RequestParam("userName") String userName) throws Exception {
-		return userAccountService.restoreUser(getUserAccountBean(userName, true), getCurrentUser());
+		return restore(userName);
 	}
 }
