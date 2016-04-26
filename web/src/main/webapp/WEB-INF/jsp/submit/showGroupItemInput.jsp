@@ -192,7 +192,7 @@ function changeImage(name) {
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-	  <ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${inputName}" linkId="anchor${inputName}" checkIfShowYear="true"/>
+	  <ui:calendarIcon onClickSelector="getSib(this.previousSibling)" linkName="anchor${inputName}" linkId="anchor${inputName}" checkIfShowYear="true" inputId="${inputName}"/>
     <c:set var="numOfDate" value="${numOfDate+1}"/>
   </c:if>
 </c:if>

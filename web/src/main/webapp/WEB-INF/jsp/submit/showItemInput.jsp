@@ -205,7 +205,7 @@ form element in red --%>
 	</div>
 	<c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
 		<div style="display: table-cell; padding-left: 10px;">
-			<ui:calendarIcon onClickSelector="'#input${itemId}'" linkName="anchor${itemId}" linkId="anchor${itemId}" imageId="anchor${itemId}" checkIfShowYear="true"/>
+			<ui:calendarIcon onClickSelector="'#input${itemId}'" linkName="anchor${itemId}" linkId="anchor${itemId}" imageId="anchor${itemId}" checkIfShowYear="true" inputId="input${itemId}"/>
 			<c:set var="numOfDate" value="${numOfDate+1}"/>
 		</div>
 	</c:if>

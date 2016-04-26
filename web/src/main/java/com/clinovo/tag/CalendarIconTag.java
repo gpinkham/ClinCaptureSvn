@@ -33,6 +33,7 @@ public class CalendarIconTag extends TagSupport {
 	private String linkName = "";
 	private String dateFormat = "";
 	private String onClickSelector;
+	private String inputId = "";
 	private boolean checkIfShowYear = false;
 
 	public static final int INT_10 = 10;
@@ -45,6 +46,7 @@ public class CalendarIconTag extends TagSupport {
 		imageId = "";
 		linkName = "";
 		dateFormat = "";
+		inputId = "";
 		onClickSelector = null;
 		checkIfShowYear = false;
 	}
@@ -72,7 +74,7 @@ public class CalendarIconTag extends TagSupport {
 
 			boolean showYears = !checkIfShowYear
 					|| currentStudy.getStudyParameterConfig().getShowYearsInCalendar().equalsIgnoreCase("yes");
-
+			boolean shouldChangeItem = (inputId != null && !inputId.trim().isEmpty());
 			if (showYears) {
 				int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 				html = html.concat(", changeYear: true,changeMonth : true,\n")
@@ -80,7 +82,13 @@ public class CalendarIconTag extends TagSupport {
 								+ "\t if ($.trim(date) != '') {\n"
 								+ "\t\t var newDate = month + '/' + inst.currentDay + '/' + year;\n"
 								+ "\t\t $(this).val($.datepicker.formatDate('" + dateFormat
-								+ "', new Date(newDate)));\n" + "\t}\n},\n yearRange: '" + (currentYear - INT_100) + ":"
+								+ "', new Date(newDate)));\n"
+								+ (shouldChangeItem? "\t\t if ($.trim(date) != $.datepicker.formatDate('" + dateFormat
+								+ "', new Date(newDate))) {\n"
+								+ "\t \t \t changeImage('" + inputId + "');\n"
+								+ "\t \t \t $('#" + inputId + "').attr('class', 'changedField');\n"
+								+ "\t \t }\n" : "")
+								+ "\t}\n},\n yearRange: '" + (currentYear - INT_100) + ":"
 								+ (currentYear + INT_10) + "'");
 			}
 			html = html.concat("}).datepicker('show');\" ");
@@ -176,5 +184,13 @@ public class CalendarIconTag extends TagSupport {
 	public void release() {
 		reset();
 		super.release();
+	}
+	
+	public String getInputId() {
+		return this.inputId;
+	}
+
+	public void setInputId(String inputId) {
+		this.inputId = inputId;
 	}
 }
