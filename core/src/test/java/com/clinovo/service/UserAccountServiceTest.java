@@ -20,6 +20,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
@@ -644,5 +645,11 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 			userBean.setUpdater(userBean);
 			userAccountDAO.update(userBean);
 		}
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		UserAccountBean userBean = (UserAccountBean) userAccountDAO.findByPK(1);
+		userAccountDAO.restore(userBean);
 	}
 }

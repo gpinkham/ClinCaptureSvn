@@ -299,22 +299,30 @@ $(function() {
 		showCRFItem(this);
 	});
 	$(document).on('click', '.opt', function() {
+		var $target = $(this).prev().find('.target');
 		var itemName = $(this).prev().find('.target').val();
 		if (itemName) {
+			var eventOid = $target.attr("event-oid");
+			var crfOid = $target.attr("crf-oid");
+			var itemOid = $target.attr("item-oid");
 			// Check event duplication
-			var eventDuplex = parser.isDuplicated({
-				name: itemName,
-				type: "eventOid"
+			var presentInMultipleEvents = parser.hasMultipleEntitiesIn({
+				itemOid: itemOid,
+				crfOid: crfOid,
+				eventOid: eventOid,
+				entity: "m_events"
 			});
-			if (!eventDuplex) {
+			if (presentInMultipleEvents) {
 				$(this).prev().find(".eventify").parent().removeClass("hidden");
 			}
 			// Check version duplication
-			var versionDuplex = parser.isDuplicated({
-				name: itemName,
-				type: "crfVersionOid"
+			var presentInMultipleVersions = parser.hasMultipleEntitiesIn({
+				itemOid: itemOid,
+				crfOid: crfOid,
+				eventOid: eventOid,
+				entity: "m_versions"
 			});
-			if (!versionDuplex) {
+			if (presentInMultipleVersions) {
 				$(this).prev().find(".versionify").parent().removeClass("hidden");
 			}
 			// Check if target is repeat item
@@ -482,7 +490,13 @@ $(function() {
 	$('.variables a').click(function(e) {
 		currentPageIndex = 0;
 		e.preventDefault();
-		$(this).tab('show');
+		var tabId = $(this).attr("href");
+		var $table = $(".tab-pane" + tabId).find("table");
+		if (!$table.attr("class")) {
+			showDataAbsenceMessage(tabId);
+		} else {
+			$(this).tab('show');
+		}
 	});
 
 	$("a[href=#items]").click(function() {
@@ -555,6 +569,27 @@ $(window).load(function() {
 $(window).resize(function(){
 	resizeBody();
 });
+
+function showDataAbsenceMessage(tab) {
+	var message = "";
+	switch (tab) {
+		case "#events":
+			message = messageSource.validations.missingEventsData;
+			break;
+		case "#crfs":
+			message = messageSource.validations.missingCRFsData;
+			break;
+		case "#versions":
+			message = messageSource.validations.missingVersionsData;
+			break;
+		case "#items":
+			message = messageSource.validations.missingItemsData;
+			break;
+	}
+	if (message != "") {
+		bootbox.alert(message);
+	}
+}
 
 function showHideOnEvaluationAlert() {
 	$('.alert').remove();

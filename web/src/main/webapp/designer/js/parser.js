@@ -70,39 +70,62 @@ Parser.prototype.setRuleSet = function(ruleSet) {
 Parser.prototype.fetchStudies = function() {
 	// Notification
 	$("body").append(createLoader());
-	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-	$.ajax({
-		type: "POST",
-		url: c + "/rules?action=fetch",
-		success: function(studies) {
-			// FF can return a string
-			if (typeof(studies) === "string") {
-				studies = JSON.parse(studies);
-			}
-			sessionStorage.setItem("studies", JSON.stringify(studies));
-			loadStudies(studies);
-			// If editing a rule
-			if (parser.getParameter("action") === "edit") {
-				parser.fetchRuleForEditing();
-			}
-			// A back action from validation page
-			if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
-				parser.render(JSON.parse(sessionStorage.getItem("rule")));
-				sessionStorage.removeItem("status");
-			}
-			// Successful save - load previous context
+	// Added for handling unexpected cases
+	var shouldLoadStudies = true;
+	var savedStudies = sessionStorage.getItem("studies");
+
+	if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
+		// A back action from validation page
+		if (!savedStudies) {
+			bootbox.alert(messageSource.validations.missingSessionStudies);
+		} else {
+			shouldLoadStudies = false;
+			savedStudies = JSON.parse(savedStudies);
+			loadStudies(savedStudies);
+			parser.render(JSON.parse(sessionStorage.getItem("rule")));
+			sessionStorage.removeItem("status");
+		}
+		removeLoader();
+	} else if (sessionStorage.getItem("context") && savedStudies) {
+		// Successful save - load previous context
+		if (!savedStudies) {
+			bootbox.alert(messageSource.validations.missingSessionStudies);
+		} else {
+			shouldLoadStudies = false;
+			savedStudies = JSON.parse(savedStudies);
+			loadStudies(savedStudies);
 			if (sessionStorage.getItem("context")) {
 				parser.render(JSON.parse(sessionStorage.getItem("context")));
 				sessionStorage.removeItem("context");
 			}
-			removeLoader();
-		},
-		error: function(response) {
-			handleErrorResponse({
-				response: response
-			});
 		}
-	});
+		removeLoader();
+	}
+	if (shouldLoadStudies) {
+		var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+		$.ajax({
+			type: "POST",
+			url: c + "/rules?action=fetch",
+			success: function(studies) {
+				// FF can return a string
+				if (typeof(studies) === "string") {
+					studies = JSON.parse(studies);
+				}
+				sessionStorage.setItem("studies", JSON.stringify(studies));
+				loadStudies(studies);
+				// If editing a rule
+				if (parser.getParameter("action") === "edit") {
+					parser.fetchRuleForEditing();
+				}
+				removeLoader();
+			},
+			error: function(response) {
+				handleErrorResponse({
+					response: response
+				});
+			}
+		});
+	}
 };
 
 /* ========================================================================
@@ -119,10 +142,15 @@ Parser.prototype.fetchRuleForEditing = function() {
 		url: c + "/rules?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
 		success: function(response) {
 			var rule = null;
+			var studies = null;
 			// FF can return a string
 			if (typeof(response) === "string") {
-				rule = JSON.parse(response);
+				response = JSON.parse(response);
+				rule = response.rule;
+				studies = response.studies;
 			}
+			sessionStorage.setItem("studies", JSON.stringify(studies));
+			loadStudies(studies);
 			rule.editing = true;
 			rule.ruleSet = parser.getParameterValue("rId");
 			rule.study = parseInt(parser.getParameterValue("study"));
@@ -453,80 +481,65 @@ Parser.prototype.isCurrentDate = function(element) {
 	return element.is('.current-date');
 };
 
-Parser.prototype.getItemDuplicates = function(itemName) {
-	var duplicates = [];
+Parser.prototype.getItemByEventAndCRF = function(eventOID, crfOID, itemOID) {
 	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
+	var result = {};
 	storedStudies.forEach(function(study) {
-		study.events.forEach(function(evt) {
-			evt.crfs.forEach(function(crf) {
-				crf.versions.forEach(function(version) {
-					version.items.forEach(function(item) {
-						if (item.name == itemName) {
-							item.crfOid = crf.oid;
-							item.eventOid = evt.oid;
-							item.crfVersionOid = version.oid;
-							duplicates.push(item);
+		if (study.events) {
+			study.events.forEach(function(evt) {
+				if (evt.oid == eventOID && evt.crfs) {
+					evt.crfs.forEach(function(crf) {
+						if (crf.oid == crfOID && crf.versions) {
+							crf.versions.forEach(function(version) {
+								if (version.items) {
+									version.items.forEach(function(item) {
+										if (item.oid == itemOID) {
+											result = item;
+										}
+									});
+								}
+							});
 						}
 					});
-				});
+				}
 			});
-		});
+		}
 	});
-	return duplicates;
+	return result;
 };
 
-Parser.prototype.isDuplicated = function(params) {
-	var duped = this.getItemDuplicates(params.name).map(function(x) {
-		return x[params.type];
-	}).every(function(element, index, array){
-		return array[0] === array[index];
-	});
-	return duped;
+Parser.prototype.hasMultipleEntitiesIn = function(params) {
+	var item = this.getItemByEventAndCRF(params.eventOid, params.crfOid, params.itemOid);
+	return item[params.entity] === "true";
 };
 
 Parser.prototype.isRepeatItem = function(itemName) {
 	var item = this.getItem(itemName);
-	if (item.repeat) {
-		return true;
-	}
-	return false;
+	return item.repeat;
 };
 
-Parser.prototype.getRuleCRFItems = function() {
-	var items = [];
-	var itemHolders = $(".dotted-border, .target, .item, .value, .dest").each(function() {
-		var element = $(this), attributes = Object.create(null);
-		attributes['version-oid'] = element[0].getAttribute('version-oid');
-		var item = parser.findItem(element.text(), attributes);
-		if (item && typeof(item) !== "function") {
-			var pred = Object.create(null);
-			parser.addAttributesToElement(parser.extractTarget(item), element);
-			pred.holder = element;
-			pred.itemName = element.text();
-			items.push(pred);
-		}
-	});
-	return items;
-};
 Parser.prototype.createAttributes = function(expression) {
 	var attributes = Object.create(null);
 	attributes['event-oid'] = this.extractEventFromExpression(expression);
 	attributes['version-oid'] = this.extractVersionFromExpression(expression);
 	return attributes;
-}
+};
+
 Parser.prototype.createAttrMap = function(attributes) {
     var map = {};
     $.makeArray(attributes).map(function(attr, index) {
         map[attr.name] = attr.value;
     });
     return map;
-}
+};
+
 Parser.prototype.createTargetAttrMap = function(target) {
     return {
         'event-oid' : target['target-event-oid'] ? target['target-event-oid'] : target.evt,
         'version-oid' : target['target-version-oid'] ? target['target-version-oid'] : target.version
     }
-}
+};
+
 /* ==============================================================================
  * Creates a rule based on what the user has dropped on the drop surfaces and the
  * entered details.
@@ -551,8 +564,7 @@ Parser.prototype.createRule = function() {
 		}
 		return true;
 	};
-	var study = this.extractStudy(this.getStudy());
-	var oids = $(".dotted-border:not(:empty), .target:not(:empty)").toArray().map(function(x) {
+	$(".dotted-border:not(:empty), .target:not(:empty)").toArray().map(function(x) {
 		if ($(x).is(".group") || $(x).is(".target")) {
 			var tar = parser.getItem($(x).text(), parser.createAttrMap($(x).get(0).attributes));
 			if (tar && typeof(tar) !== "function")
@@ -740,36 +752,36 @@ Parser.prototype.isValid = function(expression) {
     }
 
     if ($("input[action=discrepancy]").is(":checked")) {
-        if ($(".discrepancy-properties").find("textarea").val().length <= 0) {
+		var $dnProperties = $(".discrepancy-properties");
+        if ($dnProperties.find("textarea").val().length <= 0) {
             valid = false;
             message = messageSource.messages.specifyDiscrepancyText;
-            $(".discrepancy-properties").find("textarea").focus();
-        } else if ($(".discrepancy-properties").find("textarea").val().length > 2000) {
+			$dnProperties.find("textarea").focus();
+        } else if ($dnProperties.find("textarea").val().length > 2000) {
         	valid = false;
         	message = messageSource.messages.invalidDiscrepancyText;
-            $(".discrepancy-properties").find("textarea").focus();
+			$dnProperties.find("textarea").focus();
         }
     }
 
     if ($("input[action=email]").is(":checked")) {
-        if ($(".email-properties").find("textarea").val().length <= 0) {
+		var $mailProperties = $(".email-properties");
+        if ($mailProperties.find("textarea").val().length <= 0) {
             valid = false;
             message = messageSource.messages.specifyEmailMessage;
-            $(".email-properties").find("textarea").focus();
-        } else if ($(".email-properties").find("textarea").val().length > 2000) {
+			$mailProperties.find("textarea").focus();
+        } else if ($mailProperties.find("textarea").val().length > 2000) {
         	valid = false;
         	message = messageSource.messages.invalidEmailText;
-        	$(".email-properties").find("textarea").focus();
+			$mailProperties.find("textarea").focus();
         }
-    }
-
-    if ($("input[action=email]").is(":checked")) {
-        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!re.test($(".to").val().trim())) {
-            valid = false;
-            message = messageSource.messages.invalidEmail;
-            $(".to").focus();
-        }
+		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		var $to = $(".to");
+		if (!re.test($to.val().trim())) {
+			valid = false;
+			message = messageSource.messages.invalidEmail;
+			$to.focus();
+		}
     }
 
     if ($("input[action=insert]").is(":checked")) {
@@ -1020,7 +1032,8 @@ Parser.prototype.getItem = function(expression, attrMap) {
 				return this.findItem(this.extractItemFromExpression(expression), {});
 		}
 	}
-}
+};
+
 /* ===========================================================================
  * Finds a CRF item from the original data returns from CC given an item name
  *
@@ -1030,45 +1043,70 @@ Parser.prototype.getItem = function(expression, attrMap) {
  * Returns the returned CRF item
  * ========================================================================= */
 Parser.prototype.findItem = function(identifier, attrMap) {
-	var item = null, study = this.extractStudy(this.getStudy()), events = study.events, LEN = events.length;
-	for (var e = 0; e < LEN; e++) {
-		var evt = events[e];
-		if (attrMap['event-oid'] && evt.oid != attrMap['event-oid'])
+	var item = null;
+	var study = this.extractStudy(this.getStudy());
+	var events = study.events;
+	if (!events) {
+		return;
+	}
+	var length = events.length;
+	for (var e = 0; e < length; e++) {
+		var event = events[e];
+		if (attrMap['event-oid'] && event.oid != attrMap['event-oid']) {
 			continue;
-		item = parser.extractItemFromCRFs(evt.crfs, identifier, attrMap);
-		item &&  (item.eventOid = evt.oid);
-		if (item) break;
+		}
+		// If CRFs were not uploaded for this event.
+		if (!event.crfs) {
+			continue;
+		}
+		item = parser.extractItemFromCRFs(event.crfs, identifier, attrMap);
+		item && (item.eventOid = event.oid);
+		if (item) {
+			break;
+		}
 	}
 	return item;
 };
+
 Parser.prototype.extractItemFromCRFs = function(crfs, identifier, attrMap) {
 	var item = null, LEN = crfs.length;
 	for (var c = 0; c < LEN; c++) {
 		var crf = crfs[c];
+		if (crf.versions === undefined) {
+			continue;
+		}
 		item = parser.extractItemFromVersions(crf.versions, identifier, attrMap);
 		item && (item.crfOid = crf.oid);
 		if (item) break;
 	}
 	return item;
 };
+
 Parser.prototype.extractItemFromVersions = function(versions, identifier, attrMap) {
 	var item = null, LEN = versions.length;
 	for (var v = 0; v < LEN; v++) {
 		var version = versions[v];
-		if (attrMap['version-oid'] && version.oid != attrMap['version-oid'])
+		if (attrMap['version-oid'] && version.oid != attrMap['version-oid']) {
 			continue;
+		}
+		if (version.items === undefined) {
+			continue;
+		}
 		item = parser.extractItem(version.items, identifier);
 		item && (item.crfVersionOid = version.oid);
 		if (item) break;
-	};
+	}
 	return item;
 };
+
 Parser.prototype.extractItem = function(items, identifier) {
 	return items.filter(function(item) {
-		if (item.oid == identifier || item.name == identifier)
+		if (item.oid == identifier || item.name == identifier) {
 			return item;
+		}
 	})[0];
-}
+};
+
 Parser.prototype.findStudyItem = function(params) {
 	for (var e in params.study.events) {
 		var evt = params.study.events[e];
@@ -1127,7 +1165,6 @@ Parser.prototype.findItemBySelectedProperties = function(params) {
 									itm.eventOid = evt.oid;
 									itm.crfVersionOid = ver.oid;
 									item = itm;
-									return;
 								}
 							});
 						}
@@ -1137,19 +1174,6 @@ Parser.prototype.findItemBySelectedProperties = function(params) {
 		}
 	});
 	return item;
-};
-Parser.prototype.getVersionCRF = function(params) {
-	var cf = null;
-	params.study.events.forEach(function(evt) {
-		evt.crfs.forEach(function(crf) {
-			crf.versions.forEach(function(ver) {
-				if (ver.oid == params.ver) {
-					cf = crf;
-				}
-			});
-		});
-	});
-	return cf;
 };
 
 Parser.prototype.setName = function(name) {
@@ -1808,12 +1832,14 @@ Parser.prototype.setTargets = function(targets) {
 			});
 			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
 			div.after($('.opt:last').clone());
-			// Eventify
-			var eventDuplex = this.isDuplicated({
-				type: "eventOid",
-				name: tar.name
+
+			var presentInMultipleEvents = this.hasMultipleEntitiesIn({
+				entity: "m_events",
+				eventOid: tar.evt,
+				crfOid: tar.crf,
+				itemOid: tar.oid
 			});
-			if (!eventDuplex) {
+			if (presentInMultipleEvents) {
 				tar.eventify = false;
 				div.find(".eventify").parent().removeClass("hidden");
 				if (targets[x].eventify) {
@@ -1823,11 +1849,13 @@ Parser.prototype.setTargets = function(targets) {
 				}
 			}
 			// Versionify
-			var versionDuplex = this.isDuplicated({
-				name: tar.name,
-				type: "crfVersionOid"
+			var presentInMultipleVersuibs = this.hasMultipleEntitiesIn({
+				entity: "m_versions",
+				eventOid: tar.evt,
+				crfOid: tar.crf,
+				itemOid: tar.oid
 			});
-			if (!versionDuplex) {
+			if (presentInMultipleVersuibs) {
 				tar.versionify = false;
 				div.find(".versionify").parent().removeClass("hidden");
 				if (this.isVersionified(targets[x].name)) {
@@ -1855,7 +1883,8 @@ Parser.prototype.addAttributesToElement = function(attributeMap, element) {
 	element.attr("event-oid", attributeMap.evt);
 	element.attr("version-oid", attributeMap.version);
 	element.attr("study-oid", this.extractStudy(this.getStudy()).oid);
-}
+};
+
 Parser.prototype.extractTarget = function(candidate) {
 	var target = Object.create(null);
 	var tt = this.getItem(candidate.name, this.createTargetAttrMap(candidate));
@@ -2056,13 +2085,124 @@ Parser.prototype.extractItemFromExpression = function(predicate) {
 	return /([^\.]+)$/.exec(predicate)[1];
 };
 
+/* =================================================================
+ * Functions that will get entities from the sessionStorage.
+ * ============================================================= */
 Parser.prototype.extractStudy = function(id) {
 	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	return studies[this.getStudyIndex(id)];
+};
+
+Parser.prototype.extractStudyEvent = function(studyId, eventId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	var eventIndex = this.getEventIndex(studyIndex, eventId);
+	if (eventIndex != undefined && studyIndex != undefined) {
+		return studies[studyIndex].events[eventIndex];
+	}
+};
+
+Parser.prototype.extractEventCRF = function(studyId, eventId, crfId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	var eventIndex = this.getEventIndex(studyIndex, eventId);
+	var crfIndex = this.getCRFIndex(studyIndex, eventIndex, crfId);
+	return studies[studyIndex].events[eventIndex].crfs[crfIndex];
+};
+
+Parser.prototype.extractCRFVersion = function(studyId, eventId, crfId, versionId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	var eventIndex = this.getEventIndex(studyIndex, eventId);
+	var crfIndex = this.getCRFIndex(studyIndex, eventIndex, crfId);
+	var versionIndex = this.getVersionIndex(studyIndex,eventIndex,crfIndex, versionId);
+	return studies[studyIndex].events[eventIndex].crfs[crfIndex].versions[versionIndex];
+};
+
+/* =================================================================
+ * Set of functions that will get index of an entity in the
+ * session by ID.
+ * Were added in order to avoid duplication of loops.
+ * ============================================================= */
+Parser.prototype.getStudyIndex = function(studyId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
 	for (var x = 0; x < studies.length; x++) {
-		if (studies[x].id === id) {
-			return studies[x];
+		if (studies[x].id === studyId) {
+			return x;
 		}
 	}
+};
+
+Parser.prototype.getEventIndex = function(studyIndex, eventId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var study = studies[studyIndex];
+	for (var i = 0; i < study.events.length; i++) {
+		if (study.events[i].id === eventId) {
+			return i;
+		}
+	}
+};
+
+Parser.prototype.getCRFIndex = function(studyIndex, eventIndex, crfId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var study = studies[studyIndex];
+	var event = study.events[eventIndex];
+	for (var i = 0; i < event.crfs.length; i++) {
+		if (event.crfs[i].id === crfId) {
+			return i;
+		}
+	}
+};
+
+Parser.prototype.getVersionIndex = function(studyIndex, eventIndex, crfIndex, versionId) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var study = studies[studyIndex];
+	var event = study.events[eventIndex];
+	var crf = event.crfs[crfIndex];
+	for (var i = 0; i < crf.versions.length; i++) {
+		if (crf.versions[i].id === versionId) {
+			return i;
+		}
+	}
+};
+
+/* =================================================================
+ * Functions that will add new entities to the sessionStorage.
+ * It's done in order to avoid uploading same data from the DB
+ * multiple times.
+ * ============================================================= */
+Parser.prototype.addEventsToStudy = function(studyId, events) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	studies[studyIndex].events = events;
+	sessionStorage.setItem("studies", JSON.stringify(studies));
+};
+
+Parser.prototype.addCRFsToEvent = function(studyId, eventId, crfs) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	var eventIndex = this.getEventIndex(studyIndex, eventId);
+	studies[studyIndex].events[eventIndex].crfs = crfs;
+	sessionStorage.setItem("studies", JSON.stringify(studies));
+};
+
+Parser.prototype.addVersionsToCRF = function(studyId, eventId, crfId, versions) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	var eventIndex = this.getEventIndex(studyIndex, eventId);
+	var crfIndex = this.getCRFIndex(studyIndex, eventIndex, crfId);
+	studies[studyIndex].events[eventIndex].crfs[crfIndex].versions = versions;
+	sessionStorage.setItem("studies", JSON.stringify(studies));
+};
+
+Parser.prototype.addItemsToVersion = function(studyId, eventId, crfId, versionId, items) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	var studyIndex = this.getStudyIndex(studyId);
+	var eventIndex = this.getEventIndex(studyIndex, eventId);
+	var crfIndex = this.getCRFIndex(studyIndex, eventIndex, crfId);
+	var versionIndex = this.getVersionIndex(studyIndex, eventIndex, crfIndex, versionId);
+	studies[studyIndex].events[eventIndex].crfs[crfIndex].versions[versionIndex].items = items;
+	sessionStorage.setItem("studies", JSON.stringify(studies));
 };
 
 Parser.prototype.constructCRFPath = function(itemName) {
@@ -2090,34 +2230,38 @@ Parser.prototype.constructRepeatItemPath = function(target) {
 	}
 	return name + "." + target.group + "[" + target.line + "]" + "." + target.oid;
 };
+
 Parser.prototype.isEventified = function(expression) {
 	return expression.slice(0, "SE_".length) == "SE_";
 };
+
 Parser.prototype.isVersionified = function(expression) {
 	return /(f_[a-z0-9]+_[a-z0-9]+)(?=\.)/ig.test(expression);
 };
+
 Parser.prototype.eventify = function(targetEvent) {
-	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
+	var element = $(targetEvent).parent().siblings(".target"), name = element.val();
 	this.rule.targets.map(function(target) {
 		if (target.name === name) {
 			if (target.evt == element[0].getAttribute('event-oid') &&
-				target.version == element[0].getAttribute('version-oid'))
+				target.version == element[0].getAttribute('version-oid')) {
 				target.eventify = $(targetEvent).is(":checked");
-			return;
+			}
 		}
 	});
 };
 Parser.prototype.versionify = function(targetEvent) {
-	var element = $(targetEvent).parent().siblings(".target"), name = element.val();;
+	var element = $(targetEvent).parent().siblings(".target"), name = element.val();
 	this.rule.targets.map(function(target) {
 		if (target.name === name) {
 			if (target.evt == element[0].getAttribute('event-oid') &&
-				target.version == element[0].getAttribute('version-oid'))
+				target.version == element[0].getAttribute('version-oid')) {
 				target.versionify = $(targetEvent).is(":checked");
-			return;
+			}
 		}
 	});
 };
+
 Parser.prototype.linefy = function(targetEvent) {
 	var targetName = $(targetEvent).siblings(".target").val();
 	for (var x = 0; x < this.rule.targets.length; x++) {
@@ -2133,6 +2277,7 @@ Parser.prototype.linefy = function(targetEvent) {
 		}
 	}
 };
+
 // This function is a bit involved - consider refactoring
 Parser.prototype.recursiveSelect = function(params) {
 	var next = $("div[id=" + params.type + "]").find("a:contains(" + unescape(JSON.parse('"\u00BB\u00BB"')) + ")");
@@ -2154,6 +2299,7 @@ Parser.prototype.recursiveSelect = function(params) {
 		$("td[oid=" + params.candidate + "]").parent().trigger('click', [{x:false}]);
 	}
 };
+
 Parser.prototype.resetActions = function(target) {
 	function isShowHideTarget(item) {
 		return $(item).attr("action") == 'show' || $(item).attr("action") == 'hide';
@@ -2169,10 +2315,12 @@ Parser.prototype.resetActions = function(target) {
 	$(".dotted-border-lg").children().hide();
 	$("input[name='action']").not(target).attr("previous-state", false);
 };
+
 Parser.prototype.isDateValue = function(val, expressionFormat) {
     var date = Date.parse(val);
     return date != null && date.toString(expressionFormat ? "yyyy-MM-dd" : getCookie('ccDateFormat')) == val;
 };
+
 Parser.prototype.resetTarget = function(params) {
 	for (var x = 0; x < this.rule.targets.length; x++) {
 		if (this.rule.targets[x].oid == params.oid) {
@@ -2180,73 +2328,3 @@ Parser.prototype.resetTarget = function(params) {
 		}
 	}
 };
-/* =================================================================
- * Get crf version from current study if it exists
- *
- * Argument Object [params] parameters:
- * - versionOid - the oid of the version to get returned
- * - study - the study being checked for crf version
- * 
- * Returns version if found, null otherwise
- * ============================================================== */
-Parser.prototype.getCrfVersionByOid = function(params) {
-	for (var e in params.study.events) {
-		var evt = params.study.events[e];
-		for (var c in evt.crfs) {
-			var crf = evt.crfs[c];
-			for (var v in crf.versions) {
-				var ver = crf.versions[v];
-				if(ver.oid == params.versionOid) {
-					ver.crfOid = crf.oid;
-					ver.eventOid = evt.oid;
-					return ver;
-				}
-			}
-		}
-	}
-	return null;
-};
-/* =================================================================
- * Get study item by name. Return null if no item exists
- *
- * Argument Object [params] parameters:
- * - itemName - the target element to be updated
- * - study - the study being changed to
- * ============================================================== */
-Parser.prototype.getStudyItemByName = function(study, identifier) {
-	for (var e in study.events) {
-		var evt = study.events[e];
-		for (var c in evt.crfs) {
-			var crf = evt.crfs[c];
-			for (var v in crf.versions) {
-				var ver = crf.versions[v];
-				for (var i in ver.items) {
-					var itm = ver.items[i];
-					if (itm.name == identifier || itm.oid == identifier) {
-						itm.crfOid = crf.oid;
-						itm.eventOid = evt.oid;
-						itm.crfVersionOid = ver.oid;
-						return itm;
-					}
-				}
-			}
-		}
-	}
-	return null;
-}
-Parser.prototype.updateRuleDestinationProperties = function(study) {
-	if (this.getInsertAction()) {
-		this.getInsertAction().destinations.map(function(x) {
-			if (x.item && parser.isEventified(x.oid)) {
-				var item = parser.getStudyItemByName(study, parser.extractItemFromExpression(x.oid));
-				x.oid = x.oid.replace(/SE_\w+(?=\.)/g, item.eventOid);
-			}
-		});
-	} else if (this.getShowHideAction()) {
-		var destinations = this.getShowHideAction().destinations;
-		destinations.map(function(x) {
-			if (parser.isEventified(x))
-				destinations[destinations.indexOf(x)] = x.replace(/SE_\w+(?=\.)/g, item.eventOid);
-		});
-	}
-}

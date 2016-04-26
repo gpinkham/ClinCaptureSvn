@@ -22,7 +22,6 @@
 		messageSource.texts.dataText = '<fmt:message bundle="${resword}" key="data"/>';
 		messageSource.texts.selectDate = '<fmt:message bundle="${resword}" key="selectDate"/>';
 		messageSource.texts.changingStudy = '<fmt:message bundle="${resword}" key="changingStudy"/>';
-		messageSource.texts.keep = '<fmt:message bundle="${resword}" key="keep"/>';
 		messageSource.texts.cancel = '<fmt:message bundle="${resword}" key="cancel"/>';
 		messageSource.texts.clear = '<fmt:message bundle="${resword}" key="clear"/>';
 
@@ -70,7 +69,6 @@
 
 		messageSource.messages.clearExpression = '<fmt:message bundle="${resword}" key="rs.message.clearExpression"/>';
 		messageSource.messages.showHideEvaluation = '<fmt:message bundle="${resword}" key="rs.message.showHideEvaluation"/>';
-		messageSource.messages.itemDoesNotExistInTheStudy = '<fmt:message bundle="${resword}" key="rs.message.itemDoesNotExistInTheStudy"/>';
 		messageSource.messages.serverIsNotAvailable = '<fmt:message bundle="${resword}" key="rs.message.serverIsNotAvailable"/>';
 		messageSource.messages.enterNumber = '<fmt:message bundle="${resword}" key="rs.message.enterNumber"/>';
 		messageSource.messages.expressionWillBeLost = '<fmt:message bundle="${resword}" key="rs.message.expressionWillBeLost"/>';
@@ -104,6 +102,11 @@
 		messageSource.validations.ruleFailure = '<fmt:message bundle="${resword}" key="rs.validation.failure"/>';
 		messageSource.validations.ruleValid = '<fmt:message bundle="${resword}" key="rs.validation.valid"/>';
 		messageSource.validations.ruleInvalid = '<fmt:message bundle="${resword}" key="rs.validation.invalid"/>';
+		messageSource.validations.missingEventsData = '<fmt:message bundle="${resword}" key="rs.validation.missingEventsData"/>';
+		messageSource.validations.missingCRFsData = '<fmt:message bundle="${resword}" key="rs.validation.missingCRFsData"/>';
+		messageSource.validations.missingVersionsData = '<fmt:message bundle="${resword}" key="rs.validation.missingVersionsData"/>';
+		messageSource.validations.missingItemsData = '<fmt:message bundle="${resword}" key="rs.validation.missingItemsData"/>';
+		messageSource.validations.missingSessionStudies = '<fmt:message bundle="${resword}" key="rs.validation.missingSessionStudies"/>';
 
 		messageSource.dataType.st = '<fmt:message bundle="${resword}" key="data_type_st"/>';
 		messageSource.dataType.int = '<fmt:message bundle="${resword}" key="data_type_int"/>';

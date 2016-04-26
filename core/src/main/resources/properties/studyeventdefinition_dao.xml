@@ -250,7 +250,7 @@
 	<query>
 		<name>findAllActiveByStudyIdAndCRFId</name>
 		<sql>
-			SELECT sed.*
+			SELECT DISTINCT sed.*
 			FROM study_event_definition sed, event_definition_crf edc
 			WHERE sed.status_id = 1 AND sed.study_id = ?
 			AND edc.study_event_definition_id = sed.study_event_definition_id

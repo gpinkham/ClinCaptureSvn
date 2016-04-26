@@ -12,42 +12,23 @@
  ******************************************************************************/
 package com.clinovo.servlet;
 
+import com.clinovo.builder.RuleStudioJSONBuilder;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.ActionType;
-import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
-import org.akaza.openclinica.domain.rule.action.EmailActionBean;
-import org.akaza.openclinica.domain.rule.action.HideActionBean;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,8 +54,14 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings({ "unchecked", "serial", "deprecation"})
+/**
+ * Servlet that is used to handle all RulesStudio actions.
+ */
+@SuppressWarnings({ "unchecked", "serial" })
 public class RulesServlet extends HttpServlet {
+
+	public static final int RANDOM_OID_RANGE = 101;
+	public static final int RULE_OID_INCREMENT = 10;
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -82,337 +69,133 @@ public class RulesServlet extends HttpServlet {
 		PrintWriter writer = response.getWriter();
 		try {
 			DataSource datasource = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(DataSource.class);
+			RuleStudioJSONBuilder rsJSONBuilder = new RuleStudioJSONBuilder(datasource);
+			UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+
 			if ("fetch".equals(action)) {
-				JSONArray studies = new JSONArray();
-				StudyDAO studyDAO = new StudyDAO(datasource);
-				UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-				List<StudyBean> availableStudies = studyDAO.findAllActiveStudiesWhereUserHasRole(userAccountBean
-						.getName());
-				for (StudyBean x : availableStudies) {
-					if (!x.isSite(x.getParentStudyId())) {
-
-						JSONObject study = new JSONObject();
-						study.put("id", x.getId());
-						study.put("oid", x.getOid());
-						study.put("name", x.getName());
-						study.put("description", x.getSummary());
-						study.put("identifier", x.getIdentifier());
-
-						JSONArray events = getStudyEvents(x, datasource);
-						study.put("events", events);
-						studies.put(study);
-					}
-				}
-
+				JSONArray studies = rsJSONBuilder.buildStudiesArray(userAccountBean);
 				writer.write(studies.toString());
-
+			} else if ("events".equals(action)) {
+				int id = Integer.parseInt(request.getParameter("id"));
+				StudyDAO studyDAO = new StudyDAO(datasource);
+				StudyBean study = (StudyBean) studyDAO.findByPK(id);
+				JSONArray events = rsJSONBuilder.buildEventsArray(study);
+				writer.write(events.toString());
+			} else if ("crfs".equals(action)) {
+				int id = Integer.parseInt(request.getParameter("id"));
+				StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(datasource);
+				StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(id);
+				StudyDAO studyDAO = new StudyDAO(datasource);
+				StudyBean study = (StudyBean) studyDAO.findByPK(studyEventDefinitionBean.getStudyId());
+				JSONArray crfs = rsJSONBuilder.buildCRFsArray(studyEventDefinitionBean, study);
+				writer.write(crfs.toString());
+			} else if ("versions".equals(action)) {
+				int id = Integer.parseInt(request.getParameter("id"));
+				CRFDAO crfdao = new CRFDAO(datasource);
+				CRFBean crf = (CRFBean) crfdao.findByPK(id);
+				JSONArray versions = rsJSONBuilder.buildVersionsArray(crf);
+				writer.write(versions.toString());
+			} else if ("items".equals(action)) {
+				int id = Integer.parseInt(request.getParameter("id"));
+				CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
+				CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(id);
+				StudyDAO studyDAO = new StudyDAO(datasource);
+				int studyId = Integer.parseInt(request.getParameter("studyId"));
+				StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
+				JSONArray items = rsJSONBuilder.buildItemsArray(crfVersionBean, study);
+				writer.write(items.toString());
 			} else if ("validate".equals(action)) {
-
 				JSONObject rule = new JSONObject(request.getParameter("rule"));
-
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = factory.newDocumentBuilder();
-
-				Document document = builder.newDocument();
-
-				List<Element> ruleDefs = new LinkedList<Element>();
-				Element rootElement = document.createElement("RuleImport");
-
-				// Rule Assignments
-				JSONArray rTargets = rule.getJSONArray("targets");
-
-				int currentCount = 1;
-				for (int x = 0; x < rTargets.length(); x++) {
-
-					JSONArray actions = rule.getJSONArray("actions");
-					Element rAssigment = document.createElement("RuleAssignment");
-					// Target
-					Element rTarget = document.createElement("Target");
-					rTarget.setAttribute("Context", "OC_RULES_V1");
-					rTarget.setAttribute("EventOid", rTargets.getJSONObject(x).getString("evt"));
-					rTarget.setAttribute("VersionOid", rTargets.getJSONObject(x).getString("version"));
-
-					// Content
-					rTarget.setTextContent(rTargets.getJSONObject(x).getString("name"));
-					String expression = rTargets.getJSONObject(x).getString("expression");
-					// Rule target children
-					rAssigment.appendChild(rTarget);
-					for (int act = 0; act < actions.length(); act++) {
-						// Rule Def
-						Element ruleDef = document.createElement("RuleDef");
-						// attributes
-						ruleDef.setAttribute("Name", rule.getString("name"));
-						ruleDef.setAttribute("OID", generateOID(expression, currentCount));
-						// Increment the count
-						currentCount = currentCount + 1;
-						Element expr = document.createElement("Expression");
-						expr.setTextContent(expression);
-						// Description - it comes before expression
-						Element description = document.createElement("Description");
-						description.setTextContent(rule.getString("name"));
-						ruleDef.appendChild(description);
-						ruleDef.appendChild(expr);
-
-						// Rule Ref
-						Element ref = document.createElement("RuleRef");
-						ref.setAttribute("OID", ruleDef.getAttribute("OID"));
-
-						List<Element> acts = createAction(actions.getString(act), rule, document);
-						for (Element el : acts) {
-							ref.appendChild(el);
-						}
-
-						// Append ref
-						rAssigment.appendChild(ref);
-						// Append to root
-						ruleDefs.add(ruleDef);
-					}
-
-					rootElement.appendChild(rAssigment);
-				}
-
-				for (Element ele : ruleDefs) {
-					rootElement.appendChild(ele);
-				}
-
-				document.appendChild(rootElement);
-
+				Document document = createRuleDocument(rule);
 				TransformerFactory tFactory = TransformerFactory.newInstance();
 				Transformer transformer = tFactory.newTransformer();
-
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-
 				StringWriter xWriter = new StringWriter();
 				transformer.transform(new DOMSource(document), new StreamResult(xWriter));
-
 				writer.write(xWriter.getBuffer().toString());
-
 			} else if ("edit".equals(action)) {
 				RuleDao dao = SpringServletAccess.getApplicationContext(this.getServletContext())
 						.getBean(RuleDao.class);
 				RuleSetRuleDao rDao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(
 						RuleSetRuleDao.class);
-
-				JSONObject object = new JSONObject();
 				RuleBean rule = dao.findById(Integer.parseInt(request.getParameter("id")));
-				JSONArray ruleActions = new JSONArray();
 				RuleSetRuleBean ruleSetRule = rDao.findById(Integer.parseInt(request.getParameter("rId")));
-				try {
-					JSONObject act = new JSONObject();
-					act.put("type", ruleSetRule.getActions().get(0).getActionType());
-					act.put("select", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
-					object.put("evaluates", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
-					if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.EMAIL)) {
-						EmailActionBean emailAction = (EmailActionBean) ruleSetRule.getActions().get(0);
-						act.put("to", emailAction.getTo());
-						act.put("body", emailAction.getMessage());
-					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.FILE_DISCREPANCY_NOTE)) {
-						DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) ruleSetRule
-								.getActions().get(0);
-						act.put("type", "discrepancy");
-						act.put("message", discrepancyAction.getMessage());
-					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.INSERT)) {
-						InsertActionBean insertAction = (InsertActionBean) ruleSetRule.getActions().get(0);
-						act.put("type", "insert");
-						act.put("message", insertAction.getCuratedMessage());
-						// Destinations
-						JSONArray destinations = new JSONArray();
-						for (int x = 0; x < insertAction.getProperties().size(); x++) {
-							JSONObject dest = new JSONObject();
-							PropertyBean bean = insertAction.getProperties().get(x);
-							dest.put("id", x + 1);
-							dest.put("oid", bean.getOid());
-							if (bean.getValue() == null && bean.getValueExpression() != null) {
-								dest.put("item", true);
-								dest.put("value", bean.getValueExpression().getValue());
-							} else {
-								dest.put("value", bean.getValue());
-							}
-							destinations.put(dest);
-						}
-						act.put("destinations", destinations);
-					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW)
-							|| ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
-						act.put("type", "showHide");
-						for (int x = 0; x < ruleSetRule.getActions().size(); x++) {
-							RuleActionBean vAction = ruleSetRule.getActions().get(x);
-							if (vAction.getActionType().equals(ActionType.SHOW)) {
-								ShowActionBean showAction = (ShowActionBean) ruleSetRule.getActions().get(x);
-								act.put("type", "showHide");
-								act.put("message", showAction.getMessage());
-								act.put("show", showAction.getExpressionEvaluatesTo());
-								object.put("evaluates", showAction.getExpressionEvaluatesTo());
-							} else {
-								HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(x);
-								act.put("hide", hideAction.getExpressionEvaluatesTo());
-								JSONArray destinations = new JSONArray();
-								for (int d = 0; d < hideAction.getProperties().size(); d++) {
-									destinations.put(hideAction.getProperties().get(d).getOid());
-								}
-								act.put("destinations", destinations);
-							}
-						}
-					}
 
-					ruleActions.put(act);
-
-				} catch (JSONException e) {
-					response.sendError(500, e.getMessage());
-				}
-				// Rule run
-				object.put("di", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
-						.getImportDataEntry());
-				object.put("dde", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
-						.getDoubleDataEntry());
-				object.put("ide", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
-						.getInitialDataEntry());
-				object.put("ae", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun()
-						.getAdministrativeDataEntry());
-				// Targets
-				JSONObject tar = new JSONObject();
-				JSONArray targets = new JSONArray();
-
-				ExpressionBean originalTarget = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget();
-				String targetPath = originalTarget.getValue();
-				String name = targetPath.replaceAll("\\[\\w+\\]", "").trim();
-				tar.put("name", name);
-				if (targetPath.split("\\.").length > 3) {
-					tar.put("evt", getItemEvent(targetPath, tar));
-				}
-				if (isVersionified(targetPath)) {
-					tar.put("versionify", true);
-					tar.put("version", getItemVersion(targetPath));
-				}
-				if (getItemLine(targetPath, tar) != null) {
-					tar.put("line", getItemLine(targetPath, tar));
-				}
-				if (originalTarget.getTargetEventOid() != null) {
-					tar.put("target-event-oid", originalTarget.getTargetEventOid());
-				}
-				if (originalTarget.getTargetVersionOid() != null) {
-					tar.put("target-version-oid", originalTarget.getTargetVersionOid());
-				}				
-				tar.put("crf", getItemVersion(targetPath));
-				tar.put("group", getItemGroup(targetPath));
-				targets.put(tar);
-				// Rule properties
-				object.put("targets", targets);
-				object.put("oid", rule.getOid());
-				object.put("actions", ruleActions);
-
-				if (!rule.getDescription().isEmpty()) {
-					object.put("name", rule.getDescription());
-				} else {
-					object.put("name", rule.getName());
-				}
-				object.put("expression", rule.getExpression().getValue());
-				response.getWriter().write(object.toString());
+				JSONObject wrapper = new JSONObject();
+				JSONArray studies = rsJSONBuilder.getCascadeRuleData(userAccountBean, rule, ruleSetRule);
+				JSONObject object = rsJSONBuilder.buildRule(rule, ruleSetRule);
+				wrapper.put("studies", studies);
+				wrapper.put("rule", object);
+				response.getWriter().write(wrapper.toString());
 			}
-
 		} catch (Exception ex) {
-			response.sendError(500, ex.getMessage());
+			response.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		} finally {
 			writer.flush();
 			writer.close();
 		}
 	}
 
-	private JSONArray getStudyEvents(StudyBean study, DataSource datasource) throws Exception {
+	private Document createRuleDocument(JSONObject rule) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.newDocument();
+		List<Element> ruleDefs = new LinkedList<Element>();
+		Element rootElement = document.createElement("RuleImport");
+		// Rule Assignments
+		JSONArray rTargets = rule.getJSONArray("targets");
+		int currentCount = 1;
 
-		JSONArray events = new JSONArray();
+		for (int x = 0; x < rTargets.length(); x++) {
+			JSONArray actions = rule.getJSONArray("actions");
+			Element rAssigment = document.createElement("RuleAssignment");
+			// Target
+			Element rTarget = document.createElement("Target");
+			rTarget.setAttribute("Context", "OC_RULES_V1");
+			rTarget.setAttribute("EventOid", rTargets.getJSONObject(x).getString("evt"));
+			rTarget.setAttribute("VersionOid", rTargets.getJSONObject(x).getString("version"));
 
-		StudyEventDefinitionDAO eventDAO = new StudyEventDefinitionDAO(datasource);
-		List<StudyEventDefinitionBean> studyEvents = eventDAO.findAllByStudy(study);
-		for (StudyEventDefinitionBean evt : studyEvents) {
-			if (!evt.getStatus().equals(Status.DELETED)) {
-				JSONObject obj = new JSONObject();
-				obj.put("id", evt.getId());
-				obj.put("oid", evt.getOid());
-				obj.put("name", evt.getName());
-				obj.put("ordinal", evt.getOrdinal());
-				obj.put("description", evt.getDescription());
-				JSONArray crfs = getStudyEventCRFs(evt, study, datasource);
-				obj.put("crfs", crfs);
-				events.put(obj);
-			}
-		}
-		return events;
-	}
+			// Content
+			rTarget.setTextContent(rTargets.getJSONObject(x).getString("name"));
+			String expression = rTargets.getJSONObject(x).getString("expression");
+			// Rule target children
+			rAssigment.appendChild(rTarget);
+			for (int act = 0; act < actions.length(); act++) {
+				// Rule Def
+				Element ruleDef = document.createElement("RuleDef");
+				// attributes
+				ruleDef.setAttribute("Name", rule.getString("name"));
+				ruleDef.setAttribute("OID", generateOID(expression, currentCount));
+				// Increment the count
+				currentCount = currentCount + 1;
+				Element expr = document.createElement("Expression");
+				expr.setTextContent(expression);
+				// Description - it comes before expression
+				Element description = document.createElement("Description");
+				description.setTextContent(rule.getString("name"));
+				ruleDef.appendChild(description);
+				ruleDef.appendChild(expr);
+				// Rule Ref
+				Element ref = document.createElement("RuleRef");
+				ref.setAttribute("OID", ruleDef.getAttribute("OID"));
 
-	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource)
-			throws Exception {
-		JSONArray crfs = new JSONArray();
-		CRFDAO crfDAO = new CRFDAO(datasource);
-		EventDefinitionCRFDAO eCrfDAO = new EventDefinitionCRFDAO(datasource);
-		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eCrfDAO
-				.findAllActiveByEventDefinitionId(study, evt.getId());
-		for (EventDefinitionCRFBean crf : eventCRFs) {
-			JSONObject obj = new JSONObject();
-			CRFBean cf = (CRFBean) crfDAO.findByPK(crf.getCrfId());
-			if (!cf.getStatus().equals(Status.DELETED)) {
-				obj.put("id", cf.getId());
-				obj.put("oid", cf.getOid());
-				obj.put("name", cf.getName());
-				obj.put("version", cf.getVersionNumber());
-				JSONArray versions = getCRFVersions(cf, datasource);
-				if (versions.length() > 0) {
-					obj.put("versions", versions);
-					crfs.put(obj);
+				List<Element> acts = createAction(actions.getString(act), rule, document);
+				for (Element el : acts) {
+					ref.appendChild(el);
 				}
+				// Append ref
+				rAssigment.appendChild(ref);
+				// Append to root
+				ruleDefs.add(ruleDef);
 			}
+			rootElement.appendChild(rAssigment);
 		}
-		return crfs;
-	}
-
-	private JSONArray getCRFVersions(CRFBean cf, DataSource datasource) throws Exception {
-		JSONArray versions = new JSONArray();
-		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
-		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllActiveByCRF(cf.getId());
-		for (CRFVersionBean ver : vers) {
-			if (!ver.getStatus().equals(Status.DELETED)) {
-				JSONObject obj = new JSONObject();
-				obj.put("id", ver.getId());
-				obj.put("oid", ver.getOid());
-				obj.put("name", ver.getName());
-				JSONArray items = getCRFVersionItems(ver, datasource);
-				obj.put("items", items);
-				versions.put(obj);
-			}
+		for (Element ele : ruleDefs) {
+			rootElement.appendChild(ele);
 		}
-		return versions;
-	}
-
-	private JSONArray getCRFVersionItems(CRFVersionBean crfVersion, DataSource datasource) throws Exception {
-		JSONArray items = new JSONArray();
-		ItemDAO crfDAO = new ItemDAO(datasource);
-		ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
-		ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(datasource);
-		ItemFormMetadataDAO itemFormMetaDataDAO = new ItemFormMetadataDAO(datasource);
-		List<ItemBean> crfItems = (List<ItemBean>) crfDAO.findAllItemsByVersionId(crfVersion.getId());
-		for (ItemBean item : crfItems) {
-			JSONObject obj = new JSONObject();
-			// Item group
-			ItemGroupBean itemGroup = itemGroupDAO.findByItemAndCRFVersion(item, crfVersion);
-			// Form meta data
-			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(),
-					crfVersion.getId());
-			obj.put("id", item.getId());
-			obj.put("oid", item.getOid());
-			obj.put("name", item.getName());
-			obj.put("group", itemGroup.getOid());
-			obj.put("type", item.getDataType().getName());
-			obj.put("description", item.getDescription());
-			obj.put("ordinal", itemFormMetaData.getOrdinal());
-			// Repeat item?
-			ItemGroupMetadataBean itemGroupMeta = (ItemGroupMetadataBean) itemGroupMetaDAO.findByItemAndCrfVersion(
-					item.getId(), crfVersion.getId());
-			if (itemGroupMeta.isRepeatingGroup()) {
-				obj.put("repeat", true);
-			}
-			items.put(obj);
-		}
-		return items;
+		document.appendChild(rootElement);
+		return document;
 	}
 
 	private String generateOID(String expression, int x) {
@@ -431,13 +214,11 @@ public class RulesServlet extends HttpServlet {
 
 		List<String> oids = ruleDAO.findRuleOIDs();
 		if (oids != null && !oids.isEmpty()) {
-			oid = oid + "_" + new Random().nextInt(110 - 10 + 1) + 10;
+			oid = oid + "_" + new Random().nextInt(RANDOM_OID_RANGE) + RULE_OID_INCREMENT;
 			oid = checkOIDAvailability(oid, oids);
-
 		} else {
 			oid = oid + "_0" + x;
 		}
-
 		return oid;
 	}
 
@@ -538,61 +319,5 @@ public class RulesServlet extends HttpServlet {
 			actions.add(action);
 		}
 		return actions;
-	}
-
-	private String getItemEvent(String targetPath, JSONObject tar) throws JSONException {
-		String[] preds = targetPath.split("\\.");
-		if (preds.length == 4) {
-			tar.put("eventify", true);
-			return preds[0];
-		} else {
-			return targetPath;
-		}
-	}
-
-	private String getItemLine(String targetPath, JSONObject tar) throws JSONException {
-		Pattern pattern = Pattern.compile("(?<=\\[)(\\w+)(?=\\])");
-		Matcher matcher = pattern.matcher(targetPath);
-		if (matcher.find()) {
-			tar.put("linefy", true);
-			return matcher.group(0);
-		}
-		return null;
-	}
-
-	private boolean isVersionified(String targetPath) {
-		String crf = "";
-		String[] preds = targetPath.split("\\.");
-		if (preds.length == 3) {
-			crf = preds[0];
-		} else if (preds.length > 3) {
-			crf = preds[preds.length - 3];
-		}
-		Pattern pattern = Pattern.compile("V\\d+$");
-		Matcher matcher = pattern.matcher(crf);
-		return matcher.find();
-	}
-
-	private String getItemVersion(String targetPath) {
-		String[] preds = targetPath.split("\\.");
-		if (preds.length == 3) {
-			return preds[0];
-		} else if (preds.length > 3) {
-			return preds[preds.length - 3];
-		} else {
-			return targetPath;
-		}
-	}
-
-	private String getItemGroup(String targetPath) throws JSONException {
-		targetPath = targetPath.replaceAll("\\[\\w+\\]", "").trim();
-		String[] preds = targetPath.split("\\.");
-		if (preds.length == 2) {
-			return preds[0];
-		} else if (preds.length > 2) {
-			return preds[preds.length - 2];
-		} else {
-			return targetPath;
-		}
 	}
 }

@@ -33,7 +33,6 @@ function MessageSourceGetter() {
 		dataText: "",
 		selectDate: "",
 		changingStudy: "",
-		keep: "",
 		clear: "",
 		cancel: ""
 	};
@@ -84,7 +83,6 @@ function MessageSourceGetter() {
 	this.messages = {
 		clearExpression: "",
 		showHideEvaluation: "",
-		itemDoesNotExistInTheStudy: "",
 		invalidDiscrepancyText: "",
 		invalidEmailText: "",
 		serverIsNotAvailable: "",
@@ -118,7 +116,12 @@ function MessageSourceGetter() {
 		doubleDe: "",
 		ruleFailure: "",
 		ruleValid: "",
-		ruleInvalid: ""
+		ruleInvalid: "",
+		missingEventsData: "",
+		missingCRFsData: "",
+		missingVersionsData: "",
+		missingItemsData: "",
+		missingSessionStudies: ""
 	};
 	this.dataType = {
 		st: "",
