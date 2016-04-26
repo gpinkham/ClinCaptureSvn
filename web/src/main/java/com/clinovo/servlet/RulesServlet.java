@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
 /**
  * Servlet that is used to handle all RulesStudio actions.
  */
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings("serial")
 public class RulesServlet extends HttpServlet {
 
 	public static final int RANDOM_OID_RANGE = 101;

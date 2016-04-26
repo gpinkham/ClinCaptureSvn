@@ -26,7 +26,6 @@ public class RuleStudioJSONBuilderTest extends BaseControllerTest {
 	private CRFVersionBean versionBean;
 
 	@Before
-	@SuppressWarnings("unchecked")
 	public void prepare() {
 		builder = new RuleStudioJSONBuilder(dataSource);
 
