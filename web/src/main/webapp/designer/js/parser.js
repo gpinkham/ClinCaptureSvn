@@ -791,11 +791,14 @@ Parser.prototype.isValid = function(expression) {
         }
     }
 
-    if ($("input[name='ruleInvoke']").is(":checked")) {
+    if ($("input[action=show]").is(":checked") || $("input[action=hide]").is(":checked")) {
         if (this.getShowHideAction() && this.getShowHideAction().destinations.length < 1) {
             valid = false;
             message = messageSource.messages.selectItemsToShowHide;
-        }
+        } else if ($("input[name=ruleInvoke]").is(':checked')) {
+			valid = false;
+			message = messageSource.messages.showHideEvaluation;
+		}
     }
 
     if (expression != undefined) {
