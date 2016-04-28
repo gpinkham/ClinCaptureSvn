@@ -1029,6 +1029,9 @@ Parser.prototype.isAddedShowHideTarget = function(target) {
 };
 
 Parser.prototype.getItem = function(expression, attrMap) {
+	if (expression === undefined || expression === "") {
+		return;
+	}
 	if (this.isOp(expression))
 		return expression;
 	else {
