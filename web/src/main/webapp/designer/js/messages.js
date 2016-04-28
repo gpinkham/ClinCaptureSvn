@@ -121,7 +121,8 @@ function MessageSourceGetter() {
 		missingCRFsData: "",
 		missingVersionsData: "",
 		missingItemsData: "",
-		missingSessionStudies: ""
+		missingSessionStudies: "",
+		missingDestination: ""
 	};
 	this.dataType = {
 		st: "",

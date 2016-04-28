@@ -785,9 +785,19 @@ Parser.prototype.isValid = function(expression) {
     }
 
     if ($("input[action=insert]").is(":checked")) {
-        if (this.getInsertAction() && this.getInsertAction().destinations.length < 1) {
-            valid = false;
-            message = messageSource.messages.selectItemsToInsert;
+        if (this.getInsertAction()) {
+			if (this.getInsertAction().destinations.length < 1) {
+				valid = false;
+				message = messageSource.messages.selectItemsToInsert;
+			} else {
+				var destinations = this.getInsertAction().destinations;
+				for (var i = 0; i < destinations.length; i++) {
+					if (destinations[i].oid === undefined) {
+						valid = false;
+						message = messageSource.validations.missingDestination;
+					}
+				}
+			}
         }
     }
 

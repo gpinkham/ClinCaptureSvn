@@ -826,7 +826,8 @@ function handleDateDrop(element) {
  * =================================================== */
 function loadStudies(studies) {
 	var itemArr = [];
-	$("div[id='studies']").find("table").remove();
+	var $studies = $("div[id='studies']");
+	$studies.find("table").remove();
 	if (studies) {
 		// Table headers
 		var table = createTable([messageSource.texts.nameText, messageSource.texts.identifier]);
@@ -869,14 +870,14 @@ function loadStudies(studies) {
 			itemArr.push(tr);
 		}
 
-		$("div[id='studies']").append(table);
+		$studies.append(table);
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
 		var pagination = createPagination({
 			itemsArr: chunkedItemsArr,
-			div: $("div[id='studies']")
+			div: $studies
 		});
 
 		table.after(pagination);
@@ -1413,6 +1414,14 @@ function resetStudy(params) {
 	}
 }
 function showCRFItem(ele) {
+
+	// validate presence of all attributest
+	if ($(ele).attr("study-oid") === undefined || $(ele).attr("event-oid") === undefined
+		|| $(ele).attr("crf-oid") === undefined || $(ele).attr("version-oid") === undefined
+		|| $(ele).attr("item-oid") === undefined) {
+		return;
+	}
+
 	parser.recursiveSelect({
 		click: true,
 		type: "studies",
@@ -1494,17 +1503,18 @@ function handleClickDrop(ele) {
 
 function getDropSurfaceElement(clickedElement) {
 	//If left parenthesis is clicked
+	var $group = $('.dotted-border.group');
 	if($(clickedElement).is('.leftPAREN')){
 		//If there's more than one element and Group or Data is left most surface
-		if($('.dotted-border.' + 'group').length > 1 && $('.dotted-border.' + 'group').first().text() == messageSource.texts.groupOrData) {
-			return $('.dotted-border.' + 'group').first();
+		if($group.length > 1 && $group.first().text() == messageSource.texts.groupOrData) {
+			return $group.first();
 		} else {
-			return $('.dotted-border.' + 'group').last();
+			return $group.last();
 		}
 	}	
-	else if ($('.dotted-border.' + 'group').last().text() == ')') {
-		return $('.dotted-border.' + 'group').eq(-2);
+	else if ($group.last().text() == ')') {
+		return $group.eq(-2);
 	} else {
-		return $('.dotted-border.' + 'group').last();
+		return $group.last();
 	}
 }

@@ -107,6 +107,7 @@
 		messageSource.validations.missingVersionsData = '<fmt:message bundle="${resword}" key="rs.validation.missingVersionsData"/>';
 		messageSource.validations.missingItemsData = '<fmt:message bundle="${resword}" key="rs.validation.missingItemsData"/>';
 		messageSource.validations.missingSessionStudies = '<fmt:message bundle="${resword}" key="rs.validation.missingSessionStudies"/>';
+		messageSource.validations.missingDestination = '<fmt:message bundle="${resword}" key="rs.validation.missingDestination"/>';
 
 		messageSource.dataType.st = '<fmt:message bundle="${resword}" key="data_type_st"/>';
 		messageSource.dataType.int = '<fmt:message bundle="${resword}" key="data_type_int"/>';
