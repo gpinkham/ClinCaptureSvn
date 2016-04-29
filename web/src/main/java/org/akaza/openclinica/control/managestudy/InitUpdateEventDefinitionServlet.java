@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,16 +28,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import com.clinovo.util.EventDefinitionCRFUtil;
 import org.akaza.openclinica.domain.SourceDataVerification;
@@ -77,41 +73,17 @@ public class InitUpdateEventDefinitionServlet extends SpringServlet {
 			return;
 		}
 
-		StudyEventDAO sdao = getStudyEventDAO();
-		// get current studyid
 		int studyId = currentStudy.getId();
 
 		if (ub.hasRoleInStudy(studyId)) {
 			Role r = ub.getRoleByStudy(studyId).getRole();
-			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
-				return;
-			} else {
+			if (!r.equals(Role.STUDY_DIRECTOR) && !r.equals(Role.STUDY_ADMINISTRATOR)) {
 				addPageMessage(getResPage().getString("no_have_permission_to_update_study_event_definition")
 						+ getResPage().getString("please_contact_sysadmin_questions"), request);
 				throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 						getResException().getString("not_study_director"), "1");
-
 			}
 		}
-
-		// To Do: the following code doesn't apply to admin for now
-		String idString = request.getParameter("id");
-		int defId = Integer.valueOf(idString.trim());
-		logger.info("defId" + defId);
-		ArrayList events = (ArrayList) sdao.findAllByDefinition(defId);
-		if (events != null && events.size() > 0) {
-			logger.info("has events");
-			for (Object event : events) {
-				StudyEventBean sb = (StudyEventBean) event;
-				if (!sb.getStatus().equals(Status.DELETED) && !sb.getStatus().equals(Status.AUTO_DELETED)) {
-					logger.info("found one event");
-					addPageMessage(getResPage().getString("sorry_but_at_this_time_may_not_modufy_SED"), request);
-					throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
-							getResException().getString("not_unpopulated"), "1");
-				}
-			}
-		}
-
 	}
 
 	@Override
@@ -143,10 +115,12 @@ public class InitUpdateEventDefinitionServlet extends SpringServlet {
 			Map<Integer, SignStateRestorer> signStateRestorerMap = getEventDefinitionService().prepareSignStateRestorer(studyEventDefinitionBean);
 			List<EventDefinitionCRFBean> childEventDefCRFs = getEventDefinitionService().getAllChildrenEventDefinitionCrfs(studyEventDefinitionBean);
 			List<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionService().getAllParentsEventDefinitionCrfs(studyEventDefinitionBean);
+			boolean childEDCConfigurationIsSameAsParent = EventDefinitionCRFUtil.compareEDCListConfiguration(childEventDefCRFs, eventDefinitionCRFs);
 
 			boolean isItemLevelSDVAllowed = getCurrentStudy().getStudyParameterConfig().getItemLevelSDV().equals("yes");
 			request.getSession().setAttribute(UpdateEventDefinitionServlet.SDV_STATES,
 					SourceDataVerification.getAvailableSDVStates(isItemLevelSDVAllowed));
+			session.setAttribute("childEDCConfigurationIsSameAsParent", childEDCConfigurationIsSameAsParent);
 			session.setAttribute("definition", studyEventDefinitionBean);
 			session.setAttribute("childEventDefCRFs", childEventDefCRFs);
 			session.setAttribute("signStateRestorerMap", signStateRestorerMap);

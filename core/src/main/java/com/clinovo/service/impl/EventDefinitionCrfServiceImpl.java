@@ -294,8 +294,8 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 		}
 	}
 
-	private boolean shouldParameterBeUpdated(Object parentValue, Object childValue, int propagateChange) {
-		return propagateChange == 1 || (propagateChange == 2 && parentValue.equals(childValue));
+	private boolean shouldEDCBeUpdated(EventDefinitionCRFBean parentEDC, EventDefinitionCRFBean childEDC, int propagateChange) {
+		return propagateChange == 1 || (propagateChange == 2 && childEDC.configurationEquals(parentEDC));
 	}
 
 	/**
@@ -407,17 +407,17 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 			Map<Integer, EventDefinitionCRFBean> parentsMap,
 			Map<Integer, EventDefinitionCRFBean> parentsBeforeUpdateMap, UserAccountBean updater) {
 		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
-		for (EventDefinitionCRFBean childEdc : childEventDefinitionCRFsToUpdate) {
-			StudyBean childEdcStudyBean = (StudyBean) getStudyDAO().findByPK(childEdc.getStudyId());
 
+		for (EventDefinitionCRFBean childEdc : childEventDefinitionCRFsToUpdate) {
+			StudyBean siteBean = (StudyBean) getStudyDAO().findByPK(childEdc.getStudyId());
 			EventDefinitionCRFBean parentEdc = parentsMap.get(childEdc.getParentId());
 			EventDefinitionCRFBean oldParentEdc = parentsBeforeUpdateMap.get(childEdc.getParentId());
 
 			if (parentEdc != null && oldParentEdc != null) {
 				int propagateChange = parentEdc.getPropagateChange();
+
+
 				String versionIds = childEdc.getSelectedVersionIds();
-				childEdc.setDefaultVersionId(parentEdc.getDefaultVersionId());
-				childEdc.setAcceptNewCrfVersions(parentEdc.isAcceptNewCrfVersions());
 				if (versionIds != null && !versionIds.trim().isEmpty()) {
 					List<String> idList = new ArrayList<String>(Arrays.asList(versionIds.trim().split(",")));
 					String parentDefaultVersionId = Integer.toString(parentEdc.getDefaultVersionId());
@@ -429,42 +429,27 @@ public class EventDefinitionCrfServiceImpl implements EventDefinitionCrfService 
 				childEdc.setUpdater(updater);
 				childEdc.setUpdatedDate(new Date());
 
-				if (shouldParameterBeUpdated(oldParentEdc.isRequiredCRF(), childEdc.isRequiredCRF(), propagateChange)) {
+				if (shouldEDCBeUpdated(childEdc, oldParentEdc, propagateChange)) {
+					childEdc.setDefaultVersionId(parentEdc.getDefaultVersionId());
+					childEdc.setAcceptNewCrfVersions(parentEdc.isAcceptNewCrfVersions());
 					childEdc.setRequiredCRF(parentEdc.isRequiredCRF());
-				}
-				if (shouldParameterBeUpdated(oldParentEdc.isElectronicSignature(), childEdc.isElectronicSignature(),
-						propagateChange)) {
 					childEdc.setElectronicSignature(parentEdc.isElectronicSignature());
-				}
-				if (shouldParameterBeUpdated(oldParentEdc.isHideCrf(), childEdc.isHideCrf(), propagateChange)) {
 					childEdc.setHideCrf(parentEdc.isHideCrf());
+					childEdc.setDoubleEntry(parentEdc.isDoubleEntry());
+					childEdc.setEvaluatedCRF(parentEdc.isEvaluatedCRF());
+					childEdc.setEmailStep(parentEdc.getEmailStep());
+					childEdc.setEmailTo(parentEdc.getEmailTo());
+					childEdc.setTabbingMode(parentEdc.getTabbingMode());
 				}
 
 				// Update for all sites, only study level parameter.
 				childEdc.setSourceDataVerification(parentEdc.getSourceDataVerification());
 
-				if (shouldParameterBeUpdated(oldParentEdc.isDoubleEntry(), childEdc.isDoubleEntry(), propagateChange)) {
-					childEdc.setDoubleEntry(parentEdc.isDoubleEntry());
-				}
-				if (shouldParameterBeUpdated(oldParentEdc.isEvaluatedCRF(), childEdc.isEvaluatedCRF(),
-						propagateChange)) {
-					childEdc.setEvaluatedCRF(parentEdc.isEvaluatedCRF());
-				}
-				if (shouldParameterBeUpdated(oldParentEdc.getEmailStep(), childEdc.getEmailStep(), propagateChange)) {
-					childEdc.setEmailStep(parentEdc.getEmailStep());
-				}
-				if (shouldParameterBeUpdated(oldParentEdc.getEmailTo(), childEdc.getEmailTo(), propagateChange)) {
-					childEdc.setEmailTo(parentEdc.getEmailTo());
-				}
-				if (shouldParameterBeUpdated(oldParentEdc.getTabbingMode(), childEdc.getTabbingMode(),
-						propagateChange)) {
-					childEdc.setTabbingMode(parentEdc.getTabbingMode());
-				}
 				if (childEdc.getStatus().isAvailable()
-						&& (childEdcStudyBean.getStatus().isDeleted() || childEdcStudyBean.getStatus().isLocked())) {
-					childEdc.setStatus(childEdcStudyBean.getStatus().isDeleted()
+						&& (siteBean.getStatus().isDeleted() || siteBean.getStatus().isLocked())) {
+					childEdc.setStatus(siteBean.getStatus().isDeleted()
 							? Status.AUTO_DELETED
-							: childEdcStudyBean.getStatus());
+							: siteBean.getStatus());
 				}
 				eventDefinitionCrfDao.update(childEdc);
 			}

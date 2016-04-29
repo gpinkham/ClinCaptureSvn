@@ -1,13 +1,13 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
@@ -20,28 +20,34 @@
  */
 package org.akaza.openclinica.core.form;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 /**
- * 
- * Help class for string usage
- * 
+ * Help class for string usage.
+ *
  * @author jxu
  */
 @SuppressWarnings({"rawtypes"})
-public class StringUtil {
-	/*
+public final class StringUtil {
+
+	private StringUtil() {
+	}
+
+	public static final int MAX_YEAR = 9999;
+	public static final int MIN_YEAR = 1000;
+	public static final int MAX_YEAR_LENGTH = 4;
+
+	/**
 	 * A utility method for escaping apostrophes in Strings. "My'String" becomes "My\'String". This could be used for
 	 * example to escape a String for insertion into a postgresql varchar field.
+	 * @param escapeSource - String.
+	 * @return String.
 	 */
 	public static String escapeSingleQuote(String escapeSource) {
-
 		if (escapeSource == null || "".equalsIgnoreCase(escapeSource)) {
 			return "";
 		}
@@ -49,79 +55,92 @@ public class StringUtil {
 		// \' from
 		// a single apostrophe
 		return escapeSource.replaceAll("'", "\\\\'");
-
-	}
-
-	public static void main(String[] args) {
-		System.out.println(StringUtil.escapeSingleQuote("my ' header'"));
 	}
 
 	/**
-	 * Checks whether a string is blank
-	 * 
-	 * @param s
+	 * Check if string is not blank and equals to one of the options.
+	 * @param string String
+	 * @param options List of options.
+	 * @return boolean.
+	 */
+	public static boolean notBlankAndEquals(String string, String... options) {
+		if (isBlank(string)) {
+			return false;
+		}
+		for (String option : options) {
+			if (string.trim().equalsIgnoreCase(option)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether a string is blank.
+	 *
+	 * @param s - String.
 	 * @return true if blank, false otherwise
 	 */
 	public static boolean isBlank(String s) {
-		return s == null ? true : s.trim().equals("") ? true : false;
-
+		return s == null || (s.trim().equals(""));
 	}
 
-	public static boolean isNumber(String s) {
-		// To Do: whether we consider a blank string is still a number?
-		return Pattern.matches("[0-9]*", s) ? true : false;
-
-	}
-
-	public static boolean isValidDate(String s) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-		sdf.setLenient(false);
-		try {
-			java.util.Date date = sdf.parse(s);
-			if (date.after(new java.util.Date())) {
-				return false; // not a date in the past,for date of birth
-			}
-		} catch (ParseException fe) {
-			return false; // format is wrong
-		}
-
-		return true;
-
-	}
-
-	public static boolean isEmail(String s) {
-		return Pattern.matches("[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*@[A-Za-z]+(\\.[A-Za-z]+)*", s) ? true : false;
-	}
-
-	public static String join(String glue, ArrayList a) {
+	/**
+	 * Join array of Strings.
+	 * @param glue - string that will be used as joint.
+	 * @param list an array of strings.
+	 * @return String.
+	 */
+	public static String join(String glue, ArrayList<String> list) {
 		String answer = "";
 		String join = "";
 
-		for (int i = 0; i < a.size(); i++) {
-			String s = (String) a.get(i);
-			answer += join + s;
+		for (String entry : list) {
+			answer += join + entry;
 			join = glue;
 		}
-
 		return answer;
 	}
 
+	/**
+	 * Check if String is date.
+	 * @param s - String
+	 * @param dateFormat - String
+	 * @return boolean
+	 */
 	public static boolean isFormatDate(String s, String dateFormat) {
 		return isFormatDate(s, dateFormat, Locale.getDefault());
 	}
 
+	/**
+	 * Check if is format date.
+	 * @param s - String.
+	 * @param dateFormat - String.
+	 * @param locale - Locale.
+	 * @return boolean.
+	 */
 	public static boolean isFormatDate(String s, String dateFormat, Locale locale) {
-		String dateformat = parseDateFormat(dateFormat);
-		return isSameDate(dateformat, dateformat, s, locale);
+		String parsedFormat = parseDateFormat(dateFormat);
+		return isSameDate(parsedFormat, parsedFormat, s, locale);
 	}
 
 	/**
-	 * Allow only 4 digits, no more, no less
+	 * Allow only 4 digits, no more, no less.
+	 * @param s - String
+	 * @param yearFormat - String
+	 * @return boolean.
 	 */
 	public static boolean isPartialYear(String s, String yearFormat) {
 		return partialYear(s, yearFormat, null);
 	}
 
+	/**
+	 * Check if String is partial date.
+	 * @param s String
+	 * @param yearFormat String
+	 * @param locale Locale
+	 * @return boolean - validation result.
+	 */
 	public static boolean isPartialYear(String s, String yearFormat, Locale locale) {
 		return partialYear(s, yearFormat, locale);
 	}
@@ -135,20 +154,20 @@ public class StringUtil {
 			}
 			++dn;
 		}
-		if (dn != 4) {
+		if (dn != MAX_YEAR_LENGTH) {
 			return false;
 		}
-		String yearformat = parseDateFormat(yearFormat) + "-MM-dd";
-		SimpleDateFormat sdf_y;
+		String parsedYearFormat = parseDateFormat(yearFormat) + "-MM-dd";
+		SimpleDateFormat dateFormat;
 		if (locale == null) {
-			sdf_y = new SimpleDateFormat(yearformat);
+			dateFormat = new SimpleDateFormat(parsedYearFormat);
 		} else {
-			sdf_y = new SimpleDateFormat(yearformat, locale);
+			dateFormat = new SimpleDateFormat(parsedYearFormat, locale);
 		}
-		sdf_y.setLenient(false);
+		dateFormat.setLenient(false);
 		String sy = s + "-01-18";
 		try {
-			sdf_y.parse(sy);
+			dateFormat.parse(sy);
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -157,21 +176,34 @@ public class StringUtil {
 
 	/**
 	 * The year can only between 1000 and 9999.
+	 * @param s - String to check
+	 * @param yearMonthFormat - Date Format
+	 * @return boolean.
 	 */
 	public static boolean isPartialYearMonth(String s, String yearMonthFormat) {
-		String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
+		String parsedFormat = parseDateFormat(yearMonthFormat) + "-dd";
 		String sym = s + "-18";
-		return isSameDate(yearmonthformat, yearmonthformat, sym);
-	}
-
-	public static boolean isPartialYearMonth(String s, String yearMonthFormat, Locale locale) {
-		String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
-		String sym = s + "-18";
-		return isSameDate(yearmonthformat, yearmonthformat, sym, locale);
+		return isSameDate(parsedFormat, parsedFormat, sym);
 	}
 
 	/**
-	 * return dateFormat with lowercase "y" and "d"
+	 * Check if String is partial date.
+	 * @param s - String
+	 * @param yearMonthFormat - String
+	 * @param locale - Locale
+	 * @return boolean
+	 */
+	public static boolean isPartialYearMonth(String s, String yearMonthFormat, Locale locale) {
+		String parsedFormat = parseDateFormat(yearMonthFormat) + "-dd";
+		String sym = s + "-18";
+		return isSameDate(parsedFormat, parsedFormat, sym, locale);
+	}
+
+	/**
+	 * Return dateFormat with lowercase "y" and "d".
+	 * @param dateFormat - String
+	 *
+	 * @return String date format.
 	 */
 	public static String parseDateFormat(String dateFormat) {
 		String s = dateFormat;
@@ -187,12 +219,12 @@ public class StringUtil {
 	/**
 	 * Return true if a date String is the same day when it is parsed by two different dateFormats, depends on locale.
 	 * The year can only between 1000 and 9999.
-	 * 
-	 * @param dateFormat1
-	 * @param dateFormat2
-	 * @param dateStr
-	 * @param locale
-	 * @return
+	 *
+	 * @param dateFormat1 - String
+	 * @param dateFormat2 - String
+	 * @param dateStr - String
+	 * @param locale - Locale
+	 * @return boolean
 	 */
 	public static boolean isSameDate(String dateFormat1, String dateFormat2, String dateStr, Locale locale) {
 		SimpleDateFormat sdf1 = new SimpleDateFormat(dateFormat1, locale);
@@ -207,10 +239,7 @@ public class StringUtil {
 					Calendar c = Calendar.getInstance();
 					c.setTime(d1);
 					int year = c.get(Calendar.YEAR);
-					if (year > 9999 || year < 1000) {
-						return false;
-					}
-					return true;
+					return !(year > MAX_YEAR || year < MIN_YEAR);
 				} else {
 					return false;
 				}
@@ -225,11 +254,11 @@ public class StringUtil {
 	/**
 	 * Return true if a date String is the same day when it is parsed by two different dateFormats. The year can only
 	 * between 1000 and 9999.
-	 * 
-	 * @param dateFormat1
-	 * @param dateFormat2
-	 * @param dateStr
-	 * @return
+	 *
+	 * @param dateFormat1 String
+	 * @param dateFormat2 String
+	 * @param dateStr String
+	 * @return boolean
 	 */
 	public static boolean isSameDate(String dateFormat1, String dateFormat2, String dateStr) {
 		return isSameDate(dateFormat1, dateFormat2, dateStr, Locale.getDefault());

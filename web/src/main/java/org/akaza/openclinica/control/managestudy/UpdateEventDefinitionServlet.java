@@ -20,16 +20,11 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.model.EDCItemMetadata;
 import com.clinovo.util.EventDefinitionCRFUtil;
+import com.clinovo.util.RequestUtil;
+import com.clinovo.util.SignStateRestorer;
+import com.clinovo.validator.EventDefinitionValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -48,10 +43,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.model.EDCItemMetadata;
-import com.clinovo.util.RequestUtil;
-import com.clinovo.util.SignStateRestorer;
-import com.clinovo.validator.EventDefinitionValidator;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Servlet handles update requests on study event definition bean properties and update/remove/restore requests on event
@@ -204,6 +202,7 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 
 		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) fp.getRequest().getSession().getAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
+		int propagateChange = fp.getInt("propagateChange");
 
 		for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
 			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
@@ -213,85 +212,39 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
 				edcBean.setDefaultVersionName(defaultVersion.getName());
 
-				String requiredCRF = fp.getString("requiredCRF" + i);
-				String deQuality = fp.getString("deQuality" + i);
-				String decisionCondition = fp.getString("decisionCondition" + i);
-				String electronicSignature = fp.getString("electronicSignature" + i);
-				String hideCRF = fp.getString("hideCRF" + i);
-				String acceptNewCrfVersions = fp.getString("acceptNewCrfVersions" + i);
 				int sdvId = fp.getInt("sdvOption" + i);
-				String emailStep = fp.getString("emailOnStep" + i);
-				String emailTo = fp.getString("mailTo" + i);
 				String tabbingMode = fp.getString("tabbingMode" + i);
-				int propagateChange = fp.getInt("propagateChange" + i);
 
-				if (!StringUtil.isBlank(tabbingMode) && ("leftToRight".equalsIgnoreCase(tabbingMode.trim())
-						|| "topToBottom".equalsIgnoreCase(tabbingMode.trim()))) {
+				if (StringUtil.notBlankAndEquals(tabbingMode, "leftToRight", "topToBottom")) {
 					edcBean.setTabbingMode(tabbingMode);
 				} else {
 					edcBean.setTabbingMode("leftToRight");
 				}
+				String emailTo = fp.getString("mailTo" + i);
+				String hideCRF = fp.getString("hideCRF" + i);
+				String emailStep = fp.getString("emailOnStep" + i);
+				String requiredCRF = fp.getString("requiredCRF" + i);
+				String deQuality = fp.getString("deQuality" + i);
+				String decisionCondition = fp.getString("decisionCondition" + i);
+				String electronicSignature = fp.getString("electronicSignature" + i);
+				String acceptNewCrfVersions = fp.getString("acceptNewCrfVersions" + i);
 
-				if (!StringUtil.isBlank(acceptNewCrfVersions) && "yes".equalsIgnoreCase(acceptNewCrfVersions.trim())) {
-					edcBean.setAcceptNewCrfVersions(true);
-				} else {
-					edcBean.setAcceptNewCrfVersions(false);
-				}
-				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
-					edcBean.setHideCrf(true);
-				} else {
-					edcBean.setHideCrf(false);
-				}
-				if (!StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
-					edcBean.setRequiredCRF(true);
-				} else {
-					edcBean.setRequiredCRF(false);
-				}
-
-				if (!StringUtil.isBlank(deQuality) && "dde".equalsIgnoreCase(deQuality.trim())) {
-					edcBean.setDoubleEntry(true);
-				} else {
-					edcBean.setDoubleEntry(false);
-				}
-
-				if (!StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim())) {
-					edcBean.setElectronicSignature(true);
-				} else {
-					edcBean.setElectronicSignature(false);
-				}
-
-				if (!StringUtil.isBlank(decisionCondition) && "yes".equalsIgnoreCase(decisionCondition.trim())) {
-					edcBean.setDecisionCondition(true);
-				} else {
-					edcBean.setDecisionCondition(false);
-				}
-
-				if (!StringUtil.isBlank(deQuality) && "evaluation".equalsIgnoreCase(deQuality.trim())) {
-					edcBean.setEvaluatedCRF(true);
-				} else {
-					edcBean.setEvaluatedCRF(false);
-				}
+				edcBean.setEmailTo(!StringUtil.isBlank(emailTo) ? emailTo : "");
+				edcBean.setHideCrf(StringUtil.notBlankAndEquals(hideCRF, "yes"));
+				edcBean.setEmailStep(!StringUtil.isBlank(emailStep) ? emailStep : "");
+				edcBean.setPropagateChange(propagateChange);
+				edcBean.setRequiredCRF(StringUtil.notBlankAndEquals(requiredCRF, "yes"));
+				edcBean.setDoubleEntry(StringUtil.notBlankAndEquals(deQuality, "dde"));
+				edcBean.setEvaluatedCRF(StringUtil.notBlankAndEquals(deQuality, "evaluation"));
+				edcBean.setDecisionCondition(StringUtil.notBlankAndEquals(decisionCondition, "yes"));
+				edcBean.setElectronicSignature(StringUtil.notBlankAndEquals(electronicSignature, "yes"));
+				edcBean.setAcceptNewCrfVersions(StringUtil.notBlankAndEquals(acceptNewCrfVersions, "yes"));
 
 				if (sdvId > 0 && (edcBean.getSourceDataVerification() == null
 						|| sdvId != edcBean.getSourceDataVerification().getCode())) {
 					edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 				}
-
-				if (!StringUtil.isBlank(emailTo)) {
-					edcBean.setEmailTo(emailTo);
-				} else {
-					edcBean.setEmailTo("");
-				}
-
-				if (!StringUtil.isBlank(emailStep)) {
-					edcBean.setEmailStep(emailStep);
-				} else {
-					edcBean.setEmailStep("");
-				}
-
-				edcBean.setPropagateChange(propagateChange);
 			}
-
 		}
 		fp.getRequest().getSession().setAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL, eventDefinitionCRFs);
 	}
@@ -332,9 +285,9 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 		session.removeAttribute("childEventDefCRFs");
 		session.removeAttribute("edcItemMetadataMap");
 		session.removeAttribute("userNameInsteadEmail");
-		session.removeAttribute("userNameInsteadEmail");
 		session.removeAttribute("oldEventDefinitionCRFs");
 		session.removeAttribute("showCalendaredVisitBox");
+		session.removeAttribute("compareEDCListConfiguration");
 		session.removeAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
 		RequestUtil.getRequest().removeAttribute("formWithStateFlag");
 		session.removeAttribute(DefineStudyEventServlet.DEFINE_UPDATE_STUDY_EVENT_PAGE_2_URL);

@@ -345,6 +345,27 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		return true;
 	}
 
+	/**
+	 * Compare two EventDefinitionCRFBeans parameters.
+	 * @param other EventDefinitionCRFBean
+	 * @return compare result.
+	 */
+	public boolean configurationEquals(EventDefinitionCRFBean other) {
+		return this.isRequiredCRF() == other.isRequiredCRF()
+				&& this.isElectronicSignature() == other.isElectronicSignature()
+				&& this.getDefaultVersionId() == other.getDefaultVersionId()
+				&& this.getDefaultVersionName().equals(other.getDefaultVersionName())
+				&& this.isHideCrf() == other.isHideCrf()
+				&& this.getStudyEventDefinitionId() == other.getStudyEventDefinitionId()
+				&& this.getSourceDataVerification().getCode().equals(other.getSourceDataVerification().getCode())
+				&& this.isAcceptNewCrfVersions() == other.isAcceptNewCrfVersions()
+				&& this.isDoubleEntry() == other.isDoubleEntry()
+				&& this.isEvaluatedCRF() == other.isEvaluatedCRF()
+				&& this.getEmailStep().equals(other.getEmailStep())
+				&& this.getEmailTo().equals(other.getEmailTo())
+				&& this.getTabbingMode().equals(other.getTabbingMode());
+	}
+
 	public String getSelectedVersionIds() {
 		return selectedVersionIds;
 	}

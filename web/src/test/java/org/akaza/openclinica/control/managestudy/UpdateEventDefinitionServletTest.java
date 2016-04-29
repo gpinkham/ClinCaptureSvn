@@ -309,6 +309,7 @@ public class UpdateEventDefinitionServletTest {
 		parentEventDefinitionCRF.setOldStatus(Status.DELETED);
 		parentEventDefinitionCRF.setCrf(testCRF);
 		parentEventDefinitionCRF.setDefaultVersionId(1);
+		parentEventDefinitionCRF.setPropagateChange(1);
 		List<EventDefinitionCRFBean> eventDefinitionCRFsToUpdate = new ArrayList<EventDefinitionCRFBean>();
 		eventDefinitionCRFsToUpdate.add(parentEventDefinitionCRF);
 		request.getSession().setAttribute("eventDefinitionCRFs", eventDefinitionCRFsToUpdate);

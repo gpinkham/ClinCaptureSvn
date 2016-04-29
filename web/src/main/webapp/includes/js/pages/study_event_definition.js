@@ -88,7 +88,9 @@ function checkItemLevelSDVChanges(message, button) {
 		if (itemLevelSDVChanged) {
 			return confirmSubmit({ message: message, height: 180, width: 500, submit: button });
 		} else {
-			return true;
+			button.setAttribute("onClick", "");
+			button.setAttribute("onclick", "");
+			button.click();
 		}
 	} else {
 		return false;

@@ -151,4 +151,25 @@ public final class EventDefinitionCRFUtil {
 		}
 		return false;
 	}
+
+	/**
+	 * Check if at least one of the properties of child EDCs is different from parent.
+	 * @param childEventDefCRFs List of EventDefinitionCRFBean
+	 * @param eventDefinitionCRFs List of EventDefinitionCRFBean
+	 * @return boolean
+	 */
+	public static boolean compareEDCListConfiguration(List<EventDefinitionCRFBean> childEventDefCRFs,
+													  List<EventDefinitionCRFBean> eventDefinitionCRFs) {
+		for (EventDefinitionCRFBean parentEDC : eventDefinitionCRFs) {
+			for (EventDefinitionCRFBean childEDC : childEventDefCRFs) {
+				if (childEDC.getParentId() != parentEDC.getId()) {
+					continue;
+				}
+				if ((!childEDC.configurationEquals(parentEDC))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }

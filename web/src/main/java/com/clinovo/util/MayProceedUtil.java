@@ -31,6 +31,12 @@ public final class MayProceedUtil {
 	private MayProceedUtil() {
 	}
 
+	/**
+	 * Check if user's role is in the list of roles.
+	 * @param request HttpServletRequest.
+	 * @param roles List of user roles.
+	 * @return boolean.
+	 */
 	public static boolean mayProceed(HttpServletRequest request, Role... roles) {
 		boolean mayProceed = false;
 		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(SpringController.USER_ROLE);

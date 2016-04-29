@@ -9,6 +9,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
+<jsp:include page="/includes/js/pages/update_event_definition.js.jsp" />
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -52,6 +53,7 @@
 	<input type="hidden" name="formWithStateFlag" id="formWithStateFlag" value="${formWithStateFlag != null ? formWithStateFlag : ''}" />
 	<input type="hidden" name="action" value="confirm">
 	<input type="hidden" name="edcToConfigure" value="">
+	<input type="hidden" name="propagateChange" value="${propagateChange}" id="propagateChange">
 	<div style="width: 600px">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
@@ -466,15 +468,6 @@
                 </td>
             </tr>
 
-			<tr>
-				<td class="table_cell" colspan="4">
-					<fmt:message key="propagate_change" bundle="${resword}"/>:
-					<input type="radio" name="propagateChange${count}" onchange="changeIcon();" value="1" ${edc.propagateChange == "1" ? "checked" : ""}/> <fmt:message key="yes_unconditionally" bundle="${resword}"/>
-					<input type="radio" name="propagateChange${count}" onchange="changeIcon();" value="2" ${edc.propagateChange == "2" ? "checked" : ""}/> <fmt:message key="yes_preserve_different" bundle="${resword}"/>
-					<input type="radio" name="propagateChange${count}" onchange="changeIcon();" value="3" ${edc.propagateChange == "3" || edc.propagateChange == "0" ? "checked" : ""}/> <fmt:message key="no" bundle="${resword}"/>
-				</td>
-			</tr>
-
 			<tr><td class="table_divider" colspan="4">&nbsp;</td></tr>
 			</c:if>
 			<c:set var="count" value="${count+1}"/>
@@ -492,7 +485,7 @@
 			</td>
 			<td>
 				<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue"
-					   onClick="return checkItemLevelSDVChanges('<fmt:message bundle='${resword}' key='item_level_sdv_status_changed'/>', this);">
+					   onClick="return showPropagateChangesDialog(${childEDCConfigurationIsSameAsParent}, this);">
 			</td>
 			<td>
 				<c:set var="addNewCRFBTNCaption"><fmt:message key="add_a_new_CRF" bundle="${resword}"/></c:set>

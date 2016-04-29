@@ -72,6 +72,7 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		eventDefinitionCrfBean.setUpdater(updater);
 		eventDefinitionCrfBean.setDefaultVersionId(1);
 		eventDefinitionCrfBean.setSelectedVersionIds("");
+		eventDefinitionCrfBean.setPropagateChange(1);
 		eventDefinitionCRFDAO.update(eventDefinitionCrfBean);
 		parentsMap.put(eventDefinitionCrfBean.getId(), eventDefinitionCrfBean);
 
@@ -223,7 +224,7 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatUpdateAllChildEventDefinitionCRFsUpdatesChildIfPropagateModeEqOverrideNotDifferent() {
+	public void testThatNotUpdatesAllChildEventDefinitionCRFsUpdatesChildIfPropagateModeEqOverrideNotDifferent() {
 		List<EventDefinitionCRFBean> childEventDefCRFs = new ArrayList<EventDefinitionCRFBean>();
 		Map<Integer, EventDefinitionCRFBean> parentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
 		Map<Integer, EventDefinitionCRFBean> oldParentsMap = new HashMap<Integer, EventDefinitionCRFBean>();
@@ -251,7 +252,7 @@ public class EventDefinitionCrfServiceTest extends DefaultAppContextTest {
 		eventDefinitionCrfService.updateChildEventDefinitionCRFs(childEventDefCRFs, parentsMap, oldParentsMap,
 				userBean);
 
-		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() == eventDefinitionCrfBean.isRequiredCRF());
+		assertTrue(childEventDefinitionCrfBean.isRequiredCRF() != eventDefinitionCrfBean.isRequiredCRF());
 		assertTrue(
 				childEventDefinitionCrfBean.isElectronicSignature() != eventDefinitionCrfBean.isElectronicSignature());
 	}
