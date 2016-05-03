@@ -51,7 +51,6 @@ import com.clinovo.util.SignStateRestorer;
  * 
  */
 @Component
-@SuppressWarnings("rawtypes")
 public class InitUpdateEventDefinitionServlet extends SpringServlet {
 
 	/**

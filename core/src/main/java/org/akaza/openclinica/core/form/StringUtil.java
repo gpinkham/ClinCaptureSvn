@@ -31,7 +31,6 @@ import java.util.Locale;
  *
  * @author jxu
  */
-@SuppressWarnings({"rawtypes"})
 public final class StringUtil {
 
 	private StringUtil() {
