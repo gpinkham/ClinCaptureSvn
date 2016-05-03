@@ -31,6 +31,7 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
 import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -49,6 +50,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -116,6 +118,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 	private Map<String, ItemGroupBean> itemGroupLabelMap = new HashMap<String, ItemGroupBean>();
 	private Map<String, ItemFormMetadataBean> itemNameToMetaMap = new HashMap<String, ItemFormMetadataBean>();
 	private Map<String, ItemGroupMetadataBean> itemGroupLabelToMetaMap = new HashMap<String, ItemGroupMetadataBean>();
+	private Map<String, List<ItemBeanExt>> parentNameToChildrenMap = new HashMap<String, List<ItemBeanExt>>();
 
 	// message source
 	private MessageSource messageSource;
@@ -344,6 +347,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	public Map<String, ItemGroupMetadataBean> getItemGroupLabelToMetaMap() {
 		return itemGroupLabelToMetaMap;
+	}
+
+	public Map<String, List<ItemBeanExt>> getParentNameToChildrenMap() {
+		return parentNameToChildrenMap;
 	}
 
 	public Map<String, ItemBeanExt> getItemNameToItemMap() {
@@ -614,6 +621,8 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 			Map<String, ItemBean> existingItemsMap = existingItemsMap(itemDao);
 			Map<String, ItemGroupBean> existingGroupsMap = existingGroupsMap(itemGroupDao);
 
+			processSCDForChildItems();
+
 			// create crf & crf version
 			if (crfBean.getId() > 0) {
 				crfBean = (CRFBean) crfDao.findByPK(crfBean.getId());
@@ -696,8 +705,10 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 				// create item meta
 				itemBean.getItemMeta().setItemId(itemBean.getId());
 				if (itemBean.getParentItemBean() != null) {
-					itemBean.getItemMeta().setParentId(itemBean.getParentItemBean().getId());
-					itemBean.getItemMeta().setParentLabel(itemBean.getParentItemBean().getName());
+					itemBean.getItemMeta().setParentId(0);
+					itemBean.getItemMeta().setParentLabel("");
+					itemBean.getItemMeta().setColumnNumber(1);
+					itemBean.getItemMeta().setPseudoChild(true);
 				}
 				itemBean.getItemMeta().setSectionId(itemBean.getSectionBean().getId());
 				itemBean.getItemMeta().setCrfVersionId(crfVersionBean.getId());
@@ -746,5 +757,50 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 			createItemRenderMeta();
 		}
 		return crfVersionBean;
+	}
+
+	/**
+	 * Puts current item bean into the parentNameToChildrenMap, if it has a parent.
+	 */
+	public void addCurrentItemToChildrenMap() {
+
+		ItemBeanExt currentItem = getCurrentItem();
+		if (currentItem != null && currentItem.getParentItemBean() != null
+				&& StringUtils.isNotEmpty(currentItem.getParentItemBean().getName())) {
+
+			String parentItemName = currentItem.getParentItemBean().getName();
+			if (parentNameToChildrenMap.get(parentItemName) == null) {
+				List<ItemBeanExt> children = new ArrayList<ItemBeanExt>();
+				children.add(currentItem);
+				parentNameToChildrenMap.put(parentItemName, children);
+			} else {
+				parentNameToChildrenMap.get(parentItemName).add(currentItem);
+			}
+		}
+	}
+
+	private void processSCDForChildItems() {
+
+		for (String parentItemName : parentNameToChildrenMap.keySet()) {
+			ItemBeanExt parentItem = itemNameToItemMap.get(parentItemName);
+			if (parentItem.hasSCD()) {
+
+				boolean copyParentSCDToChildItems = true;
+				for (ItemBeanExt childItem: parentNameToChildrenMap.get(parentItemName)) {
+					if (childItem.hasSCD()) {
+						copyParentSCDToChildItems = false;
+						break;
+					}
+				}
+
+				if (copyParentSCDToChildItems) {
+					SimpleConditionalDisplayBean parentSCDBean = parentItem.getSimpleConditionalDisplayBean();
+					for (ItemBeanExt childItem: parentNameToChildrenMap.get(parentItemName)) {
+						childItem.setSimpleConditionalDisplayBean(new SimpleConditionalDisplayBean(parentSCDBean));
+						childItem.getItemMeta().setShowItem(false);
+					}
+				}
+			}
+		}
 	}
 }

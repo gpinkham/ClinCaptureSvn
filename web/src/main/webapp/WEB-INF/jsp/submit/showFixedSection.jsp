@@ -108,7 +108,7 @@
 			<table border="0">
 				<tr>
 					<%--<td valign="top"><c:out value="${displayItem.metadata.questionNumberLabel}" /></td>--%>
-					<td class="text_block" valign="top"><c:out value="${displayItem.metadata.questionNumberLabel}" /> <c:out value="${displayItem.metadata.leftItemText}" escapeXml="false"/></td>
+					<td class="text_block" valign="top"><c:out value="${displayItem.metadata.questionNumberLabel}" escapeXml="false"/> <c:out value="${displayItem.metadata.leftItemText}" escapeXml="false"/></td>
 					<td valign="top">
 						<%-- display the HTML input tag --%>
 						<c:set var="displayItem" scope="request" value="${displayItem}" />

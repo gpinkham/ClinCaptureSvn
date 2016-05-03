@@ -159,7 +159,6 @@
             left_item_text,
             right_item_text,
             section_id,
-            decision_condition_id,
             response_set_id,
             regexp,
             regexp_error_msg,
@@ -169,7 +168,8 @@
             response_layout,
             width_decimal,
             show_item,
-            code_ref)
+            code_ref,
+            pseudo_child)
 			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
@@ -190,7 +190,6 @@
             left_item_text=?,
             right_item_text=?,
             section_id=?,
-            decision_condition_id=?,
             response_set_id=?,
             regexp=?,
             regexp_error_msg=?,
@@ -200,7 +199,8 @@
             response_layout =?,
             width_decimal =?,
             show_item =?,
-            code_ref=?
+            code_ref=?,
+            pseudo_child=?
 			WHERE item_form_metadata_id = ?
 		</sql>
 	</query>

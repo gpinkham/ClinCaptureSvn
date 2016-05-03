@@ -46,10 +46,12 @@
 		<div style="display: table-cell; padding: 5px; width: ${itemWidth}px; vertical-align: top;">
 			<div class="item-cell" style="position: relative; display: ${itemShown ? 'table' : 'none'}" id="t${displayItem.item.id}">
 				<div style="float: left; width: ${leftTextWidth}px; min-height: 10px">
+					<c:if test="${displayItem.metadata.pseudoChild}">
+						<div class="pl40" style="float: left;">&nbsp;</div>
+					</c:if>
 					<div style="float: left;">
 						<c:out value="${displayItem.metadata.questionNumberLabel}" escapeXml="false"/> 
-					</div>
-					<div style="float: left;">
+					</div>					<div style="float: left;">
 						<c:import url="../submit/generateLeftItemTxt.jsp">
 							<c:param name="linkText" value="${displayItem.metadata.leftItemText}"/>
 						</c:import>

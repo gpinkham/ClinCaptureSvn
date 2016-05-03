@@ -2987,12 +2987,16 @@ table.footerInnerTable {
 	border: 1px solid #cccccc;
 	box-shadow: 5px 5px 5px #ccc;
 }
+
 .pl20 {
 	padding-left: 20px;
 }
 
-td.randTd {
-    width: 120px;
+.pl40 {
+	padding-left: 40px;
+}
+
+td.randTd {    width: 120px;
     text-align: left;
 }
 

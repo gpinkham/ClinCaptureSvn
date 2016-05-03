@@ -115,7 +115,7 @@
 <table border="0">
   <tr>
     <td valign="top" class="text_block"><c:out value=
-      "${displayItem.metadata.questionNumberLabel}" /> <c:out value="${displayItem.metadata.leftItemText}" escapeXml="false"/></td>
+      "${displayItem.metadata.questionNumberLabel}" escapeXml="false"/> <c:out value="${displayItem.metadata.leftItemText}" escapeXml="false"/></td>
     <td valign="top">
         <%-- display the HTML input tag --%>
       <c:set var="displayItem" scope="request" value="${displayItem}" />

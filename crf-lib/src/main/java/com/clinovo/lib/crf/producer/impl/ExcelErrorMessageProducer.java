@@ -1023,19 +1023,4 @@ public class ExcelErrorMessageProducer implements ErrorMessageProducer {
 	public void crfShouldHaveAtLeastOneItem() throws CRFReadingException {
 		throw new CRFReadingException(crfBuilder.getMessage("importcrf.crfShouldHaveAtLeastOneItem"));
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void simpleConditionalDisplayPresentForParentAndChild() {
-		int row = crfBuilder.getCurrentItem().getRowNumber();
-		int sheetNumber = crfBuilder.getCurrentItem().getSheetNumber();
-		crfBuilder.getErrorsList()
-				.add(crfBuilder.getMessage("importcrf.parentAndChildHasConditionalLogic",
-						new Object[]{crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem().getParentItemBean().getName()}));
-		crfBuilder.getErrorsMap()
-				.put(sheetNumber + "," + row + ","
-								+ crfBuilder.getColumnNumber(CellName.ITEM_SIMPLE_CONDITIONAL_DISPLAY),
-						crfBuilder.getMessage("importcrf.parentAndChildHasConditionalLogicHTML"));
-	}
 }

@@ -624,7 +624,7 @@
 								</c:if>
 								<table border="0" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
 									<tr>
-										<td valign="top" class="aka_ques_block"></td>
+										<td valign="top" class="aka_ques_block ${displayItem.singleItem.metadata.pseudoChild ? ' pl40' : ''}"></td>
 										<c:if test="${displayItem.singleItem.metadata.textFromLeftItemText==''}">
 											<td valign="top" class="aka_text_block">
 												&nbsp;
@@ -644,7 +644,7 @@
 										</td>
 									</tr>
 									<tr>
-										<td valign="top" class="aka_ques_block">
+										<td valign="top" class="aka_ques_block ${displayItem.singleItem.metadata.pseudoChild ? ' pl40' : ''}">
 											<c:out value="${displayItem.singleItem.metadata.questionNumberLabel}" escapeXml="false" />
 										</td>
 										<td valign="top" class="aka_text_block">

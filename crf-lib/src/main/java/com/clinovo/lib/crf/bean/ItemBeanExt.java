@@ -26,6 +26,7 @@ import org.akaza.openclinica.domain.datamap.ResponseSet;
 
 import com.clinovo.lib.crf.builder.impl.ExcelCrfBuilder;
 import com.clinovo.lib.crf.enums.RealValueKey;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * ItemBeanExt.
@@ -55,7 +56,9 @@ public class ItemBeanExt extends ItemBean {
 	}
 
 	/**
-	 * Default constructor.
+	 * Copy constructor.
+	 *
+	 * @param itemBean item bean
 	 */
 	public ItemBeanExt(ItemBean itemBean) {
 		itemBean.cloneTo(this);
@@ -135,5 +138,19 @@ public class ItemBeanExt extends ItemBean {
 	 */
 	public void setRealValue(RealValueKey realValueKey, String value) {
 		realValues.put(realValueKey, value == null ? "" : value);
+	}
+
+	/**
+	 * Verifies if an item bean has a simple conditional display property provided.
+	 *
+	 * @return <code>true</code> if an item has a simple conditional display property provided;
+	 * <code>false</code> otherwise
+	 */
+	public boolean hasSCD() {
+
+		return this.simpleConditionalDisplayBean != null
+				&& StringUtils.isNotEmpty(this.simpleConditionalDisplayBean.getControlItemName())
+				&& StringUtils.isNotEmpty(this.simpleConditionalDisplayBean.getOptionValue())
+				&& StringUtils.isNotEmpty(this.simpleConditionalDisplayBean.getMessage());
 	}
 }

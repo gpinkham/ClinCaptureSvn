@@ -88,11 +88,10 @@
 </c:choose>
 
 <c:if test="${displayItemWithGroup.singleItem.item.dataType.id ne 13 and displayItemWithGroup.singleItem.item.dataType.id ne 14}">
-	<td valign="top" class="aka_ques_block">
+	<td valign="top" class="aka_ques_block ${displayItemWithGroup.singleItem.metadata.pseudoChild ? ' pl40' : ''}">
 		<c:out value="${displayItemWithGroup.singleItem.metadata.questionNumberLabel}" escapeXml="false"/>
 	</td>
-	<td valign="top" class="aka_text_block">
-		<c:import url="../submit/generateLeftItemTxt.jsp">
+	<td valign="top" class="aka_text_block">		<c:import url="../submit/generateLeftItemTxt.jsp">
 			<c:param name="itemId" value="${displayItemWithGroup.singleItem.item.id}"/>
 			<c:param name="inputType" value="${displayItemWithGroup.singleItem.metadata.responseSet.responseType.name}"/>
 			<c:param name="function" value="${displayItemWithGroup.singleItem.metadata.responseSet.options[0].value}"/>

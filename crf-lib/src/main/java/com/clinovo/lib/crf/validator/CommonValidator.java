@@ -727,10 +727,7 @@ public final class CommonValidator {
 			}
 			// validate availability of item_label
 			if (crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean() != null) {
-				if (crfBuilder.getCurrentItem().getParentItemBean() != null && ((ItemBeanExt) crfBuilder
-						.getCurrentItem().getParentItemBean()).getSimpleConditionalDisplayBean() != null) {
-					crfBuilder.getErrorMessageProducer().simpleConditionalDisplayPresentForParentAndChild();
-				} else if (crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getControlItemName().length() > 0
+				if (crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getControlItemName().length() > 0
 						&& crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getOptionValue().length() > 0
 						&& crfBuilder.getCurrentItem().getSimpleConditionalDisplayBean().getMessage().length() > 0) {
 					if (crfBuilder.getItemNames().contains(

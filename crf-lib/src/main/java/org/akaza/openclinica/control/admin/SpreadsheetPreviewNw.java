@@ -20,6 +20,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.akaza.openclinica.bean.core.ApplicationConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.akaza.openclinica.util.SpreadsheetPreviewUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,11 +36,13 @@ import org.slf4j.LoggerFactory;
 public final class SpreadsheetPreviewNw implements Preview {
 
 	public static final int FOUR = 4;
+	public static final int COL_NUMBER_PARENT_ITEM = 9;
 	public static final int INT_1000 = 1000;
 	private final Logger logger = LoggerFactory.getLogger(SpreadsheetPreviewNw.class);
 
 	public static final String ITEMS = "Items";
 	public static final String SECTIONS = "Sections";
+	public static final String QUESTION_NUMBER_PREFIX_FOR_CHILD_ITEM = "<span class=\"pl40\"></span>";
 
 	/**
 	 * Constructor.
@@ -137,18 +140,13 @@ public final class SpreadsheetPreviewNw implements Preview {
 					if (row == null) {
 						continue;
 					}
+
+					boolean hasParentItem = StringUtils.isNotEmpty(getCellValue(row.getCell(COL_NUMBER_PARENT_ITEM)));
 					for (int k = 0; k < headers.length; k++) {
 						cell = row.getCell((short) k);
 						if ("default_value".equalsIgnoreCase(headers[k]) && isDateDatatype(headers, row)
 								&& !"".equalsIgnoreCase(getCellValue(cell))) {
 							try {
-								// BWP>> getDateCellValue() wll throw an
-								// exception if
-								// the value is an invalid date. Keep the date
-								// format the same as
-								// it is in the database; MM/dd/yyyy
-								// String pttrn =
-								// ResourceBundleProvider.getFormatBundle().getString("oc_date_format_string");
 								String pttrn = ApplicationConstants.getDateFormatInItemData();
 								dateFormat = new SimpleDateFormat(pttrn).format(cell.getDateCellValue());
 								rowCells.put(headers[k], dateFormat);
@@ -160,7 +158,6 @@ public final class SpreadsheetPreviewNw implements Preview {
 								rowCells.put(headers[k], cellVal);
 								continue;
 							}
-
 						}
 
 						if (headers[k].equalsIgnoreCase("left_item_text")
@@ -172,10 +169,19 @@ public final class SpreadsheetPreviewNw implements Preview {
 								|| headers[k].equalsIgnoreCase("instructions")
 								|| headers[k].equalsIgnoreCase("response_options_text")
 								|| headers[k].equalsIgnoreCase("code_ref")) {
-							rowCells.put(headers[k], getCellValue(cell).replaceAll("\\\\,", "\\,"));
+
+							String cellValue = getCellValue(cell).replaceAll("\\\\,", "\\,");
+							if (headers[k].equalsIgnoreCase("question_number") && hasParentItem) {
+								cellValue = QUESTION_NUMBER_PREFIX_FOR_CHILD_ITEM.concat(cellValue);
+							}
+							rowCells.put(headers[k], cellValue);
+
+						} else if (headers[k].equalsIgnoreCase("parent_item")) {
+							rowCells.put(headers[k], "");
 						} else {
-							rowCells.put(headers[k],
-									getCellValue(cell).replaceAll("\\\\,", "\\,").replaceAll("<[^>]*>", ""));
+							String cellValue = (headers[k].equalsIgnoreCase("column_number") && hasParentItem) ? "0"
+									: getCellValue(cell).replaceAll("\\\\,", "\\,").replaceAll("<[^>]*>", "");
+							rowCells.put(headers[k], cellValue);
 						}
 					}
 					// item_name

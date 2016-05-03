@@ -136,7 +136,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		answer.setLeftItemText(getStringFromRow(hm, "left_item_text"));
 		answer.setRightItemText(getStringFromRow(hm, "right_item_text"));
 		answer.setSectionId(getIntFromRow(hm, "section_id"));
-		answer.setDescisionConditionId(getIntFromRow(hm, "decision_condition_id"));
 		answer.setResponseSetId(getIntFromRow(hm, "response_set_id"));
 		answer.setRegexp(getStringFromRow(hm, "regexp"));
 		answer.setRegexpErrorMsg(getStringFromRow(hm, "regexp_error_msg"));
@@ -147,6 +146,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
 		answer.setShowItem(getBooleanFromRow(hm, "show_item"));
 		answer.setCodeRef(getStringFromRow(hm, "code_ref"));
+		answer.setPseudoChild((Integer) hm.get("pseudo_child") == 1);
 
 		ResponseSetBean rsb = new ResponseSetBean();
 		rsb.setId(getIntFromRow(hm, "response_set_id"));
@@ -167,66 +167,40 @@ public class ItemFormMetadataDAO extends EntityDAO {
 	 * @return int
 	 */
 	public int setTypesExpected() {
+
 		this.unsetTypeExpected();
 		int ind = 1;
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // item form metadata id 2
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // item id 3
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // crf version id 4
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // header 5
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // subheader 6
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // parent id 7
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // parent label 8
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // column number 9
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // page number label 10
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // question number label 11
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // left item text 12
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // right item text 13
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // section id 14
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // decision condition id 15
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // response set id 16
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // regexp 17
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // regexp error msg 18
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // ordinal 19
-		this.setTypeExpected(ind, TypeNames.BOOL);
-		ind++; // required 20
-		this.setTypeExpected(ind, TypeNames.STRING); // default_value
-		ind++; // 21
-		this.setTypeExpected(ind, TypeNames.STRING); // response_layout 21
-		ind++; // 22
-		this.setTypeExpected(ind, TypeNames.STRING); // width_decimal 22
-		ind++; // 23
-		// will need to set the boolean value here, tbh 23
-		this.setTypeExpected(ind, TypeNames.BOOL);
-		ind++; // show_item 24
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // code_ref 25
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // response_set.response_type_id 26
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.label 27
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.options_text 28
-		this.setTypeExpected(ind, TypeNames.STRING);
-		// response_set.options_values // 39
-		return ++ind;
+		this.setTypeExpected(ind++, TypeNames.INT); // item form metadata id
+		this.setTypeExpected(ind++, TypeNames.INT); // item id
+		this.setTypeExpected(ind++, TypeNames.INT); // crf version id
+		this.setTypeExpected(ind++, TypeNames.STRING); // header
+		this.setTypeExpected(ind++, TypeNames.STRING); // sub-header
+		this.setTypeExpected(ind++, TypeNames.INT); // parent id
+		this.setTypeExpected(ind++, TypeNames.STRING); // parent label
+		this.setTypeExpected(ind++, TypeNames.INT); // column number
+		this.setTypeExpected(ind++, TypeNames.STRING); // page number label
+		this.setTypeExpected(ind++, TypeNames.STRING); // question number label
+		this.setTypeExpected(ind++, TypeNames.STRING); // left item text
+		this.setTypeExpected(ind++, TypeNames.STRING); // right item text
+		this.setTypeExpected(ind++, TypeNames.INT); // section id
+		this.setTypeExpected(ind++, TypeNames.INT); // response set id
+		this.setTypeExpected(ind++, TypeNames.STRING); // regexp
+		this.setTypeExpected(ind++, TypeNames.STRING); // regexp error msg
+		this.setTypeExpected(ind++, TypeNames.INT); // ordinal
+		this.setTypeExpected(ind++, TypeNames.BOOL); // required
+		this.setTypeExpected(ind++, TypeNames.STRING); // default_value
+		this.setTypeExpected(ind++, TypeNames.STRING); // response_layout
+		this.setTypeExpected(ind++, TypeNames.STRING); // width_decimal
+		this.setTypeExpected(ind++, TypeNames.BOOL); // show_item
+		this.setTypeExpected(ind++, TypeNames.STRING); // code_ref
+		this.setTypeExpected(ind++, TypeNames.INT); // pseudo_child
+
+		// extra fields
+		this.setTypeExpected(ind++, TypeNames.INT); // response_set.response_type_id
+		this.setTypeExpected(ind++, TypeNames.STRING); // response_set.label
+		this.setTypeExpected(ind++, TypeNames.STRING); // response_set.options_text
+		this.setTypeExpected(ind++, TypeNames.STRING); // response_set.options_values
+		return ind;
 	}
 
 	/**
@@ -677,7 +651,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		variables.put(ind++, ifmb.getLeftItemText());
 		variables.put(ind++, ifmb.getRightItemText());
 		variables.put(ind++, ifmb.getSectionId());
-		variables.put(ind++, ifmb.getDescisionConditionId());
 		variables.put(ind++, ifmb.getResponseSetId());
 		variables.put(ind++, ifmb.getRegexp());
 		variables.put(ind++, ifmb.getRegexpErrorMsg());
@@ -692,7 +665,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
 			variables.put(ind++, ifmb.getWidthDecimal());
 		}
 		variables.put(ind++, ifmb.isShowItem());
-		variables.put(ind, ifmb.getCodeRef());
+		variables.put(ind++, ifmb.getCodeRef());
+		variables.put(ind, ifmb.isPseudoChild() ? 1 : 0);
 
 		executeWithPK(digester.getQuery("create"), variables, nullVars, con);
 
@@ -730,7 +704,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		variables.put(ind++, ifmb.getLeftItemText());
 		variables.put(ind++, ifmb.getRightItemText());
 		variables.put(ind++, ifmb.getSectionId());
-		variables.put(ind++, ifmb.getDescisionConditionId());
 		variables.put(ind++, ifmb.getResponseSetId());
 		variables.put(ind++, ifmb.getRegexp());
 		variables.put(ind++, ifmb.getRegexpErrorMsg());
@@ -746,6 +719,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
 		}
 		variables.put(ind++, ifmb.isShowItem());
 		variables.put(ind++, ifmb.getCodeRef());
+		variables.put(ind++, ifmb.isPseudoChild() ? 1 : 0);
 		variables.put(ind, ifmb.getId());
 
 		execute(digester.getQuery("update"), variables, nullVars);

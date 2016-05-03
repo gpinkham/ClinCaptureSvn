@@ -40,6 +40,28 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private int columnNumber;
 	private String pageNumberLabel;
 	private String codeRef = "";
+	private String questionNumberLabel;
+	private String leftItemText;
+	private String rightItemText;
+	private int sectionId;
+	private int responseSetId;
+	private String regexp;
+	private String regexpErrorMsg;
+	private int ordinal;
+	private boolean required;
+	private String defaultValue;
+	private String widthDecimal;
+	private boolean showItem;
+	private boolean pseudoChild;
+	private String groupLabel;
+	private String responseLayout;
+	private String crfVersionName; // not in the DB,only for display purpose
+	private String crfName; // not in the DB
+	private String sectionName; // not in the DB only for display
+	private int repeatMax; // not in the DB,
+	private boolean isHighlighted; // not in the db
+	private ResponseSetBean responseSet; // not in the database
+	private String conditionalDisplay; // simple_conditional_display
 
 	@Override
 	public int hashCode() {
@@ -51,7 +73,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		result = prime * result + crfVersionId;
 		result = prime * result + ((crfVersionName == null) ? 0 : crfVersionName.hashCode());
 		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
-		result = prime * result + descisionConditionId;
 		result = prime * result + ((groupLabel == null) ? 0 : groupLabel.hashCode());
 		result = prime * result + ((header == null) ? 0 : header.hashCode());
 		result = prime * result + (isHighlighted ? INT_1231 : INT_1237);
@@ -122,9 +143,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 				return false;
 			}
 		} else if (!defaultValue.equals(other.defaultValue)) {
-			return false;
-		}
-		if (descisionConditionId != other.descisionConditionId) {
 			return false;
 		}
 		if (groupLabel == null) {
@@ -252,46 +270,11 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		} else if (!widthDecimal.equals(other.widthDecimal)) {
 			return false;
 		}
+		if (pseudoChild != other.pseudoChild) {
+			return false;
+		}
 		return true;
 	}
-
-	private String questionNumberLabel;
-	private String leftItemText;
-	private String rightItemText;
-	private int sectionId;
-	private int descisionConditionId;
-	private int responseSetId;
-	private String regexp;
-	private String regexpErrorMsg;
-	private int ordinal;
-	private boolean required;
-	private String defaultValue;
-	private String widthDecimal;
-
-	private boolean showItem;
-
-	// New properties added in response to group-related
-	// template
-	private String groupLabel;
-	private String responseLayout;
-
-	private String crfVersionName; // not in the DB,only for display purpose
-	private String crfName; // not in the DB
-
-	private String sectionName; // not in the DB only for display
-	private int repeatMax; // not in the DB,
-
-	private boolean isHighlighted; // not in the db
-
-	/**
-	 * Not in the database. Not guaranteed to correspond to responseSetId, although ItemFormDAO should take care of that
-	 * correspondence.
-	 */
-	private ResponseSetBean responseSet;
-	/**
-	 * Not in the table. Text in simple_conditional_display field
-	 */
-	private String conditionalDisplay; // simple_conditional_display
 
 	/**
 	 * ItemFormMetadataBean clone method.
@@ -313,7 +296,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		ifmb.setLeftItemText(getLeftItemText());
 		ifmb.setRightItemText(getRightItemText());
 		ifmb.setSectionId(getSectionId());
-		ifmb.setDescisionConditionId(getDescisionConditionId());
 		ifmb.setResponseSetId(getResponseSetId());
 		ifmb.setRegexp(getRegexp());
 		ifmb.setRegexpErrorMsg(getRegexpErrorMsg());
@@ -342,6 +324,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 			rsb.addOption(ro.copy());
 		}
 		ifmb.setResponseSet(rsb);
+		ifmb.setPseudoChild(isPseudoChild());
 		return ifmb;
 	}
 
@@ -363,7 +346,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		leftItemText = "";
 		rightItemText = "";
 		sectionId = 0;
-		descisionConditionId = 0;
 		responseSetId = 0;
 		regexp = "";
 		regexpErrorMsg = "";
@@ -374,6 +356,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 		responseSet = new ResponseSetBean();
 		isHighlighted = false;
 		conditionalDisplay = "";
+		pseudoChild = false;
 	}
 
 	public String getDefaultValue() {
@@ -509,21 +492,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	 */
 	public void setCrfVersionId(int crfVersionId) {
 		this.crfVersionId = crfVersionId;
-	}
-
-	/**
-	 * @return Returns the descisionConditionId.
-	 */
-	public int getDescisionConditionId() {
-		return descisionConditionId;
-	}
-
-	/**
-	 * @param descisionConditionId
-	 *            The descisionConditionId to set.
-	 */
-	public void setDescisionConditionId(int descisionConditionId) {
-		this.descisionConditionId = descisionConditionId;
 	}
 
 	/**
@@ -838,5 +806,13 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	 */
 	public String getTextFromRightItemText(String leftItemText) {
 		return DRUtil.getTextFromHTML(this.rightItemText.replaceAll("&nbsp;", ""));
+	}
+
+	public boolean isPseudoChild() {
+		return pseudoChild;
+	}
+
+	public void setPseudoChild(boolean pseudoChild) {
+		this.pseudoChild = pseudoChild;
 	}
 }

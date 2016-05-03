@@ -26,6 +26,23 @@ public class SimpleConditionalDisplayBean {
 	private String optionValue;
 	private String message;
 
+	/**
+	 * Default constructor.
+	 */
+	public SimpleConditionalDisplayBean() {
+	}
+
+	/**
+	 * Copy constructor.
+	 * @param origin bean to copy from.
+	 */
+	public SimpleConditionalDisplayBean(SimpleConditionalDisplayBean origin) {
+
+		this.controlItemName = origin.getControlItemName();
+		this.optionValue = origin.getOptionValue();
+		this.message = origin.getMessage();
+	}
+
 	public String getControlItemName() {
 		return controlItemName;
 	}

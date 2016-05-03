@@ -39,7 +39,6 @@ public class ItemFormMetadata extends DataMapDomainObject {
     private String questionNumberLabel;
     private String leftItemText;
     private String rightItemText;
-    private Integer decisionConditionId;
     private String regexp;
     private String regexpErrorMsg;
     private int ordinal;
@@ -178,15 +177,6 @@ public class ItemFormMetadata extends DataMapDomainObject {
 
     public void setRightItemText(String rightItemText) {
         this.rightItemText = rightItemText;
-    }
-
-    @Column(name = "decision_condition_id")
-    public Integer getDecisionConditionId() {
-        return this.decisionConditionId;
-    }
-
-    public void setDecisionConditionId(Integer decisionConditionId) {
-        this.decisionConditionId = decisionConditionId;
     }
 
     @Column(name = "regexp", length = 1000)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+	<changeSet author="aram" id="2016-04-29-TICKET3010-01">
+		<comment>Add new filed pseudo_child to the item_form_metadata.</comment>
+		<addColumn tableName="item_form_metadata">
+			<column name="pseudo_child" type="integer" defaultValueNumeric="0"/>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="aram" id="2016-04-29-TICKET3010-02">
+		<comment>Drop unused field decision_condition_id from the item_form_metadata.</comment>
+		<dropColumn columnName="decision_condition_id" tableName="item_form_metadata" />
+	</changeSet>
+
+</databaseChangeLog>

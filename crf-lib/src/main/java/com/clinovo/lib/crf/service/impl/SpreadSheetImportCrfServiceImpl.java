@@ -311,6 +311,7 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 			if (itemBean != null) {
 				crfBuilder.getCurrentItem().setParentItemBean(itemBean);
 				crfBuilder.getCurrentItem().getItemMeta().setParentId(itemBean.getId());
+				crfBuilder.addCurrentItemToChildrenMap();
 			}
 		}
 		crfBuilder.getCurrentItem().getItemMeta()

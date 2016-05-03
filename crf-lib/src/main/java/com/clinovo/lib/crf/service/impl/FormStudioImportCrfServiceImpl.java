@@ -566,6 +566,7 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.REQUIRED, getString(jsonObj, REQUIRED));
 		crfBuilder.getCurrentItem().setRealValue(RealValueKey.PHI, getString(jsonObj, PHI_DATA));
 		crfBuilder.getItemNameToItemMap().put(crfBuilder.getCurrentItem().getName(), crfBuilder.getCurrentItem());
+		crfBuilder.addCurrentItemToChildrenMap();
 
 		checkItemName(crfBuilder);
 
