@@ -17,17 +17,16 @@ package com.clinovo.rest.service.base;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.util.ReflectionUtil;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -35,6 +34,7 @@ import org.springframework.context.MessageSource;
 import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.enums.study.StudyAllocation;
 import com.clinovo.enums.study.StudyAssignment;
+import com.clinovo.enums.study.StudyConfigurationParameter;
 import com.clinovo.enums.study.StudyControl;
 import com.clinovo.enums.study.StudyDuration;
 import com.clinovo.enums.study.StudyEndPoint;
@@ -48,10 +48,14 @@ import com.clinovo.enums.study.StudyProtocolType;
 import com.clinovo.enums.study.StudySelection;
 import com.clinovo.enums.study.StudyTiming;
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.model.DiscrepancyDescriptionType;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.util.ValidatorUtil;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudyService;
 import com.clinovo.util.DateUtil;
+import com.clinovo.util.ReflectionUtil;
 import com.clinovo.util.RequestUtil;
 import com.clinovo.util.StudyUtil;
 import com.clinovo.validator.StudyValidator;
@@ -72,12 +76,28 @@ public abstract class BaseStudyService extends BaseService {
 	private ConfigurationDao configurationDao;
 
 	@Autowired
-	private StudyConfigService studyConfigService;
+	private DiscrepancyDescriptionService discrepancyDescriptionService;
 
-	private void validate(StudyBean studyBean) throws Exception {
-		HashMap errors = StudyValidator.validate(getStudyDAO(), configurationDao, studyBean, null,
-				DateUtil.DatePattern.ISO_DATE, true);
+	private void validate(StudyBean studyBean, Map<String, List<DiscrepancyDescription>> dnDescriptionsMap)
+			throws Exception {
+		HashMap errors = StudyValidator.validate(getStudyDAO(), configurationDao, studyBean, dnDescriptionsMap,
+				DateUtil.DatePattern.ISO_DATE, true, true);
 		ValidatorUtil.checkForErrors(errors);
+	}
+
+	private Map<String, List<DiscrepancyDescription>> prepareDNDescriptionsMap(StudyBean studyBean) {
+		Map<String, List<DiscrepancyDescription>> dnDescriptionsMap = new HashMap<String, List<DiscrepancyDescription>>();
+		StudyUtil.prepareDiscrepancyDescriptions(dnDescriptionsMap, studyBean.getId(), false);
+		return dnDescriptionsMap;
+	}
+
+	private void prepareDiscrepancyDescriptions(StudyBean studyBean) {
+		studyBean.setDnUpdateDescriptions(discrepancyDescriptionService.findAllByStudyIdAndTypeId(studyBean.getId(),
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
+		studyBean.setDnCloseDescriptions(discrepancyDescriptionService.findAllByStudyIdAndTypeId(studyBean.getId(),
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
+		studyBean.setDnRFCDescriptions(discrepancyDescriptionService.findAllByStudyIdAndTypeId(studyBean.getId(),
+				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
 	}
 
 	protected StudyBean getStudy(int studyId) throws Exception {
@@ -95,13 +115,18 @@ public abstract class BaseStudyService extends BaseService {
 			throw new RestException(messageSource, "rest.studyservice.youDoNotHaveRightsToAccessThisStudy");
 		}
 		studyService.prepareStudyBeanConfiguration(studyBean);
+		prepareDiscrepancyDescriptions(studyBean);
 		return studyBean;
 	}
 
 	protected StudyBean saveStudyBean(String userName) throws Exception {
 		StudyBean studyBean = new StudyBean();
 		studyBean.setOrigin(StudyOrigin.STUDIO.getName());
-		validate(studyBean);
+
+		Map<String, List<DiscrepancyDescription>> dnDescriptionsMap = prepareDNDescriptionsMap(studyBean);
+
+		validate(studyBean, dnDescriptionsMap);
+
 		int userId = 0;
 		if (userName != null) {
 			UserAccountBean userAccountBean = (UserAccountBean) getUserAccountDAO().findByUserName(userName);
@@ -126,11 +151,14 @@ public abstract class BaseStudyService extends BaseService {
 
 		studyService.prepareStudyBeanConfiguration(studyBean, studyMapsHolder.getStudyConfigurationParametersMap());
 
-		studyService.saveStudyBean(userId, studyBean, getCurrentUser(), ResourceBundleProvider.getPageMessagesBundle());
+		studyService.saveStudyBean(userId, studyBean, getCurrentUser(), dnDescriptionsMap,
+				ResourceBundleProvider.getPageMessagesBundle());
 
 		if (studyBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.studyservice.createstudy.operationFailed");
 		}
+
+		prepareDiscrepancyDescriptions(studyBean);
 
 		return studyBean;
 	}
@@ -140,6 +168,8 @@ public abstract class BaseStudyService extends BaseService {
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyBean studyBean = getStudy(studyId);
+
+		Map<String, List<DiscrepancyDescription>> dnDescriptionsMap = prepareDNDescriptionsMap(studyBean);
 
 		// start date is required field now but old studies may have null values
 		if (studyBean.getDatePlannedStart() == null) {
@@ -194,7 +224,22 @@ public abstract class BaseStudyService extends BaseService {
 					ReflectionUtil.getParameter(studyFacility.getName(), studyBean));
 		}
 
-		validate(studyBean);
+		prepareForValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(),
+				studyBean.getStudyParameterConfig().getInstanceType());
+		prepareForValidation(StudyConfigurationParameter.STUDY_SUBJECT_ID_LABEL.getName(),
+				studyBean.getStudyParameterConfig().getStudySubjectIdLabel());
+		prepareForValidation(StudyConfigurationParameter.SECONDARY_ID_LABEL.getName(),
+				studyBean.getStudyParameterConfig().getSecondaryIdLabel());
+		prepareForValidation(StudyConfigurationParameter.DATE_OF_ENROLLMENT_FOR_STUDY_LABEL.getName(),
+				studyBean.getStudyParameterConfig().getDateOfEnrollmentForStudyLabel());
+		prepareForValidation(StudyConfigurationParameter.GENDER_LABEL.getName(),
+				studyBean.getStudyParameterConfig().getGenderLabel());
+		prepareForValidation(StudyConfigurationParameter.START_DATE_TIME_LABEL.getName(),
+				studyBean.getStudyParameterConfig().getStartDateTimeLabel());
+		prepareForValidation(StudyConfigurationParameter.END_DATE_TIME_LABEL.getName(),
+				studyBean.getStudyParameterConfig().getEndDateTimeLabel());
+
+		validate(studyBean, dnDescriptionsMap);
 
 		StudyMapsHolder studyMapsHolder = new StudyMapsHolder(StudyUtil.getStudyFeaturesMap(),
 				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFacilitiesMap(),
@@ -205,7 +250,9 @@ public abstract class BaseStudyService extends BaseService {
 
 		studyService.prepareStudyBeanConfiguration(studyBean, studyMapsHolder.getStudyConfigurationParametersMap());
 
-		studyService.updateStudy(studyBean, null, getCurrentUser());
+		studyService.updateStudy(studyBean, dnDescriptionsMap, getCurrentUser());
+
+		prepareDiscrepancyDescriptions(studyBean);
 
 		return studyBean;
 	}

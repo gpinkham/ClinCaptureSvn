@@ -15,25 +15,23 @@
 package com.clinovo.enums.discrepancy;
 
 /**
- * DiscrepancyVisibility.
+ * DiscrepancyVisibilityConstants.
  */
-public enum DiscrepancyVisibility {
+public final class DiscrepancyConstants {
 
-	SITE("site", "site_level"), STUDY("study", "study_level"), BOTH("both", "both");
+	public static final String[] VISIBILITY_VALUES = new String[]{DiscrepancyVisibility.SITE.getValue(),
+			DiscrepancyVisibility.STUDY.getValue(), DiscrepancyVisibility.BOTH.getValue()};
 
-	private String value;
-	private String code;
+	public static final String[] VISIBILITY_VALUE_CODES = new String[]{DiscrepancyVisibility.SITE.getCode(),
+			DiscrepancyVisibility.STUDY.getCode(), DiscrepancyVisibility.BOTH.getCode()};
 
-	DiscrepancyVisibility(String value, String code) {
-		this.value = value;
-		this.code = code;
-	}
+	public static final int MIN_DESCRIPTIONS = 0;
+	public static final int MAX_DESCRIPTIONS = 25;
 
-	public String getValue() {
-		return value;
-	}
+	public static final String DN_UPDATE_DESCRIPTIONS = "dnUpdateDescriptions";
+	public static final String DN_CLOSE_DESCRIPTIONS = "dnCloseDescriptions";
+	public static final String DN_RFC_DESCRIPTIONS = "dnRFCDescriptions";
 
-	public String getCode() {
-		return code;
+	private DiscrepancyConstants() {
 	}
 }

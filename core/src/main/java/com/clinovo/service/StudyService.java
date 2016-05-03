@@ -166,12 +166,26 @@ public interface StudyService {
 	 *            StudyBean
 	 * @param currentUser
 	 *            UserAccountBean
+	 * @param dnDescriptionsMap
+	 *            Map
 	 * @param pageMessagesBundle
 	 *            ResourceBundle
 	 * @return StudyBean
 	 */
 	StudyBean saveStudyBean(int userId, StudyBean studyBean, UserAccountBean currentUser,
-			ResourceBundle pageMessagesBundle);
+			Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, ResourceBundle pageMessagesBundle);
+
+	/**
+	 * Creates default discrepancy descriptions map.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @param resourceBundle
+	 *            ResourceBundle
+	 * @return Map
+	 */
+	Map<String, List<DiscrepancyDescription>> createDefaultDiscrepancyDescriptions(StudyBean studyBean,
+			ResourceBundle resourceBundle);
 
 	/**
 	 * Updates study bean.

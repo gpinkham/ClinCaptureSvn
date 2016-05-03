@@ -18,7 +18,7 @@ public class ErrorTest {
 	public void testThatConstructorSetsCorrectValuesForFields() throws Exception {
 		String status = "401";
 		String message = "No study found for specified study name";
-		Error error = new Error(new Exception(message), status);
+		Error error = new Error(new Exception(message), status, "");
 		assertTrue(error.getStatus().equals(status));
 		assertTrue(error.getMessage().equals(message));
 	}

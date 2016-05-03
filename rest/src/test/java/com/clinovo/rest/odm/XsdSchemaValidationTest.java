@@ -224,6 +224,9 @@ public class XsdSchemaValidationTest {
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactDegree(), "MD");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), "(843) 678-2390");
 		assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), "tony.kane@npmedic.com");
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getDnUpdateDescriptions().size(), 1);
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getDnCloseDescriptions().size(), 2);
+		assertEquals(restOdmContainer.getRestData().getStudyBean().getDnRFCDescriptions().size(), 3);
 		marshal(restOdmContainer.getRestData().getStudyBean());
 		assertNotNull(restOdmContainer.getRestData().getStudyBean().getStudyParameterConfig());
 		assertEquals(

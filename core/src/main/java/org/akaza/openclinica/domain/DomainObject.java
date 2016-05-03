@@ -10,12 +10,19 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.domain;
 
+import javax.xml.bind.annotation.XmlTransient;
+
+/**
+ * DomainObject.
+ */
+@XmlTransient
 public interface DomainObject {
 
 	/**
+	 * Returns id.
+	 * 
 	 * @return the internal database identifier for this object
 	 */
 	Integer getId();
@@ -25,6 +32,7 @@ public interface DomainObject {
 	 * -- just the persistence mechanism.
 	 * 
 	 * @param id
+	 *            Integer
 	 */
 	void setId(Integer id);
 

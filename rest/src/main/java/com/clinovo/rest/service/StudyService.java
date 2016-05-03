@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clinovo.enums.discrepancy.DiscrepancyCloseDescriptions;
+import com.clinovo.enums.discrepancy.DiscrepancyUpdateDescriptions;
+import com.clinovo.enums.discrepancy.ReasonForChangeDescriptions;
 import com.clinovo.enums.study.StudyConfigurationParameter;
 import com.clinovo.enums.study.StudyFacility;
 import com.clinovo.enums.study.StudyFeature;
@@ -105,6 +108,9 @@ public class StudyService extends BaseStudyService {
 	 *             an Exception
 	 */
 	@EnumBasedParametersHolder({@EnumBasedParameters(enumClass = StudyFacility.class, useDefaultValues = true),
+			@EnumBasedParameters(enumClass = DiscrepancyUpdateDescriptions.class, useDefaultValues = true, synchronizeQuantityOfValues = true),
+			@EnumBasedParameters(enumClass = DiscrepancyCloseDescriptions.class, useDefaultValues = true, synchronizeQuantityOfValues = true),
+			@EnumBasedParameters(enumClass = ReasonForChangeDescriptions.class, useDefaultValues = true, synchronizeQuantityOfValues = true),
 			@EnumBasedParameters(enumClass = StudyFeature.class, useDefaultValues = true),
 			@EnumBasedParameters(enumClass = StudyConfigurationParameter.class, useDefaultValues = true)})
 	@PossibleValuesHolder({
@@ -118,7 +124,10 @@ public class StudyService extends BaseStudyService {
 			@PossibleValues(name = "masking", canBeNotSpecified = true, values = "0,1,2,3", valueDescriptions = "rest.masking.valueDescription"),
 			@PossibleValues(name = "control", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.control.valueDescription"),
 			@PossibleValues(name = "assignment", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.assignment.valueDescription"),
-			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription")})
+			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription"),
+			@PossibleValues(name = "dnUpdateVisibilityLevel", canBeNotSpecified = true, values = "site,study,both"),
+			@PossibleValues(name = "dnCloseVisibilityLevel", canBeNotSpecified = true, values = "site,study,both"),
+			@PossibleValues(name = "dnRFCVisibilityLevel", canBeNotSpecified = true, values = "site,study,both")})
 	@RequestMapping(value = "/study/create", method = RequestMethod.POST)
 	public StudyBean createStudy(@RequestParam(value = "studyName") String studyName,
 			@RequestParam(value = "briefTitle", required = false, defaultValue = "") String briefTitle,
@@ -209,6 +218,9 @@ public class StudyService extends BaseStudyService {
 	 */
 	@ProvideAtLeastOneNotRequired
 	@EnumBasedParametersHolder({@EnumBasedParameters(enumClass = StudyFacility.class),
+			@EnumBasedParameters(enumClass = DiscrepancyUpdateDescriptions.class, synchronizeQuantityOfValues = true),
+			@EnumBasedParameters(enumClass = DiscrepancyCloseDescriptions.class, synchronizeQuantityOfValues = true),
+			@EnumBasedParameters(enumClass = ReasonForChangeDescriptions.class, synchronizeQuantityOfValues = true),
 			@EnumBasedParameters(enumClass = StudyFeature.class),
 			@EnumBasedParameters(enumClass = StudyConfigurationParameter.class)})
 	@PossibleValuesHolder({
@@ -222,7 +234,10 @@ public class StudyService extends BaseStudyService {
 			@PossibleValues(name = "masking", canBeNotSpecified = true, values = "0,1,2,3", valueDescriptions = "rest.masking.valueDescription"),
 			@PossibleValues(name = "control", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.control.valueDescription"),
 			@PossibleValues(name = "assignment", canBeNotSpecified = true, values = "0,1,2,3,4,5", valueDescriptions = "rest.assignment.valueDescription"),
-			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription")})
+			@PossibleValues(name = "endPoint", canBeNotSpecified = true, values = "0,1,2,3,4,5,6,7,8", valueDescriptions = "rest.endPoint.valueDescription"),
+			@PossibleValues(name = "dnUpdateVisibilityLevel", canBeNotSpecified = true, values = "site,study,both"),
+			@PossibleValues(name = "dnCloseVisibilityLevel", canBeNotSpecified = true, values = "site,study,both"),
+			@PossibleValues(name = "dnRFCVisibilityLevel", canBeNotSpecified = true, values = "site,study,both")})
 	@RequestMapping(value = "/study/edit", method = RequestMethod.POST)
 	public StudyBean editStudy(@RequestParam("studyId") int studyId,
 			@RequestParam(value = "studyName", required = false) String studyName,
@@ -279,6 +294,18 @@ public class StudyService extends BaseStudyService {
 	@RequestMapping(value = "/study/restore", method = RequestMethod.POST)
 	public StudyBean restore(@RequestParam(value = "id") int studyId) throws Exception {
 		return restoreStudy(studyId);
+	}
+
+	/**
+	 * Method returns info about current scope.
+	 *
+	 * @return StudyBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/scope", method = RequestMethod.GET)
+	public StudyBean scope() throws Exception {
+		return getStudy(getCurrentStudy().getId());
 	}
 
 	/**

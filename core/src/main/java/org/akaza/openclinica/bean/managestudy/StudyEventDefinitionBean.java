@@ -10,7 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * StudyEventDefinitionBean.
@@ -38,8 +36,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonPropertyOrder({"id", "oid", "eventName", "type", "repeating", "description", "category", "isReference", "minDay",
-		"maxDay", "schDay", "emailDay", "userEmailId", "status", "eventDefinitionCrfs"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventDefinitionBean extends AuditableEntityBean implements Comparable {
 

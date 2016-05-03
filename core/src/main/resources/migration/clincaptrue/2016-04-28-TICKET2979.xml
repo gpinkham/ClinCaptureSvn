@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+	<changeSet author="skirpichenok" id="2016-04-28-TICKET2979-01">
+		<comment>fix some values</comment>
+		<sql splitStatements="false">
+			update study set protocol_type = 'interventional' where protocol_type = 'Interventional';
+			update study set protocol_type = 'observational' where protocol_type = 'Observational';
+		</sql>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-04-28-TICKET2979-02">
+		<comment>fix some values</comment>
+		<sql splitStatements="false">
+			update discrepancy_description set version = 0 where version is null;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

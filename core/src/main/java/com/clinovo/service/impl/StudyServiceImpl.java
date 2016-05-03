@@ -24,8 +24,6 @@ import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
-import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
-import com.clinovo.util.ReflectionUtil;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -45,10 +43,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.bean.StudyMapsHolder;
+import com.clinovo.enums.ParameterType;
+import com.clinovo.enums.discrepancy.DiscrepancyConstants;
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import com.clinovo.enums.study.StudyAllocation;
 import com.clinovo.enums.study.StudyAssignment;
 import com.clinovo.enums.study.StudyConfigurationParameter;
-import com.clinovo.enums.ParameterType;
 import com.clinovo.enums.study.StudyControl;
 import com.clinovo.enums.study.StudyDuration;
 import com.clinovo.enums.study.StudyEndPoint;
@@ -74,6 +74,7 @@ import com.clinovo.service.StudySubjectService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.ParameterUtil;
+import com.clinovo.util.ReflectionUtil;
 
 /**
  * StudyServiceImpl.
@@ -290,16 +291,75 @@ public class StudyServiceImpl implements StudyService {
 	 * {@inheritDoc}
 	 */
 	public StudyBean saveStudyBean(int userId, StudyBean studyBean, UserAccountBean currentUser,
-			ResourceBundle pageMessagesBundle) {
+			Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, ResourceBundle pageMessagesBundle) {
 		StudyDAO studyDao = getStudyDAO();
 		studyBean.setOwner(currentUser);
 		studyBean.setCreatedDate(new Date());
 		studyBean.setStatus(Status.PENDING);
 		studyDao.create(studyBean);
-		createDefaultDiscrepancyDescriptions(studyBean, pageMessagesBundle);
+		submitDescriptions(dnDescriptionsMap, studyBean.getId());
 		submitStudyParameters(studyBean);
 		createStudyUserRoleForStudy(userId, studyBean, currentUser);
 		return studyBean;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Map<String, List<DiscrepancyDescription>> createDefaultDiscrepancyDescriptions(StudyBean studyBean,
+			ResourceBundle resourceBundle) {
+		List<DiscrepancyDescription> descriptions;
+		Map<String, List<DiscrepancyDescription>> dnDescriptionsMap = new HashMap<String, List<DiscrepancyDescription>>();
+
+		// create default update discrepancy descriptions
+		descriptions = new ArrayList<DiscrepancyDescription>();
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("corrected_CRF_data"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("CRF_data_was_correctly_entered"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("need_additional_clarification"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("requested_information_is_provided"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
+		dnDescriptionsMap.put(DiscrepancyConstants.DN_UPDATE_DESCRIPTIONS, descriptions);
+
+		// create default close discrepancy descriptions
+		descriptions = new ArrayList<DiscrepancyDescription>();
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("query_response_monitored"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("CRF_data_change_monitored"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("calendared_event_monitored"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("failed_edit_check_monitored"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
+		dnDescriptionsMap.put(DiscrepancyConstants.DN_CLOSE_DESCRIPTIONS, descriptions);
+
+		// create default RFC discrepancy descriptions
+		descriptions = new ArrayList<DiscrepancyDescription>();
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("corrected_CRF_data_entry_error"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("source_data_was_missing"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("source_data_was_incorrect"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
+		descriptions.add(new DiscrepancyDescription(resourceBundle.getString("information_was_not_available"), "",
+				studyBean.getId(), DiscrepancyVisibility.BOTH.getValue(),
+				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
+		dnDescriptionsMap.put(DiscrepancyConstants.DN_RFC_DESCRIPTIONS, descriptions);
+
+		return dnDescriptionsMap;
 	}
 
 	/**
@@ -414,9 +474,7 @@ public class StudyServiceImpl implements StudyService {
 		StudyDAO sdao = getStudyDAO();
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
 
-		if (dDescriptionsMap != null) {
-			submitDescriptions(dDescriptionsMap, studyBean.getId());
-		}
+		submitDescriptions(dDescriptionsMap, studyBean.getId());
 
 		studyBean.setUpdatedDate(new Date());
 		studyBean.setUpdater(currentUser);
@@ -462,13 +520,17 @@ public class StudyServiceImpl implements StudyService {
 
 		return studyBean;
 	}
+
 	private Date parseDate(UserAccountBean currentUser, String parameterName, Map<String, String> parametersMap,
 			Date date, DateUtil.DatePattern datePattern, Locale locale) {
 		try {
-			date = DateUtil.parseDateStringToServerDateTime(parametersMap.get(parameterName),
-					currentUser.getUserTimeZoneId(), datePattern, locale, true);
+			String parameterValue = parametersMap.get(parameterName);
+			if (parameterValue != null && !parameterValue.isEmpty()) {
+				date = DateUtil.parseDateStringToServerDateTime(parametersMap.get(parameterName),
+						currentUser.getUserTimeZoneId(), datePattern, locale, true);
+			}
 		} catch (Exception ex) {
-			//
+			// LOGGER.info("Error has occurred.", ex);
 		}
 		return date;
 	}
@@ -492,93 +554,49 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
-	private void submitDescriptions(Map<String, List<DiscrepancyDescription>> dDescriptionsMap, int studyId) {
-		submitSpecifiedDescriptions(dDescriptionsMap.get("dnUpdateDescriptions"),
+	private void submitDescriptions(Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, int studyId) {
+		submitSpecifiedDescriptions(dnDescriptionsMap, DiscrepancyConstants.DN_UPDATE_DESCRIPTIONS,
 				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId(), studyId);
-		submitSpecifiedDescriptions(dDescriptionsMap.get("dnCloseDescriptions"),
+		submitSpecifiedDescriptions(dnDescriptionsMap, DiscrepancyConstants.DN_CLOSE_DESCRIPTIONS,
 				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId(), studyId);
-		submitSpecifiedDescriptions(dDescriptionsMap.get("dnRFCDescriptions"),
+		submitSpecifiedDescriptions(dnDescriptionsMap, DiscrepancyConstants.DN_RFC_DESCRIPTIONS,
 				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId(), studyId);
 	}
 
-	private void submitSpecifiedDescriptions(List<DiscrepancyDescription> newDescriptions, int typeId, int studyId) {
-		// DiscrepancyDescriptions-section start
-		Map<Integer, DiscrepancyDescription> idToDnDescriptionMap = new HashMap<Integer, DiscrepancyDescription>();
-		for (DiscrepancyDescription dDescription : discrepancyDescriptionService.findAllByStudyIdAndTypeId(studyId,
-				typeId)) {
-			idToDnDescriptionMap.put(dDescription.getId(), dDescription);
-		}
-		for (DiscrepancyDescription dDescription : newDescriptions) {
-			if (idToDnDescriptionMap.keySet().contains(dDescription.getId())) {
-				DiscrepancyDescription dDescriptionOld = idToDnDescriptionMap.get(dDescription.getId());
-				if (!dDescription.getName().equals(dDescriptionOld.getName())
-						|| !dDescription.getVisibilityLevel().equals(dDescriptionOld.getVisibilityLevel())) {
-					// description was changed
-					dDescriptionOld.setVisibilityLevel(dDescription.getVisibilityLevel());
-					discrepancyDescriptionService.saveDiscrepancyDescription(dDescriptionOld);
-					idToDnDescriptionMap.remove(dDescription.getId());
+	private void submitSpecifiedDescriptions(Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, String mapKey,
+			int typeId, int studyId) {
+		List<DiscrepancyDescription> newDescriptions = dnDescriptionsMap != null ? dnDescriptionsMap.get(mapKey) : null;
+		if (newDescriptions != null) {
+			Map<Integer, DiscrepancyDescription> idToDnDescriptionMap = new HashMap<Integer, DiscrepancyDescription>();
+			for (DiscrepancyDescription dDescription : discrepancyDescriptionService.findAllByStudyIdAndTypeId(studyId,
+					typeId)) {
+				idToDnDescriptionMap.put(dDescription.getId(), dDescription);
+			}
+			for (DiscrepancyDescription dDescription : newDescriptions) {
+				dDescription.setStudyId(studyId);
+				if (idToDnDescriptionMap.keySet().contains(dDescription.getId())) {
+					DiscrepancyDescription dDescriptionOld = idToDnDescriptionMap.get(dDescription.getId());
+					if (!dDescription.getName().equals(dDescriptionOld.getName())
+							|| !dDescription.getVisibilityLevel().equals(dDescriptionOld.getVisibilityLevel())) {
+						// description was changed
+						dDescriptionOld.setName(dDescription.getName());
+						dDescriptionOld.setVisibilityLevel(dDescription.getVisibilityLevel());
+						discrepancyDescriptionService.saveDiscrepancyDescription(dDescriptionOld);
+						idToDnDescriptionMap.remove(dDescription.getId());
+					} else {
+						// description wasn't changed
+						idToDnDescriptionMap.remove(dDescriptionOld.getId());
+					}
 				} else {
-					// description wasn't changed
-					idToDnDescriptionMap.remove(dDescription.getId());
+					// description is new (id=0)
+					discrepancyDescriptionService.saveDiscrepancyDescription(dDescription);
 				}
-			} else {
-				// description is new (id=0)
-				discrepancyDescriptionService.saveDiscrepancyDescription(dDescription);
+			}
+			// delete unneeded descriptions
+			for (DiscrepancyDescription dDescriptionForDelete : idToDnDescriptionMap.values()) {
+				discrepancyDescriptionService.deleteDiscrepancyDescription(dDescriptionForDelete);
 			}
 		}
-		// delete unneeded descriptions
-		for (DiscrepancyDescription dDescriptionForDelete : idToDnDescriptionMap.values()) {
-			discrepancyDescriptionService.deleteDiscrepancyDescription(dDescriptionForDelete);
-		}
-	}
-
-	private void createDefaultDiscrepancyDescriptions(StudyBean studyBean, ResourceBundle pageMessagesBundle) {
-		int studyId = studyBean.getId();
-
-		int dnFailedValidationCheckTypeId = DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId();
-		int dnAnnotationTypeId = DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId();
-		int dnQueryTypeId = DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId();
-
-		// create default update discrepancy descriptions
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("corrected_CRF_data"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("CRF_data_was_correctly_entered"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("need_additional_clarification"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("requested_information_is_provided"), "",
-						studyId, DiscrepancyVisibility.BOTH.getName(), dnFailedValidationCheckTypeId));
-
-		// create default close discrepancy descriptions
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("query_response_monitored"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("CRF_data_change_monitored"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("calendared_event_monitored"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("failed_edit_check_monitored"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnAnnotationTypeId));
-
-		// create default RFC discrepancy descriptions
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("corrected_CRF_data_entry_error"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(new DiscrepancyDescription(
-				pageMessagesBundle.getString("source_data_was_missing"), "", studyId, DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("source_data_was_incorrect"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
-		discrepancyDescriptionService.saveDiscrepancyDescription(
-				new DiscrepancyDescription(pageMessagesBundle.getString("information_was_not_available"), "", studyId,
-						DiscrepancyVisibility.BOTH.getName(), dnQueryTypeId));
 	}
 
 	private void submitStudyParameters(StudyBean studyBean) {
@@ -651,8 +669,7 @@ public class StudyServiceImpl implements StudyService {
 
 	private void setFacilities(StudyBean studyBean, Map<String, String> facilitiesMap) {
 		for (StudyFacility studyFacility : StudyFacility.values()) {
-			ReflectionUtil.setParameter(studyFacility.getName(), facilitiesMap.get(studyFacility.getName()),
-					studyBean);
+			ReflectionUtil.setParameter(studyFacility.getName(), facilitiesMap.get(studyFacility.getName()), studyBean);
 		}
 	}
 

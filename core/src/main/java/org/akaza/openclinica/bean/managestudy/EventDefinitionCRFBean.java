@@ -35,7 +35,6 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * The bean for event definition crf parameters.
@@ -44,9 +43,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "EventDefinitionCrf", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonPropertyOrder({"id", "eventName", "crfName", "status", "defaultVersion", "hideCrf", "required", "parentId",
-		"availableVersionIds", "passwordRequired", "acceptNewCrfVersions", "evaluatedCrf", "doubleDataEntry",
-		"sourceDataVerification", "tabbingMode", "ordinal", "studyId", "emailWhen", "email"})
 @SuppressWarnings({"serial", "rawtypes", "unchecked"})
 public class EventDefinitionCRFBean extends AuditableEntityBean implements Comparable {
 

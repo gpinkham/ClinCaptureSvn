@@ -40,6 +40,36 @@
             <FacilityContactPhone>(843) 678-2390</FacilityContactPhone>
             <FacilityContactEmail>tony.kane@npmedic.com</FacilityContactEmail>
             <Oid>OC_TEST1</Oid>
+            <DiscrepancyUpdateDescriptions>
+                <DiscrepancyDescription>
+                    <Value>Corrected CRF data</Value>
+                    <VisibilityLevel>both</VisibilityLevel>
+                </DiscrepancyDescription>
+            </DiscrepancyUpdateDescriptions>
+            <DiscrepancyCloseDescriptions>
+                <DiscrepancyDescription>
+                    <Value>Query response monitored</Value>
+                    <VisibilityLevel>both</VisibilityLevel>
+                </DiscrepancyDescription>
+                <DiscrepancyDescription>
+                    <Value>CRF data change monitored</Value>
+                    <VisibilityLevel>both</VisibilityLevel>
+                </DiscrepancyDescription>
+            </DiscrepancyCloseDescriptions>
+            <DiscrepancyRFCDescriptions>
+                <DiscrepancyDescription>
+                    <Value>Corrected CRF data entry error</Value>
+                    <VisibilityLevel>both</VisibilityLevel>
+                </DiscrepancyDescription>
+                <DiscrepancyDescription>
+                    <Value>Source data was missing</Value>
+                    <VisibilityLevel>both</VisibilityLevel>
+                </DiscrepancyDescription>
+                <DiscrepancyDescription>
+                    <Value>Source data was incorrect</Value>
+                    <VisibilityLevel>both</VisibilityLevel>
+                </DiscrepancyDescription>
+            </DiscrepancyRFCDescriptions>
             <Parameters>
                 <CollectDob>1</CollectDob>
                 <DiscrepancyManagement>true</DiscrepancyManagement>

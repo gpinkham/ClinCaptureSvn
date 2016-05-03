@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -34,6 +33,7 @@ import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import com.clinovo.enums.discrepancy.DiscrepancyConstants;
 import com.clinovo.enums.study.StudyConfigurationParameter;
 import com.clinovo.enums.study.StudyFacility;
 import com.clinovo.enums.study.StudyOrigin;
@@ -41,7 +41,6 @@ import com.clinovo.enums.study.StudyParameter;
 import com.clinovo.enums.study.StudyProtocolType;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.model.DiscrepancyDescription;
-import com.clinovo.model.DiscrepancyDescriptionType;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.RequestUtil;
 import com.clinovo.util.ValidatorHelper;
@@ -109,19 +108,21 @@ public class StudyValidator {
 	 *            ConfigurationDao
 	 * @param studyBean
 	 *            StudyBean
-	 * @param dDescriptionsMap
+	 * @param dnDescriptionsMap
 	 *            Map
 	 * @param datePattern
 	 *            DateUtil.DatePattern
 	 * @param validateFacilities
 	 *            boolean
+	 * @param validateConfigParams
+	 *            boolean
 	 * @return HashMap
 	 */
 	public static HashMap validate(StudyDAO studyDao, ConfigurationDao configurationDao, StudyBean studyBean,
-			Map<String, List<DiscrepancyDescription>> dDescriptionsMap, DateUtil.DatePattern datePattern,
-			boolean validateFacilities) {
+			Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, DateUtil.DatePattern datePattern,
+			boolean validateFacilities, boolean validateConfigParams) {
 		return validate(new Validator(new ValidatorHelper(RequestUtil.getRequest(), configurationDao)), studyDao,
-				studyBean, dDescriptionsMap, datePattern, validateFacilities);
+				studyBean, dnDescriptionsMap, datePattern, validateFacilities, validateConfigParams);
 	}
 
 	/**
@@ -133,17 +134,19 @@ public class StudyValidator {
 	 *            StudyDAO
 	 * @param studyBean
 	 *            StudyBean
-	 * @param dDescriptionsMap
+	 * @param dnDescriptionsMap
 	 *            Map
 	 * @param datePattern
 	 *            DateUtil.DatePattern
 	 * @param validateFacilities
 	 *            boolean
+	 * @param validateConfigParams
+	 *            boolean
 	 * @return HashMap
 	 */
 	public static HashMap validate(Validator validator, StudyDAO studyDao, StudyBean studyBean,
-			Map<String, List<DiscrepancyDescription>> dDescriptionsMap, DateUtil.DatePattern datePattern,
-			boolean validateFacilities) {
+			Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, DateUtil.DatePattern datePattern,
+			boolean validateFacilities, boolean validateConfigParams) {
 		HttpServletRequest request = RequestUtil.getRequest();
 
 		HashMap errors = new HashMap();
@@ -177,22 +180,10 @@ public class StudyValidator {
 
 		StudyProtocolType protocolType = StudyProtocolType.get(fp.getInt(StudyParameter.PROTOCOL_TYPE.getName()));
 
-		if (editMode) {
-			if (dDescriptionsMap != null) {
-				validateSpecifiedDescriptions(fp, pageMessagesBundle, errors, validator, studyBean.getId(),
-						dDescriptionsMap.get("dnUpdateDescriptions"), "dnUpdateDescription", "dnUpdateVisibilityLevel",
-						"dnUpdateDescriptionId", "dnUpdateDescriptionError",
-						DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId());
-				validateSpecifiedDescriptions(fp, pageMessagesBundle, errors, validator, studyBean.getId(),
-						dDescriptionsMap.get("dnCloseDescriptions"), "dnCloseDescription", "dnCloseVisibilityLevel",
-						"dnCloseDescriptionId", "dnCloseDescriptionError",
-						DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId());
-				validateSpecifiedDescriptions(fp, pageMessagesBundle, errors, validator, studyBean.getId(),
-						dDescriptionsMap.get("dnRFCDescriptions"), "dnRFCDescription", "dnRFCVisibilityLevel",
-						"dnRFCDescriptionId", "dnRFCDescriptionError",
-						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
-			}
-		}
+		validateDescriptions(errors, pageMessagesBundle, dnDescriptionsMap,
+				DiscrepancyConstants.DN_UPDATE_DESCRIPTIONS);
+		validateDescriptions(errors, pageMessagesBundle, dnDescriptionsMap, DiscrepancyConstants.DN_CLOSE_DESCRIPTIONS);
+		validateDescriptions(errors, pageMessagesBundle, dnDescriptionsMap, DiscrepancyConstants.DN_RFC_DESCRIPTIONS);
 
 		if (validateFacilities) {
 			if (!StringUtil.isBlank(fp.getString(StudyFacility.FACILITY_CONTACT_EMAIL.getName()))) {
@@ -217,6 +208,20 @@ public class StudyValidator {
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
 			validator.addValidation(StudyFacility.FACILITY_CONTACT_EMAIL.getName(), Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
+		}
+
+		if (validateConfigParams) {
+			validator.addValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(), Validator.NO_BLANKS);
+			validator.addValidation(StudyConfigurationParameter.INSTANCE_TYPE.getName(),
+					Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+					StudyValidator.VALIDATION_NUM_20);
+			validator.addValidation(StudyConfigurationParameter.STUDY_SUBJECT_ID_LABEL.getName(), Validator.NO_BLANKS);
+			validator.addValidation(StudyConfigurationParameter.SECONDARY_ID_LABEL.getName(), Validator.NO_BLANKS);
+			validator.addValidation(StudyConfigurationParameter.DATE_OF_ENROLLMENT_FOR_STUDY_LABEL.getName(),
+					Validator.NO_BLANKS);
+			validator.addValidation(StudyConfigurationParameter.GENDER_LABEL.getName(), Validator.NO_BLANKS);
+			validator.addValidation(StudyConfigurationParameter.START_DATE_TIME_LABEL.getName(), Validator.NO_BLANKS);
+			validator.addValidation(StudyConfigurationParameter.END_DATE_TIME_LABEL.getName(), Validator.NO_BLANKS);
 		}
 
 		if (protocolType == StudyProtocolType.INTERVENTIONAL) {
@@ -337,45 +342,28 @@ public class StudyValidator {
 		return errors;
 	}
 
-	private static void validateSpecifiedDescriptions(FormProcessor fp, ResourceBundle pageMessagesBundle,
-			HashMap errors, Validator v, int studyId, List<DiscrepancyDescription> newDescriptions,
-			String descriptionName, String visibilityLevel, String descriptionId, String descriptionError, int typeId) {
-		newDescriptions.clear();
-		final int counter = 25;
-		for (int i = 0; i < counter; i++) {
-			v.addValidation(descriptionName + i, Validator.LENGTH_NUMERIC_COMPARISON,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, StudyValidator.VALIDATION_NUM_255);
-			// set list of dn descriptions for specified type here
-			if (!"".equals(fp.getString(descriptionName + i))) {
-				DiscrepancyDescription dDescription = new DiscrepancyDescription();
-				dDescription.setTypeId(typeId);
-				dDescription.setName(fp.getString(descriptionName + i));
-				switch (fp.getInt(visibilityLevel + i)) {
-					case 1 :
-						dDescription.setVisibilityLevel(DiscrepancyVisibility.STUDY.getName());
-						break;
-					case 2 :
-						dDescription.setVisibilityLevel(DiscrepancyVisibility.SITE.getName());
-						break;
-					default :
-						dDescription.setVisibilityLevel(DiscrepancyVisibility.BOTH.getName());
-				}
-				if (fp.getInt(descriptionId + i) != 0) {
-					dDescription.setId(fp.getInt(descriptionId + i));
-				}
-				dDescription.setStudyId(studyId);
-				newDescriptions.add(dDescription);
+	private static void validateDescriptions(HashMap errors, ResourceBundle pageMessagesBundle,
+			Map<String, List<DiscrepancyDescription>> dnDescriptionsMap, String mapKey) {
+		List<DiscrepancyDescription> discrepancyDescriptions = dnDescriptionsMap != null
+				? dnDescriptionsMap.get(mapKey)
+				: null;
+		if (discrepancyDescriptions != null) {
+			if (discrepancyDescriptions.size() > DiscrepancyConstants.MAX_DESCRIPTIONS + 1) {
+				Validator.addError(errors, discrepancyDescriptions.get(0).getParameterName(),
+						pageMessagesBundle.getString("descriptions_quantity_error"));
 			}
-		}
-		errors.putAll(v.validate());
-		for (int i = 0; i < newDescriptions.size(); i++) {
-			DiscrepancyDescription rfcTerm1 = newDescriptions.get(i);
-			for (int j = 0; j < i; j++) {
-				DiscrepancyDescription rfcTerm2 = newDescriptions.get(j);
-				if (rfcTerm1.getName().equals(rfcTerm2.getName())) {
-					Validator.addError(errors, descriptionError + i,
-							pageMessagesBundle.getString("please_correct_the_duplicate_description_found_in_row") + " "
-									+ (j + 1));
+			for (int i = 0; i < discrepancyDescriptions.size(); i++) {
+				DiscrepancyDescription dnDescription1 = discrepancyDescriptions.get(i);
+				if (dnDescription1.getName().length() > StudyValidator.VALIDATION_NUM_255) {
+					Validator.addError(errors, dnDescription1.getParameterName(),
+							pageMessagesBundle.getString("description_exceeds_maximum_length"));
+				}
+				for (int j = 0; j < i; j++) {
+					DiscrepancyDescription dnDescription2 = discrepancyDescriptions.get(j);
+					if (dnDescription1.getName().equals(dnDescription2.getName())) {
+						Validator.addError(errors, dnDescription1.getParameterErrorName(),
+								pageMessagesBundle.getString("please_correct_the_duplicate_description"));
+					}
 				}
 			}
 		}

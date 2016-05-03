@@ -10,16 +10,43 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.domain;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlTransient;
 
+/**
+ * AbstractMutableDomainObject.
+ */
+@XmlTransient
 @MappedSuperclass
 public abstract class AbstractMutableDomainObject implements MutableDomainObject {
+
+	private Integer id;
+	private Integer version;
+
+	@Id
+	@GeneratedValue(generator = "id-generator")
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	@Version
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -49,27 +76,5 @@ public abstract class AbstractMutableDomainObject implements MutableDomainObject
 		} else if (!version.equals(other.version))
 			return false;
 		return true;
-	}
-
-	private Integer id;
-	private Integer version;
-
-	@Id
-	@GeneratedValue(generator = "id-generator")
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	@Version
-	public Integer getVersion() {
-		return version;
-	}
-
-	public void setVersion(Integer version) {
-		this.version = version;
 	}
 }

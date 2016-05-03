@@ -22,6 +22,8 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Component;
 
 import com.clinovo.bean.StudyMapsHolder;
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.StudyUtil;
 import com.clinovo.validator.StudyValidator;
@@ -125,7 +128,7 @@ public class CreateStudyServlet extends SpringServlet {
 		UserAccountBean currentUser = getUserAccountBean();
 
 		errors.putAll(StudyValidator.validate(getStudyDAO(), getConfigurationDao(), studyBean, null,
-				DateUtil.DatePattern.DATE, false));
+				DateUtil.DatePattern.DATE, false, false));
 
 		StudyMapsHolder studyMapsHolder = new StudyMapsHolder(StudyUtil.getStudyFeaturesMap(),
 				StudyUtil.getStudyParametersMap(), StudyUtil.getStudyFacilitiesMap());
@@ -138,7 +141,10 @@ public class CreateStudyServlet extends SpringServlet {
 			request.setAttribute("statuses", Status.toActiveArrayList());
 			logger.info("setting arrays to request, size of list: " + Status.toArrayList().size());
 			if (request.getParameter("Save") != null && request.getParameter("Save").length() > 0) {
-				getStudyService().saveStudyBean(fp.getInt("selectedUser"), studyBean, currentUser, getResPage());
+				Map<String, List<DiscrepancyDescription>> dnDescriptionsMap = getStudyService()
+						.createDefaultDiscrepancyDescriptions(studyBean, getResPage());
+				getStudyService().saveStudyBean(fp.getInt("selectedUser"), studyBean, currentUser, dnDescriptionsMap,
+						getResPage());
 				addPageMessage(getResPage().getString("the_new_study_created_succesfully_current"), request);
 				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 			}

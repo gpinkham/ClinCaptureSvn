@@ -12,38 +12,49 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-package com.clinovo.enums.study;
-
-import com.clinovo.enums.BaseEnum;
-import com.clinovo.enums.ParameterType;
+package com.clinovo.enums.discrepancy;
 
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * StudyFeature.
- */
-public enum StudyFeature implements BaseEnum {
+import com.clinovo.enums.BaseEnum;
+import com.clinovo.enums.ParameterType;
 
-	CRF_ANNOTATION("crfAnnotation", "crf_annotation"), DYNAMIC_GROUP("dynamicGroup", "dynamic_group"), CALENDARED_VISITS("calendaredVisits", "calendared_visits"),
-	INTERACTIVE_DASHBOARDS("interactiveDashboards", "interactive_dashboards"), ITEM_LEVEL_SDV("itemLevelSDV", "item_level_sdv"),
-	SUBJECT_CASEBOOK_IN_PDF("subjectCasebookInPDF", "subject_casebook_in_pdf"), CRF_MASKING("crfMasking", "crfs_masking"), SAS_EXTRACTS("sasExtracts", "sas_extracts"),
-	STUDY_EVALUATOR("studyEvaluator", "study_evaluator"), RANDOMIZATION("randomization", "randomization_cap"), MEDICAL_CODING("medicalCoding", "medical_coding");
+/**
+ * ReasonForChangeDescriptions.
+ */
+@SuppressWarnings("unused")
+public enum ReasonForChangeDescriptions implements BaseEnum {
+
+	DN_RFC_DESCRIPTION("dnRFCDescription", "reason_for_update_descriptions"),
+	DN_RFC_VISIBILITY_LEVEL("dnRFCVisibilityLevel", "visibility", DiscrepancyConstants.VISIBILITY_VALUES, DiscrepancyConstants.VISIBILITY_VALUE_CODES, ParameterType.RADIO);
 
 	private String name;
 	private String code;
 	private String[] values;
 	private boolean required;
 	private ParameterType type;
-	private String defaultValue;
+	private String[] valueCodes;
+	private String[] defaultValue;
 	private boolean localizedDefaultValues;
 
-	StudyFeature(String name, String code) {
+	ReasonForChangeDescriptions(String name, String code) {
 		this.name = name;
 		this.code = code;
-		defaultValue = "yes";
-		type = ParameterType.RADIO;
-		values = new String[]{"yes", "no"};
+		type = ParameterType.TEXT;
+		localizedDefaultValues = true;
+		defaultValue = new String[]{"corrected_CRF_data_entry_error", "source_data_was_missing",
+				"source_data_was_incorrect", "information_was_not_available"};
+	}
+
+	ReasonForChangeDescriptions(String name, String code, String[] values, String[] valueCodes, ParameterType type) {
+		this.type = type;
+		this.name = name;
+		this.code = code;
+		this.values = values;
+		this.valueCodes = valueCodes;
+		defaultValue = new String[]{DiscrepancyVisibility.BOTH.getCode(), DiscrepancyVisibility.BOTH.getCode(),
+				DiscrepancyVisibility.BOTH.getCode(), DiscrepancyVisibility.BOTH.getCode()};
 	}
 
 	/**
@@ -77,18 +88,18 @@ public enum StudyFeature implements BaseEnum {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<StudyFeature> asList() {
-		return Arrays.asList(StudyFeature.values());
+	public List<ReasonForChangeDescriptions> asList() {
+		return Arrays.asList(ReasonForChangeDescriptions.values());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public Object find(String name) {
-		StudyFeature result = null;
-		for (StudyFeature sttudyFeature : asList()) {
-			if (sttudyFeature.getName().equals(name)) {
-				result = sttudyFeature;
+		ReasonForChangeDescriptions result = null;
+		for (ReasonForChangeDescriptions studyFacility : asList()) {
+			if (studyFacility.getName().equals(name)) {
+				result = studyFacility;
 				break;
 			}
 		}
@@ -100,8 +111,8 @@ public enum StudyFeature implements BaseEnum {
 	 */
 	public boolean hasTypo(String name) {
 		boolean result = false;
-		for (StudyFeature studyFeature : asList()) {
-			if (studyFeature.getName().equalsIgnoreCase(name) && !studyFeature.getName().equals(name)) {
+		for (ReasonForChangeDescriptions studyFacility : asList()) {
+			if (studyFacility.getName().equalsIgnoreCase(name) && !studyFacility.getName().equals(name)) {
 				result = true;
 				break;
 			}
@@ -119,7 +130,7 @@ public enum StudyFeature implements BaseEnum {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getDefaultValue() {
+	public String[] getDefaultValue() {
 		return defaultValue;
 	}
 

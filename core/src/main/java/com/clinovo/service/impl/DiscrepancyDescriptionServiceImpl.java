@@ -20,13 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.enums.discrepancy.DiscrepancyConstants;
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.model.DiscrepancyDescriptionType;
 import com.clinovo.service.DiscrepancyDescriptionService;
@@ -35,12 +36,13 @@ import com.clinovo.service.DiscrepancyDescriptionService;
 @Service("discrepancyDescriptionService")
 public class DiscrepancyDescriptionServiceImpl implements DiscrepancyDescriptionService {
 
-	@Autowired DiscrepancyDescriptionDAO discrepancyDescriptionDAO;
-	
+	@Autowired
+	DiscrepancyDescriptionDAO discrepancyDescriptionDAO;
+
 	public DiscrepancyDescription findById(int id) {
 		return discrepancyDescriptionDAO.findById(id);
 	}
-	
+
 	public List<DiscrepancyDescription> findAll() {
 		return discrepancyDescriptionDAO.findAll();
 	}
@@ -49,64 +51,67 @@ public class DiscrepancyDescriptionServiceImpl implements DiscrepancyDescription
 		return discrepancyDescriptionDAO.findAllByStudyIdAndTypeId(studyId, typeId);
 	}
 
-	public DiscrepancyDescription saveDiscrepancyDescription(
-			DiscrepancyDescription discrepancyDescription) {
+	public DiscrepancyDescription saveDiscrepancyDescription(DiscrepancyDescription discrepancyDescription) {
 		return discrepancyDescriptionDAO.saveOrUpdate(discrepancyDescription);
 	}
 
 	public void deleteDiscrepancyDescription(DiscrepancyDescription discrepancyDescription) {
 		discrepancyDescriptionDAO.deleteDiscrepancyDescription(discrepancyDescription);
 	}
-	
+
 	public Map<String, List<DiscrepancyDescription>> findAllSortedDescriptionsFromStudy(int studyId) {
 		Map<String, List<DiscrepancyDescription>> dDescriptionsMap = new HashMap<String, List<DiscrepancyDescription>>();
-		
-		dDescriptionsMap.put("dnUpdateDescriptions", findAllByStudyIdAndTypeId(studyId, DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
-		dDescriptionsMap.put("dnCloseDescriptions", findAllByStudyIdAndTypeId(studyId, DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
-		dDescriptionsMap.put("dnRFCDescriptions", findAllByStudyIdAndTypeId(studyId, DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
-		
+
+		dDescriptionsMap.put(DiscrepancyConstants.DN_UPDATE_DESCRIPTIONS, findAllByStudyIdAndTypeId(studyId,
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId()));
+		dDescriptionsMap.put(DiscrepancyConstants.DN_CLOSE_DESCRIPTIONS, findAllByStudyIdAndTypeId(studyId,
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId()));
+		dDescriptionsMap.put(DiscrepancyConstants.DN_RFC_DESCRIPTIONS,
+				findAllByStudyIdAndTypeId(studyId, DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId()));
+
 		return dDescriptionsMap;
 	}
-	
+
 	public Map<String, List<DiscrepancyDescription>> getAssignedToStudySortedDescriptions(StudyBean study) {
 		Map<String, List<DiscrepancyDescription>> dDescriptionsMap = new HashMap<String, List<DiscrepancyDescription>>();
-		
-		dDescriptionsMap.put("dnUpdateDescriptions", getUpdateDescriptions(study));
-		dDescriptionsMap.put("dnCloseDescriptions", getCloseDescriptions(study));
-		dDescriptionsMap.put("dnRFCDescriptions", getRFCDescriptions(study));
-		
+
+		dDescriptionsMap.put(DiscrepancyConstants.DN_UPDATE_DESCRIPTIONS, getUpdateDescriptions(study));
+		dDescriptionsMap.put(DiscrepancyConstants.DN_CLOSE_DESCRIPTIONS, getCloseDescriptions(study));
+		dDescriptionsMap.put(DiscrepancyConstants.DN_RFC_DESCRIPTIONS, getRFCDescriptions(study));
+
 		return dDescriptionsMap;
 	}
-	
+
 	private ArrayList<DiscrepancyDescription> getUpdateDescriptions(StudyBean study) {
 		return findSpecifiedDescriptions(study, DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId());
 	}
-	
+
 	private ArrayList<DiscrepancyDescription> getCloseDescriptions(StudyBean study) {
 		return findSpecifiedDescriptions(study, DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId());
 	}
-	
+
 	private ArrayList<DiscrepancyDescription> getRFCDescriptions(StudyBean study) {
 		return findSpecifiedDescriptions(study, DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 	}
-	
+
 	private ArrayList<DiscrepancyDescription> findSpecifiedDescriptions(StudyBean study, int typeId) {
 		ArrayList<DiscrepancyDescription> result = new ArrayList<DiscrepancyDescription>();
 		ArrayList<DiscrepancyDescription> siteVisibleDescs = new ArrayList<DiscrepancyDescription>();
 		ArrayList<DiscrepancyDescription> studyVisibleDescs = new ArrayList<DiscrepancyDescription>();
 		int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
-		ArrayList<DiscrepancyDescription> rfcDescriptions = (ArrayList<DiscrepancyDescription>) discrepancyDescriptionDAO.findAllByStudyIdAndTypeId(parentStudyId, typeId);
+		ArrayList<DiscrepancyDescription> rfcDescriptions = (ArrayList<DiscrepancyDescription>) discrepancyDescriptionDAO
+				.findAllByStudyIdAndTypeId(parentStudyId, typeId);
 		for (DiscrepancyDescription rfcTerm : rfcDescriptions) {
-			if (DiscrepancyVisibility.SITE.getName().equals(rfcTerm.getVisibilityLevel())) {
+			if (DiscrepancyVisibility.SITE.getValue().equals(rfcTerm.getVisibilityLevel())) {
 				siteVisibleDescs.add(rfcTerm);
-			} else if (DiscrepancyVisibility.STUDY.getName().equals(rfcTerm.getVisibilityLevel())) {
+			} else if (DiscrepancyVisibility.STUDY.getValue().equals(rfcTerm.getVisibilityLevel())) {
 				studyVisibleDescs.add(rfcTerm);
-			} else if (DiscrepancyVisibility.BOTH.getName().equals(rfcTerm.getVisibilityLevel())) {
+			} else if (DiscrepancyVisibility.BOTH.getValue().equals(rfcTerm.getVisibilityLevel())) {
 				studyVisibleDescs.add(rfcTerm);
 				siteVisibleDescs.add(rfcTerm);
 			}
 		}
-		
+
 		if (study.getParentStudyId() > 0) {
 			result = siteVisibleDescs;
 		} else {

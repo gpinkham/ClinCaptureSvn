@@ -20,14 +20,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Error.
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "Error", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"status", "message"})
 public class Error {
 
 	@JsonProperty("status")
@@ -51,10 +49,12 @@ public class Error {
 	 *            Exception
 	 * @param status
 	 *            String
+	 * @param defaultMessage
+	 *            String
 	 */
-	public Error(Exception ex, String status) {
+	public Error(Exception ex, String status, String defaultMessage) {
 		this.status = status;
-		this.message = ex.getMessage();
+		this.message = ex.getMessage() == null ? defaultMessage : ex.getMessage();
 	}
 
 	public String getStatus() {

@@ -38,7 +38,12 @@ public @interface EnumBasedParameters {
 	Class<? extends BaseEnum> enumClass();
 
 	/**
-	 * Method that returns useDefaultValues.
+	 * Method that returns true if there is a need to use default values.
 	 */
 	boolean useDefaultValues() default false;
+
+	/**
+	 * Method that returns true if there is a need to synchronize quantity of values.
+	 */
+	boolean synchronizeQuantityOfValues() default false;
 }

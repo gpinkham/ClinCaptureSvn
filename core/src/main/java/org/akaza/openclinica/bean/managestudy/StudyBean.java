@@ -10,17 +10,18 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -33,11 +34,12 @@ import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import com.clinovo.enums.study.StudyOrigin;
+import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * <code>StudyBean</code> class represents a study entity, extends <code>AuditableEntityBean</code> class.
@@ -45,12 +47,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "StudyBean", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonPropertyOrder({"id", "oid", "studyName", "protocolId", "protocolType", "origin", "briefTitle", "summary",
-		"startDate", "endDate", "approvalDate", "detailedDescription", "phase", "totalEnrollment", "sponsor",
-		"collaborators", "officialTitle", "secondaryIDs", "principalInvestigator", "purpose", "allocation", "masking",
-		"control", "interventionModel", "classification", "duration", "selection", "timing", "facilityName",
-		"facilityCity", "facilityState", "facilityZip", "facilityCountry", "facilityContactName",
-		"facilityContactDegree", "facilityContactPhone", "facilityContactEmail", "status", "parameters", "features"})
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyBean extends AuditableEntityBean {
 
@@ -214,6 +210,24 @@ public class StudyBean extends AuditableEntityBean {
 	private String oid;
 
 	private OidGenerator oidGenerator = new StudyOidGenerator();
+
+	@JsonProperty("discrepancyUpdateDescriptions")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	@XmlElementWrapper(name = "DiscrepancyUpdateDescriptions", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	@XmlElement(name = "DiscrepancyDescription", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private List<DiscrepancyDescription> dnUpdateDescriptions = new ArrayList<DiscrepancyDescription>();
+
+	@JsonProperty("discrepancyCloseDescriptions")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	@XmlElementWrapper(name = "DiscrepancyCloseDescriptions", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	@XmlElement(name = "DiscrepancyDescription", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private List<DiscrepancyDescription> dnCloseDescriptions = new ArrayList<DiscrepancyDescription>();
+
+	@JsonProperty("discrepancyRFCDescriptions")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	@XmlElementWrapper(name = "DiscrepancyRFCDescriptions", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	@XmlElement(name = "DiscrepancyDescription", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private List<DiscrepancyDescription> dnRFCDescriptions = new ArrayList<DiscrepancyDescription>();
 
 	@JsonProperty("parameters")
 	@XmlElement(name = "Parameters", namespace = "http://www.cdisc.org/ns/odm/v1.3")
@@ -1265,5 +1279,29 @@ public class StudyBean extends AuditableEntityBean {
 
 	public void setBriefTitle(String briefTitle) {
 		this.briefTitle = briefTitle;
+	}
+
+	public List<DiscrepancyDescription> getDnUpdateDescriptions() {
+		return dnUpdateDescriptions;
+	}
+
+	public void setDnUpdateDescriptions(List<DiscrepancyDescription> dnUpdateDescriptions) {
+		this.dnUpdateDescriptions = dnUpdateDescriptions;
+	}
+
+	public List<DiscrepancyDescription> getDnCloseDescriptions() {
+		return dnCloseDescriptions;
+	}
+
+	public void setDnCloseDescriptions(List<DiscrepancyDescription> dnCloseDescriptions) {
+		this.dnCloseDescriptions = dnCloseDescriptions;
+	}
+
+	public List<DiscrepancyDescription> getDnRFCDescriptions() {
+		return dnRFCDescriptions;
+	}
+
+	public void setDnRFCDescriptions(List<DiscrepancyDescription> dnRFCDescriptions) {
+		this.dnRFCDescriptions = dnRFCDescriptions;
 	}
 }

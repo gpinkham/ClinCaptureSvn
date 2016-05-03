@@ -10,12 +10,19 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.domain;
 
+import javax.xml.bind.annotation.XmlTransient;
+
+/**
+ * MutableDomainObject.
+ */
+@XmlTransient
 public interface MutableDomainObject extends DomainObject {
 
 	/**
+	 * Returns version.
+	 * 
 	 * @return the optimistic locking version value for this object.
 	 */
 	Integer getVersion();
@@ -25,6 +32,7 @@ public interface MutableDomainObject extends DomainObject {
 	 * code -- just the persistence mechanism.
 	 * 
 	 * @param version
+	 *            Integer
 	 */
 	void setVersion(Integer version);
 

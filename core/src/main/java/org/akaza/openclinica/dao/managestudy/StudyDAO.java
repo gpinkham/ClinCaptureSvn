@@ -267,6 +267,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 		sb.setId(this.findNextKey());
+		sb.setOid(getValidOid(sb));
 		int index = 1;
 		variables.put(index++, sb.getId());
 
@@ -313,7 +314,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		variables.put(index++, sb.getFacilityContactEmail());
 		variables.put(index++, sb.getStatus().getId());
 		variables.put(index++, sb.getOwnerId());
-		variables.put(index++, getValidOid(sb));
+		variables.put(index++, sb.getOid());
 		variables.put(index++, sb.getBriefTitle());
 		variables.put(index, sb.getOrigin());
 		// replace this with the owner id

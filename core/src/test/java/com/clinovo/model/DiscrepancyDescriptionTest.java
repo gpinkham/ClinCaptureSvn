@@ -16,35 +16,36 @@ package com.clinovo.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 import org.junit.Test;
+
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
 
 public class DiscrepancyDescriptionTest {
 
 	@Test
 	public void testThatNewDDescriptionHasUnknownType() {
-		assertEquals(DiscrepancyDescriptionType.DescriptionType.UNKNOWN.getId(), new DiscrepancyDescription().getTypeId());
+		assertEquals(DiscrepancyDescriptionType.DescriptionType.UNKNOWN.getId(),
+				new DiscrepancyDescription().getTypeId());
 	}
 
 	@Test
 	public void testThatDDescriptionPersistsAChangedType() {
 		DiscrepancyDescription item = new DiscrepancyDescription();
 		item.setTypeId(DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
-		
+
 		assertEquals(DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId(), item.getTypeId());
 	}
-	
+
 	@Test
 	public void testThatForNewDDescriptionVisibilityLevelIsEmpty() {
 		assertTrue(new DiscrepancyDescription().getVisibilityLevel().isEmpty());
 	}
-	
+
 	@Test
 	public void testThatSetVisibilityLevelWorksCorrect() {
 		DiscrepancyDescription item = new DiscrepancyDescription();
-		item.setVisibilityLevel(DiscrepancyVisibility.STUDY.getName());
-		
-		assertEquals(DiscrepancyVisibility.STUDY.getName(), item.getVisibilityLevel());
+		item.setVisibilityLevel(DiscrepancyVisibility.STUDY.getValue());
+
+		assertEquals(DiscrepancyVisibility.STUDY.getValue(), item.getVisibilityLevel());
 	}
 }
-

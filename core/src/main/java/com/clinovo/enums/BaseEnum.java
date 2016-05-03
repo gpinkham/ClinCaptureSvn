@@ -85,7 +85,14 @@ public interface BaseEnum {
 	/**
 	 * Returns default value.
 	 * 
-	 * @return String
+	 * @return Object
 	 */
-	String getDefaultValue();
+	Object getDefaultValue();
+
+	/**
+	 * Returns true if default values are localized.
+	 *
+	 * @return boolean
+	 */
+	boolean isLocalizedDefaultValues();
 }

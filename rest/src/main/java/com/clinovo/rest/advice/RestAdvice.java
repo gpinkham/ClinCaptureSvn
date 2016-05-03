@@ -18,10 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.Error;
 import com.clinovo.rest.security.PermissionChecker;
@@ -34,6 +37,9 @@ import com.clinovo.util.RequestUtil;
 public class RestAdvice {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestAdvice.class);
+
+	@Autowired
+	private MessageSource messageSource;
 
 	/**
 	 * Exception handler for rest api.
@@ -56,6 +62,7 @@ public class RestAdvice {
 			RequestUtil.getRequest().getSession().removeAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 		}
 		response.setStatus(code);
-		return new Error(ex, String.valueOf(code));
+		return new Error(ex, String.valueOf(code),
+				messageSource.getMessage("rest.system.error", null, LocaleResolver.getLocale()));
 	}
 }

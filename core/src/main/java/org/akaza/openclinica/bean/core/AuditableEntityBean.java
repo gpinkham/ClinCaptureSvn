@@ -33,7 +33,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -54,7 +53,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @SuppressWarnings({"serial"})
 @XmlAccessorType(XmlAccessType.NONE)
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AuditableEntityBean extends EntityBean {
 
 	public static final int DEFAULT_STATES_LENGTH = 2;

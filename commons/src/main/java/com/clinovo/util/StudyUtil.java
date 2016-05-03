@@ -14,22 +14,34 @@
  *******************************************************************************/
 package com.clinovo.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.control.form.FormProcessor;
 
+import com.clinovo.enums.discrepancy.DiscrepancyCloseDescriptions;
+import com.clinovo.enums.discrepancy.DiscrepancyConstants;
+import com.clinovo.enums.discrepancy.DiscrepancyUpdateDescriptions;
+import com.clinovo.enums.discrepancy.DiscrepancyVisibility;
+import com.clinovo.enums.discrepancy.ReasonForChangeDescriptions;
 import com.clinovo.enums.study.StudyConfigurationParameter;
 import com.clinovo.enums.study.StudyFacility;
 import com.clinovo.enums.study.StudyFeature;
 import com.clinovo.enums.study.StudyParameter;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.model.DiscrepancyDescriptionType;
 
 /**
  * StudyUtil.
  */
 public final class StudyUtil {
+
+	public static final String ID = "Id";
+	public static final String ERROR = "Error";
 
 	private StudyUtil() {
 	}
@@ -95,5 +107,110 @@ public final class StudyUtil {
 			}
 		}
 		return map;
+	}
+
+	/**
+	 * Prepares discrepancy descriptions map.
+	 *
+	 * @param dnDescriptionsMap
+	 *            Map
+	 * @param studyId
+	 *            int
+	 * @param indexableParameters
+	 *            boolean
+	 */
+	public static void prepareDiscrepancyDescriptions(Map<String, List<DiscrepancyDescription>> dnDescriptionsMap,
+			int studyId, boolean indexableParameters) {
+		dnDescriptionsMap.clear();
+		prepareDiscrepancyDescription(dnDescriptionsMap, DiscrepancyConstants.DN_UPDATE_DESCRIPTIONS,
+				DiscrepancyUpdateDescriptions.DN_UPDATE_DESCRIPTION.getName(),
+				DiscrepancyUpdateDescriptions.DN_UPDATE_VISIBILITY_LEVEL.getName(),
+				DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId(), studyId, indexableParameters);
+		prepareDiscrepancyDescription(dnDescriptionsMap, DiscrepancyConstants.DN_CLOSE_DESCRIPTIONS,
+				DiscrepancyCloseDescriptions.DN_CLOSE_DESCRIPTION.getName(),
+				DiscrepancyCloseDescriptions.DN_CLOSE_VISIBILITY_LEVEL.getName(),
+				DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId(), studyId, indexableParameters);
+		prepareDiscrepancyDescription(dnDescriptionsMap, DiscrepancyConstants.DN_RFC_DESCRIPTIONS,
+				ReasonForChangeDescriptions.DN_RFC_DESCRIPTION.getName(),
+				ReasonForChangeDescriptions.DN_RFC_VISIBILITY_LEVEL.getName(),
+				DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId(), studyId, indexableParameters);
+	}
+
+	/**
+	 * Prepares discrepancy description map.
+	 *
+	 * @param dnDescriptionsMap
+	 *            Map
+	 * @param mapKey
+	 *            String
+	 * @param descriptionParameterName
+	 *            String
+	 * @param visibilityParameterName
+	 *            String
+	 * @param typeId
+	 *            int
+	 * @param studyId
+	 *            int
+	 * @param indexableParameters
+	 *            boolean
+	 */
+	private static void prepareDiscrepancyDescription(Map<String, List<DiscrepancyDescription>> dnDescriptionsMap,
+			String mapKey, String descriptionParameterName, String visibilityParameterName, int typeId, int studyId,
+			boolean indexableParameters) {
+		HttpServletRequest request = RequestUtil.getRequest();
+		FormProcessor fp = new FormProcessor(request);
+		List<DiscrepancyDescription> discrepancyDescriptions = new ArrayList<DiscrepancyDescription>();
+		if (indexableParameters) {
+			dnDescriptionsMap.put(mapKey, discrepancyDescriptions);
+			for (int i = DiscrepancyConstants.MIN_DESCRIPTIONS; i < DiscrepancyConstants.MAX_DESCRIPTIONS; i++) {
+				String description = fp.getString(descriptionParameterName.concat(Integer.toString(i)));
+				int discrepancyDescriptionId = fp
+						.getInt(descriptionParameterName.concat(ID).concat(Integer.toString(i)));
+				int visibilityLevel = fp.getInt(visibilityParameterName.concat(Integer.toString(i)));
+				if (!description.isEmpty()) {
+					DiscrepancyDescription discrepancyDescription = new DiscrepancyDescription();
+					discrepancyDescription.setTypeId(typeId);
+					discrepancyDescription.setParameterName(descriptionParameterName.concat(Integer.toString(i)));
+					discrepancyDescription
+							.setParameterErrorName(descriptionParameterName.concat(ERROR).concat(Integer.toString(i)));
+					discrepancyDescription.setName(description);
+					switch (visibilityLevel) {
+						case 1 :
+							discrepancyDescription.setVisibilityLevel(DiscrepancyVisibility.STUDY.getValue());
+							break;
+						case 2 :
+							discrepancyDescription.setVisibilityLevel(DiscrepancyVisibility.SITE.getValue());
+							break;
+						default :
+							discrepancyDescription.setVisibilityLevel(DiscrepancyVisibility.BOTH.getValue());
+					}
+					if (discrepancyDescriptionId != 0) {
+						discrepancyDescription.setId(discrepancyDescriptionId);
+					}
+					discrepancyDescription.setStudyId(studyId);
+					discrepancyDescriptions.add(discrepancyDescription);
+				}
+			}
+		} else {
+			String[] descriptionValues = request.getParameterValues(descriptionParameterName);
+			String[] visibilityValues = request.getParameterValues(visibilityParameterName);
+			if (descriptionValues != null && visibilityValues != null) {
+				dnDescriptionsMap.put(mapKey, discrepancyDescriptions);
+				for (int index = 0; index < descriptionValues.length; index++) {
+					String description = descriptionValues[index];
+					String visibilityLevel = visibilityValues[index];
+					if (!description.isEmpty()) {
+						DiscrepancyDescription discrepancyDescription = new DiscrepancyDescription();
+						discrepancyDescription.setStudyId(studyId);
+						discrepancyDescription.setTypeId(typeId);
+						discrepancyDescription.setName(description);
+						discrepancyDescription.setVisibilityLevel(visibilityLevel);
+						discrepancyDescription.setParameterName(descriptionParameterName);
+						discrepancyDescription.setParameterErrorName(descriptionParameterName);
+						discrepancyDescriptions.add(discrepancyDescription);
+					}
+				}
+			}
+		}
 	}
 }

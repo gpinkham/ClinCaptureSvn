@@ -17,6 +17,7 @@ package com.clinovo.rest.service.base;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -212,6 +213,21 @@ public abstract class BaseWadlService extends BaseService {
 
 	}
 
+	private String getDefaultValue(BaseEnum baseEnum) {
+		String defaultValue = "";
+		Locale locale = LocaleResolver.getLocale();
+		if (baseEnum.getDefaultValue() instanceof String) {
+			defaultValue = (String) baseEnum.getDefaultValue();
+		} else if (baseEnum.getDefaultValue() instanceof String[]) {
+			for (String value : (String[]) baseEnum.getDefaultValue()) {
+				defaultValue += (defaultValue.isEmpty() ? "" : ",")
+						+ (baseEnum.isLocalizedDefaultValues() ? messageSource.getMessage(value, null, locale) : value);
+			}
+			defaultValue = "[".concat(defaultValue).concat("]");
+		}
+		return defaultValue;
+	}
+
 	private void processMethodAnnotations(HandlerMethod handlerMethod, Method method) {
 		EnumBasedParametersHolder enumBasedParametersHolder = handlerMethod.getMethod()
 				.getAnnotation(EnumBasedParametersHolder.class);
@@ -223,16 +239,16 @@ public abstract class BaseWadlService extends BaseService {
 				Class<? extends BaseEnum> enumClass = enumBasedParameter.enumClass();
 				boolean useDefaultValues = enumBasedParameter.useDefaultValues();
 				for (BaseEnum baseEnum : (List<BaseEnum>) enumClass.getEnumConstants()[0].asList()) {
-					String type = convertJavaToXMLType(String.class);
+					String type = convertJavaToXMLType(
+							baseEnum.getDefaultValue() instanceof String[] ? String[].class : String.class);
 					Param param = new Param();
 					param.setName(baseEnum.getName());
 					param.setStyle(QUERY);
 					param.setRequired(baseEnum.isRequired());
 					param.setType(type);
-					param.setDefaultValue(useDefaultValues ? baseEnum.getDefaultValue() : NOT_USED);
+					param.setDefaultValue(useDefaultValues ? getDefaultValue(baseEnum) : NOT_USED);
 					param.setXmlnsXs(HTTP_WWW_W3_ORG_2001_XMLSCHEMA);
-					if (baseEnum.getType() == ParameterType.SELECT
-							|| baseEnum.getType() == ParameterType.RADIO) {
+					if (baseEnum.getType() == ParameterType.SELECT || baseEnum.getType() == ParameterType.RADIO) {
 						Values values = new Values();
 						values.setValue(getValues(baseEnum.getValues()));
 						param.getValuesList().add(values);

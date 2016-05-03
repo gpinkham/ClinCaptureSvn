@@ -52,11 +52,6 @@ public @interface PossibleValues {
 	String valueDescriptions() default "";
 
 	/**
-	 * Method that returns multiValue.
-	 */
-	boolean multiValue() default false;
-
-	/**
 	 * Method that returns canBeNotSpecified.
 	 */
 	boolean canBeNotSpecified() default false;

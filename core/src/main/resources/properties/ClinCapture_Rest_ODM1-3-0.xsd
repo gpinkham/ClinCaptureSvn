@@ -283,8 +283,33 @@
             <xs:element ref="FacilityContactPhone" minOccurs="0"/>
             <xs:element ref="FacilityContactEmail" minOccurs="0"/>
             <xs:element ref="Oid" minOccurs="0"/>
+            <xs:element ref="DiscrepancyUpdateDescriptions" minOccurs="0"/>
+            <xs:element ref="DiscrepancyCloseDescriptions" minOccurs="0"/>
+            <xs:element ref="DiscrepancyRFCDescriptions" minOccurs="0"/>
             <xs:element ref="Parameters" minOccurs="0"/>
             <xs:element ref="Features" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="DiscrepancyUpdateDescriptions" type="discrepancyDescriptions"/>
+    <xs:element name="DiscrepancyCloseDescriptions" type="discrepancyDescriptions"/>
+    <xs:element name="DiscrepancyRFCDescriptions" type="discrepancyDescriptions"/>
+
+    <xs:complexType name="discrepancyDescriptions">
+        <xs:sequence>
+            <xs:element ref="DiscrepancyDescription" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="DiscrepancyDescription" type="discrepancyDescription"/>
+
+    <xs:element name="Value" type="xs:string"/>
+    <xs:element name="VisibilityLevel" type="xs:string"/>
+
+    <xs:complexType name="discrepancyDescription">
+        <xs:sequence>
+            <xs:element ref="Value" minOccurs="0"/>
+            <xs:element ref="VisibilityLevel" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

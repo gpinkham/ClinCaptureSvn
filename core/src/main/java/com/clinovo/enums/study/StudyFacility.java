@@ -36,6 +36,7 @@ public enum StudyFacility implements BaseEnum {
 	private boolean required;
 	private ParameterType type;
 	private String defaultValue;
+	private boolean localizedDefaultValues;
 
 	StudyFacility(String name, String code) {
 		this.name = name;
@@ -119,5 +120,12 @@ public enum StudyFacility implements BaseEnum {
 	 */
 	public String getDefaultValue() {
 		return defaultValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isLocalizedDefaultValues() {
+		return localizedDefaultValues;
 	}
 }

@@ -20,14 +20,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Server.
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "Server", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonPropertyOrder({"version"})
 public class Server {
 
 	@JsonProperty("version")

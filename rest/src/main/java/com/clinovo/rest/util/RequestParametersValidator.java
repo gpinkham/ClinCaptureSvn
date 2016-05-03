@@ -15,10 +15,13 @@
 package com.clinovo.rest.util;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,6 +39,7 @@ import org.springframework.web.method.HandlerMethod;
 
 import com.clinovo.enums.BaseEnum;
 import com.clinovo.enums.ParameterType;
+import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.annotation.EnumBasedParameters;
 import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
@@ -105,11 +109,12 @@ public final class RequestParametersValidator {
 				if (annotation instanceof PossibleValuesHolder) {
 					for (PossibleValues possibleValues : ((PossibleValuesHolder) annotation).value()) {
 						String parameterName = possibleValues.name();
-						String parameterValue = request.getParameter(parameterName);
+						String[] parameterValueArray = request.getParameterValues(parameterName);
 						if (possibleValues.canBeNotSpecified()
-								&& (parameterValue == null || nullParameters.contains(parameterName))) {
+								&& (parameterValueArray == null || nullParameters.contains(parameterName))) {
 							continue;
 						}
+						parameterValueArray = parameterValueArray == null ? new String[]{null} : parameterValueArray;
 						String values = possibleValues.values();
 						String dependentOn = possibleValues.dependentOn();
 						String valueDescriptions = possibleValues.valueDescriptions();
@@ -119,20 +124,19 @@ public final class RequestParametersValidator {
 									CoreResources.getSystemLocale());
 							valueDescriptions = valueDescriptions.replace("{#}", dependentOnValue);
 						}
-						if (parameterValue != null && possibleValues.multiValue()
-								? !Arrays.asList(values.split(","))
-										.containsAll(Arrays.asList(parameterValue.split(",")))
-								: !Arrays.asList(values.split(",")).contains(parameterValue)) {
-							throw new RestException(messageSource,
-									valueDescriptions.isEmpty()
-											? "rest.possibleValuesAre"
-											: "rest.possibleValuesWithDescriptionsAre",
-									valueDescriptions.isEmpty()
-											? new Object[]{parameterName, values}
-											: new Object[]{parameterName, values,
-													messageSource.getMessage(valueDescriptions, null,
-															CoreResources.getSystemLocale())},
-									HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+						for (String parameterValue : parameterValueArray) {
+							if (!Arrays.asList(values.split(",")).contains(parameterValue)) {
+								throw new RestException(messageSource,
+										valueDescriptions.isEmpty()
+												? "rest.possibleValuesAre"
+												: "rest.possibleValuesWithDescriptionsAre",
+										valueDescriptions.isEmpty()
+												? new Object[]{parameterName, values}
+												: new Object[]{parameterName, values,
+														messageSource.getMessage(valueDescriptions, null,
+																CoreResources.getSystemLocale())},
+										HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+							}
 						}
 					}
 				}
@@ -170,8 +174,7 @@ public final class RequestParametersValidator {
 					}
 				}
 				if (baseEnum != null) {
-					if (baseEnum.getType() == ParameterType.SELECT
-							|| baseEnum.getType() == ParameterType.RADIO) {
+					if (baseEnum.getType() == ParameterType.SELECT || baseEnum.getType() == ParameterType.RADIO) {
 						if (!Arrays.asList(baseEnum.getValues()).contains(parameterValue)) {
 							throw new RestException(messageSource, "rest.possibleValuesAre",
 									new Object[]{parameterName,
@@ -188,7 +191,9 @@ public final class RequestParametersValidator {
 		return countOfProvidedNotRequiredParameters;
 	}
 
-	private static void processEnumBasedParameters(HttpServletRequest request, HandlerMethod handler) throws Exception {
+	private static void processEnumBasedParameters(HttpServletRequest request, HandlerMethod handler,
+			MessageSource messageSource) throws Exception {
+		EnumBasedParameters outOfSyncEnumBasedParameters = null;
 		EnumBasedParametersHolder enumBasedParametersHolder = handler.getMethod()
 				.getAnnotation(EnumBasedParametersHolder.class);
 		EnumBasedParameters[] enumBasedParameters = enumBasedParametersHolder != null
@@ -196,15 +201,51 @@ public final class RequestParametersValidator {
 				: null;
 		if (enumBasedParameters != null && enumBasedParameters.length > 0) {
 			for (EnumBasedParameters enumBasedParameter : enumBasedParameters) {
-				if (enumBasedParameter.useDefaultValues()) {
-					for (BaseEnum baseEnum : enumBasedParameter.enumClass().getEnumConstants()) {
-						String parameterName = baseEnum.getName();
-						String defaultValue = baseEnum.getDefaultValue();
+				int synchronizedQuantity = 0;
+				for (BaseEnum baseEnum : enumBasedParameter.enumClass().getEnumConstants()) {
+					String parameterName = baseEnum.getName();
+					if (enumBasedParameter.useDefaultValues()) {
 						if (request.getParameter(parameterName) == null) {
-							((RestRequestWrapper) request).addParameter(parameterName, defaultValue);
+							addDefaultValues((RestRequestWrapper) request, parameterName, baseEnum, messageSource);
+						}
+					}
+					if (enumBasedParameter.synchronizeQuantityOfValues()) {
+						String[] parameterValues = request.getParameterValues(parameterName);
+						synchronizedQuantity = synchronizedQuantity == 0 && parameterValues != null
+								? parameterValues.length
+								: synchronizedQuantity;
+						if (outOfSyncEnumBasedParameters == null && synchronizedQuantity > 0
+								&& (parameterValues == null || parameterValues.length != synchronizedQuantity)) {
+							outOfSyncEnumBasedParameters = enumBasedParameter;
 						}
 					}
 				}
+			}
+		}
+		if (outOfSyncEnumBasedParameters != null) {
+			String parameterNames = "";
+			for (BaseEnum baseEnum : outOfSyncEnumBasedParameters.enumClass().getEnumConstants()) {
+				parameterNames += (parameterNames.isEmpty() ? "" : ", ") + baseEnum.getName();
+			}
+			throw new RestException(messageSource, "rest.parametersAreOutOfSync", new Object[]{parameterNames},
+					HttpServletResponse.SC_BAD_REQUEST);
+		}
+	}
+
+	private static void addDefaultValues(RestRequestWrapper request, String parameterName, BaseEnum baseEnum,
+			MessageSource messageSource) {
+		if (baseEnum.getDefaultValue() instanceof String) {
+			request.addParameter(parameterName, (String) baseEnum.getDefaultValue());
+		} else if (baseEnum.getDefaultValue() instanceof String[]) {
+			if (baseEnum.isLocalizedDefaultValues()) {
+				Locale locale = LocaleResolver.getLocale();
+				List<String> descriptions = new ArrayList<String>();
+				for (String defaultValueCode : (String[]) baseEnum.getDefaultValue()) {
+					descriptions.add(messageSource.getMessage(defaultValueCode, null, locale));
+				}
+				request.addParameter(parameterName, descriptions.toArray(new String[descriptions.size()]));
+			} else {
+				request.addParameter(parameterName, (String[]) baseEnum.getDefaultValue());
 			}
 		}
 	}
@@ -301,7 +342,7 @@ public final class RequestParametersValidator {
 		}
 		fillDeclaredParams(request, declaredParams);
 		validateClientVersion(request, messageSource);
-		processEnumBasedParameters(request, handler);
+		processEnumBasedParameters(request, handler, messageSource);
 		countOfProvidedNotRequiredParameters = validateMethodParameterAnnotations(request, messageSource, handler,
 				declaredFields, declaredParams, nullParameters, countOfProvidedNotRequiredParameters);
 		validateScopeRequirement(userDetails, messageSource, handler);

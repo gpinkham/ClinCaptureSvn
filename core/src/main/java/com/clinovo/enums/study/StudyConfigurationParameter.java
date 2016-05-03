@@ -122,6 +122,7 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	private String[] values;
 	private boolean required;
 	private boolean disabled;
+	private ParameterType type;
 	private boolean ignoreName;
 	private String defaultValue;
 	private String[] valueCodes;
@@ -132,8 +133,8 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	private String processorMode = "";
 	private String validationPattern = "";
 	private String dependentRowsClassName;
+	private boolean localizedDefaultValues;
 	private String validationErrorMessage = "";
-	private ParameterType type;
 	private String hideDependentRowsIfSelectedValueIs;
 	private String selectValueIfThereIsNothingIsSelected;
 	private String showAdditionalStudyConfigurationParameterIfSelectedValueIs;
@@ -452,5 +453,12 @@ public enum StudyConfigurationParameter implements BaseEnum {
 	 */
 	public String getDefaultValue() {
 		return defaultValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isLocalizedDefaultValues() {
+		return localizedDefaultValues;
 	}
 }

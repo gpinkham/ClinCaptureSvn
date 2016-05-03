@@ -16,12 +16,10 @@ package com.clinovo.rest.json;
 
 import com.clinovo.rest.model.Server;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * RestJsonContainer.
  */
-@JsonPropertyOrder({"server", "response"})
 public class RestJsonContainer {
 
 	@JsonProperty("server")

@@ -56,9 +56,21 @@ public class RestRequestWrapper extends HttpServletRequestWrapper {
 	 *            String
 	 */
 	public void addParameter(String name, String value) {
+		addParameter(name, new String[]{value});
+	}
+
+	/**
+	 * Adds new parameters.
+	 *
+	 * @param name
+	 *            String
+	 * @param value
+	 *            String[]
+	 */
+	public void addParameter(String name, String[] value) {
 		Map<String, String[]> newAllParameters = new TreeMap<String, String[]>();
 		newAllParameters.putAll(allParameters);
-		newAllParameters.put(name, new String[]{value});
+		newAllParameters.put(name, value);
 		allParameters = new TreeMap<String, String[]>();
 		allParameters.putAll(newAllParameters);
 	}
