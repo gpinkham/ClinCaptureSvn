@@ -209,7 +209,7 @@ public class EventService extends BaseEventService {
 	 */
 	@RequestMapping(value = "/event/remove", method = RequestMethod.POST)
 	public StudyEventDefinitionBean remove(@RequestParam(value = "id") int eventId) throws Exception {
-		return removeSED(eventId);
+		return removeStudyEventDefinition(eventId);
 	}
 
 	/**
@@ -223,7 +223,7 @@ public class EventService extends BaseEventService {
 	 */
 	@RequestMapping(value = "/event/restore", method = RequestMethod.POST)
 	public StudyEventDefinitionBean restore(@RequestParam(value = "id") int eventId) throws Exception {
-		return restoreSED(eventId);
+		return restoreStudyEventDefinition(eventId);
 	}
 
 	/**
@@ -451,7 +451,7 @@ public class EventService extends BaseEventService {
 	@RequestMapping(value = "/event/removeCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean removeCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
-		return removeEDC(eventId, crfName);
+		return removeEventDefinitionCrf(eventId, crfName);
 	}
 
 	/**
@@ -468,7 +468,7 @@ public class EventService extends BaseEventService {
 	@RequestMapping(value = "/event/restoreCrf", method = RequestMethod.POST)
 	public EventDefinitionCRFBean restoreCrf(@RequestParam("eventId") int eventId,
 			@RequestParam("crfName") String crfName) throws Exception {
-		return restoreEDC(eventId, crfName);
+		return restoreEventDefinitionCrf(eventId, crfName);
 	}
 
 	/**
@@ -485,6 +485,6 @@ public class EventService extends BaseEventService {
 	@RequestMapping(value = "/event/deleteCrf", method = RequestMethod.POST)
 	public Response deleteCrf(@RequestParam("eventId") int eventId, @RequestParam("crfName") String crfName)
 			throws Exception {
-		return deleteEventDefinitionCRF(eventId, crfName);
+		return deleteEventDefinitionCrf(eventId, crfName);
 	}
 }

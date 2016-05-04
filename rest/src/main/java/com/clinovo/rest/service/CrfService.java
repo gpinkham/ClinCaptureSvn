@@ -71,7 +71,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crf", method = RequestMethod.GET)
 	public CRFBean crf(@RequestParam(value = "id") int crfId) throws Exception {
-		return getCRF(crfId);
+		return getCrfBean(crfId);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crfVersion", method = RequestMethod.GET)
 	public CRFVersionBean crfVersion(@RequestParam(value = "id") int crfVersionId) throws Exception {
-		return getCRFVersion(crfVersionId);
+		return getCrfVersionBean(crfVersionId, false);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crf/remove", method = RequestMethod.POST)
 	public CRFBean removeCrf(@RequestParam("id") int crfId) throws Exception {
-		return removeCRF(crfId);
+		return removeCrfBean(crfId);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crf/restore", method = RequestMethod.POST)
 	public CRFBean restoreCrf(@RequestParam("id") int crfId) throws Exception {
-		return restoreCRF(crfId);
+		return restoreCrfBean(crfId);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crfVersion/remove", method = RequestMethod.POST)
 	public CRFVersionBean removeCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
-		return removeCRFVersion(crfVersionId);
+		return removeCrfVersionBean(crfVersionId);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crfVersion/restore", method = RequestMethod.POST)
 	public CRFVersionBean restoreCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
-		return restoreCRFVersion(crfVersionId);
+		return restoreCrfVersionBean(crfVersionId);
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crfVersion/lock", method = RequestMethod.POST)
 	public CRFVersionBean lockCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
-		return lockCRFVersion(crfVersionId);
+		return lockCrfVersionBean(crfVersionId);
 	}
 
 	/**
@@ -193,6 +193,6 @@ public class CrfService extends BaseCrfService {
 	 */
 	@RequestMapping(value = "/crfVersion/unlock", method = RequestMethod.POST)
 	public CRFVersionBean unlockCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
-		return unlockCRFVersion(crfVersionId);
+		return unlockCrfVersionBean(crfVersionId);
 	}
 }

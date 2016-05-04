@@ -216,6 +216,18 @@ public abstract class BaseEventService extends BaseService {
 				availableVersions);
 	}
 
+	private CRFVersionBean getCrfVersionBean(String version, String crfName) throws Exception {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO().findByFullName(version, crfName);
+		if (crfVersionBean.getId() > 0) {
+			CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfVersionBean.getCrfId());
+			if (crfBean.getStudyId() != getCurrentStudy().getId()) {
+				throw new RestException(messageSource, "rest.eventservice.crfDoesNotBelongToCurrentScope",
+						new Object[]{crfName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+		}
+		return crfVersionBean;
+	}
+
 	private EventDefinitionCRFBean prepareEventDefinitionCRF(StudyBean studyBean,
 			EventDefinitionCRFBean eventDefinitionCRFBean, String crfName, String defaultVersion, Boolean required,
 			Boolean passwordRequired, Boolean hide, Integer sourceDataVerification, String dataEntryQuality,
@@ -224,8 +236,8 @@ public abstract class BaseEventService extends BaseService {
 		eventDefinitionCRFBean.setCrfName(crfName);
 		eventDefinitionCRFBean.setDefaultVersionName(
 				defaultVersion != null ? defaultVersion : eventDefinitionCRFBean.getDefaultVersionName());
-		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO()
-				.findByFullName(eventDefinitionCRFBean.getDefaultVersionName(), eventDefinitionCRFBean.getCrfName());
+		CRFVersionBean crfVersionBean = getCrfVersionBean(eventDefinitionCRFBean.getDefaultVersionName(),
+				eventDefinitionCRFBean.getCrfName());
 		eventDefinitionCRFBean.setDefaultVersionId(crfVersionBean.getId());
 		eventDefinitionCRFBean.setCrfId(crfVersionBean.getCrfId());
 		eventDefinitionCRFBean.setRequiredCRF(required != null ? required : eventDefinitionCRFBean.isRequiredCRF());
@@ -308,7 +320,7 @@ public abstract class BaseEventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
-	protected Response deleteEventDefinitionCRF(int eventId, String crfName) throws Exception {
+	protected Response deleteEventDefinitionCrf(int eventId, String crfName) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
 				.findByPK(eventId);
 		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, getCurrentStudy(),
@@ -318,7 +330,7 @@ public abstract class BaseEventService extends BaseService {
 		return new Response(String.valueOf(HttpServletResponse.SC_OK));
 	}
 
-	protected EventDefinitionCRFBean removeEDC(int eventId, String crfName) throws Exception {
+	protected EventDefinitionCRFBean removeEventDefinitionCrf(int eventId, String crfName) throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, getCurrentStudy(),
 				false);
 		if (eventDefinitionCRFBean.getStatus().isLocked()) {
@@ -329,7 +341,7 @@ public abstract class BaseEventService extends BaseService {
 		return eventDefinitionCRFBean;
 	}
 
-	protected EventDefinitionCRFBean restoreEDC(int eventId, String crfName) throws Exception {
+	protected EventDefinitionCRFBean restoreEventDefinitionCrf(int eventId, String crfName) throws Exception {
 		EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRF(eventId, crfName, getCurrentStudy(),
 				false);
 		if (!eventDefinitionCRFBean.getStatus().isDeleted()) {
@@ -340,7 +352,7 @@ public abstract class BaseEventService extends BaseService {
 		return eventDefinitionCRFBean;
 	}
 
-	protected StudyEventDefinitionBean removeSED(int eventId) throws Exception {
+	protected StudyEventDefinitionBean removeStudyEventDefinition(int eventId) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
 		if (studyEventDefinitionBean.getStatus().isLocked()) {
 			throw new RestException(messageSource, "rest.eventservice.youCannotRemoveLockedSED");
@@ -350,7 +362,7 @@ public abstract class BaseEventService extends BaseService {
 		return studyEventDefinitionBean;
 	}
 
-	protected StudyEventDefinitionBean restoreSED(int eventId) throws Exception {
+	protected StudyEventDefinitionBean restoreStudyEventDefinition(int eventId) throws Exception {
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
 		if (!studyEventDefinitionBean.getStatus().isDeleted()) {
 			throw new RestException(messageSource, "rest.eventservice.sedIsNotInRemovedState");

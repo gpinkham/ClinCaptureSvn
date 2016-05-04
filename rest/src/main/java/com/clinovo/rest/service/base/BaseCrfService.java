@@ -77,38 +77,6 @@ public abstract class BaseCrfService extends BaseService {
 		return crfBean;
 	}
 
-	private CRFBean getCrfBean(int crfId) throws Exception {
-		CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfId);
-		if (crfBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.crfservice.crfWithIdDoesNotExist", new Object[]{crfId},
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (crfBean.getStudyId() != getCurrentStudy().getId()) {
-			throw new RestException(messageSource, "rest.crfservice.crfDoesNotBelongToCurrentScope",
-					new Object[]{crfId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-		List<CRFVersionBean> crfVersionBeanList = getCRFVersionDAO().findAllByCRFId(crfId);
-		if (crfVersionBeanList != null) {
-			crfBean.setCrfVersions(crfVersionBeanList);
-		}
-		return crfBean;
-	}
-
-	private CRFVersionBean getCrfVersionBean(int crfVersionId) throws Exception {
-		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO().findByPK(crfVersionId);
-		if (crfVersionBean.getId() == 0) {
-			throw new RestException(messageSource, "rest.crfservice.crfVersionWithIdDoesNotExist",
-					new Object[]{crfVersionId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-		CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfVersionBean.getCrfId());
-		if (crfBean.getStudyId() != getCurrentStudy().getId()) {
-			throw new RestException(messageSource, "rest.crfservice.crfVersionDoesNotBelongToCurrentScope",
-					new Object[]{crfVersionId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (!crfBean.getStatus().isAvailable()) {
-			throw new RestException(messageSource, "rest.crfservice.cannotPerformOperationBecauseCRFIsNotAvailable");
-		}
-		return crfVersionBean;
-	}
-
 	protected CRFVersionBean importCrf(String jsonData, boolean importCrfVersion) throws Exception {
 		UserAccountBean owner = getCurrentUser();
 		StudyBean currentStudy = getCurrentStudy();
@@ -120,6 +88,38 @@ public abstract class BaseCrfService extends BaseService {
 			crfBuilder.build();
 		}
 		return save(crfBuilder, importCrfVersion);
+	}
+
+	protected CRFBean getCrfBean(int crfId) throws Exception {
+		CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfId);
+		if (crfBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.crfservice.crfWithIdDoesNotExist", new Object[]{crfId},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (crfBean.getStudyId() != getCurrentStudy().getId()) {
+			throw new RestException(messageSource, "rest.crfservice.crfWithIdDoesNotBelongToCurrentScope",
+					new Object[]{crfId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		List<CRFVersionBean> crfVersionBeanList = getCRFVersionDAO().findAllByCRFId(crfId);
+		if (crfVersionBeanList != null) {
+			crfBean.setCrfVersions(crfVersionBeanList);
+		}
+		return crfBean;
+	}
+
+	protected CRFVersionBean getCrfVersionBean(int crfVersionId, boolean checkCrfAvailability) throws Exception {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO().findByPK(crfVersionId);
+		if (crfVersionBean.getId() == 0) {
+			throw new RestException(messageSource, "rest.crfservice.crfVersionWithIdDoesNotExist",
+					new Object[]{crfVersionId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfVersionBean.getCrfId());
+		if (crfBean.getStudyId() != getCurrentStudy().getId()) {
+			throw new RestException(messageSource, "rest.crfservice.crfVersionDoesNotBelongToCurrentScope",
+					new Object[]{crfVersionId}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} else if (checkCrfAvailability && !crfBean.getStatus().isAvailable()) {
+			throw new RestException(messageSource, "rest.crfservice.cannotPerformOperationBecauseCRFIsNotAvailable");
+		}
+		return crfVersionBean;
 	}
 
 	protected List<CRFBean> getAllCrfs() throws Exception {
@@ -147,15 +147,7 @@ public abstract class BaseCrfService extends BaseService {
 		return getCRFVersionDAO().findAllByStudyId(getCurrentStudy().getId());
 	}
 
-	protected CRFBean getCRF(int crfId) throws Exception {
-		return getCrfBean(crfId);
-	}
-
-	protected CRFVersionBean getCRFVersion(int crfVersionId) throws Exception {
-		return getCrfVersionBean(crfVersionId);
-	}
-
-	protected CRFBean removeCRF(int crfId) throws Exception {
+	protected CRFBean removeCrfBean(int crfId) throws Exception {
 		CRFBean crfBean = getCrfBean(crfId);
 		if (crfBean.getStatus().isLocked()) {
 			throw new RestException(messageSource, "rest.crfservice.youCannotRemoveLockedCRF");
@@ -165,7 +157,7 @@ public abstract class BaseCrfService extends BaseService {
 		return crfBean;
 	}
 
-	protected CRFBean restoreCRF(int crfId) throws Exception {
+	protected CRFBean restoreCrfBean(int crfId) throws Exception {
 		CRFBean crfBean = getCrfBean(crfId);
 		if (!crfBean.getStatus().isDeleted()) {
 			throw new RestException(messageSource, "rest.crfservice.crfIsNotInRemovedState");
@@ -175,8 +167,8 @@ public abstract class BaseCrfService extends BaseService {
 		return crfBean;
 	}
 
-	protected CRFVersionBean removeCRFVersion(int crfVersionId) throws Exception {
-		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId);
+	protected CRFVersionBean removeCrfVersionBean(int crfVersionId) throws Exception {
+		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId, true);
 		if (crfVersionBean.getStatus().isLocked()) {
 			throw new RestException(messageSource, "rest.crfservice.youCannotRemoveLockedCRFVersion");
 		} else if (!crfVersionBean.getStatus().isDeleted()) {
@@ -185,8 +177,8 @@ public abstract class BaseCrfService extends BaseService {
 		return crfVersionBean;
 	}
 
-	protected CRFVersionBean restoreCRFVersion(int crfVersionId) throws Exception {
-		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId);
+	protected CRFVersionBean restoreCrfVersionBean(int crfVersionId) throws Exception {
+		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId, true);
 		if (!crfVersionBean.getStatus().isDeleted()) {
 			throw new RestException(messageSource, "rest.crfservice.crfVersionIsNotInRemovedState");
 		} else {
@@ -195,8 +187,8 @@ public abstract class BaseCrfService extends BaseService {
 		return crfVersionBean;
 	}
 
-	protected CRFVersionBean lockCRFVersion(int crfVersionId) throws Exception {
-		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId);
+	protected CRFVersionBean lockCrfVersionBean(int crfVersionId) throws Exception {
+		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId, true);
 		if (crfVersionBean.getStatus().isDeleted()) {
 			throw new RestException(messageSource, "rest.crfservice.youCannotLockRemovedCRFVersion");
 		} else if (!crfVersionBean.getStatus().isLocked()) {
@@ -205,8 +197,8 @@ public abstract class BaseCrfService extends BaseService {
 		return crfVersionBean;
 	}
 
-	protected CRFVersionBean unlockCRFVersion(int crfVersionId) throws Exception {
-		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId);
+	protected CRFVersionBean unlockCrfVersionBean(int crfVersionId) throws Exception {
+		CRFVersionBean crfVersionBean = getCrfVersionBean(crfVersionId, true);
 		if (!crfVersionBean.getStatus().isLocked()) {
 			throw new RestException(messageSource, "rest.crfservice.crfVersionIsNotInLockedState");
 		} else {
