@@ -119,6 +119,7 @@ public class InitUpdateEventDefinitionServlet extends SpringServlet {
 			boolean isItemLevelSDVAllowed = getCurrentStudy().getStudyParameterConfig().getItemLevelSDV().equals("yes");
 			request.getSession().setAttribute(UpdateEventDefinitionServlet.SDV_STATES,
 					SourceDataVerification.getAvailableSDVStates(isItemLevelSDVAllowed));
+			session.setAttribute("numberOfExistingSitesOnStudy", getStudyDAO().findOlnySiteIdsByStudy(getCurrentStudy()).size());
 			session.setAttribute("childEDCConfigurationIsSameAsParent", childEDCConfigurationIsSameAsParent);
 			session.setAttribute("definition", studyEventDefinitionBean);
 			session.setAttribute("childEventDefCRFs", childEventDefCRFs);

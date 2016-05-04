@@ -485,7 +485,7 @@
 			</td>
 			<td>
 				<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium medium_continue"
-					   onClick="return showPropagateChangesDialog(${childEDCConfigurationIsSameAsParent}, this);">
+					   onClick="if (${numberOfExistingSitesOnStudy > 0}) return showPropagateChangesDialog(${childEDCConfigurationIsSameAsParent}, this);">
 			</td>
 			<td>
 				<c:set var="addNewCRFBTNCaption"><fmt:message key="add_a_new_CRF" bundle="${resword}"/></c:set>
