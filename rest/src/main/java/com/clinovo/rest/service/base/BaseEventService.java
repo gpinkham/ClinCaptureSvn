@@ -15,6 +15,8 @@
 package com.clinovo.rest.service.base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +32,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +52,7 @@ import com.clinovo.validator.EventDefinitionValidator;
 /**
  * BaseEventService.
  */
+@SuppressWarnings("unchecked")
 public abstract class BaseEventService extends BaseService {
 
 	@Autowired
@@ -369,6 +374,54 @@ public abstract class BaseEventService extends BaseService {
 		} else {
 			eventDefinitionService.restoreStudyEventDefinition(studyEventDefinitionBean, getCurrentUser());
 		}
+		return studyEventDefinitionBean;
+	}
+
+	protected List<StudyEventDefinitionBean> orderStudyEventDefinitions(Integer[] ids) throws Exception {
+		List<Integer> idList = Arrays.asList(ids);
+		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
+		List<StudyEventDefinitionBean> studyEventDefinitionBeanList = eventDefinitionService
+				.getAllStudyEventDefinitions(getCurrentStudy());
+		if (idList.size() != studyEventDefinitionBeanList.size()) {
+			throw new RestException(messageSource, "rest.eventservice.passAllSEDIds");
+		}
+		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitionBeanList) {
+			if (!idList.contains(studyEventDefinitionBean.getId())) {
+				throw new RestException(messageSource, "rest.eventservice.missedSEDId",
+						new Object[]{studyEventDefinitionBean.getId()}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+			studyEventDefinitionBean.setOrdinal(idList.indexOf(studyEventDefinitionBean.getId()));
+			studyEventDefinitionBean.setUpdater(getCurrentUser());
+			studyEventDefinitionDao.update(studyEventDefinitionBean);
+		}
+		Collections.sort(studyEventDefinitionBeanList,
+				new StudyEventDefinitionBean.StudyEventDefinitionBeanOrdinalComparator());
+		return studyEventDefinitionBeanList;
+	}
+
+	protected StudyEventDefinitionBean orderEventDefinitionCRFs(int eventId, Integer[] ids) throws Exception {
+		List<Integer> idList = Arrays.asList(ids);
+		EventDefinitionCRFDAO eventDefinitionCrfDao = getEventDefinitionCRFDAO();
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
+		eventDefinitionService.fillEventDefinitionCrfs(studyEventDefinitionBean, getCurrentStudy());
+		List<EventDefinitionCRFBean> allParentEventDefinitionCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCrfDao
+				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
+		if (idList.size() != allParentEventDefinitionCRFs.size()) {
+			throw new RestException(messageSource, "rest.eventservice.passAllCRFIds", new Object[]{eventId},
+					HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : studyEventDefinitionBean.getEventDefinitionCrfs()) {
+			if (!idList.contains(eventDefinitionCRFBean.getCrfId())) {
+				throw new RestException(messageSource, "rest.eventservice.missedCRFId",
+						new Object[]{eventDefinitionCRFBean.getCrfId(), eventId},
+						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+			eventDefinitionCRFBean.setOrdinal(idList.indexOf(eventDefinitionCRFBean.getCrfId()));
+			eventDefinitionCRFBean.setUpdater(getCurrentUser());
+			eventDefinitionCrfDao.update(eventDefinitionCRFBean);
+		}
+		Collections.sort(studyEventDefinitionBean.getEventDefinitionCrfs(),
+				new EventDefinitionCRFBean.EventDefinitionCRFBeanOrdinalComparator());
 		return studyEventDefinitionBean;
 	}
 

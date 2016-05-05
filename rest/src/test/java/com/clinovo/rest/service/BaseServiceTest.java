@@ -90,6 +90,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_CRF_JSON_IMPORT_CRF_VERSION = "/crf/json/importCrfVersion";
 	public static final String API_EVENT = "/event";
 	public static final String API_EVENTS = "/events";
+	public static final String API_EVENTS_ORDER = "/events/order";
 	public static final String API_EVENT_DELETE = "/event/delete";
 	public static final String API_EVENT_DELETE_CRF = "/event/deleteCrf";
 	public static final String API_EVENT_REMOVE_CRF = "/event/removeCrf";
@@ -97,6 +98,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_EVENT_REMOVE = "/event/remove";
 	public static final String API_EVENT_RESTORE = "/event/restore";
 	public static final String API_EVENT_EDIT = "/event/edit";
+	public static final String API_EVENT_CRFS_ORDER = "/event/crfs/order";
 	public static final String API_EVENT_ADD_CRF = "/event/addCrf";
 	public static final String API_EVENT_EDIT_STUDY_CRF = "/event/editStudyCrf";
 	public static final String API_EVENT_EDIT_SITE_CRF = "/event/editSiteCrf";

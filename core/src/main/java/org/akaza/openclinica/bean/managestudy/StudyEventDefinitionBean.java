@@ -13,6 +13,7 @@
 package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -401,5 +402,17 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
 	public void setEventDefinitionCrfs(List<EventDefinitionCRFBean> eventDefinitionCrfs) {
 		this.eventDefinitionCrfs = eventDefinitionCrfs;
+	}
+
+	/**
+	 * Comparator by ordinal.
+	 */
+	public static class StudyEventDefinitionBeanOrdinalComparator implements Comparator<StudyEventDefinitionBean> {
+		/**
+		 * {@inheritDoc}
+		 */
+		public int compare(StudyEventDefinitionBean sed1, StudyEventDefinitionBean sed2) {
+			return ((Integer) sed1.getOrdinal()).compareTo(sed2.getOrdinal());
+		}
 	}
 }

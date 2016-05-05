@@ -1,5 +1,13 @@
 package com.clinovo.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Status;
@@ -26,14 +34,6 @@ import com.clinovo.service.StudyEventService;
 import com.clinovo.util.DAOWrapper;
 import com.clinovo.util.SignStateRestorer;
 import com.clinovo.util.SubjectEventStatusUtil;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * EventDefinitionServiceImpl.
@@ -151,9 +151,8 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 				if (eventDefinitionCRFBean.getStatus().isDeleted()) {
 					eventCRFService.removeEventCRFs(studyEventDefinitionBean.getOid(),
 							eventDefinitionCRFBean.getCrf().getOid(), updater);
-				} else
-					if (eventDefinitionCRFBean.getOldStatus() != null
-							&& eventDefinitionCRFBean.getOldStatus().equals(Status.DELETED)) {
+				} else if (eventDefinitionCRFBean.getOldStatus() != null
+						&& eventDefinitionCRFBean.getOldStatus().equals(Status.DELETED)) {
 					eventCRFService.restoreEventCRFs(studyEventDefinitionBean.getOid(),
 							eventDefinitionCRFBean.getCrf().getOid(), updater);
 				}
@@ -219,7 +218,7 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	public StudyEventDefinitionBean fillEventDefinitionCrfs(StudyEventDefinitionBean studyEventDefinitionBean,
 			StudyBean currentStudy) {
 		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
-				.findAllActiveByEventDefinitionId(studyEventDefinitionBean.getId());
+				.findAllByDefinition(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		studyEventDefinitionBean.setEventDefinitionCrfs(eventDefinitionCrfs);
 		return studyEventDefinitionBean;
@@ -231,7 +230,7 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	public List<StudyEventDefinitionBean> getAllStudyEventDefinitions(StudyBean currentStudy) {
 		return getStudyEventDefinitionDAO().findAllByStudy(currentStudy);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -372,9 +371,9 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 */
 	public void dropItemLevelSDVConfig(StudyEventDefinitionBean eventDefBean) {
 
-		List<EventDefinitionCRFBean> eventDefCRFBeans
-				= getEventDefinitionCRFDAO().findAllParentsByEventDefinitionId(eventDefBean.getId());
-		for (EventDefinitionCRFBean eventDefCRF: eventDefCRFBeans) {
+		List<EventDefinitionCRFBean> eventDefCRFBeans = getEventDefinitionCRFDAO()
+				.findAllParentsByEventDefinitionId(eventDefBean.getId());
+		for (EventDefinitionCRFBean eventDefCRF : eventDefCRFBeans) {
 			if (SourceDataVerification.PARTIALREQUIRED.equals(eventDefCRF.getSourceDataVerification())) {
 				eventDefinitionCrfService.dropItemLevelSDVConfig(eventDefCRF);
 			}

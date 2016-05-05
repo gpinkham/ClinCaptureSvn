@@ -241,6 +241,20 @@ public class EventService extends BaseEventService {
 	}
 
 	/**
+	 * Method orders study event definitions.
+	 *
+	 * @param ids
+	 *            list of study event definition ids
+	 * @return List of StudyEventDefinitionBeans
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/events/order", method = RequestMethod.POST)
+	public List<StudyEventDefinitionBean> orderEvents(@RequestParam("id") Integer[] ids) throws Exception {
+		return orderStudyEventDefinitions(ids);
+	}
+
+	/**
 	 * Method adds crf to the study event definition.
 	 *
 	 * @param eventId
@@ -486,5 +500,22 @@ public class EventService extends BaseEventService {
 	public Response deleteCrf(@RequestParam("eventId") int eventId, @RequestParam("crfName") String crfName)
 			throws Exception {
 		return deleteEventDefinitionCrf(eventId, crfName);
+	}
+
+	/**
+	 * Method orders event definition CRFs.
+	 *
+	 * @param eventId
+	 *            int
+	 * @param ids
+	 *            list of crf ids
+	 * @return StudyEventDefinitionBean
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/event/crfs/order", method = RequestMethod.POST)
+	public StudyEventDefinitionBean orderCRFs(@RequestParam("eventId") int eventId, @RequestParam("id") Integer[] ids)
+			throws Exception {
+		return orderEventDefinitionCRFs(eventId, ids);
 	}
 }

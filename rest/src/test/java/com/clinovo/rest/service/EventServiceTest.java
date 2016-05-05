@@ -2,6 +2,8 @@ package com.clinovo.rest.service;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -9,11 +11,13 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+@SuppressWarnings("unchecked")
 public class EventServiceTest extends BaseServiceTest {
 
 	@Test
@@ -2350,5 +2354,194 @@ public class EventServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatGetEventsMethodDoesNotSupportTheHttpPost() throws Exception {
 		mockMvc.perform(post(API_EVENTS)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEventsOrderMethodDoesNotSupportTheHttpGet() throws Exception {
+		mockMvc.perform(get(API_EVENTS_ORDER).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventsIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventsIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventsIfIdParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER).param("iD", "1")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventsIfIdParameterHasWrongData() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER).param("id", "asd")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEventsOrderMethodThrowsExceptionIfWrongQuantityOfIdsArePassed() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEventsOrderMethodThrowsExceptionIfWrongIdIsPassed() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER).param("id", "1").param("id", "2").param("id", "3").param("id", "4")
+				.param("id", "5").param("id", "6").param("id", "7").param("id", "8").param("id", "111167"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEventsOrderMethodWorksFine() throws Exception {
+		mockMvc.perform(post(API_EVENTS_ORDER).param("id", "1").param("id", "2").param("id", "3").param("id", "4")
+				.param("id", "5").param("id", "6").param("id", "7").param("id", "8").param("id", "9"))
+				.andExpect(status().isOk());
+		List<StudyEventDefinitionBean> studyEventDefinitionBeanList = eventDefinitionService
+				.getAllStudyEventDefinitions(defaultStudy);
+		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitionBeanList) {
+			if (studyEventDefinitionBean.getId() == 1) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 0);
+			} else if (studyEventDefinitionBean.getId() == 2) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 1);
+			} else if (studyEventDefinitionBean.getId() == 3) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 2);
+			} else if (studyEventDefinitionBean.getId() == 4) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 3);
+			} else if (studyEventDefinitionBean.getId() == 5) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 4);
+			} else if (studyEventDefinitionBean.getId() == 6) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 5);
+			} else if (studyEventDefinitionBean.getId() == 7) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 6);
+			} else if (studyEventDefinitionBean.getId() == 8) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 7);
+			} else if (studyEventDefinitionBean.getId() == 9) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 8);
+			}
+		}
+		mockMvc.perform(post(API_EVENTS_ORDER).param("id", "7").param("id", "2").param("id", "5").param("id", "4")
+				.param("id", "3").param("id", "9").param("id", "1").param("id", "8").param("id", "6"))
+				.andExpect(status().isOk());
+		studyEventDefinitionBeanList = eventDefinitionService.getAllStudyEventDefinitions(defaultStudy);
+		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitionBeanList) {
+			if (studyEventDefinitionBean.getId() == 7) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 0);
+			} else if (studyEventDefinitionBean.getId() == 2) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 1);
+			} else if (studyEventDefinitionBean.getId() == 5) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 2);
+			} else if (studyEventDefinitionBean.getId() == 4) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 3);
+			} else if (studyEventDefinitionBean.getId() == 3) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 4);
+			} else if (studyEventDefinitionBean.getId() == 9) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 5);
+			} else if (studyEventDefinitionBean.getId() == 1) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 6);
+			} else if (studyEventDefinitionBean.getId() == 8) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 7);
+			} else if (studyEventDefinitionBean.getId() == 6) {
+				assertEquals(studyEventDefinitionBean.getOrdinal(), 8);
+			}
+		}
+	}
+
+	@Test
+	public void testThatEventCrfsOrderMethodDoesNotSupportTheHttpGet() throws Exception {
+		mockMvc.perform(get(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", "1"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "1")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", ""))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfIdParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("iD", "1"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfIdParameterHasWrongData() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", "asd"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfEventIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("id", "1")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfEventIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "").param("id", "1"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfEventIdParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("evEntId", "1").param("id", "1"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToOrderEventCrfsIfEventIdParameterHasWrongData() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "dsfsdf").param("id", "1"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatEventCrfsOrderMethodThrowsExceptionIfWrongQuantityOfIdsArePassed() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", "1"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEventCrfsOrderMethodThrowsExceptionIfWrongIdIsPassed() throws Exception {
+		mockMvc.perform(post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", "2").param("id", "111167"))
+				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatEventCrfsOrderMethodWorksFine() throws Exception {
+		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+		mockMvc.perform(
+				post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", "6").param("id", "1").param("id", "2"))
+				.andExpect(status().isOk());
+		List<EventDefinitionCRFBean> allParentEventDefinitionCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
+				.findAllParentsByDefinition(1);
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : allParentEventDefinitionCRFs) {
+			if (eventDefinitionCRFBean.getCrfId() == 6) {
+				assertEquals(eventDefinitionCRFBean.getOrdinal(), 0);
+			} else if (eventDefinitionCRFBean.getCrfId() == 1) {
+				assertEquals(eventDefinitionCRFBean.getOrdinal(), 1);
+			} else if (eventDefinitionCRFBean.getCrfId() == 2) {
+				assertEquals(eventDefinitionCRFBean.getOrdinal(), 2);
+			}
+		}
+		mockMvc.perform(
+				post(API_EVENT_CRFS_ORDER).param("eventId", "1").param("id", "2").param("id", "6").param("id", "1"))
+				.andExpect(status().isOk());
+		allParentEventDefinitionCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
+				.findAllParentsByDefinition(1);
+		for (EventDefinitionCRFBean eventDefinitionCRFBean : allParentEventDefinitionCRFs) {
+			if (eventDefinitionCRFBean.getCrfId() == 2) {
+				assertEquals(eventDefinitionCRFBean.getOrdinal(), 0);
+			} else if (eventDefinitionCRFBean.getCrfId() == 6) {
+				assertEquals(eventDefinitionCRFBean.getOrdinal(), 1);
+			} else if (eventDefinitionCRFBean.getCrfId() == 1) {
+				assertEquals(eventDefinitionCRFBean.getOrdinal(), 2);
+			}
+		}
 	}
 }

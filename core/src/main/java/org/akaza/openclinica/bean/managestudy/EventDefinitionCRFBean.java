@@ -21,6 +21,7 @@
 package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -29,11 +30,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -343,7 +344,9 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	/**
 	 * Compare two EventDefinitionCRFBeans parameters.
-	 * @param other EventDefinitionCRFBean
+	 * 
+	 * @param other
+	 *            EventDefinitionCRFBean
 	 * @return compare result.
 	 */
 	public boolean configurationEquals(EventDefinitionCRFBean other) {
@@ -355,10 +358,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 				&& this.getStudyEventDefinitionId() == other.getStudyEventDefinitionId()
 				&& this.getSourceDataVerification().getCode().equals(other.getSourceDataVerification().getCode())
 				&& this.isAcceptNewCrfVersions() == other.isAcceptNewCrfVersions()
-				&& this.isDoubleEntry() == other.isDoubleEntry()
-				&& this.isEvaluatedCRF() == other.isEvaluatedCRF()
-				&& this.getEmailStep().equals(other.getEmailStep())
-				&& this.getEmailTo().equals(other.getEmailTo())
+				&& this.isDoubleEntry() == other.isDoubleEntry() && this.isEvaluatedCRF() == other.isEvaluatedCRF()
+				&& this.getEmailStep().equals(other.getEmailStep()) && this.getEmailTo().equals(other.getEmailTo())
 				&& this.getTabbingMode().equals(other.getTabbingMode());
 	}
 
@@ -714,5 +715,27 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		this.selectedVersionIdList = instance.getSelectedVersionIdList();
 		this.propagateChange = instance.getPropagateChange();
 		this.id = instance.getId();
+	}
+
+	/**
+	 * Comparator by ordinal.
+	 */
+	public static class EventDefinitionCRFBeanOrdinalComparator implements Comparator<EventDefinitionCRFBean> {
+		/**
+		 * {@inheritDoc}
+		 */
+		public int compare(EventDefinitionCRFBean edc1, EventDefinitionCRFBean edc2) {
+			int result = ((Integer) edc1.getOrdinal()).compareTo(edc2.getOrdinal());
+			if (result == 0) {
+				if (edc1.getParentId() == 0) {
+					result = -1;
+				} else if (edc2.getParentId() == 0) {
+					result = 1;
+				} else {
+					result = ((Integer) edc1.getId()).compareTo(edc2.getId());
+				}
+			}
+			return result;
+		}
 	}
 }
