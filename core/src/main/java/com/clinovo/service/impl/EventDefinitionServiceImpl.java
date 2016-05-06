@@ -217,7 +217,7 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 */
 	public StudyEventDefinitionBean fillEventDefinitionCrfs(StudyEventDefinitionBean studyEventDefinitionBean,
 			StudyBean currentStudy) {
-		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+		List<EventDefinitionCRFBean> eventDefinitionCrfs = getEventDefinitionCRFDAO()
 				.findAllByDefinition(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		studyEventDefinitionBean.setEventDefinitionCrfs(eventDefinitionCrfs);
@@ -272,7 +272,7 @@ public class EventDefinitionServiceImpl implements EventDefinitionService {
 	 */
 	public List<EventDefinitionCRFBean> getAllParentsEventDefinitionCrfs(
 			StudyEventDefinitionBean studyEventDefinitionBean) {
-		List<EventDefinitionCRFBean> eventDefinitionCrfs = (List<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+		List<EventDefinitionCRFBean> eventDefinitionCrfs = getEventDefinitionCRFDAO()
 				.findAllParentsByDefinition(studyEventDefinitionBean.getId());
 		fillEventDefinitionCrfs(studyEventDefinitionBean, eventDefinitionCrfs);
 		return eventDefinitionCrfs;

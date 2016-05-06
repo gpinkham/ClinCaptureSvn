@@ -117,7 +117,6 @@ public class UpdateEventDefinitionServlet extends SpringServlet {
 				forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 			}
 		}
-
 	}
 
 	private void confirmDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {

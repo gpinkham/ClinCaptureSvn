@@ -84,8 +84,7 @@ public final class EventDefinitionCRFUtil {
 	 * @param crfs List of EventDefinitionCRFBeans
 	 * @return List of EventDefinitionCRFBeans
 	 */
-	public static List<EventDefinitionCRFBean> mergeEventDefinitions(HttpSession session,
-																 List<EventDefinitionCRFBean> crfs) {
+	public static List<EventDefinitionCRFBean> mergeEventDefinitions(HttpSession session, List<EventDefinitionCRFBean> crfs) {
 		if (getAddedEventDefinitionCRFs(session).size() > 0) {
 			List<EventDefinitionCRFBean> addedCrfs = getAddedEventDefinitionCRFs(session);
 			for (EventDefinitionCRFBean crf : addedCrfs) {
@@ -104,8 +103,8 @@ public final class EventDefinitionCRFUtil {
 	 * @param crf EventDefinitionCRFBean
 	 * @return ArrayList ofEventDefinitionCRFBeans
 	 */
-	public static ArrayList<EventDefinitionCRFBean> removeEventDefinitionCRFFromListOfAdded(HttpSession session,
-																		   EventDefinitionCRFBean crf) {
+	public static ArrayList<EventDefinitionCRFBean> removeEventDefinitionCRFFromListOfAdded(HttpSession session, 
+			EventDefinitionCRFBean crf) {
 		ArrayList<EventDefinitionCRFBean> crfs = getAddedEventDefinitionCRFs(session);
 		if (existsInList(crfs, crf)) {
 			crfs.remove(crf);

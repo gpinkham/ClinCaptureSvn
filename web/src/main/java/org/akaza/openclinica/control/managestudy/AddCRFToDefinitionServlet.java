@@ -228,9 +228,9 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		} else {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-			ArrayList eventDefinitionCRFs = (ArrayList) session.getAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
+			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) session.getAttribute(EventDefinitionCRFUtil.EVENT_DEFINITION_CRFS_LABEL);
 			ArrayList<EventDefinitionCRFBean> addedEventDefinitions = EventDefinitionCRFUtil.getAddedEventDefinitionCRFs(session);
-			int ordinalForNewCRF = eventDefinitionCRFs.size();
+			int ordinalForNewCRF = getTheLastOrdinal(eventDefinitionCRFs);
 			for (Object aCrfArray : crfArray) {
 				CRFBean crf = (CRFBean) aCrfArray;
 				EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
@@ -254,6 +254,14 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 			addPageMessage(getResPage().getString("has_have_been_added_need_confirmation"), request);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
+	}
+
+	private int getTheLastOrdinal(ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs) {
+		int result = 0;
+		for (EventDefinitionCRFBean edcrf : eventDefinitionCRFs) {
+			result = result < edcrf.getOrdinal()? edcrf.getOrdinal() : result;
+		}
+		return result;
 	}
 
 	private EntityBeanTable createTable(HttpServletRequest request, ArrayList crfs) throws Exception {
