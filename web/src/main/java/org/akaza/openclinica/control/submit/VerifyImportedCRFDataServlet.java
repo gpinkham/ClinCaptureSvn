@@ -142,7 +142,7 @@ public class VerifyImportedCRFDataServlet extends SpringServlet {
 			addPageMessage(getResPage().getString("data_has_been_successfully_import"), request);
 			System.out.println("Data is committed");
 
-			addPageMessage(summary.prepareSummaryMessage(currentStudy, getResWord()), request);
+			addPageMessage(summary.prepareSummaryMessage(getResWord()), request);
 
 			importCrfDataService.saveAuditItems(auditItemList);
 

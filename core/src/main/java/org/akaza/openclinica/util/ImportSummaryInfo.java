@@ -49,33 +49,20 @@ public class ImportSummaryInfo {
 		}
 	}
 
-    public String prepareSummaryMessage(StudyBean currentStudy, ResourceBundle resword) {
+    public String prepareSummaryMessage(ResourceBundle resword) {
+
         String msg = "";
-        if (currentStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport().equals("no")) {
-            MessageFormat mf = new MessageFormat("");
-            mf.applyPattern(resword.getString("import_summary_subjects_out_of_affected"));
-            msg += mf.format(new Object[]{ affectedStudySubjectIds.size(), totalStudySubjectIds.size() }) + "<br/>";
+        MessageFormat mf = new MessageFormat("");
+        mf.applyPattern(resword.getString("import_summary_subjects_out_of_affected"));
+        msg += mf.format(new Object[] { affectedStudySubjectIds.size(), totalStudySubjectIds.size() }) + "<br/>";
 
-            mf = new MessageFormat("");
-            mf.applyPattern(resword.getString("import_summary_events_out_of_affected"));
-            msg += mf.format(new Object[]{ affectedStudyEventIds.size(), totalStudyEventIds.size() }) + "<br/>";
+        mf = new MessageFormat("");
+        mf.applyPattern(resword.getString("import_summary_events_out_of_affected"));
+        msg += mf.format(new Object[] { affectedStudyEventIds.size(), totalStudyEventIds.size() }) + "<br/>";
 
-            mf = new MessageFormat("");
-            mf.applyPattern(resword.getString("import_summary_item_out_of_affected"));
-            msg += mf.format(new Object[]{ affectedItemIds.size(), totalItemIds.size() });
-        } else {
-            MessageFormat mf = new MessageFormat("");
-            mf.applyPattern(resword.getString("import_summary_subjects_affected"));
-            msg += mf.format(new Object[]{ totalStudySubjectIds.size() }) + "<br/>";
-
-            mf = new MessageFormat("");
-            mf.applyPattern(resword.getString("import_summary_events_affected"));
-            msg += mf.format(new Object[]{ totalStudyEventIds.size() }) + "<br/>";
-
-            mf = new MessageFormat("");
-            mf.applyPattern(resword.getString("import_summary_item_affected"));
-            msg += mf.format(new Object[]{ totalItemIds.size() });
-        }
+        mf = new MessageFormat("");
+        mf.applyPattern(resword.getString("import_summary_item_out_of_affected"));
+        msg += mf.format(new Object[] { affectedItemIds.size(), totalItemIds.size() });
         return msg;
     }
 }

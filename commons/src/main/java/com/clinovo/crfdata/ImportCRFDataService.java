@@ -110,6 +110,10 @@ import com.clinovo.util.ValidatorHelper;
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class ImportCRFDataService {
 
+	public static final String IMPORT_HAS_DATA_FOR_UNAVAILABLE_VERSIONS = "importHasDataForUnavailableCRFVersions";
+	public static final String IMPORT_HAS_DATA_TO_REPLACE_EXISTING = "importHasDataToReplaceExisting";
+	public static final String IMPORT_HAS_DATA_TO_SKIP = "hasSkippedItems";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImportCRFDataService.class);
 
 	public static final int INT_52 = 52;
@@ -278,6 +282,7 @@ public class ImportCRFDataService {
 	 * @return List<EventCRFBean>
 	 */
 	public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
+
 		ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
 		ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
 		EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
@@ -327,28 +332,24 @@ public class ImportCRFDataService {
 				for (FormDataBean formDataBean : formDataBeans) {
 
 					CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-
 					ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
+
 					for (CRFVersionBean crfVersionBean : crfVersionBeans) {
+
 						CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersionBean.getCrfId()));
 						ArrayList<EventCRFBean> eventCrfBeans = new EventCRFDAO(ds)
 								.findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBean, crfBean.getOid());
-						// what if we have begun with creating a study
-						// event, but haven't entered data yet? this would
-						// have us with a study event, but no corresponding
-						// event crf, yet.
+
 						if (eventCrfBeans.isEmpty()) {
-							LOGGER.debug("   found no event crfs from Study Event id " + studyEventBean.getId()
-									+ ", location " + studyEventBean.getLocation());
-							// spell out criteria and create a bean if
-							// necessary, avoiding false-positives
-							if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)
-									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-									|| studyEventBean.getSubjectEventStatus()
-											.equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-									|| studyEventBean.getSubjectEventStatus()
-											.equals(SubjectEventStatus.SOURCE_DATA_VERIFIED)
-									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
+
+							SubjectEventStatus studyEventStatus = studyEventBean.getSubjectEventStatus();
+							boolean studyEventIsAvailable = studyEventStatus.isNotScheduled()
+									|| studyEventStatus.isScheduled()
+									|| studyEventStatus.isDE_Started()
+									|| studyEventStatus.isSourceDataVerified()
+									|| studyEventStatus.isCompleted();
+
+							if (crfVersionBean.getStatus().isAvailable() && studyEventIsAvailable) {
 								EventCRFBean newEventCrfBean = new EventCRFBean();
 								newEventCrfBean.setStudyEventId(studyEventBean.getId());
 								newEventCrfBean.setStudySubjectId(studySubjectBean.getId());
@@ -356,15 +357,11 @@ public class ImportCRFDataService {
 								newEventCrfBean.setDateInterviewed(new Date());
 								newEventCrfBean.setOwner(ub);
 								newEventCrfBean.setInterviewerName(ub.getName());
-								newEventCrfBean.setCompletionStatusId(1); // place
-								// filler
+								newEventCrfBean.setCompletionStatusId(1);
 								newEventCrfBean.setStatus(Status.AVAILABLE);
 								newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
-								// these will be updated later in the
-								// workflow
 								newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
 								eventCrfBeans.add(newEventCrfBean);
-								LOGGER.debug("   created and added new event crf");
 							}
 						}
 
@@ -380,8 +377,6 @@ public class ImportCRFDataService {
 				}
 			}
 		}
-		// if it's null, throw an error, since they should be existing beans for
-		// iteration one
 		return eventCRFBeans;
 	}
 
@@ -392,27 +387,46 @@ public class ImportCRFDataService {
 	 *            ODMContainer
 	 * @param wrappers
 	 *            List<DisplayItemBeanWrapper>
+	 * @param validatorHelper
+	 *            ValidatorHelper
 	 * @return SummaryStatsBean
 	 */
-	public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
+	public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers,
+			ValidatorHelper validatorHelper) {
+
 		int discNotesGenerated = 0;
 		for (DisplayItemBeanWrapper wr : wrappers) {
 			HashMap validations = wr.getValidationErrors();
 			discNotesGenerated += validations.size();
 		}
+
+		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 		Set<String> setOfSubjectOids = new HashSet<String>();
 		Set<String> setOfStudyEventOids = new HashSet<String>();
+		Set<String> unavailableCRFVersionOIDs = new HashSet<String>();
 		for (SubjectDataBean subjectDataBean : odmContainer.getCrfDataPostImportContainer().getSubjectData()) {
 			setOfSubjectOids.add(subjectDataBean.getSubjectOID());
 			for (StudyEventDataBean studyEventDataBean : subjectDataBean.getStudyEventData()) {
 				setOfStudyEventOids.add(studyEventDataBean.getStudyEventOID());
+				for (FormDataBean formDataBean: studyEventDataBean.getFormData()) {
+					CRFVersionBean crfVersionBean = crfVersionDAO.findByOid(formDataBean.getFormOID());
+					if (!crfVersionBean.getStatus().isAvailable()) {
+						unavailableCRFVersionOIDs.add(crfVersionBean.getOid());
+					}
+				}
 			}
+		}
+
+		if (unavailableCRFVersionOIDs.size() > 0) {
+			validatorHelper.setAttribute(IMPORT_HAS_DATA_TO_SKIP, true);
+			validatorHelper.setAttribute(IMPORT_HAS_DATA_FOR_UNAVAILABLE_VERSIONS, true);
 		}
 
 		SummaryStatsBean ssBean = new SummaryStatsBean();
 		ssBean.setDiscNoteCount(discNotesGenerated);
 		ssBean.setEventCrfCount(setOfStudyEventOids.size());
 		ssBean.setStudySubjectCount(setOfSubjectOids.size());
+		ssBean.setUnavailableCRFVersionOIDs(unavailableCRFVersionOIDs);
 		return ssBean;
 	}
 
@@ -568,7 +582,7 @@ public class ImportCRFDataService {
 							eventCRFBean = (EventCRFBean) eventCRFDAO.update(eventCRFBean);
 						}
 					}
-					if (eventCRFBean == null) {
+					if (eventCRFBean == null && crfVersion.getStatus().isAvailable()) {
 						eventCRFBean = createEventCRFBean(ub, crfVersion.getId(), studySubjectBean, studyEvent,
 								eventCRFDAO);
 						permittedEventCRFIds.add(eventCRFBean.getId());
@@ -586,7 +600,7 @@ public class ImportCRFDataService {
 							itemDAO.findAllItemsByVersionId(crfVersion.getId()),
 							itemGroupDAO.findGroupByCrfVersionId(crfVersion.getId()),
 							itemGroupMetadataDAO.findByCrfVersion(crfVersion.getId()));
-					if (permittedEventCRFIds.contains(eventCRFBean.getId())) {
+					if (eventCRFBean != null && permittedEventCRFIds.contains(eventCRFBean.getId())) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
 
 							ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
@@ -695,25 +709,33 @@ public class ImportCRFDataService {
 							// possibly create the import summary here
 
 					// check if we need to overwrite
-					DataEntryStage dataEntryStage = eventCRFBean.getStage();
 					boolean overwrite = false;
-					if (dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
-							|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-							|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-							|| dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-						overwrite = true;
+					if (eventCRFBean != null) {
+						DataEntryStage dataEntryStage = eventCRFBean.getStage();
+						if (dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
+								|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
+								|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
+								|| dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+							overwrite = true;
+						}
 					}
+
 					displayItemBeanWrapper = new DisplayItemBeanWrapper(displayItemBeans, true, overwrite,
 							validationErrors, studyEventId, crfVersionId, studyEventDataBean.getStudyEventOID(),
-							studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
+							studySubjectBean.getLabel(), studyEvent.getCreatedDate(), crfBean.getName(),
 							crfVersion.getName(), studySubjectBean.getOid(),
 							studyEventDataBean.getStudyEventRepeatKey());
-					Set<Integer> sectionIds = partialSectionIdMap.get(eventCRFBean.getId());
-					if (sectionIds == null) {
-						sectionIds = new HashSet<Integer>();
-						partialSectionIdMap.put(eventCRFBean.getId(), sectionIds);
+
+					if (eventCRFBean != null) {
+						Set<Integer> sectionIds;
+						sectionIds = partialSectionIdMap.get(eventCRFBean.getId());
+						if (sectionIds == null) {
+							sectionIds = new HashSet<Integer>();
+							partialSectionIdMap.put(eventCRFBean.getId(), sectionIds);
+						}
+						sectionIds.addAll(formDataBean.getPartialSectionIds());
 					}
-					sectionIds.addAll(formDataBean.getPartialSectionIds());
+
 					displayItemBeanWrapper.setPartialSectionIdMap(partialSectionIdMap);
 					displayItemBeanWrapper.getValidationErrors().putAll(prevValidationErrors);
 					prevValidationErrors = displayItemBeanWrapper.getValidationErrors();
@@ -739,8 +761,9 @@ public class ImportCRFDataService {
 					displayItemBean.getData().getOrdinal());
 			if (existingItemDataBean != null && existingItemDataBean.getId() > 0) {
 				displayItemBean.setSkip(true);
-				validatorHelper.setAttribute("hasSkippedItems", true);
 				itemBean.getImportItemDataBean().setSkip(true);
+				validatorHelper.setAttribute(IMPORT_HAS_DATA_TO_SKIP, true);
+				validatorHelper.setAttribute(IMPORT_HAS_DATA_TO_REPLACE_EXISTING, true);
 			}
 		}
 	}

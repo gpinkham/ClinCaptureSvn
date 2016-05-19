@@ -119,7 +119,8 @@ public class TriggerService {
 		return trigger;
 	}
 
-	public String generateSummaryStatsMessage(SummaryStatsBean ssBean, ResourceBundle respage) {
+	public String generateSummaryStatsMessage(SummaryStatsBean ssBean, ResourceBundle respage, ResourceBundle reword) {
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
 		sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>" + respage.getString("summary_statistics")
@@ -131,12 +132,24 @@ public class TriggerService {
 		sb.append("<tr valign=\'top\'><td class=\'table_cell_left\'>" + respage.getString("validation_rules_generated")
 				+ ": " + ssBean.getDiscNoteCount() + "</td> </tr> </table>");
 
+		if (ssBean.getUnavailableCRFVersionOIDs().size() > 0) {
+			sb.append("<br/>");
+			sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
+			sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>"
+					+ reword.getString("import_contains_unavailable_crf_versions") + "</td> </tr>");
+			sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>"
+					+ reword.getString("unavailable_crf_version_oids") + ":</td> </tr>");
+			for (String crfVersionOID: ssBean.getUnavailableCRFVersionOIDs()) {
+				sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>" + crfVersionOID + "</td> </tr>");
+			}
+			sb.append("</table>");
+		}
 		return sb.toString();
 	}
 
 	public String generateHardValidationErrorMessage(ArrayList<SubjectDataBean> subjectData,
 			HashMap<String, String> hardValidationErrors, boolean isValid, boolean hasSkippedItems,
-			ResourceBundle respage) {
+			ResourceBundle respage, ResourceBundle resword, SummaryStatsBean summaryStats) {
 		StringBuffer sb = new StringBuffer();
 		String studyEventRepeatKey = "1";
 		String groupRepeatKey = "1";
@@ -203,13 +216,6 @@ public class TriggerService {
 									sb.append(itemDataBean.getValue() + "<br/>");
 									sb.append(hardValidationErrors.get(oidKey));
 									sb.append("</td></tr>");
-									/*
-									 * <tr valign="top"> <td class="table_cell_left"></td> <td class="table_cell"></td>
-									 * <td class="table_cell"><font color="red"><c:out
-									 * value="${itemData.itemOID}"/></font></td> <td class="table_cell"> <c:out
-									 * value="${itemData.value}"/><br/> <c:out value="${hardValidationErrors[oidKey]}"/>
-									 * </td> </tr>
-									 */
 								}
 							} else {
 								if (!hardValidationErrors.containsKey(oidKey)) {
@@ -220,9 +226,15 @@ public class TriggerService {
 									sb.append(itemDataBean.getValue());
 									sb.append("</td>");
 									if (hasSkippedItems) {
-										sb.append("<td class='table_cell'>"
-												+ (itemDataBean.isSkip() ? respage.getString("was_skipped") : "")
-												+ "</td>");
+										String skipMsg = "";
+										if (itemDataBean.isSkip()) {
+											skipMsg = respage.getString("was_skipped");
+										}
+										if (summaryStats.getUnavailableCRFVersionOIDs().contains(formDataBean.getFormOID())) {
+											skipMsg = respage.getString("was_skipped").concat("<br/>")
+													.concat(resword.getString("crf_version_was_unavailable"));
+										}
+										sb.append("<td class='table_cell'>" + skipMsg + "</td>");
 									}
 									sb.append("</tr>");
 								}
@@ -237,25 +249,20 @@ public class TriggerService {
 	}
 
 	public String generateValidMessage(ArrayList<SubjectDataBean> subjectData,
-			HashMap<String, String> totalValidationErrors, boolean hasSkippedItems, ResourceBundle respage) {
-		return generateHardValidationErrorMessage(subjectData, totalValidationErrors, true, hasSkippedItems, respage);
+			HashMap<String, String> totalValidationErrors, boolean hasSkippedItems, ResourceBundle respage,
+			ResourceBundle resword, SummaryStatsBean summaryStats) {
+		return generateHardValidationErrorMessage(subjectData, totalValidationErrors, true, hasSkippedItems, respage,
+				resword, summaryStats);
 	}
 
 	public HashMap validateImportJobForm(FormProcessor fp, ValidatorHelper validatorHelper,
 			Set<TriggerKey> triggerKeys, String properName) {
 		Validator v = new Validator(validatorHelper);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
-		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
 		if (!"".equals(fp.getString(EMAIL))) {
 			v.addValidation(EMAIL, Validator.IS_A_EMAIL);
 		}
-		// << tbh we are now allowing email to be optional
-		// v.addValidation(PERIOD, Validator.NO_BLANKS);
-		// v.addValidation(DIRECTORY, Validator.NO_BLANKS);
-		// v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-
-		// TODO job names will have to be unique, tbh
 
 		String hours = fp.getString("hours");
 		String minutes = fp.getString("minutes");

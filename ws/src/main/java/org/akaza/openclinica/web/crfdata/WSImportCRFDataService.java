@@ -81,9 +81,9 @@ import javax.sql.DataSource;
  * Import CRF Data Service.
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class ImportCRFDataService {
+public class WSImportCRFDataService {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(ImportCRFDataService.class.getName());
+	public static final Logger LOGGER = LoggerFactory.getLogger(WSImportCRFDataService.class.getName());
 
 	private final DataSource ds;
 
@@ -95,7 +95,7 @@ public class ImportCRFDataService {
 	 * @param ds DataSource
 	 * @param locale Locale
 	 */
-	public ImportCRFDataService(DataSource ds, Locale locale) {
+	public WSImportCRFDataService(DataSource ds, Locale locale) {
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		this.ds = ds;

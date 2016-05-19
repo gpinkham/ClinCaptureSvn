@@ -216,22 +216,18 @@ public class ImportCRFDataServlet extends SpringServlet {
 			List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 			HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
 			HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
+			ValidatorHelper validatorHelper = new ValidatorHelper(request, getConfigurationDao());
 
 			if (eventCRFBeans == null) {
 				fail = true;
 				addPageMessage(getResPage().getString("no_event_status_matching"), request);
 			} else {
 				ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-				logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
-
-				logger.debug("found event crfs " + eventCRFBeans.size());
 				if (!eventCRFBeans.isEmpty()) {
 					for (EventCRFBean eventCRFBean : eventCRFBeans) {
+
 						DataEntryStage dataEntryStage = eventCRFBean.getStage();
 						Status eventCRFStatus = eventCRFBean.getStatus();
-
-						logger.info("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage "
-								+ dataEntryStage.getName() + ", status " + eventCRFStatus.getName());
 						if (eventCRFStatus.equals(Status.AVAILABLE)
 								|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
 								|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
@@ -241,8 +237,6 @@ public class ImportCRFDataServlet extends SpringServlet {
 						}
 					}
 
-					// so that we don't repeat this following message
-					// did we exclude all the event CRFs? if not, pass, else fail
 					if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
 						addPageMessage(getResPage().getString("passed_event_crf_status_check"), request);
 					} else {
@@ -252,12 +246,8 @@ public class ImportCRFDataServlet extends SpringServlet {
 
 					try {
 						List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers;
-						tempDisplayItemBeanWrappers = importCRFDataService.lookupValidationErrors(
-								new ValidatorHelper(request, getConfigurationDao()), odmContainer, ub,
-								totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
-						logger.info("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
-						logger.info("size of total validation errors: " + totalValidationErrors.size());
-						logger.info("size of hard validation errors: " + hardValidationErrors.size());
+						tempDisplayItemBeanWrappers = importCRFDataService.lookupValidationErrors(validatorHelper,
+								odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
 						displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
 					} catch (NullPointerException npe1) {
 						// what if you have 2 event crfs but the third is a fake?
@@ -287,17 +277,24 @@ public class ImportCRFDataServlet extends SpringServlet {
 
 				logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
 				SummaryStatsBean ssBean = importCRFDataService.generateSummaryStatsBean(odmContainer,
-						displayItemBeanWrappers);
+						displayItemBeanWrappers, validatorHelper);
 				request.getSession().setAttribute("summaryStats", ssBean);
 				request.getSession().setAttribute("subjectData",
 						odmContainer.getCrfDataPostImportContainer().getSubjectData());
-				if (request.getAttribute("hasSkippedItems") != null) {
-					addPageMessage(getResWord().getString("import_msg_part1") + " "
-							+ (currentStudy.getParentStudyId() > 0
-									? getResWord().getString("site")
-									: getResWord().getString("study"))
-							+ " " + getResWord().getString("import_msg_part2"), request);
+
+				if (request.getAttribute(ImportCRFDataService.IMPORT_HAS_DATA_TO_SKIP) != null) {
+					if (request.getAttribute(ImportCRFDataService.IMPORT_HAS_DATA_TO_REPLACE_EXISTING) != null) {
+						addPageMessage(getResWord().getString("import_msg_part1") + " "
+								+ (currentStudy.getParentStudyId() > 0
+								? getResWord().getString("site")
+								: getResWord().getString("study"))
+								+ " " + getResWord().getString("import_msg_part2"), request);
+					}
+					if (request.getAttribute(ImportCRFDataService.IMPORT_HAS_DATA_FOR_UNAVAILABLE_VERSIONS) != null) {
+						addPageMessage(getResWord().getString("import_contains_unavailable_crf_versions"), request);
+					}
 				}
+
 				forwardPage(Page.VERIFY_IMPORT_SERVLET, request, response);
 			}
 		}
@@ -317,7 +314,6 @@ public class ImportCRFDataServlet extends SpringServlet {
 				Validator.addError(errorsMap, "xml_file", "You have to provide an XML file!");
 			} else if (!f.getName().contains(".xml") && !f.getName().contains(".XML")) {
 				logger.info("file name:" + f.getName());
-				// TODO change the message below
 				addPageMessage(getResPage().getString("file_you_uploaded_not_seem_xml_file"), request);
 				f = null;
 			}

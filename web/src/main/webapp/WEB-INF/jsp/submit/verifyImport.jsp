@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -73,14 +74,8 @@
 
 <p><fmt:message key="import_instructions" bundle="${restext}"/></p>
 
-<!--  summary stats here, tbh -->
-
 <div style="width: 300px">
-
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-<div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-
+<table class="table_shadow_bottom table_horizontal" width="100%">
 	<tr valign="top">
 		<td class="table_header_row"><fmt:message key="summary_statistics" bundle="${resword}"/>:</td>
 	</tr>
@@ -93,12 +88,29 @@
 	<tr valign="top">
     	<td class="table_cell_left"><fmt:message key="validation_rules_generated" bundle="${resword}"/>: <c:out value="${summaryStats.discNoteCount}" /></td>
 	</tr>
-
 </table>
 </div>
-</div></div></div></div></div></div></div></div>
-</div>
 <br/>
+
+<c:if test="${fn:length(summaryStats.unavailableCRFVersionOIDs) > 0}">
+	<div style="width: 300px">
+		<table class="table_shadow_bottom table_horizontal" width="100%">
+			<tr valign="top">
+				<td class="table_cell_left">
+					<fmt:message key="unavailable_crf_version_oids" bundle="${resword}"/>:
+				</td>
+			</tr>
+			<c:forEach items="${summaryStats.unavailableCRFVersionOIDs}" var="crfVersionOID">
+				<tr valign="top">
+					<td class="table_cell_left">
+						<c:out value="${crfVersionOID}"/>
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
+	</div>
+	<br/>
+</c:if>
 
 <%-- hard validation errors here --%>
 <%-- if we have hard validation errors here, we stop and don't generate the other two tables --%>
@@ -106,10 +118,7 @@
 	<c:when test="${not empty hardValidationErrors}">
 	<fmt:message key="hard_validation_error_checks" bundle="${resword}"/>
 	<div style="width: 100%">
-
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
-	<table border="0" cellpadding="0" cellspacing="0" width="90%">
+	<table class="table_shadow_bottom" border="0" cellpadding="0" cellspacing="0" width="90%">
 
 		<c:forEach var="subjectDataBean" items="${subjectData}" >
 			<tr valign="top">
@@ -187,19 +196,13 @@
 		</c:forEach>
 	</table>
 	</div>
-	</div></div></div></div></div></div></div></div>
-	</div>
 	<br/>
 	<%-- place form here, so that user can go back --%>
 	<form action="ImportCRFData?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
 
 	<p><fmt:message key="import_instructions" bundle="${restext}"/></p>
 	<div style="width: 400px">
-
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
-	<table border="0" cellpadding="0" cellspacing="0">
-
+	<table class="table_shadow_bottom" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterm}"/>:</td>
 		<td>
@@ -207,11 +210,8 @@
 			<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
 		</td>
 	</tr>
-	<input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-
 	</table>
-	</div>
-	</div></div></div></div></div></div></div></div>
+		<input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
 	</div>
 
 	<br clear="all">
@@ -232,17 +232,7 @@
 			<fmt:message key="validation_error_generated" bundle="${resword}" />
 
 			<div style="width: 100%">
-
-			<div class="box_T">
-			<div class="box_L">
-			<div class="box_R">
-			<div class="box_B">
-			<div class="box_TL">
-			<div class="box_TR">
-			<div class="box_BL">
-			<div class="box_BR">
-			<div class="textbox_center">
-			<table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<table class="table_shadow_bottom" border="0" cellpadding="0" cellspacing="0" width="100%">
 
 				<c:forEach var="subjectDataBean" items="${subjectData}">
 					<tr valign="top">
@@ -329,15 +319,6 @@
 				</c:forEach>
 			</table>
 			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
 		</c:if>
 		<br />
 
@@ -356,19 +337,12 @@
 
 		<!--  valid data section, show all valid data -->
 		<fmt:message key="valid_data_imported" bundle="${resword}"/>
+		<c:set var="notificationColumnRequired" scope="request"
+			   value="${fn:length(summaryStats.unavailableCRFVersionOIDs) > 0
+					|| study.studyParameterConfig.replaceExisitingDataDuringImport == 'no'}"/>
 
 			<div style="width: 100%">
-
-			<div class="box_T">
-			<div class="box_L">
-			<div class="box_R">
-			<div class="box_B">
-			<div class="box_TL">
-			<div class="box_TR">
-			<div class="box_BL">
-			<div class="box_BR">
-			<div class="textbox_center">
-			<table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<table class="table_shadow_bottom" border="0" cellpadding="0" cellspacing="0" width="100%">
 
 				<c:forEach var="subjectDataBean" items="${subjectData}">
 					<tr valign="top">
@@ -432,7 +406,6 @@
 											<c:set var="groupRepeatKey" value="${1}" />
 										</c:otherwise>
 									</c:choose></td>
-									<%-- add repeat key here? --%>
 								</tr>
 								<c:forEach var="itemData" items="${itemGroupData.itemData}">
 									<c:set var="oidKey"
@@ -441,15 +414,23 @@
 										<tr valign="top">
 											<td class="table_cell_left"></td>
 											<td class="table_cell"></td>
-											<td class="table_cell"><c:out
-												value="${itemData.itemOID}" /></td>
-											<%-- or add it here? --%>
+											<td class="table_cell"><c:out value="${itemData.itemOID}" /></td>
 											<td class="table_cell"><c:out value="${itemData.value}" /></td>
-                                            <c:if test="${study.studyParameterConfig.replaceExisitingDataDuringImport == 'no'}">
+                                            <c:if test="${notificationColumnRequired}">
+												<c:set var="crfVersionUnavailable" value="false" scope="request" />
+												<c:forEach items="${summaryStats.unavailableCRFVersionOIDs}" var="value">
+													<c:if test="${value == formData.formOID}">
+														<c:set var="crfVersionUnavailable" value="true" scope="request" />
+													</c:if>
+												</c:forEach>
                                                 <td class="table_cell">
-                                                    <c:if test="${itemData.skip}">
-                                                        <fmt:message key="will_be_skipped" bundle="${resword}"/>
-                                                    </c:if>
+													<c:if test="${itemData.skip}">
+														<fmt:message key="will_be_skipped" bundle="${resword}"/>
+													</c:if>
+													<c:if test="${crfVersionUnavailable}">
+														<fmt:message key="will_be_skipped" bundle="${resword}"/>
+														<br/><fmt:message key="crf_version_is_unavailable" bundle="${resword}"/>
+													</c:if>
                                                 </td>
                                             </c:if>
 										</tr>
@@ -460,15 +441,6 @@
 					</c:forEach>
 				</c:forEach>
 			</table>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
-			</div>
 			</div>
 			<br />
 			

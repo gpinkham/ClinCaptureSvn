@@ -108,7 +108,7 @@ public class ImportSummaryInfoTest {
 
 	@Test
 	public void testSummaryMessage() {
-		String msg = summary.prepareSummaryMessage(studyBean, reswords);
+		String msg = summary.prepareSummaryMessage(reswords);
 		assertTrue(msg.length() > 0);
 	}
 }

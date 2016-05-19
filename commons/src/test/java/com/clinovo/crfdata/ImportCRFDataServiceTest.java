@@ -120,33 +120,6 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testThatGeneratedSummaryStatsBeanIsNotNull() {
-		TestCase.assertNotNull(
-				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()));
-	}
-
-	@Test
-	public void testThatGetEventCrfCountReturnsCorrectValue() {
-		TestCase.assertEquals(1,
-				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
-						.getEventCrfCount());
-	}
-
-	@Test
-	public void testThatGetDiscNoteCountReturnsCorrectValue() {
-		TestCase.assertEquals(0,
-				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
-						.getDiscNoteCount());
-	}
-
-	@Test
-	public void testThatGetStudySubjectCountReturnsCorrectValue() {
-		TestCase.assertEquals(1,
-				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
-						.getStudySubjectCount());
-	}
-
-	@Test
 	public void testThatGetSubjectDataFromTestFile1ReturnsCorrectSize() throws Exception {
 		TestCase.assertEquals(holder1.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}

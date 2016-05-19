@@ -13,11 +13,14 @@
 
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import java.util.Set;
+
 public class SummaryStatsBean {
 
 	private int eventCrfCount;
 	private int studySubjectCount;
 	private int discNoteCount;
+	private Set<String> unavailableCRFVersionOIDs;
 
 	public int getEventCrfCount() {
 		return eventCrfCount;
@@ -43,4 +46,11 @@ public class SummaryStatsBean {
 		this.discNoteCount = discNoteCount;
 	}
 
+	public Set<String> getUnavailableCRFVersionOIDs() {
+		return unavailableCRFVersionOIDs;
+	}
+
+	public void setUnavailableCRFVersionOIDs(Set<String> unavailableCRFVersionOIDs) {
+		this.unavailableCRFVersionOIDs = unavailableCRFVersionOIDs;
+	}
 }

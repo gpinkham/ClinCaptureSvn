@@ -45,7 +45,6 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-//import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class DataImportService {
 	ResourceBundle respage;
 	Locale locale;
 
-	private ImportCRFDataService dataService;
+	private WSImportCRFDataService dataService;
 
 	public List<String> validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources,
 			StudyBean studyBean, UserAccountBean userBean, List<DisplayItemBeanWrapper> displayItemBeanWrappers) {
@@ -280,11 +279,11 @@ public class DataImportService {
 		return note;
 	}
 
-	private ImportCRFDataService getImportCRFDataService(DataSource dataSource) {
+	private WSImportCRFDataService getImportCRFDataService(DataSource dataSource) {
 		if (locale == null) {
 			locale = new Locale("en-US");
 		}
-		dataService = (this.dataService != null) ? dataService : new ImportCRFDataService(dataSource, locale);
+		dataService = (this.dataService != null) ? dataService : new WSImportCRFDataService(dataSource, locale);
 		return dataService;
 	}
 

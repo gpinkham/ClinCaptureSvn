@@ -282,8 +282,8 @@ public class ImportSpringJob extends QuartzJobBean {
 				cutAndPaste(target, destination);
 				destination = removeNullElements(destination);
 				// do everything else here with 'destination'
-				ProcessDataResult pdResult = processData(destination, dataSource, respage, ub, studyBean, destDirectory,
-						triggerBean, ruleSetService);
+				ProcessDataResult pdResult = processData(destination, respage, resword, ub, studyBean, destDirectory,
+						triggerBean);
 
 				auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, pdResult.auditMsg);
 				try {
@@ -348,9 +348,9 @@ public class ImportSpringJob extends QuartzJobBean {
 	 * them into the database if not, and return a message which will go to audit and to the end user. Sergey thinks
 	 * that we should use here the single transaction logic from the VerifyImportedCRFDataServlet.
 	 */
-	private ProcessDataResult processData(File[] dest, DataSource dataSource, ResourceBundle respage,
-			UserAccountBean ub, StudyBean studyBean, File destDirectory, TriggerBean triggerBean,
-			RuleSetService ruleSetService) throws Exception {
+	private ProcessDataResult processData(File[] dest, ResourceBundle respage, ResourceBundle resword,
+			UserAccountBean ub, StudyBean studyBean, File destDirectory, TriggerBean triggerBean) throws Exception {
+
 		BufferedWriter out;
 		boolean fail = false;
 		ODMContainer odmContainer;
@@ -442,7 +442,6 @@ public class ImportSpringJob extends QuartzJobBean {
 				}
 
 			}
-			// validation errors, the same as in the ImportCRFDataServlet. DRY?
 			List<EventCRFBean> eventCRFBeans = importCrfDataService.fetchEventCRFBeans(odmContainer, ub);
 
 			ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
@@ -452,7 +451,6 @@ public class ImportSpringJob extends QuartzJobBean {
 			HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
 			HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
 
-			// -- does the event already exist? if not, fail
 			if (!eventCRFBeans.isEmpty()) {
 				for (EventCRFBean eventCRFBean : eventCRFBeans) {
 					DataEntryStage dataEntryStage = eventCRFBean.getStage();
@@ -489,11 +487,8 @@ public class ImportSpringJob extends QuartzJobBean {
 					List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers;
 					tempDisplayItemBeanWrappers = importCrfDataService.lookupValidationErrors(validatorHelper,
 							odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
-					logger.debug("size of total validation errors: " + totalValidationErrors.size());
-					hasSkippedItems = validatorHelper.getAttribute("hasSkippedItems") != null;
 					displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
 				} catch (NullPointerException npe1) {
-					// what if you have 2 event crfs but the third is a fake?
 					npe1.printStackTrace();
 					fail = true;
 					logger.debug("threw a NPE after calling lookup validation errors");
@@ -517,19 +512,22 @@ public class ImportSpringJob extends QuartzJobBean {
 
 			ArrayList<SubjectDataBean> subjectData = odmContainer.getCrfDataPostImportContainer().getSubjectData();
 
+			SummaryStatsBean ssBean = importCrfDataService.generateSummaryStatsBean(odmContainer,
+					displayItemBeanWrappers, validatorHelper);
+			hasSkippedItems = validatorHelper.getAttribute(ImportCRFDataService.IMPORT_HAS_DATA_TO_SKIP) != null;
+
 			if (!hardValidationErrors.isEmpty()) {
 				String messageHardVals = triggerService.generateHardValidationErrorMessage(subjectData,
-						hardValidationErrors, false, false, respage);
+						hardValidationErrors, false, false, respage, resword, ssBean);
 				out.write(messageHardVals);
 			} else {
 				if (!totalValidationErrors.isEmpty()) {
 					String totalValErrors = triggerService.generateHardValidationErrorMessage(subjectData,
-							totalValidationErrors, false, false, respage);
+							totalValidationErrors, false, false, respage, resword, ssBean);
 					out.write(totalValErrors);
-					// here we also append data to the file, tbh 06/2010
 				}
 				String validMsgs = triggerService.generateValidMessage(subjectData, totalValidationErrors,
-						hasSkippedItems, respage);
+						hasSkippedItems, respage, resword, ssBean);
 				out.write(validMsgs);
 			}
 
@@ -544,9 +542,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(respage.getString("passing_crf_edit_checks")).append("<br/>");
 				auditMsg.append(respage.getString("passing_crf_edit_checks")).append("<br/>");
 				logger.debug("found total validation errors: " + totalValidationErrors.size());
-				SummaryStatsBean ssBean = importCrfDataService.generateSummaryStatsBean(odmContainer,
-						displayItemBeanWrappers);
-				msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage)).append("<br/>");
+				msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage, resword)).append("<br/>");
 
 				// actually the crf data import is here
 				List<ImportDataRuleRunnerContainer> containers = importCrfDataService.importCrfData(studyBean, ub,
@@ -555,10 +551,26 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(respage.getString("data_has_been_successfully_import")).append("<br/>");
 				auditMsg.append(respage.getString("data_has_been_successfully_import")).append("<br/>");
 
-				msg.append(summary.prepareSummaryMessage(studyBean, resword));
-				auditMsg.append(summary.prepareSummaryMessage(studyBean, resword));
+				msg.append(summary.prepareSummaryMessage(resword));
+				auditMsg.append(summary.prepareSummaryMessage(resword));
 
-				if (hasSkippedItems) {
+				boolean importHasDataForUnavailableVersions =
+						validatorHelper.getAttribute(ImportCRFDataService.IMPORT_HAS_DATA_FOR_UNAVAILABLE_VERSIONS) != null;
+				if (hasSkippedItems && importHasDataForUnavailableVersions) {
+
+					String additionalMsg = "<br/><br/>"
+							.concat(resword.getString("import_contained_unavailable_crf_versions")).concat("<br/>")
+							.concat(resword.getString("unavailable_crf_version_oids")).concat(":");
+					for (String crfVersionOID : ssBean.getUnavailableCRFVersionOIDs()) {
+						additionalMsg += "<br/>".concat(crfVersionOID);
+					}
+					additionalMsg = additionalMsg.concat("<br/>");
+					auditMsg.append(additionalMsg);
+				}
+
+				boolean importHasDataToReplaceExisting =
+						validatorHelper.getAttribute(ImportCRFDataService.IMPORT_HAS_DATA_TO_REPLACE_EXISTING) != null;
+				if (hasSkippedItems && importHasDataToReplaceExisting) {
 					String additionalMsg = "<br/>"
 							+ (studyBean.getParentStudyId() > 0
 									? respage.getString("site")
