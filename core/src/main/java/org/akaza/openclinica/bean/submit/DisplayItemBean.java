@@ -801,7 +801,9 @@ public class DisplayItemBean implements Comparable {
 				maxLength = Integer.toString(width);
 			} else if ("ST".equalsIgnoreCase(item.getDataType().getName())) {
 				maxLength = "4000";
-			} else if ("INT".equalsIgnoreCase(item.getDataType().getName())) {
+			} else if ("INT".equalsIgnoreCase(item.getDataType().getName())
+					|| "DATE".equalsIgnoreCase(item.getDataType().getName())
+					|| "PDATE".equalsIgnoreCase(item.getDataType().getName())) {
 				maxLength = "11";
 			} else if ("REAL".equalsIgnoreCase(item.getDataType().getName())) {
 				maxLength = "27";
