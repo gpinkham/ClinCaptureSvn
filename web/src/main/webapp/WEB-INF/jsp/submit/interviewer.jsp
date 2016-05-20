@@ -201,7 +201,9 @@
             <div class="crfInfoBlock">
                 <div class="table_title_Admin">
                     <fmt:message key="event" bundle="${resword}"/>: <c:out value="${toc.studyEventDefinition.name}" />
-                    (<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
+					<c:if test="${not empty toc.studyEvent.dateStarted}">
+						(<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
+					</c:if>
                     &emsp;
 	                <c:if test="${not empty siteTitle}">
                         <fmt:message key="site" bundle="${resword}"/>:
@@ -251,7 +253,9 @@
             <div class="crfInfoBlock">
                 <div class="table_title_Admin">
                     <fmt:message key="event" bundle="${resword}"/>: <c:out value="${toc.studyEventDefinition.name}" />
-                    (<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
+					<c:if test="${not empty toc.studyEvent.dateStarted}">
+						(<cc-fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/>)
+					</c:if>
                     &emsp;
 	                <c:if test="${not empty siteTitle}">
                         <fmt:message key="site" bundle="${resword}"/>:

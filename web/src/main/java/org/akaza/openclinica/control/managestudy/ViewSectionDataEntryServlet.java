@@ -92,7 +92,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	public static final String EVENT_CRF_ID = "eventCRFId";
 	public static final String ENCLOSING_PAGE = "enclosingPage";
-	public static final String VIEW_SECTION_DATA_ENTRY = "ViewSectionDataEntry";
 
 	/**
 	 * Checks whether the user has the correct privilege.
@@ -208,7 +207,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		String age = "";
 
 		if (studySubjectId > 0) {
-			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(studySubjectId);
+			StudySubjectBean sub = studySubjectDao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", sub);
 			StudyBean subjectStudy = getStudyService().getSubjectStudy(currentStudy, sub);
 			request.setAttribute("subjectStudy", subjectStudy);
@@ -295,6 +294,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			if (displayBean.getEventDefinitionCRF().getId() == 0 && edcb.getId() > 0) {
 				displayBean.setEventDefinitionCRF(edcb);
 			}
+			if (edcb != null && edcb.getStudyEventDefinitionId() != 0) {
+				addEventDefinitionInfo(displayBean, edcb.getStudyEventDefinitionId());
+			}
 			request.setAttribute("toc", displayBean);
 			ArrayList sections = displayBean.getSections();
 
@@ -338,7 +340,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute(SECTION_BEAN, sb);
 
 			// This is the StudySubjectBean
-			StudySubjectBean sub = (StudySubjectBean) studySubjectDao.findByPK(ecb.getStudySubjectId());
+			StudySubjectBean sub = studySubjectDao.findByPK(ecb.getStudySubjectId());
 			// This is the SubjectBean
 			SubjectDAO subjectDao = getSubjectDAO();
 			int subjectId = sub.getSubjectId();
@@ -502,6 +504,16 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	@Override
 	protected void putDataEntryStageFlagToRequest(HttpServletRequest request) {
 
+	}
+
+	private void addEventDefinitionInfo(DisplayTableOfContentsBean displayBean, int studyEventDefinitionId) {
+		StudyEventDefinitionDAO studyEventDefinitionDAO = getStudyEventDefinitionDAO();
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean)
+				studyEventDefinitionDAO.findByPK(studyEventDefinitionId);
+
+		if (studyEventDefinitionBean.getId() > 0) {
+			displayBean.setStudyEventDefinition(studyEventDefinitionBean);
+		}
 	}
 
 	@Override
