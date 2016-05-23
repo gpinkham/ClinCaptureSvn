@@ -52,7 +52,6 @@ import com.clinovo.validator.EventDefinitionValidator;
 /**
  * BaseEventService.
  */
-@SuppressWarnings("unchecked")
 public abstract class BaseEventService extends BaseService {
 
 	@Autowired

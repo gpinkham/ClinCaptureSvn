@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-
 public class ImportSummaryInfo {
 
 	public Set<Integer> totalStudySubjectIds = new HashSet<Integer>();

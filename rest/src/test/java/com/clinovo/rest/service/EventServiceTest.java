@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-@SuppressWarnings("unchecked")
 public class EventServiceTest extends BaseServiceTest {
 
 	@Test
