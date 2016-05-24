@@ -29,7 +29,8 @@
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js?r=${revisionNumber}"></script>
 	<script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/js/crf_shortcuts.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/Tabs.js?r=${revisionNumber}"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/prototype.js?r=${revisionNumber}"></script>
+	<script type="text/javascript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
+	<script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/prototype.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/scriptaculous.js?load=effects&r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/effects.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/jmesa/jquery-ui.min.js"></script>
