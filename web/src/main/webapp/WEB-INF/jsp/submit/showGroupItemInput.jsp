@@ -366,8 +366,8 @@ function changeImage(name) {
   </select>
 </c:if>
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
-	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-	<label for="<c:out value="${inputName}"/>"></label>
+	<input type="hidden" name="${inputName}" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+	<label for="${inputName}"></label>
 	<c:choose>
 		<c:when test="${isInError}">
 			<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="${tabNum}" onChange="this.className='changedField'; changeImage(this.id);" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />

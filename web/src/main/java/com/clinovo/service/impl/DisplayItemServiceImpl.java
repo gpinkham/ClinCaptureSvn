@@ -106,6 +106,7 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
 			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, itemDataCache,
 					itemFormMetadataCache, ecb, sb.getId(), nullValuesList, dynamicsMetadataService);
+			populateGroupItemsWithEDCMetadata(dibs, eventDefCRFId);
 			dibs = processInputForGroupItem(fp, dibs, i, displayItemGroupBean);
 			formGroup.setItems(dibs);
 			formGroup.setItemGroupBean(displayItemGroupBean.getItemGroupBean());
@@ -301,6 +302,19 @@ public class DisplayItemServiceImpl implements DisplayItemService {
 		Collections.sort(displayItemWithGroups);
 		populateItemsWithEDCMetadata(displayItemWithGroups, dsb);
 		return displayItemWithGroups;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void populateGroupItemsWithEDCMetadata(List<DisplayItemBean> dibs, int eventDefCRFId) {
+		for (DisplayItemBean displayItemBean : dibs) {
+			EDCItemMetadata edcItemMetadata = edcItemMetadataService
+					.findByCRFVersionIDEventDefinitionCRFIDAndItemID(
+							displayItemBean.getMetadata().getCrfVersionId(),
+							eventDefCRFId, displayItemBean.getItem().getId());
+			displayItemBean.setEdcItemMetadata(edcItemMetadata);
+		}
 	}
 
 	private void populateItemsWithEDCMetadata(List<DisplayItemWithGroupBean> displayItemWithGroups, DisplaySectionBean dsb) {

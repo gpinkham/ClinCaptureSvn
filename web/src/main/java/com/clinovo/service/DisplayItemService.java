@@ -1,6 +1,7 @@
 package com.clinovo.service;
 
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
@@ -53,4 +54,11 @@ public interface DisplayItemService {
 	 */
 	List<DisplayItemWithGroupBean> createItemWithGroups(DisplaySectionBean dsb, boolean hasItemGroup,
 																  int eventCRFDefId, HttpServletRequest request);
+
+	/**
+	 * Add metadata to the List of DisplayItemBeans.
+	 * @param dibs List<DisplayItemBean>
+	 * @param eventDefCRFId int
+	 */
+	void populateGroupItemsWithEDCMetadata(List<DisplayItemBean> dibs, int eventDefCRFId);
 }
