@@ -23,10 +23,10 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
+import org.apache.commons.lang3.StringUtils;
 
 import com.clinovo.lib.crf.builder.impl.ExcelCrfBuilder;
 import com.clinovo.lib.crf.enums.RealValueKey;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * ItemBeanExt.
@@ -58,7 +58,8 @@ public class ItemBeanExt extends ItemBean {
 	/**
 	 * Copy constructor.
 	 *
-	 * @param itemBean item bean
+	 * @param itemBean
+	 *            item bean
 	 */
 	public ItemBeanExt(ItemBean itemBean) {
 		itemBean.cloneTo(this);
@@ -74,6 +75,11 @@ public class ItemBeanExt extends ItemBean {
 		setIndex(crfBuilder.getIndex());
 		setRowNumber(crfBuilder.getRowNumber());
 		setSheetNumber(crfBuilder.getCurrentSheetNumber());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
 	}
 
 	public SectionBean getSectionBean() {
@@ -143,8 +149,8 @@ public class ItemBeanExt extends ItemBean {
 	/**
 	 * Verifies if an item bean has a simple conditional display property provided.
 	 *
-	 * @return <code>true</code> if an item has a simple conditional display property provided;
-	 * <code>false</code> otherwise
+	 * @return <code>true</code> if an item has a simple conditional display property provided; <code>false</code>
+	 *         otherwise
 	 */
 	public boolean hasSCD() {
 

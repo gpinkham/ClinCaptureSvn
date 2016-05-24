@@ -59,7 +59,7 @@ public class OnChangeSheetValidator implements SpreadSheetValidator {
 	 * SheetValidationType; vise versa.
 	 */
 	private void validateWithOrder(OnChangeSheetValidationCell cell) {
-		if (cell.getOnChangeTypeFirst() == Boolean.TRUE) {
+		if (cell.getOnChangeTypeFirst()) {
 			validateOnChangeType(cell);
 			SheetValidatorHelper.validateSheetValidationCell(cell.getSheetValidationCell(), sheetErrors);
 		} else {

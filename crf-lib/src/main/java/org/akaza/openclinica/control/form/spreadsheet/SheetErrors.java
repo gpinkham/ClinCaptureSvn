@@ -110,7 +110,7 @@ public final class SheetErrors {
 
 	public Map<String, String> putHtmlErrorsToSheet(Map<String, String> htmlErrorsFromSheet) {
 		htmlErrorsFromSheet.putAll(htmlErrors);
-		return htmlErrorsFromSheet == null ? new HashMap<String, String>() : htmlErrorsFromSheet;
+		return htmlErrorsFromSheet;
 	}
 
 	public List<String> addErrorsToSheet(List<String> errorsFromSheet) {

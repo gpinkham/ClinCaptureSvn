@@ -345,7 +345,6 @@ public class SpreadSheetImportCrfServiceImpl extends BaseImportCrfService {
 	}
 
 	private void prepareCurrent(ExcelCrfBuilder crfBuilder) {
-		String itemName = crfBuilder.getCellValue(CellName.ITEM_NAME, true);
 		ItemBeanExt itemBean = (ItemBeanExt) crfBuilder.getItems().get(crfBuilder.getIndex());
 		crfBuilder.setCurrentSection(itemBean.getSectionBean());
 		crfBuilder.setCurrentItem(itemBean);

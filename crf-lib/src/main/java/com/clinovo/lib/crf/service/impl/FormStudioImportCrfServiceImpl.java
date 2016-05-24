@@ -686,10 +686,6 @@ public class FormStudioImportCrfServiceImpl extends BaseImportCrfService {
 		return childrenQuestions;
 	}
 
-	private void processQuestions(JSONArray questions, JsonCrfBuilder crfBuilder) throws Exception {
-		processQuestions(questions, null, crfBuilder);
-	}
-
 	private void processQuestions(JSONArray questions, ItemBeanExt parentItemBean, JsonCrfBuilder crfBuilder)
 			throws Exception {
 		for (int i = 0; i < questions.length(); i++) {

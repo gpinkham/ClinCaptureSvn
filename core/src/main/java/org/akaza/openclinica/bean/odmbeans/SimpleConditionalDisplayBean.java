@@ -18,10 +18,15 @@
  * For details see: http://www.openclinica.org/license copyright 
  *
  */
-
 package org.akaza.openclinica.bean.odmbeans;
 
-public class SimpleConditionalDisplayBean {
+import java.io.Serializable;
+
+/**
+ * SimpleConditionalDisplayBean.
+ */
+@SuppressWarnings("serial")
+public class SimpleConditionalDisplayBean implements Serializable {
 	private String controlItemName;
 	private String optionValue;
 	private String message;
@@ -34,7 +39,9 @@ public class SimpleConditionalDisplayBean {
 
 	/**
 	 * Copy constructor.
-	 * @param origin bean to copy from.
+	 * 
+	 * @param origin
+	 *            bean to copy from.
 	 */
 	public SimpleConditionalDisplayBean(SimpleConditionalDisplayBean origin) {
 
