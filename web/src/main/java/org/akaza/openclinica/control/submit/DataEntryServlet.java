@@ -81,6 +81,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
+import org.akaza.openclinica.bean.submit.SCDShowStatus;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -1004,6 +1005,26 @@ public abstract class DataEntryServlet extends SpringServlet {
 								}
 							}
 						} else {
+							DisplayItemWithGroupBean displayItemWithGroup = section
+									.getSingleDisplayItemByItemBeanId(displayItem.getItem().getId());
+							DisplayItemBean displayItemBean = displayItemWithGroup.getSingleItem();
+							SCDItemDisplayInfo displayInfo = displayItemBean.getScdData().getScdDisplayInfo();
+							if (displayInfo.getScdShowStatus() != SCDShowStatus.SHOW_UNCHANGABLE.getCode()) {
+								displayInfo.setScdShowStatus(SCDShowStatus.SHOW_UNCHANGABLE.getCode());
+							}
+							// If column # if != 0 or != 1 but item before it is in the repeating group.
+							if (displayInfo.getRowDisplayStatus() != SCDShowStatus.SHOW_UNCHANGABLE.getCode()) {
+								displayInfo.setRowDisplayStatus(SCDShowStatus.SHOW_UNCHANGABLE.getCode());
+							}
+							if (displayItem.getMetadata().getColumnNumber() != 1 && displayItem.getMetadata().getColumnNumber() != 0) {
+								DisplayItemBean firstInTheRow = section.getFirstDisplayItemBeanInTheRow(displayItemWithGroup);
+								if (firstInTheRow != null && firstInTheRow.getScdData().getScdDisplayInfo()
+										.getRowDisplayStatus() != SCDShowStatus.SHOW_UNCHANGABLE.getCode()) {
+									firstInTheRow.getScdData().getScdDisplayInfo()
+											.setRowDisplayStatus(SCDShowStatus.SHOW_UNCHANGABLE.getCode());
+								}
+							}
+
 							this.setReasonForChangeError(errors, idb, formName, error, request);
 							if (rfcWasAdded != null) {
 								rfcForNewRows.put(newRowRfcKey, true);

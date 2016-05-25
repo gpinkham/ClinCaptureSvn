@@ -279,4 +279,46 @@ public class DisplaySectionBean {
 	public void setEventCRFSection(EventCRFSectionBean eventCRFSection) {
 		this.eventCRFSection = eventCRFSection;
 	}
+
+	/**
+	 * Get non grouped item by ItemBean id.
+	 * @param itemId int
+	 * @return DisplayItemBean or null.
+	 */
+	public DisplayItemWithGroupBean getSingleDisplayItemByItemBeanId(int itemId) {
+		List<DisplayItemWithGroupBean> groups = getDisplayItemGroups();
+		for (DisplayItemWithGroupBean itemWithGroup : groups) {
+			DisplayItemBean displayItemBean = itemWithGroup.getSingleItem();
+			if (displayItemBean.getItem().getId() == itemId) {
+				return itemWithGroup;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get first item in the same row with given DisplayItemWithGroup.
+	 * @param displayItemWithGroup DisplayItemWithGroup
+	 * @return DisplayItemBean or null.
+	 */
+	public DisplayItemBean getFirstDisplayItemBeanInTheRow(DisplayItemWithGroupBean displayItemWithGroup) {
+		List<DisplayItemWithGroupBean> groups = getDisplayItemGroups();
+		int currentItemIndex = groups.indexOf(displayItemWithGroup) - 1;
+		int currentColumnNum = displayItemWithGroup.getSingleItem().getMetadata().getColumnNumber();
+		DisplayItemBean result = null;
+		for (int i = currentItemIndex; i > 0; i--) {
+			DisplayItemWithGroupBean displayItemWithGroupBean = groups.get(i);
+			if (displayItemWithGroupBean.isInGroup()) {
+				return result;
+			}
+			DisplayItemBean displayItemBean = displayItemWithGroupBean.getSingleItem();
+			if (displayItemBean.getMetadata().getColumnNumber() < currentColumnNum) {
+				result = displayItemBean;
+				currentColumnNum = displayItemBean.getMetadata().getColumnNumber();
+			} else {
+				return result;
+			}
+		}
+		return result;
+	}
 }
