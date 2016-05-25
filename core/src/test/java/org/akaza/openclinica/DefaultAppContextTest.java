@@ -125,12 +125,14 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			resetSequence(session, "event_crf_id", "event_crf");
 			resetSequence(session, "id", "item_render_metadata");
 			resetSequence(session, "item_group_id", "item_group");
+			resetSequence(session, "study_group_id", "study_group");
 			resetSequence(session, "crf_version_id", "crf_version");
 			resetSequence(session, "study_event_id", "study_event");
 			resetSequence(session, "response_set_id", "response_set");
 			resetSequence(session, "dynamic_event_id", "dynamic_event");
 			resetSequence(session, "study_subject_id", "study_subject");
 			resetSequence(session, "discrepancy_note_id", "discrepancy_note");
+			resetSequence(session, "subject_group_map_id", "subject_group_map");
 			resetSequence(session, "study_group_class_id", "study_group_class");
 			resetSequence(session, "item_form_metadata_id", "item_form_metadata");
 			resetSequence(session, "item_group_metadata_id", "item_group_metadata");

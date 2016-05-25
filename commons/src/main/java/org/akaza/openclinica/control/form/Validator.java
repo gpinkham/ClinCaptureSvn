@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -760,21 +761,19 @@ public class Validator {
 	}
 
 	/**
-	 * quick debug function to look inside the validations set.
+	 * Quick debug function to look inside the validations set.
 	 * 
 	 * @return String
 	 */
 	public String getKeySet() {
-		String retMe = "";
-		Set keys = validations.keySet();
-
-		for (Object key : keys) {
-			String fieldName = (String) key;
-			retMe += fieldName;
+		StringBuilder retMe = new StringBuilder("");
+		for (Map.Entry entry : (Set<Map.Entry>) validations.entrySet()) {
+			String fieldName = (String) entry.getKey();
+			retMe.append(fieldName);
 			ArrayList fieldValidations = getFieldValidations(fieldName);
-			retMe += " found " + fieldValidations.size() + " field validations; ";
+			retMe.append(" found ").append(fieldValidations.size()).append(" field validations; ");
 		}
-		return retMe;
+		return retMe.toString();
 	}
 
 	/**
@@ -806,8 +805,8 @@ public class Validator {
 				case IS_IN_RANGE :
 					float lowerBound = v.getFloat(0);
 					float upperBound = v.getFloat(1);
-					errorMessage = resexception.getString("input_should_be_between") + new Float(lowerBound).intValue()
-							+ " " + resword.getString("and") + " " + new Float(upperBound).intValue() + ".";
+					errorMessage = resexception.getString("input_should_be_between") + (int) lowerBound
+							+ " " + resword.getString("and") + " " + (int) upperBound + ".";
 					break;
 				case IS_A_DATE :
 					errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription()
@@ -1864,10 +1863,12 @@ public class Validator {
 			String[] fieldValues = validatorHelper.getParameterValues(fieldName);
 
 			if (fieldValues != null) {
+				StringBuilder fieldValueBuilder = new StringBuilder("");
 				for (String element : fieldValues) {
-					fieldValue += glue + element;
+					fieldValueBuilder.append(glue).append(element);
 					glue = ",";
 				}
+				fieldValue = fieldValueBuilder.toString();
 			}
 		} else {
 			// added the NPE catch block, tbh, 09012007

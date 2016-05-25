@@ -521,8 +521,7 @@ public class FormProcessor {
 	 *            int
 	 */
 	public void addPresetValue(String fieldName, int value) {
-		Integer fieldValue = new Integer(value);
-		presetValues.put(fieldName, fieldValue);
+		presetValues.put(fieldName, value);
 	}
 
 	/**
@@ -533,8 +532,7 @@ public class FormProcessor {
 	 *            float
 	 */
 	public void addPresetValue(String fieldName, float value) {
-		Float fieldValue = new Float(value);
-		presetValues.put(fieldName, fieldValue);
+		presetValues.put(fieldName, value);
 	}
 
 	/**
@@ -545,8 +543,7 @@ public class FormProcessor {
 	 *            String
 	 */
 	public void addPresetValue(String fieldName, boolean value) {
-		Boolean fieldValue = new Boolean(value);
-		presetValues.put(fieldName, fieldValue);
+		presetValues.put(fieldName, value);
 	}
 
 	/**

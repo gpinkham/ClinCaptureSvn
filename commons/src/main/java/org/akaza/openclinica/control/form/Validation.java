@@ -22,8 +22,12 @@ package org.akaza.openclinica.control.form;
 
 import java.util.ArrayList;
 
+/**
+ * Validation.
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Validation {
+
 	private int type;
 
 	private String errorMessage;
@@ -38,6 +42,12 @@ public class Validation {
 
 	private boolean convertDate;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param type
+	 *            int
+	 */
 	public Validation(int type) {
 		this.type = type;
 		arguments = new ArrayList();
@@ -46,77 +56,117 @@ public class Validation {
 	}
 
 	/**
-	 * @return Returns the arguments.
+	 * Get arguments method.
+	 * 
+	 * @return ArrayList
 	 */
 	public ArrayList getArguments() {
 		return arguments;
 	}
 
 	/**
+	 * Set arguments method.
+	 * 
 	 * @param arguments
-	 *            The arguments to set.
+	 *            ArrayList
 	 */
 	public void setArguments(ArrayList arguments) {
 		this.arguments = arguments;
 	}
 
 	/**
-	 * @return Returns the type.
+	 * Get type method.
+	 * 
+	 * @return int
 	 */
 	public int getType() {
 		return type;
 	}
 
 	/**
+	 * Set type method.
+	 * 
 	 * @param type
-	 *            The type to set.
+	 *            int
 	 */
 	public void setType(int type) {
 		this.type = type;
 	}
 
+	/**
+	 * Adds object argument.
+	 * 
+	 * @param arg
+	 *            Object
+	 */
 	public void addArgument(Object arg) {
 		arguments.add(arg);
 	}
 
+	/**
+	 * Adds int argument.
+	 * 
+	 * @param arg
+	 *            int
+	 */
 	public void addArgument(int arg) {
-		arguments.add(new Integer(arg));
+		arguments.add(arg);
 	}
 
-	public void addArgument(boolean b) {
-		arguments.add(new Boolean(b));
+	/**
+	 * Adds boolean argument.
+	 * 
+	 * @param arg
+	 *            boolean
+	 */
+	public void addArgument(boolean arg) {
+		arguments.add(arg);
 	}
 
+	/**
+	 * Adds float argument.
+	 * 
+	 * @param arg
+	 *            float
+	 */
 	public void addArgument(float arg) {
-		arguments.add(new Float(arg));
+		arguments.add(arg);
 	}
 
-	/*
+	/**
 	 * Gets the boolean value of the argument with the specified index.
+	 * 
+	 * @param index
+	 *            int
+	 * @return boolean
 	 */
 	public boolean getBoolean(int index) {
 		if (index >= arguments.size()) {
 			return false;
 		}
-
-		Boolean b = (Boolean) arguments.get(index);
-		return b.booleanValue();
+		return (Boolean) arguments.get(index);
 	}
 
-	/*
+	/**
 	 * Gets the integer value of the argument with the specified index.
+	 * 
+	 * @param index
+	 *            int
+	 * @return int
 	 */
 	public int getInt(int index) {
 		if (index >= arguments.size()) {
 			return 0;
 		}
-
-		Integer i = (Integer) arguments.get(index);
-		return i.intValue();
+		return (Integer) arguments.get(index);
 	}
 
-	/*
+	/**
 	 * Gets the float value of the argument with the specified index.
+	 * 
+	 * @param index
+	 *            int
+	 * @return float
 	 */
 	public float getFloat(int index) {
 		if (index >= arguments.size()) {
@@ -124,25 +174,33 @@ public class Validation {
 		}
 
 		try {
-			Float i = (Float) arguments.get(index);
-			return i.floatValue();
-
+			return (Float) arguments.get(index);
 		} catch (ClassCastException ce) {
-			Integer i = (Integer) arguments.get(index);
-			return i.intValue();
+			return (Integer) arguments.get(index);
 		}
-
 	}
 
+	/**
+	 * Gets the string value of the argument with the specified index.
+	 * 
+	 * @param index
+	 *            int
+	 * @return String
+	 */
 	public String getString(int index) {
 		if (index >= arguments.size()) {
 			return "";
 		}
-
-		String s = (String) arguments.get(index);
-		return s;
+		return (String) arguments.get(index);
 	}
 
+	/**
+	 * Gets the object value of the argument with the specified index.
+	 * 
+	 * @param index
+	 *            int
+	 * @return Object
+	 */
 	public Object getArg(int index) {
 		if (index >= arguments.size()) {
 			return null;
@@ -159,32 +217,24 @@ public class Validation {
 	}
 
 	/**
+	 * Sets the errorMessage.
+	 * 
 	 * @param errorMessage
-	 *            The errorMessage to set.
+	 *            String
 	 */
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 		errorMessageSet = true;
 	}
 
-	/**
-	 * @return Returns the errorMessageSet.
-	 */
 	public boolean isErrorMessageSet() {
 		return errorMessageSet;
 	}
 
-	/**
-	 * @return Returns the alwaysExecuted.
-	 */
 	public boolean isAlwaysExecuted() {
 		return alwaysExecuted;
 	}
 
-	/**
-	 * @param alwaysExecuted
-	 *            The alwaysExecuted to set.
-	 */
 	public void setAlwaysExecuted(boolean alwaysExecuted) {
 		this.alwaysExecuted = alwaysExecuted;
 	}

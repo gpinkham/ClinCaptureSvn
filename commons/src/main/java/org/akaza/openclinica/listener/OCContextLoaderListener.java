@@ -83,7 +83,7 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 				configurator.doConfigure(defaultResourceLoader.getResource("logback.xml").getURL());
 				logger = LoggerFactory.getLogger(this.getClass().getName());
 			}
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			logger.error(ex.getMessage());
 		}
 	}

@@ -13,6 +13,7 @@
 
 package com.clinovo.crfdata;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -161,7 +162,7 @@ public class ImportCRFDataService {
 		this.ds = ds;
 	}
 
-	private static class ItemGroupComparator<T extends ImportItemGroupDataBean> implements Comparator<T> {
+	private static class ItemGroupComparator<T extends ImportItemGroupDataBean> implements Comparator<T>, Serializable {
 		public int compare(T g1, T g2) {
 			int result = 0;
 			if (g1 != null && g2 != null && g1.getItemGroupOID() != null && g2.getItemGroupOID() != null) {
@@ -686,16 +687,16 @@ public class ImportCRFDataService {
 					// version or event crf bean
 					validationErrors = discValidator.validate();
 
-					for (Object errorKey : validationErrors.keySet()) {
-						if (!totalValidationErrors.containsKey(errorKey.toString())) {
-							totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
+					for (Map.Entry entry : (Set<Map.Entry>) validationErrors.entrySet()) {
+						if (!totalValidationErrors.containsKey(entry.getKey().toString())) {
+							totalValidationErrors.put(entry.getKey().toString(), entry.getValue().toString());
 						}
-						LOGGER.debug("+++ adding " + errorKey.toString());
+						LOGGER.debug("+++ adding " + entry.getKey().toString());
 					}
 					LOGGER.debug("-- hard validation checks: --");
-					for (String errorKey : hardValidator.keySet()) {
-						LOGGER.debug(errorKey + " -- " + hardValidator.get(errorKey));
-						hardValidationErrors.put(errorKey, hardValidator.get(errorKey));
+					for (Map.Entry<String, String> entry : hardValidator.entrySet()) {
+						LOGGER.debug(entry.getKey() + " -- " + entry.getValue());
+						hardValidationErrors.put(entry.getKey(), entry.getValue());
 					}
 
 					String studyEventId = studyEvent.getId() + "";
@@ -947,38 +948,35 @@ public class ImportCRFDataService {
 	}
 
 	/*
-	 * difference from the above is only a 'contains' in the place of an 'equals'. and a few other switches...also need
-	 * to keep in mind that there are non-null values that need to be taken into account
+	 * Difference from the above is only a 'contains' in the place of an 'equals'. and a few other switches...also need
+	 * to keep in mind that there are non-null values that need to be taken into account.
 	 */
 	private String matchValueWithManyOptions(DisplayItemBean displayItemBean, String value, List options) {
-		String entireOptions = "";
-
+		StringBuilder entireOptions = new StringBuilder("");
 		String[] simValues = value.split(",");
-
 		// also remove all spaces, so they will fit up with the entire set
 		// of options
-		boolean checkComplete;
 		if (!options.isEmpty()) {
 			for (Object responseOption : options) {
 				ResponseOptionBean responseOptionBean = (ResponseOptionBean) responseOption;
-				entireOptions += responseOptionBean.getValue();
+				// remove spaces, since they are causing problems
+				String responseOptionValue = responseOptionBean.getValue();
+				entireOptions.append(responseOptionValue != null ? responseOptionValue.replace(" ", "") : null);
 
 			}
-			// remove spaces, since they are causing problems:
-			entireOptions = entireOptions.replace(" ", "");
-			// following may be superfluous, tbh
 
 			ArrayList nullValues = displayItemBean.getEventDefinitionCRF().getNullValuesList();
 
 			for (Object nullValue : nullValues) {
 				NullValue nullValueTerm = (NullValue) nullValue;
-				entireOptions += nullValueTerm.getName();
+				entireOptions.append(nullValueTerm.getName());
 			}
+
+			String entireOptionsString = entireOptions.toString();
 
 			for (String sim : simValues) {
 				sim = sim.replace(" ", "");
-				checkComplete = entireOptions.contains(sim);
-				if (!checkComplete) {
+				if (!entireOptionsString.contains(sim)) {
 					return null;
 				}
 			}
@@ -1618,12 +1616,12 @@ public class ImportCRFDataService {
 	private List<String> extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
 		List<String> messages = new ArrayList<String>();
 		if (summaryMap != null && !summaryMap.isEmpty()) {
-			for (String key : summaryMap.keySet()) {
-				StringBuilder mesg = new StringBuilder(key + " : ");
-				for (String s : summaryMap.get(key)) {
-					mesg.append(s).append(", ");
+			for (Map.Entry<String, ArrayList<String>> entry : summaryMap.entrySet()) {
+				StringBuilder msg = new StringBuilder(entry.getKey() + " : ");
+				for (String s : entry.getValue()) {
+					msg.append(s).append(", ");
 				}
-				messages.add(mesg.toString());
+				messages.add(msg.toString());
 			}
 		}
 		return messages;
@@ -1646,10 +1644,11 @@ public class ImportCRFDataService {
 	}
 
 	private class SubjectInfoHolder {
+
 		private String oid;
 		private HashMap<String, ArrayList<String>> eventsWithCRFs;
 
-		public SubjectInfoHolder() {
+		SubjectInfoHolder() {
 			oid = "";
 			eventsWithCRFs = new HashMap<String, ArrayList<String>>();
 		}
@@ -1664,7 +1663,9 @@ public class ImportCRFDataService {
 
 		/**
 		 * Add a new event to the map.
-		 * @param eventOid String.
+		 * 
+		 * @param eventOid
+		 *            String.
 		 */
 		public void addEvent(String eventOid) {
 			if (!this.eventsWithCRFs.containsKey(eventOid)) {
@@ -1674,8 +1675,11 @@ public class ImportCRFDataService {
 
 		/**
 		 * Add a new CRF oid to the event.
-		 * @param eventOid String
-		 * @param crfOid String
+		 * 
+		 * @param eventOid
+		 *            String
+		 * @param crfOid
+		 *            String
 		 */
 		public void addCRFToEvent(String eventOid, String crfOid) {
 			ArrayList<String> crfOIDs = this.eventsWithCRFs.get(eventOid);
@@ -1688,12 +1692,14 @@ public class ImportCRFDataService {
 
 		/**
 		 * Check if event is already present in the list.
-		 * @param eventOid String
+		 * 
+		 * @param eventOid
+		 *            String
 		 * @return boolean
 		 */
 		public boolean eventAlreadyPresent(String eventOid) {
 			ArrayList<String> crfOIDs = this.eventsWithCRFs.get(eventOid);
-			return  crfOIDs != null && crfOIDs.size() > 0;
+			return crfOIDs != null && crfOIDs.size() > 0;
 		}
 
 		public boolean eventCRFAlreadyPresent(String eventOid, String crfOid) {
@@ -1706,6 +1712,11 @@ public class ImportCRFDataService {
 		}
 
 		@Override
+		public int hashCode() {
+			return this.oid.hashCode();
+		}
+
+		@Override
 		public boolean equals(Object other) {
 			if (other == null) {
 				return false;
@@ -1714,7 +1725,6 @@ public class ImportCRFDataService {
 				return false;
 			}
 			SubjectInfoHolder otherHolder = (SubjectInfoHolder) other;
-
 			return this.oid.equals(otherHolder.oid);
 		}
 	}

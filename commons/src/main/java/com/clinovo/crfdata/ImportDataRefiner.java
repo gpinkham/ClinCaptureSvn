@@ -114,15 +114,15 @@ public class ImportDataRefiner {
 				itemGroupDataBeanList.add(group);
 			}
 		}
-		for (String itemGroupOid : groupOidToMaxOrdinalMap.keySet()) {
-			int maxOrdinal = groupOidToMaxOrdinalMap.get(itemGroupOid);
+		for (Map.Entry<String, Integer> entry : groupOidToMaxOrdinalMap.entrySet()) {
+			int maxOrdinal = entry.getValue();
 			for (int i = 1; i <= maxOrdinal; i++) {
 				String currentOrdinal = Integer.toString(i);
-				String key = itemGroupOid.concat("_").concat(currentOrdinal);
+				String key = entry.getKey().concat("_").concat(currentOrdinal);
 				if (groupOidOrdinalKeyMap.get(key) == null) {
 					ImportItemGroupDataBean group = new ImportItemGroupDataBean();
 					group.setItemGroupRepeatKey(currentOrdinal);
-					group.setItemGroupOID(itemGroupOid);
+					group.setItemGroupOID(entry.getKey());
 					groupOidOrdinalKeyMap.put(key, group);
 				}
 			}
