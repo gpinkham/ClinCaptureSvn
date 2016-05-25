@@ -108,7 +108,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * ImportCRFDataService.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+@SuppressWarnings({"rawtypes", "unchecked", "unused", "serial"})
 public class ImportCRFDataService {
 
 	public static final String IMPORT_HAS_DATA_FOR_UNAVAILABLE_VERSIONS = "importHasDataForUnavailableCRFVersions";
