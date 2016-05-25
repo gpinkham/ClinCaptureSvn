@@ -68,7 +68,7 @@ public abstract class BaseWadlService extends BaseService {
 	@Autowired
 	private MessageSource messageSource;
 
-	private class PossibleValuesInfo {
+	private static class PossibleValuesInfo {
 		private String values;
 		private String dependOn;
 		private String valueDescriptions;
@@ -146,11 +146,13 @@ public abstract class BaseWadlService extends BaseService {
 	}
 
 	private String getValues(String[] values) {
-		String result = "";
+		String splitter = "";
+		StringBuilder result = new StringBuilder("");
 		for (String value : values) {
-			result += (result.isEmpty() ? "" : ",") + value;
+			result.append(splitter).append(value);
+			splitter = ",";
 		}
-		return result;
+		return result.toString();
 	}
 
 	private Map<String, PossibleValuesInfo> preparePossibleValuesInfoMap(HandlerMethod handlerMethod) {
@@ -214,18 +216,21 @@ public abstract class BaseWadlService extends BaseService {
 	}
 
 	private String getDefaultValue(BaseEnum baseEnum) {
-		String defaultValue = "";
+		String splitter = "";
+		StringBuilder result = new StringBuilder("");
 		Locale locale = LocaleResolver.getLocale();
 		if (baseEnum.getDefaultValue() instanceof String) {
-			defaultValue = (String) baseEnum.getDefaultValue();
+			result.append((String) baseEnum.getDefaultValue());
 		} else if (baseEnum.getDefaultValue() instanceof String[]) {
+			result.append("[");
 			for (String value : (String[]) baseEnum.getDefaultValue()) {
-				defaultValue += (defaultValue.isEmpty() ? "" : ",")
-						+ (baseEnum.isLocalizedDefaultValues() ? messageSource.getMessage(value, null, locale) : value);
+				result.append(splitter).append(
+						baseEnum.isLocalizedDefaultValues() ? messageSource.getMessage(value, null, locale) : value);
+				splitter = ",";
 			}
-			defaultValue = "[".concat(defaultValue).concat("]");
+			result.append("]");
 		}
-		return defaultValue;
+		return result.toString();
 	}
 
 	private void processMethodAnnotations(HandlerMethod handlerMethod, Method method) {

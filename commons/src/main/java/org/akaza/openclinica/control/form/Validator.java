@@ -1308,7 +1308,7 @@ public class Validator {
 		}
 
 		try {
-			float f = Float.parseFloat(fieldValue);
+			Float.parseFloat(fieldValue);
 		} catch (Exception e) {
 			return false;
 		}
@@ -1536,7 +1536,7 @@ public class Validator {
 		}
 
 		try {
-			int i = Integer.parseInt(fieldValue);
+			Integer.parseInt(fieldValue);
 		} catch (Exception e) {
 			return false;
 		}

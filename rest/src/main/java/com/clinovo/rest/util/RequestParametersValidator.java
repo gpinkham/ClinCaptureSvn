@@ -223,11 +223,13 @@ public final class RequestParametersValidator {
 			}
 		}
 		if (outOfSyncEnumBasedParameters != null) {
-			String parameterNames = "";
+			String splitter = "";
+			StringBuilder result = new StringBuilder("");
 			for (BaseEnum baseEnum : outOfSyncEnumBasedParameters.enumClass().getEnumConstants()) {
-				parameterNames += (parameterNames.isEmpty() ? "" : ", ") + baseEnum.getName();
+				result.append(splitter).append(baseEnum.getName());
+				splitter = ", ";
 			}
-			throw new RestException(messageSource, "rest.parametersAreOutOfSync", new Object[]{parameterNames},
+			throw new RestException(messageSource, "rest.parametersAreOutOfSync", new Object[]{result.toString()},
 					HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}

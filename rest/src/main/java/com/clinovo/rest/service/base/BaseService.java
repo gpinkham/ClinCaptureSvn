@@ -138,11 +138,13 @@ public abstract class BaseService {
 	}
 
 	protected String intArrayAsString(Integer[] intArray) {
-		String result = "";
+		String splitter = "";
+		StringBuilder result = new StringBuilder("");
 		for (Integer value : intArray) {
-			result += (result.isEmpty() ? "" : ",").concat(Integer.toString(value));
+			result.append(splitter).append(Integer.toString(value));
+			splitter = ",";
 		}
-		return result;
+		return result.toString();
 	}
 
 	protected CRFDAO getCRFDAO() {
