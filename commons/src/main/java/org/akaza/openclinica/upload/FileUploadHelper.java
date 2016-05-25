@@ -176,7 +176,9 @@ public class FileUploadHelper {
 
 	private String createDirectoryIfDoesNotExist(String theDir) {
 		if (!new File(theDir).isDirectory()) {
-			new File(theDir).mkdirs();
+			if (!new File(theDir).mkdirs()) {
+				logger.error("Cannot create directory: ".concat(theDir));
+			}
 		}
 		return new File(theDir).toString();
 	}
