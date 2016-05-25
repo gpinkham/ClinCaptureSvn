@@ -223,10 +223,6 @@ public abstract class DataEntryServlet extends SpringServlet {
 
 	private DisplayItemBeanValidator displayItemBeanValidator;
 
-	@Override
-	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException;
-
 	private String getSectionFirstFieldId(int sectionId) {
 
 		ItemDAO itemDAO = new ItemDAO(getDataSource());
