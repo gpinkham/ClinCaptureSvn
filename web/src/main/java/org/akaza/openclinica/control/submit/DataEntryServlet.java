@@ -1153,23 +1153,25 @@ public abstract class DataEntryServlet extends SpringServlet {
 				}
 
 				boolean resetSDVForItems = false;
-				if (ecb.isSdvStatus() && changedItemsList.size() > 0) {
-					logger.debug("Status of Study Subject is SDV we are updating");
-					StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
-					ssb.setStatus(Status.AVAILABLE);
-					ssb.setUpdater(ub);
-					ssb.setUpdatedDate(new Date());
-					studySubjectDao.update(ssb);
-					ecb.setSdvUpdateId(ub.getId());
-					if (edcb.getSourceDataVerification().isAllRequired()
+				if ((ecb.getStage().isDoubleDE_Complete() || ecb.isSdvStatus()) && changedItemsList.size() > 0) {
+
+					if (ecb.isSdvStatus()) {
+						StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
+						ssb.setStatus(Status.AVAILABLE);
+						ssb.setUpdater(ub);
+						ssb.setUpdatedDate(new Date());
+						studySubjectDao.update(ssb);
+						ecb.setSdvUpdateId(ub.getId());
+					}
+					if ((ecb.isSdvStatus() && edcb.getSourceDataVerification().isAllRequired())
 							|| (edcb.getSourceDataVerification().isPartialRequired()
 							&& getItemSDVService().hasChangedSDVRequiredItems(changedItemsList))) {
 						ecb.setSdvStatus(false);
 						resetSDVForItems = true;
-					}				}
+					}
+				}
 
 				ecb = (EventCRFBean) ecdao.update(ecb);
-
 				if (ecb.isNotStarted()) {
 					ecb.setOwner(ub);
 				}
