@@ -625,18 +625,6 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 		return successMsg;
 	}
 
-	/**
-	 * Method that adds a message to the request.
-	 *
-	 * @param message
-	 *            String
-	 * @param request
-	 *            HttpServletRequest
-	 */
-	public void addPageMessage(String message, HttpServletRequest request) {
-		addPageMessage(message, request, logger);
-	}
-
 	protected void setToPanel(String title, String info, HttpServletRequest request) {
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		if (panel.isOrderedData()) {

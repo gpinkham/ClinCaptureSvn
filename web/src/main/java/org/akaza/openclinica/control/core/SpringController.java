@@ -61,10 +61,8 @@ public abstract class SpringController extends BaseSpringController {
 	 *            String
 	 * @param request
 	 *            HttpServletRequest
-	 * @param aLogger
-	 *            Logger
 	 */
-	public static void addPageMessage(String message, HttpServletRequest request, Logger aLogger) {
+	public static void addPageMessage(String message, HttpServletRequest request) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 
 		if (pageMessages == null) {
@@ -74,8 +72,23 @@ public abstract class SpringController extends BaseSpringController {
 		if (!pageMessages.contains(message) && !message.isEmpty()) {
 			pageMessages.add(message);
 		}
-		aLogger.debug(message);
+
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
+	}
+
+	/**
+	 * Method that adds a message to the request.
+	 *
+	 * @param message
+	 *            String
+	 * @param request
+	 *            HttpServletRequest
+	 * @param aLogger
+	 *            Logger
+	 */
+	public static void addPageMessage(String message, HttpServletRequest request, Logger aLogger) {
+		addPageMessage(message, request);
+		aLogger.debug(message);
 	}
 
 	/**
