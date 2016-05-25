@@ -872,7 +872,7 @@ public class Validator {
 					NumericComparisonOperator operator = (NumericComparisonOperator) v.getArg(0);
 					float compareTo = v.getFloat(1);
 					errorMessage = resexception.getString("input_provided_is_not") + operator.getDescription() + " "
-							+ new Float(compareTo).intValue() + ".";
+							+ (int) compareTo + ".";
 					break;
 				case LENGTH_NUMERIC_COMPARISON :
 					NumericComparisonOperator operator2 = (NumericComparisonOperator) v.getArg(0);
