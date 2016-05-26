@@ -783,7 +783,13 @@ public class ExpressionService {
 		return getOidFromExpression(expression, ZERO, ZERO);
 	}
 
-	private String getItemGroupOidFromExpression(String expression) {
+	/**
+	 * Get Item Group Bean OID from expression String.
+	 *
+	 * @param expression String
+	 * @return String
+	 */
+	public String getItemGroupOidFromExpression(String expression) {
 		return getOidFromExpression(expression, ONE, ONE).replaceAll(BRACKETS_AND_CONTENTS, "");
 	}
 
@@ -1319,6 +1325,10 @@ public class ExpressionService {
 				if (studyEventDefinition == null || crf == null) {
 					throw new OpenClinicaSystemException("OCRERR_0034");
 				}
+				if (this.getExpressionWrapper() != null && this.getExpressionWrapper().getStudyBean() != null
+						&& studyEventDefinition.getStudyId() != this.getExpressionWrapper().getStudyBean().getId()) {
+					throw new OpenClinicaSystemException("CCRERR_0036");
+				}
 
 				String key = Integer.toString(this.expressionWrapper.getStudyBean().getId()).concat("_")
 						.concat(Integer.toString(studyEventDefinition.getId())).concat("_")
@@ -1521,7 +1531,11 @@ public class ExpressionService {
 		return new CRFDAO(ds);
 	}
 
-	private ItemGroupDAO getItemGroupDao() {
+	/**
+	 * Get ItemGroupDAO.
+	 * @return ItemGroupDAO
+	 */
+	public ItemGroupDAO getItemGroupDao() {
 		return new ItemGroupDAO(ds);
 	}
 

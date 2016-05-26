@@ -13,15 +13,24 @@
 
 package org.akaza.openclinica.service.rule.expression;
 
+import junit.framework.TestCase;
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -37,6 +46,17 @@ public class ExpressionServiceTest extends DefaultAppContextTest {
 
 	private ExpressionService expressionService;
 	private RuleSetBean ruleSet;
+	private ExpressionService spyExpressionService;
+	private ItemGroupDAO mockedItemGroupDAO;
+
+	public static final String TEST_E_OID = "STUDY_EVENT_OID";
+	public static final String TEST_F_OID = "FORM_OID";
+	public static final String TEST_IG_OID = "ITEM_GROUP_OID";
+	public static final String TEST_I_OID = "ITEM_OID_1";
+	public static final String TEST_EXPRESSION = TEST_E_OID + "." + TEST_F_OID + "." + TEST_IG_OID  + "." + TEST_I_OID;
+
+	public static final int ID_1 = 1;
+	public static final int ID_2 = 2;
 
 	/**
 	 * Sets up objects to be used in tests.
@@ -45,6 +65,7 @@ public class ExpressionServiceTest extends DefaultAppContextTest {
 	public void setUp() {
 		BasicDataSource ds = new BasicDataSource();
 		expressionService = new ExpressionService(ds);
+		spyExpressionService = Mockito.spy(new ExpressionService(ds));
 		ruleSet = new RuleSetBean();
 
 		ExpressionBean ruleTarget = new ExpressionBean();
@@ -57,6 +78,28 @@ public class ExpressionServiceTest extends DefaultAppContextTest {
 
 		ruleSet.setOriginalTarget(originalTarget);
 		ruleSet.setTarget(ruleTarget);
+
+		StudyBean studyBean = new StudyBean();
+		studyBean.setId(ID_1);
+		StudyEventDefinitionBean sedBean = new StudyEventDefinitionBean();
+		sedBean.setStudyId(ID_2);
+		CRFBean crfBean = new CRFBean();
+		crfBean.setId(ID_1);
+		ItemGroupBean itemGroupBean = new ItemGroupBean();
+		itemGroupBean.setCrfId(crfBean.getId());
+
+		ExpressionBean expressionBean = new ExpressionBean();
+		ExpressionObjectWrapper wrapper = new ExpressionObjectWrapper(dataSource, studyBean, expressionBean);
+		spyExpressionService.setExpressionWrapper(wrapper);
+
+		mockedItemGroupDAO = Mockito.mock(ItemGroupDAO.class);
+
+		Mockito.doReturn(new ItemBean()).when(spyExpressionService).getItemFromExpression(Mockito.anyString());
+		Mockito.doReturn(TEST_IG_OID).when(spyExpressionService).getItemGroupOidFromExpression(Mockito.anyString());
+		Mockito.doReturn(mockedItemGroupDAO).when(spyExpressionService).getItemGroupDao();
+		Mockito.doReturn(itemGroupBean).when(mockedItemGroupDAO).findByOid(Mockito.anyString());
+		Mockito.doReturn(crfBean).when(spyExpressionService).getCRFFromExpression(Mockito.anyString());
+		Mockito.doReturn(sedBean).when(spyExpressionService).getStudyEventDefinitionFromExpression(Mockito.anyString());
 	}
 
 	/**
@@ -234,6 +277,74 @@ public class ExpressionServiceTest extends DefaultAppContextTest {
 			String localizedDate = new SimpleDateFormat(dateFormatString, locale).format(new SimpleDateFormat(
 					"yyyy-MM-dd").parse(systemDate));
 			assertEquals(expressionService.ifValueIsDate(itemBean, localizedDate), systemDate);
+		}
+	}
+
+	@Test
+	public void testThatIsExpressionValidWithOptimiseRuleValidatorThrowsErrorIfItemIsNotFound() {
+		Mockito.doReturn(null).when(spyExpressionService).getItemFromExpression(Mockito.anyString());
+
+		String errorCode = "";
+		try {
+			spyExpressionService.isExpressionValidWithOptimiseRuleValidator(TEST_EXPRESSION, false);
+		} catch (OpenClinicaSystemException ex) {
+			errorCode = ex.getErrorCode();
+		} finally {
+			TestCase.assertEquals("OCRERR_0023", errorCode);
+		}
+	}
+
+	@Test
+	public void testThatIsExpressionValidWithOptimiseRuleValidatorThrowsErrorIfItemGroupIsNotFound() {
+		Mockito.doReturn(null).when(mockedItemGroupDAO).findByOid(Mockito.anyString());
+
+		String errorCode = "";
+		try {
+			spyExpressionService.isExpressionValidWithOptimiseRuleValidator(TEST_EXPRESSION, false);
+		} catch (OpenClinicaSystemException ex) {
+			errorCode = ex.getErrorCode();
+		} finally {
+			TestCase.assertEquals("OCRERR_0022", errorCode);
+		}
+	}
+
+	@Test
+	public void testThatIsExpressionValidWithOptimiseRuleValidatorThrowsErrorIfCRFIsNotFound() {
+		Mockito.doReturn(null).when(spyExpressionService).getCRFFromExpression(Mockito.anyString());
+
+		String errorCode = "";
+		try {
+			spyExpressionService.isExpressionValidWithOptimiseRuleValidator(TEST_EXPRESSION, false);
+		} catch (OpenClinicaSystemException ex) {
+			errorCode = ex.getErrorCode();
+		} finally {
+			TestCase.assertEquals("OCRERR_0033", errorCode);
+		}
+	}
+
+	@Test
+	public void testThatIsExpressionValidWithOptimiseRuleValidatorThrowsErrorIfStudyEventIsNotFound() {
+		Mockito.doReturn(null).when(spyExpressionService).getStudyEventDefinitionFromExpression(Mockito.anyString());
+
+		String errorCode = "";
+		try {
+			spyExpressionService.isExpressionValidWithOptimiseRuleValidator(TEST_EXPRESSION, false);
+		} catch (OpenClinicaSystemException ex) {
+			errorCode = ex.getErrorCode();
+		} finally {
+			TestCase.assertEquals("OCRERR_0034", errorCode);
+		}
+	}
+
+	@Test
+	public void testThatIsExpressionValidWithOptimiseRuleValidatorThrowsErrorIfEventIsNotPresentInStudy() {
+		String errorCode = "";
+		try {
+			spyExpressionService.isExpressionValidWithOptimiseRuleValidator(TEST_EXPRESSION, false);
+		} catch (OpenClinicaSystemException ex) {
+			errorCode = ex.getErrorCode();
+		} finally {
+			TestCase.assertEquals("CCRERR_0036", errorCode);
 		}
 	}
 }
