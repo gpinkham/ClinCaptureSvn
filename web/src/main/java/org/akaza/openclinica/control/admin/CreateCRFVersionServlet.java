@@ -411,7 +411,7 @@ public class CreateCRFVersionServlet extends SpringServlet {
 					ex.printStackTrace();
 					String message = getResWord().getString("the_application_encountered_a_problem_uploading_CRF");
 					logger.info(message + ": " + ex.getMessage());
-					this.addPageMessage(message, request);
+					addPageMessage(message, request);
 				} finally {
 					if (inputStream != null) {
 						try {
