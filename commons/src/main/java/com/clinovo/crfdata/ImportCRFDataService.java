@@ -338,7 +338,7 @@ public class ImportCRFDataService {
 					for (CRFVersionBean crfVersionBean : crfVersionBeans) {
 
 						CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersionBean.getCrfId()));
-						ArrayList<EventCRFBean> eventCrfBeans = new EventCRFDAO(ds)
+						List<EventCRFBean> eventCrfBeans = new EventCRFDAO(ds)
 								.findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBean, crfBean.getOid());
 
 						if (eventCrfBeans.isEmpty()) {
@@ -574,7 +574,7 @@ public class ImportCRFDataService {
 					CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersion.getCrfId()));
 
 					EventCRFBean eventCRFBean = null;
-					ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO
+					List<EventCRFBean> eventCrfBeans = eventCRFDAO
 							.findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent, crfBean.getOid());
 					if (eventCrfBeans.size() > 0) {
 						eventCRFBean = eventCrfBeans.get(0);

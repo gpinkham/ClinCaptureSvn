@@ -1325,9 +1325,12 @@ public class ExpressionService {
 				if (studyEventDefinition == null || crf == null) {
 					throw new OpenClinicaSystemException("OCRERR_0034");
 				}
-				if (this.getExpressionWrapper() != null && this.getExpressionWrapper().getStudyBean() != null
-						&& studyEventDefinition.getStudyId() != this.getExpressionWrapper().getStudyBean().getId()) {
-					throw new OpenClinicaSystemException("CCRERR_0036");
+				if (this.getExpressionWrapper() != null && this.getExpressionWrapper().getStudyBean() != null) {
+					StudyBean studyBean = this.getExpressionWrapper().getStudyBean();
+					int studyId = studyBean.isSite() ? studyBean.getParentStudyId() : studyBean.getId();
+					if (studyEventDefinition.getStudyId() != studyId) {
+						throw new OpenClinicaSystemException("CCRERR_0036");
+					}
 				}
 
 				String key = Integer.toString(this.expressionWrapper.getStudyBean().getId()).concat("_")

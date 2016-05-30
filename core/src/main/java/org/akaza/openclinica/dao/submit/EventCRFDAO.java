@@ -587,9 +587,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	 *            StudyEventBean
 	 * @param crfVersionOrCrfOID
 	 *            String
-	 * @return ArrayList
+	 * @return List
 	 */
-	public ArrayList findAllByStudyEventAndCrfOrCrfVersionOid(StudyEventBean studyEvent, String crfVersionOrCrfOID) {
+	public List<EventCRFBean> findAllByStudyEventAndCrfOrCrfVersionOid(StudyEventBean studyEvent,
+			String crfVersionOrCrfOID) {
+
 		HashMap variables = new HashMap();
 		int ind = 1;
 		variables.put(ind++, studyEvent.getId());
