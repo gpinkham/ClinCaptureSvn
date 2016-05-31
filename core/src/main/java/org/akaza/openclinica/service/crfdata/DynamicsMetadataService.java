@@ -79,7 +79,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
 /**
  * Service performs actions for show/hide and insert rules.
  */
-@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
+@SuppressWarnings({"unchecked", "deprecation"})
 public class DynamicsMetadataService implements MetadataServiceInterface {
 	public static final int FOUR = 4;
 	public static final int THREE = 3;

@@ -112,7 +112,6 @@ public class RuleRunner {
 		return ruleOid + " " + message;
 	}
 
-	@SuppressWarnings("unchecked")
 	HashMap<String, String> prepareEmailContents(RuleSetBean ruleSet,
 												 StudyBean currentStudy, RuleActionBean ruleAction) {
 
