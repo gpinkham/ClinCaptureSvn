@@ -308,8 +308,8 @@ public final class EventDefinitionValidator {
 			StudyEventDefinitionBean studyEventDefinitionBean, StudyBean currentStudy) {
 		Locale locale = LocaleResolver.getLocale();
 
-		CRFVersionBean crfVersionBean = (CRFVersionBean) new CRFVersionDAO(dataSource).findByFullName(versionName,
-				crfName);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) new CRFVersionDAO(dataSource)
+				.findByFullNameAndStudy(versionName, crfName, currentStudy);
 
 		HashMap errors = validateEDC(messageSource, eventId, versionName, crfName, sdvCode, emailWhen, email, false,
 				crfVersionBean, studyEventDefinitionBean, currentStudy);
@@ -352,8 +352,8 @@ public final class EventDefinitionValidator {
 			StudyBean currentStudy, EDCItemMetadataService edcItemMetadataService) {
 		Locale locale = LocaleResolver.getLocale();
 
-		CRFVersionBean crfVersionBean = (CRFVersionBean) new CRFVersionDAO(dataSource)
-				.findByFullName(eventDefinitionCRFBean.getDefaultVersionName(), eventDefinitionCRFBean.getCrfName());
+		CRFVersionBean crfVersionBean = (CRFVersionBean) new CRFVersionDAO(dataSource).findByFullNameAndStudy(
+				eventDefinitionCRFBean.getDefaultVersionName(), eventDefinitionCRFBean.getCrfName(), currentStudy);
 
 		boolean hasSDVRequiredItems = false;
 		List<EDCItemMetadata> edcItemMetadataList = edcItemMetadataService
@@ -430,8 +430,8 @@ public final class EventDefinitionValidator {
 					defaultVersionIsPresent = !defaultVersionIsPresent
 							&& versionId == eventDefinitionCRFBean.getDefaultVersionId() || defaultVersionIsPresent;
 					CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(versionId);
-					crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(crfVersionBean.getName(),
-							eventDefinitionCRFBean.getCrfName());
+					crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullNameAndStudy(crfVersionBean.getName(),
+							eventDefinitionCRFBean.getCrfName(), currentStudy);
 					if (crfVersionBean.getId() == 0) {
 						ArrayList errorMessages = new ArrayList();
 						errorMessages.add(messageSource.getMessage("eventDefinitionValidator.crfDoesNotHaveVersion",

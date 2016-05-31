@@ -105,6 +105,13 @@ public class JsonErrorMessageProducer implements ErrorMessageProducer {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void crfNameHasAlreadyBeenUsed() throws CRFReadingException {
+		throw new CRFReadingException(crfBuilder.getMessage("crf_name_already_used"));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void sectionLabelIsBlank() {
 		crfBuilder.getErrorsList().add(crfBuilder.getMessage("importcrf.sectionLabelIsBlank")
 				+ crfBuilder.getMessage("importcrf.checkItem", new Object[]{crfBuilder.getCurrentItem().getName()}));

@@ -74,6 +74,14 @@ public interface ErrorMessageProducer {
 	void didNotMatchCrfName(String crfName) throws CRFReadingException;
 
 	/**
+	 * Generate error message if crf name has already been used.
+	 *
+	 * @throws CRFReadingException
+	 *             the CRFReadingException
+	 */
+	void crfNameHasAlreadyBeenUsed() throws CRFReadingException;
+
+	/**
 	 * Generate error message if crf version has already been used.
 	 *
 	 * @throws CRFReadingException

@@ -29,9 +29,18 @@
         OC_OID = ?</sql>
     </query>
 	<query>
-		<name>findByName</name>
-		<sql>SELECT * FROM CRF WHERE
-		name = ?</sql>
+		<name>findByNameInGUIStudies</name>
+		<sql>
+			select c.* from crf c
+			join study s on s.study_id = c.source_study_id
+			where s.origin != 'studio' and c.name = ?
+		</sql>
+	</query>
+	<query>
+		<name>findByNameAndStudy</name>
+		<sql>
+			select * from crf where name = ? and source_study_id = ?
+		</sql>
 	</query>
     <query>
 		<name>findAnotherByName</name>

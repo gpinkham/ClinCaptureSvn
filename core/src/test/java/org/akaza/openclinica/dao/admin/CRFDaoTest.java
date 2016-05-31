@@ -20,6 +20,7 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -29,6 +30,7 @@ import org.mockito.internal.util.reflection.Whitebox;
 
 public class CRFDaoTest extends DefaultAppContextTest {
 
+	private StudyBean studyBean;
 	private String dbTypeOracle;
 	private String dbTypePostgres;
 	private CRFBean testCRFBean;
@@ -37,6 +39,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 
 	@Before
 	public void setUp() {
+		studyBean = (StudyBean) studyDAO.findByPK(1);
 
 		dbTypeOracle = "oracle";
 		dbTypePostgres = "postgres";
@@ -90,9 +93,11 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindByNameReturnsCRFWithCorrectName() throws OpenClinicaException {
+	public void testThatFindByNameAndStudyMethodWorksFine() throws OpenClinicaException {
 		String cfrName = "Agent Administration";
-		assertEquals(cfrName, crfdao.findByName(cfrName).getName());
+		CRFBean crfBean = (CRFBean) crfdao.findByNameAndStudy(cfrName, studyBean);
+		assertTrue(crfBean.getId() > 0);
+		assertEquals(cfrName, crfBean.getName());
 	}
 
 	@Test

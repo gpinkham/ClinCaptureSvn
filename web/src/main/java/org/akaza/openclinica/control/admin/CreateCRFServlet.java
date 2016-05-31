@@ -132,7 +132,7 @@ public class CreateCRFServlet extends SpringServlet {
 
 				} else {
 
-					CRFBean crf1 = (CRFBean) cdao.findByName(name.trim());
+					CRFBean crf1 = (CRFBean) cdao.findByNameAndStudy(name, getCurrentStudy());
 					if (crf1.getId() > 0) {
 						Validator.addError(errors, "name", getResException().getString("CRF_name_used_choose_unique_name"));
 						request.setAttribute("formMessages", errors);
@@ -145,7 +145,7 @@ public class CreateCRFServlet extends SpringServlet {
 						crf.setStatus(Status.AVAILABLE);
 						cdao.create(crf);
 
-						crf = (CRFBean) cdao.findByName(crf.getName());
+						crf = (CRFBean) cdao.findByNameAndStudy(crf.getName(), getCurrentStudy());
 						CRFVersionBean version = new CRFVersionBean();
 						version.setCrfId(crf.getId());
 						request.getSession().setAttribute("version", version);

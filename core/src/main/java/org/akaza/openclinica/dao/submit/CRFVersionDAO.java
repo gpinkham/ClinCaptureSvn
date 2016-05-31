@@ -33,12 +33,15 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+
+import com.clinovo.enums.study.StudyOrigin;
 
 /**
  * <p>
@@ -394,30 +397,39 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	}
 
 	/**
+	 * Method that finds crf version by crf version name, crf name and study.
 	 * 
 	 * @param version
 	 *            CRF version
 	 * @param crfName
 	 *            Name of CRF
+	 * @param studyBean
+	 *            StudyBean
 	 * @return CRFVersionBean
 	 */
-	public EntityBean findByFullName(String version, String crfName) {
-		CRFVersionBean eb = new CRFVersionBean();
-		this.setTypesExpected();
+	public EntityBean findByFullNameAndStudy(String version, String crfName, StudyBean studyBean) {
+		String sql;
+		int index = 1;
+		setTypesExpected();
+		CRFVersionBean crfVersionBean = new CRFVersionBean();
 
 		HashMap variables = new HashMap();
-		variables.put(1, version);
-		variables.put(2, crfName);
+		variables.put(index++, version.trim());
+		variables.put(index++, crfName.trim());
 
-		String sql = digester.getQuery("findByFullName");
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-
-		if (it.hasNext()) {
-			eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("findByFullNameAndStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("findByFullNameInGUIStudies");
 		}
-		return eb;
 
+		List<HashMap> mapList = select(sql, variables);
+		Iterator<HashMap> mapIterator = mapList.iterator();
+		if (mapIterator.hasNext()) {
+			crfVersionBean = (CRFVersionBean) getEntityFromHashMap(mapIterator.next());
+		}
+		return crfVersionBean;
 	}
 
 	/**

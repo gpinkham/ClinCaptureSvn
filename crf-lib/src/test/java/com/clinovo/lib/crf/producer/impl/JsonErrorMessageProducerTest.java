@@ -113,6 +113,12 @@ public class JsonErrorMessageProducerTest extends DefaultAppContextTest {
 	}
 
 	@Test(expected = CRFReadingException.class)
+	public void testThatCrfNameHasAlreadyBeenUsedMethodGeneratesErrorMessage() throws Exception {
+		jsonErrorMessageProducer.crfNameHasAlreadyBeenUsed();
+		assertEquals(jsonCrfBuilder.getErrorsList().size(), 1);
+	}
+
+	@Test(expected = CRFReadingException.class)
 	public void testThatCrfVersionHasAlreadyBeenUsedMethodGeneratesErrorMessage() throws Exception {
 		jsonErrorMessageProducer.crfVersionHasAlreadyBeenUsed();
 		assertEquals(jsonCrfBuilder.getErrorsList().size(), 1);

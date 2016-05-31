@@ -4,11 +4,20 @@ import java.util.ArrayList;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.junit.Before;
 import org.junit.Test;
 
 public class CRFVersionDAOTest extends DefaultAppContextTest {
+
+	private StudyBean studyBean;
+
+	@Before
+	public void setUp() {
+		studyBean = (StudyBean) studyDAO.findByPK(1);
+	}
 
 	@Test
 	@SuppressWarnings("unchecked")
@@ -34,11 +43,13 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindByFullNameDoesNotReturnNull() throws OpenClinicaException {
-		String version = "1";
+	public void testThatFindByFullNameAndStudyMethodWorksFine() throws OpenClinicaException {
+		String version = "v2.0";
 		String cfrName = "Concomitant Medications AG";
-		CRFVersionBean crfVer = (CRFVersionBean) crfVersionDao.findByFullName(version, cfrName);
-		assertNotNull(crfVer);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullNameAndStudy(version, cfrName,
+				studyBean);
+		assertTrue(crfVersionBean.getId() > 0);
+		assertEquals(version, crfVersionBean.getName());
 	}
 
 	@Test

@@ -84,13 +84,21 @@ public final class CommonValidator {
 		if (crfBuilder.getCrfBean().getName().length() > INT_255) {
 			crfBuilder.getErrorMessageProducer().crfNameLengthIsExceeded();
 		}
+		if (crfBuilder.getOperationType() == OperationType.IMPORT_NEW_CRF) {
+			CRFBean crfBean = (CRFBean) crfDao.findByNameAndStudy(crfBuilder.getCrfBean().getName(),
+					crfBuilder.getStudyBean());
+			if (crfBean.getId() > 0) {
+				crfBuilder.getErrorMessageProducer().crfNameHasAlreadyBeenUsed();
+			}
+		}
 		if (crfBuilder.getOperationType() == OperationType.IMPORT_NEW_CRF_VERSION) {
 			CRFBean crfBean = (CRFBean) crfDao.findByPK(crfBuilder.getCrfBean().getId());
 			if (!crfBean.getName().equalsIgnoreCase(crfBuilder.getCrfBean().getName())) {
 				crfBuilder.getErrorMessageProducer().didNotMatchCrfName(crfBean.getName());
 			} else {
-				CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao
-						.findByFullName(crfBuilder.getCrfVersionBean().getName(), crfBuilder.getCrfBean().getName());
+				CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullNameAndStudy(
+						crfBuilder.getCrfVersionBean().getName(), crfBuilder.getCrfBean().getName(),
+						crfBuilder.getStudyBean());
 				if (crfVersionBean.getId() > 0) {
 					crfBuilder.getErrorMessageProducer().crfVersionHasAlreadyBeenUsed();
 				}

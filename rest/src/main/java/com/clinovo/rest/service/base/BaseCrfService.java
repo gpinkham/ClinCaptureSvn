@@ -69,7 +69,7 @@ public abstract class BaseCrfService extends BaseService {
 		if (crfName.isEmpty()) {
 			throw new RestException(messageSource, "rest.crfservice.importcrf.crfNameIsEmpty");
 		}
-		CRFBean crfBean = (CRFBean) getCRFDAO().findByName(crfName);
+		CRFBean crfBean = (CRFBean) getCRFDAO().findByNameAndStudy(crfName, getCurrentStudy());
 		if (crfBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.crfservice.importcrf.crfNameDoesNotExist",
 					new Object[]{crfName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

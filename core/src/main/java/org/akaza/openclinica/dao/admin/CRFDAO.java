@@ -33,12 +33,15 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+
+import com.clinovo.enums.study.StudyOrigin;
 
 /**
  * The data access object for instruments in the database.
@@ -435,27 +438,36 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that finds crf by name.
+	 * Method that finds crf by name and study.
 	 *
 	 * @param name
 	 *            String
+	 * @param studyBean
+	 *            StudyBean
 	 * @return CRFBean
 	 */
-	public EntityBean findByName(String name) {
-		CRFBean eb = new CRFBean();
-		this.setTypesExpected();
+	public EntityBean findByNameAndStudy(String name, StudyBean studyBean) {
+		String sql;
+		int index = 1;
+		setTypesExpected();
+		CRFBean crfBean = new CRFBean();
 
 		HashMap variables = new HashMap();
-		variables.put(1, name);
+		variables.put(index++, name.trim());
 
-		String sql = digester.getQuery("findByName");
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-
-		if (it.hasNext()) {
-			eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("findByNameAndStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("findByNameInGUIStudies");
 		}
-		return eb;
+
+		List<HashMap> mapList = select(sql, variables);
+		Iterator<HashMap> mapIterator = mapList.iterator();
+		if (mapIterator.hasNext()) {
+			crfBean = (CRFBean) getEntityFromHashMap(mapIterator.next());
+		}
+		return crfBean;
 	}
 
 	/**

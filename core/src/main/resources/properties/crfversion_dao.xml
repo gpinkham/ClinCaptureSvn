@@ -11,9 +11,21 @@
         OC_OID = ?</sql>
     </query>
 	<query>
-		<name>findByFullName</name>
-		<sql>SELECT cv.* FROM CRF_VERSION cv, CRF c WHERE 
-		cv.CRF_ID = c.CRF_ID AND cv.NAME = ? AND c.NAME = ?</sql>
+		<name>findByFullNameInGUIStudies</name>
+		<sql>
+			select cv.* from crf_version cv
+			join crf c on c.crf_id = cv.crf_id
+			join study s on s.study_id = c.source_study_id
+			where s.origin != 'studio' and cv.name = ? and c.name = ?
+		</sql>
+	</query>
+	<query>
+		<name>findByFullNameAndStudy</name>
+		<sql>
+			select cv.* from crf_version cv
+			join crf c on c.crf_id = cv.crf_id
+			where cv.name = ? and c.name = ? and c.source_study_id = ?
+		</sql>
 	</query>
 	<query>
 		<name>findAll</name>

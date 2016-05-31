@@ -152,7 +152,7 @@ public abstract class BaseEventService extends BaseService {
 
 	protected EventDefinitionCRFBean getEventDefinitionCRF(int eventId, String crfName, StudyBean studyBean,
 			boolean checkAvailability) throws Exception {
-		CRFBean crfBean = (CRFBean) getCRFDAO().findByName(crfName);
+		CRFBean crfBean = (CRFBean) getCRFDAO().findByNameAndStudy(crfName, studyBean);
 		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefinition(eventId, false);
 		if (crfBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.eventservice.crfNameIsNotFound", new Object[]{crfName},
@@ -221,7 +221,8 @@ public abstract class BaseEventService extends BaseService {
 	}
 
 	private CRFVersionBean getCrfVersionBean(String version, String crfName) throws Exception {
-		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO().findByFullName(version, crfName);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO().findByFullNameAndStudy(version, crfName,
+				getCurrentStudy());
 		if (crfVersionBean.getId() > 0) {
 			CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfVersionBean.getCrfId());
 			if (crfBean.getStudyId() != getCurrentStudy().getId()) {

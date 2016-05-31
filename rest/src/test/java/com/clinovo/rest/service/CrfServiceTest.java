@@ -24,7 +24,7 @@ public class CrfServiceTest extends BaseServiceTest {
 
 	@After
 	public void after() {
-		CRFBean crfBean = (CRFBean) crfdao.findByName(CRF_NAME);
+		CRFBean crfBean = (CRFBean) crfdao.findByNameAndStudy(CRF_NAME, defaultStudy);
 		if (crfBean != null && crfBean.getId() > 0) {
 			deleteCrfService.deleteCrf(crfBean.getId());
 		}
@@ -38,6 +38,24 @@ public class CrfServiceTest extends BaseServiceTest {
 	}
 
 	@Test
+	public void testThatImportCrfServiceDoesNotAllowToImportSameCrfTwiceInTheSameStudy() throws Exception {
+		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatImportCrfServiceDoesNotAllowToImportSameCrfTwiceInTheSameStudyEvenIfVersionIsDifferent() throws Exception {
+		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
+				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
+		jsonObject.put("version", "v2.0");
+		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", jsonObject.toString()).accept(mediaType)
+				.secure(true).session(session)).andExpect(status().isInternalServerError());
+	}
+
+	@Test
 	public void testThatImportCrfVersionServiceWorksFine() throws Exception {
 		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json")))
 				.andExpect(status().isOk());
@@ -46,7 +64,8 @@ public class CrfServiceTest extends BaseServiceTest {
 		jsonObject.put("version", newCrfVersion);
 		mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF_VERSION).param("jsonData", jsonObject.toString()))
 				.andExpect(status().isOk());
-		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName(newCrfVersion, CRF_NAME);
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullNameAndStudy(newCrfVersion, CRF_NAME,
+				defaultStudy);
 		assertTrue(crfVersionBean.getId() > 0);
 	}
 
