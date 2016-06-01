@@ -48,8 +48,19 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+
+  /**
+  * Update Subject Group Class Servlet.
+  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Component
 public class UpdateSubjectGroupClassServlet extends SpringServlet {
@@ -83,7 +94,8 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 		int classId = fp.getInt("id");
 		StudyBean currentStudy = getCurrentStudy(request);
 		String action = request.getParameter("action");
-
+		request.getSession().setAttribute("maxNumberOfSubjectGroups", CreateSubjectGroupClassServlet.MAX_NUMBER_OF_SUBJECT_GROUPS);
+		
 		if (classId == 0) {
 			addPageMessage(getResPage().getString("please_choose_a_subject_group_class_to_edit"), request);
 			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
@@ -180,7 +192,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 	}
 
 	/**
-	 * Validates the first section of study and save it into study bean
+	 * Validates the first section of study and save it into study bean.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -212,9 +224,9 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 		v.addValidation("subjectAssignment", Validator.NO_BLANKS);
 
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				30);
+				CreateSubjectGroupClassServlet.MAX_NAME_LENGTH);
 		v.addValidation("subjectAssignment", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, CreateSubjectGroupClassServlet.MAX_NAME_LENGTH);
 
 		HashMap errors = v.validate();
 
@@ -251,8 +263,8 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 				}
 			}
 			// sort: Events from DB will be first, new marked Events - second
-			for (Integer index : ordinalToStudyEventDefinitionId.keySet()) {
-				int id = ordinalToStudyEventDefinitionId.get(index);
+			for (Map.Entry<Integer, Integer> entry : ordinalToStudyEventDefinitionId.entrySet()) {
+				int id = entry.getValue();
 				if (studyEventDefinitionIdToOrdinal.containsKey(id)) {
 					sortedListOfDefinitions.add(idToStudyEventDefinition.get(id));
 				}
@@ -266,7 +278,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 			atLeastOneEventDefSelected = true;
 			StringBuilder rowsWithDuplicateNames = new StringBuilder("");
 			Set<String> setOfNames = new HashSet<String>();
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < CreateSubjectGroupClassServlet.MAX_NUMBER_OF_SUBJECT_GROUPS; i++) {
 				String name = fp.getString("studyGroup" + i).trim();
 				String description = fp.getString("studyGroupDescription" + i);
 				int studyGroupId = fp.getInt("studyGroupId" + i);
@@ -276,7 +288,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 					sGroup.setDescription(description);
 					sGroup.setId(studyGroupId);
 					studyGroups.add(sGroup);
-					if (name.length() > 255) {
+					if (name.length() > CreateSubjectGroupClassServlet.MAX_GROUP_NAME_LENGTH) {
 						Validator.addError(errors, "studyGroupError",
 								getResPage().getString("group_name_cannot_be_more_255"));
 					}
@@ -286,7 +298,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 								getResPage().getString("please_correct_the_duplicate_name_found_in_row") + " "
 										+ rowsWithDuplicateNames.substring(1));
 					}
-					if (description.length() > 1000) {
+					if (description.length() > CreateSubjectGroupClassServlet.MAX_GROUP_DESC_LENGTH) {
 						Validator.addError(errors, "studyGroupError",
 								getResPage().getString("group_description_cannot_be_more_100"));
 					}
@@ -357,7 +369,7 @@ public class UpdateSubjectGroupClassServlet extends SpringServlet {
 
 				// read order from submit-page and create ordered list
 				for (StudyEventDefinitionBean def : listOfDefinitions) {
-					int index = Integer.valueOf(request.getParameter("event" + def.getId()));
+					int index = Integer.parseInt(request.getParameter("event" + def.getId()));
 					listOfOrderedDefinitions.set(index - 1, def);
 				}
 				// if it is needed, create DynamicEventBeans and write them to DB

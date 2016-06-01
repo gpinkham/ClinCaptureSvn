@@ -52,7 +52,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jxu, igor
@@ -62,6 +67,12 @@ import java.util.*;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @Component
 public class CreateSubjectGroupClassServlet extends SpringServlet {
+	
+	public static final int MAX_NUMBER_OF_SUBJECT_GROUPS = 100;
+	public static final int MAX_NAME_LENGTH = 30;
+	public static final int MAX_GROUP_NAME_LENGTH = 255;
+	public static final int MAX_GROUP_DESC_LENGTH = 1000;
+	
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
@@ -100,6 +111,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 
 		String action = request.getParameter("action");
 
+		request.getSession().setAttribute("maxNumberOfSubjectGroups", MAX_NUMBER_OF_SUBJECT_GROUPS);
 		if (StringUtil.isBlank(action)) {
 			ArrayList studyGroups = new ArrayList();
 			StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
@@ -139,7 +151,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 	}
 
 	/**
-	 * Validates the first section of study inputs and save it into study bean
+	 * Validates the first section of study inputs and save it into study bean.
 	 * 
 	 * @param request
 	 *            HttpServletRequest
@@ -170,9 +182,9 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 		v.addValidation("subjectAssignment", Validator.NO_BLANKS);
 
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				30);
+				MAX_NAME_LENGTH);
 		v.addValidation("subjectAssignment", Validator.LENGTH_NUMERIC_COMPARISON,
-				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
+				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, MAX_NAME_LENGTH);
 
 		HashMap errors = v.validate();
 
@@ -200,7 +212,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 			atLeastOneEventDefSelected = true;
 			StringBuilder rowsWithDuplicateNames = new StringBuilder("");
 			Set<String> setOfNames = new HashSet<String>();
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < MAX_NUMBER_OF_SUBJECT_GROUPS; i++) {
 				String name = fp.getString("studyGroup" + i).trim();
 				String description = fp.getString("studyGroupDescription" + i);
 				if (!StringUtil.isBlank(name)) {
@@ -208,7 +220,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 					sGroup.setName(name);
 					sGroup.setDescription(description);
 					studyGroups.add(sGroup);
-					if (name.length() > 255) {
+					if (name.length() > MAX_GROUP_NAME_LENGTH) {
 						Validator.addError(errors, "studyGroupError",
 								getResPage().getString("group_name_cannot_be_more_255"));
 					}
@@ -218,7 +230,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 								getResPage().getString("please_correct_the_duplicate_name_found_in_row") + " "
 										+ rowsWithDuplicateNames.substring(1));
 					}
-					if (description.length() > 1000) {
+					if (description.length() > MAX_GROUP_DESC_LENGTH) {
 						Validator.addError(errors, "studyGroupError",
 								getResPage().getString("group_description_cannot_be_more_100"));
 					}
@@ -264,7 +276,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 	}
 
 	/**
-	 * Saves study group information into database
+	 * Saves study group information into database.
 	 * 
 	 * @throws OpenClinicaException
 	 */
@@ -292,7 +304,7 @@ public class CreateSubjectGroupClassServlet extends SpringServlet {
 
 				// read order from submit-page and create ordered list
 				for (StudyEventDefinitionBean def : listOfDefinitions) {
-					int index = Integer.valueOf(request.getParameter("event" + def.getId()));
+					int index = Integer.parseInt(request.getParameter("event" + def.getId()));
 					listOfOrderedDefinitions.set(index - 1, def);
 				}
 				// create DynamicEventBeans and write to DB

@@ -73,7 +73,7 @@
 
   function showMoreFields(index) {
   
-	for (var j=index+1; (j<51)&&(j<(index+4)); j++){
+	for (var j=index+1; (j<${maxNumberOfSubjectGroups}+1)&&(j<(index+4)); j++){
 		$("tr#row"+j).show();
 	}
   }	
@@ -261,8 +261,8 @@
 						<c:when test="${count < 5}">
 							<c:set var="delta" value="${6-count}"/>
 						</c:when>
-						<c:when test="${count > 46}">
-							<c:set var="delta" value="${49-count}"/>
+						<c:when test="${count > maxNumberOfSubjectGroups-4}">
+							<c:set var="delta" value="${maxNumberOfSubjectGroups-1-count}"/>
 						</c:when>
 						<c:otherwise>
 							<c:set var="delta" value="2"/>
@@ -289,8 +289,8 @@
 					<c:set var="count" value="${count+1}"/>
 					</c:forEach>
 					
-					<c:if test="${count <= 49}">
-						<c:forEach begin="${count}" end="49">
+					<c:if test="${count <= maxNumberOfSubjectGroups-1}">
+						<c:forEach begin="${count}" end="${maxNumberOfSubjectGroups-1}">
 						<tr style="display: none" id="row${count}">  
 							<td valign="top"><c:out value="${count+1}"/>&nbsp;</td>    
 							<td>
