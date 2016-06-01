@@ -166,7 +166,7 @@ public class CRFDaoTest extends DefaultAppContextTest {
 		eventCRFDAO.delete(14);
 
 		// now we are able to delete crf
-		crfdao.deleteCrfById(3);
+		crfdao.deleteCrf(3);
 		CRFBean crfBean = (CRFBean) crfdao.findByPK(3);
 		assertFalse(crfBean.isActive());
 	}

@@ -44,9 +44,9 @@ public class SpreadSheetImportCrfServiceImplTest extends DefaultAppContextTest {
 	}
 
 	@After
-	public void after() {
+	public void after() throws Exception {
 		if (crfBuilder != null && crfBuilder.getCrfBean() != null && crfBuilder.getCrfBean().getId() > 0) {
-			deleteCrfService.deleteCrf(crfBuilder.getCrfBean().getId());
+			deleteCrfService.deleteCrf(crfBuilder.getCrfBean(), owner, Locale.ENGLISH, false);
 		}
 	}
 

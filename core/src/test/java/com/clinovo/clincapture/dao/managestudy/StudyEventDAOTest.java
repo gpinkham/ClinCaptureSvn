@@ -44,9 +44,9 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindStudyEventsByCrfVersionAndSubjectEventStatusReturnsCorrectSize()
 			throws OpenClinicaException {
-		assertEquals(
-				studyEventDao.findStudyEventsByCrfVersionAndSubjectEventStatus(1,
-						SubjectEventStatus.SOURCE_DATA_VERIFIED).size(), 0);
+		assertEquals(studyEventDao
+				.findStudyEventsByCrfVersionAndSubjectEventStatus(1, SubjectEventStatus.SOURCE_DATA_VERIFIED).size(),
+				0);
 	}
 
 	@Test
@@ -96,5 +96,10 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 
 		assertEquals(eventCRFDAO.findByPK(eventCrfId).getId(), 0);
 		assertEquals(studyEventDao.findByPK(studyEventId).getId(), 0);
+	}
+
+	@Test
+	public void testThatFindStartedCompletedOrSDVStudyEventsByCrfMathodReturnsCorrectCollectionSize() {
+		assertEquals(studyEventDao.findStartedCompletedOrSDVStudyEventsByCrf(1).size(), 5);
 	}
 }

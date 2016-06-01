@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clinovo.rest.model.Response;
 import com.clinovo.rest.service.base.BaseCrfService;
 
 /**
@@ -194,5 +195,39 @@ public class CrfService extends BaseCrfService {
 	@RequestMapping(value = "/crfVersion/unlock", method = RequestMethod.POST)
 	public CRFVersionBean unlockCrfVersion(@RequestParam("id") int crfVersionId) throws Exception {
 		return unlockCrfVersionBean(crfVersionId);
+	}
+
+	/**
+	 * Method deletes crf.
+	 *
+	 * @param crfId
+	 *            int
+	 * @param force
+	 *            boolean
+	 * @return Response
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crf/delete", method = RequestMethod.POST)
+	public Response deleteCrf(@RequestParam("id") int crfId,
+			@RequestParam(value = "force", defaultValue = "false", required = false) boolean force) throws Exception {
+		return deleteCrfBean(crfId, force);
+	}
+
+	/**
+	 * Method deletes crf version.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 * @param force
+	 *            boolean
+	 * @return Response
+	 * @throws Exception
+	 *             an Exception
+	 */
+	@RequestMapping(value = "/crfVersion/delete", method = RequestMethod.POST)
+	public Response deleteCrfVersion(@RequestParam("id") int crfVersionId,
+			@RequestParam(value = "force", defaultValue = "false", required = false) boolean force) throws Exception {
+		return deleteCrfVersionBean(crfVersionId, force);
 	}
 }

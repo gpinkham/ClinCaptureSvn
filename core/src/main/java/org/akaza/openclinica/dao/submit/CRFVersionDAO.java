@@ -22,7 +22,6 @@
 package org.akaza.openclinica.dao.submit;
 
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -433,94 +432,20 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	}
 
 	/**
-	 * Generates all the delete queries for deleting a version.
-	 * 
-	 * @param versionId
-	 *            CRF Version
-	 * @param items
-	 *            ArrayList
-	 * @return List of deleted queries
-	 */
-	private ArrayList generateDeleteQueries(int versionId, ArrayList items) {
-		ArrayList sqls = new ArrayList();
-		String sql = digester.getQuery("deleteScdItemMetadataByVersion") + versionId + ")";
-		sqls.add(sql);
-		sql = digester.getQuery("deleteItemMetaDataByVersion") + versionId;
-		sqls.add(sql);
-		sql = digester.getQuery("deleteSectionsByVersion") + versionId;
-		sqls.add(sql);
-		sql = digester.getQuery("deleteItemMapByVersion") + versionId;
-		sqls.add(sql);
-		sql = digester.getQuery("deleteResponseSetsByVersion") + versionId;
-		sqls.add(sql);
-
-		sql = digester.getQuery("deleteItemGroupMetaByVersion") + versionId;
-		sqls.add(sql);
-
-		for (Object item1 : items) {
-			ItemBean item = (ItemBean) item1;
-			sql = digester.getQuery("deleteNotSharedItemDataByVersion") + item.getId();
-			sqls.add(sql);
-		}
-
-		for (Object item1 : items) {
-			ItemBean item = (ItemBean) item1;
-			sql = digester.getQuery("deleteItemsByVersion") + item.getId();
-			sqls.add(sql);
-		}
-
-		sql = digester.getQuery("deleteResponseSetByVersion") + versionId;
-		sqls.add(sql);
-
-		sql = digester.getQuery("deleteEventCrfByVersion") + versionId;
-		sqls.add(sql);
-
-		sql = digester.getQuery("delete") + versionId;
-		sqls.add(sql);
-		return sqls;
-
-	}
-
-	/**
 	 * Deletes crf version. Note: it will be better to use the DeleteCrfService.deleteCrfVersion(int crfVersionId)
 	 * instead of this method, cuz service has additional logic.
 	 * 
-	 * @param crfVersionBean
-	 *            CRFVersionBean
-	 * @param items
-	 *            ArrayList
+	 * @param crfVersionId
+	 *            int
 	 */
-	public void deleteCrfVersion(CRFVersionBean crfVersionBean, ArrayList items) {
-		Statement statement = null;
-		Connection connection = null;
-		try {
-			connection = ds.getConnection();
-			connection.setAutoCommit(false);
-			List<String> queryList = (List<String>) generateDeleteQueries(crfVersionBean.getId(), items);
-			for (String query : queryList) {
-				statement = connection.createStatement();
-				statement.executeUpdate(query);
-				statement.close();
-			}
-			connection.commit();
-		} catch (Exception ex) {
-			logger.error("Error has occurred.", ex);
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-			} catch (Exception ex) {
-				logger.error("Error has occurred.", ex);
-			}
-			try {
-				if (statement != null) {
-					statement.close();
-				}
-			} catch (Exception ex) {
-				logger.error("Error has occurred.", ex);
-			}
+	public void deleteCrfVersion(int crfVersionId) {
+		final int max = 14;
+		String sql = digester.getQuery("deleteCrfVersion");
+		HashMap variables = new HashMap();
+		for (int i = 1; i <= max; i++) {
+			variables.put(i, crfVersionId);
 		}
+		execute(sql, variables);
 	}
 
 	private String getOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {

@@ -828,6 +828,36 @@
         </sql>
     </query>
     <query>
+        <name>deleteByCrfId</name>
+        <sql>
+            delete from discrepancy_note where discrepancy_note_id in (select distinct dn_id.discrepancy_note_id from dn_item_data_map dn_id
+            join item_data id on id.item_data_id = dn_id.item_data_id
+            join event_crf ec on ec.event_crf_id = id.event_crf_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            where cv.crf_id = ?);
+
+            delete from discrepancy_note where discrepancy_note_id in (select distinct dn_ec.discrepancy_note_id from dn_event_crf_map dn_ec
+            join event_crf ec on ec.event_crf_id = dn_ec.event_crf_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            where cv.crf_id = ?);
+        </sql>
+    </query>
+    <query>
+        <name>deleteByCrfVersionId</name>
+        <sql>
+            delete from discrepancy_note where discrepancy_note_id in (select distinct dn_id.discrepancy_note_id from dn_item_data_map dn_id
+            join item_data id on id.item_data_id = dn_id.item_data_id
+            join event_crf ec on ec.event_crf_id = id.event_crf_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            where cv.crf_version_id = ?);
+
+            delete from discrepancy_note where discrepancy_note_id in (select distinct dn_ec.discrepancy_note_id from dn_event_crf_map dn_ec
+            join event_crf ec on ec.event_crf_id = dn_ec.event_crf_id
+            join crf_version cv on cv.crf_version_id = ec.crf_version_id
+            where cv.crf_version_id = ?);
+        </sql>
+    </query>
+    <query>
         <name>createSubjectMap</name>
         <sql>
             INSERT INTO dn_subject_map

@@ -38,7 +38,6 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.upload.FileUploadHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -55,6 +54,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
+import org.akaza.openclinica.upload.FileUploadHelper;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -169,15 +169,17 @@ public class CreateCRFVersionServlet extends SpringServlet {
 				forwardPage(Page.CREATE_CRF_VERSION_NODELETE, request, response);
 				return;
 			}
-			getDeleteCrfService().deleteCrfVersion(previousVersionId);
+			try {
+				getDeleteCrfService().deleteCrfVersion((CRFVersionBean) getCRFVersionDAO().findByPK(previousVersionId),
+						LocaleResolver.getLocale(), false);
+			} catch (Exception ex) {
+				addPageMessage(ex.getMessage(), request);
+			}
 		}
 		logger.info("commit sql");
 		CrfBuilder crfBuilder = (CrfBuilder) request.getSession().getAttribute("crfBuilder");
 		if (crfBuilder != null) {
-
 			CRFVersionDAO cvdao = getCRFVersionDAO();
-			List<CRFVersionBean> crfVersionList = (List<CRFVersionBean>) cvdao
-					.findAllActiveByCRF(version.getCrfId());
 			crfBuilder.save();
 
 			ArrayList crfvbeans;
@@ -228,7 +230,9 @@ public class CreateCRFVersionServlet extends SpringServlet {
 					String finalDir = dir + "crf" + File.separator + "new" + File.separator;
 					if (!new File(finalDir).isDirectory()) {
 						logger.info("need to create folder for excel files" + finalDir);
-						new File(finalDir).mkdirs();
+						if (!new File(finalDir).mkdirs()) {
+							logger.error("Cannot create the directory " + finalDir);
+						}
 					}
 					String newFile = version.getCrfId() + version.getOid() + ".xls";
 					logger.info("*** ^^^ *** new file: " + newFile);
@@ -242,8 +246,8 @@ public class CreateCRFVersionServlet extends SpringServlet {
 			}
 			request.getSession().removeAttribute("tempFileName");
 			request.getSession().removeAttribute("excelErrors");
-				request.getSession().removeAttribute("htmlTab");
-				forwardPage(Page.CREATE_CRF_VERSION_DONE, request, response);
+			request.getSession().removeAttribute("htmlTab");
+			forwardPage(Page.CREATE_CRF_VERSION_DONE, request, response);
 		} else {
 			forwardPage(Page.CREATE_CRF_VERSION, request, response);
 		}
@@ -272,8 +276,11 @@ public class CreateCRFVersionServlet extends SpringServlet {
 		String theDir = dir + "crf" + File.separator + "original" + File.separator;
 		if (!(new File(theDir)).isDirectory()) {
 			// noinspection ResultOfMethodCallIgnored
-			(new File(theDir)).mkdirs();
-			logger.info("Made the directory " + theDir);
+			if (!new File(theDir).mkdirs()) {
+				logger.error("Cannot create the directory " + theDir);
+			} else {
+				logger.info("Made the directory " + theDir);
+			}
 		}
 		String tempFile = "";
 		try {
@@ -315,8 +322,8 @@ public class CreateCRFVersionServlet extends SpringServlet {
 					logger.info("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
 					if (ub.getId() != version1.getOwnerId()) {
 						addPageMessage(getResPage().getString("CRF_version_try_upload_exists_database")
-								+ version1.getOwner().getName() + getResPage().getString("please_contact_owner_to_delete"),
-								request);
+								+ version1.getOwner().getName()
+								+ getResPage().getString("please_contact_owner_to_delete"), request);
 						forwardPage(Page.CREATE_CRF_VERSION, request, response);
 						return false;
 					} else {
@@ -433,18 +440,10 @@ public class CreateCRFVersionServlet extends SpringServlet {
 				boolean isOwner = ibs.get(0).getOwner().getId() == ub.getId();
 				warnings.add(getResException().getString("you_may_not_modify_items"));
 				for (ItemBean ib : ibs) {
-					if (isOwner) {
-						warnings.add(getResWord().getString("the_item") + " '" + ib.getName() + "' "
-								+ getResException().getString("in_your_spreadsheet_already_exists")
-								+ ib.getDataType().getName() + ") " + getResWord().getString("and_or") + " UNITS("
-								+ ib.getUnits() + ").");
-					} else {
-						warnings.add(getResWord().getString("the_item") + " '" + ib.getName() + "' "
-								+ getResException().getString("in_your_spreadsheet_already_exists")
-								+ ib.getDataType().getName() + ") " + getResWord().getString("and_or") + " UNITS("
-								+ ib.getUnits() + ").");
-					}
-
+					warnings.add(getResWord().getString("the_item") + " '" + ib.getName() + "' "
+							+ getResException().getString("in_your_spreadsheet_already_exists")
+							+ ib.getDataType().getName() + ") " + getResWord().getString("and_or") + " UNITS("
+							+ ib.getUnits() + ").");
 				}
 				if (isOwner) {
 					warnings.add("UNITS " + getResWord().getString("and") + " DATA_TYPE(PDATE to DATE) "
@@ -631,18 +630,35 @@ public class CreateCRFVersionServlet extends SpringServlet {
 	 *             in case of IO errors
 	 */
 	public void copy(File src, File dst) throws IOException {
+		InputStream in = null;
+		OutputStream out = null;
 		final int maxSize = 1024;
-		InputStream in = new FileInputStream(src);
-		OutputStream out = new FileOutputStream(dst);
+		try {
+			in = new FileInputStream(src);
+			out = new FileOutputStream(dst);
 
-		// Transfer bytes from in to out
-		byte[] buf = new byte[maxSize];
-		int len;
-		while ((len = in.read(buf)) > 0) {
-			out.write(buf, 0, len);
+			// Transfer bytes from in to out
+			byte[] buf = new byte[maxSize];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception e) {
+					logger.error("Error has occurred.", e);
+				}
+			}
+			if (out != null) {
+				try {
+					out.close();
+				} catch (Exception e) {
+					logger.error("Error has occurred.", e);
+				}
+			}
 		}
-		in.close();
-		out.close();
 	}
 
 	/**
@@ -663,11 +679,12 @@ public class CreateCRFVersionServlet extends SpringServlet {
 		if (subjarray.length == 1) {
 			returnme = subjarray[0];
 		} else {
+			StringBuilder returnmeBuilder = new StringBuilder("");
 			for (int i = 0; i < subjarray.length - 1; i++) {
-				returnme += subjarray[i];
-				returnme += "'";
+				returnmeBuilder.append(subjarray[i]).append("'");
 			}
-			returnme += subjarray[subjarray.length - 1];
+			returnmeBuilder.append(subjarray[subjarray.length - 1]);
+			returnme = returnmeBuilder.toString();
 		}
 		return returnme;
 	}

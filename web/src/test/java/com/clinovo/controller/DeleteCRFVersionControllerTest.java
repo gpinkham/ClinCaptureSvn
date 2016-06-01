@@ -68,13 +68,13 @@ public class DeleteCRFVersionControllerTest extends BaseControllerTest {
 	}
 
 	@Test
-	public void testThatDeleteCRFVersionConfirmDoesNotAllowToDeleteCrfVersion() throws Exception {
+	public void testThatDeleteCRFVersionConfirmDoesNotAllowToDeleteLatestCrfVersion() throws Exception {
 		this.mockMvc.perform(post(DELETE_CRF_VERSION).param("crfVersionId", "7").param("confirm", "confirm"))
 				.andExpect(
 						MockMvcResultMatchers.request().sessionAttribute(
 								"controllerMessage",
 								messageSource
-										.getMessage("this_crf_version_has_associated_data", null, new Locale("en"))));
+										.getMessage("unable_to_delete_latest_crf_version", null, new Locale("en"))));
 	}
 
 	@Test

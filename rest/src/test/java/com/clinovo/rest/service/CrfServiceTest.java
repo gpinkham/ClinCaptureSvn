@@ -2,6 +2,8 @@ package com.clinovo.rest.service;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -24,9 +26,14 @@ public class CrfServiceTest extends BaseServiceTest {
 
 	@After
 	public void after() {
+		UserAccountBean user = (UserAccountBean) userAccountDAO.findByPK(1);
 		CRFBean crfBean = (CRFBean) crfdao.findByNameAndStudy(CRF_NAME, defaultStudy);
 		if (crfBean != null && crfBean.getId() > 0) {
-			deleteCrfService.deleteCrf(crfBean.getId());
+			try {
+				deleteCrfService.deleteCrf(crfBean, user, Locale.ENGLISH, false);
+			} catch (Exception ex) {
+				//
+			}
 		}
 		super.after();
 	}
@@ -400,5 +407,89 @@ public class CrfServiceTest extends BaseServiceTest {
 		mockMvc.perform(post(API_CRF_VERSION_UNLOCK).param("id", "1")).andExpect(status().isOk());
 		crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
 		assertTrue(crfVersionBean.getStatus().isAvailable());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_DELETE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfIdParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE).param("iD", "1")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfForceParameterHasWrongValue() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE).param("id", "1").param("force", "123")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfForceParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE).param("id", "1").param("foRce", "true"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfIfItHasRelatedData() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfMethodThrowsExceptionIfCrfDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_DELETE).param("id", "34234234")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodDoesNotSupportGetMethod() throws Exception {
+		mockMvc.perform(get(API_CRF_VERSION_DELETE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodThrowsExceptionIfIdParameterIsMissing() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE)).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodThrowsExceptionIfIdParameterIsEmpty() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE).param("id", "")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodThrowsExceptionIfIdParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE).param("iD", "1")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodThrowsExceptionIfForceParameterHasWrongValue() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE).param("id", "1").param("force", "123"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodThrowsExceptionIfForceParameterHasTypo() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE).param("id", "1").param("foRce", "true"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testThatItIsImpossibleToDeleteCrfVersionIfItHasRelatedData() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE).param("id", "1")).andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodThrowsExceptionIfCrfVersionDoesNotExist() throws Exception {
+		mockMvc.perform(post(API_CRF_VERSION_DELETE).param("id", "34234234"))
+				.andExpect(status().isInternalServerError());
 	}
 }

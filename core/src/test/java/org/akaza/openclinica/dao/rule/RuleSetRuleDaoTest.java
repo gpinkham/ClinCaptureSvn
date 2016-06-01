@@ -10,14 +10,16 @@
 
 package org.akaza.openclinica.dao.rule;
 
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.junit.Test;
-
-import java.util.List;
 
 public class RuleSetRuleDaoTest extends DefaultAppContextTest {
 
@@ -53,5 +55,33 @@ public class RuleSetRuleDaoTest extends DefaultAppContextTest {
 		ViewRuleAssignmentFilter filter = new ViewRuleAssignmentFilter();
 		filter.addFilter("ignoreWrongRules", true);
 		assertEquals(0, ruleSetRuleDao.getCountWithFilter(filter));
+	}
+
+	@Test
+	public void testThatFindAllByCrfMethodReturnsCorrectCollectionSize() {
+		CRFBean crfBean = (CRFBean) crfdao.findByPK(1);
+		assertEquals(ruleSetRuleDao.findAllByCrf(crfBean).size(), 5);
+	}
+
+	@Test
+	public void testThatFindAllByCrfVersionMethodReturnsCorrectCollectionSize() {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(2);
+		assertEquals(ruleSetRuleDao.findAllByCrfVersion(crfVersionBean).size(), 1);
+	}
+
+	@Test
+	public void testThatDeleteAllRulesByCrfMethodWorksFine() {
+		CRFBean crfBean = (CRFBean) crfdao.findByPK(1);
+		assertEquals(ruleSetRuleDao.findAllByCrf(crfBean).size(), 5);
+		ruleSetRuleDao.deleteAllRulesByCrf(crfBean);
+		assertEquals(ruleSetRuleDao.findAllByCrf(crfBean).size(), 0);
+	}
+
+	@Test
+	public void testThatDeleteAllRulesByCrfVersionMethodWorksFine() {
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(2);
+		assertEquals(ruleSetRuleDao.findAllByCrfVersion(crfVersionBean).size(), 1);
+		ruleSetRuleDao.deleteAllRulesByCrfVersion(crfVersionBean);
+		assertEquals(ruleSetRuleDao.findAllByCrfVersion(crfVersionBean).size(), 0);
 	}
 }

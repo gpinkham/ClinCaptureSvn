@@ -103,49 +103,6 @@
 	<query>
 		<name>delete</name>
 		<sql>delete from CRF_VERSION where crf_version_id=</sql>
-	</query>	
-	<query>
-		<name>deleteItemsByVersion</name>
-		<sql>delete from item where item_id=</sql>
-	</query>
-	<query>
-		<name>deleteItemMapByVersion</name>
-		<sql>delete from versioning_map where crf_version_id=</sql>
-	</query>
-	<query>
-		<name>deleteResponseSetsByVersion</name>
-		<sql>delete from response_set where version_id=</sql>
-	</query>
-	<query>
-		<name>deleteSectionsByVersion</name>
-		<sql>delete from section where crf_version_id=</sql>
-	</query>
-	<query>
-		<name>deleteScdItemMetadataByVersion</name>
-		<sql>delete from scd_item_metadata scd where scd.scd_item_form_metadata_id in (
-				select ifm.item_form_metadata_id from item_form_metadata ifm 
-				where ifm.show_item=0 and ifm.crf_version_id=
-		</sql>
-	</query>
-	<query>
-		<name>deleteItemMetaDataByVersion</name>
-		<sql>delete from item_form_metadata where crf_version_id=</sql>
-	</query>
-    <query>
-		<name>deleteResponseSetByVersion</name>
-		<sql>delete from response_set where version_id=</sql>
-	</query>
-	<query>
-		<name>deleteItemGroupMetaByVersion</name>
-		<sql>delete from item_group_metadata where crf_version_id=</sql>
-	</query>
-    <query>
-        <name>deleteEventCrfByVersion</name>
-        <sql>delete from event_crf where crf_version_id=</sql>
-    </query>
-	<query>
-		<name>deleteNotSharedItemDataByVersion</name>
-		<sql>delete from item_data where item_id = </sql>
 	</query>
 	<query>
 		<name>getCRFIdFromCRFVersionId</name>
@@ -169,5 +126,53 @@
 	<query>
 		<name>findAllByStudyId</name>
 		<sql>select distinct cv.*, c.name as crf_name from crf_version cv, crf c where cv.crf_id = c.crf_id and c.source_study_id = ? order by cv.crf_id, cv.crf_version_id</sql>
+	</query>
+	<query>
+		<name>deleteCrfVersion</name>
+		<sql>
+			DELETE FROM scd_item_metadata scd WHERE scd.scd_item_form_metadata_id IN (SELECT item_form_metadata.item_form_metadata_id FROM item_form_metadata WHERE item_form_metadata.crf_version_id = ?);
+
+			DELETE FROM dyn_item_form_metadata WHERE crf_version_id = ?;
+
+			DELETE FROM dyn_item_group_metadata WHERE event_crf_id IN (SELECT ec.event_crf_id FROM event_crf ec WHERE ec.crf_version_id = ?);
+
+			DELETE FROM item_form_metadata WHERE item_form_metadata.crf_version_id = ?;
+
+			DELETE FROM item_group_metadata WHERE crf_version_id = ?;
+
+			DELETE FROM item_group WHERE item_group_id in (select distinct ig.item_group_id from item_group ig
+			JOIN crf_version cv ON cv.crf_id = ig.crf_id
+			LEFT JOIN item_group_metadata igm on igm.item_group_id = ig.item_group_id
+			where  igm is null and ig.name != 'Ungrouped' and cv.crf_version_id = ?);
+
+			DELETE FROM section WHERE crf_version_id = ?;
+
+			DELETE FROM versioning_map WHERE crf_version_id = ?;
+
+			DELETE FROM response_set WHERE response_set_id IN (SELECT DISTINCT rs.response_set_id FROM response_set rs
+			LEFT JOIN item_form_metadata ifm ON ifm.response_set_id = rs.response_set_id
+			WHERE ifm is null AND rs.version_id = ?);
+
+			DELETE FROM coded_item_element WHERE id IN (SELECT DISTINCT cie.id FROM coded_item_element cie
+			JOIN item_data id ON id.item_data_id = cie.item_data_id
+			JOIN event_crf ec ON ec.event_crf_id = id.event_crf_id
+			JOIN crf_version cv ON cv.crf_version_id = ec.crf_version_id
+			WHERE cv.crf_version_id = ?);
+
+			DELETE FROM coded_item WHERE id IN (SELECT DISTINCT ci.id FROM coded_item ci
+			JOIN crf_version cv on cv.crf_version_id = ci.crf_version_id
+			WHERE cv.crf_version_id = ?);
+
+			DELETE FROM item_data WHERE item_data_id IN (SELECT DISTINCT id.item_data_id FROM item_data id
+			JOIN event_crf ec ON ec.event_crf_id = id.event_crf_id
+			JOIN crf_version cv ON cv.crf_version_id = ec.crf_version_id
+			WHERE cv.crf_version_id = ?);
+
+			DELETE FROM event_crf where crf_version_id = ?;
+
+			DELETE FROM item WHERE item.item_id NOT IN (SELECT item_id FROM versioning_map);
+
+			DELETE FROM crf_version WHERE crf_version_id = ?;
+		</sql>
 	</query>
 </queries>

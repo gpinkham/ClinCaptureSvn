@@ -360,6 +360,12 @@
         </sql>
     </query>
     <query>
+        <name>findStartedCompletedOrSDVStudyEventsByCrf</name>
+        <sql>
+            select distinct se.* from study_event se, event_definition_crf edc where se.study_event_definition_id = edc.study_event_definition_id and se.subject_event_status_id in (3,4,9) and edc.crf_id = ?
+        </sql>
+    </query>
+    <query>
         <name>deleteStudyEvent</name>
         <sql>
             delete from event_crf where not_started = true and study_event_id = ?;

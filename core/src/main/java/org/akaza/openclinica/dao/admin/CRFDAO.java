@@ -665,22 +665,14 @@ public class CRFDAO extends AuditableEntityDAO {
 	 * @param crfId
 	 *            int
 	 */
-	public void deleteCrfById(int crfId) {
-		int index = 1;
-		String sql = digester.getQuery("deleteCrfByCrfId");
+	public void deleteCrf(int crfId) {
+		final int max = 16;
+		String sql = digester.getQuery("deleteCrf");
 		HashMap variables = new HashMap();
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index++, crfId);
-		variables.put(index, crfId);
-		this.execute(sql, variables);
+		for (int i = 1; i <= max; i++) {
+			variables.put(i, crfId);
+		}
+		execute(sql, variables);
 	}
 
 	/**

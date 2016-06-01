@@ -34,8 +34,10 @@ import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.lib.crf.builder.CrfBuilder;
 import com.clinovo.lib.crf.factory.CrfBuilderFactory;
 import com.clinovo.rest.exception.RestException;
+import com.clinovo.rest.model.Response;
 import com.clinovo.rest.util.ValidatorUtil;
 import com.clinovo.service.CrfVersionService;
+import com.clinovo.service.DeleteCrfService;
 
 /**
  * BaseCrfService.
@@ -44,13 +46,16 @@ import com.clinovo.service.CrfVersionService;
 public abstract class BaseCrfService extends BaseService {
 
 	@Autowired
+	private MessageSource messageSource;
+
+	@Autowired
+	private DeleteCrfService deleteCrfService;
+
+	@Autowired
 	private CrfBuilderFactory crfBuilderFactory;
 
 	@Autowired
 	private CrfVersionService crfVersionService;
-
-	@Autowired
-	private MessageSource messageSource;
 
 	private CRFVersionBean save(CrfBuilder crfBuilder, boolean importCrfVersion) throws Exception {
 		ValidatorUtil.checkForErrors(crfBuilder.getErrorsList());
@@ -205,5 +210,15 @@ public abstract class BaseCrfService extends BaseService {
 			crfVersionService.unlockCrfVersion(crfVersionBean, getCurrentUser());
 		}
 		return crfVersionBean;
+	}
+
+	protected Response deleteCrfBean(int crfId, boolean force) throws Exception {
+		deleteCrfService.deleteCrf(getCrfBean(crfId), getCurrentUser(), LocaleResolver.getLocale(), force);
+		return new Response(String.valueOf(HttpServletResponse.SC_OK));
+	}
+
+	protected Response deleteCrfVersionBean(int crfVersionId, boolean force) throws Exception {
+		deleteCrfService.deleteCrfVersion(getCrfVersionBean(crfVersionId, force), LocaleResolver.getLocale(), force);
+		return new Response(String.valueOf(HttpServletResponse.SC_OK));
 	}
 }

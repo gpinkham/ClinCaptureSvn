@@ -12,7 +12,6 @@
  ******************************************************************************/
 package com.clinovo.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +51,10 @@ import com.clinovo.util.PageMessagesUtil;
 @SuppressWarnings("unchecked")
 public class CompleteCRFDeleteController extends SpringController {
 
+	public static final String CRF_LIST = "redirect:/ListCRF";
+	public static final String ACTION_PAGE = "admin/completeCRFDelete";
+	public static final String ERROR_PAGE = "redirect:/MainMenu?message=system_no_permission";
+
 	@Autowired
 	private RuleSetDao ruleSetDao;
 
@@ -63,10 +66,6 @@ public class CompleteCRFDeleteController extends SpringController {
 
 	@Autowired
 	private DeleteCrfService deleteCrfService;
-
-	public static final String ACTION_PAGE = "admin/completeCRFDelete";
-	public static final String ERROR_PAGE = "redirect:/MainMenu?message=system_no_permission";
-	public static final String CRF_LIST = "redirect:/ListCRF";
 
 	/**
 	 * Method that handles requests for delete crf page.
@@ -83,19 +82,15 @@ public class CompleteCRFDeleteController extends SpringController {
 	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public String mainGet(HttpServletRequest request, Model model, @RequestParam("crfId") int crfId) throws Exception {
-
 		StudyUserRoleBean userRole = (StudyUserRoleBean) request.getSession().getAttribute(USER_ROLE);
-
 		if (userRole.getRole() == Role.SYSTEM_ADMINISTRATOR || (userRole.getRole() == Role.STUDY_ADMINISTRATOR)) {
-
 			CRFDAO crfDao = new CRFDAO(dataSource);
 			EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
 			DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(dataSource);
 			EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
 
 			CRFBean crfBean = (CRFBean) crfDao.findByPK(crfId);
-
-			List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfId);
+			List<RuleSetBean> ruleSetBeanList = ruleSetDao.findByCrfIdAndCrfOid(crfBean);
 			List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrf(crfId);
 			List<StudyEventDefinitionBean> eventDefinitionListAvailable = StudyEventDefinitionUtil
 					.studyEventDefinitionListFilter(dataSource, eventDefinitionCrfDao.findAllByCRF(crfId));
@@ -119,12 +114,9 @@ public class CompleteCRFDeleteController extends SpringController {
 				PageMessagesUtil.addPageMessage(request,
 						messageSource.getMessage("this_crf_has_no_conflict_data", null, LocaleResolver.getLocale()));
 			}
-
 		} else {
-
 			return ERROR_PAGE;
 		}
-
 		return ACTION_PAGE;
 	}
 
@@ -141,40 +133,16 @@ public class CompleteCRFDeleteController extends SpringController {
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
 	public String confirm(HttpServletRequest request, @RequestParam("crfId") int crfId) throws Exception {
-		EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
-		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(dataSource);
-		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
-
-		List<RuleSetBean> ruleSetBeanList = ruleSetListFilter(crfId);
-		List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrf(crfId);
-		List<StudyEventDefinitionBean> eventDefinitionListAvailable = StudyEventDefinitionUtil
-				.studyEventDefinitionListFilter(dataSource, eventDefinitionCrfDao.findAllByCRF(crfId));
-		List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCRFId(crfId);
-
-		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
-				|| ruleSetBeanList.size() > 0) {
-			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("this_crf_has_associated_data", null, LocaleResolver.getLocale()));
-		} else {
-			deleteCrfService.deleteCrf(crfId);
-			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("the_crf_has_been_removed", null, LocaleResolver.getLocale()));
+		CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfId);
+		String message = messageSource.getMessage("the_crf_has_been_removed", null, LocaleResolver.getLocale());
+		try {
+			if (crfBean.getId() > 0) {
+				deleteCrfService.deleteCrf(crfBean, getUserAccountBean(), LocaleResolver.getLocale(), false);
+			}
+		} catch (Exception ex) {
+			message = ex.getMessage();
 		}
-
+		request.getSession().setAttribute("controllerMessage", message);
 		return CRF_LIST;
-	}
-
-	private List<RuleSetBean> ruleSetListFilter(int crfId) {
-		CRFDAO crfDao = new CRFDAO(dataSource);
-
-		List<RuleSetBean> ruleSetBeanList = new ArrayList<RuleSetBean>();
-		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfId);
-
-		List<RuleSetBean> studyRuleSetBeanList = ruleSetDao.findByCrfIdAndCrfOid(crfBean);
-		for (RuleSetBean ruleSetRule : studyRuleSetBeanList) {
-			ruleSetBeanList.add(ruleSetRule);
-		}
-
-		return ruleSetBeanList;
 	}
 }

@@ -29,6 +29,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -624,5 +625,23 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	public void testThatCountDNsByCRFsMethodReturnsCorrectValues() {
 		Map<String, Map<ResolutionStatus, Integer>> result = discrepancyNoteDAO.countDNsByCRFs(study, user);
 		assertEquals(result.keySet().size(), 0);
+	}
+
+	@Test
+	public void testThatDeleteByCrfIdMethodWorksFine() throws OpenClinicaException {
+		final int crfId = 1;
+		final int discrepancyNoteId = 4;
+		assertTrue(discrepancyNoteDAO.findByPK(discrepancyNoteId).getId() != 0);
+		discrepancyNoteDAO.deleteByCrfId(crfId);
+		assertTrue(discrepancyNoteDAO.findByPK(discrepancyNoteId).getId() == 0);
+	}
+
+	@Test
+	public void testThatDeleteByCrfVersionIdMethodWorksFine() throws OpenClinicaException {
+		final int crfVersionId = 1;
+		final int discrepancyNoteId = 4;
+		assertTrue(discrepancyNoteDAO.findByPK(discrepancyNoteId).getId() != 0);
+		discrepancyNoteDAO.deleteByCrfVersionId(crfVersionId);
+		assertTrue(discrepancyNoteDAO.findByPK(discrepancyNoteId).getId() == 0);
 	}
 }

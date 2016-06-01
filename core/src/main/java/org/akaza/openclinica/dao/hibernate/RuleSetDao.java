@@ -10,7 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.dao.hibernate;
 
 import java.math.BigInteger;
@@ -22,12 +21,14 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.transaction.annotation.Transactional;
 
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+/**
+ * RuleSetDao.
+ */
+@SuppressWarnings("unchecked")
 public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
 	@Override
@@ -35,6 +36,15 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return RuleSetBean.class;
 	}
 
+	/**
+	 * Finds RuleSetBean by id and study.
+	 * 
+	 * @param id
+	 *            Integer
+	 * @param study
+	 *            StudyBean
+	 * @return RuleSetBean
+	 */
 	public RuleSetBean findById(Integer id, StudyBean study) {
 		String query = "from " + getDomainClassName()
 				+ " ruleSet  where ruleSet.id = :id and ruleSet.studyId = :studyId ";
@@ -44,6 +54,13 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (RuleSetBean) q.uniqueResult();
 	}
 
+	/**
+	 * Returns count of RuleSetBean's by study.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @return Long
+	 */
 	public Long count(StudyBean study) {
 		String query = "select count(*) from " + domainClass().getName() + " ruleSet where ruleSet.studyId = :studyId "
 				+ " AND ruleSet.status != :status ";
@@ -54,8 +71,14 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
 	}
 
+	/**
+	 * Returns count of RuleSetBean's by filter.
+	 * 
+	 * @param filter
+	 *            ViewRuleAssignmentFilter
+	 * @return int
+	 */
 	public int getCountWithFilter(final ViewRuleAssignmentFilter filter) {
-
 		// Using a sql query because we are referencing objects not managed by hibernate
 		String query = "select COUNT(DISTINCT(rs.id)) from rule_set rs "
 				+ " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
@@ -73,7 +96,19 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return ((BigInteger) q.uniqueResult()).intValue();
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns list of RuleSetBean's by filter and sort.
+	 * 
+	 * @param filter
+	 *            ViewRuleAssignmentFilter
+	 * @param sort
+	 *            ViewRuleAssignmentSort
+	 * @param rowStart
+	 *            int
+	 * @param rowEnd
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList<RuleSetBean> getWithFilterAndSort(final ViewRuleAssignmentFilter filter,
 			final ViewRuleAssignmentSort sort, final int rowStart, final int rowEnd) {
 
@@ -94,7 +129,19 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns list of RuleSetBean's by crf version or crf and study and study event definition.
+	 * 
+	 * @param crfVersion
+	 *            CRFVersionBean
+	 * @param crfBean
+	 *            CRFBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @return ArrayList
+	 */
 	@Transactional
 	public ArrayList<RuleSetBean> findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(CRFVersionBean crfVersion,
 			CRFBean crfBean, StudyBean currentStudy, StudyEventDefinitionBean sed) {
@@ -121,7 +168,13 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns list of RuleSetBean's by study.
+	 * 
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return ArrayList
+	 */
 	public ArrayList<RuleSetBean> findAllByStudy(StudyBean currentStudy) {
 		String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyId = :studyId  ";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
@@ -129,7 +182,15 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns list of RuleSetBean's by crf.
+	 * 
+	 * @param crfBean
+	 *            CRFBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @return ArrayList
+	 */
 	public ArrayList<RuleSetBean> findByCrf(CRFBean crfBean, StudyBean currentStudy) {
 		String query = " select rs.* from rule_set rs where rs.study_id = :studyId "
 				+ " AND rs.item_id in ( select distinct(item_id) from item_form_metadata ifm,crf_version cv "
@@ -141,7 +202,13 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns list of RuleSetBean's by crf id and crf oid.
+	 * 
+	 * @param crfBean
+	 *            CRFBean
+	 * @return ArrayList
+	 */
 	public ArrayList<RuleSetBean> findByCrfIdAndCrfOid(CRFBean crfBean) {
 		String query = "select distinct rs.* from rule_set rs, rule r, rule_expression re, rule_set_rule rsr left OUTER join rule_action ra on ra.rule_set_rule_id = rsr.id left outer join rule_action_property rap on rap.rule_action_id = ra.id where rsr.rule_set_id = rs.id and rsr.rule_id = r.id and (rs.rule_expression_id = re.id or r.rule_expression_id = re.id)\n"
 				+ "and (rs.item_id in (select distinct(item_id) from item_form_metadata ifm, crf_version cv where ifm.crf_version_id = cv.crf_version_id and cv.crf_id = :crfId) or re.value like '%"
@@ -154,7 +221,13 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns list of RuleSetBean's by crf version id and crf version oid.
+	 * 
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @return ArrayList
+	 */
 	public ArrayList<RuleSetBean> findByCrfVersionIdAndCrfVersionOid(CRFVersionBean crfVersionBean) {
 		String query = "select distinct rs.* from rule_set_rule rsr, rule_set rs, rule r, rule_expression re "
 				+ "where rsr.rule_set_id = rs.id " + "and rsr.rule_id = r.id "
@@ -166,6 +239,13 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (ArrayList<RuleSetBean>) q.list();
 	}
 
+	/**
+	 * Finds RuleSetBean by expression.
+	 * 
+	 * @param ruleSet
+	 *            RuleSetBean
+	 * @return RuleSetBean
+	 */
 	public RuleSetBean findByExpression(RuleSetBean ruleSet) {
 		String query = "from " + getDomainClassName()
 				+ " ruleSet  where ruleSet.originalTarget.value = :value AND ruleSet.originalTarget.context = :context ";
@@ -175,6 +255,15 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (RuleSetBean) q.uniqueResult();
 	}
 
+	/**
+	 * Finds RuleSetBean by expression and study.
+	 * 
+	 * @param ruleSet
+	 *            RuleSetBean
+	 * @param studyId
+	 *            Integer
+	 * @return RuleSetBean
+	 */
 	public RuleSetBean findByExpressionAndStudy(RuleSetBean ruleSet, Integer studyId) {
 		String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.originalTarget.value = :value "
 				+ "AND ruleSet.originalTarget.context = :context " + "AND ruleSet.studyId = :studyId ";
@@ -185,24 +274,23 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		return (RuleSetBean) q.uniqueResult();
 	}
 
-	public Long getCountByStudy(StudyBean currentStudy) {
-		String query = "select count(*) from " + getDomainClassName()
-				+ " ruleSet  where ruleSet.studyId = :studyId and ruleSet.status = :status ";
-		org.hibernate.Query q = getCurrentSession().createQuery(query);
-		q.setInteger("studyId", currentStudy.getId());
-		q.setParameter("status", org.akaza.openclinica.domain.Status.AVAILABLE);
-		return (Long) q.uniqueResult();
-	}
-
 	/**
-	 * Cleanup RS metadata on deletion of CRF version.
+	 * Unbinds rules from CRFVersion.
 	 *
-	 * @param oid
-	 *            of version that will be deleted
+	 * @param crfVersionBean
+	 *            CRFVersionBean
 	 */
-	public void deleteRuleStudioMetadataByCRFVersionOID(String oid) {
-		String query = "UPDATE rule_expression SET target_version_oid = NULL WHERE target_version_oid = '" + oid + "'";
-		org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
-		q.executeUpdate();
+	@Transactional
+	public void unbindRulesFromCrfVersion(CRFVersionBean crfVersionBean) {
+		String sql = "UPDATE rule_expression SET target_version_oid = NULL WHERE target_version_oid = '"
+				.concat(crfVersionBean.getOid()).concat("'");
+		Query query = getCurrentSession().createSQLQuery(sql);
+		query.executeUpdate();
+
+		sql = "UPDATE rule_set SET crf_id = ".concat(Integer.toString(crfVersionBean.getCrfId()))
+				.concat(", crf_version_id = null WHERE crf_version_id = ")
+				.concat(Integer.toString(crfVersionBean.getId()));
+		query = getCurrentSession().createSQLQuery(sql);
+		query.executeUpdate();
 	}
 }

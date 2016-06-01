@@ -204,22 +204,6 @@
 		<sql>SELECT distinct name FROM crf WHERE crf_id IN (SELECT distinct crf_id FROM event_definition_crf WHERE study_id=?)</sql>
 	</query>
     <query>
-        <name>deleteCrfByCrfId</name>
-        <sql>DELETE FROM scd_item_metadata scd WHERE scd.scd_item_form_metadata_id IN (SELECT item_form_metadata.item_form_metadata_id FROM item_form_metadata WHERE item_form_metadata.crf_version_id in (SELECT crf_version_id FROM crf_version WHERE crf_id = ?));
-            DELETE FROM item_form_metadata WHERE item_form_metadata.crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
-            DELETE FROM item_group_metadata WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
-            DELETE FROM section WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
-            DELETE FROM versioning_map WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
-			DELETE FROM response_set WHERE version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
-            DELETE FROM item WHERE item.item_id NOT IN (SELECT item_id FROM versioning_map);
-            DELETE FROM event_crf where crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?) and not_started = true;
-            DELETE FROM crf_version WHERE crf_id = ?;
-            DELETE FROM item_group WHERE crf_id = ?;
-            DELETE FROM event_definition_crf WHERE crf_id = ?;
-            DELETE FROM crf WHERE crf_id = ?;
-        </sql>
-    </query>
-    <query>
         <name>findAllEvaluableCrfs</name>
         <sql>
             SELECT DISTINCT c.* FROM event_definition_crf edc
@@ -243,4 +227,55 @@
 			ORDER BY c.name
         </sql>
     </query>
+	<query>
+		<name>deleteCrf</name>
+		<sql>
+			DELETE FROM scd_item_metadata scd WHERE scd.scd_item_form_metadata_id IN (SELECT item_form_metadata.item_form_metadata_id FROM item_form_metadata WHERE item_form_metadata.crf_version_id in (SELECT crf_version_id FROM crf_version WHERE crf_id = ?));
+
+			DELETE FROM dyn_item_form_metadata WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+
+			DELETE FROM dyn_item_group_metadata WHERE event_crf_id IN (SELECT DISTINCT ec.event_crf_id FROM event_crf ec
+			JOIN crf_version cv ON cv.crf_version_id = ec.crf_version_id
+			WHERE cv.crf_id = ?);
+
+			DELETE FROM item_form_metadata WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+
+			DELETE FROM item_group_metadata WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+
+			DELETE FROM item_group WHERE crf_id = ?;
+
+			DELETE FROM section WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+
+			DELETE FROM versioning_map WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+
+			DELETE FROM response_set WHERE response_set_id IN (SELECT DISTINCT rs.response_set_id FROM response_set rs
+			JOIN crf_version cv ON cv.crf_version_id = rs.version_id
+			WHERE cv.crf_id = ?);
+
+			DELETE FROM coded_item_element WHERE id IN (SELECT DISTINCT cie.id FROM coded_item_element cie
+			JOIN item_data id ON id.item_data_id = cie.item_data_id
+			JOIN event_crf ec ON ec.event_crf_id = id.event_crf_id
+			JOIN crf_version cv ON cv.crf_version_id = ec.crf_version_id
+			WHERE cv.crf_id = ?);
+
+			DELETE FROM coded_item WHERE id IN (SELECT DISTINCT ci.id FROM coded_item ci
+			JOIN crf_version cv on cv.crf_version_id = ci.crf_version_id
+			WHERE cv.crf_id = ?);
+
+			DELETE FROM item_data WHERE item_data_id IN (SELECT DISTINCT id.item_data_id FROM item_data id
+			JOIN event_crf ec ON ec.event_crf_id = id.event_crf_id
+			JOIN crf_version cv ON cv.crf_version_id = ec.crf_version_id
+			WHERE cv.crf_id = ?);
+
+			DELETE FROM event_crf where crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+
+			DELETE FROM item WHERE item.item_id NOT IN (SELECT item_id FROM versioning_map);
+
+			DELETE FROM event_definition_crf WHERE crf_id = ?;
+
+			DELETE FROM crf_version WHERE crf_id = ?;
+
+			DELETE FROM crf WHERE crf_id = ?;
+		</sql>
+	</query>
 </queries>

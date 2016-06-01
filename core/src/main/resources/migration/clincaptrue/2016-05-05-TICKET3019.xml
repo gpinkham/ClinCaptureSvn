@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+	
+	<changeSet author="skirpichenok" id="2016-05-05-TICKET3019-01">
+		<comment>replace constraints in dn_event_crf_map and dn_item_data_map tables</comment>
+		<dropForeignKeyConstraint baseTableName="dn_event_crf_map" constraintName="dn_event_crf_map_dn_id_fkey"/>
+		<dropForeignKeyConstraint baseTableName="dn_item_data_map" constraintName="dn_item_data_map_dn_id_fkey"/>
+		<sql splitStatements="false">
+			ALTER TABLE dn_event_crf_map
+			ADD CONSTRAINT dn_event_crf_map_dn_id_fkey FOREIGN KEY (discrepancy_note_id)
+			REFERENCES discrepancy_note (discrepancy_note_id) MATCH SIMPLE
+			ON UPDATE NO ACTION ON DELETE CASCADE;
+
+			ALTER TABLE dn_item_data_map
+			ADD CONSTRAINT dn_item_data_map_dn_id_fkey FOREIGN KEY (discrepancy_note_id)
+			REFERENCES discrepancy_note (discrepancy_note_id) MATCH SIMPLE
+			ON UPDATE NO ACTION ON DELETE CASCADE;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

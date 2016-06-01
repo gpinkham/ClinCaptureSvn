@@ -248,18 +248,27 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		eb.setOldStatus(Status.get((Integer) hm.get("old_status_id")));
 		eb.setStates((String) hm.get("states"));
 
+		ObjectInputStream ois = null;
 		try {
 			eb.getSignedData().clear();
 			ByteArrayInputStream bais = (ByteArrayInputStream) hm.get("signed_data");
 			if (bais != null) {
-				Map<Integer, SignedData> signedData = (Map<Integer, SignedData>) new ObjectInputStream(bais)
-						.readObject();
+				ois = new ObjectInputStream(bais);
+				Map<Integer, SignedData> signedData = (Map<Integer, SignedData>) ois.readObject();
 				if (signedData != null) {
 					eb.setSignedData(signedData);
 				}
 			}
 		} catch (Exception e) {
 			logger.error("Error has occurred.", e);
+		} finally {
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (Exception ex) {
+					logger.error("Error has occurred.", ex);
+				}
+			}
 		}
 
 		return eb;
@@ -1541,6 +1550,19 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(ind++, crfVersionId);
 		variables.put(ind, subjectEventStatus.getId());
 		return executeFindAllQuery("findStudyEventsByCrfVersionAndSubjectEventStatus", variables);
+	}
+
+	/**
+	 * Method returns all study events by crf id.
+	 *
+	 * @param crfId
+	 *            int
+	 * @return List<StudyEventBean>
+	 */
+	public List<StudyEventBean> findStartedCompletedOrSDVStudyEventsByCrf(int crfId) {
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+		return executeFindAllQuery("findStartedCompletedOrSDVStudyEventsByCrf", variables);
 	}
 
 	/**

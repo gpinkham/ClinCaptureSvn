@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="/WEB-INF/tlds/format/date/date-time-format.tld" prefix="cc-fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <ui:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
@@ -222,7 +223,7 @@
             <td><a href="pages/deleteCRFVersion?crfVersionId=<c:out value="${version.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                    onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"
-                   onclick="setAccessedObjectWithRowspans(this)"><img
+                   onclick="setAccessedObjectWithRowspans(this)" style="${fn:length(currRow.bean.versions) <= 1 ? 'visibility: hidden;' : ''}"><img
               name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
           </c:if>

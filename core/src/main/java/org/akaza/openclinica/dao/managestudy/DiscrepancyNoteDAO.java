@@ -96,7 +96,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Constructor with DataSource.
-	 * @param ds DataSource
+	 * 
+	 * @param ds
+	 *            DataSource
 	 */
 	public DiscrepancyNoteDAO(DataSource ds) {
 		super(ds);
@@ -105,8 +107,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Constructor with DAODigester and DataSource.
-	 * @param ds DataSource
-	 * @param digester DAODigester
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
 	 */
 	public DiscrepancyNoteDAO(DataSource ds, DAODigester digester) {
 		super(ds);
@@ -116,8 +121,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Constructor with DataSource and Connection.
-	 * @param ds DataSource
-	 * @param connection Connection
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param connection
+	 *            Connection
 	 */
 	public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
 		super(ds, connection);
@@ -206,7 +214,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Method that gets the object from the database query.
 	 *
-	 * @param hm HashMap
+	 * @param hm
+	 *            HashMap
 	 * @return Object
 	 */
 	@SuppressWarnings("deprecation")
@@ -252,7 +261,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Method that gets the DNs statistic bean from the database query.
 	 *
-	 * @param hm Map
+	 * @param hm
+	 *            Map
 	 * @return DiscrepancyNoteStatisticBean
 	 */
 	public DiscrepancyNoteStatisticBean getStatisticEntityFromHashMap(Map hm) {
@@ -275,7 +285,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns all the parent DNs from specific study and its sites.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllParentsByStudy(StudyBean study) {
@@ -296,8 +307,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of child DNs by parent DN and study/site.
 	 *
-	 * @param study    StudyBean
-	 * @param parentId int
+	 * @param study
+	 *            StudyBean
+	 * @param parentId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findAllByStudyAndParent(StudyBean study, int parentId) {
@@ -313,7 +326,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns all the DNs by event CRF id.
 	 *
-	 * @param eventCRFId int
+	 * @param eventCRFId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllItemNotesByEventCRF(int eventCRFId) {
@@ -332,7 +346,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns all the parent DNs by event CRF id.
 	 *
-	 * @param eventCRFId int
+	 * @param eventCRFId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllParentItemNotesByEventCRF(int eventCRFId) {
@@ -351,8 +366,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs by study/site with specific filters applied.
 	 *
-	 * @param filter       ListNotesFilter
-	 * @param currentStudy currentStudy
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param currentStudy
+	 *            currentStudy
 	 * @return Integer
 	 */
 	public Integer getCountWithFilter(ListNotesFilter filter, StudyBean currentStudy) {
@@ -378,11 +395,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs by study/site with specific filters and sorting applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
-	 * @param sort         ListNotesSort
-	 * @param rowStart     int
-	 * @param rowEnd       int
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param rowStart
+	 *            int
+	 * @param rowEnd
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> getWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter,
@@ -419,9 +441,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs by study/site with specific filters applied.
 	 *
-	 * @param filter       String
-	 * @param currentStudy StudyBean
-	 * @param userId       int
+	 * @param filter
+	 *            String
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param userId
+	 *            int
 	 * @return Integer
 	 */
 	public Integer getViewNotesCountWithFilter(String filter, StudyBean currentStudy, int userId) {
@@ -474,12 +499,18 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a set of DNs from filtered and sorted list of all the parent DNs by study/site.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter ListNotesFilter
-	 * @param sort ListNotesSort
-	 * @param offset int
-	 * @param limit int
-	 * @param userAccount UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param offset
+	 *            int
+	 * @param limit
+	 *            int
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
@@ -490,11 +521,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a set of DNs from filtered and sorted list of all the parent DNs by study/site.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter ListNotesFilter
-	 * @param sort ListNotesSort
-	 * @param offset int
-	 * @param limit int
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param offset
+	 *            int
+	 * @param limit
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
@@ -505,14 +541,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a slq string to retrieve a set of DNs from filtered and sorted list of all the parent DNs by study/site.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
-	 * @param sort         ListNotesSort
-	 * @param offset       int
-	 * @param limit        int
-	 * @param eventCrfOnly boolean	if <code>true</code>, then sql will search for DNs assigned to event CRFs and
-	 *                     its data only; otherwise - sql will search for all the DNs in a study/site
-	 * @param activeUser   UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param offset
+	 *            int
+	 * @param limit
+	 *            int
+	 * @param eventCrfOnly
+	 *            boolean if <code>true</code>, then sql will search for DNs assigned to event CRFs and its data only;
+	 *            otherwise - sql will search for all the DNs in a study/site
+	 * @param activeUser
+	 *            UserAccountBean
 	 * @return String
 	 */
 	public String getSQLViewNotesWithFilterAndSortLimits(StudyBean currentStudy, ListNotesFilter filter,
@@ -565,18 +608,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a set of DNs from filtered and sorted list of all the parent DNs by study/site.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
-	 * @param sort         ListNotesSort
-	 * @param offset       int
-	 * @param limit        int
-	 * @param eventCrfOnly boolean	if <code>true</code>, then sql will search for DNs assigned to event CRFs and
-	 *                     its data only; otherwise - sql will search for all the DNs in a study/site
-	 * @param userAccount  UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param offset
+	 *            int
+	 * @param limit
+	 *            int
+	 * @param eventCrfOnly
+	 *            boolean if <code>true</code>, then sql will search for DNs assigned to event CRFs and its data only;
+	 *            otherwise - sql will search for all the DNs in a study/site
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
-			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly, UserAccountBean userAccount) {
+			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly,
+			UserAccountBean userAccount) {
 		setTypesExpected();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index++, TypeNames.STRING);
@@ -594,9 +645,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(i, currentStudy.getId());
 		}
 
-		ArrayList rows =
-				select(getSQLViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, eventCrfOnly, userAccount),
-				variables);
+		ArrayList rows = select(getSQLViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit,
+				eventCrfOnly, userAccount), variables);
 		Iterator it = rows.iterator();
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
 		while (it.hasNext()) {
@@ -610,8 +660,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a count of parent DNs by study/site with specific filters and sorting applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
 	 * @return Integer
 	 */
 	public Integer countViewNotesWithFilter(StudyBean currentStudy, ListNotesFilter filter) {
@@ -621,9 +673,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a count of parent DNs by study/site with specific filters and sorting applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
-	 * @param ub           UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param ub
+	 *            UserAccountBean
 	 * @return Integer
 	 */
 	public Integer countViewNotesWithFilter(StudyBean currentStudy, ListNotesFilter filter, UserAccountBean ub) {
@@ -663,7 +718,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(") dns left outer join user_account ua on ua.user_id = dns.assigned_user_id ")
 				.append(filter.addUserFilter()).append(filter.getAdditionalFilter());
 		ArrayList rows = select(sql.toString(), variables);
-		return rows.size() != 0 ? (Integer) ((Map) rows.get(0)).get("count") : new Integer(0);
+		return rows.size() != 0 ? (Integer) ((Map) rows.get(0)).get("count") : Integer.valueOf(0);
 	}
 
 	/**
@@ -677,8 +732,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 */
 	public Map<String, Map<ResolutionStatus, Integer>> countDNsByCRFs(StudyBean currentStudy, UserAccountBean ub) {
 
-		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap
-				= new HashMap<String, Map<ResolutionStatus, Integer>>();
+		Map<String, Map<ResolutionStatus, Integer>> crfNameToRSToDNCountMap = new HashMap<String, Map<ResolutionStatus, Integer>>();
 		int activeUserId = ub == null ? 0 : ub.getId();
 		int index = 1;
 		unsetTypeExpected();
@@ -727,14 +781,18 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Gets all DNs for view with filter and sort applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
-	 * @param sort         ListNotesSort
-	 * @param ub           UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param ub
+	 *            UserAccountBean
 	 * @return List of DiscrepancyNoteBeans
 	 */
-	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortForPrint(StudyBean currentStudy, ListNotesFilter filter,
-			ListNotesSort sort, UserAccountBean ub) {
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortForPrint(StudyBean currentStudy,
+			ListNotesFilter filter, ListNotesSort sort, UserAccountBean ub) {
 		ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
 		Map variables = new HashMap();
 		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_2; i++) {
@@ -755,11 +813,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Gets DNs owned by or assigned to user for view with filter and sort applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param currentUser  UserAccountBean
-	 * @param filter       ListNotesFilter
-	 * @param sort         ListNotesSort
-	 * @param filterMasks  boolean defines - should DNs for masked CRFs be shown
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
+	 * @param filterMasks
+	 *            boolean defines - should DNs for masked CRFs be shown
 	 * @return List of DiscrepancyNoteBeans
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy,
@@ -769,7 +832,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		for (int i = 1; i <= SQL_QUERY_VARIABLES_COUNT_2; i++) {
 			variables.put(i, currentStudy.getId());
 		}
-		StringBuilder sql = filterMasks ? buildViewNotesSQL(currentStudy, filter, sort, currentUser) : buildViewNotesSQL(currentStudy, filter, sort);
+		StringBuilder sql = filterMasks
+				? buildViewNotesSQL(currentStudy, filter, sort, currentUser)
+				: buildViewNotesSQL(currentStudy, filter, sort);
 		sql.append(filter.getOwnerOrAssignedFilter(currentUser));
 		String sortPart = sort.execute("");
 		sql.append(sortPart);
@@ -785,19 +850,23 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Gets DNs owned by or assigned to user for view with filter and sort applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param currentUser  UserAccountBean
-	 * @param filter       ListNotesFilter
-	 * @param sort         ListNotesSort
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param sort
+	 *            ListNotesSort
 	 * @return List of DiscrepancyNoteBeans
 	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy,
-				UserAccountBean currentUser, ListNotesFilter filter, ListNotesSort sort) {
+			UserAccountBean currentUser, ListNotesFilter filter, ListNotesSort sort) {
 		return getViewNotesWithFilterAndSort(currentStudy, currentUser, filter, sort, false);
 	}
 
-
-	private StringBuilder buildViewNotesSQL(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort, UserAccountBean ub) {
+	private StringBuilder buildViewNotesSQL(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort,
+			UserAccountBean ub) {
 		setTypesExpected();
 		int activeUserAccountId = ub == null ? 0 : ub.getId();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
@@ -842,7 +911,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of all the parent DNs by study/site.
 	 *
-	 * @param currentStudy StudyBean
+	 * @param currentStudy
+	 *            StudyBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllDiscrepancyNotesDataByStudy(StudyBean currentStudy) {
@@ -887,8 +957,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns DNs statistics by DNs types and resolution statuses from study/site.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param ub           UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param ub
+	 *            UserAccountBean
 	 * @return List<DiscrepancyNoteStatisticBean>
 	 */
 	public List<DiscrepancyNoteStatisticBean> countNotesStatisticWithMasks(StudyBean currentStudy, UserAccountBean ub) {
@@ -934,8 +1006,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * Returns DNs statistics by DNs types and resolution statuses from study/site, for DNs assigned to/owned by
 	 * specific user account.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param currentUser  UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param currentUser
+	 *            UserAccountBean
 	 * @return List<DiscrepancyNoteStatisticBean>
 	 */
 	public List<DiscrepancyNoteStatisticBean> countUserNotesStatistics(StudyBean currentStudy,
@@ -985,12 +1059,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of all the parent DNs by study/site, with specific filters applied.
 	 *
-	 * @param currentStudy StudyBean
-	 * @param filter       ListNotesFilter
-	 * @param ub           UserAccountBean
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param filter
+	 *            ListNotesFilter
+	 * @param ub
+	 *            UserAccountBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
-	public ArrayList<DiscrepancyNoteBean> getNotesWithFilterAndSortForOutput(StudyBean currentStudy, ListNotesFilter filter, UserAccountBean ub) {
+	public ArrayList<DiscrepancyNoteBean> getNotesWithFilterAndSortForOutput(StudyBean currentStudy,
+			ListNotesFilter filter, UserAccountBean ub) {
 		setTypesExpected();
 		int activeUserAccountId = ub == null ? 0 : ub.getId();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
@@ -1047,16 +1125,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of DNs assigned to a specific property of a specific entity
-	 * (like Date of Birth property of entity Subject).
+	 * Returns a list of DNs assigned to a specific property of a specific entity (like Date of Birth property of entity
+	 * Subject).
 	 *
-	 * @param study      StudyBean
-	 * @param entityName String
-	 * @param entityId   int
-	 * @param column     String
+	 * @param study
+	 *            StudyBean
+	 * @param entityName
+	 *            String
+	 * @param entityId
+	 *            int
+	 * @param column
+	 *            String
 	 * @return Collection
 	 */
-	public Collection findAllByEntityAndColumnAndStudy(StudyBean study, String entityName, int entityId, String column) {
+	public Collection findAllByEntityAndColumnAndStudy(StudyBean study, String entityName, int entityId,
+			String column) {
 		this.setTypesExpected();
 		int index = START_INDEX_TO_ADD_EXTRA_TYPES_EXPECTED;
 		this.setTypeExpected(index, TypeNames.STRING); // ss.label
@@ -1120,7 +1203,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, assigned to Subjects only, from specific study/site.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllSubjectByStudy(StudyBean study) {
@@ -1154,8 +1238,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, assigned to specific Subject in study/site.
 	 *
-	 * @param study     StudyBean
-	 * @param subjectId int
+	 * @param study
+	 *            StudyBean
+	 * @param subjectId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllSubjectByStudyAndId(StudyBean study, int subjectId) {
@@ -1190,7 +1276,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, assigned to Study Subjects only, from specific study/site.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllStudySubjectByStudy(StudyBean study) {
@@ -1223,8 +1310,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, assigned to specific Study Subject in study/site.
 	 *
-	 * @param study          StudyBean
-	 * @param studySubjectId int
+	 * @param study
+	 *            StudyBean
+	 * @param studySubjectId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllStudySubjectByStudyAndId(StudyBean study, int studySubjectId) {
@@ -1256,13 +1345,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of parent DNs, assigned to specific Study Subject in current study and in study,
-	 * where Study Subject was enrolled (actually, searches for DNs assigned to Study Subject property
-	 * Date of Enrollment).
+	 * Returns a list of parent DNs, assigned to specific Study Subject in current study and in study, where Study
+	 * Subject was enrolled (actually, searches for DNs assigned to Study Subject property Date of Enrollment).
 	 *
-	 * @param currentStudy   StudyBean
-	 * @param subjectStudy   StudyBean
-	 * @param studySubjectId int
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param subjectStudy
+	 *            StudyBean
+	 * @param studySubjectId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllStudySubjectByStudiesAndStudySubjectId(StudyBean currentStudy,
@@ -1296,13 +1387,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of parent DNs, assigned to specific Study Subject in current study/site and in study/site,
-	 * where Study Subject was enrolled (actually, searches for DNs assigned to Subject properties:
-	 * Date of Birth, Sex, Person ID).
+	 * Returns a list of parent DNs, assigned to specific Study Subject in current study/site and in study/site, where
+	 * Study Subject was enrolled (actually, searches for DNs assigned to Subject properties: Date of Birth, Sex, Person
+	 * ID).
 	 *
-	 * @param currentStudy   StudyBean
-	 * @param subjectStudy   StudyBean
-	 * @param studySubjectId int
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param subjectStudy
+	 *            StudyBean
+	 * @param studySubjectId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllSubjectByStudiesAndSubjectId(StudyBean currentStudy,
@@ -1340,7 +1434,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, assigned to Study Events only, in specific study/site.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllStudyEventByStudy(StudyBean study) {
@@ -1377,8 +1472,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all DNs, associated with Study Events of a certain Study Subject, in specific study/site.
 	 *
-	 * @param study          A StudyBean, whose id property is checked.
-	 * @param studySubjectId The id of a Study Subject.
+	 * @param study
+	 *            A StudyBean, whose id property is checked.
+	 * @param studySubjectId
+	 *            The id of a Study Subject.
 	 * @return An ArrayList of DiscrepancyNoteBeans.
 	 */
 	public ArrayList findAllStudyEventByStudyAndId(StudyBean study, int studySubjectId) {
@@ -1415,11 +1512,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Finds all DNs, associated with Study Events of a certain Study Subject, in current study/site and in study/site,
-	 * where  Study Subject was enrolled.
+	 * where Study Subject was enrolled.
 	 *
-	 * @param currentStudy   StudyBean
-	 * @param subjectStudy   StudyBean
-	 * @param studySubjectId int
+	 * @param currentStudy
+	 *            StudyBean
+	 * @param subjectStudy
+	 *            StudyBean
+	 * @param studySubjectId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findAllStudyEventByStudiesAndSubjectId(StudyBean currentStudy, StudyBean subjectStudy,
@@ -1459,7 +1559,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, assigned to Event CRFs only, in specific study/site.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllEventCRFByStudy(StudyBean study) {
@@ -1497,8 +1598,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of child DNs of a certain parent DN, associated with a certain Event CRF, in specific study/site.
 	 *
-	 * @param study  StudyBean
-	 * @param parent DiscrepancyNoteBean
+	 * @param study
+	 *            StudyBean
+	 * @param parent
+	 *            DiscrepancyNoteBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllEventCRFByStudyAndParent(StudyBean study, DiscrepancyNoteBean parent) {
@@ -1538,7 +1641,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs, associated with Items of a specific Event CRF.
 	 *
-	 * @param eventCRFBean EventCRFBean
+	 * @param eventCRFBean
+	 *            EventCRFBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findItemDataDNotesFromEventCRF(EventCRFBean eventCRFBean) {
@@ -1562,7 +1666,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs only, associated with Items of a specific Event CRF.
 	 *
-	 * @param eventCRFBean EventCRFBean
+	 * @param eventCRFBean
+	 *            EventCRFBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findParentItemDataDNotesFromEventCRF(EventCRFBean eventCRFBean) {
@@ -1586,7 +1691,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs, associated with Interviewer Name and Interview Date properties of a specific Event CRF.
 	 *
-	 * @param eventCRFBean EventCRFBean
+	 * @param eventCRFBean
+	 *            EventCRFBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findEventCRFDNotesFromEventCRF(EventCRFBean eventCRFBean) {
@@ -1614,7 +1720,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * findEventCRFDNotesToolTips.
 	 *
-	 * @param eventCRFBean EventCRFBean
+	 * @param eventCRFBean
+	 *            EventCRFBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findEventCRFDNotesToolTips(EventCRFBean eventCRFBean) {
@@ -1645,11 +1752,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs, associated with a specific Item in a specific EventCRF.
 	 *
-	 * @param eventCRFBean eventCRFBean
-	 * @param itemName     String
+	 * @param eventCRFBean
+	 *            eventCRFBean
+	 * @param itemName
+	 *            String
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
-	public ArrayList<DiscrepancyNoteBean> findAllDNotesByItemNameAndEventCRF(EventCRFBean eventCRFBean, String itemName) {
+	public ArrayList<DiscrepancyNoteBean> findAllDNotesByItemNameAndEventCRF(EventCRFBean eventCRFBean,
+			String itemName) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		int index = 1;
@@ -1669,7 +1779,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, associated with Item Data only, in specific study/site.
 	 *
-	 * @param study StudyBean
+	 * @param study
+	 *            StudyBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllItemDataByStudy(StudyBean study) {
@@ -1709,11 +1820,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of parent DNs, associated with Item Data only, in specific study/site.
-	 * Excludes DNs, associated with CRFs from <code>hiddenCrfNames</code> set.
+	 * Returns a list of parent DNs, associated with Item Data only, in specific study/site. Excludes DNs, associated
+	 * with CRFs from <code>hiddenCrfNames</code> set.
 	 *
-	 * @param study          StudyBean
-	 * @param hiddenCrfNames Set<String>
+	 * @param study
+	 *            StudyBean
+	 * @param hiddenCrfNames
+	 *            Set<String>
 	 * @return ArrayList
 	 */
 	public ArrayList findAllItemDataByStudy(StudyBean study, Set<String> hiddenCrfNames) {
@@ -1774,11 +1887,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of parent DNs, associated with Item Data only, in specific study/site,
-	 * and assigned to a specific user account.
+	 * Returns a list of parent DNs, associated with Item Data only, in specific study/site, and assigned to a specific
+	 * user account.
 	 *
-	 * @param study StudyBean
-	 * @param user  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param user
+	 *            UserAccountBean
 	 * @return Integer
 	 */
 	public Integer countAllItemDataByStudyAndUser(StudyBean study, UserAccountBean user) {
@@ -1812,8 +1927,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of child DNs by its Parent DN record and study/site.
 	 *
-	 * @param study  StudyBean
-	 * @param parent DiscrepancyNoteBean
+	 * @param study
+	 *            StudyBean
+	 * @param parent
+	 *            DiscrepancyNoteBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllItemDataByStudyAndParent(StudyBean study, DiscrepancyNoteBean parent) {
@@ -1857,9 +1974,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all with aditional params. Not Implemented!
-	 * @param strOrderByColumn String
-	 * @param blnAscendingSort boolean
-	 * @param strSearchPhrase String
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
 	 * @return new ArrayList.
 	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -1868,7 +1989,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find by id.
-	 * @param id int
+	 * 
+	 * @param id
+	 *            int
 	 * @return EntityBean
 	 */
 	public EntityBean findByPK(int id) {
@@ -1893,7 +2016,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Create Discrepancy Note.
-	 * @param eb EntityBean
+	 * 
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 */
 	public EntityBean create(EntityBean eb) {
@@ -1903,8 +2028,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new DN record.
 	 *
-	 * @param eb         EntityBean
-	 * @param connection Connection
+	 * @param eb
+	 *            EntityBean
+	 * @param connection
+	 *            Connection
 	 * @return EntityBean
 	 */
 	public EntityBean create(EntityBean eb, Connection connection) {
@@ -1945,7 +2072,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new discrepancy note map.
 	 *
-	 * @param eb DiscrepancyNoteBean
+	 * @param eb
+	 *            DiscrepancyNoteBean
 	 */
 	public void createMapping(DiscrepancyNoteBean eb) {
 		createMapping(eb, null);
@@ -1954,8 +2082,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new discrepancy note map.
 	 *
-	 * @param eb         DiscrepancyNoteBean
-	 * @param connection Connection
+	 * @param eb
+	 *            DiscrepancyNoteBean
+	 * @param connection
+	 *            Connection
 	 */
 	public void createMapping(DiscrepancyNoteBean eb, Connection connection) {
 		HashMap variables = new HashMap();
@@ -1981,7 +2111,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Update Discrepancy Note.
-	 * @param eb EntityBean
+	 * 
+	 * @param eb
+	 *            EntityBean
 	 * @return DiscrepancyNoteBean
 	 */
 	public EntityBean update(EntityBean eb) {
@@ -2007,7 +2139,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Updates assigned user id of a specific DN record.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 */
 	public EntityBean updateAssignedUser(EntityBean eb) {
@@ -2030,7 +2163,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Sets assigned user id as <code>null</code> in a specific DN record.
 	 *
-	 * @param eb EntityBean
+	 * @param eb
+	 *            EntityBean
 	 * @return EntityBean
 	 */
 	public EntityBean updateAssignedUserToNull(EntityBean eb) {
@@ -2051,7 +2185,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Deletes DN record by its id.
 	 *
-	 * @param id int
+	 * @param id
+	 *            int
 	 */
 	public void deleteNotes(int id) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -2061,11 +2196,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all by permission. Not Implemented!
-	 * @param objCurrentUser Object
-	 * @param intActionType int
-	 * @param strOrderByColumn String
-	 * @param blnAscendingSort boolean
-	 * @param strSearchPhrase String
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
 	 * @return new ArrayList
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
@@ -2075,8 +2216,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	/**
 	 * Find all by permission. Not Implemented!
-	 * @param objCurrentUser Object
-	 * @param intActionType int
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
 	 * @return new ArrayList
 	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
@@ -2100,7 +2244,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of child DNs by its Parent DN record.
 	 *
-	 * @param parent DiscrepancyNoteBean
+	 * @param parent
+	 *            DiscrepancyNoteBean
 	 * @return ArrayList
 	 */
 	public ArrayList findAllByParent(DiscrepancyNoteBean parent) {
@@ -2112,7 +2257,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs ids, associated with properties of a certain Study Event.
 	 *
-	 * @param studyEventId int
+	 * @param studyEventId
+	 *            int
 	 * @return List<Integer>
 	 */
 	public List<Integer> findAllDnIdsByStudyEvent(int studyEventId) {
@@ -2189,7 +2335,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns Entity Bean, DN is associated with.
 	 *
-	 * @param note DiscrepancyNoteBean
+	 * @param note
+	 *            DiscrepancyNoteBean
 	 * @return AuditableEntityBean
 	 */
 	public AuditableEntityBean findEntity(DiscrepancyNoteBean note) {
@@ -2223,7 +2370,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns count of DNs, associated with specific ItemData bean.
 	 *
-	 * @param itemDataId int
+	 * @param itemDataId
+	 *            int
 	 * @return int
 	 */
 	public int findNumExistingNotesForItem(int itemDataId) {
@@ -2250,7 +2398,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs, associated with specific ItemData bean.
 	 *
-	 * @param itemDataId int
+	 * @param itemDataId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findExistingNotesForItemData(int itemDataId) {
@@ -2269,7 +2418,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs, associated with specific ItemData bean, for tooltip.
 	 *
-	 * @param itemDataId int
+	 * @param itemDataId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findExistingNotesForToolTip(int itemDataId) {
@@ -2292,7 +2442,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of DNs, associated with ItemData beans of a specific Event CRF, for tooltip.
 	 *
-	 * @param eventCrfId int
+	 * @param eventCrfId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findExistingNotesForToolTipByEventCrfId(int eventCrfId) {
@@ -2314,7 +2465,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, associated with specific ItemData bean, for tooltip.
 	 *
-	 * @param itemDataId int
+	 * @param itemDataId
+	 *            int
 	 * @return ArrayList
 	 */
 	public ArrayList findParentNotesForToolTip(int itemDataId) {
@@ -2336,7 +2488,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns a list of parent DNs, associated with Item Data beans, in specific Event CRF.
 	 *
-	 * @param eventCRFId int
+	 * @param eventCRFId
+	 *            int
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllTopNotesByEventCRF(int eventCRFId) {
@@ -2356,10 +2509,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of parent DNs, associated with Interviewer Name and Interview Date properties
-	 * of a specific Event CRF.
+	 * Returns a list of parent DNs, associated with Interviewer Name and Interview Date properties of a specific Event
+	 * CRF.
 	 *
-	 * @param eventCRFBean EventCRFBean
+	 * @param eventCRFBean
+	 *            EventCRFBean
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findOnlyParentEventCRFDNotesFromEventCRF(EventCRFBean eventCRFBean) {
@@ -2393,8 +2547,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 				+ "LEFT JOIN study_subject ss ON ec.study_subject_id = ss.study_subject_id) "
 				+ "LEFT JOIN (SELECT edc.study_id, edc.study_event_definition_id, edc.crf_id "
 				+ "FROM event_definition_crf edc " + "WHERE (edc.study_id = " + site.getId()
-				+ " OR edc.study_id = (SELECT s.parent_study_id FROM study s WHERE s.study_id = " + site.getId()
-				+ ")) " + "AND edc.status_id = 1 " + "AND edc.hide_crf = " + valueOfBooleanTrue
+				+ " OR edc.study_id = (SELECT s.parent_study_id FROM study s WHERE s.study_id = " + site.getId() + ")) "
+				+ "AND edc.status_id = 1 " + "AND edc.hide_crf = " + valueOfBooleanTrue
 				+ ") sedc ON cv.crf_id = sedc.crf_id " + "WHERE ec.status_id NOT IN (5,7) "
 				+ "AND se.study_event_definition_id = sedc.study_event_definition_id " + "AND (ss.study_id = "
 				+ site.getId() + ")";
@@ -2405,7 +2559,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns the latest child DN of given parent DN record.
 	 *
-	 * @param parentId int
+	 * @param parentId
+	 *            int
 	 * @return EntityBean
 	 */
 	public EntityBean findLatestChildByParent(int parentId) {
@@ -2430,8 +2585,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns resolution status id for DN flag, for a specific property of a specific Subject bean.
 	 *
-	 * @param subjectId int
-	 * @param column    String
+	 * @param subjectId
+	 *            int
+	 * @param column
+	 *            String
 	 * @return int
 	 */
 	public int getResolutionStatusIdForSubjectDNFlag(int subjectId, String column) {
@@ -2461,7 +2618,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Checking if a specific Study Subject has outstanding DNs, associated with Item Data beans within Event CRFs.
 	 *
-	 * @param ssb StudySubjectBean
+	 * @param ssb
+	 *            StudySubjectBean
 	 * @return boolean
 	 */
 	public boolean doesNotHaveOutstandingDNs(StudySubjectBean ssb) {
@@ -2482,10 +2640,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a specific Study Event has outstanding DNs, associated with Study Event properties or
-	 * with Item Data beans within Event CRFs.
+	 * Finds out if a specific Study Event has outstanding DNs, associated with Study Event properties or with Item Data
+	 * beans within Event CRFs.
 	 *
-	 * @param seb StudyEventBean
+	 * @param seb
+	 *            StudyEventBean
 	 * @return boolean
 	 */
 	public boolean doesNotHaveOutstandingDNs(StudyEventBean seb) {
@@ -2509,10 +2668,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a specific Event CRF has outstanding DNs, associated with its properties or
-	 * with Item Data beans within Event CRF.
+	 * Finds out if a specific Event CRF has outstanding DNs, associated with its properties or with Item Data beans
+	 * within Event CRF.
 	 *
-	 * @param ecb EventCRFBean
+	 * @param ecb
+	 *            EventCRFBean
 	 * @return boolean
 	 */
 	public boolean doesNotHaveOutstandingDNs(EventCRFBean ecb) {
@@ -2534,16 +2694,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs in certain resolution status,
-	 * associated with Event CRFs properties or with Item Data beans within Event CRFs.
+	 * Finds out if a certain Study Subject has DNs in certain resolution status, associated with Event CRFs properties
+	 * or with Item Data beans within Event CRFs.
 	 *
-	 * @param study            StudyBean
-	 * @param subjectLabel     String
-	 * @param resolutionStatus String
-	 * @param userAccount      UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
+	 * @param resolutionStatus
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus, UserAccountBean userAccount) {
+	public boolean doesSubjectHaveDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus,
+			UserAccountBean userAccount) {
 
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
@@ -2554,12 +2719,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New,
-	 * associated with Event CRFs properties or with Item Data beans within Event CRFs.
+	 * Finds out if a certain Study Subject has DNs with resolution status New, associated with Event CRFs properties or
+	 * with Item Data beans within Event CRFs.
 	 *
-	 * @param study        StudyBean
-	 * @param subjectLabel String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveNewDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
@@ -2567,28 +2735,37 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
-	 * associated with Event CRFs properties or with Item Data beans within Event CRFs.
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated, associated with Event CRFs
+	 * properties or with Item Data beans within Event CRFs.
 	 *
-	 * @param study        StudyBean
-	 * @param subjectLabel String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveUnclosedDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
+	public boolean doesSubjectHaveUnclosedDNsInStudy(StudyBean study, String subjectLabel,
+			UserAccountBean userAccount) {
 		return doesSubjectHaveDNsInStudy(study, subjectLabel, "1236", userAccount);
 	}
 
 	/**
 	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status.
 	 *
-	 * @param study            StudyBean
-	 * @param subjectLabel     String
-	 * @param resolutionStatus String
-	 * @param userAccount      UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
+	 * @param resolutionStatus
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveAnyDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus, UserAccountBean userAccount) {
+	public boolean doesSubjectHaveAnyDNsInStudy(StudyBean study, String subjectLabel, String resolutionStatus,
+			UserAccountBean userAccount) {
 
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
@@ -2601,9 +2778,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status New.
 	 *
-	 * @param study        StudyBean
-	 * @param subjectLabel String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyNewDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
@@ -2613,8 +2793,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status New.
 	 *
-	 * @param study        StudyBean
-	 * @param subjectLabel String
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyNewDNsInStudy(StudyBean study, String subjectLabel) {
@@ -2624,20 +2806,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status New/Updated.
 	 *
-	 * @param study        StudyBean
-	 * @param subjectLabel String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel, UserAccountBean userAccount) {
+	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel,
+			UserAccountBean userAccount) {
 		return doesSubjectHaveAnyDNsInStudy(study, subjectLabel, "1236", userAccount);
 	}
 
 	/**
 	 * Finds out if a certain Study Subject has any DNs in study/site, with certain resolution status New/Updated.
 	 *
-	 * @param study        StudyBean
-	 * @param subjectLabel String
+	 * @param study
+	 *            StudyBean
+	 * @param subjectLabel
+	 *            String
 	 * @return boolean
 	 */
 	public boolean doesSubjectHaveAnyUnclosedDNsInStudy(StudyBean study, String subjectLabel) {
@@ -2645,15 +2833,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs in certain resolution status,
-	 * associated with a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs in certain resolution status, associated with a specific Study Event
+	 * bean.
 	 *
-	 * @param study            StudyBean
-	 * @param eventLabel       String
-	 * @param eventId          int
-	 * @param subjectLabel     String
-	 * @param resolutionStatus String
-	 * @param userAccount      UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param resolutionStatus
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesEventHaveSomeDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
@@ -2669,28 +2863,38 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New,
-	 * associated with a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New, associated with a specific Study Event
+	 * bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel, UserAccountBean userAccount) {
+	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
+			UserAccountBean userAccount) {
 		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "16", userAccount);
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New,
-	 * associated with a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New, associated with a specific Study Event
+	 * bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
 	 * @return boolean
 	 */
 	public boolean doesEventHaveNewDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
@@ -2698,51 +2902,67 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
-	 * associated with a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated, associated with a specific Study
+	 * Event bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId,
-			String subjectLabel, UserAccountBean userAccount) {
+	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
+			UserAccountBean userAccount) {
 		return doesEventHaveSomeDNsInStudy(study, eventLabel, eventId, subjectLabel, "1236", userAccount);
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
-	 * associated with a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated, associated with a specific Study
+	 * Event bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
 	 * @return boolean
 	 */
 	public boolean doesEventHaveUnclosedDNsInStudy(StudyBean study, String eventLabel, int eventId,
-												   String subjectLabel) {
+			String subjectLabel) {
 		return doesEventHaveUnclosedDNsInStudy(study, eventLabel, eventId, subjectLabel, null);
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs in certain resolution status,
-	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs in certain resolution status, associated with a specific Event CRF
+	 * inside of a specific Study Event bean.
 	 *
-	 * @param study            StudyBean
-	 * @param eventLabel       String
-	 * @param eventId          int
-	 * @param subjectLabel     String
-	 * @param crfName          String
-	 * @param resolutionStatus String
-	 * @param userAccount      UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param crfName
+	 *            String
+	 * @param resolutionStatus
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
-	public boolean doesCRFHaveDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
-			String subjectLabel, String crfName, String resolutionStatus, UserAccountBean userAccount) {
+	public boolean doesCRFHaveDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId, String subjectLabel,
+			String crfName, String resolutionStatus, UserAccountBean userAccount) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventId", eventId);
 		listNotesFilter.addFilter("crfName", crfName);
@@ -2755,15 +2975,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New,
-	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New, associated with a specific Event CRF
+	 * inside of a specific Study Event bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
-	 * @param crfName      String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param crfName
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveNewDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
@@ -2772,31 +2998,42 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New,
-	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New, associated with a specific Event CRF
+	 * inside of a specific Study Event bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
-	 * @param crfName      String
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param crfName
+	 *            String
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveNewDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
-													  String subjectLabel, String crfName) {
+			String subjectLabel, String crfName) {
 		return doesCRFHaveNewDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, null);
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
-	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated, associated with a specific Event
+	 * CRF inside of a specific Study Event bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
-	 * @param crfName      String
-	 * @param userAccount  UserAccountBean
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param crfName
+	 *            String
+	 * @param userAccount
+	 *            UserAccountBean
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveUnclosedDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
@@ -2805,25 +3042,31 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated,
-	 * associated with a specific Event CRF inside of a specific Study Event bean.
+	 * Finds out if a certain Study Subject has DNs with resolution status New/Updated, associated with a specific Event
+	 * CRF inside of a specific Study Event bean.
 	 *
-	 * @param study        StudyBean
-	 * @param eventLabel   String
-	 * @param eventId      int
-	 * @param subjectLabel String
-	 * @param crfName      String
+	 * @param study
+	 *            StudyBean
+	 * @param eventLabel
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @param subjectLabel
+	 *            String
+	 * @param crfName
+	 *            String
 	 * @return boolean
 	 */
 	public boolean doesCRFHaveUnclosedDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
-														   String subjectLabel, String crfName) {
+			String subjectLabel, String crfName) {
 		return doesCRFHaveUnclosedDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, null);
 	}
 
 	/**
 	 * Returns count of DNs, associated with properties of a specific Study Event bean.
 	 *
-	 * @param studyEvent StudyEventBean
+	 * @param studyEvent
+	 *            StudyEventBean
 	 * @return Integer
 	 */
 	public Integer countAllByStudyEventTypeAndStudyEvent(StudyEventBean studyEvent) {
@@ -2838,7 +3081,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		if (it.hasNext()) {
 			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count == null ? 0 : count;
+			return count == null ? Integer.valueOf(0) : count;
 		} else {
 			return 0;
 		}
@@ -2847,8 +3090,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Returns total count of parent DNs with certain resolution status, in specific study/site.
 	 *
-	 * @param studyId  int
-	 * @param statusId int
+	 * @param studyId
+	 *            int
+	 * @param statusId
+	 *            int
 	 * @return int
 	 */
 	public int countViewNotesByStatusId(int studyId, int statusId) {
@@ -2873,10 +3118,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Returns a list of Event CRF ids, for a specific Study Subject, which have unclosed DNs,
-	 * associated with Item Data beans inside Event CRFs.
+	 * Returns a list of Event CRF ids, for a specific Study Subject, which have unclosed DNs, associated with Item Data
+	 * beans inside Event CRFs.
 	 *
-	 * @param studySubjectId int
+	 * @param studySubjectId
+	 *            int
 	 * @return List<Integer>
 	 */
 	public List<Integer> findAllEvCRFIdsWithUnclosedDNsByStSubId(int studySubjectId) {
@@ -2894,7 +3140,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Find all by crf id.
 	 *
-	 * @param crfId crf id
+	 * @param crfId
+	 *            crf id
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllByCRFId(int crfId) {
@@ -2922,7 +3169,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Find all by crf version id.
 	 *
-	 * @param crfVersionId crf version id
+	 * @param crfVersionId
+	 *            crf version id
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllByCrfVersionId(int crfVersionId) {
@@ -2949,7 +3197,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Find all by event crf id.
 	 *
-	 * @param eventCrfId event crf id
+	 * @param eventCrfId
+	 *            event crf id
 	 * @return ArrayList<DiscrepancyNoteBean>
 	 */
 	public ArrayList<DiscrepancyNoteBean> findAllByEventCrfId(int eventCrfId) {
@@ -2973,9 +3222,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Gets list of DiscrepancyCorrectionForms by note Ids.
 	 *
-	 * @param study   StudyBean
-	 * @param resword ResourceBundle
-	 * @param noteIds Integer...
+	 * @param study
+	 *            StudyBean
+	 * @param resword
+	 *            ResourceBundle
+	 * @param noteIds
+	 *            Integer...
 	 * @return List<DiscrepancyCorrectionForm>
 	 */
 	public List<DiscrepancyCorrectionForm> getDiscrepancyCorrectionFormsByNoteIds(StudyBean study,
@@ -2990,6 +3242,36 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			}
 		}
 		return dcfs;
+	}
+
+	/**
+	 * Deletes discrepancy notes by crf id.
+	 *
+	 * @param crfId
+	 *            int
+	 */
+	public void deleteByCrfId(int crfId) {
+		int index = 1;
+		String sql = digester.getQuery("deleteByCrfId");
+		HashMap variables = new HashMap();
+		variables.put(index++, crfId);
+		variables.put(index, crfId);
+		execute(sql, variables);
+	}
+
+	/**
+	 * Deletes discrepancy notes by crf version id.
+	 *
+	 * @param crfVersionId
+	 *            int
+	 */
+	public void deleteByCrfVersionId(int crfVersionId) {
+		int index = 1;
+		String sql = digester.getQuery("deleteByCrfVersionId");
+		HashMap variables = new HashMap();
+		variables.put(index++, crfVersionId);
+		variables.put(index, crfVersionId);
+		execute(sql, variables);
 	}
 
 	private String buildDcfQuery(String commaDelimitedNoteIds) {
@@ -3079,12 +3361,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		Object itemValue = resultRow.get(itemName);
 		if (itemName.equals("date_start")) {
 			dcf.setEventItemName(study.getStudyParameterConfig().getStartDateTimeLabel());
-			dcf.setEventItemValue(formatDateItemValue(itemValue, study.getStudyParameterConfig().getUseStartTime()
-					.equalsIgnoreCase("yes")));
+			dcf.setEventItemValue(formatDateItemValue(itemValue,
+					study.getStudyParameterConfig().getUseStartTime().equalsIgnoreCase("yes")));
 		} else if (itemName.equals("date_end")) {
 			dcf.setEventItemName(study.getStudyParameterConfig().getEndDateTimeLabel());
-			dcf.setEventItemValue(formatDateItemValue(itemValue, study.getStudyParameterConfig().getUseEndTime()
-					.equalsIgnoreCase("yes")));
+			dcf.setEventItemValue(formatDateItemValue(itemValue,
+					study.getStudyParameterConfig().getUseEndTime().equalsIgnoreCase("yes")));
 		} else {
 			dcf.setEventItemName("");
 			dcf.setEventItemValue("");
@@ -3166,10 +3448,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	private String commaDelimitNoteIds(Integer... noteIds) {
-		String commaDelimitedNoteIds = "" + noteIds[0];
-		for (int i = 1; i < noteIds.length; i++) {
-			commaDelimitedNoteIds += "," + noteIds[i];
+		String splitter = "";
+		StringBuilder commaDelimitedNoteIds = new StringBuilder("");
+		for (Integer noteId : noteIds) {
+			commaDelimitedNoteIds.append(splitter).append(noteId);
+			splitter = ",";
 		}
-		return commaDelimitedNoteIds;
+		return commaDelimitedNoteIds.toString();
 	}
 }

@@ -21,6 +21,12 @@
 
 package com.clinovo.service;
 
+import java.util.Locale;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+
 /**
  * DeleteCrfService.
  */
@@ -29,16 +35,30 @@ public interface DeleteCrfService {
 	/**
 	 * Deletes crf.
 	 * 
-	 * @param crfId
-	 *            int
+	 * @param crfBean
+	 *            CRFBean
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 * @param locale
+	 *            Locale
+	 * @param force
+	 *            boolean if it is true then crf will be deleted immediately with all related data
+	 * @throws Exception
+	 *             an Exception
 	 */
-	void deleteCrf(int crfId);
+	void deleteCrf(CRFBean crfBean, UserAccountBean userAccountBean, Locale locale, boolean force) throws Exception;
 
 	/**
 	 * Deletes crf version.
 	 * 
-	 * @param crfVersionId
-	 *            int
+	 * @param crfVersionBean
+	 *            CRFVersionBean
+	 * @param locale
+	 *            Locale
+	 * @param force
+	 *            boolean if it is true then crf version will be deleted immediately with all related data
+	 * @throws Exception
+	 *             an Exception
 	 */
-	void deleteCrfVersion(int crfVersionId);
+	void deleteCrfVersion(CRFVersionBean crfVersionBean, Locale locale, boolean force) throws Exception;
 }

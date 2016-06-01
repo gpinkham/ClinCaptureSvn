@@ -110,4 +110,12 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 	public void testThatFindAllByStudyIdReturnsCorrectCollectionSize() throws OpenClinicaException {
 		assertEquals(crfVersionDao.findAllByStudyId(1).size(), 8);
 	}
+
+	@Test
+	public void testThatDeleteCrfVersionMethodWorksFine() throws OpenClinicaException {
+		final int crfVersionId = 6;
+		assertTrue(crfVersionDao.findByPK(crfVersionId).getId() != 0);
+		crfVersionDao.deleteCrfVersion(crfVersionId);
+		assertTrue(crfVersionDao.findByPK(crfVersionId).getId() == 0);
+	}
 }

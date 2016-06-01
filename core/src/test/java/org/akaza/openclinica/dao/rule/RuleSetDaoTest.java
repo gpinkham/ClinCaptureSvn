@@ -45,11 +45,11 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 				Integer.valueOf(ruleSet.getRuleSetRules().size()));
 
 		// Test RuleActions in RuleSetRules
-		assertEquals("The ActionType should be FILE_DISCREPANCY_NOTE", ActionType.FILE_DISCREPANCY_NOTE, ruleSet
-				.getRuleSetRules().get(0).getActions().get(0).getActionType());
+		assertEquals("The ActionType should be FILE_DISCREPANCY_NOTE", ActionType.FILE_DISCREPANCY_NOTE,
+				ruleSet.getRuleSetRules().get(0).getActions().get(0).getActionType());
 		assertEquals("The type of the Action should be DiscrepancyNoteAction",
-				"org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean", ruleSet.getRuleSetRules().get(0)
-						.getActions().get(0).getClass().getName());
+				"org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean",
+				ruleSet.getRuleSetRules().get(0).getActions().get(0).getClass().getName());
 		assertEquals("The size of the RuleSetRules is not 2", new Integer(2),
 				Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
 	}
@@ -137,5 +137,18 @@ public class RuleSetDaoTest extends DefaultAppContextTest {
 	public void testThatFindByCrfVersionIdAndCrfVersionOidReturnsCorrectCollectionSize() {
 		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(1);
 		assertEquals(ruleSetDao.findByCrfVersionIdAndCrfVersionOid(crfVersionBean).size(), 1);
+	}
+
+	@Test
+	public void testThatUnbindRulesFromCrfVersionMethodWorksFine() {
+		final int ruleSetId = 7;
+		final int crfVersionId = 8;
+		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfVersionId);
+		RuleSetBean ruleSetBean = ruleSetDao.findById(ruleSetId);
+		assertTrue(ruleSetBean.getCrfVersionId().equals(crfVersionId));
+		ruleSetDao.unbindRulesFromCrfVersion(crfVersionBean);
+		ruleSetDao.getSessionFactory().getCurrentSession().evict(ruleSetBean);
+		ruleSetBean = ruleSetDao.findById(ruleSetId);
+		assertNull(ruleSetBean.getCrfVersionId());
 	}
 }

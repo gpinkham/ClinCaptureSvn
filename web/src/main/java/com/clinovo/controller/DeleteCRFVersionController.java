@@ -26,12 +26,8 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.SpringController;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.util.StudyEventDefinitionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DeleteCrfService;
 import com.clinovo.util.PageMessagesUtil;
 
@@ -56,23 +51,20 @@ import com.clinovo.util.PageMessagesUtil;
 public class DeleteCRFVersionController extends SpringController {
 
 	@Autowired
+	private RuleSetDao ruleSetDao;
+
+	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
 	private MessageSource messageSource;
 
 	@Autowired
-	private CodedItemService codedItemService;
-
-	@Autowired
-	private RuleSetDao ruleSetDao;
-
-	@Autowired
 	private DeleteCrfService deleteCrfService;
 
+	public static final String CRF_LIST = "redirect:/ListCRF";
 	public static final String ACTION_PAGE = "admin/deleteCRFVersion";
 	public static final String ERROR_PAGE = "redirect:/MainMenu?message=system_no_permission";
-	public static final String CRF_LIST = "redirect:/ListCRF";
 
 	/**
 	 * Method that handles requests for delete crf version page.
@@ -95,27 +87,24 @@ public class DeleteCRFVersionController extends SpringController {
 
 		if (userRole.getRole() == Role.SYSTEM_ADMINISTRATOR || (userRole.getRole() == Role.STUDY_ADMINISTRATOR)) {
 
-			CRFDAO crfDao = new CRFDAO(dataSource);
-			EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
 			CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
-			DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(dataSource);
-			EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
 
 			CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfVersionId);
-			CRFBean crfBean = (CRFBean) crfDao.findByPK(crfVersionBean.getCrfId());
+			CRFBean crfBean = (CRFBean) getCRFDAO().findByPK(crfVersionBean.getCrfId());
 			int crfVersionsQuantity = crfVersionDao.findAllByCRF(crfBean.getId()).size();
 
-			List<RuleSetBean> ruleSetBeanList = crfVersionsQuantity > 1 ? ruleSetListFilterForVersion(crfVersionId)
-					:  ruleSetListFilterForCRF(crfVersionBean.getCrfId());
-			List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
+			List<RuleSetBean> ruleSetBeanList = crfVersionsQuantity > 1
+					? ruleSetDao.findByCrfVersionIdAndCrfVersionOid(crfVersionBean)
+					: ruleSetDao.findByCrfIdAndCrfOid(crfBean);
+			List<EventCRFBean> eventCrfBeanList = getEventCRFDAO().findAllStartedByCrfVersion(crfVersionId);
 			List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionsQuantity > 1
 					? new ArrayList<StudyEventDefinitionBean>()
 					: StudyEventDefinitionUtil.studyEventDefinitionListFilter(dataSource,
-							eventDefinitionCrfDao.findAllByCRF(crfBean.getId()));
+							getEventDefinitionCRFDAO().findAllByCRF(crfBean.getId()));
 			List<StudyEventDefinitionBean> eventDefinitionListFull = StudyEventDefinitionUtil
 					.studyEventDefinitionStatusUpdate(dataSource, crfBean.getId());
 
-			List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCrfVersionId(crfVersionId);
+			List<DiscrepancyNoteBean> crfDiscrepancyNotes = getDiscrepancyNoteDAO().findAllByCrfVersionId(crfVersionId);
 
 			model.addAttribute("crfBean", crfBean);
 			model.addAttribute("crfVersionBean", crfVersionBean);
@@ -158,67 +147,16 @@ public class DeleteCRFVersionController extends SpringController {
 	 */
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
 	public String confirm(HttpServletRequest request, @RequestParam("crfVersionId") int crfVersionId) throws Exception {
-
-		CRFDAO crfDao = new CRFDAO(dataSource);
-		EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
-		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
-		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(dataSource);
-		EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
-
-		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(crfVersionId);
-		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfVersionBean.getCrfId());
-		int crfVersionQuantity = crfVersionDao.findAllActiveByCRF(crfBean.getId()).size();
-
-		List<RuleSetBean> ruleSetBeanList = crfVersionQuantity > 1 ? ruleSetListFilterForVersion(crfVersionId)
-				: ruleSetListFilterForCRF(crfVersionBean.getCrfId());
-		List<EventCRFBean> eventCrfBeanList = eventCrfDAO.findAllStartedByCrfVersion(crfVersionId);
-		List<StudyEventDefinitionBean> eventDefinitionListAvailable = crfVersionQuantity > 1
-				? new ArrayList<StudyEventDefinitionBean>()
-				: StudyEventDefinitionUtil.studyEventDefinitionListFilter(dataSource,
-						eventDefinitionCrfDao.findAllByCRF(crfBean.getId()));
-		List<DiscrepancyNoteBean> crfDiscrepancyNotes = discrepancyNoteDao.findAllByCrfVersionId(crfVersionId);
-
-		if (eventCrfBeanList.size() > 0 || crfDiscrepancyNotes.size() > 0 || eventDefinitionListAvailable.size() > 0
-				|| ruleSetBeanList.size() > 0) {
-			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("this_crf_version_has_associated_data", null, LocaleResolver.getLocale()));
-		} else {
-			deleteCrfService.deleteCrfVersion(crfVersionBean.getId());
-
-			// Purge coded items
-			codedItemService.deleteByCRFVersion(crfVersionBean.getId());
-
-			request.getSession().setAttribute("controllerMessage",
-					messageSource.getMessage("the_crf_version_has_been_removed", null, LocaleResolver.getLocale()));
+		CRFVersionBean crfVersionBean = (CRFVersionBean) getCRFVersionDAO().findByPK(crfVersionId);
+		String message = messageSource.getMessage("the_crf_version_has_been_removed", null, LocaleResolver.getLocale());
+		try {
+			if (crfVersionBean.getId() > 0) {
+				deleteCrfService.deleteCrfVersion(crfVersionBean, LocaleResolver.getLocale(), false);
+			}
+		} catch (Exception ex) {
+			message = ex.getMessage();
 		}
-
+		request.getSession().setAttribute("controllerMessage", message);
 		return CRF_LIST;
-	}
-
-	private List<RuleSetBean> ruleSetListFilterForVersion(int crfVersionId) {
-		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
-
-		List<RuleSetBean> ruleSetBeanList = new ArrayList<RuleSetBean>();
-		CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(crfVersionId);
-
-		List<RuleSetBean> studyRuleSetBeanList = ruleSetDao.findByCrfVersionIdAndCrfVersionOid(crfVersionBean);
-		for (RuleSetBean ruleSetRule : studyRuleSetBeanList) {
-			ruleSetBeanList.add(ruleSetRule);
-		}
-		return ruleSetBeanList;
-	}
-
-	private List<RuleSetBean> ruleSetListFilterForCRF(int crfId) {
-		CRFDAO crfDao = new CRFDAO(dataSource);
-
-		List<RuleSetBean> ruleSetBeanList = new ArrayList<RuleSetBean>();
-		CRFBean crfBean = (CRFBean) crfDao.findByPK(crfId);
-
-		List<RuleSetBean> studyRuleSetBeanList = ruleSetDao.findByCrfIdAndCrfOid(crfBean);
-		for (RuleSetBean ruleSetRule : studyRuleSetBeanList) {
-			ruleSetBeanList.add(ruleSetRule);
-		}
-
-		return ruleSetBeanList;
 	}
 }
