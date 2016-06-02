@@ -410,21 +410,14 @@ public final class SubjectEventStatusUtil {
 		boolean hasStarted = false;
 		boolean justScheduled = true;
 		boolean hasSDVRequiredCRFs = false;
+		List<Integer> crfsToProcess = new ArrayList<Integer>();
 		List<Integer> requiredCrfIds = new ArrayList<Integer>();
 		SubjectEventStatus savedPrevSubjectEventStatus = studyEventBean.getPrevSubjectEventStatus();
 		SubjectEventStatus savedCurrentSubjectEventStatus = studyEventBean.getSubjectEventStatus();
-		StudySubjectBean studySubjectBean = (StudySubjectBean) daoWrapper.getSsdao()
-				.findByPK(studyEventBean.getStudySubjectId());
+		StudySubjectBean studySubjectBean = daoWrapper.getSsdao().findByPK(studyEventBean.getStudySubjectId());
 		StudyBean studySubjectStudyBean = (StudyBean) daoWrapper.getSdao().findByPK(studySubjectBean.getStudyId());
 		List<EventDefinitionCRFBean> eventDefCrfs = (List<EventDefinitionCRFBean>) daoWrapper.getEdcdao()
 				.findAllActiveByEventDefinitionId(studySubjectStudyBean, studyEventBean.getStudyEventDefinitionId());
-		List<Integer> crfsToProcess = new ArrayList<Integer>();
-		for (EventDefinitionCRFBean eventDefinitionCRFBean : eventDefCrfs) {
-			if (eventDefinitionCRFBean.getStatus() == Status.AVAILABLE && eventDefinitionCRFBean.isActive()
-					&& !eventDefinitionCRFBean.isHideCrf()) {
-				crfsToProcess.add(eventDefinitionCRFBean.getCrfId());
-			}
-		}
 		SignStateRestorer signStateRestorer = signStateRestorerMap != null
 				? signStateRestorerMap.get(studySubjectBean.getStudyId())
 				: null;
@@ -433,9 +426,10 @@ public final class SubjectEventStatusUtil {
 		Map<Integer, SignedData> postSignedData = SignStateRestorer.initPostSignedData(eventDefCrfs);
 		for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
 			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive()
-					|| eventDefinitionCrf.isHideCrf() || !crfsToProcess.contains(eventDefinitionCrf.getCrfId())) {
+					|| eventDefinitionCrf.isHideCrf()) {
 				continue;
 			}
+			crfsToProcess.add(eventDefinitionCrf.getCrfId());
 			if (eventDefinitionCrf.isRequiredCRF()) {
 				requiredCrfIds.add(eventDefinitionCrf.getId());
 			}
@@ -444,9 +438,9 @@ public final class SubjectEventStatusUtil {
 				hasSDVRequiredCRFs = true;
 			}
 		}
-		boolean notAllStartedSDVRequiredCRFsAreSDVed = false;
-		boolean hasRequiredCRFs = requiredCrfIds.size() > 0;
 		boolean hasSDVedCRFs = false;
+		boolean hasRequiredCRFs = requiredCrfIds.size() > 0;
+		boolean notAllStartedSDVRequiredCRFsAreSDVed = false;
 		for (EventCRFBean eventCRFBean : eventCRFs) {
 			int crfId = daoWrapper.getCvdao().getCRFIdFromCRFVersionId(eventCRFBean.getCRFVersionId());
 			if (eventCRFBean.isNotStarted() || !crfsToProcess.contains(crfId)) {

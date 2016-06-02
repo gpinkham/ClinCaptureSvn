@@ -19,6 +19,7 @@ import java.util.Set;
 /**
  * SQLUtil.
  */
+@SuppressWarnings("rawtypes")
 public final class SQLUtil {
 
 	private SQLUtil() {
