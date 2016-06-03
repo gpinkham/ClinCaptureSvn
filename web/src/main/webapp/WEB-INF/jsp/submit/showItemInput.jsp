@@ -49,9 +49,7 @@
 <c:set var="hasDataFlag" value="${hasDataFlag}" scope="request"/>
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" scope="request"/>
 
-<c:if test="${(respLayout eq 'Horizontal' || respLayout eq 'horizontal')}">
-	<c:set var="isHorizontal" value="${true}" scope="request"/>
-</c:if>
+<c:set var="isHorizontal" value="${fn:toLowerCase(respLayout) eq 'horizontal'}" scope="request"/>
 
 <%-- text input value; the default value is not displayed if the application has data, or is
  not originating from doubleDataEntry--%>
