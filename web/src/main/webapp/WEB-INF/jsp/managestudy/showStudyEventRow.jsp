@@ -280,19 +280,17 @@
 													  eventDefinitionCRF="${dec.eventDefinitionCRF}" eventCrf="${dec.eventCRF}"/>
 					</td>
 					<td class="table_cell_border" width="110">
-						<c:if test="${dec.eventCRF.updatedDate != null}">
-							<cc-fmt:formatDate value="${dec.eventCRF.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/><br>
-						</c:if>
 						<c:choose>
-							<c:when test="${dec.eventCRF.updater.name == null}">
-								(<c:out value="${dec.eventCRF.owner.name}"/>)
+							<c:when test="${dec.eventCRF.updatedDate != null}">
+								<cc-fmt:formatDate value="${dec.eventCRF.updatedDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/><br>
+								(<c:out value="${dec.eventCRF.updater.name}"/>)
 							</c:when>
 							<c:otherwise>
-								(<c:out value="${dec.eventCRF.updater.name}"/>)
+								<cc-fmt:formatDate value="${dec.eventCRF.createdDate}" pattern="${dteFormat}" dateTimeZone="${userBean.userTimeZoneId}"/><br>
+								(<c:out value="${dec.eventCRF.owner.name}"/>)
 							</c:otherwise>
 						</c:choose>
 					</td>
-
 					<td class="table_cell_border">
 						<table border="0" cellpadding="0" cellspacing="0">
 							<tr valign="top" class="innerTable <c:if test='${dec.eventDefinitionCRF.hideCrf and study.parentStudyId > 0}'>hidden</c:if>">
