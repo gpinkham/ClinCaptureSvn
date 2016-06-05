@@ -102,7 +102,9 @@
 
 </script>
 
-		<c:import url="../submit/interviewer.jsp" />
+		<c:if test="${eventCRF != null}">
+			<c:import url="../submit/interviewer.jsp" />
+		</c:if>
 
 		<c:set var="eventId" value="${eventId}" />
 		<c:set var="studySubjectId" value="${studySubjectId}" />
