@@ -13,14 +13,14 @@
 
 package org.akaza.openclinica.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * StudyEventUtil.
@@ -58,7 +58,7 @@ public final class StudyEventUtil {
 			result.addAll(seddao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId()));
 		}
 
-		List<StudyEventDefinitionBean> eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
+		List<StudyEventDefinitionBean> eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId(parentStudyId);
 		// sort by study event definition ordinal
 		Collections.sort(eventDefinitionsNotFromDynGroup);
 

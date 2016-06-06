@@ -12,9 +12,6 @@
  ******************************************************************************/
 package org.akaza.openclinica.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.clinovo.enums.study.StudyAllocation;
 import com.clinovo.enums.study.StudyAssignment;
 import com.clinovo.enums.study.StudyControl;
@@ -27,10 +24,15 @@ import com.clinovo.enums.study.StudyPurpose;
 import com.clinovo.enums.study.StudySelection;
 import com.clinovo.enums.study.StudyTiming;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * MapsHolder.
  */
-public class MapsHolder {
+@SuppressWarnings("serial")
+public class MapsHolder implements Serializable {
 
 	private List<StudyFacRecruitStatus> facRecruitStatusList = new ArrayList<StudyFacRecruitStatus>();
 	private List<StudyPhase> studyPhaseList = new ArrayList<StudyPhase>();

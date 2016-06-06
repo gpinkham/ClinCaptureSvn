@@ -1018,7 +1018,7 @@
 					   group_class_type_id="4" status_id="1" is_default="false"
 					   dynamic_ordinal="1"/>
 	<study_group_class study_group_class_id="4" name="study group 4" study_id="1" owner_id="1" date_created="2013-11-29"
-					   group_class_type_id="4" status_id="1" is_default="true"
+					   group_class_type_id="4" status_id="5" is_default="true"
 					   dynamic_ordinal="2"/>
 	<study_group_class study_group_class_id="5" name="study group 5" study_id="1" owner_id="1" date_created="2016-02-29"
 					   group_class_type_id="3" status_id="1" is_default="false"/>

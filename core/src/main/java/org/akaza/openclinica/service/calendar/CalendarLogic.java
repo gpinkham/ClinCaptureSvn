@@ -37,6 +37,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Calendar Logic.
+ */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class CalendarLogic {
 
@@ -48,14 +51,21 @@ public class CalendarLogic {
 	private ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 
+	/**
+	 * Public constructor.
+	 * @param ds DataSource
+	 * @param scheduler StdScheduler
+	 */
 	public CalendarLogic(DataSource ds, StdScheduler scheduler) {
 		this.ds = ds;
 		this.scheduler = scheduler;
-
 	}
 
+	/**
+	 * Schedule Subject Events.
+	 * @param studyEventBean StudyEventBean
+	 */
 	public void scheduleSubjectEvents(StudyEventBean studyEventBean) {
-
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
 		StudyEventDAO sed = new StudyEventDAO(ds);
 		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
@@ -114,7 +124,7 @@ public class CalendarLogic {
 					sedForSch.addAll(seddao.findAllActiveOrderedByStudyGroupClassId(defaultGroup.getId()));
 				}
 				// find all non-grouped events
-				sedForSch.addAll(seddao.findAllActiveNotClassGroupedByStudyId(studyBean.getId()));
+				sedForSch.addAll(seddao.findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId(studyBean.getId()));
 			}
 			LOGGER.debug("found list " + sedForSch.size());
 			for (StudyEventDefinitionBean sedTmp : sedForSch) {
@@ -155,6 +165,11 @@ public class CalendarLogic {
 		}
 	}
 
+	/**
+	 * Validate Max Min days.
+	 * @param studyEventBean StudyEventBean
+	 * @return String
+	 */
 	public String maxMinDaysValidator(StudyEventBean studyEventBean) {
 		String messageReturn = "empty";
 		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
@@ -292,10 +307,20 @@ public class CalendarLogic {
 		return result;
 	}
 
+	/**
+	 * Get Date Time Ended If Exist.
+	 * @param studyEventBeanRef StudyEventBean
+	 * @return DateTime
+	 */
 	public static DateTime getDateTimeEndedIfExist(StudyEventBean studyEventBeanRef) {
 		return new DateTime(getDateEndedIfExist(studyEventBeanRef).getTime());
 	}
-	
+
+	/**
+	 * Get Date Ended If Exist.
+	 * @param studyEventBeanRef StudyEventBean
+	 * @return Date
+	 */
 	public static Date getDateEndedIfExist(StudyEventBean studyEventBeanRef) {
 		if (studyEventBeanRef.getDateEnded() != null) {
 			return studyEventBeanRef.getDateEnded();

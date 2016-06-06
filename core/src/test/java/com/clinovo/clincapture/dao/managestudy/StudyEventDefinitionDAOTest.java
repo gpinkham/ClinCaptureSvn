@@ -29,6 +29,14 @@ import java.util.List;
 public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 
 	@Test
+	public void testFindAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId() throws OpenClinicaException {
+		int studyId = 1;
+		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+				.findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId(studyId);
+		assertEquals(2, result.size());
+	}
+
+	@Test
 	public void testFindAllActiveNotClassGroupedByStudyId() throws OpenClinicaException {
 		int studyId = 1;
 		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
@@ -43,7 +51,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		ssb.setDynamicGroupClassId(3);
 		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectAndStudyId(ssb,
 				studyId);
-		assertEquals(6, result.size());
+		assertEquals(7, result.size());
 	}
 
 	@Test
@@ -53,7 +61,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		ssb.setDynamicGroupClassId(3);
 		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
-		assertEquals(6, result.size());
+		assertEquals(7, result.size());
 	}
 
 	@Test
@@ -63,7 +71,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		ssb.setDynamicGroupClassId(4);
 		List<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
-		assertEquals(4, result.size());
+		assertEquals(2, result.size());
 	}
 
 	@Test

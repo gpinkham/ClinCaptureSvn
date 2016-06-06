@@ -546,7 +546,6 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
-
 		return answer;
 	}
 
@@ -573,7 +572,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 				defsFromActiveGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
 			}
 		}
-		List<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
+		List<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId(studyId);
 		defsFromActiveGroup.addAll(nonGroupDefs);
 
 		return defsFromActiveGroup;
@@ -599,7 +598,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		} else {
 			defsFromGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
 		}
-		List<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
+		List<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId(studyId);
 		defsFromGroup.addAll(nonGroupDefs);
 
 		return defsFromGroup;
@@ -608,24 +607,40 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all active by id and not class grouped.
 	 * 
-	 * @param id
-	 *            int
+	 * @param id int
+	 * @return ArrayList<StudyEventDefinitionBean>
+	 */
+	public List<StudyEventDefinitionBean> findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId(int id) {
+		List answer = new ArrayList();
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, id);
+		List alist = this.select(digester.getQuery("findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId"), variables);
+
+		for (Object anAlist : alist) {
+			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			answer.add(seb);
+		}
+		return answer;
+	}
+
+	/**
+	 * Finds all active by id and not class grouped.
+	 *
+	 * @param id int
 	 * @return ArrayList<StudyEventDefinitionBean>
 	 */
 	public List<StudyEventDefinitionBean> findAllActiveNotClassGroupedByStudyId(int id) {
 		List answer = new ArrayList();
-
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, id);
-
 		List alist = this.select(digester.getQuery("findAllActiveNotClassGroupedByStudyId"), variables);
 
 		for (Object anAlist : alist) {
 			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
-
 		return answer;
 	}
 
