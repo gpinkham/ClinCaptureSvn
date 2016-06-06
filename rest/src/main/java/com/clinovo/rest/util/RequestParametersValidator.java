@@ -51,6 +51,7 @@ import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.service.AuthenticationService;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
+import com.clinovo.util.RequestUtil;
 
 /**
  * RequestParametersValidator.
@@ -206,7 +207,8 @@ public final class RequestParametersValidator {
 					String parameterName = baseEnum.getName();
 					if (enumBasedParameter.useDefaultValues()) {
 						if (request.getParameter(parameterName) == null) {
-							addDefaultValues((RestRequestWrapper) request, parameterName, baseEnum, messageSource);
+							addDefaultValues((RestRequestWrapper) RequestUtil.getRequest(), parameterName, baseEnum,
+									messageSource);
 						}
 					}
 					if (enumBasedParameter.synchronizeQuantityOfValues()) {
@@ -297,7 +299,8 @@ public final class RequestParametersValidator {
 									} else if (!notUsed && parameterValue == null) {
 										nullParameters.add(parameterName);
 										String defaultValue = ((RequestParam) annotation).defaultValue();
-										((RestRequestWrapper) request).addParameter(parameterName, defaultValue);
+										((RestRequestWrapper) RequestUtil.getRequest()).addParameter(parameterName,
+												defaultValue);
 									}
 								}
 							}
