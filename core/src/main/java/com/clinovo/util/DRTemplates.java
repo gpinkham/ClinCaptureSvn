@@ -35,6 +35,7 @@ import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.constant.LineStyle;
 import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.definition.ReportParameters;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 /**
  * 
@@ -56,7 +57,6 @@ public final class DRTemplates {
 	public static final ReportTemplateBuilder REPORT_TEMPLATE;
 	public static final ComponentBuilder<?, ?> FOOTER_COMPONENT;
 
-	private static final String IMAGE_PATH = "images/Logo.gif";
 	private static final int THREE = 3;
 	private static final int SEVEN = 7;
 	private static final int TEN = 10;
@@ -225,7 +225,8 @@ public final class DRTemplates {
 	public static ComponentBuilder<?, ?> getDynamicReportsComponent(String urlPath, String sysPath) {
 		HyperLinkBuilder link = hyperLink(urlPath);
 		ComponentBuilder<?, ?> dynamicReportsComponent = cmp.horizontalList(
-				cmp.image(sysPath + "/" + IMAGE_PATH).setFixedDimension(ONE_HUNDRED, FIFTY),
+				cmp.image(sysPath + CoreResources.getField(CoreResources.PROP_CLIENT_LOGO))
+						.setFixedDimension(ONE_HUNDRED, FIFTY),
 				cmp.verticalList(cmp.text("CRF Report").setStyle(BOLD_22_CENTERED_STYLE.setLeftPadding(TWENTY))
 						.setHorizontalAlignment(HorizontalAlignment.LEFT), cmp.text(urlPath).setStyle(ITALIC_STYLE)
 						.setHyperLink(link))).setFixedWidth(THREE_HUNDRED);

@@ -89,7 +89,9 @@ public class OCServletFilter implements javax.servlet.Filter {
 
 		request.setAttribute(REVISION_NUMBER, ResourceBundleProvider.getBuildNumberBundle().getString(REVISION_NUMBER));
 
-		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
+		((HttpServletRequest) request).getSession().setAttribute("systemLogoUrl", CoreResources.SYSTEM_LOGO_PATH);
+		((HttpServletRequest) request).getSession().setAttribute("logoUrl",
+				CoreResources.getField(CoreResources.PROP_CLIENT_LOGO));
 		((HttpServletRequest) request).getSession()
 				.setAttribute("instanceType", getInstanceType((HttpServletRequest) request));
 

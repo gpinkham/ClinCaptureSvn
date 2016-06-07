@@ -19,11 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -39,6 +37,9 @@ import com.clinovo.model.SystemGroup;
 import com.clinovo.service.SystemService;
 import com.clinovo.util.FileUtil;
 
+/**
+ * System service implementation.
+ */
 @Service
 @Transactional
 public class SystemServiceImpl implements SystemService {
@@ -47,45 +48,56 @@ public class SystemServiceImpl implements SystemService {
 	private SystemDAO systemDAO;
 
 	@Autowired
-	private DataSource datasource;
-
-	@Autowired
 	private CoreResources coreResources;
 
 	@Autowired
 	private JavaMailSenderImpl mailSender;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<System> findAll() {
 		return systemDAO.findAll();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<SystemGroup> getAllMainGroups() {
 		return systemDAO.getAllMainGroups();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<SystemGroup> getAllChildGroups(int parentId) {
 		return systemDAO.getAllChildGroups(parentId);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<System> getAllProperties(int groupId, Role role) {
 		return systemDAO.getAllProperties(groupId, role);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<SystemGroupHolder> getSystemPropertyGroups(Role role) {
 
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(datasource);
 		List<SystemGroupHolder> systemPropertyGroups = new ArrayList<SystemGroupHolder>();
 		List<SystemGroup> groupList = systemDAO.getAllMainGroups();
-		boolean addGroup = false;
+		boolean addGroup;
 
 		for (SystemGroup group : groupList) {
 			addGroup = false;
 			SystemGroupHolder groupHolder = new SystemGroupHolder(group);
-			addGroup = processGroupProperties(role, groupHolder, addGroup, spvdao);
+			addGroup = processGroupProperties(role, groupHolder, addGroup);
 
 			for (SystemGroup subGroup : systemDAO.getAllChildGroups(group.getId())) {
 				SystemGroupHolder subGroupHolder = new SystemGroupHolder(subGroup);
-				addGroup = processGroupProperties(role, subGroupHolder, addGroup, spvdao);
+				addGroup = processGroupProperties(role, subGroupHolder, addGroup);
 				groupHolder.getSubGroups().add(subGroupHolder);
 			}
 			if (addGroup) {
@@ -95,13 +107,11 @@ public class SystemServiceImpl implements SystemService {
 		return systemPropertyGroups;
 	}
 
-	private boolean processGroupProperties(Role role, SystemGroupHolder groupHolder, boolean addGroup,
-			StudyParameterValueDAO spvdao) {
+	private boolean processGroupProperties(Role role, SystemGroupHolder groupHolder, boolean addGroup) {
 
 		groupHolder.setSystemProperties(systemDAO.getAllProperties(groupHolder.getGroup().getId(), role));
 		processDynamicProperties(groupHolder.getSystemProperties());
 		addGroup = !addGroup && groupHolder.getSystemProperties().size() > 0 || addGroup;
-
 		return addGroup;
 	}
 
@@ -109,12 +119,15 @@ public class SystemServiceImpl implements SystemService {
 		for (System systemProperty : systemProperties) {
 			if (systemProperty.getType() == PropertyType.DYNAMIC_INPUT
 					|| systemProperty.getType() == PropertyType.DYNAMIC_RADIO
-					|| systemProperty.getName().equalsIgnoreCase("logo")) {
+					|| systemProperty.getName().equalsIgnoreCase(CoreResources.PROP_CLIENT_LOGO)) {
 				systemProperty.setValue(coreResources.getDataInfo().getProperty(systemProperty.getName()));
 			}
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void updateSystemProperties(SystemCommand systemCommand,
 			OpenClinicaSchedulerFactoryBean schedulerFactoryBean) throws Exception {
 		FileUtil.changeLogo(systemCommand);
@@ -167,7 +180,8 @@ public class SystemServiceImpl implements SystemService {
 		String value = systemProperty.getValue();
 		if (value != null && systemProperty.getType() != PropertyType.DYNAMIC_INPUT
 				&& systemProperty.getType() != PropertyType.DYNAMIC_RADIO) {
-			if (systemProperty.getName().equalsIgnoreCase("logo") && systemCommand.getNewLogoUrl() != null
+			if (systemProperty.getName().equalsIgnoreCase(CoreResources.PROP_CLIENT_LOGO)
+					&& systemCommand.getNewLogoUrl() != null
 					&& !systemCommand.getNewLogoUrl().trim().isEmpty()) {
 				systemProperty.setValue(systemCommand.getNewLogoUrl());
 			}

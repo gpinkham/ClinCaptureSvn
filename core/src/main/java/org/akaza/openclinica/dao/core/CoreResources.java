@@ -51,17 +51,18 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
+/**
+ * Core resources.
+ */
 @Component
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class CoreResources implements ResourceLoaderAware {
 
-	private final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CoreResources.class);
 
 	public static final Set<String> CALENDAR_LOCALES = new HashSet<String>();
 
 	public static final String UTF_8 = "utf-8";
-
-	public static String PROPERTIES_DIR;
 
 	private static boolean copyODM;
 
@@ -77,9 +78,11 @@ public class CoreResources implements ResourceLoaderAware {
 	public static final Integer CDISC_ODM_1_3_EXTENSION_ID = 2;
 	public static final Integer SPSS_ID = 9;
 
-	private static String webapp;
-	public static String ODM_MAPPING_DIR;
-	private static boolean shouldBeRestarted;
+	public static final String PROP_CLIENT_LOGO = "logo";
+
+	public static final String CLIENT_DEFAULT_LOGO_PATH = "/images/logo_client_default_200x61.png";
+	public static final String SYSTEM_LOGO_PATH = "/images/logo_system_200x61.png";
+
 	private static ArrayList<ExtractPropertyBean> extractProperties;
 	private static String domainName;
 
@@ -119,7 +122,7 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	private void setDatabaseProperties(String dbType) {
-		logger.info("Initializing web application properties");
+		LOGGER.info("Initializing web application properties");
 		dataInfo.setProperty("username", dataInfo.getProperty("dbUser"));
 		dataInfo.setProperty("password", dataInfo.getProperty("dbPass"));
 		String url, driver, hibernateDialect;
@@ -148,11 +151,10 @@ public class CoreResources implements ResourceLoaderAware {
 		Connection connection = null;
 		BasicDataSource dataSource = null;
 		try {
-
 			String path = resourceLoader.getResource("/").exists()
 					? resourceLoader.getResource("/").getURI().getPath()
 					: "";
-			webapp = getWebAppName(path);
+			String webapp = getWebAppName(path);
 			String logDir = System.getProperty("log.dir") == null ? "" : System.getProperty("log.dir");
 			String dbType = dataInfo.getProperty("dbType").trim();
 			String attachedFileLocation = dataInfo.getProperty("attached_file_location");
@@ -206,8 +208,6 @@ public class CoreResources implements ResourceLoaderAware {
 			prepareDataInfoProperties();
 
 			SQLFactory.getInstance().run(dbType, resourceLoader);
-		} catch (Exception ex) {
-			throw ex;
 		} finally {
 			try {
 				if (connection != null) {
@@ -217,7 +217,7 @@ public class CoreResources implements ResourceLoaderAware {
 					dataSource.close();
 				}
 			} catch (Exception ex) {
-				logger.error("Error has occurred.", ex);
+				LOGGER.error("Error has occurred.", ex);
 			}
 		}
 	}
@@ -233,7 +233,7 @@ public class CoreResources implements ResourceLoaderAware {
 				}
 			}
 		} catch (Exception ex) {
-			logger.error("Error has occurred.", ex);
+			LOGGER.error("Error has occurred.", ex);
 		}
 	}
 
@@ -241,20 +241,22 @@ public class CoreResources implements ResourceLoaderAware {
 		try {
 			File logoFile = new File(new DefaultResourceLoader()
 					.getResource(".." + File.separator + ".." + File.separator).getFile().getAbsoluteFile()
-					+ CoreResources.getField("logo"));
+					+ CoreResources.getField(PROP_CLIENT_LOGO));
 			if (!logoFile.exists()) {
 				FileCopyUtils.copy(new File(new File(CoreResources.getField("filePath")).getAbsolutePath()
 						+ File.separator + "uploads" + File.separator + logoFile.getName()), logoFile);
 			}
 		} catch (Exception ex) {
-			CoreResources.setField("logo", "/images/CLIlogo.jpg");
+			CoreResources.setField(PROP_CLIENT_LOGO, CLIENT_DEFAULT_LOGO_PATH);
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 		try {
-			setODM_MAPPING_DIR();
 			if (dataInfo != null) {
 				fillCalendarLangs();
 				loadSystemProperties();
@@ -270,10 +272,10 @@ public class CoreResources implements ResourceLoaderAware {
 			}
 		} catch (OpenClinicaSystemException ex) {
 			ex.printStackTrace();
-			logger.error("Error has occurred.", ex);
+			LOGGER.error("Error has occurred.", ex);
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			logger.error("Error has occurred.", ex);
+			LOGGER.error("Error has occurred.", ex);
 		}
 	}
 
@@ -300,6 +302,9 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 	}
 
+	/**
+	 * Prepares dataInfo properties.
+	 */
 	public static void prepareDataInfoProperties() {
 		String dbType = dataInfo.getProperty("dbType");
 
@@ -354,11 +359,10 @@ public class CoreResources implements ResourceLoaderAware {
 			dataInfo.setProperty("crf_file_extension_settings", dataInfo.getProperty("crfFileExtensionSettings"));
 		}
 
-		String dataset_file_delete = dataInfo.getProperty("dataset_file_delete");
-		if (dataset_file_delete == null) {
+		String datasetFileDelete = dataInfo.getProperty("dataset_file_delete");
+		if (datasetFileDelete == null) {
 			dataInfo.setProperty("dataset_file_delete", "true");
 		}
-		// TODO:Revisit me!
 
 		if (dataInfo.getProperty("maxInactiveInterval") != null) {
 			dataInfo.setProperty("max_inactive_interval", dataInfo.getProperty("maxInactiveInterval"));
@@ -372,16 +376,16 @@ public class CoreResources implements ResourceLoaderAware {
 		dataInfo.setProperty("study_monitor", "Study_Monitor");
 		dataInfo.setProperty("ccts.waitBeforeCommit", "6000");
 
-		String rss_url = dataInfo.getProperty("rssUrl");
-		if (rss_url == null || rss_url.isEmpty()) {
-			rss_url = "http://clinicalresearch.wordpress.com/feed/";
+		String rssUrl = dataInfo.getProperty("rssUrl");
+		if (rssUrl == null || rssUrl.isEmpty()) {
+			rssUrl = "http://clinicalresearch.wordpress.com/feed/";
 		}
-		dataInfo.setProperty("rss.url", rss_url);
-		String rss_more = dataInfo.getProperty("rssMore");
-		if (rss_more == null || rss_more.isEmpty()) {
-			rss_more = "http://clinicalresearch.wordpress.com/";
+		dataInfo.setProperty("rss.url", rssUrl);
+		String rssMore = dataInfo.getProperty("rssMore");
+		if (rssMore == null || rssMore.isEmpty()) {
+			rssMore = "http://clinicalresearch.wordpress.com/";
 		}
-		dataInfo.setProperty("rss.more", rss_more);
+		dataInfo.setProperty("rss.more", rssMore);
 
 		String supportURL = dataInfo.getProperty("supportURL");
 		if (supportURL == null || supportURL.isEmpty()) {
@@ -419,7 +423,7 @@ public class CoreResources implements ResourceLoaderAware {
 		try {
 			resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
 		} catch (IOException ioe) {
-			logger.debug(ioe.getMessage(), ioe);
+			LOGGER.debug(ioe.getMessage(), ioe);
 			throw new OpenClinicaSystemException("Unable to read source files", ioe);
 
 		}
@@ -441,7 +445,7 @@ public class CoreResources implements ResourceLoaderAware {
 				out.close();
 
 			} catch (IOException ioe) {
-				logger.debug(ioe.getMessage(), ioe);
+				LOGGER.debug(ioe.getMessage(), ioe);
 				throw new OpenClinicaSystemException("Unable to copy file: " + r.getFilename() + " to "
 						+ f.getAbsolutePath(), ioe);
 
@@ -451,7 +455,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 	private void copyImportRulesFiles() throws IOException {
 		final int size = 3;
-		InputStream listSrcFiles[] = new InputStream[size];
+		InputStream[] listSrcFiles = new InputStream[size];
 		String[] fileNames = {"rules.xsd", "rules_template.xml", "rules_template_with_notes.xml"};
 		listSrcFiles[0] = resourceLoader.getResource("classpath:properties" + File.separator + fileNames[0])
 				.getInputStream();
@@ -484,13 +488,13 @@ public class CoreResources implements ResourceLoaderAware {
 		FileOutputStream fos = null;
 		byte[] buffer = new byte[512]; // Buffer 4K at a time (you can change this).
 		int bytesRead;
-		logger.debug("fis?" + fis);
+		LOGGER.debug("fis?" + fis);
 		try {
 			fos = new FileOutputStream(dest);
 			while ((bytesRead = fis.read(buffer)) >= 0) {
 				fos.write(buffer, 0, bytesRead);
 			}
-		} catch (IOException ioe) {// error while copying files
+		} catch (IOException ioe) {
 			OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to"
 					+ dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
 			oe.initCause(ioe);
@@ -505,7 +509,7 @@ public class CoreResources implements ResourceLoaderAware {
 							+ dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
 					oe.initCause(ioe);
 					oe.setStackTrace(ioe.getStackTrace());
-					logger.debug(ioe.getMessage());
+					LOGGER.debug(ioe.getMessage());
 					throw oe;
 
 				}
@@ -518,7 +522,7 @@ public class CoreResources implements ResourceLoaderAware {
 							+ dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
 					oe.initCause(ioe);
 					oe.setStackTrace(ioe.getStackTrace());
-					logger.debug(ioe.getMessage());
+					LOGGER.debug(ioe.getMessage());
 					throw oe;
 
 				}
@@ -527,13 +531,14 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
-	 * @pgawade 18-April-2011 - Fix for issue 8394 Copy core\resources\properties\cd_odm_mapping.xml to web application
-	 *          resources outside the core jar file Reason - During CRF data import, Castor API is not able to load this
-	 *          mapping xml file from core jar file
+	 * Copy core\resources\properties\cd_odm_mapping.xml to web application resources outside the core jar file.
+	 * Reason - During CRF data import, Castor API is not able to load this mapping xml file from core jar file.
+	 *
+	 * @param resourceLoader ResourceLoader
 	 */
 	private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
 
-		ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
+		ByteArrayInputStream[] listSrcFiles = new ByteArrayInputStream[10];
 		String[] fileNames = {"cd_odm_mapping.xml"};
 		try {
 			listSrcFiles[0] = new ByteArrayInputStream(resourceLoader
@@ -544,18 +549,18 @@ public class CoreResources implements ResourceLoaderAware {
 			OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
 			oe.initCause(ioe);
 			oe.setStackTrace(ioe.getStackTrace());
-			logger.error(ioe.getMessage());
+			LOGGER.error(ioe.getMessage());
 			throw oe;
 		}
 
 		File dest;
 		try {
-			File placeholder_file = new File(resourceLoader
+			File placeholderFile = new File(resourceLoader
 					.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
 
-			String placeholder_file_path = URLDecoder.decode(placeholder_file.getPath(), UTF_8);
+			String placeholderFilePath = URLDecoder.decode(placeholderFile.getPath(), UTF_8);
 
-			String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
+			String tmp2 = placeholderFilePath.substring(0, placeholderFilePath.indexOf("WEB-INF") - 1);
 			String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
 			dest = new File(tmp3 + File.separator + "odm_mapping");
 
@@ -563,13 +568,13 @@ public class CoreResources implements ResourceLoaderAware {
 			OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
 			oe.initCause(ioe);
 			oe.setStackTrace(ioe.getStackTrace());
-			logger.error(ioe.getMessage());
+			LOGGER.error(ioe.getMessage());
 			throw oe;
 		}
 
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
-				logger.error("Copying files, Could not create directory: " + dest.getAbsolutePath() + ".");
+				LOGGER.error("Copying files, Could not create directory: " + dest.getAbsolutePath() + ".");
 				throw new OpenClinicaSystemException("Copying files, Could not create directory: "
 						+ dest.getAbsolutePath() + ".");
 			}
@@ -657,7 +662,6 @@ public class CoreResources implements ResourceLoaderAware {
 				// also pre-set the database connection stuff
 				epbean.setPostProcessing(function);
 			} else if ("pdf".equals(whichFunction)) {
-				// TODO add other functions here
 				epbean.setPostProcessing(new PdfProcessingFunction());
 			} else if ("sas".equals(whichFunction)) {
 				epbean.setPostProcessing(new SasProcessingFunction());
@@ -669,9 +673,7 @@ public class CoreResources implements ResourceLoaderAware {
 					epbean.setPostProcZip(getExtractFieldBoolean(whichFunction + ".zip"));
 					epbean.setPostProcLocation(getExtractField(whichFunction + ".location"));
 					epbean.setPostProcExportName(getExtractField(whichFunction + ".exportname"));
-				}
-				// since the database is the last option TODO: think about custom post processing options
-				else {
+				} else {
 					SqlProcessingFunction function = new SqlProcessingFunction(epbean);
 
 					function.setDatabaseType(getExtractFieldNoRep(whichFunction + ".dataBase").toLowerCase());
@@ -719,22 +721,47 @@ public class CoreResources implements ResourceLoaderAware {
 
 	}
 
+	/**
+	 * Returns input stream instance, bind to specified file.
+	 *
+	 * @param fileName file name
+	 * @return InputStream
+	 * @throws IOException exception
+	 */
 	public InputStream getInputStream(String fileName) throws IOException {
 		return resourceLoader.getResource("classpath:properties/" + fileName).getInputStream();
 	}
 
+	/**
+	 * Returns URL of specified file.
+	 *
+	 * @param fileName file name
+	 * @return URL
+	 * @throws IOException exception
+	 */
 	public URL getURL(String fileName) throws IOException {
 		return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
 	}
 
 	/**
-	 * @throws IOException
+	 * Get file.
+	 *
+	 * @param fileName file name
+	 * @return File
+	 * @throws IOException exception
 	 * @deprecated Use {@link #getFile(String, String)} instead
 	 */
 	public File getFile(String fileName) throws IOException {
 		return getFile(fileName, "filePath");
 	}
 
+	/**
+	 * Get file.
+	 *
+	 * @param fileName     file name
+	 * @param relDirectory directory
+	 * @return File
+	 */
 	public File getFile(String fileName, String relDirectory) {
 		try {
 
@@ -742,38 +769,6 @@ public class CoreResources implements ResourceLoaderAware {
 
 			return new File(getField("filePath") + relDirectory + fileName);
 
-		} catch (IOException e) {
-			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-		}
-	}
-
-	public void setPROPERTIES_DIR() {
-		String resource = "classpath:properties/placeholder.properties";
-		Resource scr = resourceLoader.getResource(resource);
-		String absolutePath;
-		try {
-			absolutePath = scr.getFile().getAbsolutePath();
-			PROPERTIES_DIR = absolutePath.replaceAll("placeholder.properties", "");
-		} catch (IOException e) {
-			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-		}
-
-	}
-
-	/**
-	 * pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute file path value to point to "odm_mapping"
-	 * in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this location
-	 * during application initialization
-	 */
-	public void setODM_MAPPING_DIR() {
-		String resource = "classpath:datainfo.properties";
-
-		Resource scr = resourceLoader.getResource(resource);
-		String absolutePath;
-		try {
-
-			absolutePath = scr.getFile().getAbsolutePath();
-			ODM_MAPPING_DIR = absolutePath.replaceAll("datainfo.properties", "") + "odm_mapping";
 		} catch (IOException e) {
 			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
 		}
@@ -796,6 +791,12 @@ public class CoreResources implements ResourceLoaderAware {
 		return LocaleUtils.toLocale(getSystemLanguage());
 	}
 
+	/**
+	 * Get field.
+	 *
+	 * @param key property key.
+	 * @return value of property
+	 */
 	public static String getField(String key) {
 		if (dataInfo == null) {
 			return "";
@@ -807,6 +808,12 @@ public class CoreResources implements ResourceLoaderAware {
 		return value == null ? "" : value;
 	}
 
+	/**
+	 * Set field.
+	 *
+	 * @param key   property key
+	 * @param value new value
+	 */
 	public static void setField(String key, String value) {
 		if (dataInfo != null && value != null) {
 			dataInfo.setProperty(key, value.trim());
@@ -814,8 +821,9 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
-	 * gets the actual system URL by doing a DNS name lookup repeated code from web to fix #99 eventually refactor to
-	 * work as one, tbh
+	 * Gets the actual system URL by doing a DNS name lookup repeated code from web to fix #99.
+	 *
+	 * @return String
 	 */
 	public static String getSystemURL() {
 		String url = dataInfo.getProperty("sysURL.base");
@@ -829,7 +837,12 @@ public class CoreResources implements ResourceLoaderAware {
 		return lookup.getTrueSystemURL(url);
 	}
 
-	// TODO internationalize
+	/**
+	 * Get extract field.
+	 *
+	 * @param key property key
+	 * @return String
+	 */
 	public static String getExtractField(String key) {
 		String value = extractInfo.getProperty(key);
 		if (value != null) {
@@ -839,7 +852,12 @@ public class CoreResources implements ResourceLoaderAware {
 		return value == null ? "" : value;
 	}
 
-	// JN:The following method returns default of true when converting from string
+	/**
+	 * Get extract field of type Boolean.
+	 *
+	 * @param key property key
+	 * @return boolean
+	 */
 	public static boolean getExtractFieldBoolean(String key) {
 		String value = extractInfo.getProperty(key);
 		if (value != null) {
@@ -849,6 +867,12 @@ public class CoreResources implements ResourceLoaderAware {
 
 	}
 
+	/**
+	 * Get extract field as string array. Comma is used as the delimiter.
+	 *
+	 * @param key property key
+	 * @return string array
+	 */
 	public static String[] getExtractFields(String key) {
 		String value = extractInfo.getProperty(key);
 
@@ -858,6 +882,13 @@ public class CoreResources implements ResourceLoaderAware {
 		return value != null ? value.split(",") : new String[0];
 	}
 
+	/**
+	 * Find extract property by ID.
+	 *
+	 * @param id        property ID
+	 * @param datasetId dataset ID
+	 * @return ExtractPropertyBean
+	 */
 	public ExtractPropertyBean findExtractPropertyBeanById(int id, String datasetId) {
 		ArrayList<ExtractPropertyBean> epBeans = findExtractProperties();
 		for (ExtractPropertyBean epbean : epBeans) {
@@ -887,6 +918,12 @@ public class CoreResources implements ResourceLoaderAware {
 		CoreResources.extractInfo = extractInfo;
 	}
 
+	/**
+	 * Get webapp name.
+	 *
+	 * @param servletCtxRealPath servlet context real path
+	 * @return String
+	 */
 	public String getWebAppName(String servletCtxRealPath) {
 		String webAppName = "";
 		if (null != servletCtxRealPath) {
@@ -896,14 +933,6 @@ public class CoreResources implements ResourceLoaderAware {
 			}
 		}
 		return webAppName;
-	}
-
-	public static boolean isShouldBeRestarted() {
-		return shouldBeRestarted;
-	}
-
-	public static void setShouldBeRestarted(boolean shouldBeRestarted) {
-		CoreResources.shouldBeRestarted = shouldBeRestarted;
 	}
 
 	public static void setDomainName(String domain) {

@@ -36,11 +36,10 @@
 <!--content container, on the right side-->
 <div id="about-content">
 		<!-- clinovo icon should be here -->
-		<img src="../images/CLIlogo.png" alt="Clinovo Inc."/>
+		<img src="${'..'}${systemLogoUrl}" alt="Clinovo Inc."/>
 		<P>ClinCapture&#0153; <fmt:message key="Version_release" bundle="${resword}"/>&nbsp;&nbsp;<fmt:message key="buildNumber" bundle="${resbuildnumber}"/></P>
 		<P>Licensed under LGPLv2.1.  The program is free software; you can redistribute it and modify it under the terms of the GNU Lesser General Public License version 2.1 as published by the Free Software Foundation.</P>
-		<p> &copy; 2004-2012 OpenClinica, LLC and collaborators. The OpenClinica
-			<a href="http://www.openclinica.com" target="_blank">software for clinical research</a>
+		<p> &copy; 2004-2012 OpenClinica, LLC and collaborators. The OpenClinica			<a href="http://www.openclinica.com" target="_blank">software for clinical research</a>
 			is provided AS IS, without warranty. Licensed under LGPLv2.1, you can redistribute it and/or modify it under the terms of the
 			<a href="http://www.openclinica.com/gnu-lgpl-open-source-license" target="_blank">GNU Lesser General Public License</a>
 			version 2.1 as published by the Free Software Foundation. OpenClinica is a

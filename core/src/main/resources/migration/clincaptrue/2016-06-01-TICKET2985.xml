@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+	<changeSet author="aram" id="2016-06-01-TICKET2985">
+		<comment>Change client default logo.</comment>
+		<update tableName="system">
+			<column name="value" value="/images/logo_200x61.png"/>
+			<where>name='logo' AND value='/images/Logo.gif'</where>
+		</update>
+	</changeSet>
+
+</databaseChangeLog>

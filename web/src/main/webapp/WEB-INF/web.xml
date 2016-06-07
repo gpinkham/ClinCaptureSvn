@@ -858,11 +858,6 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewSectionDataEntryByIdServlet</servlet-name>
-        <display-name>ViewSectionDataEntryById</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>printDataEntryServlet</servlet-name>
         <display-name>PrintDataEntry</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1720,10 +1715,6 @@
     <servlet-mapping>
         <servlet-name>viewSectionDataEntryRESTUrlServlet</servlet-name>
         <url-pattern>/ViewSectionDataEntryRESTUrlServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>viewSectionDataEntryByIdServlet</servlet-name>
-        <url-pattern>/ViewSectionDataEntryById</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>printDataEntryServlet</servlet-name>

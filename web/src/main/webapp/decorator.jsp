@@ -30,7 +30,7 @@
 <body>
 <div id="headerDiv">
     <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-    <div id="logoDiv"><img src="<c:url value='/images/Logo.gif'/>" alt="Clinovo logo"/></div>
+    <div id="logoDiv"><img src="<c:url value='${systemLogoUrl}'/>" alt="Clinovo logo"/></div>
     <!-- the sub-menu, or alternative menu, displays if JavaScript is disabled-->
     <div id="menuContainer">
         <noscript>
