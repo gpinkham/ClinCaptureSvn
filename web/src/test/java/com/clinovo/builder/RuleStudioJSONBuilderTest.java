@@ -6,12 +6,26 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.action.ActionType;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * RuleStudioJSONBuilder Test
@@ -19,15 +33,27 @@ import org.junit.Test;
 public class RuleStudioJSONBuilderTest extends BaseControllerTest {
 
 	private RuleStudioJSONBuilder builder;
+	private RuleStudioJSONBuilder mockedBuilder;
+	private RuleBean ruleBean;
+	private RuleSetRuleBean ruleSetRule;
 	private UserAccountBean user;
 	private StudyBean studyBean;
 	private StudyEventDefinitionBean eventBean;
 	private CRFBean crfBean;
 	private CRFVersionBean versionBean;
 
+	public static final String TARGET = "SE_TE1.F_FORM1.IG_GROUP1.I_Q1";
+	public static final String EX_ITEM1 = "I_Q1";
+	public static final String EX_ACTION = " eq ";
+	public static final String EX_ITEM2 = "I_Q2";
+	public static final String EXPRESSION = EX_ITEM1 + EX_ACTION + EX_ITEM2;
+	public static final String DESTINATION = "SE_TE2.F_FORM2.IG_GROUP2.I_Q12";
+	public static final String INSERT_VALUE = "F_FORM1.IG_GROUP1.I_Q3";
+
 	@Before
-	public void prepare() {
+	public void prepare() throws Exception {
 		builder = new RuleStudioJSONBuilder(dataSource);
+		mockedBuilder = Mockito.mock(RuleStudioJSONBuilder.class);
 
 		user = new UserAccountBean();
 		user.setName("root");
@@ -47,6 +73,29 @@ public class RuleStudioJSONBuilderTest extends BaseControllerTest {
 		versionBean = new CRFVersionBean();
 		versionBean.setOid("F_AGEN_V20");
 		versionBean.setId(1);
+
+		ruleSetRule = new RuleSetRuleBean();
+		ruleBean = new RuleBean();
+		ruleBean.setStudy(studyBean);
+		List<RuleSetRuleBean> ruleSetRuleBeanList = new ArrayList<RuleSetRuleBean>();
+		RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
+		RuleSetBean ruleSetBean = new RuleSetBean();
+		ExpressionBean target = new ExpressionBean();
+		target.setValue(TARGET);
+		ruleSetBean.setOriginalTarget(target);
+		ruleSetRuleBean.setRuleSetBean(ruleSetBean);
+		ruleSetRuleBeanList.add(ruleSetRuleBean);
+		ruleBean.setRuleSetRules(ruleSetRuleBeanList);
+		ExpressionBean expression = new ExpressionBean();
+		expression.setValue(EXPRESSION);
+		ruleBean.setExpression(expression);
+		List<RuleActionBean> actions = new ArrayList<RuleActionBean>();
+		ruleSetRule.setActions(actions);
+
+		StudyDAO mockedStudyDao = Mockito.mock(StudyDAO.class);
+		Mockito.doReturn(mockedStudyDao).when(mockedBuilder).getStudyDao();
+		Mockito.doReturn(studyBean).when(mockedStudyDao).findByPK(Mockito.anyInt());
+		Mockito.doCallRealMethod().when(mockedBuilder).getCascadeRuleData(user, ruleBean, ruleSetRule);
 	}
 
 	@Test
@@ -140,5 +189,76 @@ public class RuleStudioJSONBuilderTest extends BaseControllerTest {
 			}
 		}
 		Assert.assertTrue(containsExpectedItems);
+	}
+
+	@Test
+	public void testThatGetCascadeRuleDataParsesAllItemsInTheExpression() throws Exception {
+		mockedBuilder.getCascadeRuleData(user, ruleBean, ruleSetRule);
+		Mockito.verify(mockedBuilder).cascadeParse(Mockito.eq(studyBean), Mockito.any(JSONArray.class),
+				Mockito.eq(EX_ITEM2), Mockito.isNull(ExpressionBean.class));
+		Mockito.verify(mockedBuilder).cascadeParse(Mockito.eq(studyBean), Mockito.any(JSONArray.class),
+				Mockito.eq(EX_ITEM2), Mockito.isNull(ExpressionBean.class));
+	}
+
+	@Test
+	public void testThatGetCascadeRuleDataParsesRuleTarget() throws Exception {
+		mockedBuilder.getCascadeRuleData(user, ruleBean, ruleSetRule);
+		Mockito.verify(mockedBuilder).cascadeParse(Mockito.eq(studyBean), Mockito.any(JSONArray.class),
+				Mockito.eq(TARGET), Mockito.any(ExpressionBean.class));
+	}
+
+	@Test
+	public void testThatGetCascadeRuleDataParsesInsertRuleDestination() throws Exception {
+		setInsertAction();
+		mockedBuilder.getCascadeRuleData(user, ruleBean, ruleSetRule);
+		Mockito.verify(mockedBuilder).cascadeParse(Mockito.eq(studyBean), Mockito.any(JSONArray.class),
+				Mockito.eq(DESTINATION), Mockito.any(ExpressionBean.class));
+	}
+
+	@Test
+	public void testThatGetCascadeRuleDataParsesInsertRuleValueIfItsItem() throws Exception {
+		setInsertAction();
+		mockedBuilder.getCascadeRuleData(user, ruleBean, ruleSetRule);
+		Mockito.verify(mockedBuilder).cascadeParse(Mockito.eq(studyBean), Mockito.any(JSONArray.class),
+				Mockito.eq(INSERT_VALUE), Mockito.any(ExpressionBean.class));
+	}
+
+	@Test
+	public void testThatGetCascadeRuleDataParsesShowHideRuleDestination() throws Exception {
+		setHideAction();
+		mockedBuilder.getCascadeRuleData(user, ruleBean, ruleSetRule);
+		Mockito.verify(mockedBuilder).cascadeParse(Mockito.eq(studyBean), Mockito.any(JSONArray.class),
+				Mockito.eq(DESTINATION), Mockito.any(ExpressionBean.class));
+	}
+
+	private void setInsertAction() {
+		InsertActionBean insertAction = new InsertActionBean();
+		insertAction.setActionType(ActionType.INSERT);
+		List<PropertyBean> propertyBeans = new ArrayList<PropertyBean>();
+		PropertyBean propertyBean = new PropertyBean();
+		ExpressionBean expressionBean = new ExpressionBean();
+		expressionBean.setValue(INSERT_VALUE);
+		propertyBean.setValueExpression(expressionBean);
+		propertyBean.setOid(DESTINATION);
+		propertyBeans.add(propertyBean);
+		insertAction.setProperties(propertyBeans);
+
+		List<RuleActionBean> actions = new ArrayList<RuleActionBean>();
+		actions.add(insertAction);
+		ruleSetRule.setActions(actions);
+	}
+
+	private void setHideAction() {
+		HideActionBean hideAction = new HideActionBean();
+		hideAction.setActionType(ActionType.HIDE);
+		List<PropertyBean> propertyBeans = new ArrayList<PropertyBean>();
+		PropertyBean propertyBean = new PropertyBean();
+		propertyBean.setOid(DESTINATION);
+		propertyBeans.add(propertyBean);
+		hideAction.setProperties(propertyBeans);
+
+		List<RuleActionBean> actions = new ArrayList<RuleActionBean>();
+		actions.add(hideAction);
+		ruleSetRule.setActions(actions);
 	}
 }

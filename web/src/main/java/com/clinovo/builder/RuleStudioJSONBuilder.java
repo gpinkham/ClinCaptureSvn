@@ -235,8 +235,8 @@ public class RuleStudioJSONBuilder {
 	 * @throws Exception in case if there will be an error while JSON generation.
 	 */
 	public JSONArray getCascadeRuleData(UserAccountBean user, RuleBean rule, RuleSetRuleBean ruleSetRule) throws Exception {
-		StudyDAO studyDAO = new StudyDAO(dataSource);
-		StudyBean currentStudy = (StudyBean) studyDAO.findByPK(rule.getStudyId());
+
+		StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(rule.getStudyId());
 		JSONArray studies = buildStudiesArray(user);
 		// parse rule target.
 		ExpressionBean target = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget();
@@ -251,6 +251,9 @@ public class RuleStudioJSONBuilder {
 				for (PropertyBean property : insertAction.getProperties()) {
 					if (property.getValue() == null && property.getValueExpression() != null) {
 						cascadeParse(currentStudy, studies, property.getValueExpression().getValue(), null);
+					}
+					if (property.getOid() != null) {
+						cascadeParse(currentStudy, studies, property.getOid(), null);
 					}
 				}
 			} else if (actionType.equals(ActionType.HIDE)) {
@@ -437,6 +440,14 @@ public class RuleStudioJSONBuilder {
 			targetVersionOID = crfVersionBean.getOid();
 		}
 		return studies;
+	}
+
+	/**
+	 * Get StudyDao.
+	 * @return StudyDao.
+	 */
+	public StudyDAO getStudyDao() {
+		return new StudyDAO(dataSource);
 	}
 
 	private JSONArray getEntitiesFromArrayByOID(JSONArray array, String oid, String key) throws JSONException {
