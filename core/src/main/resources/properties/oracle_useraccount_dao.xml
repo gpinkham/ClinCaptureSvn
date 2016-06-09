@@ -197,7 +197,7 @@
                 </sql>
         </query>
         <query>
-			<name>findAllRolesByStudy</name>
+			<name>findAllRolesByStudyExceptRoot</name>
 			<sql>
 			SELECT
 				ua.user_name
@@ -216,6 +216,7 @@
 				, study_user_role sur
 				, study s
 			WHERE ua.user_name=sur.user_name
+                AND sur.user_name != 'root'
 				AND (sur.study_id=s.study_id)
 				AND ua.status_id=1
 				AND (s.study_id=? OR s.parent_study_id=?)
