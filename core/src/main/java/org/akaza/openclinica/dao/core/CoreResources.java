@@ -821,6 +821,21 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
+	 * Returns tokenExpirationDate.
+	 *
+	 * @return int
+	 */
+	public static int getTokenExpirationDate() {
+		int tokenExpirationDate = 0;
+		try {
+			tokenExpirationDate = Integer.parseInt(CoreResources.getField("tokenExpirationDate"));
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return tokenExpirationDate;
+	}
+
+	/**
 	 * Gets the actual system URL by doing a DNS name lookup repeated code from web to fix #99.
 	 *
 	 * @return String
