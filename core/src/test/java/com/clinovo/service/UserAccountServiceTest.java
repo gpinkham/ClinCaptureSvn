@@ -371,7 +371,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		assertTrue(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
 				respage));
 
-		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(1), user.getName());
+		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(1));
 		verify(spyUserAccountDAO).lockUser(user.getId());
 	}
 
@@ -417,7 +417,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		assertTrue(spyUserAccountService.removeStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
 				respage));
 
-		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(1), user.getName());
+		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(1));
 		verify(spyUserAccountDAO).update(user);
 		verify(spyUserAccountDAO, never()).lockUser(user.getId());
 		assertEquals(newActiveStudyId, user.getActiveStudyId());
@@ -491,7 +491,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, removedStudyId, currentUser,
 				new StringBuilder(""), respage));
 
-		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0), user.getName());
+		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0));
 		verify(spyUserAccountDAO, never()).update(user);
 	}
 
@@ -531,7 +531,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		assertFalse(spyUserAccountService.restoreStudyUserRole(userId, studyId, currentUser, new StringBuilder(""),
 				respage));
 
-		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0), user.getName());
+		verify(spyUserAccountDAO, never()).updateStudyUserRole(user.getRoles().get(0));
 		verify(spyUserAccountDAO, never()).update(user);
 	}
 
@@ -573,7 +573,7 @@ public class UserAccountServiceTest extends DefaultAppContextTest {
 		assertTrue(spyUserAccountService.restoreStudyUserRole(userId, newActiveSstudyId, currentUser,
 				new StringBuilder(""), respage));
 
-		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(0), user.getName());
+		verify(spyUserAccountDAO).updateStudyUserRole(user.getRoles().get(0));
 		verify(spyUserAccountDAO).update(user);
 		assertEquals(newActiveSstudyId, user.getActiveStudyId());
 	}

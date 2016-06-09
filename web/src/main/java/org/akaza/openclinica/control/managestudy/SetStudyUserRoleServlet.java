@@ -146,14 +146,14 @@ public class SetStudyUserRoleServlet extends SpringServlet {
 				int studyId = fp.getInt("studyId");
 				int roleId = fp.getInt("roleId");
 				StudyUserRoleBean sur = new StudyUserRoleBean();
-				sur.setName(userName);
+				sur.setUserName(userName);
 				sur.setRole(Role.get(roleId));
 				sur.setStudyId(studyId);
 				sur.setStudyName(userStudy.getName());
 				sur.setStatus(Status.AVAILABLE);
 				sur.setUpdater(ub);
 				sur.setUpdatedDate(new Date());
-				udao.updateStudyUserRole(sur, userName);
+				udao.updateStudyUserRole(sur);
 				addPageMessage(sendEmail(user, sur), request);
 				if (ub.getId() == user.getId()) {
 					request.getSession().setAttribute("reloadUserBean", true);

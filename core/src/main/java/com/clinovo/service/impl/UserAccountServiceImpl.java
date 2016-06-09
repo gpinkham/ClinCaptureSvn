@@ -240,7 +240,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 			studyUserRole.setUpdater(currentUser);
 			studyUserRole.setUpdatedDate(new Date());
-			getUserAccountDAO().updateStudyUserRole(studyUserRole, user.getName());
+			getUserAccountDAO().updateStudyUserRole(studyUserRole);
 
 			if (user.getActiveStudyId() == studyUserRole.getStudyId()) {
 				updateUserAcocunt(user.getId());
@@ -325,7 +325,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 					studyUserRole.setStatus(Status.AVAILABLE);
 					studyUserRole.setUpdater(currentUser);
 					studyUserRole.setUpdatedDate(new Date());
-					getUserAccountDAO().updateStudyUserRole(studyUserRole, user.getName());
+					getUserAccountDAO().updateStudyUserRole(studyUserRole);
 
 					setActiveStudyId(user, studyUserRole.getStudyId());
 

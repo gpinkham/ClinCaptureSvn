@@ -65,7 +65,7 @@ public class StudyDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllActiveWhereUserHasActiveRoleReturnsOnlyActive() {
 		sur.setStatus(Status.DELETED);
-		userAccountDAO.updateStudyUserRole(sur, user.getName());
+		userAccountDAO.updateStudyUserRole(sur);
 		assertEquals(0, studyDAO.findAllActiveWhereUserHasActiveRole(user.getName()).size());
 	}
 

@@ -1142,25 +1142,23 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Update StudyUserRoleBean.
 	 *
-	 * @param s
+	 * @param studyUserRoleBean
 	 *            the StudyUserRoleBean to update.
-	 * @param userName
-	 *            the the name of the user for which all StudyUserRoleBeans will be updated.
 	 * @return updated StudyUserRoleBean.
 	 */
-	public StudyUserRoleBean updateStudyUserRole(StudyUserRoleBean s, String userName) {
+	public StudyUserRoleBean updateStudyUserRole(StudyUserRoleBean studyUserRoleBean) {
 		HashMap variables = new HashMap();
 		int index = 1;
-		variables.put(index++, s.getRoleCode());
-		variables.put(index++, s.getStatus().getId());
-		variables.put(index++, s.getUpdaterId());
-		variables.put(index++, s.getStudyId());
-		variables.put(index, userName);
+		variables.put(index++, studyUserRoleBean.getRoleCode());
+		variables.put(index++, studyUserRoleBean.getStatus().getId());
+		variables.put(index++, studyUserRoleBean.getUpdaterId());
+		variables.put(index++, studyUserRoleBean.getStudyId());
+		variables.put(index, studyUserRoleBean.getUserName());
 
 		String sql = digester.getQuery("updateStudyUserRole");
 		this.execute(sql, variables);
 
-		return s;
+		return studyUserRoleBean;
 	}
 
 	/**

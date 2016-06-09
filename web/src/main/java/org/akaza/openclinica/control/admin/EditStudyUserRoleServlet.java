@@ -126,7 +126,7 @@ public class EditStudyUserRoleServlet extends SpringServlet {
 					maskingService.updateMasksOnUserRoleUpdate(studyUserRole.getRole(), r, sb, user.getId());
 					studyUserRole.setRoleName(r.getCode());
 					studyUserRole.setUpdater(ub);
-					udao.updateStudyUserRole(studyUserRole, uName);
+					udao.updateStudyUserRole(studyUserRole);
 					addPageMessage(getResPage().getString("the_user_in_study_has_been_updated"), request);
 					if (ub.getName().equals(studyUserRole.getUserName())) {
 						request.getSession().setAttribute("reloadUserBean", true);
