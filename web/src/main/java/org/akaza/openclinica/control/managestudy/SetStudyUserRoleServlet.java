@@ -88,7 +88,7 @@ public class SetStudyUserRoleServlet extends SpringServlet {
 			UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
 			StudyBean userStudy = (StudyBean) sdao.findByPK(fp.getInt("studyId"));
 			if ("confirm".equalsIgnoreCase(action)) {
-				int studyId = Integer.valueOf(studyIdString.trim());
+				int studyId = Integer.parseInt(studyIdString.trim());
 				StudyBean study = (StudyBean) sdao.findByPK(studyId);
 				request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
