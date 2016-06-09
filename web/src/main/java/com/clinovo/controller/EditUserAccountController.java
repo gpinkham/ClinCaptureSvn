@@ -22,6 +22,10 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.clinovo.bean.EmailDetails;
+import com.clinovo.enums.EmailAction;
+import com.clinovo.service.EmailService;
+import com.clinovo.util.RequestUtil;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -34,13 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.service.EmailService;
 import com.clinovo.service.UserAccountService;
 import com.clinovo.util.DateUtil;
 import com.clinovo.util.EmailUtil;
@@ -51,6 +55,7 @@ import com.clinovo.validator.UserValidator;
  * Edit User Account Controller class.
  */
 @Controller
+@EnableAsync
 @RequestMapping("/EditUserAccount")
 @SuppressWarnings("rawtypes")
 public class EditUserAccountController extends SpringController {
@@ -288,14 +293,12 @@ public class EditUserAccountController extends SpringController {
 		return types;
 	}
 
-	private void sendResetPasswordEmail(HttpServletRequest request, UserAccountBean user, String password)
-			throws Exception {
+	private void sendResetPasswordEmail(HttpServletRequest request, UserAccountBean user, String password) {
+
 		StudyBean currentStudy = getCurrentStudy(request);
-
+		UserAccountBean currentUser = RequestUtil.getUserAccountBean();
 		LOGGER.info("Sending password reset notification to " + user.getName());
-
 		Locale locale = LocaleResolver.getLocale(request);
-
 		String body = EmailUtil.getEmailBodyStart();
 		body += messageSource.getMessage("dear", null, locale) + " " + user.getFirstName() + " " + user.getLastName()
 				+ ",<br/><br/>\n\n";
@@ -317,9 +320,20 @@ public class EditUserAccountController extends SpringController {
 				emailParentStudy.getName());
 		body += EmailUtil.getEmailBodyEnd();
 		body += EmailUtil.getEmailFooter(locale);
-		mailer.sendEmail(user.getEmail().trim(),
-				messageSource.getMessage("your_openclinica_account_password_reset", null, locale), body, false,
-				request);
+
+		EmailDetails emailDetails = new EmailDetails();
+		emailDetails.setStudyId(emailParentStudy.getId());
+		emailDetails.setAction(EmailAction.RESET_PASSWORD);
+		emailDetails.setTo(user.getEmail());
+		emailDetails.setMessage(body);
+		emailDetails.setSubject(messageSource.getMessage("your_openclinica_account_password_reset", null, locale));
+		emailDetails.setSentBy(currentUser.getId());
+
+		try {
+			mailer.sendEmail(emailDetails);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void updateMainFieldsForEditedUser(UserAccountBean user, FormProcessor fp, HttpServletRequest request) {
@@ -363,12 +377,7 @@ public class EditUserAccountController extends SpringController {
 
 			if (!"true".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PASSWORD))) {
 				LOGGER.info("displayPwd is no");
-				try {
-					sendResetPasswordEmail(request, user, password);
-				} catch (Exception e) {
-					PageMessagesUtil.addPageMessage(request,
-							messageSource.getMessage("there_was_an_error_sending_reset_email_try_reset", null, locale));
-				}
+				sendResetPasswordEmail(request, user, password);
 			} else {
 				PageMessagesUtil.addPageMessage(request,
 						messageSource.getMessage("new_user_password", null, locale) + ":<br/> " + password + "<br/>"

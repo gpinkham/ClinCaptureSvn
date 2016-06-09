@@ -28,6 +28,9 @@
 <div class="taskRightColumn">
 	<c:if test="${!userRole.studySponsor}">
 		<div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
-    </c:if>
-    <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
+	</c:if>
+	<div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
+	<c:if test="${study.parentStudyId == 0 && (userBean.name == 'root' || (userRole.studyAdministrator && userBean.sysAdmin))}">
+		<div class="taskLink"><a href="${urlPrefix}pages/EmailLog"><fmt:message key="email_log" bundle="${resword}"/></a></div>
+	</c:if>
 </div>

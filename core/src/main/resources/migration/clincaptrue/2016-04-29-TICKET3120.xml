@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+	<changeSet author="denis" id="2016-04-29-TICKET3120-0">
+		<comment>
+			Add new entity email_log.
+		</comment>
+		<createTable tableName="email_log">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="version" type="int"/>
+			<column name="study_id" type="int"/>
+			<column name="parent_id" type="int"/>
+			<column name="action" type="text"/>
+			<column name="recipient" type="text"/>
+			<column name="cc" type="text"/>
+			<column name="sender" type="text"/>
+			<column name="file_attachments" type="text"/>
+			<column name="date_sent" type="TIMESTAMP WITH TIME ZONE"/>
+			<column name="sent_by" type="int"/>
+			<column name="subject" type="text"/>
+			<column name="message" type="text"/>
+			<column name="html_email" type="text"/>
+			<column name="was_sent" type="text"/>
+			<column name="was_shown" type="text"/>
+			<column name="error" type="text"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="denis" id="2016-04-29-TICKET3120-1">
+		<comment>
+			Add constrains for email_log table.
+		</comment>
+		<addForeignKeyConstraint constraintName="fk_study_id"
+								 baseColumnNames="study_id"
+								 baseTableName="email_log"
+								 onDelete="CASCADE"
+								 referencedColumnNames="study_id"
+								 referencedTableName="study"/>
+		<addForeignKeyConstraint constraintName="fk_user_id"
+								 baseColumnNames="sent_by"
+								 baseTableName="email_log"
+								 onDelete="CASCADE"
+								 referencedColumnNames="user_id"
+								 referencedTableName="user_account"/>
+		<addNotNullConstraint columnDataType="int"
+							  columnName="parent_id"
+							  defaultNullValue="0"
+							  tableName="email_log"/>
+	</changeSet>
+</databaseChangeLog>

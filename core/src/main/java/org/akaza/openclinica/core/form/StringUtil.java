@@ -21,9 +21,9 @@
 package org.akaza.openclinica.core.form;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -90,12 +90,12 @@ public final class StringUtil {
 	 * @param list an array of strings.
 	 * @return String.
 	 */
-	public static String join(String glue, ArrayList<String> list) {
+	public static String join(String glue, List<String> list) {
 		String answer = "";
 		String join = "";
 
 		for (String entry : list) {
-			answer += join + entry;
+			answer = answer.concat(join).concat(entry);
 			join = glue;
 		}
 		return answer;

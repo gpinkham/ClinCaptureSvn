@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.bean.EmailDetails;
+import com.clinovo.enums.EmailAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -39,8 +41,11 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -56,6 +61,7 @@ import com.clinovo.util.HtmlToPdfUtil;
  * Controller for print subject casebooks page.
  */
 @Controller
+@EnableAsync
 public class CasebooksController extends SpringController {
 
 	@Autowired
@@ -72,6 +78,8 @@ public class CasebooksController extends SpringController {
 
 	private ArrayList<String> subjectOIDs;
 
+
+	public static final Logger LOGGER = LoggerFactory.getLogger(CasebooksController.class);
 	public static final String CASEBOOKS_PAGE = "casebooks/studyCasebooks";
 	public static final String CRF_CASEBOOK_STORED_URL = "studyCasebooksUrl";
 	public static final String DIR_NAME = "print" + File.separator + "Casebooks";
@@ -161,8 +169,8 @@ public class CasebooksController extends SpringController {
 		if (siteId != null) {
 			StudyDAO studyDAO = new StudyDAO(dataSource);
 			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-			StudyBean siteBean = (StudyBean) studyDAO.findByPK(Integer.valueOf(siteId));
-			List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudyId(Integer.valueOf(siteId));
+			StudyBean siteBean = (StudyBean) studyDAO.findByPK(Integer.parseInt(siteId));
+			List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudyId(Integer.parseInt(siteId));
 			StudyBean parentStudyBean = siteBean.isSite()
 					? (StudyBean) studyDAO.findByPK(siteBean.getParentStudyId())
 					: siteBean;
@@ -337,7 +345,9 @@ public class CasebooksController extends SpringController {
 			String casebookPath = getCasebookFilePath(studyOid, studySubjectOid);
 			File file = new File(casebookPath);
 			if (file.isFile()) {
-				file.delete();
+				if (!file.delete()) {
+					LOGGER.error("Unable to delete file");
+				}
 			}
 		}
 
@@ -384,10 +394,13 @@ public class CasebooksController extends SpringController {
 		String datasetFilePath = SQLInitServlet.getField("filePath") + folderName + File.separator + pdfName + ".pdf";
 		File file = new File(datasetFilePath);
 		if (!file.getParentFile().isDirectory()) {
-			file.getParentFile().mkdirs();
+			if (!file.getParentFile().mkdirs()) {
+				LOGGER.error("Unable to create directory.");
+			}
 		}
-		file.createNewFile();
-
+		if (!file.createNewFile()) {
+			LOGGER.error("Unable to create casebook file.");
+		}
 		return file;
 	}
 
@@ -406,10 +419,25 @@ public class CasebooksController extends SpringController {
 				+ SQLInitServlet.getSystemURL() + "pages/casebooks\">"
 				+ messageSource.getMessage("download_casebooks", null, locale) + "</a><br/>"
 				+ EmailUtil.getEmailBodyEnd() + EmailUtil.getEmailFooter(locale);
+
+		EmailDetails emailDetails = new EmailDetails();
+		emailDetails.setMessage(message);
+		emailDetails.setSubject(subject);
+		emailDetails.setTo(user.getEmail());
+		emailDetails.setSentBy(user.getId());
+		if (study.isSite()) {
+			StudyDAO studyDAO = new StudyDAO(dataSource);
+			StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
+			emailDetails.setStudyId(parentStudy.getId());
+		} else {
+			emailDetails.setStudyId(study.getId());
+		}
+		emailDetails.setAction(EmailAction.CASEBOOK_GENERATED);
+
 		try {
-			emailService.sendEmail(user.getEmail(), subject, message, true, request);
-		} catch (Exception e) {
-			e.printStackTrace();
+			emailService.sendEmail(emailDetails);
+		} catch (Exception ex) {
+			LOGGER.error("Exception was thrown while email generation: " + ex.getMessage());
 		}
 	}
 

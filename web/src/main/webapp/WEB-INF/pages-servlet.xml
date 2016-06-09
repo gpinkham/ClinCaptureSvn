@@ -115,4 +115,15 @@
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean" p:favorPathExtension="false"/>
 
+	<mvc:annotation-driven>
+		<mvc:async-support default-timeout="30000" task-executor="taskExecutor"/>
+	</mvc:annotation-driven>
+
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5"/>
+		<property name="maxPoolSize" value="50"/>
+		<property name="queueCapacity" value="10"/>
+		<property name="keepAliveSeconds" value="120"/>
+	</bean>
+
 </beans>
