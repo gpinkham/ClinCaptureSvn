@@ -214,6 +214,7 @@
 				, study_user_role sur
 				, study s
 			WHERE ua.user_name=sur.user_name
+			    AND sur.user_name != 'root'
 				AND (sur.study_id=s.study_id)
 				AND ua.status_id=1
 				AND sur.status_id=1
@@ -222,7 +223,7 @@
 		</sql>
 	</query>
 	<query>
-		<name>findAllRolesByStudyExceptRoot</name>
+		<name>findAllRolesByStudy</name>
 		<sql>
 			SELECT
 				ua.user_name
@@ -268,6 +269,7 @@
                 , study_user_role sur
                 , study s
             WHERE ua.user_name=sur.user_name
+			    AND sur.user_name != 'root'
                 AND sur.study_id=s.study_id
                 AND ua.status_id in (1,5,6)
                 AND sur.status_id in (1,5,7)

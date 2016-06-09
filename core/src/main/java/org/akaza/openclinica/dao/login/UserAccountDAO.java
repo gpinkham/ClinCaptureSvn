@@ -969,7 +969,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	 *            int.
 	 * @return ArrayList of UserAccountBeans.
 	 */
-	public ArrayList findAllRolesByStudyExceptRoot(int studyId) {
+	public ArrayList findAllRolesByStudy(int studyId) {
 		this.unsetTypeExpected();
 		int index = 1;
 		this.setTypeExpected(index++, TypeNames.STRING);
@@ -990,7 +990,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		int index2 = 1;
 		variables.put(index2++, studyId);
 		variables.put(index2, studyId);
-		ArrayList alist = this.select(digester.getQuery("findAllRolesByStudyExceptRoot"), variables);
+		ArrayList alist = this.select(digester.getQuery("findAllRolesByStudy"), variables);
 		for (Object anAlist : alist) {
 			HashMap hm = (HashMap) anAlist;
 			StudyUserRoleBean surb = new StudyUserRoleBean();

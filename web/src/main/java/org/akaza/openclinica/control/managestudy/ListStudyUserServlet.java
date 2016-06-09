@@ -80,7 +80,7 @@ public class ListStudyUserServlet extends RememberLastPage {
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
-		ArrayList users = udao.findAllRolesByStudyExceptRoot(currentStudy.getId());
+		ArrayList users = udao.findAllRolesByStudy(currentStudy.getId());
 		Map<String, Integer> userRolesAvailableCountMap = new HashMap<String, Integer>();
 		List<StudyUserRoleBean> userRoleList;
 		String userAccountName;
