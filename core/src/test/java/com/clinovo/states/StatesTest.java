@@ -155,6 +155,10 @@ public class StatesTest extends DefaultAppContextTest {
 				.concat(Integer.toString(siteEventDefinitionCRFBean1.getId())).concat(",")
 				.concat(Integer.toString(siteEventDefinitionCRFBean2.getId())).concat(")"), new HashMap());
 
+		studyDAO.execute("delete from study_user_role where study_id = ".concat(Integer.toString(site.getId())),
+				new HashMap());
+		studyDAO.execute("delete from study_user_role where study_id = ".concat(Integer.toString(study.getId())),
+				new HashMap());
 		studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(site.getId())), new HashMap());
 		studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(study.getId())), new HashMap());
 	}

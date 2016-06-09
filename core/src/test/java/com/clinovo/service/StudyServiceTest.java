@@ -45,10 +45,14 @@ public class StudyServiceTest extends DefaultAppContextTest {
 	@After
 	public void after() {
 		if (site != null) {
+			studyDAO.execute("delete from study_user_role where study_id = ".concat(Integer.toString(site.getId())),
+					new HashMap());
 			studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(site.getId())),
 					new HashMap());
 		}
 		if (study != null) {
+			studyDAO.execute("delete from study_user_role where study_id = ".concat(Integer.toString(study.getId())),
+					new HashMap());
 			studyDAO.execute("delete from study where study_id = ".concat(Integer.toString(study.getId())),
 					new HashMap());
 		}
