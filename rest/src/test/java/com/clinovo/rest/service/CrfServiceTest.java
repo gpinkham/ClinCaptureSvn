@@ -47,19 +47,19 @@ public class CrfServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatImportCrfServiceDoesNotAllowToImportSameCrfTwiceInTheSameStudy() throws Exception {
 		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+				.accept(mediaType).secure(true)).andExpect(status().isOk());
 		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isInternalServerError());
+				.accept(mediaType).secure(true)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void testThatImportCrfServiceDoesNotAllowToImportSameCrfTwiceInTheSameStudyEvenIfVersionIsDifferent() throws Exception {
 		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", getJsonData("testCrf.json"))
-				.accept(mediaType).secure(true).session(session)).andExpect(status().isOk());
+				.accept(mediaType).secure(true)).andExpect(status().isOk());
 		JSONObject jsonObject = new JSONObject(getJsonData("testCrf.json"));
 		jsonObject.put("version", "v2.0");
 		this.mockMvc.perform(post(API_CRF_JSON_IMPORT_CRF).param("jsonData", jsonObject.toString()).accept(mediaType)
-				.secure(true).session(session)).andExpect(status().isInternalServerError());
+				.secure(true)).andExpect(status().isInternalServerError());
 	}
 
 	@Test
