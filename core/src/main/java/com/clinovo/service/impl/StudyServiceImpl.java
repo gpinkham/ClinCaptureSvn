@@ -85,6 +85,8 @@ public class StudyServiceImpl implements StudyService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyServiceImpl.class);
 
+	public static final String ROOT = "root";
+
 	@Autowired
 	private DataSource dataSource;
 
@@ -127,7 +129,9 @@ public class StudyServiceImpl implements StudyService {
 	private void autoRemoveStudyUserRole(StudyBean studyBean, UserAccountBean updater) throws Exception {
 		List<StudyUserRoleBean> studyUserRoleBeanList = getUserAccountDAO().findAllByStudyIdOnly(studyBean.getId());
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeanList) {
-			userAccountService.autoRemoveStudyUserRole(studyUserRoleBean, updater);
+			if (!studyUserRoleBean.getUserName().equals(ROOT)) {
+				userAccountService.autoRemoveStudyUserRole(studyUserRoleBean, updater);
+			}
 		}
 	}
 
