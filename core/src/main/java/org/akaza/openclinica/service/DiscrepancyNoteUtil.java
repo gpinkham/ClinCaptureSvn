@@ -745,7 +745,7 @@ public class DiscrepancyNoteUtil {
 	}
 
 	private static StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {
-		StudyUserRoleBean rootUserRole = rootUserAccount.getSysAdminRole();
+		StudyUserRoleBean rootUserRole = rootUserAccount.getRoleByStudy(studyId);
 
 		rootUserRole.setUserAccountId(rootUserAccount.getId());
 		rootUserRole.setRole(Role.SYSTEM_ADMINISTRATOR);
