@@ -746,10 +746,14 @@ Parser.prototype.isValid = function(expression) {
         message = messageSource.messages.specifyTarget;
     }
 
-    if ($("#ruleName").val().length == 0) {
+	var $ruleName = $("#ruleName");
+    if ($ruleName.val().length == 0) {
         valid = false;
         message = messageSource.messages.specifyDescription;
-    }
+    } else if ($ruleName.val().length >= 255) {
+		valid = false;
+		message = messageSource.messages.descriptionLength;
+	}
 
     if ($("input[action=discrepancy]").is(":checked")) {
 		var $dnProperties = $(".discrepancy-properties");

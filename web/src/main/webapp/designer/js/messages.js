@@ -103,7 +103,8 @@ function MessageSourceGetter() {
 		checkLog: "",
 		selectVersion: "",
 		selectCRF: "",
-		selectEvent: ""
+		selectEvent: "",
+		descriptionLength: ""
 	};
 	this.validations = {
 		discrepancyAction: "",
