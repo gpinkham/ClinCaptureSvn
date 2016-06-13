@@ -4,8 +4,8 @@
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <html>
 <head><title>SDV Subject</title>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 <body>
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->

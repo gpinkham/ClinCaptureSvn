@@ -7,7 +7,7 @@
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<link rel="shortcut icon" type="image/x-icon" href="<c:out value="${contextPath}" />/images/favicon.ico">
+<link rel="shortcut icon" type="image/x-icon" href="<c:url value='${faviconUrl}'/>">
 
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>

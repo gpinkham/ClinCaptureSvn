@@ -28,8 +28,8 @@
     <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 
 <body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">

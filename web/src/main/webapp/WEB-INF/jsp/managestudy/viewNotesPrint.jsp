@@ -17,8 +17,8 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
     <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <link rel="stylesheet" href="includes/jquery-ui.css"  type="text/css"/>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
     <ui:theme/>
 </head>
 <body onload="javascript:alertDialog({ message: '<fmt:message key="alert_to_print" bundle="${restext}"/>', height: 150, width: 400 })">

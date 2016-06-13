@@ -26,8 +26,8 @@
 	<link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css"/>
 	<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/css/charts.css?r=${revisionNumber}" type="text/css"/>
 	<link rel="stylesheet" href="includes/jquery-ui.css?r=${revisionNumber}" type="text/css"/>
-	<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-	<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+	<link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+	<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 
 	<script type="text/javascript" src="includes/jmesa/jsapi"></script>
 	<script type="text/javascript">

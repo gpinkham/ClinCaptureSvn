@@ -17,12 +17,11 @@
     <script type="text/JavaScript" language="JavaScript" src="../includes/global_functions_javascript.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="../includes/Tabs.js?r=${revisionNumber}"></script>
     <script type="text/JavaScript" language="JavaScript" src="../includes/CalendarPopup.js?r=${revisionNumber}"></script>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 
-<body>
- 	<b><fmt:message key="icon_key" bundle="${resword}"/></b><br clear="all"><br>
+<body> 	<b><fmt:message key="icon_key" bundle="${resword}"/></b><br clear="all"><br>
 
 		<table border="0" cellpadding="4" cellspacing="0">
 		   <tr>

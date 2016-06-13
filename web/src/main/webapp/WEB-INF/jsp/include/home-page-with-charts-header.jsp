@@ -50,8 +50,8 @@
     <ui:calendar/>
 	<!-- End -->
 
-    <link rel="icon" href="<c:url value='../images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='../images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 
     <ui:theme/>
 </head>

@@ -82,6 +82,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 	public static final String CLIENT_DEFAULT_LOGO_PATH = "/images/logo_client_default_200x61.png";
 	public static final String SYSTEM_LOGO_PATH = "/images/logo_system_200x61.png";
+	public static final String SYSTEM_FAVICON_PATH = "/images/favicon.png";
 
 	private static ArrayList<ExtractPropertyBean> extractProperties;
 	private static String domainName;
@@ -818,21 +819,6 @@ public class CoreResources implements ResourceLoaderAware {
 		if (dataInfo != null && value != null) {
 			dataInfo.setProperty(key, value.trim());
 		}
-	}
-
-	/**
-	 * Returns tokenExpirationDate.
-	 *
-	 * @return int
-	 */
-	public static int getTokenExpirationDate() {
-		int tokenExpirationDate = 0;
-		try {
-			tokenExpirationDate = Integer.parseInt(CoreResources.getField("tokenExpirationDate"));
-		} catch (Exception ex) {
-			LOGGER.error("Error has occurred.", ex);
-		}
-		return tokenExpirationDate;
 	}
 
 	/**

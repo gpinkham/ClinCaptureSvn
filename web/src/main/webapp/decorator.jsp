@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
@@ -23,8 +24,8 @@
     <link rel="stylesheet" href="../includes/styles_updated.css?r=${revisionNumber}" type="text/css">
     <link rel="stylesheet" href="../includes/proto_styles.css?r=${revisionNumber}" type="text/css">
     <link rel="stylesheet" href="../gwt/GwtMenu/GwtMenu.css" type="text/css">
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
     <decorator:head />
 </head>
 <body>

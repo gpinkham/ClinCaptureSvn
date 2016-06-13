@@ -19,12 +19,11 @@
             "includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>
     <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <link rel="stylesheet" href="includes/print_crf.css?r=${revisionNumber}" type="text/css">
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
     <ui:theme/>
 </head>
-<!-- Clinovo ticket #134 start -->
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script><script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
+<!-- Clinovo ticket #134 start --><script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js?r=${revisionNumber}"></script><script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js?r=${revisionNumber}"></script>
 <script type="text/JavaScript">
 $(document).ready(function() {
 $('.tableDiv').find('span').each(function() {    var $this = $(this);

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 
@@ -11,12 +12,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 
 <head>
-<link rel="icon" href="../images/favicon.ico" />
-<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 
 <title>ClinCapture About</title>
-
 <link rel="stylesheet" href="../includes/styles_hf.css?r=${revisionNumber}" type="text/css" media="screen" />
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="colorTheme.js?r=${revisionNumber}"></script>

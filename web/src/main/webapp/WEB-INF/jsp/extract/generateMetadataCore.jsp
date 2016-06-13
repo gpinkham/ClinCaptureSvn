@@ -10,8 +10,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+<link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
 <style type="text/css"> 
     #waitpage { position: absolute; } 

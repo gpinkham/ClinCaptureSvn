@@ -40,8 +40,8 @@
     <ui:calendar/>
     <ui:theme/>
     <!-- End -->
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 
     <%--<script type="text/javascript"  language="JavaScript" src=
         "../includes/repetition-model/repetition-model.js?r=${revisionNumber}"></script>--%>

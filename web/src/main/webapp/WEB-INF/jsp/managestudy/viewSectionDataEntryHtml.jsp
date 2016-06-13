@@ -9,8 +9,8 @@
 <html>
 <head>
     <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 	<c:import url="/includes/js/dn_flag_tooltip.js.jsp" />
     <ui:theme/>
 </head>

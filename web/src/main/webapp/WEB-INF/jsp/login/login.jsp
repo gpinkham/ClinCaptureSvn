@@ -6,8 +6,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" style="position: relative; min-height: 100%;">
 
 <head>
-	<link rel="icon" href="<c:url value='/images/favicon.ico'/>"/>
-	<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>"/>
+	<link rel="icon" href="<c:url value='${faviconUrl}'/>"/>
+	<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>"/>
 	<title>ClinCapture</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=8"/>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>

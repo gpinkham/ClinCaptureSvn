@@ -44,8 +44,8 @@
     <script language="JavaScript">
         var StatusBoxValue = 1;    </script>
 
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 <body style="width:1024px;" class="main_BG"
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -12,7 +13,7 @@
 	<meta http-equiv='cache-control' content='no-cache'>
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" href="http://www.clincapture.com/favicon.ico">
+	<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>">
 	<!-- Bootstrap -->
 	<link href="css/jquery-ui-1.10.3.min.css" rel="stylesheet" media="screen">
 	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">

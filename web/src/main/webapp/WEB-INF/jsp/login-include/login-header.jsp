@@ -21,8 +21,8 @@
 
 <head>
     <c:set var="contextPath" value="${pageContext.request.contextPath}" />
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>

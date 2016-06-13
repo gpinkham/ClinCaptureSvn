@@ -6,12 +6,11 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <html>
 <head>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
     <link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>
-	<title>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js?r=${revisionNumber}"></script>	<title>
 	<fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${studyName}"/>
 	</title>
     <ui:theme/>

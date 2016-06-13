@@ -4,12 +4,11 @@
 <html>
   <head>
       <title><fmt:message key="user_page" bundle="${resword}"/></title>
-      <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-      <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+      <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+      <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
   </head>
   <body>
-  <!-- *JSP* ${pageContext.page['class'].simpleName} -->
-  <fmt:message key="welcome" bundle="${resword}"/>
+  <!-- *JSP* ${pageContext.page['class'].simpleName} -->  <fmt:message key="welcome" bundle="${resword}"/>
   <c:forEach var="user" varStatus="status" items="${stringList}">
       ${user}<c:if test="${! status.last}">,</c:if>&nbsp;
   </c:forEach>

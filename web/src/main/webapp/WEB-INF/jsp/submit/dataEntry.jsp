@@ -16,12 +16,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>ClinCapture <fmt:message key="initial_data_entry" bundle="${resword}"/></title>
-	<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-	<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+	<link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+	<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-	<link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css" media="screen">
-	<link rel="stylesheet" href="includes/print.css?r=${revisionNumber}" type="text/css" media="print">
+	<link rel="stylesheet" href="includes/styles.css?r=${revisionNumber}" type="text/css" media="screen">	<link rel="stylesheet" href="includes/print.css?r=${revisionNumber}" type="text/css" media="print">
 	<link href="includes/jquery-ui.css" rel="stylesheet" type="text/css"/>
 	<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 	<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>

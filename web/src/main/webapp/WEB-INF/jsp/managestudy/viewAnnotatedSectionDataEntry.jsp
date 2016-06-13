@@ -18,8 +18,8 @@
 <head>
     <c:set var="contextPath" value="${pageContext.request.contextPath}" />
     <title>ClinCapture <fmt:message key="view_data_entry" bundle="${resword}" /></title>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+	<link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
     <link rel="stylesheet" href="${contextPath}/includes/styles.css?r=${revisionNumber}" type="text/css" media="screen">

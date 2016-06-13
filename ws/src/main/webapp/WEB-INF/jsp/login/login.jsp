@@ -12,7 +12,7 @@
 <head>
 	<title>ClinCapture Web Services</title>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
-	<link rel="shortcut icon" href='<c:url value="/images/favicon.ico"/>' />
+	<link rel="shortcut icon" href='<c:url value="/images/favicon.png"/>' />
 	<link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
 	<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
  </head>
@@ -56,11 +56,10 @@
 		<table class="footer_table">
 			<tr>
 				<td class="dotted_row"></td>
-				<td rowspan="2" class="clinovo_logo"><a href="http:\\clinovo.com"><img src="../../images/clin_logo.gif"/></a></td>
+				<td rowspan="2" class="clinovo_logo"><a href="http:\\www.clincapture.com"><img src="../../images/logo_system_200x61.png"/></a></td>
 			</tr>
 			<tr>
-				<td height="10px"></td>
-			</tr>
+				<td height="10px"></td>			</tr>
 		</table>
 	</div>
 </body>

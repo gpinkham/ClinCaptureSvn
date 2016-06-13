@@ -36,8 +36,8 @@
     <!-- End -->
     <ui:theme/>
 
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 
 <body class="main_BG aka_bodywidth" onload="TabsForwardByNum(<c:out value="${tabId}"/>);">

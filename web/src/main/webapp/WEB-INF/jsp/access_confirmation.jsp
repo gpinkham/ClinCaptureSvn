@@ -16,11 +16,10 @@
           $('#confirmationForm').submit();
       });
   </script>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 <body>
-
   <!--<h1>ClinCapture</h1>-->
 	<!-- *JSP* ${pageContext.page['class'].simpleName} -->
   <div id="content">

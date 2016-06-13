@@ -31,12 +31,11 @@
     <!-- End -->
     <ui:theme/>
 
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" /></head>
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" /></head>
 <body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"
 	<jsp:include page="../include/showPopUp.jsp"/>
->
-<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class="background">
+><table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class="background">
 	<tr>
 		<td valign="top"><!-- Header Table -->
 

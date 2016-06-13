@@ -38,8 +38,8 @@
     <ui:theme/>
 
     <script type="text/JavaScript" language="JavaScript" src="../../includes/prototype.js?r=${revisionNumber}"></script>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <link rel="icon" href="<c:url value='${faviconUrl}'/>" />
+    <link rel="shortcut icon" href="<c:url value='${faviconUrl}'/>" />
 </head>
 <body style="width:1024px;" class="main_BG"
 
