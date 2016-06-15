@@ -1,5 +1,7 @@
 package com.clinovo.steps;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +10,44 @@ import org.junit.Assert;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebElement;
 
-import com.clinovo.pages.*;
+import com.clinovo.pages.AddSubjectPage;
+import com.clinovo.pages.AdministerCRFsPage;
+import com.clinovo.pages.AdministerSubjectsPage;
+import com.clinovo.pages.AdministerUsersPage;
+import com.clinovo.pages.BasePage;
+import com.clinovo.pages.BuildStudyPage;
+import com.clinovo.pages.CRFPage;
+import com.clinovo.pages.ChangeStudyPage;
+import com.clinovo.pages.ConfigureSystemPropertiesPage;
+import com.clinovo.pages.ConfirmChangeStudyPage;
+import com.clinovo.pages.ConfirmCreateSitePage;
+import com.clinovo.pages.ConfirmEventDefinitionCreationPage;
+import com.clinovo.pages.ConfirmSystemPropertiesPage;
+import com.clinovo.pages.CreateCRFDataCommitedPage;
+import com.clinovo.pages.CreateCRFVersionPage;
+import com.clinovo.pages.CreateNewSitePage;
+import com.clinovo.pages.CreateStudyEventDefinitionPage;
+import com.clinovo.pages.CreateUserAccountPage;
+import com.clinovo.pages.DNPage;
+import com.clinovo.pages.DefineStudyEventSelectCRFsPage;
+import com.clinovo.pages.DefineStudyEventSelectedCRFsPage;
+import com.clinovo.pages.HomePage;
+import com.clinovo.pages.ImportRuleDataPage;
+import com.clinovo.pages.LoginPage;
+import com.clinovo.pages.ManageEventDefinitionsPage;
+import com.clinovo.pages.ManageRulesPage;
+import com.clinovo.pages.ManageSitesPage;
+import com.clinovo.pages.NotesAndDiscrepanciesPage;
+import com.clinovo.pages.PreviewCRFPage;
+import com.clinovo.pages.ResetPasswordPage;
+import com.clinovo.pages.SDVPage;
+import com.clinovo.pages.SignStudyEventPage;
+import com.clinovo.pages.SubjectMatrixPage;
+import com.clinovo.pages.UpdateStudyDetailsPage;
+import com.clinovo.pages.UpdateSubjectDetailsPage;
+import com.clinovo.pages.ViewEventPage;
+import com.clinovo.pages.ViewSubjectRecordPage;
+import com.clinovo.pages.ViewUserAccountPage;
 import com.clinovo.pages.beans.CRF;
 import com.clinovo.pages.beans.DNote;
 import com.clinovo.pages.beans.Study;
@@ -22,7 +61,6 @@ import net.thucydides.core.Thucydides;
 import net.thucydides.core.annotations.Step;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.core.steps.ScenarioSteps;
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Created by Anton on 01.07.2014.
@@ -32,117 +70,122 @@ public class CommonSteps extends ScenarioSteps {
 	private static final long serialVersionUID = 1L;
 
 	public CommonSteps(Pages pages) {
-        super(pages);
-    }
-    
-	protected BasePage basePage = getPages().get(BasePage.class);
-	protected AdministerUsersPage administerUsersPage = getPages().get(AdministerUsersPage.class);
-	protected CreateUserAccountPage createUserAccountPage = getPages().get(CreateUserAccountPage.class);
-	protected ViewUserAccountPage viewUserAccountPage = getPages().get(ViewUserAccountPage.class);
-	protected BuildStudyPage buildStudyPage = getPages().get(BuildStudyPage.class);
-	protected CreateNewSitePage createNewSitePage = getPages().get(CreateNewSitePage.class);
-	protected ConfirmCreateSitePage confirmCreateSitePage = getPages().get(ConfirmCreateSitePage.class);
-	protected ManageSitesPage manageSitesPage = getPages().get(ManageSitesPage.class);
-	protected ConfigureSystemPropertiesPage configureSystemPropertiesPage = getPages().get(ConfigureSystemPropertiesPage.class);
-	protected ConfirmSystemPropertiesPage confirmSystemPropertiesPage = getPages().get(ConfirmSystemPropertiesPage.class);
-	protected UpdateStudyDetailsPage updateStudyDetailsPage = getPages().get(UpdateStudyDetailsPage.class);
-	protected CreateCRFVersionPage createCRFVersionPage = getPages().get(CreateCRFVersionPage.class);
-	protected PreviewCRFPage previewCRFPage = getPages().get(PreviewCRFPage.class);
-	protected CreateCRFDataCommitedPage createCRFDataCommitedPage = getPages().get(CreateCRFDataCommitedPage.class);
-	protected CreateStudyEventDefinitionPage createStudyEventDefinitionPage = getPages().get(CreateStudyEventDefinitionPage.class);
-	protected DefineStudyEventSelectCRFsPage defineStudyEventSelectCRFsPage = getPages().get(DefineStudyEventSelectCRFsPage.class);
-	protected DefineStudyEventSelectedCRFsPage defineStudyEventSelectedCRFsPage = getPages().get(DefineStudyEventSelectedCRFsPage.class);
-	protected ConfirmEventDefinitionCreationPage confirmEventDefinitionCreationPage = getPages().get(ConfirmEventDefinitionCreationPage.class);
-	protected ChangeStudyPage changeStudyPage = getPages().get(ChangeStudyPage.class);
-	protected ConfirmChangeStudyPage confirmChangeStudyPage = getPages().get(ConfirmChangeStudyPage.class);
-	protected AddSubjectPage addSubjectPage = getPages().get(AddSubjectPage.class);
-	protected SubjectMatrixPage subjectMatrixPage = getPages().get(SubjectMatrixPage.class);
-	protected ManageEventDefinitionsPage manageEventDefinitionsPage = getPages().get(ManageEventDefinitionsPage.class);
-	protected CRFPage crfPage = getPages().get(CRFPage.class);
-	protected SDVPage sdvPage = getPages().get(SDVPage.class);
-	protected SignStudyEventPage signStudyEventPage = getPages().get(SignStudyEventPage.class);
-	protected ViewSubjectRecordPage viewSubjectRecordPage = getPages().get(ViewSubjectRecordPage.class);
-	protected DNPage dnPage = getPages().get(DNPage.class);
-	protected NotesAndDiscrepanciesPage notesAndDiscrepanciesPage = getPages().get(NotesAndDiscrepanciesPage.class);
-	protected ManageRulesPage manageRulesPage = getPages().get(ManageRulesPage.class);
-	protected ImportRuleDataPage importRuleDataPage = getPages().get(ImportRuleDataPage.class);
-	protected AdministerCRFsPage administerCRFsPage = getPages().get(AdministerCRFsPage.class);
-	protected AdministerSubjectsPage administerSubjectsPage = getPages().get(AdministerSubjectsPage.class);
-	protected UpdateSubjectDetailsPage updateSubjectDetailsPage = getPages().get(UpdateSubjectDetailsPage.class);
-
-	
-    private LoginPage loginPage = getPages().get(LoginPage.class);
-    private HomePage homePage = getPages().get(HomePage.class);
-    private ViewEventPage viewEventPage = getPages().get(ViewEventPage.class);
-    private ResetPasswordPage resetPasswordPage = getPages().get(ResetPasswordPage.class);
-
-    @Step
-    public void enters_credentials(String login, String password) {
-        loginPage.enterLoginName(login);
-        loginPage.enterPassword(password);
-    }
-
-	@Step
-    public void clicks_login_button() {
-        loginPage.clickLoginBtn();
-    }
-
-    @Step
-    public void login_to_cc_first_time(User user) {
-        cc_login(user);
-        should_see_reset_password_page();
-    }
-    
-    private void maximize() {
-    	getDriver().manage().window().maximize();
+		super(pages);
 	}
 
-    public void cc_login(User user) {
-        loginPage.open();
-        maximize();
-        enters_credentials(user.getUserName(), user.getPassword());
-        clicks_login_button();
-    }
+	private BasePage basePage = getPages().get(BasePage.class);
+	private AdministerUsersPage administerUsersPage = getPages().get(AdministerUsersPage.class);
+	private CreateUserAccountPage createUserAccountPage = getPages().get(CreateUserAccountPage.class);
+	private ViewUserAccountPage viewUserAccountPage = getPages().get(ViewUserAccountPage.class);
+	private BuildStudyPage buildStudyPage = getPages().get(BuildStudyPage.class);
+	private CreateNewSitePage createNewSitePage = getPages().get(CreateNewSitePage.class);
+	private ConfirmCreateSitePage confirmCreateSitePage = getPages().get(ConfirmCreateSitePage.class);
+	private ManageSitesPage manageSitesPage = getPages().get(ManageSitesPage.class);
+	private ConfigureSystemPropertiesPage configureSystemPropertiesPage = getPages()
+			.get(ConfigureSystemPropertiesPage.class);
+	private ConfirmSystemPropertiesPage confirmSystemPropertiesPage = getPages()
+			.get(ConfirmSystemPropertiesPage.class);
+	private UpdateStudyDetailsPage updateStudyDetailsPage = getPages().get(UpdateStudyDetailsPage.class);
+	private CreateCRFVersionPage createCRFVersionPage = getPages().get(CreateCRFVersionPage.class);
+	private PreviewCRFPage previewCRFPage = getPages().get(PreviewCRFPage.class);
+	private CreateCRFDataCommitedPage createCRFDataCommitedPage = getPages().get(CreateCRFDataCommitedPage.class);
+	private CreateStudyEventDefinitionPage createStudyEventDefinitionPage = getPages()
+			.get(CreateStudyEventDefinitionPage.class);
+	private DefineStudyEventSelectCRFsPage defineStudyEventSelectCRFsPage = getPages()
+			.get(DefineStudyEventSelectCRFsPage.class);
+	private DefineStudyEventSelectedCRFsPage defineStudyEventSelectedCRFsPage = getPages()
+			.get(DefineStudyEventSelectedCRFsPage.class);
+	private ConfirmEventDefinitionCreationPage confirmEventDefinitionCreationPage = getPages()
+			.get(ConfirmEventDefinitionCreationPage.class);
+	private ChangeStudyPage changeStudyPage = getPages().get(ChangeStudyPage.class);
+	private ConfirmChangeStudyPage confirmChangeStudyPage = getPages().get(ConfirmChangeStudyPage.class);
+	private AddSubjectPage addSubjectPage = getPages().get(AddSubjectPage.class);
+	private SubjectMatrixPage subjectMatrixPage = getPages().get(SubjectMatrixPage.class);
+	private ManageEventDefinitionsPage manageEventDefinitionsPage = getPages().get(ManageEventDefinitionsPage.class);
+	private CRFPage crfPage = getPages().get(CRFPage.class);
+	private SDVPage sdvPage = getPages().get(SDVPage.class);
+	private SignStudyEventPage signStudyEventPage = getPages().get(SignStudyEventPage.class);
+	private ViewSubjectRecordPage viewSubjectRecordPage = getPages().get(ViewSubjectRecordPage.class);
+	private DNPage dnPage = getPages().get(DNPage.class);
+	private NotesAndDiscrepanciesPage notesAndDiscrepanciesPage = getPages().get(NotesAndDiscrepanciesPage.class);
+	private ManageRulesPage manageRulesPage = getPages().get(ManageRulesPage.class);
+	private ImportRuleDataPage importRuleDataPage = getPages().get(ImportRuleDataPage.class);
+	private AdministerCRFsPage administerCRFsPage = getPages().get(AdministerCRFsPage.class);
+	private AdministerSubjectsPage administerSubjectsPage = getPages().get(AdministerSubjectsPage.class);
+	private UpdateSubjectDetailsPage updateSubjectDetailsPage = getPages().get(UpdateSubjectDetailsPage.class);
+
+	private LoginPage loginPage = getPages().get(LoginPage.class);
+	private HomePage homePage = getPages().get(HomePage.class);
+	private ViewEventPage viewEventPage = getPages().get(ViewEventPage.class);
+	private ResetPasswordPage resetPasswordPage = getPages().get(ResetPasswordPage.class);
 
 	@Step
-    public void login_to_cc(User user) {
+	public void enters_credentials(String login, String password) {
+		loginPage.enterLoginName(login);
+		loginPage.enterPassword(password);
+	}
+
+	@Step
+	public void clicks_login_button() {
+		loginPage.clickLoginBtn();
+	}
+
+	@Step
+	public void login_to_cc_first_time(User user) {
+		cc_login(user);
+		should_see_reset_password_page();
+	}
+
+	private void maximize() {
+		getDriver().manage().window().maximize();
+	}
+
+	public void cc_login(User user) {
+		loginPage.open();
+		maximize();
+		enters_credentials(user.getUserName(), user.getPassword());
+		clicks_login_button();
+	}
+
+	@Step
+	public void login_to_cc(User user) {
 		cc_login(user);
 		should_see_task_menu();
-    }
+	}
 
-    @Step
-    public void should_see_reset_password_page() {
-        assertThat(resetPasswordPage.isOnPage()).isTrue();
-    }
-    
-    @Step
-    public void should_see_task_menu() {
-        assertThat(homePage.taskMenuIsVisible()).isTrue();
-    }
+	@Step
+	public void should_see_reset_password_page() {
+		assertThat(resetPasswordPage.isOnPage()).isTrue();
+	}
 
-    @Step
-    public void go_to_subject_matrix_page() {
-        basePage.goToSubjectMatrix();
-    }
+	@Step
+	public void should_see_task_menu() {
+		assertThat(homePage.taskMenuIsVisible()).isTrue();
+	}
 
-    @Step
-    public void log_out() {
-        basePage.logOut();
-    }
+	@Step
+	public void go_to_subject_matrix_page() {
+		basePage.goToSubjectMatrix();
+	}
 
-    @Step
-    public void open_browser_window() {
-        loginPage.open();
-        getDriver().manage().window().maximize();
-    }
-    
-    @Step
+	@Step
+	public void log_out() {
+		basePage.logOut();
+	}
+
+	@Step
+	public void open_browser_window() {
+		loginPage.open();
+		getDriver().manage().window().maximize();
+	}
+
+	@Step
 	public void change_old_password_to_new(User currentUser) {
 		resetPasswordPage.fillInResetPasswordPage(currentUser);
 		resetPasswordPage.clickSubmit();
 		should_see_task_menu();
 	}
-    
+
 	public BasePage getPageByPageName(String page) {
 		switch (page) {
 		case LoginPage.PAGE_NAME:
@@ -216,26 +259,26 @@ public class CommonSteps extends ScenarioSteps {
 		case AdministerCRFsPage.PAGE_NAME:
 			return administerCRFsPage;
 		case AdministerSubjectsPage.PAGE_NAME:
-			return administerSubjectsPage;	
+			return administerSubjectsPage;
 		case UpdateSubjectDetailsPage.PAGE_NAME:
-			return updateSubjectDetailsPage;	
-			
+			return updateSubjectDetailsPage;
+
 		default:
 			;
 		}
 
 		return basePage;
 	}
-    
-    @Step
+
+	@Step
 	public void user_is_on_page(String page) {
 		boolean isOnPage = false;
 		isOnPage = getPageByPageName(page).isOnPage(getDriver());
-		
+
 		assertThat(isOnPage).isTrue();
 	}
 
-    @Step
+	@Step
 	public void click_submit_button() {
 		basePage.clickSubmit();
 	}
@@ -278,12 +321,12 @@ public class CommonSteps extends ScenarioSteps {
 	public void go_to_administer_users_page() {
 		basePage.goToAdministerUsersPage();
 	}
-	
+
 	@Step
 	public void go_to_configure_system_properties_page() {
 		basePage.goToConfigureSystemPropertiesPage();
 	}
-	
+
 	@Step
 	public void go_to_page(String page) {
 
@@ -330,7 +373,7 @@ public class CommonSteps extends ScenarioSteps {
 		case AdministerSubjectsPage.PAGE_NAME:
 			go_to_administer_subjects_page();
 			break;
-			
+
 		default:
 			;
 		}
@@ -357,7 +400,7 @@ public class CommonSteps extends ScenarioSteps {
 	private void go_to_manage_rules_page() {
 		basePage.goToManageRulesPage();
 	}
-	
+
 	private void go_to_notes_and_discrepancies_page() {
 		basePage.goToNDsPage();
 	}
@@ -373,7 +416,7 @@ public class CommonSteps extends ScenarioSteps {
 	private void go_to_change_study_page() {
 		basePage.clickChangeStudyLink();
 	}
-	
+
 	private void go_to_update_study_details_page() {
 		buildStudyPage.clickUpdateStudy();
 	}
@@ -413,7 +456,7 @@ public class CommonSteps extends ScenarioSteps {
 	public void click_submit_button(String page) {
 		getPageByPageName(page).clickSubmit();
 	}
-	
+
 	@Step
 	public void fill_in_study_event_definition(StudyEventDefinition event) {
 		createStudyEventDefinitionPage.fillInStudyEventDefinitionPage(event);
@@ -423,58 +466,58 @@ public class CommonSteps extends ScenarioSteps {
 	public void select_CRFs_for_study_event_definition(StudyEventDefinition event) {
 		defineStudyEventSelectCRFsPage.selectCRFs(event.getCRFList());
 	}
-	
-    @Step
+
+	@Step
 	public void click_create_user_button(User currentUser) {
-    	administerUsersPage.clickCreateUserButton();
+		administerUsersPage.clickCreateUserButton();
 	}
 
-    @Step
+	@Step
 	public void fill_data_on_create_user_page(User createdUser) {
 		createUserAccountPage.fillInCreateUserAccountPage(createdUser);
 	}
 
-    @Step
+	@Step
 	public void click_add_event_definition_button() {
 		buildStudyPage.clickAddStudyEventDefinition();
 	}
 
-    @Step
+	@Step
 	public void select_study_on_change_study_page(String studyName) {
 		changeStudyPage.selectStudy(studyName);
 	}
-    
-    @Step
+
+	@Step
 	public void current_study_is(String studyName) {
-    	Assert.assertEquals(studyName, basePage.getCurrentStudyName());
+		Assert.assertEquals(studyName, basePage.getCurrentStudyName());
 	}
-    
-    @Step
+
+	@Step
 	public String get_study_name_from_page() {
 		return basePage.getCurrentParentStudyName();
 	}
-    
-    @Step
+
+	@Step
 	public void is_on_study_level() {
 		basePage.isOnStudyLevel();
 	}
 
-    @Step
+	@Step
 	public void fill_in_study_subject_page(StudySubject ssubj) {
 		addSubjectPage.fillInAddSubjectPage(ssubj);
 	}
-    
-    @Step
+
+	@Step
 	public void call_popup_for_subject_and_event(String studySubjectID, String eventName) {
 		subjectMatrixPage.callPopupForSubjectAndEvent(studySubjectID, eventName);
 	}
-    
-    @Step
+
+	@Step
 	public void fill_in_popup_to_schedule_event(StudyEventDefinition event) {
 		subjectMatrixPage.fillInPopupToScheduleEvent(event);
 	}
 
-    @Step
+	@Step
 	public void click_schedule_event_button_in_popup() {
 		subjectMatrixPage.clickScheduleEventButtonInPopup();
 	}
@@ -483,17 +526,17 @@ public class CommonSteps extends ScenarioSteps {
 	public void event_is_scheduled(StudyEventDefinition event) {
 		subjectMatrixPage.eventIsScheduled(event);
 	}
-	
+
 	@Step
 	public void clear_filter_on_SM() {
 		subjectMatrixPage.clickClearFilterLink();
 	}
-	
+
 	@Step
 	public void filter_SM_by_study_subject_id(String studySubjectID) {
 		subjectMatrixPage.filterSMByStudySubjectID(studySubjectID);
 	}
-	
+
 	@Step
 	public void click_enter_data_button_in_popup(String aCRFName) {
 		subjectMatrixPage.clickEnterDataButtonInPopup(aCRFName);
@@ -509,12 +552,12 @@ public class CommonSteps extends ScenarioSteps {
 		assertThat(Common.checkAllTrue(crfPage.checkDataInCRF(crf))).isTrue();
 		crfPage.clickExit();
 	}
-	
+
 	@Step
-	public void click_save_button() {
+	public void click_save_button_on_CRF_page() {
 		crfPage.clickSaveButton();
 	}
-	
+
 	@Step
 	public void click_perform_SDV_button_for_filtered_table() {
 		sdvPage.clickPerformSDVButtonForFilteredTable();
@@ -529,27 +572,27 @@ public class CommonSteps extends ScenarioSteps {
 	public void user_check_CRF_SDVed() {
 		sdvPage.checkSDVIcon();
 	}
-	
+
 	@Step
 	public void click_sign_event_button_in_popup() {
 		subjectMatrixPage.clickSignEventButton();
 	}
-	
+
 	@Step
 	public void enter_credentials_on_sign_study_event_page(User user) {
 		signStudyEventPage.enterCredentials(user);
 	}
-	
+
 	@Step
 	public void click_sign_button_on_sign_study_event_page() {
 		signStudyEventPage.clickSignButton();
 	}
-	
+
 	@Step
 	public void user_filters_SM_page(Map<String, String> map) {
 		subjectMatrixPage.filterSMPage(map);
 	}
-	
+
 	@Step
 	public void check_sign_event_status(Map<String, String> values) {
 		subjectMatrixPage.checkSignEventStatus(values);
@@ -576,10 +619,10 @@ public class CommonSteps extends ScenarioSteps {
 		default:
 			dnPage.fillInAndSaveDN(dn, newWindowId);
 		}
-		
+
 		switch_to_another_window(oldWindowId);
 	}
-	
+
 	@Step
 	public void save_crf() {
 		crfPage.clickSaveButton();
@@ -593,16 +636,17 @@ public class CommonSteps extends ScenarioSteps {
 	public void click_dn_flag_icon(WebElement flagIcon) {
 		flagIcon.click();
 	}
-	
+
 	public Map<String, String> switch_to_another_window(String windowId) {
-		//Store the current window handle
+		// Store the current window handle
 		Map<String, String> fromWinToWin = new HashMap<String, String>();
-		
+
 		if (windowId.isEmpty()) {
-			//Switch to new window opened
+			// Switch to new window opened
 			int i = 0;
-			for(String winHandle : getDriver().getWindowHandles()){
-				if (i == 0) fromWinToWin.put("from", winHandle);
+			for (String winHandle : getDriver().getWindowHandles()) {
+				if (i == 0)
+					fromWinToWin.put("from", winHandle);
 				if (i == getDriver().getWindowHandles().size() - 1) {
 					fromWinToWin.put("to", winHandle);
 					getDriver().switchTo().window(winHandle);
@@ -612,11 +656,11 @@ public class CommonSteps extends ScenarioSteps {
 		} else {
 			try {
 				fromWinToWin.put("from", getDriver().getWindowHandle());
-			} catch(NoSuchWindowException e) {
+			} catch (NoSuchWindowException e) {
 				fromWinToWin.put("from", "");
 			}
-			
-			for(String winHandle : getDriver().getWindowHandles()){
+
+			for (String winHandle : getDriver().getWindowHandles()) {
 				if (windowId.equals(winHandle)) {
 					fromWinToWin.put("to", winHandle);
 					getDriver().switchTo().window(winHandle);
@@ -624,12 +668,12 @@ public class CommonSteps extends ScenarioSteps {
 			}
 		}
 
-		//Close the new window, if that window no more required
-		//webdriver.close();
+		// Close the new window, if that window no more required
+		// webdriver.close();
 
-		//Switch back to original browser (first window)
-		//webdriver.switchTo().window(winHandleBefore);
-		
+		// Switch back to original browser (first window)
+		// webdriver.switchTo().window(winHandleBefore);
+
 		return fromWinToWin;
 	}
 
@@ -642,7 +686,7 @@ public class CommonSteps extends ScenarioSteps {
 	public void check_DN_row_is_present(DNote dn) {
 		notesAndDiscrepanciesPage.checkDNPresent(dn);
 	}
-	
+
 	@Step
 	public void update_or_close_DN(DNote dn) {
 		String oldWindowId = switch_to_another_window("").get("from");
@@ -768,11 +812,11 @@ public class CommonSteps extends ScenarioSteps {
 	public void click_start_date_flag_in_popup() {
 		subjectMatrixPage.clickStartDateFlagInPopup();
 	}
-	
+
 	public void click_end_date_flag_in_popup() {
 		subjectMatrixPage.clickEndDateFlagInPopup();
 	}
-	
+
 	public void click_location_flag_in_popup() {
 		subjectMatrixPage.clickLocationFlagInPopup();
 	}
@@ -816,12 +860,12 @@ public class CommonSteps extends ScenarioSteps {
 	public void check_row_is_present_on_SM() {
 		subjectMatrixPage.checkFirstRowIsPresent();
 	}
-	
+
 	@Step
 	public void click_view_icon_for_study_subject_on_SM(String studySubjectID) {
 		subjectMatrixPage.clickViewIconForStudySubject(studySubjectID);
 	}
-	
+
 	@Step
 	public void click_edit_icon_for_subject_on_Administer_Subjects_page(String studyIDStSubjectID) {
 		Map<String, String> map = new HashMap<String, String>();
@@ -844,5 +888,26 @@ public class CommonSteps extends ScenarioSteps {
 
 	public void clear_filter_NDs_page(DNote dn) {
 		notesAndDiscrepanciesPage.clickClearFilterLink();
+	}
+
+	@Step
+	public void click_section_tab_in_crf(String sectionName) {
+		crfPage.clickSectionTabInCRF(sectionName);
+	}
+
+	@Step
+	public void click_more_info_button() {
+		crfPage.clickMoreInfoButton();
+	}
+
+	@Step
+	public void leave_CRF_without_saving() {
+		crfPage.clickCancelButton();
+		crfPage.clickYesAtDlg();
+	}
+
+	@Step
+	public void verify_error_message_on_CRF(String errorMessage) {
+		crfPage.verifyErrorMessage(errorMessage);
 	}
 }

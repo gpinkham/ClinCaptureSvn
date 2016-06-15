@@ -327,7 +327,7 @@ And User fills in data into CRF:
 |Mark Complete|input1(T)  |input2(T)|input3(R)|input4(T)  |input5(R)|
 |no           |20-Apr-2015|22:00    |1        |description|0        |
 
-When User clicks 'Save' button
+When User clicks 'Save' button on CRF page
 Then User is on SM page
 
 
@@ -429,7 +429,7 @@ And User is on Import Rule Data page
 When User clicks 'Submit' button
 And User clicks 'Yes' button in popup on Import Rule Data page
 Then User is on Build Study page
-And User sees '1 Rule(s) and 1 Rule Assignment(s) were uploaded successfully.' message
+And User sees '1 Rule(s) and 1 Rule Assignment(s) were uploaded successfully.' message in 'Alerts&Messages' section
 Examples:
 |filepath                                  |
 |.\\src\\test\\resources\\Rules\\Rule_1.xml|
@@ -496,7 +496,7 @@ And User creates DNs in CRF:
 |Item  |Type|Description            |Detailed Note   |
 |input1|RFC |Source data was missing|peace of text...|
 
-When User clicks 'Save' button
+When User clicks 'Save' button on CRF page
 Then User is on SM page
 And DNs are created
 
@@ -509,12 +509,12 @@ And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input2(T)  |
 |StSubj_2        |Event B   |CRF_w_basic_fields_1|13:15      |
 
-And User clicks 'Save' button
+And User clicks 'Save' button on CRF page
 And User creates DNs in CRF:
 |Item  |Type|Description                  |Detailed Note   |
 |input2|RFC |Information was not available|peace of text...|
 
-When User clicks 'Save' button
+When User clicks 'Save' button on CRF page
 Then User is on SM page
 And DNs are created
 
@@ -527,12 +527,12 @@ And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input6(R)|input7(T)  |input8(T)|input9(R)|input11(R)|
 |StSubj_1        |Event E   |CRF_w_basic_fields_2|1        |05-Feb-2014|00:00    |1        |0         |
 
-And User clicks 'Save' button
+And User clicks 'Save' button on CRF page
 And User creates DNs in CRF:
 |Item  |Type|Description                  |Detailed Note   |
 |input8|FVC |Information was not available|peace of text...|
 
-When User clicks 'Save' button
+When User clicks 'Save' button on CRF page
 Then User is on SM page
 And DNs are created
 
@@ -545,8 +545,8 @@ And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input6(R)|input7(T)  |input8(T)|input9(R)|input11(R)|
 |StSubj_5        |Event D   |CRF_w_basic_fields_2|1        |20-Apr-2015|00:00    |2        |0         |
 
-And User clicks 'Save' button
-When User clicks 'Save' button
+And User clicks 'Save' button on CRF page
+When User clicks 'Save' button on CRF page
 Then User is on SM page
 And DN is created:
 |Study Subject ID|Event Name|CRF Name            |Type|Detailed Note|Entity Name|
@@ -561,12 +561,12 @@ And User fills in CRF:
 |Study Subject ID|Event Name|CRF Name            |input8(T)|
 |StSubj_5        |Event E   |CRF_w_basic_fields_2|00:00    |
 
-And User clicks 'Save' button
+And User clicks 'Save' button on CRF page
 And User creates DNs in CRF:
 |Study Subject ID|Item  |Type|Description            |Detailed Note    |
 |StSubj_5        |input8|RFC |Source data was missing|Scenario 20.9 ...|
 
-When User clicks 'Save' button
+When User clicks 'Save' button on CRF page
 Then User is on SM page
 And DNs are created
 

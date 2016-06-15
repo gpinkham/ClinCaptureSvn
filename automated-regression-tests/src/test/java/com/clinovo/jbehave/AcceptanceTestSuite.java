@@ -1,19 +1,22 @@
 package com.clinovo.jbehave;
 
-import net.thucydides.jbehave.ThucydidesJUnitStories;
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.jbehave.core.annotations.BeforeStory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-
-import javax.sql.DataSource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.jbehave.core.annotations.BeforeStory;
+import org.jbehave.core.annotations.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+
+import net.thucydides.jbehave.ThucydidesJUnitStories;
 
 public class AcceptanceTestSuite extends ThucydidesJUnitStories {
 
@@ -26,17 +29,19 @@ public class AcceptanceTestSuite extends ThucydidesJUnitStories {
 	public static final List<String> EXCLUDED_FILES = Arrays.asList("Preconditions.story");
 
 	private DataSource dataSource;
-
 	private Logger logger = LoggerFactory.getLogger(AcceptanceTestSuite.class);
 	private Properties properties = new Properties();
 
 	@BeforeStory
-	public void prepare() {
+	public void prepare(@Named("backup_name") String backupFileName) {
 		try {
 			setupDatabaseConnection();
 			ResourceDatabasePopulator rdp = new ResourceDatabasePopulator();
-			rdp.addScript(new ClassPathResource("sql/reset_root_password.sql"));
-			rdp.populate(dataSource.getConnection());
+			if (!backupFileName.equals("")) {
+				rdp.addScript(new ClassPathResource("sql/clear_db.sql"));
+				rdp.addScript(new ClassPathResource("sql/" + backupFileName + ".sql"));
+				rdp.populate(dataSource.getConnection());
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {

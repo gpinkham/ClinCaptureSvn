@@ -1,9 +1,17 @@
 Meta:
+@backup_name 
 
 Narrative:
-As a user
-I want to perform an action
-So that I can achieve a business goal
+In order to communicate effectively to the business some functionality
+As a development team
+I want to use Behaviour-Driven Development
+ 
+Lifecycle:
+After:
+Outcome: ANY
+Given User logs out
+
+
 
 Scenario: 1. "Root" logs in first time
 

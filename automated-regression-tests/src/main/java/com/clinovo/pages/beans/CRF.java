@@ -6,11 +6,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * CRF bean.
+ */
 public class CRF{
 	
 	public static final String CRFS_TO_CHECK_SDV_STATUS = "CRFs to check SDV tatus";
 	public static final String CRFS_TO_CHECK_EXIST = "CRFs to check for existence";
-	public static final String CRFs_TO_CHECK_SAVED_DATA = "CRFs to check saved data";
+	public static final String CRFS_TO_CHECK_SAVED_DATA = "CRFs to check saved data";
 
 	public static ComparatorForItemOIDs comparatorForItemOIDs = new ComparatorForItemOIDs();
 	public static final String[] ARRAY_OF_PARAMETERS_TO_SKIP = new String[] {"Mark Complete", "Study Subject ID", "Event Name", "CRF Name", "Section Name", "Add Rows"};
@@ -33,6 +36,13 @@ public class CRF{
 		this.fieldNameToValueMap = fieldNameToValueMap;
 	}
 
+	/**
+	 * Method fill CRF from table row.
+	 *
+	 * @param values
+	 *            Map<String, String>
+	 * @return CRF
+	 */
 	public static CRF fillCRFFromTableRow(Map<String, String> values) {
 		CRF crf = new CRF();
 		if (values.containsKey("Mark Complete")) crf.setMarkComplete(values.get("Mark Complete"));
@@ -54,6 +64,14 @@ public class CRF{
 		return crf;
 	}
 
+	/**
+	 * Method remove values from map.
+	 *
+	 * @param map
+	 *            Map<String, String>
+	 * @param values
+	 *				String[]
+	 */
 	public static void removeValuesFromMap(Map<String, String> map, String[] values) {
 		for (String key: values) {
 			map.remove(key);
@@ -72,9 +90,9 @@ public class CRF{
 				if (value.isEmpty()) continue;
 				number = key.replaceFirst(".*item", "");
 				parsedValue = value.replaceFirst(".*input(\\d+)\\(\\w+\\):", "").trim();
-				parsedKey = value.replaceFirst(": "+parsedValue, "").trim();
+				parsedKey = value.replaceFirst(": "+ parsedValue, "").trim();
 				
-				parsedValues.put("("+number+")"+parsedKey, parsedValue);
+				parsedValues.put("("+ number +")"+ parsedKey, parsedValue);
 			}
 			
 			return parsedValues;
@@ -146,7 +164,16 @@ public class CRF{
 	public void setAddRows(String addRows) {
 		this.addRows = addRows;
 	}
-	
+
+	/**
+	 * Method changes keys for CRF items.
+	 *
+	 * @param map
+	 * 			Map<String, String>
+	 * @param values
+	 * 			Map<String, String>
+	 * @return
+	 */
 	public static Map<String, String> changeKeysForCRFItems(Map<String, String> map, Map<String, String> values) {
     	Map<String, String> result = new HashMap<String, String>();
     	int max = 0;
@@ -155,7 +182,7 @@ public class CRF{
     		Matcher m = p.matcher(key);
     		if (m.matches()) {
     			int itemNumber = Integer.parseInt(m.group(1));
-    			max = max > itemNumber? max : itemNumber;
+    			max = max > itemNumber ? max : itemNumber;
     		}
     	}
     	for (String key: values.keySet()) {
@@ -190,7 +217,8 @@ class ComparatorForItemOIDs implements Comparator<String> {
 		p = Pattern.compile(".+_(\\d+)input.+");
 		m1 = p.matcher(str1);
 		m2 = p.matcher(str2);
-		c1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;		c2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
+		c1 = m1.matches()? Integer.parseInt(m1.group(1)) : 0;		
+		c2 = m2.matches()? Integer.parseInt(m2.group(1)) : 0;
 		
 		p = Pattern.compile(".*input(\\d+).*");
 		m1 = p.matcher(str1);

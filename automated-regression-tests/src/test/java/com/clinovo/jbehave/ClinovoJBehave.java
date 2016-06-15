@@ -426,10 +426,10 @@ public class ClinovoJBehave {
 		commonSteps.filter_SDV_page(values);
 	}
 
-	@Given("User clicks 'Save' button")
-    @When("User clicks 'Save' button")
+	@Given(value = "User clicks 'Save' button on CRF page", priority=1)
+    @When(value = "User clicks 'Save' button on CRF page", priority=1)
 	public void userClicksSaveButton() {
-    	commonSteps.click_save_button();
+    	commonSteps.click_save_button_on_CRF_page();
     }
 	
 	@Then("CRFs are SDVed")
@@ -619,19 +619,19 @@ public class ClinovoJBehave {
     		}
     		listWithCRFs.add(crf);
     	}
-    	Thucydides.getCurrentSession().put(CRF.CRFs_TO_CHECK_SAVED_DATA, listWithCRFs);
+    	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_SAVED_DATA, listWithCRFs);
     }
     
     @SuppressWarnings("unchecked")
 	@Then("CRF data is saved correctly")
 	public void crfDataIsSavedCorrectly() {
-    	List<CRF> crfs = (List<CRF>) Thucydides.getCurrentSession().get(CRF.CRFs_TO_CHECK_SAVED_DATA);
+    	List<CRF> crfs = (List<CRF>) Thucydides.getCurrentSession().get(CRF.CRFS_TO_CHECK_SAVED_DATA);
     	for (CRF crf : crfs) {
     		userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
     		userClicksEnterDataButtonInPopup(crf.getCrfName());
     		commonSteps.check_data_in_crf(crf);
     	}
-    	Thucydides.getCurrentSession().remove(CRF.CRFs_TO_CHECK_SAVED_DATA);
+    	Thucydides.getCurrentSession().remove(CRF.CRFS_TO_CHECK_SAVED_DATA);
     }
     
     private List<Map<String, String>> getCorrectMapWithCRFItems(ExamplesTable table) {
@@ -693,9 +693,9 @@ public class ClinovoJBehave {
     	commonSteps.browse_file_with_rule(filepath);
     }
     
-    @When("User sees '$message' message")
-    @Given("User sees '$message' message")
-    @Then("User sees '$message' message")
+    @When("User sees '$message' message in 'Alerts&Messages' section")
+    @Given("User sees '$message' message in 'Alerts&Messages' section")
+    @Then("User sees '$message' message in 'Alerts&Messages' section")
 	public void userSeesMessage(String message) {
     	commonSteps.see_message(message);
     }
@@ -928,6 +928,18 @@ public class ClinovoJBehave {
     	Thucydides.getCurrentSession().put(DNote.DNS_TO_CHECK_EXIST, dns);
     }
     
+    @When("User leaves CRF without saving")
+    @Given("User leaves CRF without saving")
+    @Then("User leaves CRF without saving")
+	public void userLeavesCRFWithoutSaving() {
+    	commonSteps.leave_CRF_without_saving();
+    }    
+    
+	@Then("Verify error message \"$errorMessage\" on CRF page")
+	public void verifyErrorMessage(String errorMessage) {
+		commonSteps.verify_error_message_on_CRF(errorMessage);
+	}
+
 	private void userChecksSignEventStatus(Map<String, String> values) {
 		commonSteps.check_sign_event_status(values);
 	}
