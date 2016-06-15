@@ -70,7 +70,7 @@
         </query>
         <query>
             <name>deleteUserRole</name>
-            <sql>delete from study_user_role where user_name = ? and role_name = ? and (study_id = ? or study_id is null)</sql>
+            <sql>delete from study_user_role where user_name = ? and role_name = ? and study_id = ?</sql>
         </query>
         <query>
                 <name>deleteStudyUserRolesByUserID</name>
@@ -133,6 +133,8 @@
                                 , status_id = ?
                                 , date_updated = sysdate
                                 , update_id = ?
+                                , token = ?
+                                , token_expiration_date = ?
                         WHERE
                                 study_id = ?
                                 AND user_name = ?
@@ -159,9 +161,9 @@
         <query>
             <name>findStudyByUser</name>
             <sql>
-                select sur.role_name, s.study_id ,s.name
+                select sur.study_user_role_id, sur.role_name, s.study_id ,s.name
                 from study_user_role sur, study s
-                where (sur.study_id = s.study_id or (sur.study_id is null and sur.role_name = 'system_administrator'))
+                where sur.study_id = s.study_id
                 and sur.status_id = 1 and sur.user_name=?
                 order by sur.study_id asc
             </sql>
@@ -287,7 +289,10 @@
                 WHERE sur.user_name=uc.user_name and (sur.role_name=? OR sur.role_name=?)
             </sql>
         </query>
-
+        <query>
+            <name>findRoleByToken</name>
+            <sql>select * from study_user_role where token = ?</sql>
+        </query>
         <query>
             <name>findRoleByUserNameAndStudyIdOrSiteId</name>
             <sql>SELECT * from study_user_role where
@@ -312,6 +317,7 @@
 				where sur.study_id = s.study_id
 				and sur.user_name = ua.user_name
 				and (s.study_id = ? or s.parent_study_id = ?)
+                and ua.user_name != 'root'
 				and ua.institutional_affiliation not like '%Clinovo%'
             </sql>
         </query>

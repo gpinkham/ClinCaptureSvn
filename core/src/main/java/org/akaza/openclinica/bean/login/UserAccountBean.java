@@ -157,6 +157,9 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	// this acocunt on page
 
+	/**
+	 * Constructor.
+	 */
 	public UserAccountBean() {
 		super();
 		passwd = "";
@@ -373,6 +376,10 @@ public class UserAccountBean extends AuditableEntityBean {
 	// SECURITY MODEL CODE //
 	// ///////////////////////
 
+	/**
+	 * Adds UserType.
+	 * @param u UserType
+	 */
 	public void addUserType(UserType u) {
 		// in effect userTypes is just a single UserType object
 		// we do things this way for forward-compatibility,
@@ -427,6 +434,11 @@ public class UserAccountBean extends AuditableEntityBean {
 		return techAdmin;
 	}
 
+	/**
+	 * Returns true if UserType is present.
+	 * @param u UserType
+	 * @return boolean
+	 */
 	public boolean hasUserType(UserType u) {
 
 		for (UserType myType : userTypes) {
@@ -453,6 +465,10 @@ public class UserAccountBean extends AuditableEntityBean {
 		this.activeStudyId = activeStudyId;
 	}
 
+	/**
+	 * Adds role.
+	 * @param sur StudyUserRoleBean
+	 */
 	public void addRole(StudyUserRoleBean sur) {
 		Integer key = sur.getStudyId();
 		if (rolesByStudy.containsKey(key)) {
@@ -464,51 +480,37 @@ public class UserAccountBean extends AuditableEntityBean {
 		}
 	}
 
+	/**
+	 * Returns role by study.
+	 * @param study StudyBean
+	 * @return StudyUserRoleBean
+	 */
 	public StudyUserRoleBean getRoleByStudy(StudyBean study) {
 		return getRoleByStudy(study.getId());
 	}
 
-	public void updateSysAdminRole(Integer studyId, Integer prevStudyId) {
-		if (name.equals(ROOT)) {
-			for (StudyUserRoleBean surb : roles) {
-				if (surb.getRole() == Role.SYSTEM_ADMINISTRATOR) {
-					rolesByStudy.put(studyId, rolesByStudy.remove(prevStudyId));
-					break;
-				}
-			}
-		}
-	}
-
-	public StudyUserRoleBean getSysAdminRole() {
-		StudyUserRoleBean studyUserRoleBean = null;
-		for (StudyUserRoleBean surb : roles) {
-			if (surb.getRole() == Role.SYSTEM_ADMINISTRATOR) {
-				studyUserRoleBean = surb;
-				break;
-			}
-		}
-		return studyUserRoleBean;
-	}
-
+	/**
+	 * Returns role by study id.
+	 * @param studyId int
+	 * @return StudyUserRoleBean
+	 */
 	public StudyUserRoleBean getRoleByStudy(int studyId) {
-		if (name.equals(ROOT)) {
-			return getSysAdminRole();
-		}
-
 		Integer key = studyId;
-
 		if (rolesByStudy.containsKey(key)) {
 			Integer index = rolesByStudy.get(key);
 			StudyUserRoleBean s = roles.get(index);
-
 			if (s != null && !s.getStatus().equals(Status.DELETED) && !s.getStatus().equals(Status.AUTO_DELETED)) {
 				return s;
 			}
 		}
-
 		return new StudyUserRoleBean();
 	}
 
+	/**
+	 * Returns true if role is present in study.
+	 * @param studyId int
+	 * @return boolean
+	 */
 	public boolean hasRoleInStudy(int studyId) {
 		StudyUserRoleBean s = getRoleByStudy(studyId);
 		return s.isActive();
@@ -551,6 +553,10 @@ public class UserAccountBean extends AuditableEntityBean {
 		}
 	}
 
+	/**
+	 * Returns true if site level role is present.
+	 * @return boolean
+	 */
 	public boolean hasSiteLevelRoles() {
 		boolean result = false;
 		for (StudyUserRoleBean studyUserRoleBean : roles) {
@@ -563,8 +569,14 @@ public class UserAccountBean extends AuditableEntityBean {
 		return result;
 	}
 
-	public boolean equals(UserAccountBean ub) {
-		return ub != null && id == ub.getId();
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof UserAccountBean && id == ((UserAccountBean) obj).getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	/**
@@ -582,6 +594,9 @@ public class UserAccountBean extends AuditableEntityBean {
 		this.numVisitsToMainMenu = numVisitsToMainMenu;
 	}
 
+	/**
+	 * Increases numVisitsToMainMenu.
+	 */
 	public void incNumVisitsToMainMenu() {
 		numVisitsToMainMenu++;
 	}

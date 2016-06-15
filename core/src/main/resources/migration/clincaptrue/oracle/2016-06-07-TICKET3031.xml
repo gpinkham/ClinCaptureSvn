@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="skirpichenok" id="2016-06-07-TICKET3031-1" dbms="oracle">
+		<comment>Create procedure create_roles_for_root_user</comment>
+		<createProcedure>
+			CREATE OR REPLACE PROCEDURE create_roles_for_root_user
+			IS
+			    studyBean study;
+			    userBean user_account;
+			    studyUserRoleBean study_user_role;
+			BEGIN
+			    SELECT * INTO userBean from user_account where user_name = ''root'';
+			    FOR studyBean IN SELECT * FROM study WHERE parent_study_id IS NULL ORDER BY study_id LOOP
+			        SELECT * INTO studyUserRoleBean from study_user_role where user_name = ''root'' and study_id IS NULL ORDER BY study_id limit 1;
+			        IF studyUserRoleBean IS NULL THEN
+			            INSERT INTO study_user_role (role_name, study_id, status_id, owner_id, date_created, date_updated, update_id, user_name) VALUES (''system_administrator'', studyBean.study_id, 1, userBean.user_id, sysdate, sysdate, userBean.user_id, userBean.user_name);
+			        ELSE
+			            UPDATE study_user_role set study_id = studyBean.study_id where study_user_role_id = studyUserRoleBean.study_user_role_id;
+			        END IF;
+			    END LOOP;
+			    RETURN;
+			END;
+		</createProcedure>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-2" dbms="oracle">
+		<comment>Create procedure study_insert_trigger</comment>
+		<createProcedure>
+			CREATE OR REPLACE PROCEDURE study_insert_trigger
+			IS
+			    studyBean study;
+			    userBean user_account;
+			    studyUserRoleBean study_user_role;
+			BEGIN
+			    SELECT * INTO userBean from user_account where user_name = ''root'';
+			    IF NEWREC.parent_study_id IS NULL THEN
+			        SELECT * INTO studyUserRoleBean from study_user_role where user_name = ''root'' and study_id = NEWREC.study_id;
+			        IF studyUserRoleBean IS NULL THEN
+			            INSERT INTO study_user_role (role_name, study_id, status_id, owner_id, date_created, date_updated, update_id, user_name) VALUES (''system_administrator'', NEWREC.study_id, 1, userBean.user_id, sysdate, sysdate, userBean.user_id, userBean.user_name);
+			        END IF;
+			    END IF;
+			END;
+
+			CREATE TRIGGER study_insert_trigger AFTER INSERT ON study FOR EACH ROW EXECUTE PROCEDURE study_insert_trigger();
+		</createProcedure>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-3" dbms="oracle">
+		<comment>Drop all records for root user from study_user_role table then execute and drop procedure create_roles_for_root_user</comment>
+		<sql splitStatements="false">
+			EXECUTE create_roles_for_root_user();
+			DROP PROCEDURE create_roles_for_root_user;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

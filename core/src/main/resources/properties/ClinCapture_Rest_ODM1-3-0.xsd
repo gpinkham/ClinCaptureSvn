@@ -62,6 +62,7 @@
     <xs:element name="Status" type="xs:string"/>
     <xs:element name="UserStatus" type="xs:string"/>
     <xs:element name="StudyStatus" type="xs:string"/>
+    <xs:element name="Token" type="xs:string"/>
 
     <xs:complexType name="userDetails">
         <xs:sequence>
@@ -71,6 +72,7 @@
             <xs:element ref="StudyStatus" minOccurs="0"/>
             <xs:element ref="Role" minOccurs="0"/>
             <xs:element ref="UserType" minOccurs="0"/>
+            <xs:element ref="Token" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

@@ -143,8 +143,6 @@ public class ChangeStudyServlet extends SpringServlet {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 		int prevStudyId = currentStudy.getId();
 
-		ub.updateSysAdminRole(studyId, prevStudyId);
-
 		StudyDAO sdao = getStudyDAO();
 		StudyBean current = (StudyBean) sdao.findByPK(studyId);
 		StudyBean parent = current;
@@ -214,7 +212,7 @@ public class ChangeStudyServlet extends SpringServlet {
 				" AND dn.assigned_user_id =" + ub.getId()
 						+ " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)",
 				currentStudy, ub.getId());
-		request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
+		request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? Integer.valueOf(0) : assignedDiscrepancies);
 
 		if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
 			setupListStudySubjectTable(request, response);

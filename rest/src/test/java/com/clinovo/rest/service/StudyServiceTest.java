@@ -1161,20 +1161,6 @@ public class StudyServiceTest extends BaseServiceTest {
 	}
 
 	@Test
-	public void testThatStudiesMethodDoesNotRequireScope() throws Exception {
-		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword))
-				.andExpect(status().isOk());
-		mockMvc.perform(get(API_STUDIES)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void testThatRemoveStudyMethodRequiresScope() throws Exception {
-		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword))
-				.andExpect(status().isOk());
-		mockMvc.perform(post(API_STUDY_REMOVE).param("id", "1")).andExpect(status().isInternalServerError());
-	}
-
-	@Test
 	public void testThatEditStudyMethodThrowsExceptionIfSubjectPersonIdRequiredHasATypo() throws Exception {
 		createNewStudy();
 		int newTotalEnrollment = 12;

@@ -140,7 +140,8 @@
 		</tr>
 	</c:when>
 	<c:otherwise>
-		<c:forEach var="sur" items="${currRow.bean.roles}">
+		<c:forEach var="sur" items="${currRow.bean.roles}" varStatus="rolesStatus">
+			<c:if test="${currRow.bean.name ne 'root' or rolesStatus.index eq 0}">
 			<c:choose>
 				<c:when test='${sur.studyName != ""}'>
 					<c:set var="study" value="${sur.studyName}" />
@@ -176,7 +177,7 @@
 					<c:if test='${sur.status.deleted}'>
 						<font color='gray'>
 					</c:if>
-                    <c:if test="${sur.studyId > 0}">
+                    <c:if test="${sur.studyId > 0 && currRow.bean.name ne 'root'}">
                         <c:choose>
                             <c:when test='${sur.studyName != ""}'><c:out value="${sur.studyName}" /></c:when>
                             <c:otherwise>Study <c:out value="${sur.studyId}" /></c:otherwise>
@@ -249,6 +250,7 @@
                     </c:if>
 				</td>
 			</tr>
+			</c:if>
 		</c:forEach>
 	</c:otherwise>
 </c:choose>

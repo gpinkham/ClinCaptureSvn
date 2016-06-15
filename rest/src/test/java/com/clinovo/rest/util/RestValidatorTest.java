@@ -31,7 +31,7 @@ import com.clinovo.rest.security.PermissionChecker;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({CoreResources.class, UserDetails.class, RequestContextHolder.class})
-public class RequestParametersValidatorTest {
+public class RestValidatorTest {
 
 	public static final int METHOD_DEEP = 2;
 
@@ -62,6 +62,7 @@ public class RequestParametersValidatorTest {
 		session = new MockHttpSession();
 		request.setSession(session);
 		request.addParameter("version", "2.2");
+		request.addParameter("token", "D6489A37-74E7-46F1-AC11-EE36CA474184");
 
 		Locale locale = Locale.ENGLISH;
 		PowerMockito.mockStatic(CoreResources.class);
@@ -97,7 +98,7 @@ public class RequestParametersValidatorTest {
 			throws Exception {
 		request.setParameter("dataentryquality", "2");
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+		RestValidator.validate(request, dataSource, messageSource, handler);
 	}
 
 	@Test
@@ -107,7 +108,7 @@ public class RequestParametersValidatorTest {
 			throws Exception {
 		request.setParameter("dataentryquality", "dde");
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+		RestValidator.validate(request, dataSource, messageSource, handler);
 	}
 
 	@Test
@@ -116,7 +117,7 @@ public class RequestParametersValidatorTest {
 	public void testThatRequestParametersValidatorDoesNotThrowRestExceptionIfParameterValueWesNotSpecifiedAndTheCanBeNotSpecifiedIsTrue()
 			throws Exception {
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+		RestValidator.validate(request, dataSource, messageSource, handler);
 	}
 
 	@Test(expected = RestException.class)
@@ -125,19 +126,19 @@ public class RequestParametersValidatorTest {
 	public void testThatRequestParametersValidatorThrowsRestExceptionIfParameterValueWesNotSpecifiedAndTheCanBeNotSpecifiedIsFalse()
 			throws Exception {
 		Mockito.when(handler.getMethod()).thenReturn(getCurrentMethod());
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+		RestValidator.validate(request, dataSource, messageSource, handler);
 	}
 
 	@Test(expected = RestException.class)
 	public void testThatRequestParametersValidatorThrowsRestExceptionIfVersionParameterIsEmpty() throws Exception {
 		request.removeParameter("version");
 		request.addParameter("version", "");
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+		RestValidator.validate(request, dataSource, messageSource, handler);
 	}
 
 	@Test(expected = RestException.class)
 	public void testThatRequestParametersValidatorThrowsRestExceptionIfVersionParameterIsmissing() throws Exception {
 		request.removeParameter("version");
-		RequestParametersValidator.validate(request, dataSource, messageSource, handler);
+		RestValidator.validate(request, dataSource, messageSource, handler);
 	}
 }

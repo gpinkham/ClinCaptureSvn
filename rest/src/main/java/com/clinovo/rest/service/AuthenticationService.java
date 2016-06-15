@@ -15,12 +15,6 @@
 
 package com.clinovo.rest.service;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,38 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.UserDetails;
-import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.service.base.BaseAuthenticationService;
-import com.clinovo.util.RequestUtil;
 
 /**
  * AuthenticationService.
  */
 @RestController("restAuthenticationService")
 public class AuthenticationService extends BaseAuthenticationService {
-
-	/**
-	 * Method changes current scope.
-	 *
-	 * @param studyName
-	 *            String
-	 * @throws RestException
-	 *             the RESTException
-	 * @return String
-	 */
-	@RequestMapping(value = "/changeScope", method = RequestMethod.POST)
-	public UserDetails changeScope(@RequestParam("studyName") String studyName) throws RestException {
-		UserDetails userDetails = getUserDetails();
-		StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
-		StudyUserRoleBean surBean = getStudyUserRole(studyBean, getCurrentUser(),
-				HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		userDetails.setStudyName(studyName);
-		userDetails.setStudyStatus(studyBean.getStatus().getCode());
-		userDetails.setStudyOid(studyBean.getOid());
-		userDetails.setRoleCode(surBean.getRole().getCode());
-		userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
-		return userDetails;
-	}
 
 	/**
 	 * Method does user authentication.
@@ -76,27 +45,8 @@ public class AuthenticationService extends BaseAuthenticationService {
 	 */
 	@RequestMapping(value = "/authentication", method = RequestMethod.POST)
 	public UserDetails authenticate(@RequestParam("userName") String userName,
-			@RequestParam("password") String password,
-			@RequestParam(value = "studyName", required = false) String studyName) throws RestException {
-		UserAccountBean userAccountBean = authenticateUser(userName, password);
-		UserDetails userDetails = new UserDetails();
-		userDetails.setUserId(userAccountBean.getId());
-		userDetails.setUserName(userName);
-		userDetails.setPassword(password);
-		userDetails.setUserStatus(userAccountBean.getStatus().getCode());
-		if (studyName != null) {
-			StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
-			StudyUserRoleBean surBean = getStudyUserRole(studyBean, userAccountBean,
-					HttpServletResponse.SC_UNAUTHORIZED);
-
-			userDetails.setStudyName(studyName);
-			userDetails.setStudyStatus(studyBean.getStatus().getCode());
-			userDetails.setStudyOid(studyBean.getOid());
-			userDetails.setRoleCode(surBean.getRole().getCode());
-			userDetails.setUserTypeCode(UserType.SYSADMIN.getCode());
-		}
-		RequestUtil.getRequest().getSession().setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS,
-				userDetails);
-		return userDetails;
+			@RequestParam("password") String password, @RequestParam("studyName") String studyName)
+			throws RestException {
+		return authenticateUser(userName, password, studyName);
 	}
 }

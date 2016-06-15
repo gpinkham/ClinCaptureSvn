@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.rest.exception.RestException;
 import com.clinovo.rest.model.Error;
-import com.clinovo.rest.security.PermissionChecker;
-import com.clinovo.util.RequestUtil;
 
 /**
  * RestAdvice.
@@ -57,9 +55,6 @@ public class RestAdvice {
 		int code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		if (ex instanceof RestException) {
 			code = ((RestException) ex).getCode();
-		}
-		if (code == HttpServletResponse.SC_UNAUTHORIZED) {
-			RequestUtil.getRequest().getSession().removeAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 		}
 		response.setStatus(code);
 		return new Error(ex, String.valueOf(code),

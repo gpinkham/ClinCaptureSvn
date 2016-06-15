@@ -32,32 +32,25 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.cdisc.ns.odm.v130.ODM;
-import org.hamcrest.core.IsInstanceOf;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.clinovo.rest.filter.RestFilter;
-import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.odm.RestOdmContainer;
-import com.clinovo.rest.security.PermissionChecker;
 
 @Ignore
 @WebAppConfiguration("/")
@@ -111,7 +104,6 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	public static final String API_USER_REMOVE = "/user/remove";
 	public static final String API_USER_RESTORE = "/user/restore";
 	public static final String API_AUTHENTICATION = "/authentication";
-	public static final String API_CHANGE_SCOPE = "/changeScope";
 	public static final String API_WADL = "/wadl";
 	public static final String API_ODM = "/odm";
 
@@ -121,6 +113,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	private List<UserAccountBean> userAccountBeanList;
 	private List<EventDefinitionCRFBean> eventDefinitionCRFBeanList;
 	private List<StudyEventDefinitionBean> studyEventDefinitionBeanList;
+	private static boolean dbRestored;
 
 	protected Schema schema;
 
@@ -128,8 +121,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected MvcResult result;
 
-	protected static boolean dbRestored;
-
+	protected boolean revertMailSenderHost;
 	protected String mailSenderHost = null;
 
 	protected RestOdmContainer restOdmContainer;
@@ -137,6 +129,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	protected MediaType mediaType = MediaType.APPLICATION_JSON;
 
 	protected long timestamp;
+	protected String currentToken;
 	protected String rootUserName;
 	protected String rootUserPassword;
 	protected String defaultStudyName;
@@ -149,14 +142,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	protected StudyBean newStudy;
 	protected UserAccountBean newUser;
 
-	protected MockHttpSession session = new MockHttpSession();
-	protected MockHttpServletRequest request = new MockHttpServletRequest();
-
 	@Autowired
 	protected WebApplicationContext wac;
-
-	@Autowired
-	protected MessageSource messageSource;
 
 	@Autowired
 	protected org.akaza.openclinica.core.SecurityManager securityManager;
@@ -195,7 +182,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		study.setOwner(rootUser);
 		study.setCreatedDate(new Date());
 		study.setStatus(Status.PENDING);
-		return (StudyBean) studyDAO.create(study);
+		studyDAO.create(study);
+		return study;
 	}
 
 	private StudyBean createSite(int studyId) throws Exception {
@@ -340,7 +328,6 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected void login(String userName, UserType userType, Role role, String password, String studyName)
 			throws Exception {
-		session.clearAttributes();
 		currentScope = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
 		if (currentScope.isSite()) {
 			studyConfigService.setParametersForSite(currentScope);
@@ -350,10 +337,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 		String response = mockMvc
 				.perform(post(API_AUTHENTICATION).param("userName", userName).param("password", password)
 						.param("studyName", studyName))
-				.andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.request().sessionAttribute(
-						PermissionChecker.API_AUTHENTICATED_USER_DETAILS, IsInstanceOf.any(UserDetails.class)))
-				.andReturn().getResponse().getContentAsString();
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			JSONObject jsonObject = new JSONObject(response);
 			assertTrue(jsonObject.getJSONObject("response").getString("userName").equals(userName));
@@ -364,8 +348,10 @@ public class BaseServiceTest extends DefaultAppContextTest {
 					.equals(rootUser.getStatus().getName()));
 			assertTrue(jsonObject.getJSONObject("response").getString("studyStatus")
 					.equals(currentScope.getStatus().getName()));
+			currentToken = jsonObject.getJSONObject("response").getString("token");
 		} else {
 			assertTrue(response.contains("<ODM Description=\"REST Data\""));
+			currentToken = response.split("<Token>")[1].split("</Token>")[0];
 		}
 	}
 
@@ -430,6 +416,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 			studyBean.setUpdater(updater);
 			studyDAO.update(studyBean);
 		}
+		userAccountDAO.execute("delete from study_user_role where study_id > ".concat(Integer.toString(max)),
+				new HashMap());
 		studyDAO.execute("delete from study_parameter_value where study_id > ".concat(Integer.toString(max)),
 				new HashMap());
 		studyDAO.execute("delete from study where study_id > ".concat(Integer.toString(max)), new HashMap());
@@ -449,6 +437,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 		result = null;
 		restOdmContainer = null;
+		mailSenderHost = mailSender.getHost();
 
 		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new FileSystemResourceLoader()
 				.getResource("classpath:properties/ClinCapture_Rest_ODM1-3-0.xsd").getURL());
@@ -478,7 +467,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 				restOdmContainer = (RestOdmContainer) jaxbUnmarshaller
 						.unmarshal(new StringReader(result.getResponse().getContentAsString()));
 			} catch (Exception ex) {
-				//
+				logger.error("Error has occurred", ex);
 			}
 			assertNotNull(restOdmContainer);
 		}
@@ -487,19 +476,27 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	@After
 	public void after() {
 		restoreEntities();
-		if (mailSenderHost != null) {
+		if (revertMailSenderHost) {
 			mailSender.setHost(mailSenderHost);
 		}
 		unmarshalResult();
 	}
 
 	protected MockHttpServletRequestBuilder get(String url) {
-		return org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(url)
-				.param("version", DEFAULT_CLIENT_VERSION).secure(true).session(session).accept(mediaType);
+		MockHttpServletRequestBuilder mockHttpServletRequestBuilder = org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+				.get(url).param("version", DEFAULT_CLIENT_VERSION).secure(true).accept(mediaType);
+		if (!url.equals(API_AUTHENTICATION) && !url.equals(API_WADL) && !url.equals(API_ODM)) {
+			mockHttpServletRequestBuilder.param("token", currentToken);
+		}
+		return mockHttpServletRequestBuilder;
 	}
 
 	protected MockHttpServletRequestBuilder post(String url) {
-		return org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(url)
-				.param("version", DEFAULT_CLIENT_VERSION).secure(true).session(session).accept(mediaType);
+		MockHttpServletRequestBuilder mockHttpServletRequestBuilder = org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+				.post(url).param("version", DEFAULT_CLIENT_VERSION).secure(true).accept(mediaType);
+		if (!url.equals(API_AUTHENTICATION) && !url.equals(API_WADL) && !url.equals(API_ODM)) {
+			mockHttpServletRequestBuilder.param("token", currentToken);
+		}
+		return mockHttpServletRequestBuilder;
 	}
 }

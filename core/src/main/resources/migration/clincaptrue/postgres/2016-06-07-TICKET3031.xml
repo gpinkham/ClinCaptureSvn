@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="skirpichenok" id="2016-06-07-TICKET3031-1" dbms="postgresql">
+		<comment>Create function create_roles_for_root_user</comment>
+		<createProcedure>
+			CREATE OR REPLACE FUNCTION create_roles_for_root_user()
+			    RETURNS void AS
+			'DECLARE
+			    userBean RECORD;
+			    studyBean RECORD;
+			    studyUserRoleBean RECORD;
+			BEGIN
+			    SELECT * INTO userBean from user_account where user_name = ''root'';
+			    FOR studyBean IN SELECT * FROM study WHERE parent_study_id IS NULL ORDER BY study_id LOOP
+			        SELECT * INTO studyUserRoleBean from study_user_role where user_name = ''root'' and study_id IS NULL ORDER BY study_id limit 1;
+			        IF studyUserRoleBean IS NULL THEN
+			            INSERT INTO study_user_role (role_name, study_id, status_id, owner_id, date_created, date_updated, update_id, user_name) VALUES (''system_administrator'', studyBean.study_id, 1, userBean.user_id, now(), now(), userBean.user_id, userBean.user_name);
+			        ELSE
+			            UPDATE study_user_role set study_id = studyBean.study_id where study_user_role_id = studyUserRoleBean.study_user_role_id;
+			        END IF;
+			    END LOOP;
+			END;
+			'LANGUAGE plpgsql;
+		</createProcedure>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-2" dbms="postgresql">
+		<comment>Create function study_insert_trigger</comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE FUNCTION study_insert_trigger()
+			    RETURNS trigger AS
+			'DECLARE
+			    userBean RECORD;
+			    studyBean RECORD;
+			    studyUserRoleBean RECORD;
+			BEGIN
+			    SELECT * INTO userBean from user_account where user_name = ''root'';
+			    IF NEW.parent_study_id IS NULL THEN
+			        SELECT * INTO studyUserRoleBean from study_user_role where user_name = ''root'' and study_id = NEW.study_id;
+			        IF studyUserRoleBean IS NULL THEN
+			            INSERT INTO study_user_role (role_name, study_id, status_id, owner_id, date_created, date_updated, update_id, user_name) VALUES (''system_administrator'', NEW.study_id, 1, userBean.user_id, now(), now(), userBean.user_id, userBean.user_name);
+			        END IF;
+			    END IF;
+			    RETURN NULL;
+			END;
+			'LANGUAGE plpgsql;
+
+			CREATE TRIGGER study_insert_trigger AFTER INSERT ON study FOR EACH ROW EXECUTE PROCEDURE study_insert_trigger();
+		</sql>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-3" dbms="postgresql">
+		<comment>Drop all records for root user from study_user_role table then execute and drop function create_roles_for_root_user</comment>
+		<sql splitStatements="false">
+			SELECT create_roles_for_root_user();
+			DROP FUNCTION create_roles_for_root_user();
+		</sql>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-4">
+		<comment>Add new fields into the study_user_role table that are used for token based authentication on REST API side</comment>
+		<addColumn tableName="study_user_role" >
+			<column name="token" type="text">
+				<constraints nullable="true" unique="true"/>
+			</column>
+			<column name="token_expiration_date" type="timestamp with time zone">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-5">
+		<comment>Delete all records from study_user_role table where study_id is null</comment>
+		<sql splitStatements="false">
+			DELETE FROM study_user_role WHERE study_id IS NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-6">
+		<comment>Add not null constraint for study_id in study_user_role table</comment>
+		<addNotNullConstraint tableName="study_user_role" columnName="study_id"/>
+	</changeSet>
+
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-7">
+		<comment>Add tokenExpirationDate parameter into the system table</comment>
+		<insert tableName="system">
+			<column name="id" value="79"/>
+			<column name="name" value="tokenExpirationDate"/>
+			<column name="required" valueBoolean="true"/>
+			<column name="value" value="1"/>
+			<column name="value_type" value="INTEGER" />
+			<column name="type" value="TEXT" />
+			<column name="type_values"  value=""/>
+			<column name="size" value="4"/>
+			<column name="show_measurements" value="FALSE"/>
+			<column name="show_description" value="TRUE"/>
+			<column name="show_note" value="FALSE"/>
+			<column name="group_id" value="4"/>
+			<column name="crc" value="READ"/>
+			<column name="investigator" value="READ"/>
+			<column name="monitor" value="READ"/>
+			<column name="admin" value="READ"/>
+			<column name="root" value="WRITE"/>
+			<column name="order_id" value="5"/>
+			<column name="version" value="1"/>
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>

@@ -36,7 +36,6 @@ import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
-import com.clinovo.rest.annotation.ScopeIsNotRequired;
 import com.clinovo.rest.service.base.BaseStudyService;
 
 /**
@@ -315,7 +314,6 @@ public class StudyService extends BaseStudyService {
 	 * @throws Exception
 	 *             an Exception
 	 */
-	@ScopeIsNotRequired
 	@RequestMapping(value = "/studies", method = RequestMethod.GET)
 	public List<StudyBean> studies() throws Exception {
 		return getStudies();

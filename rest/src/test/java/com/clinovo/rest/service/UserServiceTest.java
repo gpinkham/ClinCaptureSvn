@@ -75,7 +75,7 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsPossibleToCreateAStudyUserIfAllParametersAreSpecified() throws Exception {
 		String timeZone = "Etc/GMT+11";
-		mailSenderHost = mailSender.getHost();
+		revertMailSenderHost = true;
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		result = mockMvc
@@ -102,7 +102,7 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatItIsPossibleToCreateAStudyUserIfOnlyRequiredParametersAreSpecified() throws Exception {
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		mailSenderHost = mailSender.getHost();
+		revertMailSenderHost = true;
 		mailSender.setHost("");
 		result = mockMvc
 				.perform(post(API_USER_CREATE_USER).param("userName", additionalUserName)
@@ -126,7 +126,7 @@ public class UserServiceTest extends BaseServiceTest {
 	@Test
 	public void testThatStudyAdministratorWithAdministrativePrivilegesIsAbleToCallUserAPI() throws Exception {
 		ResultMatcher expectStatus = status().isOk();
-		mailSenderHost = mailSender.getHost();
+		revertMailSenderHost = true;
 		mailSender.setHost("");
 		createNewStudy();
 		createNewSite(newStudy.getId());
@@ -200,7 +200,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatItIsPossibleToCreateASiteUserIfAllParametersAreSpecified() throws Exception {
 		createNewSite(currentScope.getId());
 		String timeZone = "Etc/GMT+11";
-		mailSenderHost = mailSender.getHost();
+		revertMailSenderHost = true;
 		mailSender.setHost("");
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
 		result = mockMvc
@@ -229,7 +229,7 @@ public class UserServiceTest extends BaseServiceTest {
 	public void testThatItIsPossibleToCreateASiteUserIfOnlyRequiredParametersAreSpecified() throws Exception {
 		createNewSite(currentScope.getId());
 		String additionalUserName = "new_user_".concat(Long.toString(timestamp));
-		mailSenderHost = mailSender.getHost();
+		revertMailSenderHost = true;
 		mailSender.setHost("");
 		result = mockMvc
 				.perform(post(API_USER_CREATE_USER).param("siteName", newSite.getName())

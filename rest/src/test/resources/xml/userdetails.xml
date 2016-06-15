@@ -8,6 +8,7 @@
             <StudyStatus>avaliable</StudyStatus>
             <Role>system_administrator</Role>
             <UserType>administrator</UserType>
+            <Token>D6489A37-74E7-46F1-AC11-EE36CA474184</Token>
         </UserDetails>
     </RestData>
 </ODM>

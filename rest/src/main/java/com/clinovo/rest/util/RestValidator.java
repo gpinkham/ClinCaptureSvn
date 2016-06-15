@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +47,11 @@ import com.clinovo.rest.annotation.EnumBasedParametersHolder;
 import com.clinovo.rest.annotation.PossibleValues;
 import com.clinovo.rest.annotation.PossibleValuesHolder;
 import com.clinovo.rest.annotation.ProvideAtLeastOneNotRequired;
-import com.clinovo.rest.annotation.ScopeIsNotRequired;
 import com.clinovo.rest.exception.RestException;
-import com.clinovo.rest.model.UserDetails;
 import com.clinovo.rest.security.PermissionChecker;
 import com.clinovo.rest.service.AuthenticationService;
+import com.clinovo.rest.service.OdmService;
+import com.clinovo.rest.service.WadlService;
 import com.clinovo.rest.wrapper.RestRequestWrapper;
 import com.clinovo.util.RequestUtil;
 
@@ -60,9 +62,9 @@ import com.clinovo.util.RequestUtil;
  * default values if it's necessary and if parameters were not specified.
  */
 @SuppressWarnings({"unused", "unchecked"})
-public final class RequestParametersValidator {
+public final class RestValidator {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RequestParametersValidator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RestValidator.class);
 
 	public static final String DOT = ".";
 	public static final String REST = "rest.";
@@ -70,35 +72,25 @@ public final class RequestParametersValidator {
 	public static final String ACCEPT = "Accept";
 	public static final String MISSING = ".missing.";
 
-	private RequestParametersValidator() {
+	private RestValidator() {
 	}
 
 	private static void validateClientVersion(HttpServletRequest request, MessageSource messageSource)
 			throws Exception {
 		String clientVersion = request.getParameter(PermissionChecker.CLIENT_VERSION);
 		if (clientVersion == null || clientVersion.trim().isEmpty()) {
-			throw new RestException(messageSource, "rest.eachRequestMustHaveVersionParameter",
+			throw new RestException(messageSource, "rest.eachRequestMustHaveParameter",
 					new Object[]{PermissionChecker.CLIENT_VERSION}, HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
 
-	private static void validateScopeRequirement(UserDetails userDetails, MessageSource messageSource,
-			HandlerMethod handler) throws Exception {
-		if (userDetails != null && userDetails.getStudyName() == null
-				&& !(handler.getBean() instanceof AuthenticationService)) {
-			boolean scopeIsRequired = true;
-			Annotation[] annotationArray = handler.getMethod().getAnnotations();
-			if (annotationArray != null) {
-				for (Annotation annotation : annotationArray) {
-					if (annotation instanceof ScopeIsNotRequired) {
-						scopeIsRequired = false;
-						break;
-					}
-				}
-			}
-			if (scopeIsRequired) {
-				throw new RestException(messageSource, "rest.scopeIsRequired");
-			}
+	private static void validateToken(HttpServletRequest request, MessageSource messageSource, HandlerMethod handler)
+			throws Exception {
+		String token = request.getParameter(PermissionChecker.TOKEN);
+		if (!(handler.getBean() instanceof AuthenticationService) && !(handler.getBean() instanceof WadlService)
+				&& !(handler.getBean() instanceof OdmService) && (token == null || token.trim().isEmpty())) {
+			throw new RestException(messageSource, "rest.eachRequestMustHaveParameter",
+					new Object[]{PermissionChecker.TOKEN}, HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
 
@@ -154,7 +146,8 @@ public final class RequestParametersValidator {
 				? enumBasedParametersHolder.value()
 				: null;
 		for (String parameterName : declaredParams.values()) {
-			if (!parameterName.equals(PermissionChecker.CLIENT_VERSION) && !declaredFields.contains(parameterName)) {
+			if (!parameterName.equals(PermissionChecker.CLIENT_VERSION)
+					&& !parameterName.equals(PermissionChecker.TOKEN) && !declaredFields.contains(parameterName)) {
 				BaseEnum baseEnum = null;
 				countOfProvidedNotRequiredParameters++;
 				String parameterValue = request.getParameter(parameterName);
@@ -321,6 +314,30 @@ public final class RequestParametersValidator {
 	}
 
 	/**
+	 * Validates StudyUserRoleBean.
+	 * 
+	 * @param studyUserRoleBean
+	 *            StudyUserRoleBean
+	 * @param messageSource
+	 *            MessageSource
+	 * @param errorMessageCode
+	 *            String
+	 */
+	public static void validateStudyUserRole(StudyUserRoleBean studyUserRoleBean, MessageSource messageSource,
+			String errorMessageCode) {
+		if (studyUserRoleBean != null && studyUserRoleBean.getId() > 0) {
+			if (studyUserRoleBean.getRole().getId() != Role.STUDY_ADMINISTRATOR.getId()
+					&& studyUserRoleBean.getRole().getId() != Role.SYSTEM_ADMINISTRATOR.getId()) {
+				throw new RestException(messageSource,
+						"rest.authenticationservice.onlyRootOrStudyAdministratorCanBeAuthenticated",
+						HttpServletResponse.SC_UNAUTHORIZED);
+			}
+		} else {
+			throw new RestException(messageSource, errorMessageCode, HttpServletResponse.SC_UNAUTHORIZED);
+		}
+	}
+
+	/**
 	 * Method that validates request parameters.
 	 * 
 	 * @param request
@@ -331,26 +348,22 @@ public final class RequestParametersValidator {
 	 *            MessageSource
 	 * @param handler
 	 *            HandlerMethod
+	 * @return boolean
 	 * @throws Exception
 	 *             the Exception
 	 */
-	public static void validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
+	public static boolean validate(HttpServletRequest request, DataSource dataSource, MessageSource messageSource,
 			HandlerMethod handler) throws Exception {
 		int countOfProvidedNotRequiredParameters = 0;
 		Set<String> nullParameters = new HashSet<String>();
 		Set<String> declaredFields = new HashSet<String>();
 		Map<String, String> declaredParams = new HashMap<String, String>();
-		UserDetails userDetails = (UserDetails) request.getSession()
-				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
-		if (userDetails == null && !(handler.getBean() instanceof AuthenticationService)) {
-			return;
-		}
-		fillDeclaredParams(request, declaredParams);
 		validateClientVersion(request, messageSource);
+		fillDeclaredParams(request, declaredParams);
+		validateToken(request, messageSource, handler);
 		processEnumBasedParameters(request, handler, messageSource);
 		countOfProvidedNotRequiredParameters = validateMethodParameterAnnotations(request, messageSource, handler,
 				declaredFields, declaredParams, nullParameters, countOfProvidedNotRequiredParameters);
-		validateScopeRequirement(userDetails, messageSource, handler);
 		validateRestParametersPossibleValues(request, messageSource, nullParameters, handler);
 		countOfProvidedNotRequiredParameters = validateRequestParameters(request, messageSource, handler,
 				declaredFields, declaredParams, countOfProvidedNotRequiredParameters);
@@ -358,5 +371,7 @@ public final class RequestParametersValidator {
 				&& countOfProvidedNotRequiredParameters == 0) {
 			throw new RestException(messageSource, "rest.atLeastOneNotRequiredParameterShouldBeSpecified");
 		}
+		return handler.getBean() instanceof AuthenticationService || handler.getBean() instanceof WadlService
+				|| handler.getBean() instanceof OdmService;
 	}
 }

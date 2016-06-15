@@ -34,7 +34,7 @@ public class UserDetailsTest {
 		session = new MockHttpSession();
 		request = new MockHttpServletRequest();
 		request.setSession(session);
-		session.setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS, new UserDetails());
+		request.setAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS, new UserDetails());
 		PowerMockito.mockStatic(RequestContextHolder.class);
 		Whitebox.setInternalState(servletRequestAttributes, "request", request);
 		PowerMockito.when(RequestContextHolder.currentRequestAttributes()).thenReturn(servletRequestAttributes);

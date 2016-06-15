@@ -126,6 +126,8 @@ public class XsdSchemaValidationTest {
 				new FileSystemResourceLoader().getResource("classpath:xml/userdetails.xml"));
 		assertNotNull(restOdmContainer.getRestData().getUserDetails());
 		assertEquals(restOdmContainer.getRestData().getUserDetails().getUserName(), "root");
+		assertEquals(restOdmContainer.getRestData().getUserDetails().getToken(),
+				"D6489A37-74E7-46F1-AC11-EE36CA474184");
 		marshal(restOdmContainer.getRestData().getUserDetails());
 	}
 

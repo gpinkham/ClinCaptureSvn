@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.bean.login;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -50,6 +52,8 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	private boolean canGenerateDCF;
 	private boolean canSDV;
 	private int primaryKey;
+	private String token;
+	private Date tokenExpirationDate;
 
 	/**
 	 * Default study user role bean constructor.
@@ -59,6 +63,16 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		studyId = 0;
 		setRole(role);
 		status = Status.AVAILABLE;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
 	}
 
 	public Role getRole() {
@@ -326,5 +340,29 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
 	public void setPrimaryKey(int primaryKey) {
 		this.primaryKey = primaryKey;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * Setter for token.
+	 * 
+	 * @param token
+	 *            String
+	 */
+	public void setToken(String token) {
+		if (token != null && !token.trim().isEmpty()) {
+			this.token = token;
+		}
+	}
+
+	public Date getTokenExpirationDate() {
+		return tokenExpirationDate;
+	}
+
+	public void setTokenExpirationDate(Date tokenExpirationDate) {
+		this.tokenExpirationDate = tokenExpirationDate;
 	}
 }

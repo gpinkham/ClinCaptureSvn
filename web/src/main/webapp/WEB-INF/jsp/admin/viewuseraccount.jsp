@@ -155,10 +155,12 @@ for each study user is in, show:
 	<tr>
 		<td class="table_header_column"><fmt:message key="roles" bundle="${resword}"/>:</td>
 		<td class="table_cell">
-			<c:forEach var="studyUserRole" items="${user.roles}">
+			<c:forEach var="studyUserRole" items="${user.roles}" varStatus="studyUserRoleStatus">
                 <c:choose>
                     <c:when test="${studyUserRole.role.id eq 1}">
-                        <c:out value="${studyUserRole.role.description}" /><br/>
+						<c:if test="${studyUserRoleStatus.index eq 0}">
+                        	<c:out value="${studyUserRole.role.description}" /><br/>
+						</c:if>
                     </c:when>
                     <c:otherwise>
                         <c:out value="${studyUserRole.studyName}" /> - <c:out value="${studyUserRole.role.description}" /><br/>

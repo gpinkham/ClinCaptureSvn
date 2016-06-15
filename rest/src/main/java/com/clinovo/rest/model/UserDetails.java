@@ -45,8 +45,6 @@ public class UserDetails {
 	@XmlElement(name = "UserName", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userName;
 
-	private String password;
-
 	@JsonProperty("userStatus")
 	@XmlElement(name = "UserStatus", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userStatus;
@@ -69,20 +67,16 @@ public class UserDetails {
 	@XmlElement(name = "UserType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String userTypeCode;
 
+	@JsonProperty("token")
+	@XmlElement(name = "Token", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private String token;
+
 	public String getUserName() {
 		return userName;
 	}
 
 	public void setUserName(String userName) {
 		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	public String getUserStatus() {
@@ -147,8 +141,7 @@ public class UserDetails {
 	 * @return UserDetails
 	 */
 	public static UserDetails getCurrentUserDetails() {
-		return (UserDetails) RequestUtil.getRequest().getSession()
-				.getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
+		return (UserDetails) RequestUtil.getRequest().getAttribute(PermissionChecker.API_AUTHENTICATED_USER_DETAILS);
 	}
 
 	/**
@@ -180,5 +173,13 @@ public class UserDetails {
 	 */
 	public UserAccountBean getCurrentUser(DataSource dataSource) {
 		return (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }
