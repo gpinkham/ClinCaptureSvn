@@ -69,7 +69,7 @@ public abstract class BaseAuthenticationService extends BaseService {
 		if (studyBean != null && studyBean.getId() > 0) {
 			if (studyBean.getParentStudyId() > 0) {
 				throw new RestException(messageSource, "rest.authenticationservice.studyMustBeStudy",
-						HttpServletResponse.SC_UNAUTHORIZED);
+						new Object[]{studyName}, HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		} else {
 			throw new RestException(messageSource, "rest.authenticationservice.wrongStudyName",

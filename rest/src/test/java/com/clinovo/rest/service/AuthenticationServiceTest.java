@@ -134,7 +134,8 @@ public class AuthenticationServiceTest extends BaseServiceTest {
 	public void testThatAuthenticationOnSiteIsNotPossible() throws Exception {
 		createNewSite(currentScope.getId());
 		mockMvc.perform(post(API_AUTHENTICATION).param("userName", rootUserName).param("password", rootUserPassword)
-				.param("studyName", newSite.getName())).andExpect(status().isUnauthorized());
+				.param("studyName", newSite.getName())).andExpect(status().isUnauthorized()).andReturn().getResponse()
+				.getContentAsString().contains(newSite.getName());
 	}
 
 	@Test
