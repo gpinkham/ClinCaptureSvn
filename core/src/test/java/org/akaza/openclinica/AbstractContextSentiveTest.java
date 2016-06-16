@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
@@ -184,6 +185,9 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected static EventServiceInterface eventService;
 	protected static DiscrepancyNoteService discrepancyNoteService;
 	protected static RuleSetService ruleSetService;
+
+	@Autowired
+	protected CoreResources coreResources;
 
 	@Autowired
 	protected JavaMailSenderImpl mailSender;
