@@ -1,5 +1,5 @@
 Meta:
-@backup_name 
+@backup_name AuditLogWF_DB
 
 Narrative:
 In order to communicate effectively to the business some functionality
