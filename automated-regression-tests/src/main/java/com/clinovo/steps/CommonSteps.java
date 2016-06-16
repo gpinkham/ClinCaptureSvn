@@ -65,6 +65,7 @@ import net.thucydides.core.steps.ScenarioSteps;
 /**
  * Created by Anton on 01.07.2014.
  */
+@SuppressWarnings("unused")
 public class CommonSteps extends ScenarioSteps {
 
 	private static final long serialVersionUID = 1L;

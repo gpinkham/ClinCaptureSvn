@@ -1,7 +1,5 @@
 package com.clinovo.pages;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
