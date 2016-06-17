@@ -111,14 +111,10 @@ public class StudyModuleController extends SpringController {
 			sms.setStudyId(currentStudy.getId());
 		}
 
-		int crfCount = crfDao.findAllByStudy(currentStudy.getId()).size();
-		int crfWithEventDefinition = crfDao.findAllActiveByDefinitions(currentStudy.getId()).size();
-		int totalCrf = crfCount + crfWithEventDefinition;
-		int eventDefinitionCount = studyEventDefinitionDao.findAllActiveByStudy(currentStudy).size();
-
-		int subjectGroupCount = studyGroupClassDao.findAllByStudy(currentStudy).size();
-
 		int ruleCount = getCountOfRules(currentStudy);
+		int totalCrf = crfDao.findAllCRFs(currentStudy).size();
+		int subjectGroupCount = studyGroupClassDao.findAllByStudy(currentStudy).size();
+		int eventDefinitionCount = studyEventDefinitionDao.findAllActiveByStudy(currentStudy).size();
 
 		int siteCount = studyDao.findOlnySiteIdsByStudy(currentStudy).size();
 		int userCount = userDao.findAllUsersByStudy(currentStudy.getId()).size();

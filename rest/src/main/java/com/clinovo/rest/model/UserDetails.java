@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.clinovo.enums.study.StudyOrigin;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -161,7 +162,10 @@ public class UserDetails {
 	 * @return StudyBean
 	 */
 	public StudyBean getCurrentStudy(DataSource dataSource) {
-		return new StudyDAO(dataSource).findByOid(studyOid);
+		StudyBean studyBean = new StudyDAO(dataSource).findByOid(studyOid);
+		// NOTE that REST API must consider any study as studio's study
+		studyBean.setOrigin(StudyOrigin.STUDIO.getName());
+		return studyBean;
 	}
 
 	/**

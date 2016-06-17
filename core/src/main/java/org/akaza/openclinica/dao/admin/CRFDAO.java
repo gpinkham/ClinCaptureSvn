@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -94,32 +93,6 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that sets expected types.
-	 */
-	@Override
-	public void setTypesExpected() {
-		int index = 1;
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
-		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
-		// set type for auto_layout property
-		if (getDBType().equals("oracle")) {
-			this.setTypeExpected(index++, TypeNames.INT);
-		} else {
-			this.setTypeExpected(index++, TypeNames.BOOL);
-		}
-		this.setTypeExpected(index, TypeNames.STRING);
-	}
-
-	/**
 	 * Method that updates EntityBean in the DB.
 	 * 
 	 * @param eb
@@ -127,16 +100,18 @@ public class CRFDAO extends AuditableEntityDAO {
 	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb) {
-		int index = 1;
-		CRFBean cb = (CRFBean) eb;
-		HashMap variables = new HashMap();
-		variables.put(index++, cb.getStatus().getId());
-		variables.put(index++, cb.getName());
-		variables.put(index++, cb.getDescription());
-		variables.put(index++, cb.getUpdater().getId());
-		variables.put(index++, cb.getSource());
-		variables.put(index, cb.getId());
-		this.execute(digester.getQuery("update"), variables);
+		if (eb instanceof CRFBean) {
+			int index = 1;
+			CRFBean cb = (CRFBean) eb;
+			HashMap variables = new HashMap();
+			variables.put(index++, cb.getStatus().getId());
+			variables.put(index++, cb.getName());
+			variables.put(index++, cb.getDescription());
+			variables.put(index++, cb.getUpdater().getId());
+			variables.put(index++, cb.getSource());
+			variables.put(index, cb.getId());
+			execute(digester.getQuery("update"), variables);
+		}
 		return eb;
 	}
 
@@ -157,28 +132,56 @@ public class CRFDAO extends AuditableEntityDAO {
 	 * @return EntityBean
 	 */
 	public EntityBean create(EntityBean eb, Connection con) {
+		if (eb instanceof CRFBean) {
+			int index = 1;
+			CRFBean cb = (CRFBean) eb;
+			cb.setOid(getValidOid(cb, cb.getName()));
+			HashMap variables = new HashMap();
+			variables.put(index++, cb.getStatus().getId());
+			variables.put(index++, cb.getName());
+			variables.put(index++, cb.getDescription());
+			variables.put(index++, cb.getOwner().getId());
+			variables.put(index++, cb.getOid());
+			variables.put(index++, cb.getStudyId());
+			// set auto_layout property
+			if (getDBType().equals("oracle")) {
+				variables.put(index++, 1);
+			} else {
+				variables.put(index++, Boolean.TRUE);
+			}
+			variables.put(index, cb.getSource());
+			executeWithPK(digester.getQuery("create"), variables, null, con);
+			if (isQuerySuccessful()) {
+				cb.setId(getLatestPK());
+			}
+		}
+		return eb;
+	}
+
+	/**
+	 * Method that sets expected types.
+	 */
+	@Override
+	public void setTypesExpected() {
 		int index = 1;
-		CRFBean cb = (CRFBean) eb;
-		cb.setOid(getValidOid(cb, cb.getName()));
-		HashMap variables = new HashMap();
-		variables.put(index++, cb.getStatus().getId());
-		variables.put(index++, cb.getName());
-		variables.put(index++, cb.getDescription());
-		variables.put(index++, cb.getOwner().getId());
-		variables.put(index++, cb.getOid());
-		variables.put(index++, cb.getStudyId());
-		// set auto_layout property
+		unsetTypeExpected();
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.INT);
+		// set type for auto_layout property
 		if (getDBType().equals("oracle")) {
-			variables.put(index++, 1);
+			setTypeExpected(index++, TypeNames.INT);
 		} else {
-			variables.put(index++, Boolean.TRUE);
+			setTypeExpected(index++, TypeNames.BOOL);
 		}
-		variables.put(index, cb.getSource());
-		executeWithPK(digester.getQuery("create"), variables, null, con);
-		if (isQuerySuccessful()) {
-			cb.setId(getLatestPK());
-		}
-		return cb;
+		setTypeExpected(index, TypeNames.STRING);
 	}
 
 	/**
@@ -190,7 +193,7 @@ public class CRFDAO extends AuditableEntityDAO {
 	 */
 	public Object getEntityFromHashMap(HashMap hm) {
 		CRFBean eb = new CRFBean();
-		this.setEntityAuditInformation(eb, hm);
+		setEntityAuditInformation(eb, hm);
 		eb.setId((Integer) hm.get("crf_id"));
 		eb.setName((String) hm.get("name"));
 		eb.setDescription((String) hm.get("description"));
@@ -208,231 +211,72 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method that returns all crfs.
-	 * 
-	 * @return Collection
-	 */
-	public Collection findAll() {
-		return findAllByLimit(false);
-	}
-
-	/**
-	 * Method returns count of active crfs.
-	 * 
-	 * @return Integer
-	 */
-	public Integer getCountofActiveCRFs() {
-		setTypesExpected();
-		String sql = digester.getQuery("getCountofCRFs");
-		ArrayList rows = this.select(sql);
-		Iterator it = rows.iterator();
-		if (it.hasNext()) {
-			return (Integer) ((HashMap) it.next()).get("count");
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Method that finds crfs by studyId.
-	 * 
-	 * @param studyId
-	 *            int
-	 * @return Collection
-	 */
-	public Collection findAllByStudy(int studyId) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that finds crfs using limit flag.
-	 * 
-	 * @param hasLimit
-	 *            boolean
-	 * @return Collection
-	 */
-	public Collection findAllByLimit(boolean hasLimit) {
-		this.setTypesExpected();
-		ArrayList alist;
-		if (hasLimit) {
-			alist = this.select(digester.getQuery("findAllByLimit"));
-		} else {
-			alist = this.select(digester.getQuery("findAll"));
-		}
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that finds all active crfs.
-	 * 
-	 * @return List<CRFBean>
-	 */
-	public List<CRFBean> findAllActiveCrfs() {
-		List result = new ArrayList<CRFBean>();
-		this.setTypesExpected();
-		ArrayList objList = select(digester.getQuery("findAllActiveCrfs"), new HashMap());
-		for (Object object : objList) {
-			result.add(getEntityFromHashMap((HashMap) object));
-		}
-		return result;
-	}
-
-	/**
-	 * Method that returns crfs by status.
-	 * 
-	 * @param status
-	 *            Status
-	 * @return List<CRFBean>
-	 */
-	public Collection findAllByStatus(Status status) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, status.getId());
-		ArrayList alist = this.select(digester.getQuery("findAllByStatus"), variables);
-
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that returns all active crfs by StudyEventDefinitionBean.
-	 *
-	 * @param definition
-	 *            StudyEventDefinitionBean
-	 * @return Collection
-	 */
-	public Collection findAllActiveByDefinition(StudyEventDefinitionBean definition) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, definition.getId());
-		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinition"), variables);
-
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that returns all active crfs by definitions in the certain studyId.
-	 *
-	 * @param studyId
-	 *            int
-	 * @return Collection
-	 */
-	public Collection findAllActiveByDefinitions(int studyId) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		variables.put(2, studyId);
-		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinitions"), variables);
-
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that returns all active crfs by definitions in the current study.
-	 *
-	 * @param studyId
-	 *            int
-	 * @return Collection
-	 */
-	public Collection findAllActiveByDefinitionsForCurrentStudy(int studyId) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinitionsForCurrentStudy"), variables);
-
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
-	/**
-	 * Method that finds all crfs.
-	 * 
-	 * @param strOrderByColumn
-	 *            String
-	 * @param blnAscendingSort
-	 *            boolean
-	 * @param strSearchPhrase
-	 *            String
-	 * @return Collection
-	 */
-	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		return new ArrayList();
-	}
-
-	/**
 	 * Method that finds crf by id.
-	 * 
+	 *
 	 * @param id
 	 *            int
 	 * @return EntityBean
 	 */
 	public EntityBean findByPK(int id) {
 		CRFBean eb = new CRFBean();
-		this.setTypesExpected();
+		setTypesExpected();
 
 		HashMap variables = new HashMap();
 		variables.put(1, id);
 
-		ArrayList alist = this.select(digester.getQuery("findByPK"), variables);
+		ArrayList alist = select(digester.getQuery("findByPK"), variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			eb = (CRFBean) getEntityFromHashMap((HashMap) it.next());
 		}
 		return eb;
 	}
 
 	/**
+	 * Method that returns crf by oid.
+	 *
+	 * @param oid
+	 *            String
+	 * @return CRFBean
+	 */
+	public CRFBean findByOid(String oid) {
+		unsetTypeExpected();
+		setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, oid);
+		String sql = digester.getQuery("findByOID");
+
+		ArrayList rows = select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			return (CRFBean) getEntityFromHashMap((HashMap) it.next());
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Method that finds crf by item oid.
-	 * 
+	 *
 	 * @param itemOid
 	 *            String
 	 * @return CRFBean
 	 */
 	public CRFBean findByItemOid(String itemOid) {
 		CRFBean eb = new CRFBean();
-		this.setTypesExpected();
+		setTypesExpected();
 
 		HashMap variables = new HashMap();
 		variables.put(1, itemOid);
 
-		ArrayList alist = this.select(digester.getQuery("findByItemOid"), variables);
+		ArrayList alist = select(digester.getQuery("findByItemOid"), variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			eb = (CRFBean) getEntityFromHashMap((HashMap) it.next());
 		}
 		return eb;
 	}
@@ -477,62 +321,38 @@ public class CRFDAO extends AuditableEntityDAO {
 	 *            int
 	 * @param name
 	 *            String
+	 * @param studyBean
+	 *            StudyBean
 	 * @return CRFBean
 	 */
-	public EntityBean findAnotherByName(String name, int crfId) {
-		CRFBean eb = new CRFBean();
-		this.setTypesExpected();
-
+	public EntityBean findAnotherByName(String name, int crfId, StudyBean studyBean) {
+		String sql;
+		int index = 1;
+		setTypesExpected();
+		CRFBean crfBean = new CRFBean();
 		HashMap variables = new HashMap();
-		variables.put(1, name);
-		variables.put(2, crfId);
 
-		String sql = digester.getQuery("findAnotherByName");
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
+		variables.put(index++, name);
+		variables.put(index++, crfId);
 
-		if (it.hasNext()) {
-			eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("findAnotherByNameInStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("findAnotherByNameInGUIStudies");
 		}
-		return eb;
-	}
 
-	/**
-	 * Method that finds crf by permissions.
-	 * 
-	 * @param objCurrentUser
-	 *            Object
-	 * @param intActionType
-	 *            int
-	 * @param strOrderByColumn
-	 *            String
-	 * @param blnAscendingSort
-	 *            boolean
-	 * @param strSearchPhrase
-	 *            String
-	 * @return Collection
-	 */
-	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
-			boolean blnAscendingSort, String strSearchPhrase) {
-		return new ArrayList();
-	}
-
-	/**
-	 * Method that finds crf by permissions.
-	 * 
-	 * @param objCurrentUser
-	 *            Object
-	 * @param intActionType
-	 *            int
-	 * @return Collection
-	 */
-	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		return new ArrayList();
+		List<HashMap> mapList = select(sql, variables);
+		Iterator<HashMap> mapIterator = mapList.iterator();
+		if (mapIterator.hasNext()) {
+			crfBean = (CRFBean) getEntityFromHashMap(mapIterator.next());
+		}
+		return crfBean;
 	}
 
 	/**
 	 * Method that find crf by crfVersionId.
-	 * 
+	 *
 	 * @param crfVersionId
 	 *            int
 	 * @return CRFBean
@@ -540,8 +360,8 @@ public class CRFDAO extends AuditableEntityDAO {
 	public CRFBean findByVersionId(int crfVersionId) {
 		CRFBean answer = new CRFBean();
 
-		this.unsetTypeExpected();
-		this.setTypesExpected();
+		unsetTypeExpected();
+		setTypesExpected();
 
 		HashMap variables = new HashMap();
 		variables.put(1, crfVersionId);
@@ -558,8 +378,265 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method returns next crf oid by crf bean and crfName.
+	 * Method returns count of active crfs.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @return Integer
+	 */
+	public Integer getCountOfActiveCRFs(StudyBean studyBean) {
+		String sql;
+		int index = 1;
+		setTypesExpected();
+		Integer result = null;
+		HashMap variables = new HashMap();
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("getCountOfActiveCRFsInStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("getCountOfActiveCRFsInGUIStudies");
+		}
+		List<HashMap> mapList = select(sql, variables);
+		Iterator<HashMap> iterator = mapList.iterator();
+		if (iterator.hasNext()) {
+			result = (Integer) iterator.next().get("count");
+		}
+		return result;
+	}
+
+	/**
+	 * Method that finds all CRFs by study.
 	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @return List<CRFBean>
+	 */
+	public List<CRFBean> findAllCRFs(StudyBean studyBean) {
+		return findAllCRFsByLimit(studyBean, false);
+	}
+
+	/**
+	 * Method that finds all CRFs by study.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @param hasLimit
+	 *            boolean
+	 * @return List<CRFBean>
+	 */
+	public List<CRFBean> findAllCRFsByLimit(StudyBean studyBean, boolean hasLimit) {
+		String sql;
+		int index = 1;
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		List<CRFBean> result = new ArrayList<CRFBean>();
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("findAllCRFsInStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("findAllCRFsInGUIStudies");
+		}
+		List<HashMap> mapList = select(sql.concat(hasLimit ? " limit 5" : ""), variables);
+		for (HashMap aMapList : mapList) {
+			result.add((CRFBean) getEntityFromHashMap(aMapList));
+		}
+		return result;
+	}
+
+	/**
+	 * Method that finds all active crfs.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
+	 * @return List<CRFBean>
+	 */
+	public List<CRFBean> findAllActiveCRFs(StudyBean studyBean) {
+		String sql;
+		int index = 1;
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		List<CRFBean> result = new ArrayList<CRFBean>();
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("findAllActiveCRFsInStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("findAllActiveCRFsInGUIStudies");
+		}
+		List<HashMap> mapList = select(sql, variables);
+		for (HashMap aMapList : mapList) {
+			result.add((CRFBean) getEntityFromHashMap(aMapList));
+		}
+		return result;
+	}
+
+	/**
+	 * Method that returns all active crfs by StudyEventDefinitionBean.
+	 *
+	 * @param definition
+	 *            StudyEventDefinitionBean
+	 * @return Collection
+	 */
+	public Collection findAllActiveByDefinition(StudyEventDefinitionBean definition) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, definition.getId());
+		ArrayList alist = select(digester.getQuery("findAllActiveByDefinition"), variables);
+
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * Method that returns all active crfs by definitions in the current study.
+	 *
+	 * @param studyId
+	 *            int
+	 * @return Collection
+	 */
+	public Collection findAllActiveByDefinitionsForCurrentStudy(int studyId) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		ArrayList alist = select(digester.getQuery("findAllActiveByDefinitionsForCurrentStudy"), variables);
+
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * Method that returns crfs that are available for evaluation.
+	 *
+	 * @param currentStudyId
+	 *            int
+	 * @return CRFBean list
+	 */
+	public List<CRFBean> findAllEvaluableCrfs(int currentStudyId) {
+		int index = 1;
+		List result = new ArrayList<CRFBean>();
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(index++, currentStudyId);
+		variables.put(index, currentStudyId);
+		ArrayList objList = select(digester.getQuery("findAllEvaluableCrfs"), variables);
+		for (Object object : objList) {
+			result.add(getEntityFromHashMap((HashMap) object));
+		}
+		return result;
+	}
+
+	/**
+	 * Method returns all unmasked available CRFs.
+	 *
+	 * @param sed
+	 *            StudyEventDefinitionBean
+	 * @param ub
+	 *            UserAccountBean
+	 * @return List<CRFBean>
+	 */
+	public List<CRFBean> findAllActiveUnmaskedByDefinition(StudyEventDefinitionBean sed, UserAccountBean ub) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		int index = 1;
+		variables.put(index++, sed.getId());
+		variables.put(index++, ub.getId());
+		variables.put(index++, ub.getActiveStudyId());
+		variables.put(index, ub.getActiveStudyId());
+		ArrayList alist = select(digester.getQuery("findAllActiveUnmaskedByDefinition"), variables);
+
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * Be careful to use this method because we need to provide different set of CRF Versions depend on origin of
+	 * current study.
+	 */
+	public List<CRFBean> findAll() {
+		setTypesExpected();
+		List<CRFBean> result = new ArrayList<CRFBean>();
+		List<HashMap> mapList = select(digester.getQuery("findAll"));
+		for (HashMap aMapList : mapList) {
+			result.add((CRFBean) getEntityFromHashMap(aMapList));
+		}
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
+		return new ArrayList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
+			boolean blnAscendingSort, String strSearchPhrase) {
+		return new ArrayList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
+		return new ArrayList();
+	}
+
+	/**
+	 * Method that deletes crf by crfId. Note: it will be better to use the DeleteCrfService.deleteCrf(int crfId)
+	 * instead of this method, cuz service may have additional logic.
+	 *
+	 * @param crfId
+	 *            int
+	 */
+	public void deleteCrf(int crfId) {
+		final int max = 16;
+		String sql = digester.getQuery("deleteCrf");
+		HashMap variables = new HashMap();
+		for (int i = 1; i <= max; i++) {
+			variables.put(i, crfId);
+		}
+		execute(sql, variables);
+	}
+
+	/**
+	 * Method returns valid crf oid by crf bean and crfName.
+	 *
+	 * @param crfBean
+	 *            CRFBean
+	 * @param crfName
+	 *            String
+	 * @return String
+	 */
+	private String getValidOid(CRFBean crfBean, String crfName) {
+
+		String oid = getOid(crfBean, crfName);
+		logger.info(oid);
+		String oidPreRandomization = oid;
+		while (findAllByOid(oid).size() > 0) {
+			oid = crfBean.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+		}
+		return oid;
+	}
+
+	/**
+	 * Method returns next crf oid by crf bean and crfName.
+	 *
 	 * @param crfBean
 	 *            CRFBean
 	 * @param crfName
@@ -578,147 +655,16 @@ public class CRFDAO extends AuditableEntityDAO {
 	}
 
 	/**
-	 * Method returns valid crf oid by crf bean and crfName.
-	 * 
-	 * @param crfBean
-	 *            CRFBean
-	 * @param crfName
-	 *            String
-	 * @return String
-	 */
-	public String getValidOid(CRFBean crfBean, String crfName) {
-
-		String oid = getOid(crfBean, crfName);
-		logger.info(oid);
-		String oidPreRandomization = oid;
-		while (findAllByOid(oid).size() > 0) {
-			oid = crfBean.getOidGenerator(ds).randomizeOid(oidPreRandomization);
-		}
-		return oid;
-	}
-
-	/**
 	 * Method that returns list of crfs by oid.
-	 * 
+	 *
 	 * @param oid
 	 *            String
 	 * @return ArrayList<CRFBean>
 	 */
-	public ArrayList<CRFBean> findAllByOid(String oid) {
+	private ArrayList<CRFBean> findAllByOid(String oid) {
 		HashMap<Integer, String> variables = new HashMap<Integer, String>();
 		variables.put(1, oid);
 
 		return executeFindAllQuery("findByOID", variables);
-	}
-
-	/**
-	 * Method that returns crf by oid.
-	 * 
-	 * @param oid
-	 *            String
-	 * @return CRFBean
-	 */
-	public CRFBean findByOid(String oid) {
-		this.unsetTypeExpected();
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, oid);
-		String sql = digester.getQuery("findByOID");
-
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			return (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Method that returns list of crf names by studyId.
-	 * 
-	 * @param studyId
-	 *            int
-	 * @return List<String>
-	 */
-	public List<String> getAllCRFNamesFromStudy(int studyId) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.STRING);
-		this.setTypeExpected(2, TypeNames.STRING);
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		ArrayList alist = this.select(digester.getQuery("getAllCRFNamesFromStudy"), variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			HashMap h = (HashMap) anAlist;
-			al.add(h.get("name"));
-		}
-		return al;
-	}
-
-	/**
-	 * Method that deletes crf by crfId. Note: it will be better to use the DeleteCrfService.deleteCrf(int crfId)
-	 * instead of this method, cuz service may have additional logic.
-	 * 
-	 * @param crfId
-	 *            int
-	 */
-	public void deleteCrf(int crfId) {
-		final int max = 16;
-		String sql = digester.getQuery("deleteCrf");
-		HashMap variables = new HashMap();
-		for (int i = 1; i <= max; i++) {
-			variables.put(i, crfId);
-		}
-		execute(sql, variables);
-	}
-
-	/**
-	 * Method that returns crfs that are available for evaluation.
-	 * 
-	 * @param currentStudyId
-	 *            int
-	 * @return CRFBean list
-	 */
-	public List<CRFBean> findAllEvaluableCrfs(int currentStudyId) {
-		List result = new ArrayList<CRFBean>();
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, currentStudyId);
-		variables.put(2, currentStudyId);
-		ArrayList objList = select(digester.getQuery("findAllEvaluableCrfs"), variables);
-		for (Object object : objList) {
-			result.add(getEntityFromHashMap((HashMap) object));
-		}
-		return result;
-	}
-
-	/**
-	 * Method returns all unmasked available CRFs.
-	 * 
-	 * @param sed
-	 *            StudyEventDefinitionBean
-	 * @param ub
-	 *            UserAccountBean
-	 * @return List<CRFBean>
-	 */
-	public List<CRFBean> findAllActiveUnmaskedByDefinition(StudyEventDefinitionBean sed, UserAccountBean ub) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		int index = 1;
-		variables.put(index++, sed.getId());
-		variables.put(index++, ub.getId());
-		variables.put(index++, ub.getActiveStudyId());
-		variables.put(index, ub.getActiveStudyId());
-		ArrayList alist = this.select(digester.getQuery("findAllActiveUnmaskedByDefinition"), variables);
-
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
 	}
 }

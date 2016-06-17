@@ -356,8 +356,8 @@ public class BaseServiceTest extends DefaultAppContextTest {
 	}
 
 	private void backupEntities() {
+		crfBeanList = crfdao.findAll();
 		crfVersionBeanList = crfVersionDao.findAll();
-		crfBeanList = (List<CRFBean>) crfdao.findAll();
 		studyBeanList = (List<StudyBean>) studyDAO.findAll();
 		userAccountBeanList = (List<UserAccountBean>) userAccountDAO.findAll();
 		eventDefinitionCRFBeanList = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO.findAll();

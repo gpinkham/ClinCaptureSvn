@@ -42,38 +42,53 @@
 			select * from crf where name = ? and source_study_id = ?
 		</sql>
 	</query>
-    <query>
-		<name>findAnotherByName</name>
-		<sql>
-        SELECT * FROM CRF WHERE
-		name = ? and crf_id !=?
-        </sql>
-	</query>
 	<query>
 		<name>findAll</name>
-		<sql>SELECT * FROM CRF</sql>
+		<sql>select * from crf</sql>
 	</query>
 	<query>
-        <name>findAllByStudy</name>
-        <sql>SELECT * FROM CRF WHERE source_study_id=?</sql>
+		<name>findAnotherByNameInStudy</name>
+		<sql>SELECT * FROM crf WHERE name = ? AND crf_id != ? AND source_study_id = ?</sql>
+	</query>
+	<query>
+		<name>findAnotherByNameInGUIStudies</name>
+		<sql>
+			SELECT DISTINCT c.* FROM CRF c
+			JOIN study s ON s.study_id = c.source_study_id
+			WHERE name = ? AND crf_id != ? AND s.origin != 'studio'
+		</sql>
+	</query>
+	<query>
+        <name>findAllCRFsInStudy</name>
+        <sql>SELECT * FROM CRF WHERE source_study_id = ?</sql>
     </query>
 	<query>
-		<name>findAllByStatus</name>
-		<sql>SELECT * FROM CRF where status_id=?</sql>
+		<name>findAllCRFsInGUIStudies</name>
+		<sql>
+			SELECT DISTINCT c.* FROM CRF c
+			JOIN study s ON s.study_id = c.source_study_id
+			WHERE s.origin != 'studio'
+		</sql>
+	</query>
+	<query>
+		<name>findAllActiveCRFsInStudy</name>
+		<sql>
+			SELECT DISTINCT c.* FROM crf_version cv
+			JOIN crf c ON c.crf_id = cv.crf_id
+			WHERE c.source_study_id = ? AND c.status_id = 1 AND cv.status_id = 1
+			ORDER BY c.name
+		</sql>
 	</query>
     <query>
-        <name>findAllActiveCrfs</name>
+        <name>findAllActiveCRFsInGUIStudies</name>
         <sql>
-			SELECT DISTINCT crf.* 
-			FROM crf_version JOIN crf ON crf.crf_id = crf_version.crf_id 
-			WHERE crf.status_id = 1 AND crf_version.status_id = 1 
-			ORDER BY crf.name
+			SELECT DISTINCT c.* FROM crf_version cv
+			JOIN crf c ON c.crf_id = cv.crf_id
+			JOIN study s ON s.study_id = c.source_study_id
+			WHERE s.origin != 'studio' AND c.status_id = 1 AND cv.status_id = 1
+			ORDER BY c.name
 		</sql>
     </query>
-	<query>
-		<name>findAllByLimit</name>
-		<sql>SELECT * FROM CRF where rownum &lt;= 5</sql>
-	</query>
 	<query>
 		<name>create</name>
 		<sql>INSERT INTO CRF (STATUS_ID, NAME,
@@ -136,14 +151,6 @@
 			WHERE c.crf_id=v.crf_id AND v.crf_version_id=?
 		</sql>
 	</query>
-	<query>
-		<name>findAllByStudyId</name>
-		<sql>
-			SELECT DISTINCT c.*
-			FROM crf c, crf_version v
-			WHERE c.crf_id=v.crf_id AND v.crf_version_id=?
-		</sql>
-	</query>
     <query>
       <name>findAllActiveByDefinition</name>
       <sql>select distinct c.* from crf c,event_definition_crf edc
@@ -174,16 +181,6 @@
 			AND status_id = 1
 		</sql>
 	</query>
-    <query>
-      <name>findAllActiveByDefinitions</name>
-      <sql>select distinct c.* from crf c,event_definition_crf edc
-         where edc.study_id=?
-         and c.crf_id=edc.crf_id
-         and c.status_id=1
-         and edc.status_id=1
-         and (c.source_study_id !=? or c.source_study_id is null) 
-      </sql>
-    </query>
 	<query>
 		<name>findAllActiveByDefinitionsForCurrentStudy</name>
 		<sql>select distinct c.* from crf c,event_definition_crf edc
@@ -195,13 +192,17 @@
 			and (c.source_study_id = ? or c.source_study_id is null)
 		</sql>
 	</query>
-    <query>
-      <name>getCountofCRFs</name>
-      <sql>select count(crf.crf_id) from crf where crf.status_id != 5</sql>
-    </query>
 	<query>
-		<name>getAllCRFNamesFromStudy</name>
-		<sql>SELECT distinct name FROM crf WHERE crf_id IN (SELECT distinct crf_id FROM event_definition_crf WHERE study_id=?)</sql>
+		<name>getCountOfActiveCRFsInStudy</name>
+		<sql>SELECT count(c.crf_id) FROM crf c WHERE c.status_id != 5 and c.source_study_id = ?</sql>
+	</query>
+	<query>
+		<name>getCountOfActiveCRFsInGUIStudies</name>
+		<sql>
+			SELECT count(DISTINCT c.crf_id) FROM CRF c
+			JOIN study s ON s.study_id = c.source_study_id
+			WHERE c.status_id != 5 AND s.origin != 'studio'
+		</sql>
 	</query>
     <query>
         <name>findAllEvaluableCrfs</name>

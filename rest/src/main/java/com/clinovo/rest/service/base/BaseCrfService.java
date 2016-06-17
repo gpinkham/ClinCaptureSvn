@@ -129,7 +129,7 @@ public abstract class BaseCrfService extends BaseService {
 
 	protected List<CRFBean> getAllCrfs() throws Exception {
 		List<CRFVersionBean> crfVersionBeanList = getAllCrfVersions();
-		List<CRFBean> crfBeanList = (List<CRFBean>) getCRFDAO().findAllByStudy(getCurrentStudy().getId());
+		List<CRFBean> crfBeanList = getCRFDAO().findAllCRFs(getCurrentStudy());
 		Map<Integer, List<CRFVersionBean>> crfToVersionsMap = new HashMap<Integer, List<CRFVersionBean>>();
 		for (CRFVersionBean crfVersionBean : crfVersionBeanList) {
 			List<CRFVersionBean> crfVersionList = crfToVersionsMap.get(crfVersionBean.getCrfId());
@@ -149,7 +149,7 @@ public abstract class BaseCrfService extends BaseService {
 	}
 
 	protected List<CRFVersionBean> getAllCrfVersions() throws Exception {
-		return getCRFVersionDAO().findAllByStudyId(getCurrentStudy().getId());
+		return getCRFVersionDAO().findAllCRFVersions(getCurrentStudy());
 	}
 
 	protected CRFBean removeCrfBean(int crfId) throws Exception {

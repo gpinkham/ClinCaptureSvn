@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * TechAdminServlet.
+ */
 @SuppressWarnings("rawtypes")
 @Component
 public class TechAdminServlet extends SpringServlet {
@@ -48,7 +51,7 @@ public class TechAdminServlet extends SpringServlet {
 		ArrayList allSubjects = (ArrayList) subdao.findAll();
 
 		CRFDAO cdao = getCRFDAO();
-		ArrayList allCrfs = (ArrayList) cdao.findAll();
+		ArrayList allCrfs = (ArrayList) cdao.findAllCRFs(getCurrentStudy());
 
         StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
@@ -56,16 +59,16 @@ public class TechAdminServlet extends SpringServlet {
 		panel.setOrderedData(true);
 		setToPanel(getResWord().getString("in_the_application"), "", request);
 		if (allSubjects.size() > 0) {
-			setToPanel(getResWord().getString("subjects"), new Integer(allSubjects.size()).toString(), request);
+			setToPanel(getResWord().getString("subjects"), Integer.toString(allSubjects.size()), request);
 		}
 		if (allUsers.size() > 0) {
-			setToPanel(getResWord().getString("users"), new Integer(allUsers.size()).toString(), request);
+			setToPanel(getResWord().getString("users"), Integer.toString(allUsers.size()), request);
 		}
 		if (allStudies.size() > 0) {
-			setToPanel(getResWord().getString("studies"), new Integer(allStudies.size()).toString(), request);
+			setToPanel(getResWord().getString("studies"), Integer.toString(allStudies.size()), request);
 		}
 		if (allCrfs.size() > 0) {
-			setToPanel(getResWord().getString("CRFs"), new Integer(allCrfs.size()).toString(), request);
+			setToPanel(getResWord().getString("CRFs"), Integer.toString(allCrfs.size()), request);
 		}
 		forwardPage(Page.TECH_ADMIN_SYSTEM, request, response);
 	}
@@ -73,13 +76,10 @@ public class TechAdminServlet extends SpringServlet {
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         UserAccountBean ub = getUserAccountBean(request);
-
 		if (!ub.isTechAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
 					getResException().getString("you_may_not_perform_technical_admin_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override

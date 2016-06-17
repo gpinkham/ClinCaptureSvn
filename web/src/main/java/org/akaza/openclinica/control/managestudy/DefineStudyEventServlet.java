@@ -107,7 +107,7 @@ public class DefineStudyEventServlet extends SpringServlet {
 		String actionName = request.getParameter("actionName");
 		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		if (crfsWithVersion == null) {
-			crfsWithVersion = (ArrayList) getCRFDAO().findAllActiveCrfs();
+			crfsWithVersion = (ArrayList) getCRFDAO().findAllActiveCRFs(getCurrentStudy());
 			request.getSession().setAttribute("crfsWithVersion", crfsWithVersion);
 		}
 		if (StringUtil.isBlank(actionName)) {
@@ -373,7 +373,7 @@ public class DefineStudyEventServlet extends SpringServlet {
 
 			String sdvOption = fp.getString("sdvOption" + i);
 			if (!StringUtil.isBlank(sdvOption)) {
-				int id = Integer.valueOf(sdvOption);
+				int id = Integer.parseInt(sdvOption);
 				edcBean.setSourceDataVerification(SourceDataVerification.getByCode(id));
 			}
 			if (!StringUtil.isBlank(acceptNewCrfVersions) && "yes".equalsIgnoreCase(acceptNewCrfVersions.trim())) {

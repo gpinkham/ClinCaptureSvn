@@ -155,7 +155,7 @@ public class UpdateCRFServlet extends SpringServlet {
 			CRFDAO cdao = getCRFDAO();
 
 			CRFBean crf = (CRFBean) request.getSession().getAttribute(CRF);
-			CRFBean crf1 = (CRFBean) cdao.findAnotherByName(fp.getString("name").trim(), crf.getId());
+			CRFBean crf1 = (CRFBean) cdao.findAnotherByName(fp.getString("name").trim(), crf.getId(), getCurrentStudy());
 			logger.info("crf:" + crf.getName() + crf.getId());
 			logger.info("crf1:" + crf1.getName() + crf1.getId());
 			if (crf1.getId() > 0) {

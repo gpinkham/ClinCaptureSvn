@@ -34,6 +34,9 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+/**
+ * AdminSystemServlet.
+ */
 @SuppressWarnings({ "rawtypes" })
 @Component
 public class AdminSystemServlet extends SpringServlet {
@@ -61,9 +64,9 @@ public class AdminSystemServlet extends SpringServlet {
 		request.setAttribute("allSubjectNumber", allSubjects.size());
 
 		CRFDAO cdao = getCRFDAO();
-		ArrayList crfs = (ArrayList) cdao.findAllByLimit(true);
+		ArrayList crfs = (ArrayList) cdao.findAllCRFsByLimit(getCurrentStudy(), true);
 		request.setAttribute("crfs", crfs);
-		ArrayList allCrfs = (ArrayList) cdao.findAll();
+		ArrayList allCrfs = (ArrayList) cdao.findAllCRFs(getCurrentStudy());
 		request.setAttribute("allCrfNumber", allCrfs.size());
 
 		StudyInfoPanel panel = getStudyInfoPanel(request);

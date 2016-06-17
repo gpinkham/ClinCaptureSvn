@@ -21,6 +21,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.clinovo.enums.study.StudyOrigin;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;

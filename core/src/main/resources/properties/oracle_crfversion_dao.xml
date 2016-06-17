@@ -124,8 +124,12 @@
         <sql>SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE CRF_ID=? AND NAME =? </sql>
     </query>
 	<query>
-		<name>findAllByStudyId</name>
+		<name>findAllCRFVersionsInStudy</name>
 		<sql>select distinct cv.*, c.name as crf_name from crf_version cv, crf c where cv.crf_id = c.crf_id and c.source_study_id = ? order by cv.crf_id, cv.crf_version_id</sql>
+	</query>
+	<query>
+		<name>findAllCRFVersionsInGUIStudies</name>
+		<sql>select distinct cv.*, c.name as crf_name from crf_version cv, crf c, study s where cv.crf_id = c.crf_id and c.source_study_id = s.study_id and s.origin != 'studio' order by cv.crf_id, cv.crf_version_id</sql>
 	</query>
 	<query>
 		<name>deleteCrfVersion</name>

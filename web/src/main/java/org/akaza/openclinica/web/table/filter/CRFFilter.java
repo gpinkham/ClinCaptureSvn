@@ -63,7 +63,7 @@ public class CRFFilter extends DroplistFilterEditor {
 	}
 
 	private List<CRFBean> getCRFs() {
-		return new CRFDAO(dataSource).findAllActiveCrfs();
+		return new CRFDAO(dataSource).findAllActiveCRFs(study);
 	}
 
 	private List<CRFBean> getEvaluationCRFs() {

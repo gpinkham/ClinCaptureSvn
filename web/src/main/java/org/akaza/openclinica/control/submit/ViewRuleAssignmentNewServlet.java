@@ -33,8 +33,8 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -57,24 +57,16 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	private static final long serialVersionUID = 9116068126651934226L;
 
-	protected final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentNewServlet.class);
+	private final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentNewServlet.class);
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-
 		FormProcessor fp = new FormProcessor(request);
-		boolean isDesigner = false;
-		boolean showMoreLink;
-		if (fp.getString("showMoreLink").equals("")) {
-			showMoreLink = true;
-		} else {
-			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
-		}
-		createTable(request, response, showMoreLink, isDesigner);
+		boolean showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
+		createTable(request, response, showMoreLink, false);
 
 	}
 
@@ -109,8 +101,8 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 			}
 		}
 		request.setAttribute("eventlist", events);
-		request.setAttribute("crfCount", crfdao.getCountofActiveCRFs());
 		request.setAttribute("itemCount", itemdao.getCountOfActiveItems());
+		request.setAttribute("crfCount", crfdao.getCountOfActiveCRFs(currentStudy));
 		request.setAttribute("ruleSetCount", getRuleSetService().getRuleSetDao().count(currentStudy));
 
 	}
@@ -141,24 +133,43 @@ public class ViewRuleAssignmentNewServlet extends RememberLastPage {
 
 	}
 
+	/**
+	 * Returns context path.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String
+	 */
 	public String getContextPath(HttpServletRequest request) {
 		String contextPath = request.getContextPath().replaceAll("/", "");
 		return contextPath;
 	}
 
+	/**
+	 * Returns host path.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String
+	 */
 	public String getHostPath(HttpServletRequest request) {
 		String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
 		String hostPath = "";
 		if (null != requestURLMinusServletPath) {
 			hostPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
-			// hostPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
 		}
 		return hostPath;
 	}
 
+	/**
+	 * Returns request url without servlet path in it.
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return String
+	 */
 	public String getRequestURLMinusServletPath(HttpServletRequest request) {
-		String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
-		return requestURLMinusServletPath;
+		return request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 	}
 
 	@Override

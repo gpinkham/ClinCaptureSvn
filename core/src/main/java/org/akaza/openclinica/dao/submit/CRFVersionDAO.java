@@ -102,17 +102,19 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		// UPDATE CRF_VERSION SET CRF_ID=?,STATUS_ID=?,NAME=?,
 		// DESCRIPTION=?,DATE_UPDATED=NOW(),UPDATE_ID=?,REVISION_NOTES =? WHERE
 		// CRF_VERSION_ID=?
-		int index = 1;
-		CRFVersionBean ib = (CRFVersionBean) eb;
-		HashMap variables = new HashMap();
-		variables.put(index++, ib.getCrfId());
-		variables.put(index++, ib.getStatus().getId());
-		variables.put(index++, ib.getName());
-		variables.put(index++, ib.getDescription());
-		variables.put(index++, ib.getUpdater().getId());
-		variables.put(index++, ib.getRevisionNotes());
-		variables.put(index++, ib.getId());
-		this.execute(digester.getQuery("update"), variables);
+		if (eb instanceof CRFVersionBean) {
+			int index = 1;
+			CRFVersionBean ib = (CRFVersionBean) eb;
+			HashMap variables = new HashMap();
+			variables.put(index++, ib.getCrfId());
+			variables.put(index++, ib.getStatus().getId());
+			variables.put(index++, ib.getName());
+			variables.put(index++, ib.getDescription());
+			variables.put(index++, ib.getUpdater().getId());
+			variables.put(index++, ib.getRevisionNotes());
+			variables.put(index, ib.getId());
+			execute(digester.getQuery("update"), variables);
+		}
 		return eb;
 	}
 
@@ -134,40 +136,42 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	 */
 	public EntityBean create(EntityBean eb, Connection con) {
 		int index = 1;
-		CRFVersionBean cb = (CRFVersionBean) eb;
-		cb.setOid(getValidOid(cb, cb.getDescription(), cb.getName()));
-		HashMap variables = new HashMap();
-		variables.put(index++, cb.getCrfId());
-		variables.put(index++, cb.getStatus().getId());
-		variables.put(index++, cb.getName());
-		variables.put(index++, cb.getDescription());
-		variables.put(index++, cb.getOwner().getId());
-		variables.put(index++, cb.getOid());
-		variables.put(index, cb.getRevisionNotes());
-		executeWithPK(digester.getQuery("create"), variables, null, con);
-		if (isQuerySuccessful()) {
-			cb.setId(getLatestPK());
+		if (eb instanceof CRFVersionBean) {
+			CRFVersionBean cb = (CRFVersionBean) eb;
+			cb.setOid(getValidOid(cb, cb.getDescription(), cb.getName()));
+			HashMap variables = new HashMap();
+			variables.put(index++, cb.getCrfId());
+			variables.put(index++, cb.getStatus().getId());
+			variables.put(index++, cb.getName());
+			variables.put(index++, cb.getDescription());
+			variables.put(index++, cb.getOwner().getId());
+			variables.put(index++, cb.getOid());
+			variables.put(index, cb.getRevisionNotes());
+			executeWithPK(digester.getQuery("create"), variables, null, con);
+			if (isQuerySuccessful()) {
+				cb.setId(getLatestPK());
+			}
 		}
-		return cb;
+		return eb;
 	}
 
 	@Override
 	public void setTypesExpected() {
 		int index = 1;
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.STRING);
+		unsetTypeExpected();
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.STRING);
 
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
 
-		this.setTypeExpected(index++, TypeNames.TIMESTAMP);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index, TypeNames.STRING);
 
 	}
 
@@ -197,120 +201,47 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<CRFVersionBean> findAll() {
-		this.setTypesExpected();
-		ArrayList alist = this.select(digester.getQuery("findAll"));
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
+	public EntityBean findByPK(int id) {
+		CRFVersionBean eb = new CRFVersionBean();
+		setTypesExpected();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		return new ArrayList();
-	}
-
-	/**
-	 * 
-	 * @param crfId
-	 *            CRF Id
-	 * @return Collection of CRF Versions
-	 */
-	public Collection findAllByCRF(int crfId) {
-		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(1, crfId);
-		String sql = digester.getQuery("findAllByCRF");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
+		variables.put(1, id);
+
+		String sql = digester.getQuery("findByPK");
+		ArrayList alist = select(sql, variables);
+		Iterator it = alist.iterator();
+
+		if (it.hasNext()) {
+			eb = (CRFVersionBean) getEntityFromHashMap((HashMap) it.next());
 		}
-		return al;
+		return eb;
 	}
 
 	/**
-	 * 
-	 * @param crfId
-	 *            CRF Id
-	 * @return Collection of CRF Versions
+	 *
+	 * @param oid
+	 *            OC OID
+	 * @return CRF Version
 	 */
-	public Collection findAllActiveByCRF(int crfId) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, crfId);
-		String sql = digester.getQuery("findAllActiveByCRF");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
+	public CRFVersionBean findByOid(String oid) {
+		CRFVersionBean crfVersionBean;
+		unsetTypeExpected();
+		setTypesExpected();
 
-	/**
-	 * 
-	 * @param versionId
-	 *            CRF Version Id
-	 * @return Collection of Items
-	 */
-	public Collection findItemFromMap(int versionId) {
-		int index = 1;
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
 		HashMap variables = new HashMap();
-		variables.put(1, versionId);
-		String sql = digester.getQuery("findItemFromMap");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			ItemBean eb = new ItemBean();
-			HashMap hm = (HashMap) anAlist;
-			eb.setId((Integer) hm.get("item_id"));
-			eb.setName((String) hm.get("name"));
-			Integer ownerId = (Integer) hm.get("owner_id");
-			eb.setOwnerId(ownerId);
+		variables.put(1, oid);
+		String sql = digester.getQuery("findByOID");
 
-			al.add(eb);
-		}
-		return al;
-	}
+		ArrayList rows = select(sql, variables);
+		Iterator it = rows.iterator();
 
-	/**
-	 * 
-	 * @param versionId
-	 *            CRF Version Id
-	 * @return Collection of Items
-	 */
-	public Collection findItemUsedByOtherVersion(int versionId) {
-		int index = 1;
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
-		HashMap variables = new HashMap();
-		variables.put(1, versionId);
-		String sql = digester.getQuery("findItemUsedByOtherVersion");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			ItemBean eb = new ItemBean();
-			HashMap hm = (HashMap) anAlist;
-			eb.setId((Integer) hm.get("item_id"));
-			eb.setName((String) hm.get("name"));
-			eb.setOwnerId((Integer) hm.get("owner_id"));
-			al.add(eb);
+		if (it.hasNext()) {
+			crfVersionBean = (CRFVersionBean) getEntityFromHashMap((HashMap) it.next());
+			return crfVersionBean;
+		} else {
+			return null;
 		}
-		return al;
 	}
 
 	/**
@@ -321,15 +252,16 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	 */
 	public ArrayList findNotSharedItemsByVersion(int versionId) {
 		int index = 1;
-		this.unsetTypeExpected();
-		this.setTypeExpected(index++, TypeNames.INT);
-		this.setTypeExpected(index++, TypeNames.STRING);
-		this.setTypeExpected(index++, TypeNames.INT);
+		unsetTypeExpected();
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index, TypeNames.INT);
+		index = 1;
 		HashMap variables = new HashMap();
-		variables.put(1, versionId);
-		variables.put(2, versionId);
+		variables.put(index++, versionId);
+		variables.put(index, versionId);
 		String sql = digester.getQuery("findNotSharedItemsByVersion");
-		ArrayList alist = this.select(sql, variables);
+		ArrayList alist = select(sql, variables);
 		ArrayList al = new ArrayList();
 		for (Object anAlist : alist) {
 			ItemBean eb = new ItemBean();
@@ -344,55 +276,18 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 
 	/**
 	 * 
-	 * @param versionId
-	 *            CRF Version Id
-	 * @return True if item is used by other version, false otherwise
-	 */
-	public boolean isItemUsedByOtherVersion(int versionId) {
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, versionId);
-		String sql = digester.getQuery("isItemUsedByOtherVersion");
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-		return it.hasNext();
-	}
-
-	/**
-	 * 
 	 * @param itemId
 	 *            Item to check
 	 * @return True if item has data, false otherwise
 	 */
 	public boolean hasItemData(int itemId) {
-		this.setTypesExpected();
+		setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, itemId);
 		String sql = digester.getQuery("hasItemData");
-		ArrayList alist = this.select(sql, variables);
+		ArrayList alist = select(sql, variables);
 		Iterator it = alist.iterator();
 		return it.hasNext();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public EntityBean findByPK(int id) {
-		CRFVersionBean eb = new CRFVersionBean();
-		this.setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, id);
-
-		String sql = digester.getQuery("findByPK");
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-
-		if (it.hasNext()) {
-			eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
-		}
-		return eb;
-
 	}
 
 	/**
@@ -432,9 +327,235 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 	}
 
 	/**
+	 * Find new CRF Version instead of deleted.
+	 *
+	 * @param deletedCRFVersionId
+	 *            int
+	 * @return CRFVersionBean to be set instead of deleted
+	 */
+	public CRFVersionBean findLatestAfterDeleted(int deletedCRFVersionId) {
+
+		CRFVersionBean crfVersionBean;
+		unsetTypeExpected();
+		setTypesExpected();
+
+		int index = 1;
+		HashMap variables = new HashMap();
+		variables.put(index++, deletedCRFVersionId);
+		variables.put(index, deletedCRFVersionId);
+		String sql = digester.getQuery("findLatestAfterDeleted");
+
+		ArrayList rows = select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			crfVersionBean = (CRFVersionBean) getEntityFromHashMap((HashMap) it.next());
+			return crfVersionBean;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 *
+	 * @param crfVersionId
+	 *            CRF Version Id
+	 * @return CRF Id
+	 */
+	public int getCRFIdFromCRFVersionId(int crfVersionId) {
+		int answer = 0;
+
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(1, crfVersionId);
+
+		String sql = digester.getQuery("getCRFIdFromCRFVersionId");
+		ArrayList rows = select(sql, variables);
+
+		if (rows.size() > 0) {
+			HashMap h = (HashMap) rows.get(0);
+			answer = (Integer) h.get("crf_id");
+		}
+		return answer;
+	}
+
+	/**
+	 *
+	 * @param crfId
+	 *            CRF Id
+	 * @param versionName
+	 *            CRF Version Name
+	 * @return CRF Version Id
+	 */
+	public Integer findCRFVersionId(int crfId, String versionName) {
+		int index = 1;
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.INT);
+		HashMap variables = new HashMap();
+		variables.put(index++, crfId);
+		variables.put(index, versionName);
+		ArrayList result = select(digester.getQuery("findCRFVersionId"), variables);
+		HashMap map;
+		Integer crfVersionId = null;
+		if (result.iterator().hasNext()) {
+			map = (HashMap) result.iterator().next();
+			crfVersionId = (Integer) map.get("crf_version_id");
+		}
+		return crfVersionId;
+	}
+
+	/**
+	 * Returns all crf versions by study.
+	 *
+	 * @param studyBean
+	 *            StudyBean
+	 * @return ArrayList of CRF Versions
+	 */
+	public ArrayList<CRFVersionBean> findAllCRFVersions(StudyBean studyBean) {
+		String sql;
+		int index = 1;
+		unsetTypeExpected();
+		HashMap variables = new HashMap();
+		ArrayList<CRFVersionBean> crfVersionList = new ArrayList<CRFVersionBean>();
+
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.TIMESTAMP);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.INT);
+		setTypeExpected(index++, TypeNames.STRING);
+		setTypeExpected(index, TypeNames.STRING);
+
+		index = 1;
+		if (studyBean.getOrigin().equalsIgnoreCase(StudyOrigin.STUDIO.getName())) {
+			sql = digester.getQuery("findAllCRFVersionsInStudy");
+			variables.put(index, studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId());
+		} else {
+			sql = digester.getQuery("findAllCRFVersionsInGUIStudies");
+		}
+
+		List<HashMap> rows = select(sql, variables);
+		for (HashMap map : rows) {
+			crfVersionList.add((CRFVersionBean) getEntityFromHashMap(map));
+		}
+		return crfVersionList;
+	}
+
+	/**
+	 *
+	 * @param oid
+	 *            OC OID
+	 * @return List of CRF Versions
+	 */
+	public ArrayList findAllByOid(String oid) {
+		HashMap variables = new HashMap();
+		variables.put(1, oid);
+
+		return executeFindAllQuery("findAllByOid", variables);
+	}
+
+	/**
+	 *
+	 * @param crfId
+	 *            CRF Id
+	 * @return List of CRF Versions
+	 */
+	public ArrayList findAllByCRFId(int crfId) {
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+
+		return executeFindAllQuery("findAllByCRFId", variables);
+	}
+
+	/**
+	 *
+	 * @param crfId
+	 *            CRF Id
+	 * @return Collection of CRF Versions
+	 */
+	public Collection findAllByCRF(int crfId) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+		String sql = digester.getQuery("findAllByCRF");
+		ArrayList alist = select(sql, variables);
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFVersionBean eb = (CRFVersionBean) getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 *
+	 * @param crfId
+	 *            CRF Id
+	 * @return Collection of CRF Versions
+	 */
+	public Collection findAllActiveByCRF(int crfId) {
+		setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+		String sql = digester.getQuery("findAllActiveByCRF");
+		ArrayList alist = select(sql, variables);
+		ArrayList al = new ArrayList();
+		for (Object anAlist : alist) {
+			CRFVersionBean eb = (CRFVersionBean) getEntityFromHashMap((HashMap) anAlist);
+			al.add(eb);
+		}
+		return al;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * Be careful to use this method because we need to provide different set of CRF Versions depend on origin of
+	 * current study.
+	 */
+	public List<CRFVersionBean> findAll() {
+		setTypesExpected();
+		List<CRFVersionBean> result = new ArrayList<CRFVersionBean>();
+		List<HashMap> mapList = select(digester.getQuery("findAll"));
+		for (HashMap aMapList : mapList) {
+			result.add((CRFVersionBean) getEntityFromHashMap(aMapList));
+		}
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
+		return new ArrayList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
+			boolean blnAscendingSort, String strSearchPhrase) {
+		return new ArrayList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
+		return new ArrayList();
+	}
+
+	/**
 	 * Deletes crf version. Note: it will be better to use the DeleteCrfService.deleteCrfVersion(int crfVersionId)
 	 * instead of this method, cuz service has additional logic.
-	 * 
+	 *
 	 * @param crfVersionId
 	 *            int
 	 */
@@ -461,17 +582,7 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		}
 	}
 
-	/**
-	 * 
-	 * @param crfVersion
-	 *            CRFVersionBean
-	 * @param crfName
-	 *            CRF Name
-	 * @param crfVersionName
-	 *            CRF Version Name
-	 * @return CRF Version OID
-	 */
-	public String getValidOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {
+	private String getValidOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {
 
 		String oid = getOid(crfVersion, crfName, crfVersionName);
 		logger.info(oid);
@@ -480,184 +591,5 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 			oid = crfVersion.getOidGenerator(ds).randomizeOid(oidPreRandomization);
 		}
 		return oid;
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
-			boolean blnAscendingSort, String strSearchPhrase) {
-		return new ArrayList();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		return new ArrayList();
-	}
-
-	/**
-	 * 
-	 * @param oid
-	 *            OC OID
-	 * @return List of CRF Versions
-	 */
-	public ArrayList findAllByOid(String oid) {
-		HashMap variables = new HashMap();
-		variables.put(1, oid);
-
-		return executeFindAllQuery("findAllByOid", variables);
-	}
-
-	/**
-	 * 
-	 * @param crfVersionId
-	 *            CRF Version Id
-	 * @return CRF Id
-	 */
-	public int getCRFIdFromCRFVersionId(int crfVersionId) {
-		int answer = 0;
-
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-
-		HashMap variables = new HashMap();
-		variables.put(1, crfVersionId);
-
-		String sql = digester.getQuery("getCRFIdFromCRFVersionId");
-		ArrayList rows = select(sql, variables);
-
-		if (rows.size() > 0) {
-			HashMap h = (HashMap) rows.get(0);
-			answer = (Integer) h.get("crf_id");
-		}
-		return answer;
-	}
-
-	/**
-	 * 
-	 * @param crfId
-	 *            CRF Id
-	 * @return List of CRF Versions
-	 */
-	public ArrayList findAllByCRFId(int crfId) {
-		HashMap variables = new HashMap();
-		variables.put(1, crfId);
-
-		return executeFindAllQuery("findAllByCRFId", variables);
-	}
-
-	/**
-	 * Returns all crf versions by study ud.
-	 * 
-	 * @param studyId
-	 *            int
-	 * @return List of CRF Versions
-	 */
-	public List<CRFVersionBean> findAllByStudyId(int studyId) {
-		List<CRFVersionBean> crfVersionList = new ArrayList<CRFVersionBean>();
-		int index = 1;
-		unsetTypeExpected();
-		setTypeExpected(index++, TypeNames.INT);
-		setTypeExpected(index++, TypeNames.INT);
-		setTypeExpected(index++, TypeNames.STRING);
-		setTypeExpected(index++, TypeNames.STRING);
-		setTypeExpected(index++, TypeNames.STRING);
-		setTypeExpected(index++, TypeNames.INT);
-		setTypeExpected(index++, TypeNames.TIMESTAMP);
-		setTypeExpected(index++, TypeNames.TIMESTAMP);
-		setTypeExpected(index++, TypeNames.INT);
-		setTypeExpected(index++, TypeNames.INT);
-		setTypeExpected(index++, TypeNames.STRING);
-		setTypeExpected(index, TypeNames.STRING);
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		String sql = digester.getQuery("findAllByStudyId");
-		List<HashMap> rows = select(sql, variables);
-		for (HashMap map : rows) {
-			crfVersionList.add((CRFVersionBean) getEntityFromHashMap(map));
-		}
-		return crfVersionList;
-	}
-
-	/**
-	 * 
-	 * @param crfId
-	 *            CRF Id
-	 * @param versionName
-	 *            CRF Version Name
-	 * @return CRF Version Id
-	 */
-	public Integer findCRFVersionId(int crfId, String versionName) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		HashMap variables = new HashMap();
-		variables.put(1, crfId);
-		variables.put(2, versionName);
-		ArrayList result = this.select(digester.getQuery("findCRFVersionId"), variables);
-		HashMap map;
-		Integer crfVersionId = null;
-		if (result.iterator().hasNext()) {
-			map = (HashMap) result.iterator().next();
-			crfVersionId = (Integer) map.get("crf_version_id");
-		}
-		return crfVersionId;
-	}
-
-	/**
-	 * 
-	 * @param oid
-	 *            OC OID
-	 * @return CRF Version
-	 */
-	public CRFVersionBean findByOid(String oid) {
-		CRFVersionBean crfVersionBean;
-		this.unsetTypeExpected();
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, oid);
-		String sql = digester.getQuery("findByOID");
-
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			crfVersionBean = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
-			return crfVersionBean;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Find new CRF Version instead of deleted.
-	 * 
-	 * @param deletedCRFVersionId
-	 *            int
-	 * @return CRFVersionBean to be set instead of deleted
-	 */
-	public CRFVersionBean findLatestAfterDeleted(int deletedCRFVersionId) {
-
-		CRFVersionBean crfVersionBean;
-		this.unsetTypeExpected();
-		setTypesExpected();
-
-		HashMap variables = new HashMap();
-		variables.put(1, deletedCRFVersionId);
-		variables.put(2, deletedCRFVersionId);
-		String sql = digester.getQuery("findLatestAfterDeleted");
-
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			crfVersionBean = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
-			return crfVersionBean;
-		} else {
-			return null;
-		}
 	}
 }

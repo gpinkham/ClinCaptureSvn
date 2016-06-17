@@ -117,18 +117,17 @@ public class CRFDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllDoesNotReturnAnEmptyList() throws OpenClinicaException {
-		assertFalse(crfdao.findAll().isEmpty());
+		assertFalse(crfdao.findAllCRFs(studyBean).isEmpty());
 	}
 
 	@Test
 	public void testThatFindAllByStudyReturnsAllExistingCRFs() throws OpenClinicaException {
-		int studyId = 1;
-		assertEquals(6, crfdao.findAllByStudy(studyId).size());
+		assertEquals(6, crfdao.findAllCRFs(studyBean).size());
 	}
 
 	@Test
 	public void testThatGetCountofActiveCRFsReturnsValidSize() throws OpenClinicaException {
-		assertTrue(crfdao.getCountofActiveCRFs() > 0);
+		assertTrue(crfdao.getCountOfActiveCRFs(studyBean) > 0);
 	}
 
 	@Test
@@ -138,23 +137,13 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testGetAllCRFNamesFromStudyNotReturnNull() throws OpenClinicaException {
-		assertNotNull(crfdao.getAllCRFNamesFromStudy(1));
-	}
-
-	@Test
-	public void testGetAllCRFNamesFromStudyReturnCorrectSize() throws OpenClinicaException {
-		assertEquals(6, crfdao.getAllCRFNamesFromStudy(1).size());
-	}
-
-	@Test
 	public void testThatFindAllActiveByDefinitionsForCurrentStudyReturnsCorrectSize() throws Exception {
 		assertEquals(6, crfdao.findAllActiveByDefinitionsForCurrentStudy(1).size());
 	}
 
 	@Test
 	public void testThatFindAllActiveCrfsReturnsCorrectSize() throws OpenClinicaException {
-		assertEquals(6, crfdao.findAllActiveCrfs().size());
+		assertEquals(6, crfdao.findAllActiveCRFs(studyBean).size());
 	}
 
 	@Test

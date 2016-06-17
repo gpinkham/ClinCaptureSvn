@@ -74,7 +74,7 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindCRFVersionIdReturnsCorrectCRFVersion() throws OpenClinicaException {
-		assertEquals(new Integer(1), crfVersionDao.findCRFVersionId(1, "v2.0"));
+		assertEquals(Integer.valueOf(1), crfVersionDao.findCRFVersionId(1, "v2.0"));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllByStudyIdReturnsCorrectCollectionSize() throws OpenClinicaException {
-		assertEquals(crfVersionDao.findAllByStudyId(1).size(), 8);
+		assertEquals(crfVersionDao.findAllCRFVersions(studyBean).size(), 8);
 	}
 
 	@Test

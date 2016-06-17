@@ -93,17 +93,15 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 		String submit = request.getParameter("Submit");
 
 		CRFDAO cdao = getCRFDAO();
-		ArrayList eventDefinitionCRFs = getEventDefinitionCRFsFromRequest(request);
-		ArrayList<EventDefinitionCRFBean> crfs = (ArrayList) cdao.findAllActiveCrfs();
+		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = getEventDefinitionCRFsFromRequest(request);
+		ArrayList<CRFBean> crfs = (ArrayList) cdao.findAllActiveCRFs(getCurrentStudy());
 		HashMap crfIds = new HashMap();
-		for (Object edc1 : eventDefinitionCRFs) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
+		for (EventDefinitionCRFBean edc : eventDefinitionCRFs) {
 			Integer crfId = edc.getCrfId();
 			crfIds.put(crfId, edc);
 		}
-		for (Object crf1 : crfs) {
-			CRFBean crf = (CRFBean) crf1;
-			if (crfIds.containsKey(new Integer(crf.getId()))) {
+		for (CRFBean crf : crfs) {
+			if (crfIds.containsKey(crf.getId())) {
 				crf.setSelected(true);
 			}
 		}
@@ -259,7 +257,7 @@ public class AddCRFToDefinitionServlet extends SpringServlet {
 	private int getTheLastOrdinal(ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs) {
 		int result = 0;
 		for (EventDefinitionCRFBean edcrf : eventDefinitionCRFs) {
-			result = result < edcrf.getOrdinal()? edcrf.getOrdinal() : result;
+			result = result < edcrf.getOrdinal() ? edcrf.getOrdinal() : result;
 		}
 		return result;
 	}

@@ -29,7 +29,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.clinovo.service.ListCRFService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -37,8 +36,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -49,14 +48,22 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.service.ListCRFService;
+
 /**
- * Lists all the CRF and their CRF versions
+ * Lists all the CRF and their CRF versions.
  * 
  * @author jxu
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ListCRFServlet extends RememberLastPage {
+
+	private static final int FOUR = 4;
+	private static final int FIVE = 5;
+	private static final int NINE = 9;
+	private static final int TEN = 10;
+	private static final int ELEVEN = 11;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -106,7 +113,8 @@ public class ListCRFServlet extends RememberLastPage {
 			return;
 		}
 
-		String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
+		String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;
+		// for
 		// crf
 		// version
 		// spreadsheet
@@ -114,7 +122,7 @@ public class ListCRFServlet extends RememberLastPage {
 
 		CRFDAO cdao = getCRFDAO();
 		CRFVersionDAO vdao = getCRFVersionDAO();
-		ArrayList crfs = (ArrayList) cdao.findAll();
+		ArrayList crfs = (ArrayList) cdao.findAllCRFs(getCurrentStudy());
 		for (Object crf : crfs) {
 			CRFBean eb = (CRFBean) crf;
 			logger.info("crf id:" + eb.getId());
@@ -147,16 +155,16 @@ public class ListCRFServlet extends RememberLastPage {
 				getResWord().getString("date_updated"), getResWord().getString("last_updated_by"),
 				getResWord().getString("crf_oid"), getResWord().getString("versions"),
 				getResWord().getString("version_oid"), getResWord().getString("date_created"),
-				getResWord().getString("owner"), getResWord().getString("status"),
-				getResWord().getString("download"), getResWord().getString("actions")};
+				getResWord().getString("owner"), getResWord().getString("status"), getResWord().getString("download"),
+				getResWord().getString("actions")};
 
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(0);
-		table.hideColumnLink(4);
-		table.hideColumnLink(5); // oid column
-		table.hideColumnLink(9);
-		table.hideColumnLink(10);
-		table.hideColumnLink(11);
+		table.hideColumnLink(FOUR);
+		table.hideColumnLink(FIVE); // oid column
+		table.hideColumnLink(NINE);
+		table.hideColumnLink(TEN);
+		table.hideColumnLink(ELEVEN);
 		table.setQuery("ListCRF", new HashMap());
 		table.addLink(getResWord().getString("blank_CRF_template"), "DownloadVersionSpreadSheet?template=1");
 		table.addLink(getResWord().getString("randomization_crf_template"), "DownloadVersionSpreadSheet?template=2");
@@ -220,7 +228,6 @@ public class ListCRFServlet extends RememberLastPage {
 	}
 
 	private ListCRFService getListCRFService(ServletContext context) {
-		return (ListCRFService) SpringServletAccess.getApplicationContext(context)
-				.getBean("listCRFService");
+		return (ListCRFService) SpringServletAccess.getApplicationContext(context).getBean("listCRFService");
 	}
 }
