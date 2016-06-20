@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RuleImport>
+    <RuleAssignment>
+        <Target>F_AGEN.IG_AGEN_UNGROUPED.I_AGEN_PERIODSTART</Target>
+        <RuleRef OID="RULE_FAG_1A">
+            <InsertAction IfExpressionEvaluates="true">
+                <Run AdministrativeDataEntry="true"
+                    InitialDataEntry="true" DoubleDataEntry="false"
+                    ImportDataEntry="false" Batch="false"/>
+                <DestinationProperty OID="F_AGEN.IG_AGEN_UNGROUPED.I_AGEN_MTD_DETERMINED">
+                    <ValueExpression>1</ValueExpression>
+                </DestinationProperty>
+            </InsertAction>
+        </RuleRef>
+    </RuleAssignment>
+    <RuleDef OID="RULE_FAG_1A" Name="Test_Rule_1">
+        <Description>Completion_BASE7</Description>
+        <Expression>F_AGEN.IG_AGEN_UNGROUPED.I_AGEN_PERIODSTART ne ""</Expression>
+    </RuleDef>
+</RuleImport>

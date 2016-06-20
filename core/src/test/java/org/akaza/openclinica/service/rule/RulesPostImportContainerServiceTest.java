@@ -13,10 +13,16 @@
 
 package org.akaza.openclinica.service.rule;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -24,9 +30,62 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.xml.XMLContext;
 import org.junit.Test;
+import org.springframework.core.io.DefaultResourceLoader;
 
 public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
+
+	private RulesPostImportContainer parseRuleFile(String ruleFileName) throws Exception {
+		RulesPostImportContainer ruleImport;
+		File ruleFile = new DefaultResourceLoader().getResource(ruleFileName).getFile();
+		InputStream xsdFile = coreResources.getInputStream("rules.xsd");
+		XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
+		schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
+		XMLContext xmlContext = new XMLContext();
+		Mapping mapping = xmlContext.createMapping();
+		mapping.loadMapping(coreResources.getURL("mapping.xml"));
+		xmlContext.addMapping(mapping);
+		org.exolab.castor.xml.Unmarshaller unmarshaller = xmlContext.createUnmarshaller();
+		unmarshaller.setWhitespacePreserve(false);
+		unmarshaller.setClass(RulesPostImportContainer.class);
+		Reader reader = new InputStreamReader(new FileInputStream(ruleFile), "UTF-8");
+		ruleImport = (RulesPostImportContainer) unmarshaller.unmarshal(reader);
+		ruleImport.initializeRuleDef();
+		return ruleImport;
+	}
+
+	@Test
+	public void testThatItIsImpossibleToUserStaticValuesInValueExpressionTag() throws Exception {
+		StudyBean study = (StudyBean) studyDAO.findByPK(1);
+		postImportContainerService.setCurrentStudy(study);
+		RulesPostImportContainer importedRules = parseRuleFile("rules/InsertRuleWithWrongValue.xml");
+		importedRules = postImportContainerService.validateRuleDefs(importedRules);
+		importedRules = postImportContainerService.validateRuleSetDefs(importedRules);
+		assertEquals(importedRules.getInValidRuleSetDefs().size(), 1);
+		org.akaza.openclinica.domain.rule.AuditableBeanWrapper<RuleSetBean> auditableBeanWrapper = importedRules
+				.getInValidRuleSetDefs().get(0);
+		assertEquals(auditableBeanWrapper.getImportErrors().size(), 1);
+		String message = auditableBeanWrapper.getImportErrors().get(0);
+		assertEquals(message, "InsertAction is not valid: Value provided for ValueExpression is Invalid");
+	}
+
+	@Test
+	public void testThatItIsPossibleToUseStaticValuesInTheDestinationPropertyTag() throws Exception {
+		StudyBean study = (StudyBean) studyDAO.findByPK(1);
+		postImportContainerService.setCurrentStudy(study);
+		RulesPostImportContainer importedRules = parseRuleFile("rules/InsertRuleWithCorrectValue.xml");
+		importedRules = postImportContainerService.validateRuleDefs(importedRules);
+		importedRules = postImportContainerService.validateRuleSetDefs(importedRules);
+		assertEquals(importedRules.getInValidRuleSetDefs().size(), 0);
+		assertEquals(importedRules.getInValidRuleDefs().size(), 0);
+		assertEquals(importedRules.getInValidRules().size(), 0);
+		assertEquals(importedRules.getValidRuleSetExpressionValues().size(), 1);
+		assertEquals(importedRules.getValidRuleSetDefs().size(), 1);
+		assertEquals(importedRules.getValidRuleDefs().size(), 1);
+		assertEquals(importedRules.getValidRules().size(), 1);
+	}
 
 	@Test
 	public void testThatGetDuplicationRuleSetDefsReturnsZeroOnNoDuplicates() {
@@ -40,7 +99,7 @@ public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
 		assertEquals(0, container.getDuplicateRuleDefs().size());
 
 	}
-	
+
 	@Test
 	public void testThatGetDuplicationRuleSetDefsReturnsZeroOnNoInvalidRuleDefs() {
 		StudyBean study = (StudyBean) studyDAO.findByPK(1);

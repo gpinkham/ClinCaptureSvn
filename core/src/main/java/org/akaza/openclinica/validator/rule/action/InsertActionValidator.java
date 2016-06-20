@@ -10,8 +10,12 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.validator.rule.action;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
@@ -36,21 +40,42 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
-
-@SuppressWarnings({ "rawtypes" })
+/**
+ * InsertActionValidator.
+ */
+@SuppressWarnings({"rawtypes"})
 public class InsertActionValidator implements Validator {
 
-	DataSource dataSource;
-	ExpressionService expressionService;
+	private static final int EEXPRESSION_SIZE = 4;
+	private static final int ALLOWED_LENGTH_4 = 4;
+	private static final int ALLOWED_LENGTH_3 = 3;
+	private static final int REAL_DATA_TYPE_ID = 7;
+	private static final int DATE_DATA_TYPE_ID = 9;
+	private static final int FILE_DATA_TYPE_ID = 11;
+	private static final int PDATE_DATA_TYPE_ID = 10;
+	private static final int INTEGER_DATA_TYPE_ID = 6;
 
+	private DataSource dataSource;
+	private ExpressionService expressionService;
+
+	/**
+	 * InsertActionHolder.
+	 */
 	public static class InsertActionHolder {
-		public RuleSetBean ruleSetBean;
-		public EventDefinitionCRFBean eventDefinitionCRFBean;
-		public Object obj;
+		private RuleSetBean ruleSetBean;
+		private EventDefinitionCRFBean eventDefinitionCRFBean;
+		private Object obj;
 
+		/**
+		 * InsertActionHolder constructor.
+		 * 
+		 * @param ruleSetBean
+		 *            RuleSetBean
+		 * @param eventDefinitionCRFBean
+		 *            eventDefinitionCRFBean
+		 * @param obj
+		 *            Object
+		 */
 		public InsertActionHolder(RuleSetBean ruleSetBean, EventDefinitionCRFBean eventDefinitionCRFBean, Object obj) {
 			this.obj = obj;
 			this.ruleSetBean = ruleSetBean;
@@ -58,20 +83,42 @@ public class InsertActionValidator implements Validator {
 		}
 	}
 
+	/**
+	 * InsertActionValidator constructor.
+	 * 
+	 * @param dataSource
+	 *            DataSource
+	 */
 	public InsertActionValidator(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
 	/**
-	 * This Validator validates just Person instances
+	 * This Validator validates just Person instances.
+	 * 
+	 * @param clazz
+	 *            Class
+	 * @return boolean
 	 */
 	public boolean supports(Class clazz) {
 		return InsertActionBean.class.equals(clazz);
 	}
 
+	/**
+	 * Validates oid in property bean.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSetBean
+	 * @param propertyBean
+	 *            PropertyBean
+	 * @param e
+	 *            Errors
+	 * @param p
+	 *            String
+	 */
 	public void validateOidInPropertyBean(RuleSetBean ruleSetBean, PropertyBean propertyBean, Errors e, String p) {
 		if (getExpressionService().isExpressionPartial(ruleSetBean.getTarget().getValue())) {
-			if (getExpressionService().getExpressionSize(propertyBean.getOid()) > 4) {
+			if (getExpressionService().getExpressionSize(propertyBean.getOid()) > EEXPRESSION_SIZE) {
 				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
 			}
 			try {
@@ -84,13 +131,28 @@ public class InsertActionValidator implements Validator {
 					ruleSetBean.getTarget().getValue());
 			ItemBean item = getExpressionService().getItemBeanFromExpression(expression);
 
-			if (!(getExpressionService().isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean, 3) || getExpressionService()
-					.isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean, 4)) || item == null) {
+			if (!(getExpressionService().isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean,
+					ALLOWED_LENGTH_3)
+					|| getExpressionService().isInsertActionExpressionValid(propertyBean.getOid(), ruleSetBean,
+							ALLOWED_LENGTH_4))
+					|| item == null) {
 				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
 			}
 		}
 	}
 
+	/**
+	 * Validates value expression in property bean.
+	 * 
+	 * @param ruleSetBean
+	 *            RuleSetBean
+	 * @param propertyBean
+	 *            PropertyBean
+	 * @param e
+	 *            Errors
+	 * @param p
+	 *            String
+	 */
 	public void validateValueExpressionInPropertyBean(RuleSetBean ruleSetBean, PropertyBean propertyBean, Errors e,
 			String p) {
 		if (getExpressionService().isExpressionPartial(ruleSetBean.getTarget().getValue())) {
@@ -105,20 +167,25 @@ public class InsertActionValidator implements Validator {
 						"Value provided for ValueExpression is Invalid");
 			}
 			// Use ValueExression in destinationProperty to get CRF
-			ItemBean item = getExpressionService().getItemBeanFromExpression(
-					propertyBean.getValueExpression().getValue());
-			CRFBean destinationPropertyValueExpressionCrf = getCrfDAO().findByItemOid(item.getOid());
-			// Use Target to get CRF
-			CRFBean targetCrf = getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue());
-			if (targetCrf == null) {
-				ItemBean targetItem = getExpressionService().getItemBeanFromExpression(
-						ruleSetBean.getTarget().getValue());
-				targetCrf = getCrfDAO().findByItemOid(targetItem.getOid());
-
-			}
-			if (destinationPropertyValueExpressionCrf.getId() != targetCrf.getId()) {
+			ItemBean item = getExpressionService()
+					.getItemBeanFromExpression(propertyBean.getValueExpression().getValue());
+			if (item == null) {
 				e.rejectValue(p + "valueExpression", "valueExpression.invalid",
 						"Value provided for ValueExpression is Invalid");
+			} else {
+				CRFBean destinationPropertyValueExpressionCrf = getCrfDAO().findByItemOid(item.getOid());
+				// Use Target to get CRF
+				CRFBean targetCrf = getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue());
+				if (targetCrf == null) {
+					ItemBean targetItem = getExpressionService()
+							.getItemBeanFromExpression(ruleSetBean.getTarget().getValue());
+					targetCrf = getCrfDAO().findByItemOid(targetItem.getOid());
+
+				}
+				if (destinationPropertyValueExpressionCrf.getId() != targetCrf.getId()) {
+					e.rejectValue(p + "valueExpression", "valueExpression.invalid",
+							"Value provided for ValueExpression is Invalid");
+				}
 			}
 		} else {
 			String valueExpression = getExpressionService().constructFullExpressionFromPartial(
@@ -132,6 +199,14 @@ public class InsertActionValidator implements Validator {
 		}
 	}
 
+	/**
+	 * Validates object.
+	 * 
+	 * @param obj
+	 *            Object
+	 * @param e
+	 *            Errors
+	 */
 	public void validate(Object obj, Errors e) {
 		RuleSetBean ruleSetBean = ((InsertActionHolder) obj).ruleSetBean;
 		InsertActionBean insertActionBean = (InsertActionBean) ((InsertActionHolder) obj).obj;
@@ -147,7 +222,8 @@ public class InsertActionValidator implements Validator {
 					&& propertyBean.getValueExpression().getValue().length() != 0) {
 
 				String expressionContextName = propertyBean.getValueExpression().getContextName();
-				Context context = expressionContextName != null ? Context.getByName(expressionContextName)
+				Context context = expressionContextName != null
+						? Context.getByName(expressionContextName)
 						: Context.OC_RULES_V1;
 				propertyBean.getValueExpression().setContext(context);
 
@@ -178,21 +254,21 @@ public class InsertActionValidator implements Validator {
 				}
 			}
 
-			// TODO: check Null Value logic based on not event definition crf being selected
+			// TODO check Null Value logic based on not event definition crf being selected
 			if (itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.CHECKBOX)
 					|| itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.SELECTMULTI)) {
 				if (eventDefinitionCRFBean == null) {
 					result = true;
 					break;
 				}
-				if (matchValueWithManyOptions(eventDefinitionCRFBean, value, itemFormMetadataBean.getResponseSet()
-						.getOptions()) != null) {
+				if (matchValueWithManyOptions(eventDefinitionCRFBean, value,
+						itemFormMetadataBean.getResponseSet().getOptions()) != null) {
 					result = true;
 					break;
 				}
 			}
 
-			// TODO: check Null Value logic based on not event definition crf being selected
+			// TODO check Null Value logic based on not event definition crf being selected
 			if (itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.TEXT)
 					|| itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.TEXTAREA)) {
 				if (eventDefinitionCRFBean == null) {
@@ -239,27 +315,29 @@ public class InsertActionValidator implements Validator {
 
 	private String matchValueWithManyOptions(EventDefinitionCRFBean eventDefinitionCRFBean, String value,
 			List<ResponseOptionBean> options) {
-		String entireOptions = "";
+		StringBuilder entireOptionsBuilder = new StringBuilder("");
 		String[] simValues = value.split(",");
 		boolean checkComplete;
 
 		if (!options.isEmpty()) {
 			for (ResponseOptionBean responseOptionBean : options) {
-				entireOptions += responseOptionBean.getValue();
+				entireOptionsBuilder.append(responseOptionBean.getValue());
 			}
 			// remove spaces, since they are causing problems:
-			entireOptions = entireOptions.replace(" ", "");
+			entireOptionsBuilder = new StringBuilder(entireOptionsBuilder.toString().replace(" ", ""));
 
 			ArrayList nullValues = eventDefinitionCRFBean.getNullValuesList();
 
 			for (Object nullValue : nullValues) {
 				NullValue nullValueTerm = (NullValue) nullValue;
-				entireOptions += nullValueTerm.getName();
+				entireOptionsBuilder.append(nullValueTerm.getName());
 			}
+
+			String entireOptions = entireOptionsBuilder.toString();
 
 			for (String sim : simValues) {
 				sim = sim.replace(" ", "");
-				checkComplete = entireOptions.contains(sim);// Pattern.matches(entireOptions,sim);
+				checkComplete = entireOptions.contains(sim); // Pattern.matches(entireOptions,sim);
 				if (!checkComplete) {
 					return null;
 				}
@@ -274,45 +352,38 @@ public class InsertActionValidator implements Validator {
 
 	private void checkValidityBasedOnDataType(ItemBean itemBean, String value, String index, Errors e) {
 		switch (itemBean.getItemDataTypeId()) {
-		case 6: { // ItemDataType.INTEGER
-			try {
-				Integer.valueOf(value);
-			} catch (NumberFormatException nfe) {
-				e.rejectValue(index + "value", "value.invalid.integer");
-			}
-			break;
+			case INTEGER_DATA_TYPE_ID : // ItemDataType.INTEGER
+				try {
+					Integer.parseInt(value);
+				} catch (NumberFormatException nfe) {
+					e.rejectValue(index + "value", "value.invalid.integer");
+				}
+				break;
+			case REAL_DATA_TYPE_ID : // ItemDataType.REAL
+				try {
+					Float.parseFloat(value);
+				} catch (NumberFormatException nfe) {
+					e.rejectValue(index + "value", "value.invalid.float");
+				}
+				break;
+			case DATE_DATA_TYPE_ID : // ItemDataType.DATE
+				if (!ExpressionTreeHelper.isDateyyyyMMdd(value)) {
+					e.rejectValue(index + "value", "value.invalid.date");
+				}
+				break;
+			case PDATE_DATA_TYPE_ID : // ItemDataType.PDATE
+				try {
+					Float.parseFloat(value);
+				} catch (NumberFormatException nfe) {
+					e.rejectValue(index + "value", "value.invalid.float");
+				}
+				break;
+			case FILE_DATA_TYPE_ID : // ItemDataType.FILE
+				e.rejectValue(index + "value", "value.notSupported.file");
+				break;
+			default :
+				break;
 		}
-		case 7: { // ItemDataType.REAL
-			try {
-				Float.valueOf(value);
-			} catch (NumberFormatException nfe) {
-				e.rejectValue(index + "value", "value.invalid.float");
-			}
-			break;
-		}
-		case 9: { // ItemDataType.DATE
-			if (!ExpressionTreeHelper.isDateyyyyMMdd(value)) {
-				e.rejectValue(index + "value", "value.invalid.date");
-			}
-			break;
-		}
-		case 10: { // ItemDataType.PDATE
-			try {
-				Float.valueOf(value);
-			} catch (NumberFormatException nfe) {
-				e.rejectValue(index + "value", "value.invalid.float");
-			}
-			break;
-		}
-		case 11: { // ItemDataType.FILE
-			e.rejectValue(index + "value", "value.notSupported.file");
-			break;
-		}
-
-		default:
-			break;
-		}
-
 	}
 
 	public ItemDAO getItemDAO() {
