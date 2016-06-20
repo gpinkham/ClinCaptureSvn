@@ -104,7 +104,8 @@ function MessageSourceGetter() {
 		selectVersion: "",
 		selectCRF: "",
 		selectEvent: "",
-		descriptionLength: ""
+		descriptionLength: "",
+		insertValueLength: ""
 	};
 	this.validations = {
 		discrepancyAction: "",

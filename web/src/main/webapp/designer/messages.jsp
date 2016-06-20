@@ -91,6 +91,7 @@
 		messageSource.messages.selectCRF = '<fmt:message bundle="${resword}" key="rs.message.selectCRF"/>';
 		messageSource.messages.selectVersion = '<fmt:message bundle="${resword}" key="rs.message.selectVersion"/>';
 		messageSource.messages.descriptionLength = '<fmt:message bundle="${resword}" key="rs.message.descriptionLength"/>';
+		messageSource.messages.insertValueLength = '<fmt:message bundle="${resword}" key="rs.message.insertValueLength"/>';
 
 		messageSource.validations.initialDe = '<fmt:message bundle="${resword}" key="initial_data_entry"/>';
 		messageSource.validations.administrativeDe = '<fmt:message bundle="${resword}" key="administrative_editing"/>';

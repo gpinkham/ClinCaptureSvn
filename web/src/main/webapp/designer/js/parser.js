@@ -799,6 +799,9 @@ Parser.prototype.isValid = function(expression) {
 					if (destinations[i].oid === undefined) {
 						valid = false;
 						message = messageSource.validations.missingDestination;
+					} else if (destinations[i].value.length > 500) {
+						valid = false;
+						message = messageSource.messages.insertValueLength;
 					}
 				}
 			}
