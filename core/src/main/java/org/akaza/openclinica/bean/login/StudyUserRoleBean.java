@@ -53,7 +53,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	private boolean canSDV;
 	private int primaryKey;
 	private String token;
-	private Date tokenExpirationDate;
+	private Date tokenGenerationDate;
 
 	/**
 	 * Default study user role bean constructor.
@@ -358,11 +358,11 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		}
 	}
 
-	public Date getTokenExpirationDate() {
-		return tokenExpirationDate;
+	public Date getTokenGenerationDate() {
+		return tokenGenerationDate;
 	}
 
-	public void setTokenExpirationDate(Date tokenExpirationDate) {
-		this.tokenExpirationDate = tokenExpirationDate;
+	public void setTokenGenerationDate(Date tokenGenerationDate) {
+		this.tokenGenerationDate = tokenGenerationDate;
 	}
 }

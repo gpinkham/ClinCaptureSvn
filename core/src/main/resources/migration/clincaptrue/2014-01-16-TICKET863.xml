@@ -245,4 +245,14 @@
         </insert>
     </changeSet>
 
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET863-19">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT count(*) FROM system WHERE name = 'tokenExpirationDate'</sqlCheck>
+        </preConditions>
+        <comment>Rename tokenExpirationDate parameter to the tokenExpirationInHours</comment>
+        <sql splitStatements="false">
+            update system set name = 'tokenExpirationInHours' where name = 'tokenExpirationDate';
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

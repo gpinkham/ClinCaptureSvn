@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,10 +108,11 @@ public class PermissionChecker extends HandlerInterceptorAdapter {
 					HttpServletResponse.SC_UNAUTHORIZED);
 		}
 
-		int tokenExpirationDate = CoreResources.getTokenExpirationDate();
-		if (tokenExpirationDate > 0) {
-			if (studyUserRoleBean.getTokenExpirationDate() == null
-					|| new Date().compareTo(studyUserRoleBean.getTokenExpirationDate()) > 0) {
+		int tokenExpirationInHours = CoreResources.getTokenExpirationInHours();
+		if (tokenExpirationInHours > 0) {
+			if (studyUserRoleBean.getTokenGenerationDate() == null
+					|| new Period(studyUserRoleBean.getTokenGenerationDate().getTime(), new Date().getTime())
+							.getHours() >= tokenExpirationInHours) {
 				throw new RestException(messageSource, "rest.authenticationservice.tokenExpired",
 						HttpServletResponse.SC_UNAUTHORIZED);
 			}

@@ -132,11 +132,15 @@
 				, status_id = ?
 				, date_updated = NOW()
 				, update_id = ?
-				, token = ?
-				, token_expiration_date = ?
 			WHERE
 				study_id = ?
 				AND user_name = ?
+		</sql>
+	</query>
+	<query>
+		<name>saveToken</name>
+		<sql>
+			UPDATE study_user_role SET token = ?, token_generation_date = ? WHERE study_id = ? AND user_name = ?
 		</sql>
 	</query>
 	<query>

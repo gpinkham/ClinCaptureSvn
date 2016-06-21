@@ -30,8 +30,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
-import liquibase.integration.spring.SpringLiquibase;
-
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
@@ -51,6 +49,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
+import liquibase.integration.spring.SpringLiquibase;
+
 /**
  * Core resources.
  */
@@ -63,6 +63,15 @@ public class CoreResources implements ResourceLoaderAware {
 	public static final Set<String> CALENDAR_LOCALES = new HashSet<String>();
 
 	public static final String UTF_8 = "utf-8";
+
+	public static final int MAX_IDLE = 2;
+	public static final int MAX_ACTIVE = 50;
+	public static final int BUFFER_SIZE = 512;
+	public static final int MAX_WAIT = 180000;
+	public static final int BYTE_ARRAY_SIZE = 10;
+	public static final int REMOVE_ABANDONED_TIMEOUT = 300;
+	public static final int MIN_EVICTABLE_IDLE_TIME_MILLIS = 600000;
+	public static final int TIME_BETWEEN_EVICTION_RUNS_MILLIS = 300000;
 
 	private static boolean copyODM;
 
@@ -92,9 +101,10 @@ public class CoreResources implements ResourceLoaderAware {
 		PreparedStatement ps = connection.prepareStatement("select name, value, type from system");
 		ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
-			String propertyName = rs.getString(1);
-			String propertyValue = rs.getString(2);
-			String propertyType = rs.getString(3);
+			int index = 1;
+			String propertyName = rs.getString(index++);
+			String propertyValue = rs.getString(index++);
+			String propertyType = rs.getString(index);
 			propertyValue = (propertyValue == null ? "" : propertyValue).trim();
 			if (propertyName.equals("filePath")) {
 				filePathIsEmptyInDb = propertyValue.isEmpty();
@@ -184,16 +194,16 @@ public class CoreResources implements ResourceLoaderAware {
 			dataSource.setUsername(dataInfo.getProperty("username"));
 			dataSource.setPassword(dataInfo.getProperty("password"));
 			dataSource.setDriverClassName(dataInfo.getProperty("driver"));
-			dataSource.setMaxActive(50);
-			dataSource.setMaxIdle(2);
-			dataSource.setMaxWait(180000);
+			dataSource.setMaxActive(MAX_ACTIVE);
+			dataSource.setMaxIdle(MAX_IDLE);
+			dataSource.setMaxWait(MAX_WAIT);
 			dataSource.setRemoveAbandoned(true);
-			dataSource.setRemoveAbandonedTimeout(300);
+			dataSource.setRemoveAbandonedTimeout(REMOVE_ABANDONED_TIMEOUT);
 			dataSource.setLogAbandoned(true);
 			dataSource.setTestWhileIdle(true);
 			dataSource.setTestOnReturn(true);
-			dataSource.setTimeBetweenEvictionRunsMillis(300000);
-			dataSource.setMinEvictableIdleTimeMillis(600000);
+			dataSource.setTimeBetweenEvictionRunsMillis(TIME_BETWEEN_EVICTION_RUNS_MILLIS);
+			dataSource.setMinEvictableIdleTimeMillis(MIN_EVICTABLE_IDLE_TIME_MILLIS);
 			connection = dataSource.getConnection();
 
 			SpringLiquibase liquibase = new SpringLiquibase();
@@ -487,7 +497,7 @@ public class CoreResources implements ResourceLoaderAware {
 	@Deprecated
 	private void copyFiles(ByteArrayInputStream fis, File dest) {
 		FileOutputStream fos = null;
-		byte[] buffer = new byte[512]; // Buffer 4K at a time (you can change this).
+		byte[] buffer = new byte[BUFFER_SIZE]; // Buffer 4K at a time (you can change this).
 		int bytesRead;
 		LOGGER.debug("fis?" + fis);
 		try {
@@ -539,7 +549,7 @@ public class CoreResources implements ResourceLoaderAware {
 	 */
 	private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
 
-		ByteArrayInputStream[] listSrcFiles = new ByteArrayInputStream[10];
+		ByteArrayInputStream[] listSrcFiles = new ByteArrayInputStream[BYTE_ARRAY_SIZE];
 		String[] fileNames = {"cd_odm_mapping.xml"};
 		try {
 			listSrcFiles[0] = new ByteArrayInputStream(resourceLoader
@@ -822,18 +832,18 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
-	 * Returns tokenExpirationDate.
+	 * Returns token expiration in hours.
 	 *
 	 * @return int
 	 */
-	public static int getTokenExpirationDate() {
-		int tokenExpirationDate = 0;
+	public static int getTokenExpirationInHours() {
+		int tokenExpirationInHours = 0;
 		try {
-			tokenExpirationDate = Integer.parseInt(CoreResources.getField("tokenExpirationDate"));
+			tokenExpirationInHours = Integer.parseInt(CoreResources.getField("tokenExpirationInHours"));
 		} catch (Exception ex) {
 			LOGGER.error("Error has occurred.", ex);
 		}
-		return tokenExpirationDate;
+		return tokenExpirationInHours;
 	}
 
 	/**

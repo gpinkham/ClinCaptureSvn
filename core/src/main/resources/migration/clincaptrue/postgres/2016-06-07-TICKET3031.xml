@@ -84,4 +84,14 @@
 		<addNotNullConstraint tableName="study_user_role" columnName="study_id"/>
 	</changeSet>
 
+	<changeSet author="skirpichenok" id="2016-06-07-TICKET3031-7">
+		<comment>Drop token_expiration_date and add token_generation_date into the study_user_role table</comment>
+		<dropColumn tableName="study_user_role" columnName="token_expiration_date"/>
+		<addColumn tableName="study_user_role" >
+			<column name="token_generation_date" type="timestamp with time zone">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>

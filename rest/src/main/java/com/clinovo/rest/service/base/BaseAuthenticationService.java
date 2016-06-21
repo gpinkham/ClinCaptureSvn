@@ -14,8 +14,7 @@
  *******************************************************************************/
 package com.clinovo.rest.service.base;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +24,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.core.OpenClinicaPasswordEncoder;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
@@ -49,7 +47,10 @@ public abstract class BaseAuthenticationService extends BaseService {
 		UserAccountBean userAccountBean = getUserAccountBean(userName, password);
 		StudyUserRoleBean studyUserRoleBean = getStudyUserRoleBean(studyBean, userAccountBean);
 
-		prepareToken(studyUserRoleBean);
+		studyUserRoleBean.setToken(
+				Integer.toString(studyUserRoleBean.getPrimaryKey()).concat(UUID.randomUUID().toString().toUpperCase()));
+		studyUserRoleBean.setTokenGenerationDate(new Date());
+		getUserAccountDAO().saveToken(studyUserRoleBean);
 
 		UserDetails userDetails = new UserDetails();
 		userDetails.setUserName(userName);
@@ -103,19 +104,5 @@ public abstract class BaseAuthenticationService extends BaseService {
 		RestValidator.validateStudyUserRole(studyUserRoleBean, messageSource,
 				"rest.authenticationservice.userIsNotAssignedToStudy");
 		return studyUserRoleBean;
-	}
-
-	private void prepareToken(StudyUserRoleBean studyUserRoleBean) {
-		studyUserRoleBean.setToken(
-				Integer.toString(studyUserRoleBean.getPrimaryKey()).concat(UUID.randomUUID().toString().toUpperCase()));
-		int tokenExpirationDate = CoreResources.getTokenExpirationDate();
-		if (tokenExpirationDate > 0) {
-			Calendar calendar = GregorianCalendar.getInstance();
-			calendar.add(Calendar.HOUR, tokenExpirationDate);
-			studyUserRoleBean.setTokenExpirationDate(calendar.getTime());
-		} else {
-			studyUserRoleBean.setTokenExpirationDate(null);
-		}
-		getUserAccountDAO().updateStudyUserRole(studyUserRoleBean);
 	}
 }

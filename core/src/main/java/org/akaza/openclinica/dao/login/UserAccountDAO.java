@@ -505,9 +505,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		surb.setStatus(Status.get(statusId));
 		surb.setStudyId(studyId);
 		surb.setToken((String) hm.get("token"));
-		Timestamp timestamp = (Timestamp) hm.get("token_expiration_date");
+		Timestamp timestamp = (Timestamp) hm.get("token_generation_date");
 		if (timestamp != null) {
-			surb.setTokenExpirationDate(new Date(timestamp.getTime()));
+			surb.setTokenGenerationDate(new Date(timestamp.getTime()));
 		}
 		return surb;
 	}
@@ -1123,23 +1123,28 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		variables.put(index++, studyUserRoleBean.getRoleCode());
 		variables.put(index++, studyUserRoleBean.getStatus().getId());
 		variables.put(index++, studyUserRoleBean.getUpdaterId());
-		if (studyUserRoleBean.getToken() == null) {
-			nullVariables.put(index, TypeNames.STRING);
-			variables.put(index++, null);
-		} else {
-			variables.put(index++, studyUserRoleBean.getToken());
-		}
-		if (studyUserRoleBean.getTokenExpirationDate() == null) {
-			nullVariables.put(index, TypeNames.TIMESTAMP);
-			variables.put(index++, null);
-		} else {
-			variables.put(index++, new Timestamp(studyUserRoleBean.getTokenExpirationDate().getTime()));
-		}
 		variables.put(index++, studyUserRoleBean.getStudyId());
 		variables.put(index, studyUserRoleBean.getUserName());
 		String sql = digester.getQuery("updateStudyUserRole");
 		execute(sql, variables, nullVariables);
 		return studyUserRoleBean;
+	}
+
+	/**
+	 * Saves token.
+	 *
+	 * @param studyUserRoleBean
+	 *            StudyUserRoleBean.
+	 */
+	public void saveToken(StudyUserRoleBean studyUserRoleBean) {
+		int index = 1;
+		HashMap variables = new HashMap();
+		variables.put(index++, studyUserRoleBean.getToken());
+		variables.put(index++, new Timestamp(studyUserRoleBean.getTokenGenerationDate().getTime()));
+		variables.put(index++, studyUserRoleBean.getStudyId());
+		variables.put(index, studyUserRoleBean.getUserName());
+		String sql = digester.getQuery("saveToken");
+		execute(sql, variables);
 	}
 
 	/**
