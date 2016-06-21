@@ -35,6 +35,7 @@ DROP TABLE IF EXISTS dyn_item_form_metadata CASCADE;
 DROP TABLE IF EXISTS dyn_item_group_metadata CASCADE;
 DROP TABLE IF EXISTS dynamic_event CASCADE;
 DROP TABLE IF EXISTS edc_item_metadata CASCADE;
+DROP TABLE IF EXISTS email_log CASCADE;
 DROP TABLE IF EXISTS event_crf CASCADE;
 DROP TABLE IF EXISTS event_crf_section CASCADE;
 DROP TABLE IF EXISTS event_definition_crf CASCADE;
@@ -234,6 +235,8 @@ DROP FUNCTION IF EXISTS study_event_trigger() CASCADE;
 DROP FUNCTION IF EXISTS study_subject_trigger() CASCADE;
 DROP FUNCTION IF EXISTS subject_group_assignment_trigger() CASCADE;
 DROP FUNCTION IF EXISTS update_event_crf_status() CASCADE;
+DROP FUNCTION IF EXISTS study_insert_trigger() CASCADE;
+ 
 
 --Drop VIEWS
 DROP VIEW IF EXISTS dn_age_days;
