@@ -201,19 +201,13 @@ public class ImportSpringJob extends QuartzJobBean {
 			triggerBean.setUserAccount(ub);
 
 			String directory = dataMap.getString(DIRECTORY);
-			String studyName = dataMap.getString(STUDY_NAME);
 			String studyOid = dataMap.getString(STUDY_OID);
 			if (localeStr != null) {
 				locale = new Locale(localeStr);
 				ResourceBundleProvider.updateLocale(locale);
 				respage = ResourceBundleProvider.getPageMessagesBundle();
 			}
-			StudyBean studyBean;
-			if (studyOid != null) {
-				studyBean = sdao.findByOid(studyOid);
-			} else {
-				studyBean = (StudyBean) sdao.findByName(studyName);
-			}
+			StudyBean studyBean = sdao.findByOid(studyOid);
 			studyBean = scs.setParametersForStudy(studyBean);
 			if (studyBean.getStatus().isFrozen()) {
 				try {

@@ -61,18 +61,19 @@ import com.clinovo.validator.StudyValidator;
 @Component
 public class CreateSubStudyServlet extends SpringServlet {
 
-	public static final String INPUT_APPROVAL_DATE = "approvalDate";
-	public static final String INPUT_START_DATE = "startDate";
-	public static final String INPUT_END_DATE = "endDate";
 	public static final String YES = "yes";
 	public static final String DDE = "dde";
 	public static final String EVALUATION = "evaluation";
-	public static final int INT_30 = 30;
-	public static final int INT_100 = 100;
-	public static final int INT_2000 = 2000;
-	public static final int INT_255 = 255;
+	public static final String INPUT_END_DATE = "endDate";
+	public static final String INPUT_START_DATE = "startDate";
+	public static final String INPUT_APPROVAL_DATE = "approvalDate";
+
 	public static final int INT_20 = 20;
+	public static final int INT_30 = 30;
 	public static final int INT_64 = 64;
+	public static final int INT_100 = 100;
+	public static final int INT_255 = 255;
+	public static final int INT_2000 = 2000;
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -271,11 +272,11 @@ public class CreateSubStudyServlet extends SpringServlet {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, INT_255);
 		v.addValidation("siteName", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
-				newStudy.getOrigin().equals(StudyOrigin.STUDIO.getName()) ? 20 : 100);
+				newStudy.getOrigin().equals(StudyOrigin.STUDIO.getName()) ?  INT_20 : INT_100);
 
 		errors.putAll(v.validate());
 
-		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(), null);
+		StudyValidator.checkIfStudyFieldsAreUnique(fp, errors, getStudyDAO(), getResPage(), getResException(), newStudy);
 
 		if (fp.getString("protocolId").trim().length() > INT_30) {
 			Validator.addError(errors, "protocolId", getResException().getString("maximum_lenght_unique_protocol_30"));

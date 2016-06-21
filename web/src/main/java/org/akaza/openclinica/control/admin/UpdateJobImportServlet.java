@@ -10,7 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.control.admin;
 
 import java.io.File;
@@ -47,6 +46,9 @@ import org.springframework.stereotype.Component;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.ValidatorHelper;
 
+/**
+ * UpdateJobImportServlet.
+ */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class UpdateJobImportServlet extends SpringServlet {
@@ -66,7 +68,7 @@ public class UpdateJobImportServlet extends SpringServlet {
 				getResPage().getString("no_have_correct_privilege_current_study")
 						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
-				getResException().getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+				getResException().getString("not_allowed_access_extract_data_servlet"), "1"); // TODO
 
 	}
 
@@ -105,12 +107,7 @@ public class UpdateJobImportServlet extends SpringServlet {
 			request.setAttribute(ImportSpringJob.JOB_HOUR, "" + userJobStartDate.getHourOfDay());
 			request.setAttribute(ImportSpringJob.JOB_MINUTE, "" + userJobStartDate.getMinuteOfHour());
 
-			StudyBean studyBean;
-			if (studyOID != null && !studyOID.trim().isEmpty()) {
-				studyBean = sdao.findByOid(studyOID);
-			} else {
-				studyBean = (StudyBean) sdao.findByName(studyName);
-			}
+			StudyBean studyBean = sdao.findByOid(studyOID);
 			request.setAttribute(ImportSpringJob.STUDY_ID, studyBean != null ? studyBean.getId() : "");
 		} else {
 			request.setAttribute(ImportSpringJob.TNAME, fp2.getString(ImportSpringJob.TNAME));
