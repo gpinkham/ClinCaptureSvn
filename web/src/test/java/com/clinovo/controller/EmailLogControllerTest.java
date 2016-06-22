@@ -16,8 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class EmailLogControllerTest extends BaseControllerTest  {
 
-	public static final String PAGE_NAME = "admin/emailLog";
-	public static final String URL = "/EmailLog";
+	public static final String MAIN_PAGE_NAME = "admin/emailLog";
+	public static final String MAIN_URL = "/EmailLog";
+	public static final String DETAILS_PAGE_NAME = "admin/emailLogDetails";
+	public static final String DETAILS_URL = "/EmailLogDetails";
 
 	@Before
 	public void prepare() {
@@ -30,18 +32,35 @@ public class EmailLogControllerTest extends BaseControllerTest  {
 
 	@Test
 	public void testThatHttpStatus200IsReturnedByEmailLogPageCall() throws Exception {
-		this.mockMvc.perform(get(URL).session(session)).andExpect(status().isOk());
+		this.mockMvc.perform(get(MAIN_URL).session(session)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatEmailLogPageCallReturnsModelWithAllAttributes() throws Exception {
-		this.mockMvc.perform(get(URL).session(session)).andExpect(
+		this.mockMvc.perform(get(MAIN_URL).session(session)).andExpect(
 				MockMvcResultMatchers.model().attributeExists("dataTable", "logs"));
 	}
 
 	@Test
 	public void testThatEmailLogPageCallReturnsCorrectUrl() throws Exception {
-		this.mockMvc.perform(get(URL).session(session)).andExpect(
-				MockMvcResultMatchers.view().name(PAGE_NAME));
+		this.mockMvc.perform(get(MAIN_URL).session(session)).andExpect(
+				MockMvcResultMatchers.view().name(MAIN_PAGE_NAME));
+	}
+
+	@Test
+	public void testThatHttpStatus200IsReturnedByEmailLogDetailsPageCall() throws Exception {
+		this.mockMvc.perform(get(DETAILS_URL).param("id", "1").session(session)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testThatEmailLogDetailsPageCallReturnsModelWithAllAttributes() throws Exception {
+		this.mockMvc.perform(get(DETAILS_URL).param("id", "1").session(session)).andExpect(
+				MockMvcResultMatchers.model().attributeExists("logEntry"));
+	}
+
+	@Test
+	public void testThatEmailLogDetailsPageCallReturnsCorrectUrl() throws Exception {
+		this.mockMvc.perform(get(DETAILS_URL).param("id", "1").session(session)).andExpect(
+				MockMvcResultMatchers.view().name(DETAILS_PAGE_NAME));
 	}
 }

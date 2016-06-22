@@ -3,6 +3,7 @@ package com.clinovo.model;
 import com.clinovo.bean.EmailDetails;
 import com.clinovo.enums.BooleanEnum;
 import com.clinovo.enums.EmailAction;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
@@ -41,6 +42,7 @@ public class EmailLog extends AbstractMutableDomainObject {
 	private String fileAttachments;
 	private BooleanEnum wasShown;
 	private String error;
+	private UserAccountBean senderAccount;
 
 	/**
 	 * Default constructor.
@@ -225,5 +227,14 @@ public class EmailLog extends AbstractMutableDomainObject {
 
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
+	}
+
+	@Transient
+	public UserAccountBean getSenderAccount() {
+		return senderAccount;
+	}
+
+	public void setSenderAccount(UserAccountBean senderAccount) {
+		this.senderAccount = senderAccount;
 	}
 }

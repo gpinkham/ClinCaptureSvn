@@ -59,6 +59,8 @@
 	${dataTable}
 </form>
 
+<input id="accessAttributeName" type="hidden" value="data-cc-emailLog">
+
 <br>
 
 <div style="clear:left; float:left">

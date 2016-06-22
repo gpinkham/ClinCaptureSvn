@@ -153,9 +153,14 @@ public class EmailLogTableFactory extends AbstractTableFactory {
 		return messageSource;
 	}
 
-	private static class ActionsCellEditor implements CellEditor {
+	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowCount) {
-			return "";
+			EmailLog emailLog = (EmailLog) ((HashMap) item).get(OBJECT);
+			String tooltip = getMessageSource().getMessage("view_email_log_details", null, locale);
+			return "<a href=\"EmailLogDetails?id=" + emailLog.getId() + "\" onclick=\"setAccessedObjected(this);\""
+					+ " data-cc-emailLog=\"" + emailLog.getId() + "\">"
+					+ "<img name=\"bt_Print\" src=\"../images/bt_Details.gif\" border=\"0\" "
+					+ "alt=\"" + tooltip + "\" align=\"left\" hspace=\"4\"/></a>";
 		}
 	}
 

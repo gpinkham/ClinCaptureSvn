@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,19 @@ public class EmailLogController extends SpringController {
 		model.addAttribute("dataTable", table);
 
 		return "admin/emailLog";
+	}
+
+	/**
+	 * View detailed info about email log entry.
+	 * @param model Model
+	 * @param logId int - id of the entry which will be viewed
+	 * @return String page name
+	 */
+	@RequestMapping("/EmailLogDetails")
+	public String viewEmailLogDetails(Model model, @RequestParam ("id") int logId) {
+		EmailLog emailLog = emailLogService.findById(logId);
+		model.addAttribute("logEntry", emailLog);
+		return "admin/emailLogDetails";
 	}
 
 	/**
