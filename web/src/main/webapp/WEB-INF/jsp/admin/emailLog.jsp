@@ -10,7 +10,6 @@
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 <jsp:include page="../include/sideAlert.jsp" />
 
-<link rel="stylesheet" href="<c:url value='/includes/styles.css?r=${revisionNumber}'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/includes/jmesa/jmesa.css?r=${revisionNumber}'/>" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jmesa.js?r=${revisionNumber}'/>"></script>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.jmesa.js?r=${revisionNumber}'/>"></script>
