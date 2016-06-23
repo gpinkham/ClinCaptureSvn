@@ -51,7 +51,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.SpringServlet;
-import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -179,12 +178,9 @@ public class UpdateStudyEventServlet extends SpringServlet {
 
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		StudySubjectBean ssub = null;
-		if (studySubjectId > 0) {
-			ssub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
-			request.setAttribute("studySubject", ssub);
-			request.setAttribute("id", studySubjectId + "");
-		}
+		StudySubjectBean ssub = ssdao.findByPK(studySubjectId);
+		request.setAttribute("studySubject", ssub);
+		request.setAttribute("id", studySubjectId + "");
 
 		Status s = ssub.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
@@ -215,10 +211,10 @@ public class UpdateStudyEventServlet extends SpringServlet {
 
 		// To remove signed status from the list
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+		EventCRFDAO ecdao = getEventCRFDAO();
 		DAOWrapper daoWrapper = new DAOWrapper(sm.getDataSource());
 		ssdao = new StudySubjectDAO(sm.getDataSource());
-		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+		StudySubjectBean ssb = ssdao.findByPK(studyEvent.getStudySubjectId());
 		StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());
 		if (!SignUtil.permitSign(studyEvent, study, daoWrapper) || !currentRole.isInvestigator()
 				|| study.getStatus().isPending()) {
@@ -393,9 +389,8 @@ public class UpdateStudyEventServlet extends SpringServlet {
 				studyEvent.setStudyEventDefinition(sed);
 
 				ssdao = new StudySubjectDAO(getDataSource());
-				ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+				ssb = ssdao.findByPK(studyEvent.getStudySubjectId());
 
-				ecdao = new EventCRFDAO(getDataSource());
 				ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 				SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
 
@@ -463,7 +458,7 @@ public class UpdateStudyEventServlet extends SpringServlet {
 					StdScheduler scheduler = getStdScheduler();
 					CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 					calLogic.scheduleSubjectEvents(studyEvent);
-					String message = calLogic.maxMinDaysValidator(studyEvent);
+					String message = calLogic.validateCalendaredVisitCompletionDate(studyEvent, new DateTime());
 					if (!"empty".equalsIgnoreCase(message)) {
 						addPageMessage(message, request);
 					}
@@ -546,10 +541,9 @@ public class UpdateStudyEventServlet extends SpringServlet {
 				request.setAttribute(STUDY_SUBJECT_ID, Integer.toString(studySubjectId));
 				request.setAttribute("studyEvent", seb);
 				ssdao = new StudySubjectDAO(getDataSource());
-				ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+				ssb = ssdao.findByPK(studyEvent.getStudySubjectId());
 
 				// prepare to figure out what the display should look like
-				ecdao = new EventCRFDAO(getDataSource());
 				ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 				study = (StudyBean) sdao.findByPK(ssb.getStudyId());
 				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
@@ -571,7 +565,7 @@ public class UpdateStudyEventServlet extends SpringServlet {
 			}
 		} else {
 			logger.info("No action, go to update page");
-			StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+			StudySubjectBean studySubjectBean = ssdao.findByPK(studyEvent.getStudySubjectId());
 			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
 					.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
 

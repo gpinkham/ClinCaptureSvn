@@ -1606,7 +1606,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 								StdScheduler scheduler = getScheduler(request);
 								CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 								if (!isAdministrativeEditing()) {
-									String message = calLogic.maxMinDaysValidator(seb);
+									String message = calLogic.validateCalendaredVisitCompletionDate(seb, new DateTime());
 									if (!"empty".equalsIgnoreCase(message)) {
 										addPageMessage(message, request);
 									}
@@ -3074,7 +3074,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 			CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 			calLogic.scheduleSubjectEvents(seb);
 			if (!isAdministrativeEditing()) {
-				String message = calLogic.maxMinDaysValidator(seb);
+				String message = calLogic.validateCalendaredVisitCompletionDate(seb, new DateTime());
 				if (!"empty".equalsIgnoreCase(message)) {
 					addPageMessage(message, request);
 				}

@@ -43,10 +43,7 @@ public class StudyEventBean extends AuditableEntityBean {
 	public static final int BY_STUDY_SUBJECT = 2;
 	public static final int BY_STUDY_EVENT_DEFINITION = 1;
 
-	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
-	// LOCATION SAMPLE_ORDINAL DATE_START DATE_END
-	// OWNER_ID STATUS_ID DATE_CREATED DATE_UPDATED
-	// UPDATE_ID
+
 	private int studyEventDefinitionId;
 
 	private int studySubjectId;
@@ -108,6 +105,15 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	public void setReferenceVisitId(int referenceVisitId) {
 		this.referenceVisitId = referenceVisitId;
+	}
+
+	/**
+	 * Returns visit completion date. Applicable for reference visits only.
+	 *
+	 * @return Date.
+	 */
+	public Date getVisitCompletionDate() {
+		return (this.getDateEnded() != null) ? this.getDateEnded() : this.getUpdatedDate();
 	}
 
 	// For display discrepancy notes in a matrix-type study/event grid; 5/2/2008

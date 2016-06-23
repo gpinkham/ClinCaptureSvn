@@ -41,7 +41,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.service.calendar.CalendarFuncBean;
-import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CalendarEventRow;
@@ -49,14 +48,23 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
+/**
+ * ViewCalendaredEventsForSubjectServlet.
+ */
 @SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 public class ViewCalendaredEventsForSubjectServlet extends SpringServlet {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
 		logger.debug("servlet is connected");
@@ -82,11 +90,10 @@ public class ViewCalendaredEventsForSubjectServlet extends SpringServlet {
 					if (refEventResult.getSubjectEventStatus().isCompleted()
 							|| refEventResult.getSubjectEventStatus().isSourceDataVerified()
 							|| refEventResult.getSubjectEventStatus().isSigned()) {
-						
-						Date maxDate = CalendarLogic.getDateTimeEndedIfExist(refEventResult).plusDays(
-								sedBean.getMaxDay()).toDate();
-						Date minDate = CalendarLogic.getDateTimeEndedIfExist(refEventResult).plusDays(
-								sedBean.getMinDay()).toDate();
+
+						DateTime completionDate = new DateTime(refEventResult.getVisitCompletionDate().getTime());
+						Date maxDate =  completionDate.plusDays(sedBean.getMaxDay()).toDate();
+						Date minDate = completionDate.plusDays(sedBean.getMinDay()).toDate();
 						int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
 						Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
 						// set bean with values

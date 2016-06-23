@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Interval;
@@ -32,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -44,7 +44,6 @@ import java.util.ResourceBundle;
 public class CalendarLogic {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarLogic.class);
-	private static final int ZERO_YEAR = 1970;
 
 	private StdScheduler scheduler;
 	private DataSource ds;
@@ -66,9 +65,10 @@ public class CalendarLogic {
 	 * @param studyEventBean StudyEventBean
 	 */
 	public void scheduleSubjectEvents(StudyEventBean studyEventBean) {
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-		StudyEventDAO sed = new StudyEventDAO(ds);
-		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
+
+		StudyEventDefinitionDAO seddao = getStudyEventDefDAO();
+		StudyEventDAO sed = getStudyEventDAO();
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		int subjectId = studyEventBean.getStudySubjectId();
 		StudyDAO sdao = new StudyDAO(ds);
 		StudyBean studyBean = sdao.findByStudySubjectId(subjectId);
@@ -85,11 +85,11 @@ public class CalendarLogic {
 				List<StudyEventBean> seb = sed.findAllByDefinitionAndSubject(studyEventDefinitionBean, ssb);
 				for (StudyEventBean studyEventBeanReferenceVisit : seb) {
 					if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
-						if (getDateEndedIfExist(studyEventBeanRef) == null) {
+						if (studyEventBeanRef.getVisitCompletionDate() == null) {
 							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 						} else {
-							if (getDateEndedIfExist(studyEventBeanRef)
-									.before(getDateEndedIfExist(studyEventBeanReferenceVisit))) {
+							if (studyEventBeanRef.getVisitCompletionDate()
+									.before(studyEventBeanReferenceVisit.getVisitCompletionDate())) {
 								studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 							}
 						}
@@ -137,7 +137,8 @@ public class CalendarLogic {
 						studyEvent.setStudySubjectId(subjectId);
 						studyEvent.setStartTimeFlag(false);
 						int schDay = sedTmp.getScheduleDay();
-						DateTime dateTimeCompleted = getDateTimeEndedIfExist(studyEventBeanRef).plusDays(schDay);
+						DateTime dateTimeCompleted
+								= new DateTime(studyEventBeanRef.getVisitCompletionDate().getTime()).plusDays(schDay);
 						studyEvent.setDateStarted(dateTimeCompleted.toDate());
 						studyEvent.setOwner(getUserByEmailId(sedTmp.getUserEmailId()));
 						studyEvent.setStatus(Status.AVAILABLE);
@@ -150,7 +151,7 @@ public class CalendarLogic {
 						UserAccountBean useracBean = (UserAccountBean) useracdao.findByPK(sedTmp.getUserEmailId());
 						try {
 							LOGGER.debug("Start quartz scheduler for this event");
-							DateTime dateTimeEmail = getDateTimeEndedIfExist(studyEventBeanRef);
+							DateTime dateTimeEmail = new DateTime(studyEventBeanRef.getVisitCompletionDate().getTime());
 							dateTimeEmail = dateTimeEmail.plusDays(sedTmp.getEmailDay());
 							int daysBetween = Days.daysBetween(dateTimeEmail.toDateMidnight(),
 									dateTimeCompleted.toDateMidnight()).getDays();
@@ -166,68 +167,43 @@ public class CalendarLogic {
 	}
 
 	/**
-	 * Validate Max Min days.
-	 * @param studyEventBean StudyEventBean
-	 * @return String
+	 * Validates calendared visit completion date.
+	 *
+	 * @param calendaredVisit study event to validate.
+	 * @param completionDate study event completion date.
+	 * @return String error message.
 	 */
-	public String maxMinDaysValidator(StudyEventBean studyEventBean) {
+	public String validateCalendaredVisitCompletionDate(StudyEventBean calendaredVisit, DateTime completionDate) {
+
 		String messageReturn = "empty";
-		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
-		StudyEventDAO sedao = new StudyEventDAO(ds);
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-		StudyEventDefinitionBean seBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
-				.getStudyEventDefinitionId());
-		if (!seBean.getReferenceVisit() && seBean.getType().equalsIgnoreCase("calendared_visit")
-				&& studyEventBean.getSubjectEventStatus().isCompleted()) {
-			int dayMax = seBean.getMaxDay();
-			int dayMin = seBean.getMinDay();
-			int subjectId = studyEventBean.getStudySubjectId();
-			StudyDAO sdao = new StudyDAO(ds);
-			StudyBean studyBean = sdao.findByStudySubjectId(subjectId);
-			StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPKAndStudy(subjectId, studyBean);
-			StudyEventBean studyEventBeanRef = (StudyEventBean) sedao.findByPK(studyEventBean.getReferenceVisitId());
-			// Ref Event can be null
-			if (!studyEventBeanRef.getSubjectEventStatus().isSourceDataVerified()
-					&& !studyEventBeanRef.getSubjectEventStatus().isCompleted()
-					&& !studyEventBeanRef.getSubjectEventStatus().isSigned()) {
-				LOGGER.debug("RV for this events is not Completed/SDV/Signed");
-				studyEventBeanRef = new StudyEventBean();
-			}
+		StudyEventDefinitionBean seBean = (StudyEventDefinitionBean) getStudyEventDefDAO()
+				.findByPK(calendaredVisit.getStudyEventDefinitionId());
+		if (!seBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(seBean.getType())
+				&& calendaredVisit.getSubjectEventStatus().isCompleted()) {
 
-			boolean refEventsIsEmpty = false;
-			if (getYearFromDate(studyEventBeanRef.getUpdatedDate()) == ZERO_YEAR) {
-				studyEventBeanRef.setUpdatedDate(new Date());
-				LOGGER.debug("RV not founds so get currentDate and skip DN");
-				refEventsIsEmpty = true;
-			}
+			StudyEventBean referenceVisit
+					= (StudyEventBean) getStudyEventDAO().findByPK(calendaredVisit.getReferenceVisitId());
+			if (referenceVisit.isActive()) {
 
-			StudyEventDefinitionBean infoBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef
-					.getStudyEventDefinitionId());
-			LOGGER.debug("Reference visit name " + infoBean.getName());
-			LOGGER.debug("Latest referense visit date ended " + getDateEndedIfExist(studyEventBeanRef));
-			LOGGER.debug("Information about filled event. OID? " + seBean.getOid());
+				DateTime referenceVisitCompletionDate = new DateTime(referenceVisit.getVisitCompletionDate().getTime());
+				DateMidnight lowerBoundToCompleteVisit = referenceVisitCompletionDate.plusDays(seBean.getMinDay())
+						.toDateMidnight();
+				DateMidnight upperBoundToCompleteVisit = referenceVisitCompletionDate.toDateMidnight()
+						.plusDays(seBean.getMaxDay() + 1);
+				Interval intervalToCompleteVisit = new Interval(lowerBoundToCompleteVisit, upperBoundToCompleteVisit);
 
-			DateTime dateTimeCurrent = new DateTime();
-			DateTime referenceEventStartDate = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
-			LOGGER.debug("Days range for the filled event. from "
-					+ referenceEventStartDate.plusDays(dayMin).toDateMidnight() + " to "
-					+ referenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
-			Interval timeRangeForStudyEvent = new Interval(referenceEventStartDate.plusDays(dayMin).toDateMidnight(),
-					referenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
-
-			if (timeRangeForStudyEvent.getStart().isAfter(dateTimeCurrent) && !refEventsIsEmpty) {
-				LOGGER.debug("Early start");
-				messageReturn = resexception.getString("data_has_enteret_too_early_in_the_calendar");
-				DiscrepancyNoteBean parent = createDiscrepancyNote(true, ssb, seBean, studyEventBean, null);
-				createDiscrepancyNote(true, ssb, seBean, studyEventBean, parent.getId());
-			} else if (timeRangeForStudyEvent.getEnd().isBefore(dateTimeCurrent) && !refEventsIsEmpty) {
-				LOGGER.debug("Late start");
-				messageReturn = resexception.getString("data_has_enteret_too_late_in_the_calendaror");
-				DiscrepancyNoteBean parent = createDiscrepancyNote(false, ssb, seBean, studyEventBean, null);
-				createDiscrepancyNote(false, ssb, seBean, studyEventBean, parent.getId());
+				StudySubjectBean ssb = getStudySubjectDAO().findByPK(calendaredVisit.getStudySubjectId());
+				if (intervalToCompleteVisit.getStart().isAfter(completionDate)) {
+					messageReturn = resexception.getString("calendaredVisit.eventCompletedEarlierThenExpected");
+					DiscrepancyNoteBean parent = createDiscrepancyNote(true, ssb, seBean, calendaredVisit, null);
+					createDiscrepancyNote(true, ssb, seBean, calendaredVisit, parent.getId());
+				} else if (intervalToCompleteVisit.getEnd().isBefore(completionDate)) {
+					messageReturn = resexception.getString("calendaredVisit.eventCompletedLaterThenExpected");
+					DiscrepancyNoteBean parent = createDiscrepancyNote(false, ssb, seBean, calendaredVisit, null);
+					createDiscrepancyNote(false, ssb, seBean, calendaredVisit, parent.getId());
+				}
 			}
 		}
-
 		return messageReturn;
 	}
 
@@ -236,11 +212,11 @@ public class CalendarLogic {
 		return (UserAccountBean) uadao.findByPK(userId);
 	}
 
-	private DiscrepancyNoteBean createDiscrepancyNote(boolean statement, StudySubjectBean studySubjectBean,
+	protected DiscrepancyNoteBean createDiscrepancyNote(boolean statement, StudySubjectBean studySubjectBean,
 			StudyEventDefinitionBean sedb, StudyEventBean studyEventBean, Integer parentId) {
 		DiscrepancyNoteBean note = new DiscrepancyNoteBean();
 		if (statement) {
-			String message = resexception.getString("data_has_enteret_too_early_in_the_calendar");
+			String message = resexception.getString("calendaredVisit.eventCompletedEarlierThenExpected");
 			note.setDescription(message);
 			message = resexception.getString("a_user_has_entered_data_for_subject_min");
 			message = message.replace("{0}", studySubjectBean.getLabel()).replace("{1}", sedb.getName());
@@ -248,7 +224,7 @@ public class CalendarLogic {
 			note.setEntityName(resword.getString("start_date"));
 			note.setColumn("date_start");
 		} else {
-			String message = resexception.getString("data_has_enteret_too_late_in_the_calendaror");
+			String message = resexception.getString("calendaredVisit.eventCompletedLaterThenExpected");
 			note.setDescription(message);
 			message = resexception.getString("a_user_has_entered_data_for_subject_max");
 			message = message.replace("{0}", studySubjectBean.getLabel()).replace("{1}", sedb.getName());
@@ -296,36 +272,15 @@ public class CalendarLogic {
 		scheduler.scheduleJob(jobDetailBean, trigger);
 	}
 
-	// joda getYear is deprecation method.
-	private static int getYearFromDate(Date date) {
-		int result = -1;
-		if (date != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(date);
-			result = cal.get(Calendar.YEAR);
-		}
-		return result;
+	public StudyEventDefinitionDAO getStudyEventDefDAO() {
+		return new StudyEventDefinitionDAO(this.ds);
 	}
 
-	/**
-	 * Get Date Time Ended If Exist.
-	 * @param studyEventBeanRef StudyEventBean
-	 * @return DateTime
-	 */
-	public static DateTime getDateTimeEndedIfExist(StudyEventBean studyEventBeanRef) {
-		return new DateTime(getDateEndedIfExist(studyEventBeanRef).getTime());
+	public StudyEventDAO getStudyEventDAO() {
+		return new StudyEventDAO(ds);
 	}
 
-	/**
-	 * Get Date Ended If Exist.
-	 * @param studyEventBeanRef StudyEventBean
-	 * @return Date
-	 */
-	public static Date getDateEndedIfExist(StudyEventBean studyEventBeanRef) {
-		if (studyEventBeanRef.getDateEnded() != null) {
-			return studyEventBeanRef.getDateEnded();
-		} else {
-			return studyEventBeanRef.getUpdatedDate();
-		}
+	public StudySubjectDAO getStudySubjectDAO() {
+		return new StudySubjectDAO(ds);
 	}
 }
