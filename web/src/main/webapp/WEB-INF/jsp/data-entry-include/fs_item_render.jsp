@@ -32,7 +32,7 @@
 
 <c:set var="rowWidth" value="${displayItemWithGroup.itemsRow.rowWidth}"/>
 
-<div style="border-bottom: 1px solid #eeeeee; width: 100%; ${rowShown ? "" : "display: none;"}" row-number="${itemStatus.index}">
+<div style="border-bottom: 1px solid #eeeeee; width: 100%; ${rowShown ? "" : "display: none;"}" class="items-row" row-number="${itemStatus.index}">
 	<div style="width: ${rowWidth}px;">
 	<c:forEach items="${displayItemWithGroup.itemsRow.items}" var="displayItem" varStatus="rowStatus">
 		<c:set var="displayItem" value="${displayItem}" scope="request"/>

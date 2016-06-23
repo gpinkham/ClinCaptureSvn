@@ -29,8 +29,9 @@
 
 		if (toShow == "true") {
 			if (fsCrf) {
-				if (!allItemsInTheRowAreHidden("#t" + strLeftNavRowElementName)) {
-					var $row = $("#t" + strLeftNavRowElementName).parent().parent();
+				var itemSelector = "#t" + strLeftNavRowElementName;
+				if (!allItemsInTheRowAreHidden(itemSelector)) {
+					var $row = getRowByItemSelector(itemSelector);
 					$row.css("display", "");
 					var rowNum = $row.attr("row-number");
 					$(".item-subheader[row-number=" + rowNum + "]").css("display", "");
@@ -107,8 +108,9 @@
 
 		if (toHide == "true") {
 			if (fsCrf) {
-				if (allItemsInTheRowAreHidden("#t" + strLeftNavRowElementName)) {
-					var $row = $("#t" + strLeftNavRowElementName).parent().parent()
+				var itemSelector = "#t" + strLeftNavRowElementName;
+				if (allItemsInTheRowAreHidden(itemSelector)) {
+					var $row = getRowByItemSelector(itemSelector);
 					var rowNum = $row.attr("row-number");
 					$row.css("display", "none");
 					$(".item-subheader[row-number=" + rowNum + "]").css("display", "none");
@@ -152,12 +154,12 @@
 			}
 			++m;
 		}
-		for (var i = 0; i < showIds.length; ++i) {
-			conditionalShow(showIds[i]);
+		for (var t = 0; t < showIds.length; ++t) {
+			conditionalShow(showIds[t]);
 		}
-		for (var i = 0; i < hideIds.length; ++i) {
-			if (hideIds[i] != -1) {
-				conditionalHide(hideIds[i]);
+		for (var k = 0; k < hideIds.length; ++k) {
+			if (hideIds[k] != -1) {
+				conditionalHide(hideIds[k]);
 			}
 		}
 	}
@@ -241,12 +243,16 @@
 
 	function allItemsInTheRowAreHidden(selector) {
 		var result = true;
-		$(selector).parent().parent().find(".item-cell").each(function() {
+		getRowByItemSelector(selector).find(".item-cell").each(function() {
 			var $item = $(this);
 			if ($item.css("display") != "none") {
 				result = false;
 			}
 		});
 		return result;
+	}
+
+	function getRowByItemSelector(selector) {
+		return $(selector).parents(".items-row");
 	}
 </script>
