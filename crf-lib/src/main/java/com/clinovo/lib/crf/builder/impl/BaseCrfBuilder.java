@@ -600,6 +600,7 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 		boolean operationSuccessful = false;
 		SasNameValidator sasNameValidator = new SasNameValidator();
 		try {
+			List<String> unitOidList = new ArrayList<String>();
 			List<String> itemOidList = new ArrayList<String>();
 			List<String> itemGroupOidList = new ArrayList<String>();
 			Map<String, ItemFormMetadataBean> itemNameToMetaMap = new HashMap<String, ItemFormMetadataBean>();
@@ -697,9 +698,11 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 				if (itemBean.getUnits() != null && itemBean.getUnits().length() > 0
 						&& !existingUnits.contains(itemBean.getUnits())
 						&& !itemDao.doesMeasurementUnitExist(itemBean.getUnits(), connection)) {
-					String unitOid = measurementUnitOidGenerator.generateOid(itemBean.getUnits());
+					String unitOid = itemDao.getValidUnitOid(measurementUnitOidGenerator, itemBean.getUnits(),
+							unitOidList);
 					itemDao.createMeasurementUnit(unitOid, itemBean.getUnits(), connection);
 					existingUnits.add(itemBean.getUnits());
+					unitOidList.add(unitOid);
 				}
 
 				// create item meta
@@ -781,21 +784,21 @@ public abstract class BaseCrfBuilder implements CrfBuilder {
 
 	private void processSCDForChildItems() {
 
-		for (String parentItemName : parentNameToChildrenMap.keySet()) {
+		for (Map.Entry<String, List<ItemBeanExt>> entry : parentNameToChildrenMap.entrySet()) {
+			String parentItemName = entry.getKey();
+			List<ItemBeanExt> itemBeanExtList = entry.getValue();
 			ItemBeanExt parentItem = itemNameToItemMap.get(parentItemName);
 			if (parentItem.hasSCD()) {
-
 				boolean copyParentSCDToChildItems = true;
-				for (ItemBeanExt childItem: parentNameToChildrenMap.get(parentItemName)) {
+				for (ItemBeanExt childItem : itemBeanExtList) {
 					if (childItem.hasSCD()) {
 						copyParentSCDToChildItems = false;
 						break;
 					}
 				}
-
 				if (copyParentSCDToChildItems) {
 					SimpleConditionalDisplayBean parentSCDBean = parentItem.getSimpleConditionalDisplayBean();
-					for (ItemBeanExt childItem: parentNameToChildrenMap.get(parentItemName)) {
+					for (ItemBeanExt childItem : itemBeanExtList) {
 						childItem.setSimpleConditionalDisplayBean(new SimpleConditionalDisplayBean(parentSCDBean));
 						childItem.getItemMeta().setShowItem(false);
 					}

@@ -40,6 +40,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
+import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -151,19 +152,21 @@ public class ItemDAO extends AuditableEntityDAO {
 	 * @return EntityBean
 	 */
 	public EntityBean update(EntityBean eb, Connection con) {
-		int index = 1;
-		ItemBean ib = (ItemBean) eb;
-		HashMap variables = new HashMap();
-		variables.put(index++, ib.getName());
-		variables.put(index++, ib.getDescription());
-		variables.put(index++, ib.getUnits());
-		variables.put(index++, ib.isPhiStatus());
-		variables.put(index++, ib.getItemDataTypeId());
-		variables.put(index++, ib.getItemReferenceTypeId());
-		variables.put(index++, ib.getStatus().getId());
-		variables.put(index++, ib.getUpdaterId());
-		variables.put(index, ib.getId());
-		this.execute(digester.getQuery("update"), variables, null, con);
+		if (eb instanceof ItemBean) {
+			int index = 1;
+			ItemBean ib = (ItemBean) eb;
+			HashMap variables = new HashMap();
+			variables.put(index++, ib.getName());
+			variables.put(index++, ib.getDescription());
+			variables.put(index++, ib.getUnits());
+			variables.put(index++, ib.isPhiStatus());
+			variables.put(index++, ib.getItemDataTypeId());
+			variables.put(index++, ib.getItemReferenceTypeId());
+			variables.put(index++, ib.getStatus().getId());
+			variables.put(index++, ib.getUpdaterId());
+			variables.put(index, ib.getId());
+			execute(digester.getQuery("update"), variables, null, con);
+		}
 		return eb;
 	}
 
@@ -184,23 +187,25 @@ public class ItemDAO extends AuditableEntityDAO {
 	 * @return EntityBean
 	 */
 	public EntityBean create(EntityBean eb, Connection con) {
-		int index = 1;
-		ItemBean ib = (ItemBean) eb;
-		// per the create sql statement
-		HashMap variables = new HashMap();
-		variables.put(index++, ib.getName());
-		variables.put(index++, ib.getDescription());
-		variables.put(index++, ib.getUnits());
-		variables.put(index++, ib.isPhiStatus());
-		variables.put(index++, ib.getItemDataTypeId());
-		variables.put(index++, ib.getItemReferenceTypeId());
-		variables.put(index++, ib.getStatus().getId());
-		variables.put(index++, ib.getOwnerId());
-		variables.put(index++, ib.getOid());
-		variables.put(index, ib.getSasName());
-		executeWithPK(digester.getQuery("create"), variables, null, con);
-		if (isQuerySuccessful()) {
-			eb.setId(getLatestPK());
+		if (eb instanceof ItemBean) {
+			int index = 1;
+			ItemBean ib = (ItemBean) eb;
+			// per the create sql statement
+			HashMap variables = new HashMap();
+			variables.put(index++, ib.getName());
+			variables.put(index++, ib.getDescription());
+			variables.put(index++, ib.getUnits());
+			variables.put(index++, ib.isPhiStatus());
+			variables.put(index++, ib.getItemDataTypeId());
+			variables.put(index++, ib.getItemReferenceTypeId());
+			variables.put(index++, ib.getStatus().getId());
+			variables.put(index++, ib.getOwnerId());
+			variables.put(index++, ib.getOid());
+			variables.put(index, ib.getSasName());
+			executeWithPK(digester.getQuery("create"), variables, null, con);
+			if (isQuerySuccessful()) {
+				eb.setId(getLatestPK());
+			}
 		}
 		return eb;
 	}
@@ -223,6 +228,22 @@ public class ItemDAO extends AuditableEntityDAO {
 		ArrayList<Map> resultSet = select("select id from measurement_unit where name = ?", variables, connection);
 		Iterator it = resultSet.iterator();
 		return it.hasNext();
+	}
+
+	/**
+	 * Returns true if measurement unit oid exists.
+	 *
+	 * @param unitOid
+	 *            String
+	 * @return boolean
+	 */
+	public boolean doesMeasurementUnitOidExist(String unitOid) {
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.INT);
+		HashMap variables = new HashMap();
+		variables.put(1, unitOid);
+		ArrayList<Map> resultSet = select("select id from measurement_unit where oc_oid = ?", variables);
+		return resultSet.iterator().hasNext();
 	}
 
 	/**
@@ -403,6 +424,28 @@ public class ItemDAO extends AuditableEntityDAO {
 		}
 		return oid;
 
+	}
+
+	/**
+	 * Returns valid unit oid.
+	 * 
+	 * @param measurementUnitOidGenerator
+	 *            MeasurementUnitOidGenerator
+	 * @param unitName
+	 *            String
+	 * @param oidList
+	 *            oidList
+	 * @return String
+	 * @throws Exception
+	 *             an Exception
+	 */
+	public String getValidUnitOid(MeasurementUnitOidGenerator measurementUnitOidGenerator, String unitName,
+			List<String> oidList) throws Exception {
+		String unitOid = measurementUnitOidGenerator.generateOid(unitName);
+		while (doesMeasurementUnitOidExist(unitOid) || oidList.contains(unitOid)) {
+			unitOid = measurementUnitOidGenerator.randomizeOid(unitOid);
+		}
+		return unitOid;
 	}
 
 	/**
