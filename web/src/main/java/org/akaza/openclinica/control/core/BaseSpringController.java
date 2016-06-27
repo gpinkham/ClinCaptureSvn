@@ -111,14 +111,12 @@ import com.clinovo.service.WidgetsLayoutService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.RequestUtil;
 import com.clinovo.util.RuleSetServiceUtil;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * BaseSpringController.
  * 
  * Here we can keep common methods for Servlets and for Controllers.
  */
-@EnableAsync
 @SuppressWarnings({"rawtypes"})
 public abstract class BaseSpringController {
 

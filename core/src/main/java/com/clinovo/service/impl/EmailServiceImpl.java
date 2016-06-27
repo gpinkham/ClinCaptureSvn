@@ -12,6 +12,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -24,6 +25,7 @@ import java.util.StringTokenizer;
 /**
  * Email Service Implementation.
  */
+@EnableAsync
 @Service("emailService")
 public class EmailServiceImpl implements EmailService {
 
