@@ -28,6 +28,7 @@ import java.util.Locale;
 /**
  * EmailAuditLogTableFactory.
  */
+@SuppressWarnings("rawtypes")
 public class EmailLogTableFactory extends AbstractTableFactory {
 
 	public static final String EMAIL_AUDIT_LOG_TABLE_NAME = "emailAuditLogTableName";
