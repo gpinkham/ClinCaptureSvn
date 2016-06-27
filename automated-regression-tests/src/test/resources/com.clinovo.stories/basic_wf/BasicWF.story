@@ -284,7 +284,7 @@ And User calls a popup for "StSubj_2", "Event C"
 And User fills in popup to schedule event:
 |Start Date/Time|End Date/Time|
 |               |             |
-When User clicks 'Schedule Event' button on popup
+When User clicks 'Schedule Event' button in popup on SM page
 Then User is on SM page
 And Event is scheduled
 
@@ -293,7 +293,7 @@ Scenario: 14.2 "CRC" schedules events for subjects
 
 Given User logs in as "CRC"
 And User goes to SM page
-When User schedules events on SM:
+When User schedules events on SM page:
 |Study Subject ID|Event Name                        |
 |StSubj_1        |Event A, Event C, Event B, Event E|
 |StSubj_2        |Event A, Event B                  |
@@ -375,7 +375,7 @@ When User fills in, completes and saves CRF:
 |                |          |             |            |             |        |IG_CRF_W_CMGROUP_1input68(T): 25|IG_CRF_W_CMGROUP_1input69(T): 14-Feb-2016|IG_CRF_W_CMGROUP_1input70(T): 102|IG_CRF_W_CMGROUP_1input71(T): 4  |IG_CRF_W_CMGROUP_1input72(T): ddsd|IG_CRF_W_CMGROUP_1input73(R): 2|IG_CRF_W_CMGROUP_1input74(C): 1,2,4|IG_CRF_W_CMGROUP_1input75(Sv): 3|IG_CRF_W_CMGROUP_1input76(C):  |IG_CRF_W_CMGROUP_1input77(F):|IG_CRF_W_CMGROUP_1input78(Mv): 1,3  |
 |                |          |             |            |             |        |input79(T): 11                  |input80(T): 23-Feb-2016                  |input81(T): abc                  |input82(T): 11                   |input83(T): 23-Feb-2016           |input84(R): 5                  |input85(C): 2,3,6                  |input86(Sv): 4                  |input87(C): 1                  |input88(F):                  |input89(Mv): 2,4                    |
 
-Then CRF data is saved correctly
+Then User verifies saved CRF data on DE page
 
 
 Scenario: 17. "Study Monitor" performs SDV on SDV page
@@ -397,7 +397,7 @@ Scenario: 18.1 "PI" signs event
 Given User logs in as "PI"
 And User goes to SM page
 And User calls a popup for "StSubj_2", "Event B"
-And User clicks 'Sign Event' button on popup
+And User clicks 'Sign Event' button in popup on SM page
 And User is on Sign Study Event page
 And User enters credentials on Sign Study Event page
 When User clicks 'Sign' button on Sign Study Event page
@@ -429,7 +429,7 @@ And User is on Import Rule Data page
 When User clicks 'Submit' button
 And User clicks 'Yes' button in popup on Import Rule Data page
 Then User is on Build Study page
-And User sees '1 Rule(s) and 1 Rule Assignment(s) were uploaded successfully.' message in 'Alerts&Messages' section
+And User sees "1 Rule(s) and 1 Rule Assignment(s) were uploaded successfully." message in 'Alerts&Messages' section
 Examples:
 |filepath                                  |
 |.\\src\\test\\resources\\Rules\\Rule_1.xml|
@@ -576,7 +576,7 @@ Scenario: 20.10 "Study Admin" creates DNs for Study Event Definition
 GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{0}
 
 Given User goes to SM page
-When User creates DNs for Events using popup:
+When User creates DNs for Events using popup on SM page:
 |Study Subject ID|Event Name|Type      |Description|Detailed Note    |Entity Name|
 |StSubj_5        |Event C   |Query     |event_dn_1 |Scenario 20.10...|Start Date |
 |                |          |Annotation|event_dn_2 |Scenario 20.10...|End Date   |

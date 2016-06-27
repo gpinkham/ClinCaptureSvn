@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.clinovo.utils.Common;
+
 /**
  * CRF bean.
  */
@@ -27,6 +29,7 @@ public class CRF{
 	private String addRows = "";
 	private Map<String, String> fieldNameToValueMap;
 	private String markComplete = "no";
+	private Map<String, String> fieldNameToSectionNameMap;
 
 	public Map<String, String> getFieldNameToValueMap() {
 		return fieldNameToValueMap;
@@ -57,28 +60,14 @@ public class CRF{
 		
 		if (values.containsKey("Add Rows")) crf.setAddRows(values.get("Add Rows"));
 		
-		removeValuesFromMap(values, ARRAY_OF_PARAMETERS_TO_SKIP);
+		Common.removeValuesFromMap(values, ARRAY_OF_PARAMETERS_TO_SKIP);
 		
 		crf.setFieldNameToValueMap(getFieldToValueMap(values));
 		
 		return crf;
 	}
-
-	/**
-	 * Method remove values from map.
-	 *
-	 * @param map
-	 *            Map<String, String>
-	 * @param values
-	 *				String[]
-	 */
-	public static void removeValuesFromMap(Map<String, String> map, String[] values) {
-		for (String key: values) {
-			map.remove(key);
-		}
-	}
 	
-	private static Map<String, String> getFieldToValueMap(Map<String, String> values) {
+	public static Map<String, String> getFieldToValueMap(Map<String, String> values) {
 		if (values.containsKey("item1")) {
 			Map<String, String> parsedValues = new HashMap<String, String>();
 			String parsedKey;
@@ -193,6 +182,15 @@ public class CRF{
     		}
     	}
 		return result;
+	}
+
+	public Map<String, String> getFieldNameToSectionNameMap() {
+		return fieldNameToSectionNameMap;
+	}
+
+	public void setFieldNameToSectionNameMap(
+			Map<String, String> fieldNameToSectionNameMap) {
+		this.fieldNameToSectionNameMap = fieldNameToSectionNameMap;
 	}
 }
 

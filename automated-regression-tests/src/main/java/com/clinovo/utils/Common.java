@@ -1,5 +1,6 @@
 package com.clinovo.utils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Common {
@@ -58,6 +59,49 @@ public class Common {
 			result = result && map.get(key);
 		}
 		
+		return result;
+	}
+
+	public static Map<String, String> getFieldNameToSectionNameMap(String sectionName,
+			Map<String, String> values) {
+		Map<String, String> result = new HashMap<String, String>();
+		for (String key: values.keySet()) {
+			result.put(key, sectionName);
+		}
+		
+		return result;
+	}
+
+	public static boolean arrayContains(String[] array,	String key) {
+		for (String el: array){
+			if (key.equals(el)) return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Method remove values from map.
+	 *
+	 * @param map
+	 *            Map<String, String>
+	 * @param values
+	 *				String[]
+	 */
+	public static void removeValuesFromMap(Map<String, String> map, String[] values) {
+		for (String key: values) {
+			map.remove(key);
+		}
+	}
+	
+	public static Map<String, String> getMapWithoutSomeValues(Map<String, String> map,
+			String[] arrayOfParametersToSkip) {
+		Map<String, String> result = new HashMap<String, String>();
+		for (String key: map.keySet()){
+			if (!Common.arrayContains(arrayOfParametersToSkip, key)) {
+				result.put(key, map.get(key));
+			}
+		}
 		return result;
 	}
 }

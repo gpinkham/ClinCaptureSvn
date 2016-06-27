@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.clinovo.pages.AddSubjectPage;
 import com.clinovo.pages.AdministerCRFsPage;
 import com.clinovo.pages.BuildStudyPage;
@@ -13,6 +14,7 @@ import com.clinovo.pages.ConfirmEventDefinitionCreationPage;
 import com.clinovo.pages.CreateCRFDataCommitedPage;
 import com.clinovo.pages.CreateCRFVersionPage;
 import com.clinovo.pages.CreateStudyEventDefinitionPage;
+import com.clinovo.pages.DEPage;
 import com.clinovo.pages.DefineStudyEventSelectCRFsPage;
 import com.clinovo.pages.DefineStudyEventSelectedCRFsPage;
 import com.clinovo.pages.ManageEventDefinitionsPage;
@@ -20,8 +22,10 @@ import com.clinovo.pages.NotesAndDiscrepanciesPage;
 import com.clinovo.pages.PreviewCRFPage;
 import com.clinovo.pages.SubjectMatrixPage;
 import com.clinovo.pages.UpdateSubjectDetailsPage;
+import com.clinovo.pages.ViewCRFPage;
 import com.clinovo.pages.ViewSubjectRecordPage;
 import com.clinovo.steps.CommonSteps;
+import com.clinovo.utils.Common;
 import com.clinovo.pages.beans.CRF;
 import com.clinovo.pages.beans.DNote;
 import com.clinovo.pages.beans.Study;
@@ -39,6 +43,7 @@ import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.jbehave.core.model.ExamplesTable;
 import org.jbehave.core.steps.Parameters;
+import org.junit.Assert;
 
 /**
  * Created by Anton on 17.07.2014.
@@ -322,8 +327,8 @@ public class ClinovoJBehave {
     	commonSteps.event_is_scheduled(event);
     }
     
-    @Given("User schedules events on SM: $activityTable")
-    @When("User schedules events on SM: $activityTable")
+    @Given("User schedules events on SM page: $activityTable")
+    @When("User schedules events on SM page: $activityTable")
     public void userSchedulesEventsOnSM(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	List<StudyEventDefinition> events = new ArrayList<StudyEventDefinition>();
@@ -387,6 +392,7 @@ public class ClinovoJBehave {
     }
     
     @Given("User fills in data into CRF: $activityTable")
+    @When("User fills in data into CRF: $activityTable")
    	public void userFillsInDataIntoCRF(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
@@ -609,10 +615,12 @@ public class ClinovoJBehave {
     
     private void userFillsInCRFAndSavesIfNeed(ExamplesTable table, boolean saveCRF) {
     	List<CRF> listWithCRFs = new ArrayList<CRF>();
-    	for (Map<String, String> map : getCorrectMapWithCRFItems(table)) {
+    	Map<String, Map<String, String>> crfNameToMapFieldNameToSectionNameMap = new HashMap<String, Map<String, String>>();
+    	for (Map<String, String> map : getCorrectMapWithCRFItems(table, crfNameToMapFieldNameToSectionNameMap)) {
     		CRF crf = CRF.fillCRFFromTableRow(map);
     		userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
     		userClicksEnterDataButtonInPopup(crf.getCrfName());
+    		userGoesToSectionOnDEPage(crf.getCurrentSectionName());
         	commonSteps.fill_in_crf(crf);
     		if (saveCRF) {
     			userClicksSaveButton();
@@ -622,19 +630,42 @@ public class ClinovoJBehave {
     	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_SAVED_DATA, listWithCRFs);
     }
     
-    @SuppressWarnings("unchecked")
-	@Then("CRF data is saved correctly")
-	public void crfDataIsSavedCorrectly() {
+    private void userGoesToSectionOnDEPage(String sectionName) {
+    	commonSteps.click_section_tab_in_crf(sectionName);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Then("User verifies saved CRF data on $page")
+	public void userVerifiesSavedCRFDataOnDEPage(String page) {
     	List<CRF> crfs = (List<CRF>) Thucydides.getCurrentSession().get(CRF.CRFS_TO_CHECK_SAVED_DATA);
     	for (CRF crf : crfs) {
     		userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
-    		userClicksEnterDataButtonInPopup(crf.getCrfName());
-    		commonSteps.check_data_in_crf(crf);
+    		
+    		switch (page) {
+    		case DEPage.PAGE_NAME:
+    			userClicksEnterDataButtonInPopup(crf.getCrfName());
+    			commonSteps.click_section_tab_in_crf(crf.getCurrentSectionName());
+        		commonSteps.check_data_on_DE_page(crf);
+    			break;
+    		case ViewCRFPage.PAGE_NAME:
+    			userClicksViewCRFButtonInPopup(crf.getCrfName());
+    			commonSteps.click_section_tab_in_crf(crf.getCurrentSectionName());
+        		commonSteps.check_data_on_View_CRF_page(crf);
+        		break;
+        	default:
+        		Assert.assertTrue(false);
+    		}
+    		
     	}
     	Thucydides.getCurrentSession().remove(CRF.CRFS_TO_CHECK_SAVED_DATA);
     }
-    
-    private List<Map<String, String>> getCorrectMapWithCRFItems(ExamplesTable table) {
+	
+	private void userClicksViewCRFButtonInPopup(String crf) {
+		commonSteps.click_view_CRF_button_in_popup(crf);
+	}
+	
+    private List<Map<String, String>> getCorrectMapWithCRFItems(ExamplesTable table, 
+    		Map<String, Map<String, String>> crfNameToMapFieldNameToSectionNameMap) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams;
     	List<Map<String, String>> result = new ArrayList<Map<String, String>>();
@@ -662,9 +693,17 @@ public class ClinovoJBehave {
     		} else {
     			values.put("CRF Name", crfName);
     		}
-    		if (values.containsKey("Section Name") && !values.get("Section Name").isEmpty()) {
+    		if ((values.containsKey("Section Name") && !values.get("Section Name").isEmpty()) || (i == table.getRowCount() - 1)) {
+    			// fill map crfName to FieldNameToSectionNameMap
     			sectionName = values.get("Section Name");
-    			next = true;
+    			if (!crfNameToMapFieldNameToSectionNameMap.keySet().contains(crfName)) {
+    				crfNameToMapFieldNameToSectionNameMap.put(crfName, new HashMap<String, String>()); 
+    			} 
+    				
+    			crfNameToMapFieldNameToSectionNameMap.get(crfName).putAll(Common
+    						 .getFieldNameToSectionNameMap(sectionName, CRF.getFieldToValueMap(Common.
+    								 getMapWithoutSomeValues(values, CRF.ARRAY_OF_PARAMETERS_TO_SKIP))));
+    			
     		} else {
     			values.put("Section Name", sectionName);
     		}
@@ -676,7 +715,7 @@ public class ClinovoJBehave {
     				map.putAll(values);
     			}
     		} else {
-    			CRF.removeValuesFromMap(values, CRF.ARRAY_OF_PARAMETERS_TO_SKIP);
+    			Common.removeValuesFromMap(values, CRF.ARRAY_OF_PARAMETERS_TO_SKIP);
     			map.putAll(CRF.changeKeysForCRFItems(map, values));
     		}
     		if (i == table.getRowCount() - 1) {
@@ -693,9 +732,9 @@ public class ClinovoJBehave {
     	commonSteps.browse_file_with_rule(filepath);
     }
     
-    @When("User sees '$message' message in 'Alerts&Messages' section")
-    @Given("User sees '$message' message in 'Alerts&Messages' section")
-    @Then("User sees '$message' message in 'Alerts&Messages' section")
+    @When("User {sees|verifies} \"$message\" message in 'Alerts&Messages' section")
+    @Given("User {sees|verifies} \"$message\" message in 'Alerts&Messages' section")
+    @Then("User {sees|verifies} \"$message\" message in 'Alerts&Messages' section")
 	public void userSeesMessage(String message) {
     	commonSteps.see_message(message);
     }
@@ -777,8 +816,8 @@ public class ClinovoJBehave {
     	Thucydides.getCurrentSession().put(StudySubject.STUDY_SUBJECTS_TO_CHECK_EXIST, sSubjects);
     }
     
-    @Given("User creates DNs for Events using popup: $activityTable")
-    @When("User creates DNs for Events using popup: $activityTable")
+    @Given("User creates DNs for Events using popup on SM page: $activityTable")
+    @When("User creates DNs for Events using popup on SM page: $activityTable")
    	public void userCreatesDNsForEventUsingPopup(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams;
@@ -809,13 +848,13 @@ public class ClinovoJBehave {
         	dn.setEntityType("Event");
     		switch (dn.getEntityName()) {
     		case "Start Date":
-    			commonSteps.click_element_on_page("popup", "'Start Date' flag");
+    			commonSteps.click_element_on_page("SM page", "'Start Date' flag in popup");
     			break;
     		case "End Date":
-    			commonSteps.click_element_on_page("popup", "'End Date' flag");
+    			commonSteps.click_element_on_page("SM page", "'End Date' flag in popup");
     			break;
     		case "Location":
-    			commonSteps.click_element_on_page("popup", "'Location' flag");
+    			commonSteps.click_element_on_page("SM page", "'Location' flag in popup");
     			break;
     		}
         	commonSteps.create_DN(dn);
@@ -935,7 +974,7 @@ public class ClinovoJBehave {
     	commonSteps.leave_CRF_without_saving();
     }    
     
-	@Then("Verify error message \"$errorMessage\" on CRF page")
+	@Then("User verifies error message \"$errorMessage\" on CRF page")
 	public void verifyErrorMessage(String errorMessage) {
 		commonSteps.verify_error_message_on_CRF(errorMessage);
 	}

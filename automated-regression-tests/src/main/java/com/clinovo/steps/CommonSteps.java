@@ -16,7 +16,6 @@ import com.clinovo.pages.AdministerSubjectsPage;
 import com.clinovo.pages.AdministerUsersPage;
 import com.clinovo.pages.BasePage;
 import com.clinovo.pages.BuildStudyPage;
-import com.clinovo.pages.CRFPage;
 import com.clinovo.pages.ChangeStudyPage;
 import com.clinovo.pages.ConfigureSystemPropertiesPage;
 import com.clinovo.pages.ConfirmChangeStudyPage;
@@ -28,6 +27,7 @@ import com.clinovo.pages.CreateCRFVersionPage;
 import com.clinovo.pages.CreateNewSitePage;
 import com.clinovo.pages.CreateStudyEventDefinitionPage;
 import com.clinovo.pages.CreateUserAccountPage;
+import com.clinovo.pages.DEPage;
 import com.clinovo.pages.DNPage;
 import com.clinovo.pages.DefineStudyEventSelectCRFsPage;
 import com.clinovo.pages.DefineStudyEventSelectedCRFsPage;
@@ -45,6 +45,7 @@ import com.clinovo.pages.SignStudyEventPage;
 import com.clinovo.pages.SubjectMatrixPage;
 import com.clinovo.pages.UpdateStudyDetailsPage;
 import com.clinovo.pages.UpdateSubjectDetailsPage;
+import com.clinovo.pages.ViewCRFPage;
 import com.clinovo.pages.ViewEventPage;
 import com.clinovo.pages.ViewSubjectRecordPage;
 import com.clinovo.pages.ViewUserAccountPage;
@@ -65,7 +66,6 @@ import net.thucydides.core.steps.ScenarioSteps;
 /**
  * Created by Anton on 01.07.2014.
  */
-@SuppressWarnings("unused")
 public class CommonSteps extends ScenarioSteps {
 
 	private static final long serialVersionUID = 1L;
@@ -84,8 +84,6 @@ public class CommonSteps extends ScenarioSteps {
 	private ManageSitesPage manageSitesPage = getPages().get(ManageSitesPage.class);
 	private ConfigureSystemPropertiesPage configureSystemPropertiesPage = getPages()
 			.get(ConfigureSystemPropertiesPage.class);
-	private ConfirmSystemPropertiesPage confirmSystemPropertiesPage = getPages()
-			.get(ConfirmSystemPropertiesPage.class);
 	private UpdateStudyDetailsPage updateStudyDetailsPage = getPages().get(UpdateStudyDetailsPage.class);
 	private CreateCRFVersionPage createCRFVersionPage = getPages().get(CreateCRFVersionPage.class);
 	private PreviewCRFPage previewCRFPage = getPages().get(PreviewCRFPage.class);
@@ -103,7 +101,7 @@ public class CommonSteps extends ScenarioSteps {
 	private AddSubjectPage addSubjectPage = getPages().get(AddSubjectPage.class);
 	private SubjectMatrixPage subjectMatrixPage = getPages().get(SubjectMatrixPage.class);
 	private ManageEventDefinitionsPage manageEventDefinitionsPage = getPages().get(ManageEventDefinitionsPage.class);
-	private CRFPage crfPage = getPages().get(CRFPage.class);
+	private DEPage dePage = getPages().get(DEPage.class);
 	private SDVPage sdvPage = getPages().get(SDVPage.class);
 	private SignStudyEventPage signStudyEventPage = getPages().get(SignStudyEventPage.class);
 	private ViewSubjectRecordPage viewSubjectRecordPage = getPages().get(ViewSubjectRecordPage.class);
@@ -119,7 +117,8 @@ public class CommonSteps extends ScenarioSteps {
 	private HomePage homePage = getPages().get(HomePage.class);
 	private ViewEventPage viewEventPage = getPages().get(ViewEventPage.class);
 	private ResetPasswordPage resetPasswordPage = getPages().get(ResetPasswordPage.class);
-
+	private ViewCRFPage viewCRFPage = getPages().get(ViewCRFPage.class);
+	
 	@Step
 	public void enters_credentials(String login, String password) {
 		loginPage.enterLoginName(login);
@@ -241,8 +240,8 @@ public class CommonSteps extends ScenarioSteps {
 			return addSubjectPage;
 		case ManageEventDefinitionsPage.PAGE_NAME:
 			return manageEventDefinitionsPage;
-		case CRFPage.PAGE_NAME:
-			return crfPage;
+		case DEPage.PAGE_NAME:
+			return dePage;
 		case SDVPage.PAGE_NAME:
 			return sdvPage;
 		case SignStudyEventPage.PAGE_NAME:
@@ -519,11 +518,6 @@ public class CommonSteps extends ScenarioSteps {
 	}
 
 	@Step
-	public void click_schedule_event_button_in_popup() {
-		subjectMatrixPage.clickScheduleEventButtonInPopup();
-	}
-
-	@Step
 	public void event_is_scheduled(StudyEventDefinition event) {
 		subjectMatrixPage.eventIsScheduled(event);
 	}
@@ -545,18 +539,18 @@ public class CommonSteps extends ScenarioSteps {
 
 	@Step
 	public void fill_in_crf(CRF crf) {
-		crfPage.fillInCRF(crf);
+		dePage.fillInCRF(crf);
 	}
 
 	@Step
-	public void check_data_in_crf(CRF crf) {
-		assertThat(Common.checkAllTrue(crfPage.checkDataInCRF(crf))).isTrue();
-		crfPage.clickExit();
+	public void check_data_on_DE_page(CRF crf) {
+		assertThat(Common.checkAllTrue(dePage.checkDataInCRF(crf))).isTrue();
+		dePage.clickExit();
 	}
 
 	@Step
 	public void click_save_button_on_CRF_page() {
-		crfPage.clickSaveButton();
+		dePage.clickSaveButton();
 	}
 
 	@Step
@@ -572,11 +566,6 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void user_check_CRF_SDVed() {
 		sdvPage.checkSDVIcon();
-	}
-
-	@Step
-	public void click_sign_event_button_in_popup() {
-		subjectMatrixPage.clickSignEventButton();
 	}
 
 	@Step
@@ -626,11 +615,11 @@ public class CommonSteps extends ScenarioSteps {
 
 	@Step
 	public void save_crf() {
-		crfPage.clickSaveButton();
+		dePage.clickSaveButton();
 	}
 
 	public WebElement get_flag_icon_element_by_CRF_item(String itemName) {
-		return crfPage.findFlagIconElementByCRFItem(itemName);
+		return dePage.findFlagIconElementByCRFItem(itemName);
 	}
 
 	@Step
@@ -785,22 +774,22 @@ public class CommonSteps extends ScenarioSteps {
 				break;
 			}
 			break;
-		case "popup":
+		case SubjectMatrixPage.PAGE_NAME:
 			switch (element) {
-			case "'Schedule Event' button":
-				click_schedule_event_button_in_popup();
+			case "'Schedule Event' button in popup":
+				subjectMatrixPage.clickScheduleEventButtonInPopup();
 				break;
-			case "'Sign Event' button":
-				click_sign_event_button_in_popup();
+			case "'Sign Event' button in popup":
+				subjectMatrixPage.clickSignEventButton();
 				break;
-			case "'Start Date' flag":
-				click_start_date_flag_in_popup();
+			case "'Start Date' flag in popup":
+				subjectMatrixPage.clickStartDateFlagInPopup();
 				break;
-			case "'End Date' flag":
-				click_end_date_flag_in_popup();
+			case "'End Date' flag in popup":
+				subjectMatrixPage.clickEndDateFlagInPopup();
 				break;
-			case "'Location' flag":
-				click_location_flag_in_popup();
+			case "'Location' flag in popup":
+				subjectMatrixPage.clickLocationFlagInPopup();
 				break;
 			}
 			break;
@@ -810,18 +799,16 @@ public class CommonSteps extends ScenarioSteps {
 		}
 	}
 
-	public void click_start_date_flag_in_popup() {
-		subjectMatrixPage.clickStartDateFlagInPopup();
+	@Step
+	public void click_schedule_event_button_in_popup() {
+		click_element_on_page("SM page", "'Schedule Event' button in popup");
 	}
 
-	public void click_end_date_flag_in_popup() {
-		subjectMatrixPage.clickEndDateFlagInPopup();
+	@Step
+	public void click_sign_event_button_in_popup() {
+		click_element_on_page("SM page", "'Sign Event' button in popup");
 	}
-
-	public void click_location_flag_in_popup() {
-		subjectMatrixPage.clickLocationFlagInPopup();
-	}
-
+	
 	@Step
 	public void browse_file_with_rule(String filepath) {
 		importRuleDataPage.browseRuleFile(filepath);
@@ -893,22 +880,33 @@ public class CommonSteps extends ScenarioSteps {
 
 	@Step
 	public void click_section_tab_in_crf(String sectionName) {
-		crfPage.clickSectionTabInCRF(sectionName);
+		dePage.clickSectionTabInCRF(sectionName);
 	}
 
 	@Step
 	public void click_more_info_button() {
-		crfPage.clickMoreInfoButton();
+		dePage.clickMoreInfoButton();
 	}
 
 	@Step
 	public void leave_CRF_without_saving() {
-		crfPage.clickCancelButton();
-		crfPage.clickYesAtDlg();
+		dePage.clickCancelButton();
+		dePage.clickYesAtDlg();
 	}
 
 	@Step
 	public void verify_error_message_on_CRF(String errorMessage) {
-		crfPage.verifyErrorMessage(errorMessage);
+		dePage.verifyErrorMessage(errorMessage);
+	}
+
+	@Step
+	public void click_view_CRF_button_in_popup(String crf) {
+		subjectMatrixPage.clickViewCRFButtonInPopup(crf);
+	}
+
+	@Step
+	public void check_data_on_View_CRF_page(CRF crf) {
+		assertThat(Common.checkAllTrue(viewCRFPage.checkDataInCRF(crf))).isTrue();
+		viewCRFPage.clickExit();
 	}
 }

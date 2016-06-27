@@ -137,17 +137,35 @@ public class SubjectMatrixPage extends BasePage {
 	}
 
 	public void clickEnterDataButtonInPopup(String aCRFName) {
+		clickButtonInPopup(aCRFName, "Enter Data");
+	}
+
+	public void clickViewCRFButtonInPopup(String aCRFName) {
+		clickButtonInPopup(aCRFName, "View CRF");
+	}
+	
+	private void clickButtonInPopup(String aCRFName, String buttonName) {
 		tCRFList.waitUntilVisible();
 		List<WebElement> tds = tFindSubjects.findElements(
 				By.xpath(".//div[starts-with(@id, 'crfListWrapper')]//td[contains(text(), '" + aCRFName + "')]"));
 		for (WebElement td : tds) {
 			if (td.getText().replaceFirst(aCRFName, "").trim().replace("*", "").isEmpty()) {
-				td.findElement(By.xpath("./..//img[contains(@name,'bt_EnterData')]")).click();
+				switch (buttonName) {
+	    		case "Enter Data":
+	    			td.findElement(By.xpath("./..//img[contains(@name,'bt_EnterData')]")).click();
+	    			break;
+	    		case "View CRF":
+	    			td.findElement(By.xpath("./..//img[contains(@src,'bt_View.gif')]")).click();
+	        		break;
+	        	default:
+	        		Assert.assertTrue(false);
+	    		}
+				
 				break;
 			}
 		}
 	}
-
+	
 	public void clickSignEventButton() {
 		bSignEvent.waitUntilVisible();
 		bSignEvent.click();
@@ -197,7 +215,5 @@ public class SubjectMatrixPage extends BasePage {
 				.findElement(
 						By.xpath(".//td[text()='" + studySubjectID + "']/..//a[contains(@href, 'ViewStudySubject')]"))
 				.click();
-
 	}
-
 }
