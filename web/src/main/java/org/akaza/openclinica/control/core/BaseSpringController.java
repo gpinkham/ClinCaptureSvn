@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import com.clinovo.service.EmailService;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -110,12 +111,14 @@ import com.clinovo.service.WidgetsLayoutService;
 import com.clinovo.util.CrfShortcutsAnalyzer;
 import com.clinovo.util.RequestUtil;
 import com.clinovo.util.RuleSetServiceUtil;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * BaseSpringController.
  * 
  * Here we can keep common methods for Servlets and for Controllers.
  */
+@EnableAsync
 @SuppressWarnings({"rawtypes"})
 public abstract class BaseSpringController {
 
@@ -165,7 +168,7 @@ public abstract class BaseSpringController {
 	public static final String ERRORS_HOLDER = "errors_holder";
 	public static final String STUDY_FEATURES = "studyFeatures";
 	public static final String SESSION_MANAGER = "sessionManager";
-	public static final String STUDY_FACILITIES= "studyFacilities";
+	public static final String STUDY_FACILITIES = "studyFacilities";
 	public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
 	public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
 	public static final String RESTORE_SESSION_FLAG = "restoreSessionFlag";
@@ -221,6 +224,8 @@ public abstract class BaseSpringController {
 		return ResourceBundleProvider.getWorkflowBundle();
 	}
 
+	@Autowired
+	private EmailService emailService;
 	@Autowired
 	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 	@Autowired
@@ -322,10 +327,9 @@ public abstract class BaseSpringController {
 	 */
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(UNAVAILABLE_CRF_LIST);
-		for (Integer key : map.keySet()) {
-			int id = map.get(key);
-			if (id == userId) {
-				UNAVAILABLE_CRF_LIST.remove(key);
+		for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+			if (entry.getValue() == userId) {
+				UNAVAILABLE_CRF_LIST.remove(entry.getKey());
 			}
 		}
 	}
@@ -823,8 +827,8 @@ public abstract class BaseSpringController {
 		if (storedAttributes == null || storedAttributes.size() == 0) {
 			return;
 		}
-		for (String key : storedAttributes.keySet()) {
-			session.setAttribute(key, storedAttributes.get(key));
+		for (Map.Entry<String, Object> entry : storedAttributes.entrySet()) {
+			session.setAttribute(entry.getKey(), entry.getValue());
 		}
 		getStoredSessionAttributes().remove(userName);
 	}
@@ -863,5 +867,9 @@ public abstract class BaseSpringController {
 
 	public CrfVersionService getCrfVersionService() {
 		return crfVersionService;
+	}
+
+	public EmailService getEmailService() {
+		return emailService;
 	}
 }
