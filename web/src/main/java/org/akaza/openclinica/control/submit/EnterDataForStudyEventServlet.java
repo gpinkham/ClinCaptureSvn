@@ -23,23 +23,18 @@ package org.akaza.openclinica.control.submit;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -50,7 +45,6 @@ import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -59,7 +53,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
@@ -173,8 +166,8 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		// let the user choose which version he will enter data for
 		// However, this method seems to be returning DisplayEventDefinitionCRFs
 		// that contain valid eventCRFs??
-		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
-		populateUncompletedCRFsWithCRFAndVersions(getDataSource(), logger, uncompletedEventDefinitionCRFs);
+		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, seb.getSubjectEventStatus());
+		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
 		// Attempt to provide the DisplayEventDefinitionCRF with a
 		// valid owner
@@ -193,8 +186,8 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		// ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs,
 		// eventDefinitionCRFs, seb.getSubjectEventStatus());
 
-		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
-				currentRole, seb.getSubjectEventStatus(), study);
+		ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs, ub, currentRole, seb.getSubjectEventStatus(),
+				study);
 
 		if (currentStudy.getParentStudyId() > 0) {
 			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
@@ -313,67 +306,6 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 	}
 
 	/**
-	 * Finds all the event definitions for which no event CRF exists - which is the list of event definitions with
-	 * uncompleted event CRFs.
-	 * 
-	 * @param eventDefinitionCRFs
-	 *            All of the event definition CRFs for this study event.
-	 * @param eventCRFs
-	 *            All of the event CRFs for this study event.
-	 * @return The list of event definitions for which no event CRF exists.
-	 */
-	private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {
-		int i;
-		HashMap completed = new HashMap();
-		HashMap startedButIncompleted = new HashMap();
-		ArrayList answer = new ArrayList();
-
-		/**
-		 * A somewhat non-standard algorithm is used here: let answer = empty; foreach event definition ED, set
-		 * isCompleted(ED) = false foreach event crf EC, set isCompleted(EC.getEventDefinition()) = true foreach event
-		 * definition ED, if (!isCompleted(ED)) { answer += ED; } return answer; This algorithm is guaranteed to find
-		 * all the event definitions for which no event CRF exists.
-		 * 
-		 * The motivation for using this algorithm is reducing the number of database hits.
-		 * 
-		 * -jun-we have to add more CRFs here: the event CRF which dones't have item data yet
-		 */
-
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			completed.put(edcrf.getCrfId(), Boolean.FALSE);
-			startedButIncompleted.put(edcrf.getCrfId(), new EventCRFBean());
-		}
-
-		CRFVersionDAO cvdao = getCRFVersionDAO();
-		ItemDataDAO iddao = getItemDataDAO();
-		for (i = 0; i < eventCRFs.size(); i++) {
-			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
-			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) { // this crf has data already
-				completed.put(crfId, Boolean.TRUE);
-			} else { // event crf got created, but no data entered
-				startedButIncompleted.put(crfId, ecrf);
-			}
-		}
-
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
-			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			dedc.setEdc(edcrf);
-			Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
-			EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-			if (b == null || !b) {
-				dedc.setEventCRF(ev);
-				answer.add(dedc);
-			}
-		}
-
-		return answer;
-	}
-
-	/**
 	 * populateUncompletedCRFsWithAnOwner.
 	 *
 	 * @param ds
@@ -407,98 +339,6 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 
 					eventCRFBean.setOwner(userAccountBean);
 				}
-			}
-		}
-	}
-
-	/**
-	 * populateUncompletedCRFsWithCRFAndVersions.
-	 *
-	 * @param ds
-	 *            DataSource
-	 * @param logger
-	 *            Logger
-	 * @param uncompletedEventDefinitionCRFs
-	 *            ArrayList
-	 */
-	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, Logger logger,
-			ArrayList uncompletedEventDefinitionCRFs) {
-		CRFDAO cdao = new CRFDAO(ds);
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-		Comparator<CRFVersionBean> versionComparator = new Comparator<CRFVersionBean>() {
-			public int compare(CRFVersionBean v1, CRFVersionBean v2) {
-				return v1.getName().compareTo(v2.getName());
-			}
-		};
-
-		int size = uncompletedEventDefinitionCRFs.size();
-		for (int i = 0; i < size; i++) {
-			DisplayEventDefinitionCRFBean dedcrf = (DisplayEventDefinitionCRFBean) uncompletedEventDefinitionCRFs
-					.get(i);
-			CRFBean cb = (CRFBean) cdao.findByPK(dedcrf.getEdc().getCrfId());
-			// note that we do not check status in the above query, so let's
-			// check it here, tbh 102007
-			if (cb.getStatus().equals(Status.AVAILABLE)) {
-				// the above does not allow us to show the CRF as a thing with
-				// status of 'invalid' so we have to
-				// go to the JSP for this one, I think
-				dedcrf.getEdc().setCrf(cb);
-
-				ArrayList theVersions = (ArrayList) cvdao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
-				ArrayList versions = new ArrayList();
-				HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
-
-				for (Object theVersion : theVersions) {
-					CRFVersionBean crfVersion = (CRFVersionBean) theVersion;
-					crfVersionIds.put(String.valueOf(crfVersion.getId()), crfVersion);
-				}
-
-				if (!dedcrf.getEdc().getSelectedVersionIds().equals("")) {
-					String[] kk = dedcrf.getEdc().getSelectedVersionIds().split(",");
-					for (String string : kk) {
-						if (crfVersionIds.get(string) != null) {
-							versions.add(crfVersionIds.get(string));
-						}
-					}
-				} else {
-					versions = theVersions;
-				}
-
-				Collections.sort(versions, versionComparator);
-				dedcrf.getEdc().setVersions(versions);
-				if (versions.size() != 0) {
-					boolean isLocked = false;
-					for (Object version : versions) {
-						CRFVersionBean crfvb = (CRFVersionBean) version;
-						logger.info("...checking versions..." + crfvb.getName());
-						if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
-							logger.info("found a non active crf version");
-							isLocked = true;
-						}
-					}
-					logger.info("re-set event def, line 240: " + isLocked);
-					if (isLocked) {
-						dedcrf.setStatus(Status.LOCKED);
-						dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
-					}
-					uncompletedEventDefinitionCRFs.set(i, dedcrf);
-				} else {
-					dedcrf.setStatus(Status.LOCKED);
-					dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
-					uncompletedEventDefinitionCRFs.set(i, dedcrf);
-				}
-			} else {
-				dedcrf.getEdc().setCrf(cb);
-				logger.info("_found a non active crf _");
-				dedcrf.setStatus(Status.LOCKED);
-				dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
-				dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);
-				uncompletedEventDefinitionCRFs.set(i, dedcrf);
-			}
-			if (dedcrf.getStatus() == Status.LOCKED && (dedcrf.getEventCRF().getCrfVersion() == null
-					|| dedcrf.getEventCRF().getCrfVersion().getId() == 0)) {
-				dedcrf.getEventCRF()
-						.setCrfVersion((CRFVersionBean) cvdao.findByPK(dedcrf.getEdc().getDefaultVersionId()));
 			}
 		}
 	}

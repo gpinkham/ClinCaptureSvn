@@ -37,7 +37,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -53,9 +52,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.view.Page;
@@ -194,8 +191,10 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 
 		StudyDAO studydao = getStudyDAO();
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
-		request.setAttribute("viewModeOnly", study.getStatus().isDeleted() || study.getStatus().isLocked()
-				|| studySubjectBean.getStatus().isDeleted() || studySubjectBean.getStatus().isLocked() || ub.getRoleByStudy(study.isSite()? study.getParentStudyId() : studyId).isStudySponsor());
+		request.setAttribute("viewModeOnly",
+				study.getStatus().isDeleted() || study.getStatus().isLocked()
+						|| studySubjectBean.getStatus().isDeleted() || studySubjectBean.getStatus().isLocked()
+						|| ub.getRoleByStudy(study.isSite() ? study.getParentStudyId() : studyId).isStudySponsor());
 
 		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
 		boolean isParentStudy = study.getParentStudyId() < 1;
@@ -269,15 +268,14 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 
 		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
 
-		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
-		EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(sm.getDataSource(), logger,
-				uncompletedEventDefinitionCRFs);
+		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, seb.getSubjectEventStatus());
+		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
 		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
 				uncompletedEventDefinitionCRFs);
 
-		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
-				currentRole, seb.getSubjectEventStatus(), study);
+		ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs, ub, currentRole, seb.getSubjectEventStatus(),
+				study);
 
 		if (currentStudy.getParentStudyId() > 0) {
 			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
@@ -414,48 +412,6 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 
 		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, exceptionName, "1");
-	}
-
-	private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {
-		int i;
-		HashMap completed = new HashMap();
-		HashMap startedButIncompleted = new HashMap();
-		ArrayList answer = new ArrayList();
-
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			completed.put(edcrf.getCrfId(), Boolean.FALSE);
-			startedButIncompleted.put(edcrf.getCrfId(), new EventCRFBean());
-		}
-
-		CRFVersionDAO cvdao = getCRFVersionDAO();
-		ItemDataDAO iddao = getItemDataDAO();
-		for (i = 0; i < eventCRFs.size(); i++) {
-			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
-			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) {
-				// this crf has data already
-				completed.put(crfId, Boolean.TRUE);
-			} else {
-				// event crf got created, but no data entered
-				startedButIncompleted.put(crfId, ecrf);
-			}
-		}
-
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
-			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			dedc.setEdc(edcrf);
-			Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
-			EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-			if (b == null || !b) {
-				dedc.setEventCRF(ev);
-				answer.add(dedc);
-			}
-		}
-
-		return answer;
 	}
 
 	private void setRequestAttributesForNotes(HttpServletRequest request, List<DiscrepancyNoteBean> discBeans) {

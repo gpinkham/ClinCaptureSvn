@@ -61,7 +61,6 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ListEventsForSubjectsServlet;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
-import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.MapsHolder;
@@ -130,6 +129,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1720,13 +1720,9 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	/**
 	 * Each of the event CRFs with its corresponding CRFBean. Then generates a list of DisplayEventCRFBeans, one for
 	 * each event CRF.
-	 * 
-	 * @param ds
-	 *            DataSource
+	 *
 	 * @param eventCRFs
 	 *            The list of event CRFs for this study event.
-	 * @param eventDefinitionCRFs
-	 *            list of the eventDefinitionCRFs
 	 * @param ub
 	 *            UserAccountBean
 	 * @param currentRole
@@ -1737,8 +1733,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 *            StudyBean
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
-	public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
-			UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
+	protected ArrayList getDisplayEventCRFs(ArrayList eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
 		ArrayList answer = new ArrayList();
 
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -1823,7 +1818,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 *            SubjectEventStatus
 	 * @return The list of event definitions for which no event CRF exists.
 	 */
-	public ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
+	protected ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
 		int i;
 		HashMap completed = new HashMap();
 		HashMap startedButIncompleted = new HashMap();
@@ -1896,7 +1891,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 *            boolean.
 	 * @return ArrayList of DisplayStidyEventBean.
 	 */
-	public ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
+	protected ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
 			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole, boolean excludeEventDefinishionsRemoved) {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -1910,7 +1905,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 		ArrayList displayEvents = new ArrayList();
 		for (Object event1 : events) {
 			StudyEventBean event = (StudyEventBean) event1;
-			StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+			StudySubjectBean studySubject = ssdao.findByPK(event.getStudySubjectId());
 
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
@@ -1928,10 +1923,10 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			// construct info needed on view study event page
 			DisplayStudyEventBean de = new DisplayStudyEventBean();
 			de.setStudyEvent(event);
-			de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole,
+			de.setDisplayEventCRFs(getDisplayEventCRFs(eventCRFs, ub, currentRole,
 					event.getSubjectEventStatus(), study));
 			ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
-			EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(ds, logger, al);
+			populateUncompletedCRFsWithCRFAndVersions(al);
 			de.setUncompletedCRFs(al);
 
 			de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
@@ -1941,6 +1936,93 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 		}
 
 		return displayEvents;
+	}
+
+	/**
+	 * Populates uncompleted crfs with crf and versions.
+	 *
+	 * @param uncompletedEventDefinitionCRFs
+	 *            list of uncompleted CRFs
+	 */
+	protected void populateUncompletedCRFsWithCRFAndVersions(ArrayList uncompletedEventDefinitionCRFs) {
+		CRFDAO cdao = new CRFDAO(getDataSource());
+		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
+		Comparator<CRFVersionBean> versionComparator = new Comparator<CRFVersionBean>() {
+			public int compare(CRFVersionBean v1, CRFVersionBean v2) {
+				return v1.getName().compareTo(v2.getName());
+			}
+		};
+
+		int size = uncompletedEventDefinitionCRFs.size();
+		for (int i = 0; i < size; i++) {
+			DisplayEventDefinitionCRFBean dedcrf = (DisplayEventDefinitionCRFBean) uncompletedEventDefinitionCRFs
+					.get(i);
+			CRFBean cb = (CRFBean) cdao.findByPK(dedcrf.getEdc().getCrfId());
+			// note that we do not check status in the above query, so let's
+			// check it here, tbh 102007
+			if (cb.getStatus().equals(Status.AVAILABLE)) {
+				// the above does not allow us to show the CRF as a thing with
+				// status of 'invalid' so we have to
+				// go to the JSP for this one, I think
+				dedcrf.getEdc().setCrf(cb);
+
+				ArrayList theVersions = (ArrayList) cvdao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
+				ArrayList versions = new ArrayList();
+				HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
+
+				for (Object theVersion : theVersions) {
+					CRFVersionBean crfVersion = (CRFVersionBean) theVersion;
+					crfVersionIds.put(String.valueOf(crfVersion.getId()), crfVersion);
+				}
+
+				if (!dedcrf.getEdc().getSelectedVersionIds().equals("")) {
+					String[] kk = dedcrf.getEdc().getSelectedVersionIds().split(",");
+					for (String string : kk) {
+						if (crfVersionIds.get(string) != null) {
+							versions.add(crfVersionIds.get(string));
+						}
+					}
+				} else {
+					versions = theVersions;
+				}
+
+				Collections.sort(versions, versionComparator);
+				dedcrf.getEdc().setVersions(versions);
+				if (versions.size() != 0) {
+					boolean isLocked = false;
+					for (Object version : versions) {
+						CRFVersionBean crfvb = (CRFVersionBean) version;
+						logger.info("...checking versions..." + crfvb.getName());
+						if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
+							logger.info("found a non active crf version");
+							isLocked = true;
+						}
+					}
+					logger.info("re-set event def, line 240: " + isLocked);
+					if (isLocked) {
+						dedcrf.setStatus(Status.LOCKED);
+						dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
+					}
+					uncompletedEventDefinitionCRFs.set(i, dedcrf);
+				} else {
+					dedcrf.setStatus(Status.LOCKED);
+					dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
+					uncompletedEventDefinitionCRFs.set(i, dedcrf);
+				}
+			} else {
+				dedcrf.getEdc().setCrf(cb);
+				logger.info("_found a non active crf _");
+				dedcrf.setStatus(Status.LOCKED);
+				dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
+				dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);
+				uncompletedEventDefinitionCRFs.set(i, dedcrf);
+			}
+			if (dedcrf.getStatus() == Status.LOCKED && (dedcrf.getEventCRF().getCrfVersion() == null
+					|| dedcrf.getEventCRF().getCrfVersion().getId() == 0)) {
+				dedcrf.getEventCRF()
+						.setCrfVersion((CRFVersionBean) cvdao.findByPK(dedcrf.getEdc().getDefaultVersionId()));
+			}
+		}
 	}
 
 	private List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {

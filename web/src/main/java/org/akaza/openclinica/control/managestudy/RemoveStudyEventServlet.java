@@ -21,33 +21,23 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.core.RememberLastPage;
+import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -113,18 +103,13 @@ public class RemoveStudyEventServlet extends SpringServlet {
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
-
-				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-				// find all crfs in the definition
-				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
-
-				EventCRFDAO ecdao = getEventCRFDAO();
-				ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+				ArrayList eventCRFs = getEventCRFDAO().findAllByStudyEvent(event);
 
 				// construct info needed on view study event page
 				DisplayStudyEventBean de = new DisplayStudyEventBean();
 				de.setStudyEvent(event);
-				de.setDisplayEventCRFs(getDisplayEventCRFs(eventCRFs, eventDefinitionCRFs, request));
+				de.setDisplayEventCRFs(getDisplayEventCRFs(eventCRFs, getUserAccountBean(), getCurrentRole(),
+						event.getSubjectEventStatus(), study));
 
 				request.setAttribute("displayEvent", de);
 
@@ -163,56 +148,4 @@ public class RemoveStudyEventServlet extends SpringServlet {
 					request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + id);
 		}
 	}
-
-	/**
-	 * Each of the event CRFs with its corresponding CRFBean. Then generates a list of DisplayEventCRFBeans, one for
-	 * each event CRF.
-	 * 
-	 * @param eventCRFs
-	 *            The list of event CRFs for this study event.
-	 * @param eventDefinitionCRFs
-	 *            The list of event definition CRFs for this study event.
-	 * @return The list of DisplayEventCRFBeans for this study event.
-	 */
-	private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
-			HttpServletRequest request) {
-		ArrayList answer = new ArrayList();
-
-		HashMap definitionsById = new HashMap();
-		int i;
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			definitionsById.put(edc.getStudyEventDefinitionId(), edc);
-		}
-
-		StudyEventDAO sedao = getStudyEventDAO();
-		CRFDAO cdao = getCRFDAO();
-		CRFVersionDAO cvdao = getCRFVersionDAO();
-
-		for (i = 0; i < eventCRFs.size(); i++) {
-			EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
-
-			// populate the event CRF with its crf bean
-			int crfVersionId = ecb.getCRFVersionId();
-			CRFBean cb = cdao.findByVersionId(crfVersionId);
-			ecb.setCrf(cb);
-
-			CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-			ecb.setCrfVersion(cvb);
-
-			// then get the definition so we can call
-			int studyEventId = ecb.getStudyEventId();
-			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
-
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById
-					.get(new Integer(studyEventDefinitionId));
-
-			DisplayEventCRFBean dec = new DisplayEventCRFBean();
-			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc);
-			answer.add(dec);
-		}
-
-		return answer;
-	}
-
 }

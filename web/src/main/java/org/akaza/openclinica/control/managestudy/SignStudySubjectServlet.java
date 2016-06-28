@@ -10,30 +10,32 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.control.managestudy;
 
-import com.clinovo.util.DAOWrapper;
-import com.clinovo.util.SignUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -41,17 +43,12 @@ import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -61,16 +58,8 @@ import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SignUtil;
 
 /**
  * Handles signing of subject casebook.
@@ -104,61 +93,6 @@ public class SignStudySubjectServlet extends SpringServlet {
 				getResPage().getString("no_have_correct_privilege_current_study") + " "
 						+ getResPage().getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
-	}
-
-	/**
-	 * Gets display study events for study subject.
-	 * 
-	 * @param study
-	 *            study to use
-	 * @param studySub
-	 *            study subject to use
-	 * @param ds
-	 *            DataSource to use
-	 * @param ub
-	 *            current user
-	 * @param currentRole
-	 *            current user's role in study
-	 * @return list of display study events
-	 */
-	public static ArrayList getDisplayStudyEventsForStudySubject(StudyBean study, StudySubjectBean studySub,
-			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole) {
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-		StudyEventDAO sedao = new StudyEventDAO(ds);
-		EventCRFDAO ecdao = new EventCRFDAO(ds);
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
-
-		ArrayList<StudyEventBean> events = sedao.findAllByStudySubject(studySub);
-
-		ArrayList displayEvents = new ArrayList();
-		for (StudyEventBean event : events) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
-					.findByPK(event.getStudyEventDefinitionId());
-			event.setStudyEventDefinition(sed);
-
-			// find all active crfs in the definition
-			ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
-
-			ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-			// construct info needed on view study event page
-			DisplayStudyEventBean de = new DisplayStudyEventBean();
-			de.setStudyEvent(event);
-			de.setDisplayEventCRFs(getDisplayEventCRFs(study, ds, eventCRFs, ub, currentRole,
-					event.getSubjectEventStatus()));
-			ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
-			populateUncompletedCRFsWithCRFAndVersions(ds, al);
-			de.setUncompletedCRFs(al);
-
-			StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
-			de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
-
-			displayEvents.add(de);
-
-		}
-
-		return displayEvents;
 	}
 
 	/**
@@ -254,8 +188,8 @@ public class SignStudySubjectServlet extends SpringServlet {
 		} else {
 			request.setAttribute("parentStudy", new StudyBean());
 		}
-		ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub,
-				getDataSource(), ub, currentRole);
+		ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
+				getDataSource(), ub, currentRole, false);
 		DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 		// Don't filter for now; disc note beans are returned with eventCRFId
 		// set
@@ -348,175 +282,6 @@ public class SignStudySubjectServlet extends SpringServlet {
 			request.setAttribute("id", Integer.toString(studySubId));
 			addPageMessage(getResText().getString("password_match"), request);
 			return null;
-		}
-	}
-
-	/**
-	 * Each of the event CRFs with its corresponding CRFBean. Then generates a list of DisplayEventCRFBeans, one for
-	 * each event CRF.
-	 * 
-	 * @param study
-	 *            current study
-	 * @param ds
-	 *            DataSource to be used.
-	 * @param eventCRFs
-	 *            the list of event CRFs for this study event.
-	 * @param ub
-	 *            current user
-	 * @param currentRole
-	 *            user's role in current study
-	 * @param status
-	 *            the subject event status
-	 * @return The list of DisplayEventCRFBeans for this study event.
-	 */
-	public static ArrayList getDisplayEventCRFs(StudyBean study, DataSource ds, ArrayList<EventCRFBean> eventCRFs,
-			UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status) {
-		ArrayList answer = new ArrayList();
-
-		StudyEventDAO sedao = new StudyEventDAO(ds);
-		CRFDAO cdao = new CRFDAO(ds);
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-		ItemDataDAO iddao = new ItemDataDAO(ds);
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-
-		for (EventCRFBean ecb : eventCRFs) {
-			// populate the event CRF with its crf bean
-			int crfVersionId = ecb.getCRFVersionId();
-			CRFBean cb = cdao.findByVersionId(crfVersionId);
-			ecb.setCrf(cb);
-
-			CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-			ecb.setCrfVersion(cvb);
-
-			// then get the definition so we can call
-			// DisplayEventCRFBean.setFlags
-			int studyEventId = ecb.getStudyEventId();
-			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
-
-			EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId,
-					cb.getId());
-			if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED)
-					|| status.equals(SubjectEventStatus.STOPPED)) {
-				ecb.setStage(DataEntryStage.LOCKED);
-
-				// we need to set a SED-wide flag here, because other edcs
-				// in this event can be filled in and change the status, tbh
-			} else if (status.equals(SubjectEventStatus.INVALID)) {
-				ecb.setStage(DataEntryStage.LOCKED);
-			} else if (!cb.getStatus().equals(Status.AVAILABLE)) {
-				ecb.setStage(DataEntryStage.LOCKED);
-			} else if (!cvb.getStatus().equals(Status.AVAILABLE)) {
-				ecb.setStage(DataEntryStage.LOCKED);
-			}
-			// TODO need to refactor since this is similar to other code, tbh
-			if (edc != null) {
-				DisplayEventCRFBean dec = new DisplayEventCRFBean();
-				dec.setFlags(ecb, ub, currentRole, edc);
-				ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
-				if (!idata.isEmpty()) {
-					answer.add(dec);
-				}
-			}
-		}
-
-		return answer;
-	}
-
-	/**
-	 * Finds all the event definitions for which no event CRF exists - which is the list of event definitions with
-	 * uncompleted event CRFs.
-	 * 
-	 * @param ds
-	 *            DataSource to be used.
-	 * @param eventDefinitionCRFs
-	 *            All of the event definition CRFs for this study event.
-	 * @param eventCRFs
-	 *            All of the event CRFs for this study event.
-	 * @param status
-	 *            subject event status
-	 * @return The list of event definitions for which no event CRF exists.
-	 */
-	public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs,
-			SubjectEventStatus status) {
-		int i;
-		HashMap completed = new HashMap();
-		HashMap startedButIncompleted = new HashMap();
-		ArrayList answer = new ArrayList();
-
-		/**
-		 * A somewhat non-standard algorithm is used here: let answer = empty; foreach event definition ED, set
-		 * isCompleted(ED) = false foreach event crf EC, set isCompleted(EC.getEventDefinition()) = true foreach event
-		 * definition ED, if (!isCompleted(ED)) { answer += ED; } return answer; This algorithm is guaranteed to find
-		 * all the event definitions for which no event CRF exists.
-		 * 
-		 * The motivation for using this algorithm is reducing the number of database hits.
-		 * 
-		 * -jun-we have to add more CRFs here: the event CRF which dones't have item data yet
-		 */
-
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			completed.put(edcrf.getCrfId(), Boolean.FALSE);
-			startedButIncompleted.put(edcrf.getCrfId(), new EventCRFBean());
-		}
-
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-		ItemDataDAO iddao = new ItemDataDAO(ds);
-		for (i = 0; i < eventCRFs.size(); i++) {
-			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
-			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-			if (!idata.isEmpty()) { // this crf has data already
-				completed.put(crfId, Boolean.TRUE);
-			} else { // event crf got created, but no data entered
-				startedButIncompleted.put(crfId, ecrf);
-			}
-		}
-
-		// TODO possible relation to 1689 here, tbh
-		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-			DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
-			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-
-			dedc.setEdc(edcrf);
-			if (status.equals(SubjectEventStatus.LOCKED)) {
-				dedc.setStatus(Status.LOCKED);
-			}
-			Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
-			EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-			if (b == null || !b) {
-
-				dedc.setEventCRF(ev);
-				answer.add(dedc);
-
-			}
-		}
-
-		return answer;
-	}
-
-	/**
-	 * Populates uncompleted crfs with crf and versions.
-	 * 
-	 * @param ds
-	 *            DataSource to be used.
-	 * @param uncompletedEventDefinitionCRFs
-	 *            list of uncompleted CRFs
-	 */
-	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs) {
-		CRFDAO cdao = new CRFDAO(ds);
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-
-		int size = uncompletedEventDefinitionCRFs.size();
-		for (int i = 0; i < size; i++) {
-			DisplayEventDefinitionCRFBean dedcrf = (DisplayEventDefinitionCRFBean) uncompletedEventDefinitionCRFs
-					.get(i);
-			CRFBean cb = (CRFBean) cdao.findByPK(dedcrf.getEdc().getCrfId());
-			dedcrf.getEdc().setCrf(cb);
-
-			ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
-			dedcrf.getEdc().setVersions(versions);
-			uncompletedEventDefinitionCRFs.set(i, dedcrf);
 		}
 	}
 
