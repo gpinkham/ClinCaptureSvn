@@ -13,22 +13,27 @@
 
 package org.akaza.openclinica.control.core;
 
-import com.clinovo.enums.study.StudyAllocation;
-import com.clinovo.enums.study.StudyAssignment;
-import com.clinovo.enums.study.StudyConfigurationParameter;
-import com.clinovo.enums.study.StudyControl;
-import com.clinovo.enums.study.StudyDuration;
-import com.clinovo.enums.study.StudyEndPoint;
-import com.clinovo.enums.study.StudyFacRecruitStatus;
-import com.clinovo.enums.study.StudyFacility;
-import com.clinovo.enums.study.StudyFeature;
-import com.clinovo.enums.study.StudyMasking;
-import com.clinovo.enums.study.StudyPhase;
-import com.clinovo.enums.study.StudyPurpose;
-import com.clinovo.enums.study.StudySelection;
-import com.clinovo.enums.study.StudyTiming;
-import com.clinovo.i18n.LocaleResolver;
-import com.clinovo.util.RequestUtil;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -116,26 +121,22 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import com.clinovo.enums.study.StudyAllocation;
+import com.clinovo.enums.study.StudyAssignment;
+import com.clinovo.enums.study.StudyConfigurationParameter;
+import com.clinovo.enums.study.StudyControl;
+import com.clinovo.enums.study.StudyDuration;
+import com.clinovo.enums.study.StudyEndPoint;
+import com.clinovo.enums.study.StudyFacRecruitStatus;
+import com.clinovo.enums.study.StudyFacility;
+import com.clinovo.enums.study.StudyFeature;
+import com.clinovo.enums.study.StudyMasking;
+import com.clinovo.enums.study.StudyPhase;
+import com.clinovo.enums.study.StudyPurpose;
+import com.clinovo.enums.study.StudySelection;
+import com.clinovo.enums.study.StudyTiming;
+import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.util.RequestUtil;
 
 /**
  * Abstract class for creating a spring servlet and extending capabilities of spring controller. However, not using the
@@ -1881,8 +1882,6 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 * 
 	 * @param studySub
 	 *            StudySubjectBean.
-	 * @param ds
-	 *            DataSource.
 	 * @param ub
 	 *            UserAccountBean.
 	 * @param currentRole
@@ -1892,7 +1891,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 * @return ArrayList of DisplayStidyEventBean.
 	 */
 	protected ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
-			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole, boolean excludeEventDefinishionsRemoved) {
+			UserAccountBean ub, StudyUserRoleBean currentRole, boolean excludeEventDefinishionsRemoved) {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
 		EventCRFDAO ecdao = getEventCRFDAO();
@@ -2022,6 +2021,33 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 				dedcrf.getEventCRF()
 						.setCrfVersion((CRFVersionBean) cvdao.findByPK(dedcrf.getEdc().getDefaultVersionId()));
 			}
+		}
+	}
+
+	/**
+	 * Prepares CRF Version for locked CRFs.
+	 *
+	 * @param fullCrfList
+	 *            List<Object>
+	 * @param crfvdao
+	 *            CRFVersionDAO
+	 * @param logger
+	 *            Logger
+	 */
+	protected void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao, Logger logger) {
+		try {
+			for (Object object : fullCrfList) {
+				if (object instanceof DisplayEventDefinitionCRFBean) {
+					DisplayEventDefinitionCRFBean dedCrfBean = (DisplayEventDefinitionCRFBean) object;
+					if (dedCrfBean.getStatus() == Status.LOCKED && (dedCrfBean.getEventCRF().getCrfVersion() == null
+							|| dedCrfBean.getEventCRF().getCrfVersion().getId() == 0)) {
+						dedCrfBean.getEventCRF().setCrfVersion(
+								(CRFVersionBean) crfvdao.findByPK(dedCrfBean.getEdc().getDefaultVersionId()));
+					}
+				}
+			}
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
 		}
 	}
 

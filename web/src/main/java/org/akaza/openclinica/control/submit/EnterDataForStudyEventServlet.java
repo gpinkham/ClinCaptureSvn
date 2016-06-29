@@ -212,8 +212,8 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao, logger);
 
 		// this is for generating side info panel
-		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, getDataSource(), ub, currentRole,
-				false);
+		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, ub, currentRole, false);
+
 		request.setAttribute("beans", beans);
 		EventCRFBean ecb = new EventCRFBean();
 		ecb.setStudyEventId(eventId);
@@ -259,33 +259,6 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		}
 
 		forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT, request, response);
-	}
-
-	/**
-	 * prepareCRFVersionForLockedCRFs.
-	 *
-	 * @param fullCrfList
-	 *            List<Object>
-	 * @param crfvdao
-	 *            CRFVersionDAO
-	 * @param logger
-	 *            Logger
-	 */
-	public static void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao, Logger logger) {
-		try {
-			for (Object object : fullCrfList) {
-				if (object instanceof DisplayEventDefinitionCRFBean) {
-					DisplayEventDefinitionCRFBean dedCrfBean = (DisplayEventDefinitionCRFBean) object;
-					if (dedCrfBean.getStatus() == Status.LOCKED && (dedCrfBean.getEventCRF().getCrfVersion() == null
-							|| dedCrfBean.getEventCRF().getCrfVersion().getId() == 0)) {
-						dedCrfBean.getEventCRF().setCrfVersion(
-								(CRFVersionBean) crfvdao.findByPK(dedCrfBean.getEdc().getDefaultVersionId()));
-					}
-				}
-			}
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-		}
 	}
 
 	@Override

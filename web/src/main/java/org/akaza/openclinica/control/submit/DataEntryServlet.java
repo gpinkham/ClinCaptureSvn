@@ -517,7 +517,7 @@ public abstract class DataEntryServlet extends SpringServlet {
 			Date enrollmentDate = ssb.getEnrollmentDate();
 			age = Utils.getInstance().processAge(enrollmentDate, subject.getDateOfBirth());
 		}
-		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole, false);
+		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, ub, currentRole, false);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("subject", subject);
 		request.setAttribute("beans", beans);

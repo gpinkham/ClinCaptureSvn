@@ -111,8 +111,7 @@ public class RestoreStudySubjectServlet extends SpringServlet {
 				request.setAttribute("subject", subject);
 				request.setAttribute("subjectStudy", subjectStudy);
 				request.setAttribute("studySub", studySub);
-				request.setAttribute("events", getDisplayStudyEventsForStudySubject(studySub, getDataSource(),
-						currentUser, currentRole, false));
+				request.setAttribute("events", getDisplayStudyEventsForStudySubject(studySub, currentUser, currentRole, false));
 
 				forwardPage(Page.RESTORE_STUDY_SUBJECT, request, response);
 			} else {

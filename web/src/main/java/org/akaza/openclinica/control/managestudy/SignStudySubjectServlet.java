@@ -188,8 +188,7 @@ public class SignStudySubjectServlet extends SpringServlet {
 		} else {
 			request.setAttribute("parentStudy", new StudyBean());
 		}
-		ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
-				getDataSource(), ub, currentRole, false);
+		ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, ub, currentRole, false);
 		DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 		// Don't filter for now; disc note beans are returned with eventCRFId
 		// set

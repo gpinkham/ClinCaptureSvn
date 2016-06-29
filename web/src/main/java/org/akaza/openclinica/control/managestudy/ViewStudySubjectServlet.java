@@ -313,8 +313,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			// find study events
 
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
-					getDataSource(), ub, currentRole, true);
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, ub, currentRole, true);
 
 			for (DisplayStudyEventBean decb : displayEvents) {
 				if (!(currentRole.isSysAdmin() || currentRole.isStudyAdministrator())
