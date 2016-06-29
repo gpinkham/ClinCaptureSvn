@@ -53,7 +53,6 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -342,8 +341,7 @@ public class UpdateStudyEventServlet extends SpringServlet {
 				StudySubjectBean studySubjectBean = ssdao.findByPK(studyEvent.getStudySubjectId());
 				List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
 						.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
-				EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm,
-						request);
+				setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, request);
 				setInputMessages(errors, request);
 				String[] prefixes = {INPUT_STARTDATE_PREFIX, INPUT_ENDDATE_PREFIX};
 				fp.setCurrentDateTimeValuesAsPreset(prefixes);
@@ -561,9 +559,7 @@ public class UpdateStudyEventServlet extends SpringServlet {
 			StudySubjectBean studySubjectBean = ssdao.findByPK(studyEvent.getStudySubjectId());
 			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
 					.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
-
-			EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm,
-					request);
+			setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, request);
 
 			HashMap presetValues = new HashMap();
 			DateTimeZone userTimeZone = DateTimeZone.forID(getUserAccountBean().getUserTimeZoneId());

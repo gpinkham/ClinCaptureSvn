@@ -146,7 +146,7 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		SessionManager sm = getSessionManager(request);
 		List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil
 				.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
-		setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb, sm, request);
+		setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb, request);
 
 		// prepare to figure out what the display should look like
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
@@ -272,52 +272,5 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 
 		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, exceptionName, "1");
-	}
-
-	/**
-	 * If DiscrepancyNoteBeans have a certain column value, then set flags that a JSP will check in the request
-	 * attribute. This is a convenience method called by the processRequest() method.
-	 *
-	 * @param discBeans
-	 *            List<DiscrepancyNoteBean>
-	 * @param seb
-	 *            StudyEventBean
-	 * @param sm
-	 *            SessionManager
-	 * @param request
-	 *            HttpServletRequest
-	 */
-	public static void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb,
-			SessionManager sm, HttpServletRequest request) {
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
-		List<DiscrepancyNoteBean> locationDNotes = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteBean> dateStartDNotes = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteBean> dateEndDNotes = new ArrayList<DiscrepancyNoteBean>();
-		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
-			// method discrepancyNoteBean.getEvent.getId() return 0 for all DNs
-			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())
-					&& discrepancyNoteBean.getEntityId() == seb.getId()) {
-				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					locationDNotes.add(discrepancyNoteBean);
-				} else if ("date_start".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					dateStartDNotes.add(discrepancyNoteBean);
-				} else if ("date_end".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					dateEndDNotes.add(discrepancyNoteBean);
-				}
-			}
-		}
-		request.setAttribute("numberOfLocationDNotes", locationDNotes.size());
-		request.setAttribute("numberOfDateStartDNotes", dateStartDNotes.size());
-		request.setAttribute("numberOfDateEndDNotes", dateEndDNotes.size());
-
-		request.setAttribute("imageFileNameForLocation",
-				DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
-						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(locationDNotes)));
-		request.setAttribute("imageFileNameForDateStart",
-				DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
-						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateStartDNotes)));
-		request.setAttribute("imageFileNameForDateEnd", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
-				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateEndDNotes)));
 	}
 }

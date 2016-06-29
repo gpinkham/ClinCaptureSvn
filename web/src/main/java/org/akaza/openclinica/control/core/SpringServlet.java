@@ -94,6 +94,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.navigation.Navigation;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
@@ -2081,6 +2082,51 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 				}
 			}
 		}
+	}
+
+	/**
+	 * If DiscrepancyNoteBeans have a certain column value, then set flags that a JSP will check in the request
+	 * attribute. This is a convenience method called by the processRequest() method.
+	 *
+	 * @param discBeans
+	 *            List of DiscrepancyNoteBean's
+	 * @param seb
+	 *            StudyEventBean
+	 * @param request
+	 *            HttpServletRequest
+	 */
+	protected void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb,
+			HttpServletRequest request) {
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
+		List<DiscrepancyNoteBean> locationDNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> dateStartDNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> dateEndDNotes = new ArrayList<DiscrepancyNoteBean>();
+		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
+			// method discrepancyNoteBean.getEvent.getId() return 0 for all DNs
+			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())
+					&& discrepancyNoteBean.getEntityId() == seb.getId()) {
+				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					locationDNotes.add(discrepancyNoteBean);
+				} else if ("date_start".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					dateStartDNotes.add(discrepancyNoteBean);
+				} else if ("date_end".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					dateEndDNotes.add(discrepancyNoteBean);
+				}
+			}
+		}
+		request.setAttribute("numberOfLocationDNotes", locationDNotes.size());
+		request.setAttribute("numberOfDateStartDNotes", dateStartDNotes.size());
+		request.setAttribute("numberOfDateEndDNotes", dateEndDNotes.size());
+
+		request.setAttribute("imageFileNameForLocation",
+				DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(locationDNotes)));
+		request.setAttribute("imageFileNameForDateStart",
+				DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateStartDNotes)));
+		request.setAttribute("imageFileNameForDateEnd", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateEndDNotes)));
 	}
 
 	private List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
