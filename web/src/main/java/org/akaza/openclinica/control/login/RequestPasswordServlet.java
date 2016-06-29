@@ -20,12 +20,16 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.bean.EmailDetails;
+import com.clinovo.enums.EmailAction;
+import com.clinovo.service.EmailService;
 import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,13 +37,10 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -59,144 +60,155 @@ import com.clinovo.util.ValidatorHelper;
 @Component
 public class RequestPasswordServlet extends SpringServlet {
 
+	public static final String PASS_CHANGE_QUESTION = "passwdChallengeQuestion";
+	public static final String PASS_CHANGE_ANSWER = "passwdChallengeAnswer";
+	public static final String CHANGE_QUESTIONS = "challengeQuestions";
+
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		//
+		logger.info("Sending reset password request.");
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		String action = request.getParameter("action");
-		request.getSession().setAttribute("challengeQuestions", PwdChallengeQuestion.toArrayList());
+		request.getSession().setAttribute(CHANGE_QUESTIONS, PwdChallengeQuestion.toArrayList());
 
 		request.setAttribute("previouslySelectedPasswdChallengeQuestion",
-				request.getParameter("passwdChallengeQuestion"));
+				request.getParameter(PASS_CHANGE_QUESTION));
 
-		if (StringUtil.isBlank(action)) {
+		if (StringUtil.isBlank(action) || !"confirm".equalsIgnoreCase(action)) {
 			request.setAttribute("userBean1", new UserAccountBean());
 			forwardPage(Page.REQUEST_PWD, request, response);
-		} else {
-			if ("confirm".equalsIgnoreCase(action)) {
-				confirmPassword(request, response);
-
-			} else {
-				request.setAttribute("userBean1", new UserAccountBean());
-				forwardPage(Page.REQUEST_PWD, request, response);
-			}
+			return;
 		}
 
+		confirmPassword(request, response);
 	}
 
 	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
+	 * Confirm password.
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws java.lang.Exception in case if error occur while validation.
 	 */
-	private void confirmPassword(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-		FormProcessor fp = new FormProcessor(request);
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("email", Validator.IS_A_EMAIL);
-		v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
-		v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
+	public void confirmPassword(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		HashMap errors = v.validate();
+		HashMap errors = validateReuqestAttributes(request);
+		UserAccountBean ubForm = getUserAccountFromRequest(request);
 
-		UserAccountBean ubForm = new UserAccountBean(); // user bean from web
-		// form
-		ubForm.setName(fp.getString("name"));
-		ubForm.setEmail(fp.getString("email"));
-		ubForm.setPasswdChallengeQuestion(fp.getString("passwdChallengeQuestion"));
-		ubForm.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
-
-		SessionManager sm = new SessionManager(null, ubForm.getName(),
-				SpringServletAccess.getApplicationContext(getServletContext()));
+		SessionManager sm = getSessionManager(ubForm.getName());
 		request.setAttribute(SESSION_MANAGER, sm);
 
-		UserAccountDAO uDAO = getUserAccountDAO();
-		// see whether this user in the DB
-		UserAccountBean ubDB = (UserAccountBean) uDAO.findByUserName(ubForm.getName());
-
+		UserAccountBean ubDB = (UserAccountBean) getUserAccountDAO().findByUserName(ubForm.getName());
 		request.setAttribute("userBean1", ubForm);
+
 		if (!errors.isEmpty()) {
-			logger.info("after processing form,has errors");
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.REQUEST_PWD, request, response);
-		} else {
-			logger.info("after processing form,no errors");
-			// whether this user's email is in the DB
-			if (ubDB.getEmail() != null && ubDB.getEmail().equalsIgnoreCase(ubForm.getEmail())) {
-				logger.info("ubDB.getPasswdChallengeQuestion()" + ubDB.getPasswdChallengeQuestion());
-				logger.info("ubForm.getPasswdChallengeQuestion()" + ubForm.getPasswdChallengeQuestion());
-				logger.info("ubDB.getPasswdChallengeAnswer()" + ubDB.getPasswdChallengeAnswer());
-				logger.info("ubForm.getPasswdChallengeAnswer()" + ubForm.getPasswdChallengeAnswer());
-
-				// if this user's password challenge can be verified
-				if (ubDB.getPasswdChallengeQuestion().equals(ubForm.getPasswdChallengeQuestion())
-						&& ubDB.getPasswdChallengeAnswer().equalsIgnoreCase(ubForm.getPasswdChallengeAnswer())) {
-
-					SecurityManager scm = getSecurityManager();
-					String newPass = scm.genPassword();
-					OpenClinicaJdbcService ocService = getOpenClinicaJdbcService();
-					String newDigestPass = scm.encryptPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
-					ubDB.setPasswd(newDigestPass);
-
-					ubDB.setPasswdTimestamp(null);
-					ubDB.setUpdater(ubDB);
-					ubDB.setLastVisitDate(new Date());
-
-					logger.info("user bean to be updated:" + ubDB.getId() + ubDB.getName() + ubDB.getActiveStudyId());
-
-					uDAO.update(ubDB);
-					sendPassword(newPass, ubDB, request, response);
-				} else {
-					addPageMessage(getResPage().getString("your_password_not_verified_try_again"), request);
-					forwardPage(Page.REQUEST_PWD, request, response);
-				}
-
-			} else {
-				addPageMessage(getResPage().getString("your_email_address_not_found_try_again"), request);
-				forwardPage(Page.REQUEST_PWD, request, response);
-			}
-
+			return;
 		}
+		if (ubDB.getEmail() == null || !ubDB.getEmail().equalsIgnoreCase(ubForm.getEmail())) {
+			addPageMessage(getResPage().getString("your_email_address_not_found_try_again"), request);
+			forwardPage(Page.REQUEST_PWD, request, response);
+			return;
+		}
+		if (!ubDB.getPasswdChallengeQuestion().equals(ubForm.getPasswdChallengeQuestion())
+				|| !ubDB.getPasswdChallengeAnswer().equalsIgnoreCase(ubForm.getPasswdChallengeAnswer())) {
+			addPageMessage(getResPage().getString("your_password_not_verified_try_again"), request);
+			forwardPage(Page.REQUEST_PWD, request, response);
+			return;
+		}
+		SecurityManager scm = getSecurityManager();
+		String newPass = scm.genPassword();
+		OpenClinicaJdbcService ocService = getOpenClinicaJdbcService();
+		String newDigestPass = scm.encryptPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
 
+		ubDB.setPasswd(newDigestPass);
+		ubDB.setPasswdTimestamp(null);
+		ubDB.setUpdater(ubDB);
+		ubDB.setLastVisitDate(new Date());
+
+		getUserAccountDAO().update(ubDB);
+		sendPassword(newPass, ubDB, request, response);
+	}
+
+	/**
+	 * Get Session Manager.
+	 * @param userName String
+	 * @return Session manager
+	 * @throws SQLException in case is error will be thrown while session manager creation.
+	 */
+	public SessionManager getSessionManager(String userName) throws SQLException {
+		return new SessionManager(null, userName,
+				SpringServletAccess.getApplicationContext(getServletContext()));
+	}
+
+	private HashMap validateReuqestAttributes(HttpServletRequest request) {
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
+		v.addValidation("name", Validator.NO_BLANKS);
+		v.addValidation("email", Validator.IS_A_EMAIL);
+		v.addValidation(PASS_CHANGE_QUESTION, Validator.NO_BLANKS);
+		v.addValidation(PASS_CHANGE_ANSWER, Validator.NO_BLANKS);
+		return v.validate();
+	}
+
+	/**
+	 * Get UserAccountBean from request.
+	 * @param request HttpServletRequest.
+	 * @return UserAccountBean.
+	 */
+	public UserAccountBean getUserAccountFromRequest(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		UserAccountBean user = new UserAccountBean();
+		user.setName(fp.getString("name"));
+		user.setEmail(fp.getString("email"));
+		user.setPasswdChallengeQuestion(fp.getString(PASS_CHANGE_QUESTION));
+		user.setPasswdChallengeAnswer(fp.getString(PASS_CHANGE_ANSWER));
+		return user;
 	}
 
 	/**
 	 * Gets user basic info and set email to the administrator.
+	 * @param passwd String
+	 * @param ubDB UserAccountBean
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws Exception in case if system is unable to send email.
 	 */
-	private void sendPassword(String passwd, UserAccountBean ubDB, HttpServletRequest request,
+	public void sendPassword(String passwd, UserAccountBean ubDB, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
-		StudyDAO sdao = getStudyDAO();
-		StudyBean sBean = (StudyBean) sdao.findByPK(ubDB.getActiveStudyId());
-		logger.info("Sending email...");
+		StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(ubDB.getActiveStudyId());
 
-		StudyBean emailParentStudy;
-		if (sBean.getParentStudyId() > 0) {
-			emailParentStudy = (StudyBean) sdao.findByPK(sBean.getParentStudyId());
-		} else {
-			emailParentStudy = sBean;
+		if (studyBean.getParentStudyId() > 0) {
+			studyBean = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
 		}
 		String emailBody = EmailUtil.getEmailBodyStart() + "Dear " + ubDB.getFirstName() + " " + ubDB.getLastName()
-				+ ", <br><br>" + getResText().getString("this_email_is_from_openclinica_admin") + "<br>"
+				+ ", <br><br>" + getResText().getString("this_email_is_from_clincapture_admin") + "<br>"
 				+ getResText().getString("your_password_has_been_reset_as") + ": " + passwd + "<br><br>"
 				+ getResText().getString("you_will_be_required_to_change") + " "
 				+ getResText().getString("time_you_login_to_the_system") + " "
 				+ getResText().getString("use_the_following_link_to_log") + ":<br>" + SQLInitServlet.getSystemURL()
 				+ "<br><br>" + getResPage().getString("best_system_administrator") + EmailUtil.getEmailBodyEnd()
 				+ EmailUtil.getEmailFooter(CoreResources.getSystemLocale());
-		emailBody = emailBody.replace("{0}", emailParentStudy.getName());
-		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), getResText().getString("your_openclinica_password"),
-				emailBody, true, getResPage().getString("your_password_reset_new_password_emailed"),
-				getResPage().getString("your_password_not_send_due_mail_server_problem"), true, request);
+		emailBody = emailBody.replace("{0}", studyBean.getName());
 
-		request.getSession().removeAttribute("challengeQuestions");
+		EmailDetails emailDetails = new EmailDetails();
+		emailDetails.setMessage(emailBody);
+		emailDetails.setStudyId(studyBean.getId());
+		emailDetails.setSubject(getResText().getString("your_clincapture_password"));
+		emailDetails.setTo(ubDB.getEmail().trim());
+		emailDetails.setSentBy(ubDB.getId());
+		emailDetails.setAction(EmailAction.REQUEST_PASSWORD);
+		EmailService emailService = getEmailService();
+		try {
+			emailService.sendEmail(emailDetails);
+		} catch (Exception ex) {
+			logger.error("Unable to send request password email: " + ex.getMessage());
+		}
+		request.getSession().removeAttribute(CHANGE_QUESTIONS);
 		forwardPage(Page.LOGIN, request, response);
 	}
 }
