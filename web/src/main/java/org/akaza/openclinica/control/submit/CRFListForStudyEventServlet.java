@@ -41,7 +41,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -223,7 +222,6 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 			setRequestAttributesForNotes(request, allNotesforSubjectAndEvent);
 		}
 
-		SessionManager sm = getSessionManager(request);
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());

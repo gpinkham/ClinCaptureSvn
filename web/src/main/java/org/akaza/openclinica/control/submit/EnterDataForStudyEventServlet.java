@@ -47,7 +47,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
@@ -124,7 +123,6 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 
 		// so we can display the subject's label
 		StudyDAO studydao = new StudyDAO(getDataSource());
-		CRFVersionDAO crfvdao = new CRFVersionDAO(getDataSource());
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
 		StudyBean study = (StudyBean) studydao.findByPK(studySubjectBean.getStudyId());
