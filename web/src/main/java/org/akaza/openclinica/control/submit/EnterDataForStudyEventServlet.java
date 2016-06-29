@@ -22,7 +22,6 @@ package org.akaza.openclinica.control.submit;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,14 +50,11 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.service.crfdata.HideCRFManager;
-import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.service.CRFMaskingService;
-import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * @author ssachs
@@ -69,13 +65,8 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 
 	public static final String TRUE = "true";
 	public static final String INPUT_EVENT_ID = "eventId";
-	public static final String FULL_CRF_LIST = "fullCrfList";
 	public static final String OPEN_FIRST_CRF = "openFirstCrf";
-	public static final String BEAN_STUDY_EVENT = "studyEvent";
-	public static final String BEAN_STUDY_SUBJECT = "studySubject";
-	public static final String BEAN_DISPLAY_EVENT_CRFS = "displayEventCRFs";
 	public static final String HIDE_SCHEDULE_EVENT_BUTTON = "hideScheduleEventButton";
-	public static final String BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS = "uncompletedEventDefinitionCRFs";
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
 
@@ -151,61 +142,12 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		// prepare to figure out what the display should look like
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
-		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
 
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 				seb.getStudyEventDefinitionId());
 
-		// get the event definition CRFs for which no event CRF exists
-		// the event definition CRFs must be populated with versions so we can
-		// let the user choose which version he will enter data for
-		// However, this method seems to be returning DisplayEventDefinitionCRFs
-		// that contain valid eventCRFs??
-		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, seb.getSubjectEventStatus());
-		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
-
-		// Attempt to provide the DisplayEventDefinitionCRF with a
-		// valid owner
-		// only if its container eventCRf has a valid id
-		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
-
-		// for the event definition CRFs for which event CRFs exist, get
-		// DisplayEventCRFBeans, which the JSP will use to determine what
-		// the user will see for each event CRF
-
-		// removing the below row in exchange for the ViewStudySubjectServlet
-		// version, for two
-		// reasons:
-		// 1. concentrate all business logic in one place
-		// 2. VSSS seems to handle the javascript creation correctly
-		// ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs,
-		// eventDefinitionCRFs, seb.getSubjectEventStatus());
-
-		ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs, ub, currentRole, seb.getSubjectEventStatus(),
-				study);
-
-		if (currentStudy.getParentStudyId() > 0) {
-			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
-			uncompletedEventDefinitionCRFs = hideCRFManager
-					.removeHiddenEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs);
-			displayEventCRFs = hideCRFManager.removeHiddenEventCRFBeans(displayEventCRFs);
-		}
-
-		// Remove all masked CRFs from the list
-
-		request.setAttribute(BEAN_STUDY_EVENT, seb);
-		request.setAttribute(BEAN_STUDY_SUBJECT, studySubjectBean);
-		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
-		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
-
-		List<Object> fullCrfList = new ArrayList<Object>();
-		fullCrfList.addAll(uncompletedEventDefinitionCRFs);
-		fullCrfList.addAll(displayEventCRFs);
-		Collections.sort(fullCrfList, new CrfComparator());
-		request.setAttribute(FULL_CRF_LIST, fullCrfList);
-
-		prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao);
+		List<Object> fullCrfList = prepareFullCrfList(study, studySubjectBean, seb, eventCRFs, eventDefinitionCRFs);
 
 		// this is for generating side info panel
 		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, ub, currentRole, false);

@@ -177,6 +177,12 @@ public abstract class BaseSpringController {
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 	public static final String REDIRECT_BACK_TO_CONTROLLER_AFTER_LOGIN = "redirectBackToControllerAfterLogin";
 
+	public static final String FULL_CRF_LIST = "fullCrfList";
+	public static final String BEAN_STUDY_EVENT = "studyEvent";
+	public static final String BEAN_STUDY_SUBJECT = "studySubject";
+	public static final String BEAN_DISPLAY_EVENT_CRFS = "displayEventCRFs";
+	public static final String BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS = "uncompletedEventDefinitionCRFs";
+
 	private static final Map<Integer, Integer> UNAVAILABLE_CRF_LIST = new HashMap<Integer, Integer>();
 
 	private static final HashMap<String, HashMap<String, Object>> STORED_SESSION_ATTRIBUTES = new HashMap<String, HashMap<String, Object>>();

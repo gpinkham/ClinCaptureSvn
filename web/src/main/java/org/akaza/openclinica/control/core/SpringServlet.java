@@ -96,6 +96,8 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import org.akaza.openclinica.service.crfdata.HideCRFManager;
+import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -138,6 +140,7 @@ import com.clinovo.enums.study.StudySelection;
 import com.clinovo.enums.study.StudyTiming;
 import com.clinovo.i18n.LocaleResolver;
 import com.clinovo.util.RequestUtil;
+import com.clinovo.util.SubjectEventStatusUtil;
 
 /**
  * Abstract class for creating a spring servlet and extending capabilities of spring controller. However, not using the
@@ -2030,11 +2033,10 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 *
 	 * @param fullCrfList
 	 *            List of Object's
-	 * @param crfvdao
-	 *            CRFVersionDAO
 	 */
-	protected void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao) {
+	private void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList) {
 		try {
+			CRFVersionDAO crfvdao = getCRFVersionDAO();
 			for (Object object : fullCrfList) {
 				if (object instanceof DisplayEventDefinitionCRFBean) {
 					DisplayEventDefinitionCRFBean dedCrfBean = (DisplayEventDefinitionCRFBean) object;
@@ -2127,6 +2129,128 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 						DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateStartDNotes)));
 		request.setAttribute("imageFileNameForDateEnd", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
 				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateEndDNotes)));
+	}
+
+	/**
+	 * Prepares full CRF list for data entry pages.
+	 * 
+	 * @param study
+	 *            StudyBean
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param eventCRFs
+	 *            ArrayList
+	 * @param eventDefinitionCRFs
+	 *            ArrayList
+	 * @return List
+	 */
+	protected List<Object> prepareFullCrfList(StudyBean study, StudySubjectBean studySubjectBean,
+			StudyEventBean studyEventBean, ArrayList<EventCRFBean> eventCRFs,
+			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs) {
+		StudyBean currentStudy = getCurrentStudy();
+		StudyUserRoleBean currentRole = getCurrentRole();
+		UserAccountBean userAccountBean = getUserAccountBean();
+
+		HttpServletRequest request = RequestUtil.getRequest();
+		SessionManager sm = getSessionManager(request);
+
+		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
+
+		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs,
+				studyEventBean.getSubjectEventStatus());
+
+		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
+
+		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
+
+		ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs, userAccountBean, currentRole,
+				studyEventBean.getSubjectEventStatus(), study);
+
+		if (currentStudy.getParentStudyId() > 0) {
+			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
+			uncompletedEventDefinitionCRFs = hideCRFManager
+					.removeHiddenEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs);
+			displayEventCRFs = hideCRFManager.removeHiddenEventCRFBeans(displayEventCRFs);
+		}
+
+		request.setAttribute(BEAN_STUDY_EVENT, studyEventBean);
+		request.setAttribute(BEAN_STUDY_SUBJECT, studySubjectBean);
+		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
+		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
+
+		List<Object> fullCrfList = new ArrayList<Object>();
+		fullCrfList.addAll(uncompletedEventDefinitionCRFs);
+		fullCrfList.addAll(displayEventCRFs);
+		Collections.sort(fullCrfList, new CrfComparator());
+		request.setAttribute(FULL_CRF_LIST, fullCrfList);
+
+		prepareCRFVersionForLockedCRFs(fullCrfList);
+
+		return fullCrfList;
+	}
+
+	/**
+	 * Prepares node map for full CRF list.
+	 * 
+	 * @param fullCrfList
+	 *            List
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param eventName
+	 *            String
+	 * @param eventId
+	 *            int
+	 * @return Map
+	 */
+	protected Map<Integer, String> prepareNodeMapForFullCrfList(List<Object> fullCrfList,
+			StudySubjectBean studySubjectBean, String eventName, int eventId) {
+		StudyBean currentStudy = getCurrentStudy();
+		UserAccountBean userAccountBean = getUserAccountBean();
+		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDAO();
+		Map<Integer, String> notedMap = new HashMap<Integer, String>();
+		for (Object bean : fullCrfList) {
+			if (bean instanceof DisplayEventCRFBean) {
+				DisplayEventCRFBean displayEventCRFBean = (DisplayEventCRFBean) bean;
+
+				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
+				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
+
+				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventCRFBean.getEventDefinitionCRF().getId(),
+						userAccountBean.getId(), displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
+					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
+							studySubjectBean.getLabel(), crfName)) {
+						String crfFlagColor = "yellow";
+						if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
+								studySubjectBean.getLabel(), crfName)) {
+							crfFlagColor = "red";
+						}
+						notedMap.put(crfId, crfFlagColor);
+					}
+				}
+
+			} else if (bean instanceof DisplayEventDefinitionCRFBean) {
+				DisplayEventDefinitionCRFBean displayEventDefinitionCRFBean = (DisplayEventDefinitionCRFBean) bean;
+
+				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
+				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
+
+				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventDefinitionCRFBean.getEdc().getId(),
+						userAccountBean.getId(), displayEventDefinitionCRFBean.getEdc().getStudyId())) {
+					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
+							studySubjectBean.getLabel(), crfName)) {
+						String crfFlagColor = "yellow";
+						if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
+								studySubjectBean.getLabel(), crfName)) {
+							crfFlagColor = "red";
+						}
+						notedMap.put(crfId, crfFlagColor);
+					}
+				}
+			}
+		}
+		return notedMap;
 	}
 
 	private List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {

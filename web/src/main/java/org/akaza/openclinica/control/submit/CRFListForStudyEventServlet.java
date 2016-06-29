@@ -21,9 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,12 +34,10 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -53,8 +49,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.service.crfdata.HideCRFManager;
-import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,11 +73,6 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 	public static final String STUDY_ID = "studyId";
 	public static final String SES_ICON_URL = "sesIconUrl";
 	public static final String INPUT_EVENT_ID = "studyEventId";
-	public static final String BEAN_STUDY_EVENT = "studyEvent";
-	public static final String BEAN_STUDY_SUBJECT = "studySubject";
-	public static final String BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS = "uncompletedEventDefinitionCRFs";
-	public static final String FULL_CRF_LIST = "fullCrfList";
-	public static final String BEAN_DISPLAY_EVENT_CRFS = "displayEventCRFs";
 	// The study event has an existing discrepancy note related to its location
 	// property; this
 	// value will be saved as a request attribute
@@ -173,7 +162,6 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
@@ -186,7 +174,7 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 		eventId = seb.getId();
 		request.setAttribute("eventId", eventId + "");
 
-		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
+		StudySubjectBean studySubjectBean = ssdao.findByPK(seb.getStudySubjectId());
 		int studyId = studySubjectBean.getStudyId();
 
 		StudyDAO studydao = getStudyDAO();
@@ -266,33 +254,6 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 
 		}
 
-		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
-
-		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, seb.getSubjectEventStatus());
-		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
-
-		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
-
-		ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs, ub, currentRole, seb.getSubjectEventStatus(),
-				study);
-
-		if (currentStudy.getParentStudyId() > 0) {
-			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
-
-			uncompletedEventDefinitionCRFs = hideCRFManager
-					.removeHiddenEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs);
-
-			displayEventCRFs = hideCRFManager.removeHiddenEventCRFBeans(displayEventCRFs);
-		}
-
-		request.setAttribute(STUDY_ID, currentStudy.getId());
-		request.setAttribute(BEAN_STUDY_EVENT, seb);
-		request.setAttribute(STUDY_EVENT_NAME, seb.getStudyEventDefinition().getName());
-		request.setAttribute(BEAN_STUDY_SUBJECT, studySubjectBean);
-		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
-		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
-		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
-
 		if (discrepancyNoteDAO.doesSubjectHaveUnclosedDNsInStudy(currentStudy, studySubjectBean.getLabel(), ub)) {
 			String subjectFlagColor = "yellow";
 			if (discrepancyNoteDAO.doesSubjectHaveNewDNsInStudy(currentStudy, studySubjectBean.getLabel(), ub)) {
@@ -312,54 +273,13 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 			request.setAttribute(EVENT_FLAG_COLOR, eventFlagColor);
 		}
 
-		List<Object> fullCrfList = new ArrayList<Object>();
-		fullCrfList.addAll(uncompletedEventDefinitionCRFs);
-		fullCrfList.addAll(displayEventCRFs);
-		Collections.sort(fullCrfList, new CrfComparator());
-		request.setAttribute(FULL_CRF_LIST, fullCrfList);
+		request.setAttribute(STUDY_ID, currentStudy.getId());
+		request.setAttribute(STUDY_EVENT_NAME, seb.getStudyEventDefinition().getName());
+		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
 
-		Map<Integer, String> notedMap = new HashMap<Integer, String>();
+		List<Object> fullCrfList = prepareFullCrfList(study, studySubjectBean, seb, eventCRFs, eventDefinitionCRFs);
 
-		for (Object bean : fullCrfList) {
-			if (bean instanceof DisplayEventCRFBean) {
-				DisplayEventCRFBean displayEventCRFBean = (DisplayEventCRFBean) bean;
-
-				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
-				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
-
-				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventCRFBean.getEventDefinitionCRF().getId(),
-						ub.getId(), displayEventCRFBean.getEventDefinitionCRF().getStudyId())) {
-					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
-							studySubjectBean.getLabel(), crfName)) {
-						String crfFlagColor = "yellow";
-						if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
-								studySubjectBean.getLabel(), crfName)) {
-							crfFlagColor = "red";
-						}
-						notedMap.put(crfId, crfFlagColor);
-					}
-				}
-
-			} else if (bean instanceof DisplayEventDefinitionCRFBean) {
-				DisplayEventDefinitionCRFBean displayEventDefinitionCRFBean = (DisplayEventDefinitionCRFBean) bean;
-
-				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
-				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
-
-				if (!getMaskingService().isEventDefinitionCRFMasked(displayEventDefinitionCRFBean.getEdc().getId(),
-						ub.getId(), displayEventDefinitionCRFBean.getEdc().getStudyId())) {
-					if (discrepancyNoteDAO.doesCRFHaveUnclosedDNsInStudyForSubject(currentStudy, eventName, eventId,
-							studySubjectBean.getLabel(), crfName)) {
-						String crfFlagColor = "yellow";
-						if (discrepancyNoteDAO.doesCRFHaveNewDNsInStudyForSubject(currentStudy, eventName, eventId,
-								studySubjectBean.getLabel(), crfName)) {
-							crfFlagColor = "red";
-						}
-						notedMap.put(crfId, crfFlagColor);
-					}
-				}
-			}
-		}
+		Map<Integer, String> notedMap = prepareNodeMapForFullCrfList(fullCrfList, studySubjectBean, eventName, eventId);
 
 		request.setAttribute("crfNDsMap", notedMap);
 
