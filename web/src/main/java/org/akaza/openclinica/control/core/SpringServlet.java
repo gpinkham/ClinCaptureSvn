@@ -2146,7 +2146,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 *            ArrayList
 	 * @return List
 	 */
-	protected List<Object> prepareFullCrfList(StudyBean study, StudySubjectBean studySubjectBean,
+	public List<Object> prepareFullCrfList(StudyBean study, StudySubjectBean studySubjectBean,
 			StudyEventBean studyEventBean, ArrayList<EventCRFBean> eventCRFs,
 			ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs) {
 		StudyBean currentStudy = getCurrentStudy();
@@ -2204,7 +2204,7 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 *            int
 	 * @return Map
 	 */
-	protected Map<Integer, String> prepareNodeMapForFullCrfList(List<Object> fullCrfList,
+	public Map<Integer, String> prepareNodeMapForFullCrfList(List<Object> fullCrfList,
 			StudySubjectBean studySubjectBean, String eventName, int eventId) {
 		StudyBean currentStudy = getCurrentStudy();
 		UserAccountBean userAccountBean = getUserAccountBean();
