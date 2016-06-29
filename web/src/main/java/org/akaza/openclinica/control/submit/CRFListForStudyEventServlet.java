@@ -271,8 +271,7 @@ public class CRFListForStudyEventServlet extends SpringServlet {
 		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, seb.getSubjectEventStatus());
 		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
-				uncompletedEventDefinitionCRFs);
+		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
 
 		ArrayList displayEventCRFs = getDisplayEventCRFs(eventCRFs, ub, currentRole, seb.getSubjectEventStatus(),
 				study);

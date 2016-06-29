@@ -2028,13 +2028,11 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 	 * Prepares CRF Version for locked CRFs.
 	 *
 	 * @param fullCrfList
-	 *            List<Object>
+	 *            List of Object's
 	 * @param crfvdao
 	 *            CRFVersionDAO
-	 * @param logger
-	 *            Logger
 	 */
-	protected void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao, Logger logger) {
+	protected void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao) {
 		try {
 			for (Object object : fullCrfList) {
 				if (object instanceof DisplayEventDefinitionCRFBean) {
@@ -2048,6 +2046,40 @@ public abstract class SpringServlet extends SpringController implements HttpRequ
 			}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
+		}
+	}
+
+	/**
+	 * Populates uncompleted CRFs with an owner.
+	 *
+	 * @param ds
+	 *            DataSource
+	 * @param displayEventDefinitionCRFBeans
+	 *            List of DisplayEventDefinitionCRFBean's
+	 */
+	protected void populateUncompletedCRFsWithAnOwner(
+			List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
+		if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {
+			return;
+		}
+		EventCRFBean eventCRFBean;
+		UserAccountBean userAccountBean;
+		UserAccountDAO userAccountDAO = getUserAccountDAO();
+		for (DisplayEventDefinitionCRFBean dedcBean : displayEventDefinitionCRFBeans) {
+			eventCRFBean = dedcBean.getEventCRF();
+			if (eventCRFBean != null && eventCRFBean.getOwner() == null && eventCRFBean.getOwnerId() > 0) {
+				userAccountBean = (UserAccountBean) userAccountDAO.findByPK(eventCRFBean.getOwnerId());
+
+				eventCRFBean.setOwner(userAccountBean);
+			}
+			// Failing the above, obtain the owner from the EventDefinitionCRFBean
+			if (eventCRFBean != null && eventCRFBean.getOwner() == null) {
+				int ownerId = dedcBean.getEdc().getOwnerId();
+				if (ownerId > 0) {
+					userAccountBean = (UserAccountBean) userAccountDAO.findByPK(ownerId);
+					eventCRFBean.setOwner(userAccountBean);
+				}
+			}
 		}
 	}
 

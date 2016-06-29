@@ -27,10 +27,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -45,7 +43,6 @@ import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -58,7 +55,6 @@ import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.clinovo.service.CRFMaskingService;
@@ -172,7 +168,7 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		// Attempt to provide the DisplayEventDefinitionCRF with a
 		// valid owner
 		// only if its container eventCRf has a valid id
-		populateUncompletedCRFsWithAnOwner(getDataSource(), uncompletedEventDefinitionCRFs);
+		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
 
 		// for the event definition CRFs for which event CRFs exist, get
 		// DisplayEventCRFBeans, which the JSP will use to determine what
@@ -209,7 +205,7 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 		Collections.sort(fullCrfList, new CrfComparator());
 		request.setAttribute(FULL_CRF_LIST, fullCrfList);
 
-		prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao, logger);
+		prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao);
 
 		// this is for generating side info panel
 		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, ub, currentRole, false);
@@ -276,44 +272,6 @@ public class EnterDataForStudyEventServlet extends SpringServlet {
 
 		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, exceptionName, "1");
-	}
-
-	/**
-	 * populateUncompletedCRFsWithAnOwner.
-	 *
-	 * @param ds
-	 *            DataSource
-	 * @param displayEventDefinitionCRFBeans
-	 *            List<DisplayEventDefinitionCRFBean>
-	 */
-	public static void populateUncompletedCRFsWithAnOwner(DataSource ds,
-			List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
-		if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {
-			return;
-		}
-		UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
-		UserAccountBean userAccountBean;
-		EventCRFBean eventCRFBean;
-		for (DisplayEventDefinitionCRFBean dedcBean : displayEventDefinitionCRFBeans) {
-
-			eventCRFBean = dedcBean.getEventCRF();
-			if (eventCRFBean != null && eventCRFBean.getOwner() == null && eventCRFBean.getOwnerId() > 0) {
-				userAccountBean = (UserAccountBean) userAccountDAO.findByPK(eventCRFBean.getOwnerId());
-
-				eventCRFBean.setOwner(userAccountBean);
-			}
-
-			// Failing the above, obtain the owner from the
-			// EventDefinitionCRFBean
-			if (eventCRFBean != null && eventCRFBean.getOwner() == null) {
-				int ownerId = dedcBean.getEdc().getOwnerId();
-				if (ownerId > 0) {
-					userAccountBean = (UserAccountBean) userAccountDAO.findByPK(ownerId);
-
-					eventCRFBean.setOwner(userAccountBean);
-				}
-			}
-		}
 	}
 
 	/**
