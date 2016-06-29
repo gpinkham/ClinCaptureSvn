@@ -57,8 +57,10 @@ public class SubjectEventStatus extends Term implements Comparable {
 
 	public static final SubjectEventStatus UNLOCK = new SubjectEventStatus(11, "unlock");
 
+	public static final SubjectEventStatus RESTORE = new SubjectEventStatus(12, "restore");
+
 	private static List list = Arrays.asList(new SubjectEventStatus[]{SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED,
-			COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, REMOVED, UNLOCK});
+			COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, REMOVED, UNLOCK, RESTORE});
 
 	// Solve the problem with the get() method...
 	private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();
@@ -148,6 +150,7 @@ public class SubjectEventStatus extends Term implements Comparable {
 	public static ArrayList toArrayList() {
 		ArrayList newList = new ArrayList(list);
 		newList.remove(UNLOCK);
+		newList.remove(RESTORE);
 		return newList;
 	}
 
