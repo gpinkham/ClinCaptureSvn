@@ -162,7 +162,7 @@ public class StudyServiceTest extends BaseServiceTest {
 				.param("sponsor", "test_study_1").param("totalEnrollment", Integer.toString(newTotalEnrollment))
 				.param("startDate", "2016-01-20").param("endDate", "2017-01-20")
 				.param("subjectPersonIdRequired", "copyFromSSID")).andExpect(status().isOk());
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findStudyByName(newStudyName);
 		studyConfigService.setParametersForStudy(studyBean);
 		studyBean.getStudyParameterConfig().getSubjectPersonIdRequired().equals("copyFromSSID");
 	}
@@ -241,7 +241,7 @@ public class StudyServiceTest extends BaseServiceTest {
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), facilityContactPhone);
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), facilityContactEmail);
 		}
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findStudyByName(newStudyName);
 		assertEquals(studyBean.getFacilityName(), facilityName);
 		assertEquals(studyBean.getFacilityCity(), facilityCity);
 		assertEquals(studyBean.getFacilityState(), facilityState);
@@ -782,7 +782,7 @@ public class StudyServiceTest extends BaseServiceTest {
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactPhone(), facilityContactPhone);
 			assertEquals(restOdmContainer.getRestData().getStudyBean().getFacilityContactEmail(), facilityContactEmail);
 		}
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findStudyByName(newStudyName);
 		assertEquals(studyBean.getFacilityName(), facilityName);
 		assertEquals(studyBean.getFacilityCity(), facilityCity);
 		assertEquals(studyBean.getFacilityState(), facilityState);
@@ -934,12 +934,12 @@ public class StudyServiceTest extends BaseServiceTest {
 				.param("principalInvestigator", "test").param("sponsor", "test_study_1")
 				.param("totalEnrollment", Integer.toString(newTotalEnrollment)).param("startDate", "2016-01-20"))
 				.andExpect(status().isOk());
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findStudyByName(newStudyName);
 		assertEquals(studyBean.getProtocolTypeKey(), StudyProtocolType.INTERVENTIONAL.getValue());
 		mockMvc.perform(
 				post(API_STUDY_EDIT).param("studyId", String.valueOf(studyBean.getId())).param("protocolType", "1"))
 				.andExpect(status().isOk());
-		studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		studyBean = (StudyBean) new StudyDAO(dataSource).findStudyByName(newStudyName);
 		assertEquals(studyBean.getProtocolTypeKey(), StudyProtocolType.OBSERVATIONAL.getValue());
 	}
 
@@ -1197,7 +1197,7 @@ public class StudyServiceTest extends BaseServiceTest {
 				.param("principalInvestigator", "test").param("totalEnrollment", Integer.toString(newTotalEnrollment))
 				.param("startDate", "2016-04-20").param("subjectPersonIdRequired", "copyFromSSID"))
 				.andExpect(status().isOk());
-		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findByName(newStudyName);
+		StudyBean studyBean = (StudyBean) new StudyDAO(dataSource).findStudyByName(newStudyName);
 		studyConfigService.setParametersForStudy(studyBean);
 		studyBean.getStudyParameterConfig().getSubjectPersonIdRequired().equals("copyFromSSID");
 	}

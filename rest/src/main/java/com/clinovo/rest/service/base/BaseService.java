@@ -103,12 +103,9 @@ public abstract class BaseService {
 	}
 
 	protected StudyBean getSite(String siteName) throws Exception {
-		StudyBean site = (StudyBean) getStudyDAO().findByName(siteName);
+		StudyBean site = (StudyBean) getStudyDAO().findSiteByName(getCurrentStudy(), siteName);
 		if (site.getId() == 0) {
 			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteIsNotFound",
-					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} else if (site.getParentStudyId() != getCurrentStudy().getId()) {
-			throw new RestException(messageSource, "rest.eventservice.editsitecrf.siteDoesNotBelongToCurrentScope",
 					new Object[]{siteName}, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		studyConfigService.setParametersForSite(site);

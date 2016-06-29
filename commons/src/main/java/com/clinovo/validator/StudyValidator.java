@@ -15,7 +15,6 @@
 package com.clinovo.validator;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +48,7 @@ import com.clinovo.util.ValidatorHelper;
  * StudyBean validator.
  */
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
-public class StudyValidator {
+public final class StudyValidator {
 
 	public static final int VALIDATION_NUM_20 = 20;
 	public static final int VALIDATION_NUM_30 = 30;
@@ -59,6 +58,8 @@ public class StudyValidator {
 	public static final int VALIDATION_NUM_500 = 500;
 	public static final int VALIDATION_NUM_1000 = 1000;
 	public static final int VALIDATION_NUM_2000 = 2000;
+
+	private StudyValidator() { }
 
 	/**
 	 * Checks that study fields are unique.
@@ -79,16 +80,19 @@ public class StudyValidator {
 	 */
 	public static boolean checkIfStudyFieldsAreUnique(FormProcessor fp, HashMap errors, StudyDAO studyDAO,
 			ResourceBundle respage, ResourceBundle resexception, StudyBean studyBean) {
-		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
+		String studyNameParameterName = studyBean.isSite() ? "siteName" : StudyParameter.STUDY_NAME.getName();
+		List<StudyBean> allStudies = studyBean.isSite()
+				? (List<StudyBean>) studyDAO.findAllByParent(studyBean.getParentStudyId())
+				: (List<StudyBean>) studyDAO.findAllParents();
 		boolean result = true;
 		for (StudyBean thisBean : allStudies) {
-			if (fp.getString(StudyParameter.STUDY_NAME.getName()).trim().equals(thisBean.getName())
+			if (fp.getString(studyNameParameterName).trim().equals(thisBean.getName())
 					&& isNotTheSameStudy(studyBean, thisBean)) {
 				result = false;
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("study_name_exists"));
-				Object[] arguments = {fp.getString(StudyParameter.STUDY_NAME.getName()).trim()};
-				Validator.addError(errors, StudyParameter.STUDY_NAME.getName(), mf.format(arguments));
+				Object[] arguments = {fp.getString(studyNameParameterName).trim()};
+				Validator.addError(errors, studyNameParameterName, mf.format(arguments));
 			}
 			if (fp.getString(StudyParameter.PROTOCOL_ID.getName()).trim().equals(thisBean.getIdentifier())
 					&& isNotTheSameStudy(studyBean, thisBean)) {

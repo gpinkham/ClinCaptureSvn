@@ -5,8 +5,8 @@
                 <sql>SELECT * FROM STUDY WHERE STUDY_ID = ?</sql>
         </query>
     <query>
-		<name>findByName</name>
-		<sql>SELECT * FROM STUDY WHERE NAME = ?</sql>
+		<name>findSiteByName</name>
+        <sql>SELECT * FROM STUDY WHERE NAME = ? AND parent_study_id = ?</sql>
 	</query>
 	<query>
 		<name>findStudyByName</name>

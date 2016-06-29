@@ -13,10 +13,6 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -26,7 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -46,15 +41,39 @@ import org.akaza.openclinica.dao.core.TypeNames;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 */
 	public StudyDAO(DataSource ds) {
 		super(ds);
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 */
 	public StudyDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param ds
+	 *            DataSource
+	 * @param digester
+	 *            DAODigester
+	 * @param locale
+	 *            Locale
+	 */
 	public StudyDAO(DataSource ds, DAODigester digester, Locale locale) {
 
 		this(ds, digester);
@@ -140,12 +159,14 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 * @return sb an updated study bean.
 	 */
 	public EntityBean update(EntityBean eb) {
-		StudyBean sb = (StudyBean) eb;
-		sb = this.updateStepOne(sb);
-		sb = this.createStepTwo(sb);
-		sb = this.createStepThree(sb);
-		sb = this.createStepFour(sb);
-		return sb;
+		if (eb instanceof StudyBean) {
+			StudyBean sb = (StudyBean) eb;
+			sb = this.updateStepOne(sb);
+			sb = this.createStepTwo(sb);
+			sb = this.createStepThree(sb);
+			sb = this.createStepFour(sb);
+		}
+		return eb;
 	}
 
 	/**
@@ -156,7 +177,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 *            the study bean which will be updated.
 	 * @return sb the study bean after it is updated with this phase.
 	 */
-	public StudyBean updateStepOne(StudyBean sb) {
+	private StudyBean updateStepOne(StudyBean sb) {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 
@@ -224,15 +245,17 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 * @return eb the created entity bean.
 	 */
 	public EntityBean create(EntityBean eb) {
-		StudyBean sb = (StudyBean) eb;
-		sb = this.createStepOne(sb);
-		// in the above step, we will have created a primary key,
-		// and in the next steps, we update the study bean
-		// in phases
-		sb = this.createStepTwo(sb);
-		sb = this.createStepThree(sb);
-		sb = this.createStepFour(sb);
-		return sb;
+		if (eb instanceof StudyBean) {
+			StudyBean sb = (StudyBean) eb;
+			sb = this.createStepOne(sb);
+			// in the above step, we will have created a primary key,
+			// and in the next steps, we update the study bean
+			// in phases
+			sb = this.createStepTwo(sb);
+			sb = this.createStepThree(sb);
+			sb = this.createStepFour(sb);
+		}
+		return eb;
 	}
 
 	/**
@@ -240,7 +263,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 * 
 	 * @return int, which is the next primary key for creating a study.
 	 */
-	public int findNextKey() {
+	private int findNextKey() {
 		this.unsetTypeExpected();
 		Integer keyInt = 0;
 		this.setTypeExpected(1, TypeNames.INT);
@@ -263,7 +286,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 *            Study bean about to be created.
 	 * @return same study bean with a primary key in the ID field.
 	 */
-	public StudyBean createStepOne(StudyBean sb) {
+	private StudyBean createStepOne(StudyBean sb) {
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 		sb.setId(this.findNextKey());
@@ -428,7 +451,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 *            StudyBean
 	 * @return StudyBean
 	 */
-	public StudyBean createStepTwo(StudyBean sb) {
+	private StudyBean createStepTwo(StudyBean sb) {
 
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
@@ -471,7 +494,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 *            StudyBean
 	 * @return StudyBean
 	 */
-	public StudyBean createStepThree(StudyBean sb) {
+	private StudyBean createStepThree(StudyBean sb) {
 		HashMap variables = new HashMap();
 		int index = 1;
 		variables.put(index++, sb.getPurposeKey());
@@ -492,7 +515,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 *            StudyBean
 	 * @return StudyBean
 	 */
-	public StudyBean createStepFour(StudyBean sb) {
+	private StudyBean createStepFour(StudyBean sb) {
 		HashMap variables = new HashMap();
 		int index = 1;
 		variables.put(index++, sb.getDurationKey());
@@ -722,26 +745,10 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	}
 
 	/**
-	 *
-	 * @param status
-	 *            String
-	 * @return ArrayList
+	 * Finds all studies.
+	 * 
+	 * @return Collection
 	 */
-	public ArrayList findAllByStatus(Status status) {
-		this.unsetTypeExpected();
-		this.setTypesExpected();
-		HashMap variables = new HashMap();
-		variables.put(1, status.getId());
-		String sql = digester.getQuery("findAllByStatus");
-		ArrayList alist = this.select(sql, variables);
-		ArrayList al = new ArrayList();
-		for (Object anAlist : alist) {
-			StudyBean eb = this.getEntityFromHashMap((HashMap) anAlist);
-			al.add(eb);
-		}
-		return al;
-	}
-
 	public Collection findAll() {
 		return findAllByLimit(false);
 	}
@@ -824,7 +831,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	 *            boolean
 	 * @return Collection
 	 */
-	public Collection findAllByParentAndLimit(int parentStudyId, boolean isLimited) {
+	private Collection findAllByParentAndLimit(int parentStudyId, boolean isLimited) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(1, parentStudyId);
@@ -882,10 +889,28 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return al;
 	}
 
+	/**
+	 * Finds all studies.
+	 * 
+	 * @param strOrderByColumn
+	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return Collection
+	 */
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Finds by PK.
+	 * 
+	 * @param id
+	 *            int
+	 * @return EntityBean
+	 */
 	public EntityBean findByPK(int id) {
 		StudyBean eb = new StudyBean();
 		this.setTypesExpected();
@@ -904,24 +929,29 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	}
 
 	/**
-	 *
+	 * Finds site by name.
+	 * 
+	 * @param studyBean
+	 *            StudyBean
 	 * @param name
 	 *            String
 	 * @return EntityBean
 	 */
-	public EntityBean findByName(String name) {
+	public EntityBean findSiteByName(StudyBean studyBean, String name) {
+		int index = 1;
+		setTypesExpected();
 		StudyBean eb = new StudyBean();
-		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(1, name);
+		variables.put(index++, name);
+		variables.put(index, studyBean.getId());
 
-		String sql = digester.getQuery("findByName");
-		ArrayList alist = this.select(sql, variables);
+		String sql = digester.getQuery("findSiteByName");
+		ArrayList alist = select(sql, variables);
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = this.getEntityFromHashMap((HashMap) it.next());
+			eb = getEntityFromHashMap((HashMap) it.next());
 		}
 		return eb;
 	}
@@ -951,22 +981,34 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 	}
 
 	/**
-	 * deleteTestOnly, used only to clean up after unit testing.
-	 *
-	 * @param name
+	 * Finds by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @param strOrderByColumn
 	 *            String
+	 * @param blnAscendingSort
+	 *            boolean
+	 * @param strSearchPhrase
+	 *            String
+	 * @return String
 	 */
-	public void deleteTestOnly(String name) {
-		HashMap variables = new HashMap();
-		variables.put(1, name);
-		this.execute(digester.getQuery("deleteTestOnly"), variables);
-	}
-
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
 		return new ArrayList();
 	}
 
+	/**
+	 * Finds by permission.
+	 * 
+	 * @param objCurrentUser
+	 *            Object
+	 * @param intActionType
+	 *            int
+	 * @return Collection
+	 */
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
 		return new ArrayList();
 	}
@@ -1078,112 +1120,6 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	/**
 	 *
-	 * @param studyId
-	 *            int
-	 * @return int
-	 */
-	public int countLockedEvents(int studyId) {
-		int result = 0;
-
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		String sql = digester.getQuery("countLockedEvents");
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-		if (it.hasNext()) {
-			result = (Integer) ((HashMap) it.next()).get("count");
-		}
-		return result;
-	}
-
-	/**
-	 *
-	 * @param studyId
-	 *            int
-	 * @return int
-	 */
-	public int countEvents(int studyId) {
-		int result = 0;
-
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		HashMap variables = new HashMap();
-		variables.put(1, studyId);
-		String sql = digester.getQuery("countEvents");
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-		if (it.hasNext()) {
-			result = (Integer) ((HashMap) it.next()).get("count");
-		}
-		return result;
-	}
-
-	/**
-	 *
-	 * @param studies
-	 *            List
-	 * @return Map
-	 */
-	public Map<Integer, Map<String, Integer>> analyzeEvents(List<StudyBean> studies) {
-		Map<Integer, Map<String, Integer>> infoMap = new HashMap<Integer, Map<String, Integer>>();
-
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		String sql = digester.getQuery("analyzeEvents");
-
-		String tmp = "";
-		for (StudyBean sb : studies) {
-			Map<String, Integer> map = new HashMap<String, Integer>();
-			map.put("countEvents", 0);
-			map.put("countLockedEvents", 0);
-			infoMap.put(sb.getId(), map);
-			tmp += (tmp.isEmpty() ? "" : ", ") + sb.getId();
-		}
-
-		if (!tmp.isEmpty()) {
-			ResultSet rs = null;
-			Connection con = null;
-			PreparedStatement ps = null;
-			sql = sql.replace("?", tmp);
-			try {
-				con = ds.getConnection();
-				if (con.isClosed()) {
-					if (logger.isWarnEnabled()) {
-						logger.warn("Connection is closed: StudyDAO.analyzeEvents!");
-					}
-					throw new SQLException();
-				}
-
-				ps = con.prepareStatement(sql);
-				rs = ps.executeQuery();
-				while (rs != null && rs.next()) {
-					Map<String, Integer> map = infoMap.get(rs.getInt("studyId"));
-					map.put("countEvents", rs.getInt("countEvents"));
-					map.put("countLockedEvents", rs.getInt("countLockedEvents"));
-				}
-				if (logger.isInfoEnabled()) {
-					logger.info("Executing dynamic query, StudyDAO.analyzeEvents:query " + sql);
-				}
-				signalSuccess();
-			} catch (SQLException sqle) {
-				signalFailure(sqle);
-				if (logger.isWarnEnabled()) {
-					logger.warn("Exception while executing dynamic query, StudyDAO.analyzeEvents: " + sql + ":message: "
-							+ sqle.getMessage());
-					sqle.printStackTrace();
-				}
-			} finally {
-				this.closeIfNecessary(con, rs, ps);
-			}
-		}
-
-		return infoMap;
-	}
-
-	/**
-	 *
 	 * @param sb
 	 *            StudyBean
 	 * @return StudyBean
@@ -1238,6 +1174,13 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return al;
 	}
 
+	/**
+	 * Finds all active where CFR is used.
+	 * 
+	 * @param crfId
+	 *            int
+	 * @return ArrayList
+	 */
 	public ArrayList<StudyBean> findAllActiveWhereCRFIsUsed(int crfId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();

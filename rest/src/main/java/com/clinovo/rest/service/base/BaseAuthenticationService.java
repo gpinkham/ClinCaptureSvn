@@ -66,13 +66,8 @@ public abstract class BaseAuthenticationService extends BaseService {
 	}
 
 	private StudyBean getStudyBean(String studyName) {
-		StudyBean studyBean = (StudyBean) getStudyDAO().findByName(studyName);
-		if (studyBean != null && studyBean.getId() > 0) {
-			if (studyBean.getParentStudyId() > 0) {
-				throw new RestException(messageSource, "rest.authenticationservice.studyMustBeStudy",
-						new Object[]{studyName}, HttpServletResponse.SC_UNAUTHORIZED);
-			}
-		} else {
+		StudyBean studyBean = (StudyBean) getStudyDAO().findStudyByName(studyName);
+		if (studyBean.getId() == 0) {
 			throw new RestException(messageSource, "rest.authenticationservice.wrongStudyName",
 					HttpServletResponse.SC_UNAUTHORIZED);
 		}

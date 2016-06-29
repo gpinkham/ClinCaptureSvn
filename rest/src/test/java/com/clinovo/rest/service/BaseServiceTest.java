@@ -328,7 +328,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 	protected void login(String userName, UserType userType, Role role, String password, String studyName)
 			throws Exception {
-		currentScope = (StudyBean) new StudyDAO(dataSource).findByName(studyName);
+		currentScope = (StudyBean) new StudyDAO(dataSource).findStudyByName(studyName);
 		if (currentScope.isSite()) {
 			studyConfigService.setParametersForSite(currentScope);
 		} else if (!currentScope.isSite()) {
@@ -450,7 +450,7 @@ public class BaseServiceTest extends DefaultAppContextTest {
 
 		timestamp = new Date().getTime();
 
-		defaultStudy = (StudyBean) studyDAO.findByName(defaultStudyName);
+		defaultStudy = (StudyBean) studyDAO.findStudyByName(defaultStudyName);
 		studyConfigService.setParametersForStudy(defaultStudy);
 
 		rootUser = (UserAccountBean) userAccountDAO.findByUserName(rootUserName);
