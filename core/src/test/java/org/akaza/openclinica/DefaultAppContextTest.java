@@ -36,7 +36,6 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.EventService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
@@ -96,7 +95,6 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 			requirementsDao = new PasswordRequirementsDao(configurationDao);
 			discrepancyNoteService = new DiscrepancyNoteService(dataSource);
-			eventService = new EventService(dataSource);
 			ruleSetService = new RuleSetService(dataSource, dynamicsItemFormMetadataDao, dynamicsItemGroupMetadataDao,
 					mailSender, ruleDao, ruleSetDao, ruleSetRuleDao, ruleSetAuditDao, ruleActionRunLogDao);
 			postImportContainerService = new RulesPostImportContainerService(dataSource, null, null, ruleDao,

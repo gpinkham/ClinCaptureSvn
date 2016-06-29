@@ -62,7 +62,6 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetService;
@@ -182,7 +181,6 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 	protected static StudyEventDefinitionDAO studyEventDefinitionDAO;
 	protected static RulesPostImportContainerService postImportContainerService;
 	protected static PasswordRequirementsDao requirementsDao;
-	protected static EventServiceInterface eventService;
 	protected static DiscrepancyNoteService discrepancyNoteService;
 	protected static RuleSetService ruleSetService;
 
