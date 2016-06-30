@@ -572,7 +572,14 @@ Parser.prototype.createRule = function() {
 		}
 	}).filter(function(x) { if (x) return x; });
 	// Process targets
-	for (var x = 0; x < parser.rule.targets.length; x++) {
+	var targetsLength = parser.rule.targets.length;
+
+	if (targetsLength === 0) {
+		$('.alert').remove();
+		$('.targettable .panel-body').prepend(createAlert(messageSource.messages.specifyTarget));
+	}
+
+	for (var x = 0; x < targetsLength; x++) {
         var target = parser.rule.targets[x];
         if (target.linefy) {
             target.name = this.constructRepeatItemPath(target);
