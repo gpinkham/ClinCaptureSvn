@@ -106,7 +106,7 @@ public class DEPage extends BasePage {
 	 * 			CRF
 	 * @return Map<String, Boolean>
 	 */
-	public Map<String, Boolean> checkDataInCRF(CRF crf) {
+	public Map<String, Boolean> checkCRFDataOnDEPage(CRF crf) {
 		Map<String, Boolean> result = new HashMap<String, Boolean>();
 		List<String> names = new ArrayList<String>(crf.getFieldNameToValueMap().keySet());
 		Collections.sort(names, CRF.comparatorForItemOIDs);
@@ -142,7 +142,7 @@ public class DEPage extends BasePage {
 				// or multiple select, by visible text
 				ms = new MultipleSelect(element);
 				set = new HashSet<String>(Arrays.asList(fieldValue.split(",")));
-				result.put(fieldName, ms.getSelectedOptionValues().equals(set));
+				result.put(fieldName, ms.getSelectedOptionLabels().equals(set));
 				break;
 			case "Mv":
 				// or multiple select, by value

@@ -1,7 +1,9 @@
 package com.clinovo.pages.beans;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,12 +26,11 @@ public class CRF{
 	private String name = "";
 	private String studySubjectID = "";
 	private String eventName = "";
-	private String crfName = "";
 	private String currentSectionName = "";
 	private String addRows = "";
-	private Map<String, String> fieldNameToValueMap;
+	private Map<String, String> fieldNameToValueMap = new HashMap<String, String>();
 	private String markComplete = "no";
-	private Map<String, String> fieldNameToSectionNameMap;
+	private List<CRFSection> sections = new ArrayList<>();
 
 	public Map<String, String> getFieldNameToValueMap() {
 		return fieldNameToValueMap;
@@ -47,24 +48,32 @@ public class CRF{
 	 * @return CRF
 	 */
 	public static CRF fillCRFFromTableRow(Map<String, String> values) {
-		CRF crf = new CRF();
-		if (values.containsKey("Mark Complete")) crf.setMarkComplete(values.get("Mark Complete"));
+		
+		String sectionName = values.get("Section Name") == null? "" : values.get("Section Name");
+		CRF oneSectionCRF = new CRF();
+		
+		if (values.containsKey("Mark Complete")) oneSectionCRF.setMarkComplete(values.get("Mark Complete"));
 	
-		if (values.containsKey("Study Subject ID")) crf.setStudySubjectID(values.get("Study Subject ID"));
+		if (values.containsKey("Study Subject ID")) oneSectionCRF.setStudySubjectID(values.get("Study Subject ID"));
 		
-		if (values.containsKey("Event Name")) crf.setEventName(values.get("Event Name"));
+		if (values.containsKey("Event Name")) oneSectionCRF.setEventName(values.get("Event Name"));
 		
-		if (values.containsKey("CRF Name")) crf.setCrfName(values.get("CRF Name"));
+		if (values.containsKey("CRF Name")) oneSectionCRF.setName(values.get("CRF Name"));
 		
-		if (values.containsKey("Section Name")) crf.setCurrentSectionName(values.get("Section Name"));
+		oneSectionCRF.setCurrentSectionName(sectionName);
+		oneSectionCRF.getSections().add(new CRFSection(sectionName));
 		
-		if (values.containsKey("Add Rows")) crf.setAddRows(values.get("Add Rows"));
+		if (values.containsKey("Add Rows")) {
+			oneSectionCRF.setAddRows(values.get("Add Rows"));
+			oneSectionCRF.getSections().get(0).setAddRows(values.get("Add Rows"));
+		}
 		
 		Common.removeValuesFromMap(values, ARRAY_OF_PARAMETERS_TO_SKIP);
 		
-		crf.setFieldNameToValueMap(getFieldToValueMap(values));
+		oneSectionCRF.setFieldNameToValueMap(getFieldToValueMap(values));
+		oneSectionCRF.getSections().get(0).setFieldNameToValueMap(oneSectionCRF.getFieldNameToValueMap());
 		
-		return crf;
+		return oneSectionCRF;
 	}
 	
 	public static Map<String, String> getFieldToValueMap(Map<String, String> values) {
@@ -130,14 +139,6 @@ public class CRF{
 		this.eventName = eventName;
 	}
 
-	public String getCrfName() {
-		return crfName;
-	}
-
-	public void setCrfName(String crfName) {
-		this.crfName = crfName;
-	}
-
 	public String getCurrentSectionName() {
 		return currentSectionName;
 	}
@@ -184,13 +185,29 @@ public class CRF{
 		return result;
 	}
 
-	public Map<String, String> getFieldNameToSectionNameMap() {
-		return fieldNameToSectionNameMap;
+	public List<CRFSection> getSections() {
+		return sections;
 	}
 
-	public void setFieldNameToSectionNameMap(
-			Map<String, String> fieldNameToSectionNameMap) {
-		this.fieldNameToSectionNameMap = fieldNameToSectionNameMap;
+	public void setSections(List<CRFSection> sections) {
+		this.sections = sections;
+	}
+
+	public static void setMarkCRFCompleteStatus(CRF crf) {
+		if (crf.getSections() == null || crf.getSections().isEmpty()) return;
+		boolean shouldCRFBeMarkAsCompleted = "yes".equals(crf.getMarkComplete()) || 
+				"yes".equals(crf.getSections().get(crf.getSections().size() - 1).getMarkComplete());
+		
+		crf.getSections().get(crf.getSections().size() - 1).setMarkComplete(shouldCRFBeMarkAsCompleted? "yes" : "no");
+		crf.setMarkComplete(shouldCRFBeMarkAsCompleted? "yes" : "no");
+	}
+
+	public static CRF createCRFFromSection(CRFSection section) {
+		CRF oneSectionCRF = new CRF();
+		oneSectionCRF.setFieldNameToValueMap(section.getFieldNameToValueMap());
+		oneSectionCRF.setMarkComplete(section.getMarkComplete());
+		oneSectionCRF.setAddRows(section.getAddRows());
+		return oneSectionCRF;
 	}
 }
 

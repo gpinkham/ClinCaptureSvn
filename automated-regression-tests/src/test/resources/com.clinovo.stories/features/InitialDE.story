@@ -39,9 +39,9 @@ When User fills in CRF:
 |Study Subject ID  |Event Name |CRF Name        |input39(R)|input40(T)|input41(Sv)|
 |<Study Subject ID>|TestEvent A|CRF_Two_sections|1         |test 1    |2          |
 And User clicks 'Save' button on CRF page
-And User fills in data into CRF:
-|Study Subject ID  |Event Name |CRF Name        |Add Rows|IG_CRF_T_PAIN_0input50(Sv)|IG_CRF_T_PAIN_0input52(Mv)|IG_CRF_T_PAIN_1input49(T)|IG_CRF_T_PAIN_2input51(T)|
-|<Study Subject ID>|TestEvent A|CRF_Two_sections|2       |1                         |1,2,6                     |test 1                   |test 2                   |
+And User fills in CRF:
+|CRF Name        |Add Rows|IG_CRF_T_PAIN_0input50(Sv)|IG_CRF_T_PAIN_0input52(Mv)|IG_CRF_T_PAIN_1input49(T)|IG_CRF_T_PAIN_2input51(T)|
+|CRF_Two_sections|2       |1                         |1,2,6                     |test 1                   |test 2                   |
 
 And User clicks 'Save' button on CRF page
 Then User is on SM page
@@ -102,6 +102,89 @@ Examples:
 |CRC        |TestSubject_4     |
 |PI         |TestSubject_5     |
 |Study Admin|TestSubject_6     |
+
+
+Scenario: 2.1 User checks Default Values are shown for items when user opens CRF for DE first time
+
+Given User logs in as "<User>"
+When User goes to SM page
+Then User verifies CRFs data on DE page:
+|Study Subject ID  |Event Name |CRF Name                    |input57(T)|input58(T)|input59(S)|input60(S)|input61(S)|input62(M)|input63(M)|input64(M)|input65(C)|input66(C)|input67(C)|
+|<Study Subject ID>|TestEvent A|CRF_Default_values_Ungrouped|NA        |NA        |NA        |Yes       |          |No,NA     |NA        |          |1,2       |1         |          |
+And User is on SM page
+Examples:
+{scope=Scenario}
+|User   	|<Study Subject ID>|
+|CRC    	|TestSubject_1     |
+|PI   		|TestSubject_2     |
+|Study Admin|TestSubject_3     | 
+
+
+Scenario: 2.2 User checks Default Values are shown for items when user opens View CRF first time
+
+Given User logs in as "<User>"
+When User goes to SM page
+Then User verifies CRFs data on View CRF page:
+|Study Subject ID  |Event Name |CRF Name                    |input57(T)|input58(T)|input59(S)|input60(S)|input61(S)|input62(M)|input63(M)|input64(M)|input65(C)|input66(C)|input67(C)|
+|<Study Subject ID>|TestEvent A|CRF_Default_values_Ungrouped|NA        |NA        |NA        |          |          |No,NA     |NA        |          |1,2       |1         |          |
+And User is on SM page
+Examples:
+{scope=Scenario}
+|User   	|<Study Subject ID>|
+|CRC    	|TestSubject_1     |
+|PI   		|TestSubject_2     |
+|Study Admin|TestSubject_3     | 
+
+
+Scenario: 2.3 User checks Default Values are shown for items when user opens CRF for DE first time (repeating groups)
+
+Given User logs in as "<User>"
+When User goes to SM page
+Then User verifies CRFs data on DE page:
+|Study Subject ID  |Event Name |CRF Name                  |IG_CRF_D_GROUP1_0input68(T)|IG_CRF_D_GROUP1_0input69(T)|IG_CRF_D_GROUP1_0input70(S)|IG_CRF_D_GROUP1_0input71(S)|IG_CRF_D_GROUP1_0input72(S)|IG_CRF_D_GROUP1_0input73(M)|IG_CRF_D_GROUP1_0input74(M)|IG_CRF_D_GROUP1_0input75(M)|IG_CRF_D_GROUP1_0input76(C)|IG_CRF_D_GROUP1_0input77(C)|IG_CRF_D_GROUP1_0input78(C)|
+|<Study Subject ID>|TestEvent A|CRF_Default_values_Grouped|NA                         |NA                         |NA                         |Yes                        |                           |No,NA                      |NA                         |                           |1,2                        |1                          |                           |
+And User is on SM page
+Examples:
+{scope=Scenario}
+|User   	|<Study Subject ID>|
+|CRC    	|TestSubject_1     |
+|PI   		|TestSubject_2     |
+|Study Admin|TestSubject_3     | 
+
+
+Scenario: 2.4 User checks Default Values are shown for items when user opens View CRF first time (repeating groups)
+
+Given User logs in as "<User>"
+When User goes to SM page
+Then User verifies CRFs data on View CRF page:
+|Study Subject ID  |Event Name |CRF Name                  |IG_CRF_D_GROUP1_0input68(T)|IG_CRF_D_GROUP1_0input69(T)|IG_CRF_D_GROUP1_0input70(S)|IG_CRF_D_GROUP1_0input71(S)|IG_CRF_D_GROUP1_0input72(S)|IG_CRF_D_GROUP1_0input73(M)|IG_CRF_D_GROUP1_0input74(M)|IG_CRF_D_GROUP1_0input75(M)|IG_CRF_D_GROUP1_0input76(C)|IG_CRF_D_GROUP1_0input77(C)|IG_CRF_D_GROUP1_0input78(C)|
+|<Study Subject ID>|TestEvent A|CRF_Default_values_Grouped|NA                         |NA                         |NA                         |                           |                           |No                         |NA                         |                           |1,2                        |1                          |                           |
+And User is on SM page
+Examples:
+{scope=Scenario}
+|User   	|<Study Subject ID>|
+|CRC    	|TestSubject_1     |
+|PI   		|TestSubject_2     |
+|Study Admin|TestSubject_3     | 
+
+
+Scenario: 2.5 User checks Default Values are shown for items in the new rows of repeating group
+
+Given User logs in as "<User>"
+And User goes to SM page
+When User fills in CRF:
+|Study Subject ID  |Event Name |CRF Name                  |Add Rows|
+|<Study Subject ID>|TestEvent A|CRF_Default_values_Grouped|1       |
+Then User verifies CRFs data on DE page:
+|CRF Name                  |IG_CRF_D_GROUP1_1input68(T)|IG_CRF_D_GROUP1_1input69(T)|IG_CRF_D_GROUP1_1input70(S)|IG_CRF_D_GROUP1_1input71(S)|IG_CRF_D_GROUP1_1input72(S)|IG_CRF_D_GROUP1_1input73(M)|IG_CRF_D_GROUP1_1input74(M)|IG_CRF_D_GROUP1_1input75(M)|IG_CRF_D_GROUP1_1input76(C)|IG_CRF_D_GROUP1_1input77(C)|IG_CRF_D_GROUP1_1input78(C)|
+|CRF_Default_values_Grouped|NA                         |NA                         |NA                         |Yes                        |                           |No                         |NA                         |                           |1,2                        |1                          |                           |
+And User is on SM page
+Examples:
+{scope=Scenario}
+|User   	|<Study Subject ID>|
+|CRC    	|TestSubject_1     |
+|PI   		|TestSubject_2     |
+|Study Admin|TestSubject_3     | 
 
 
 Scenario: 6.1 User is not able to save CRF, if required items are not filled

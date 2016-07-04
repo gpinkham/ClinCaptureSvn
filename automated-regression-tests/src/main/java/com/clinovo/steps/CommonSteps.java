@@ -544,8 +544,7 @@ public class CommonSteps extends ScenarioSteps {
 
 	@Step
 	public void check_data_on_DE_page(CRF crf) {
-		assertThat(Common.checkAllTrue(dePage.checkDataInCRF(crf))).isTrue();
-		dePage.clickExit();
+		assertThat(Common.checkAllTrue(dePage.checkCRFDataOnDEPage(crf))).isTrue();
 	}
 
 	@Step
@@ -873,7 +872,8 @@ public class CommonSteps extends ScenarioSteps {
 		dnPage.clickCloseWindowButton();
 		switch_to_another_window(oldWindowId);
 	}
-
+	
+	@Step
 	public void clear_filter_NDs_page(DNote dn) {
 		notesAndDiscrepanciesPage.clickClearFilterLink();
 	}
@@ -895,6 +895,16 @@ public class CommonSteps extends ScenarioSteps {
 	}
 
 	@Step
+	public void click_exit_button_on_DE_page() {
+		dePage.clickExit();
+	}
+	
+	@Step
+	public void click_exit_button_on_View_CRF_page() {
+		viewCRFPage.clickExit();
+	}
+	
+	@Step
 	public void verify_error_message_on_CRF(String errorMessage) {
 		dePage.verifyErrorMessage(errorMessage);
 	}
@@ -907,6 +917,5 @@ public class CommonSteps extends ScenarioSteps {
 	@Step
 	public void check_data_on_View_CRF_page(CRF crf) {
 		assertThat(Common.checkAllTrue(viewCRFPage.checkDataInCRF(crf))).isTrue();
-		viewCRFPage.clickExit();
 	}
 }

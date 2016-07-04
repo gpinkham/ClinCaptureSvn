@@ -24,7 +24,7 @@ public class ViewCRFPage extends BasePage {
 	@FindBy(id = "mainForm")
 	private WebElementFacade formWithData;
 
-	@FindBy(xpath = "//input[@type='button' and @value='Exit']")
+	@FindBy(xpath = ".//*[@id='centralContainer']/input[@type='button']")
 	private WebElementFacade bExit;
 
 	public ViewCRFPage(WebDriver driver) {
@@ -100,7 +100,7 @@ public class ViewCRFPage extends BasePage {
 							"for (var i = 0; i < ms.length; i++) {" +
 								"if (ms.options[i].selected) textValues.push(ms.options[i].text);" +
 							"}" +
-							"return textValues;";
+							"return textValues.toString();";
 				actualValue = (String)js.executeScript(jsCommand);
 				expectedSetOfValues = new HashSet<String>(Arrays.asList(expectedValue.split(",")));
 				actualSetOfValues = new HashSet<String>(Arrays.asList(actualValue.split(",")));

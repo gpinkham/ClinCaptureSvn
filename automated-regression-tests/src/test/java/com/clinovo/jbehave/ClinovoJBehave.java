@@ -27,6 +27,7 @@ import com.clinovo.pages.ViewSubjectRecordPage;
 import com.clinovo.steps.CommonSteps;
 import com.clinovo.utils.Common;
 import com.clinovo.pages.beans.CRF;
+import com.clinovo.pages.beans.CRFSection;
 import com.clinovo.pages.beans.DNote;
 import com.clinovo.pages.beans.Study;
 import com.clinovo.pages.beans.StudyEventDefinition;
@@ -391,16 +392,6 @@ public class ClinovoJBehave {
     	commonSteps.click_enter_data_button_in_popup(aCRF);
     }
     
-    @Given("User fills in data into CRF: $activityTable")
-    @When("User fills in data into CRF: $activityTable")
-   	public void userFillsInDataIntoCRF(ExamplesTable table) {
-    	boolean replaceNamedParameters = true;
-    	Parameters rowParams = table.getRowAsParameters(0, replaceNamedParameters);
-    	CRF crf = CRF.fillCRFFromTableRow(rowParams.values());
-    	commonSteps.fill_in_crf(crf);
-    }
-    
-    
     @Given("User fills in{ and|, completes and} saves CRF: $activityTable")
     @When("User fills in{ and|, completes and} saves CRF: $activityTable")
    	public void userFillsInAndSaveCRF(ExamplesTable table) {
@@ -614,26 +605,79 @@ public class ClinovoJBehave {
     }
     
     private void userFillsInCRFAndSavesIfNeed(ExamplesTable table, boolean saveCRF) {
-    	List<CRF> listWithCRFs = new ArrayList<CRF>();
-    	Map<String, Map<String, String>> crfNameToMapFieldNameToSectionNameMap = new HashMap<String, Map<String, String>>();
-    	for (Map<String, String> map : getCorrectMapWithCRFItems(table, crfNameToMapFieldNameToSectionNameMap)) {
-    		CRF crf = CRF.fillCRFFromTableRow(map);
-    		userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
-    		userClicksEnterDataButtonInPopup(crf.getCrfName());
-    		userGoesToSectionOnDEPage(crf.getCurrentSectionName());
-        	commonSteps.fill_in_crf(crf);
-    		if (saveCRF) {
-    			userClicksSaveButton();
+    	List<CRF> listOfCRFs = userFillCRFsFromTable(table);
+    	for (CRF crf : listOfCRFs) {
+    		if (!crf.getStudySubjectID().isEmpty() && !crf.getEventName().isEmpty() && !crf.getName().isEmpty()) {
+    			userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
+    			userClicksEnterDataButtonInPopup(crf.getName());
     		}
-    		listWithCRFs.add(crf);
+    		
+    		for (CRFSection section : crf.getSections()) {
+    			userGoesToSection(section.getName());
+    			commonSteps.fill_in_crf(CRF.createCRFFromSection(section));
+    			if (saveCRF) userClicksSaveButton();
+    		}
     	}
-    	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_SAVED_DATA, listWithCRFs);
+    	Thucydides.getCurrentSession().put(CRF.CRFS_TO_CHECK_SAVED_DATA, listOfCRFs);
     }
     
-    private void userGoesToSectionOnDEPage(String sectionName) {
+    private void userGoesToSection(String sectionName) {
     	commonSteps.click_section_tab_in_crf(sectionName);
 	}
+    
+    private List<CRF> userFillCRFsFromTable(ExamplesTable table) {
+    	List<CRF> listOfCRFs = new ArrayList<CRF>();
+    	CRF lastAddedCRF = new CRF();
+    	for (Map<String, String> map : getCorrectMapWithCRFItems(table)) {
+    		CRF crf = CRF.fillCRFFromTableRow(map);
+    		boolean isNewCRFAdded = !(lastAddedCRF.getName().equals(crf.getName()) && lastAddedCRF.getEventName()
+    				.equals(crf.getEventName()) && lastAddedCRF.getStudySubjectID().equals(crf.getStudySubjectID()));
+    		if (isNewCRFAdded) {
+    			if (!lastAddedCRF.getName().isEmpty()) CRF.setMarkCRFCompleteStatus(lastAddedCRF);
+    			listOfCRFs.add(crf);
+    			lastAddedCRF = crf;
+    		} else {
+    			//row contains data from section of already added CRF
+    			lastAddedCRF.setCurrentSectionName(crf.getCurrentSectionName());
+    			lastAddedCRF.getFieldNameToValueMap().putAll(crf.getFieldNameToValueMap());
+    			lastAddedCRF.getSections().addAll(crf.getSections());
+    		}
+    	}
+    	//for the last CRF from table
+    	if (!lastAddedCRF.getName().isEmpty()) CRF.setMarkCRFCompleteStatus(lastAddedCRF);
+    	
+		return listOfCRFs;
+	}
 
+    @Then("User verifies CRFs data on $page: $activityTable")
+	public void userVerifiesCRFDataOnPage(String page, ExamplesTable table) {
+    	List<CRF> listOfCRFs = userFillCRFsFromTable(table);
+    	for (CRF crf : listOfCRFs) {
+    		boolean useCurrentPage = crf.getStudySubjectID().isEmpty() || crf.getEventName().isEmpty() || crf.getName().isEmpty();
+    		if (!useCurrentPage) userCallsPopupOnSM(crf.getStudySubjectID(), crf.getEventName());
+    		switch (page) {
+        	case DEPage.PAGE_NAME:
+        		if (!useCurrentPage) userClicksEnterDataButtonInPopup(crf.getName());
+        		for (CRFSection section : crf.getSections()) {
+            		userGoesToSection(section.getName());
+            		commonSteps.check_data_on_DE_page(CRF.createCRFFromSection(section));
+            	}
+        		commonSteps.click_exit_button_on_DE_page();
+        		break;
+        	case ViewCRFPage.PAGE_NAME:
+        		if (!useCurrentPage) userClicksViewCRFButtonInPopup(crf.getName());
+        		for (CRFSection section : crf.getSections()) {
+            		userGoesToSection(section.getName());
+            		commonSteps.check_data_on_View_CRF_page(CRF.createCRFFromSection(section));
+            	}
+        		commonSteps.click_exit_button_on_View_CRF_page();
+           		break;
+           	default:
+           		Assert.assertTrue(false);
+        	}
+    	}
+    }
+    
 	@SuppressWarnings("unchecked")
 	@Then("User verifies saved CRF data on $page")
 	public void userVerifiesSavedCRFDataOnDEPage(String page) {
@@ -643,14 +687,16 @@ public class ClinovoJBehave {
     		
     		switch (page) {
     		case DEPage.PAGE_NAME:
-    			userClicksEnterDataButtonInPopup(crf.getCrfName());
+    			userClicksEnterDataButtonInPopup(crf.getName());
     			commonSteps.click_section_tab_in_crf(crf.getCurrentSectionName());
         		commonSteps.check_data_on_DE_page(crf);
+        		commonSteps.click_exit_button_on_DE_page();
     			break;
     		case ViewCRFPage.PAGE_NAME:
-    			userClicksViewCRFButtonInPopup(crf.getCrfName());
+    			userClicksViewCRFButtonInPopup(crf.getName());
     			commonSteps.click_section_tab_in_crf(crf.getCurrentSectionName());
         		commonSteps.check_data_on_View_CRF_page(crf);
+        		commonSteps.click_exit_button_on_View_CRF_page();
         		break;
         	default:
         		Assert.assertTrue(false);
@@ -664,8 +710,7 @@ public class ClinovoJBehave {
 		commonSteps.click_view_CRF_button_in_popup(crf);
 	}
 	
-    private List<Map<String, String>> getCorrectMapWithCRFItems(ExamplesTable table, 
-    		Map<String, Map<String, String>> crfNameToMapFieldNameToSectionNameMap) {
+    private List<Map<String, String>> getCorrectMapWithCRFItems(ExamplesTable table) {
     	boolean replaceNamedParameters = true;
     	Parameters rowParams;
     	List<Map<String, String>> result = new ArrayList<Map<String, String>>();
@@ -674,7 +719,7 @@ public class ClinovoJBehave {
     	for (int i = 0; i < table.getRowCount(); i++) {
     		rowParams = table.getRowAsParameters(i, replaceNamedParameters);
     		Map<String, String> values = rowParams.values();
-    		boolean next = false;
+    		boolean next = i == 0;	
     		if (values.containsKey("Study Subject ID") && !values.get("Study Subject ID").isEmpty()) {
     			studySubjectId = values.get("Study Subject ID");
     			next = true;
@@ -693,17 +738,8 @@ public class ClinovoJBehave {
     		} else {
     			values.put("CRF Name", crfName);
     		}
-    		if ((values.containsKey("Section Name") && !values.get("Section Name").isEmpty()) || (i == table.getRowCount() - 1)) {
-    			// fill map crfName to FieldNameToSectionNameMap
+    		if (values.containsKey("Section Name") && !values.get("Section Name").isEmpty()) {
     			sectionName = values.get("Section Name");
-    			if (!crfNameToMapFieldNameToSectionNameMap.keySet().contains(crfName)) {
-    				crfNameToMapFieldNameToSectionNameMap.put(crfName, new HashMap<String, String>()); 
-    			} 
-    				
-    			crfNameToMapFieldNameToSectionNameMap.get(crfName).putAll(Common
-    						 .getFieldNameToSectionNameMap(sectionName, CRF.getFieldToValueMap(Common.
-    								 getMapWithoutSomeValues(values, CRF.ARRAY_OF_PARAMETERS_TO_SKIP))));
-    			
     		} else {
     			values.put("Section Name", sectionName);
     		}

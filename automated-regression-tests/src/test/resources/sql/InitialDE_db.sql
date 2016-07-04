@@ -4,7 +4,7 @@
 
 -- Dumped from database version 8.4.3
 -- Dumped by pg_dump version 9.2.0
--- Started on 2016-06-23 15:29:02
+-- Started on 2016-06-29 12:37:15
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -14,7 +14,7 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 
 --
--- TOC entry 1137 (class 2612 OID 16386)
+-- TOC entry 1138 (class 2612 OID 16386)
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: postgres
 --
 
@@ -24,7 +24,7 @@ ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 365 (class 1255 OID 143882803)
+-- TOC entry 361 (class 1255 OID 143981495)
 -- Name: disable_event_crf(integer, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -43,7 +43,7 @@ CREATE FUNCTION disable_event_crf(ec_id integer, u_id integer, pos integer, stat
 ALTER FUNCTION public.disable_event_crf(ec_id integer, u_id integer, pos integer, state integer) OWNER TO clincapture;
 
 --
--- TOC entry 366 (class 1255 OID 143882804)
+-- TOC entry 362 (class 1255 OID 143981496)
 -- Name: disable_event_crfs_by_crf_version(integer, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -62,7 +62,7 @@ CREATE FUNCTION disable_event_crfs_by_crf_version(cv_id integer, u_id integer, p
 ALTER FUNCTION public.disable_event_crfs_by_crf_version(cv_id integer, u_id integer, pos integer, state integer) OWNER TO clincapture;
 
 --
--- TOC entry 367 (class 1255 OID 143882805)
+-- TOC entry 364 (class 1255 OID 143981497)
 -- Name: disable_event_crfs_by_study_event(integer, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -81,7 +81,7 @@ CREATE FUNCTION disable_event_crfs_by_study_event(se_id integer, u_id integer, p
 ALTER FUNCTION public.disable_event_crfs_by_study_event(se_id integer, u_id integer, pos integer, state integer) OWNER TO clincapture;
 
 --
--- TOC entry 368 (class 1255 OID 143882806)
+-- TOC entry 365 (class 1255 OID 143981498)
 -- Name: disable_event_crfs_by_study_event_and_crf_oid(integer, text, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -100,7 +100,7 @@ CREATE FUNCTION disable_event_crfs_by_study_event_and_crf_oid(se_id integer, poi
 ALTER FUNCTION public.disable_event_crfs_by_study_event_and_crf_oid(se_id integer, poid text, u_id integer, pos integer, state integer) OWNER TO clincapture;
 
 --
--- TOC entry 363 (class 1255 OID 143882807)
+-- TOC entry 366 (class 1255 OID 143981499)
 -- Name: enable_event_crf(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -119,7 +119,7 @@ CREATE FUNCTION enable_event_crf(ec_id integer, u_id integer, pos integer) RETUR
 ALTER FUNCTION public.enable_event_crf(ec_id integer, u_id integer, pos integer) OWNER TO clincapture;
 
 --
--- TOC entry 364 (class 1255 OID 143882808)
+-- TOC entry 368 (class 1255 OID 143981500)
 -- Name: enable_event_crfs_by_crf_version(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -138,7 +138,7 @@ CREATE FUNCTION enable_event_crfs_by_crf_version(cv_id integer, u_id integer, po
 ALTER FUNCTION public.enable_event_crfs_by_crf_version(cv_id integer, u_id integer, pos integer) OWNER TO clincapture;
 
 --
--- TOC entry 369 (class 1255 OID 143882809)
+-- TOC entry 369 (class 1255 OID 143981501)
 -- Name: enable_event_crfs_by_study_event(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -157,7 +157,7 @@ CREATE FUNCTION enable_event_crfs_by_study_event(se_id integer, u_id integer, po
 ALTER FUNCTION public.enable_event_crfs_by_study_event(se_id integer, u_id integer, pos integer) OWNER TO clincapture;
 
 --
--- TOC entry 370 (class 1255 OID 143882810)
+-- TOC entry 351 (class 1255 OID 143981502)
 -- Name: enable_event_crfs_by_study_event_and_crf_oid(integer, text, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -176,7 +176,7 @@ CREATE FUNCTION enable_event_crfs_by_study_event_and_crf_oid(se_id integer, poid
 ALTER FUNCTION public.enable_event_crfs_by_study_event_and_crf_oid(se_id integer, poid text, u_id integer, pos integer) OWNER TO clincapture;
 
 --
--- TOC entry 371 (class 1255 OID 143882811)
+-- TOC entry 352 (class 1255 OID 143981503)
 -- Name: enable_item_data(integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -198,7 +198,7 @@ CREATE FUNCTION enable_item_data(old_status integer, ev_status integer) RETURNS 
 ALTER FUNCTION public.enable_item_data(old_status integer, ev_status integer) OWNER TO clincapture;
 
 --
--- TOC entry 372 (class 1255 OID 143882812)
+-- TOC entry 353 (class 1255 OID 143981504)
 -- Name: event_crf_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -298,7 +298,7 @@ CREATE FUNCTION event_crf_trigger() RETURNS trigger
 ALTER FUNCTION public.event_crf_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 373 (class 1255 OID 143882813)
+-- TOC entry 370 (class 1255 OID 143981505)
 -- Name: event_definition_crf_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -333,7 +333,7 @@ CREATE FUNCTION event_definition_crf_trigger() RETURNS trigger
 ALTER FUNCTION public.event_definition_crf_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 374 (class 1255 OID 143882814)
+-- TOC entry 371 (class 1255 OID 143981506)
 -- Name: fix_duplicates_in_study_defs(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -366,7 +366,7 @@ CREATE FUNCTION fix_duplicates_in_study_defs() RETURNS void
 ALTER FUNCTION public.fix_duplicates_in_study_defs() OWNER TO clincapture;
 
 --
--- TOC entry 375 (class 1255 OID 143882815)
+-- TOC entry 372 (class 1255 OID 143981507)
 -- Name: fix_orders(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -388,7 +388,7 @@ CREATE FUNCTION fix_orders() RETURNS void
 ALTER FUNCTION public.fix_orders() OWNER TO clincapture;
 
 --
--- TOC entry 351 (class 1255 OID 143882816)
+-- TOC entry 373 (class 1255 OID 143981508)
 -- Name: fix_rule_referencing_cross_study(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -418,7 +418,7 @@ CREATE FUNCTION fix_rule_referencing_cross_study() RETURNS void
 ALTER FUNCTION public.fix_rule_referencing_cross_study() OWNER TO clincapture;
 
 --
--- TOC entry 352 (class 1255 OID 143882817)
+-- TOC entry 354 (class 1255 OID 143981509)
 -- Name: get_from_states(text, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -447,7 +447,7 @@ CREATE FUNCTION get_from_states(states text, current_status integer, pos integer
 ALTER FUNCTION public.get_from_states(states text, current_status integer, pos integer, status integer) OWNER TO clincapture;
 
 --
--- TOC entry 353 (class 1255 OID 143882818)
+-- TOC entry 355 (class 1255 OID 143981510)
 -- Name: global_subject_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -515,7 +515,7 @@ CREATE FUNCTION global_subject_trigger() RETURNS trigger
 ALTER FUNCTION public.global_subject_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 354 (class 1255 OID 143882819)
+-- TOC entry 356 (class 1255 OID 143981511)
 -- Name: item_data_initial_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -544,7 +544,7 @@ CREATE FUNCTION item_data_initial_trigger() RETURNS trigger
 ALTER FUNCTION public.item_data_initial_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 355 (class 1255 OID 143882820)
+-- TOC entry 357 (class 1255 OID 143981512)
 -- Name: item_data_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -613,7 +613,7 @@ CREATE FUNCTION item_data_trigger() RETURNS trigger
 ALTER FUNCTION public.item_data_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 356 (class 1255 OID 143882821)
+-- TOC entry 358 (class 1255 OID 143981513)
 -- Name: populate_ssid_in_didm_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -634,7 +634,7 @@ CREATE FUNCTION populate_ssid_in_didm_trigger() RETURNS trigger
 ALTER FUNCTION public.populate_ssid_in_didm_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 357 (class 1255 OID 143882822)
+-- TOC entry 359 (class 1255 OID 143981514)
 -- Name: repeating_item_data_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -678,7 +678,7 @@ CREATE FUNCTION repeating_item_data_trigger() RETURNS trigger
 ALTER FUNCTION public.repeating_item_data_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 358 (class 1255 OID 143882823)
+-- TOC entry 360 (class 1255 OID 143981515)
 -- Name: revert_from_states(text, integer, timestamp with time zone, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -715,7 +715,7 @@ CREATE FUNCTION revert_from_states(states text, old_status integer, dt_completed
 ALTER FUNCTION public.revert_from_states(states text, old_status integer, dt_completed timestamp with time zone, pos integer) OWNER TO clincapture;
 
 --
--- TOC entry 359 (class 1255 OID 143882824)
+-- TOC entry 367 (class 1255 OID 143981516)
 -- Name: save_partial_section_info(integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -738,7 +738,7 @@ CREATE FUNCTION save_partial_section_info(eventcrfid integer, sectionid integer)
 ALTER FUNCTION public.save_partial_section_info(eventcrfid integer, sectionid integer) OWNER TO clincapture;
 
 --
--- TOC entry 360 (class 1255 OID 143882825)
+-- TOC entry 375 (class 1255 OID 143981517)
 -- Name: study_event_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -823,7 +823,7 @@ CREATE FUNCTION study_event_trigger() RETURNS trigger
 ALTER FUNCTION public.study_event_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 361 (class 1255 OID 143882826)
+-- TOC entry 378 (class 1255 OID 143981518)
 -- Name: study_insert_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -849,7 +849,7 @@ CREATE FUNCTION study_insert_trigger() RETURNS trigger
 ALTER FUNCTION public.study_insert_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 362 (class 1255 OID 143882827)
+-- TOC entry 376 (class 1255 OID 143981519)
 -- Name: study_subject_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -932,7 +932,7 @@ CREATE FUNCTION study_subject_trigger() RETURNS trigger
 ALTER FUNCTION public.study_subject_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 376 (class 1255 OID 143882828)
+-- TOC entry 377 (class 1255 OID 143981520)
 -- Name: subject_group_assignment_trigger(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -967,7 +967,7 @@ CREATE FUNCTION subject_group_assignment_trigger() RETURNS trigger
 ALTER FUNCTION public.subject_group_assignment_trigger() OWNER TO clincapture;
 
 --
--- TOC entry 377 (class 1255 OID 143882829)
+-- TOC entry 363 (class 1255 OID 143981521)
 -- Name: update_event_crf_status(); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -990,7 +990,7 @@ CREATE FUNCTION update_event_crf_status() RETURNS trigger
 ALTER FUNCTION public.update_event_crf_status() OWNER TO clincapture;
 
 --
--- TOC entry 378 (class 1255 OID 143882830)
+-- TOC entry 374 (class 1255 OID 143981522)
 -- Name: update_states(text, integer, integer); Type: FUNCTION; Schema: public; Owner: clincapture
 --
 
@@ -1013,7 +1013,7 @@ SET default_tablespace = '';
 SET default_with_oids = true;
 
 --
--- TOC entry 140 (class 1259 OID 143882831)
+-- TOC entry 140 (class 1259 OID 143981523)
 -- Name: archived_dataset_file; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1033,7 +1033,7 @@ CREATE TABLE archived_dataset_file (
 ALTER TABLE public.archived_dataset_file OWNER TO clincapture;
 
 --
--- TOC entry 141 (class 1259 OID 143882837)
+-- TOC entry 141 (class 1259 OID 143981529)
 -- Name: archived_dataset_file_archived_dataset_file_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1048,7 +1048,7 @@ CREATE SEQUENCE archived_dataset_file_archived_dataset_file_id_seq
 ALTER TABLE public.archived_dataset_file_archived_dataset_file_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3279 (class 0 OID 0)
+-- TOC entry 3285 (class 0 OID 0)
 -- Dependencies: 141
 -- Name: archived_dataset_file_archived_dataset_file_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1057,7 +1057,7 @@ ALTER SEQUENCE archived_dataset_file_archived_dataset_file_id_seq OWNED BY archi
 
 
 --
--- TOC entry 3280 (class 0 OID 0)
+-- TOC entry 3286 (class 0 OID 0)
 -- Dependencies: 141
 -- Name: archived_dataset_file_archived_dataset_file_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1066,7 +1066,7 @@ SELECT pg_catalog.setval('archived_dataset_file_archived_dataset_file_id_seq', 1
 
 
 --
--- TOC entry 142 (class 1259 OID 143882839)
+-- TOC entry 142 (class 1259 OID 143981531)
 -- Name: audit_event; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1084,7 +1084,7 @@ CREATE TABLE audit_event (
 ALTER TABLE public.audit_event OWNER TO clincapture;
 
 --
--- TOC entry 143 (class 1259 OID 143882845)
+-- TOC entry 143 (class 1259 OID 143981537)
 -- Name: audit_event_audit_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1099,7 +1099,7 @@ CREATE SEQUENCE audit_event_audit_id_seq
 ALTER TABLE public.audit_event_audit_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3281 (class 0 OID 0)
+-- TOC entry 3287 (class 0 OID 0)
 -- Dependencies: 143
 -- Name: audit_event_audit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1108,7 +1108,7 @@ ALTER SEQUENCE audit_event_audit_id_seq OWNED BY audit_event.audit_id;
 
 
 --
--- TOC entry 3282 (class 0 OID 0)
+-- TOC entry 3288 (class 0 OID 0)
 -- Dependencies: 143
 -- Name: audit_event_audit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1117,7 +1117,7 @@ SELECT pg_catalog.setval('audit_event_audit_id_seq', 1, false);
 
 
 --
--- TOC entry 144 (class 1259 OID 143882847)
+-- TOC entry 144 (class 1259 OID 143981539)
 -- Name: audit_event_context; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1140,7 +1140,7 @@ CREATE TABLE audit_event_context (
 ALTER TABLE public.audit_event_context OWNER TO clincapture;
 
 --
--- TOC entry 145 (class 1259 OID 143882850)
+-- TOC entry 145 (class 1259 OID 143981542)
 -- Name: audit_event_values; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1155,7 +1155,7 @@ CREATE TABLE audit_event_values (
 ALTER TABLE public.audit_event_values OWNER TO clincapture;
 
 --
--- TOC entry 146 (class 1259 OID 143882856)
+-- TOC entry 146 (class 1259 OID 143981548)
 -- Name: audit_log_event; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1189,7 +1189,7 @@ CREATE TABLE audit_log_event (
 ALTER TABLE public.audit_log_event OWNER TO clincapture;
 
 --
--- TOC entry 147 (class 1259 OID 143882862)
+-- TOC entry 147 (class 1259 OID 143981554)
 -- Name: audit_log_event_audit_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1204,7 +1204,7 @@ CREATE SEQUENCE audit_log_event_audit_id_seq
 ALTER TABLE public.audit_log_event_audit_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3283 (class 0 OID 0)
+-- TOC entry 3289 (class 0 OID 0)
 -- Dependencies: 147
 -- Name: audit_log_event_audit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1213,16 +1213,16 @@ ALTER SEQUENCE audit_log_event_audit_id_seq OWNED BY audit_log_event.audit_id;
 
 
 --
--- TOC entry 3284 (class 0 OID 0)
+-- TOC entry 3290 (class 0 OID 0)
 -- Dependencies: 147
 -- Name: audit_log_event_audit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('audit_log_event_audit_id_seq', 14, true);
+SELECT pg_catalog.setval('audit_log_event_audit_id_seq', 15, true);
 
 
 --
--- TOC entry 148 (class 1259 OID 143882864)
+-- TOC entry 148 (class 1259 OID 143981556)
 -- Name: audit_log_event_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1235,7 +1235,7 @@ CREATE TABLE audit_log_event_type (
 ALTER TABLE public.audit_log_event_type OWNER TO clincapture;
 
 --
--- TOC entry 149 (class 1259 OID 143882867)
+-- TOC entry 149 (class 1259 OID 143981559)
 -- Name: audit_log_event_type_audit_log_event_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1250,7 +1250,7 @@ CREATE SEQUENCE audit_log_event_type_audit_log_event_type_id_seq
 ALTER TABLE public.audit_log_event_type_audit_log_event_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3285 (class 0 OID 0)
+-- TOC entry 3291 (class 0 OID 0)
 -- Dependencies: 149
 -- Name: audit_log_event_type_audit_log_event_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1259,7 +1259,7 @@ ALTER SEQUENCE audit_log_event_type_audit_log_event_type_id_seq OWNED BY audit_l
 
 
 --
--- TOC entry 3286 (class 0 OID 0)
+-- TOC entry 3292 (class 0 OID 0)
 -- Dependencies: 149
 -- Name: audit_log_event_type_audit_log_event_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1268,7 +1268,7 @@ SELECT pg_catalog.setval('audit_log_event_type_audit_log_event_type_id_seq', 1, 
 
 
 --
--- TOC entry 150 (class 1259 OID 143882869)
+-- TOC entry 150 (class 1259 OID 143981561)
 -- Name: audit_log_randomization; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1294,7 +1294,7 @@ CREATE TABLE audit_log_randomization (
 ALTER TABLE public.audit_log_randomization OWNER TO clincapture;
 
 --
--- TOC entry 151 (class 1259 OID 143882875)
+-- TOC entry 151 (class 1259 OID 143981567)
 -- Name: audit_log_randomization_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1309,7 +1309,7 @@ CREATE SEQUENCE audit_log_randomization_id_seq
 ALTER TABLE public.audit_log_randomization_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3287 (class 0 OID 0)
+-- TOC entry 3293 (class 0 OID 0)
 -- Dependencies: 151
 -- Name: audit_log_randomization_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1318,7 +1318,7 @@ ALTER SEQUENCE audit_log_randomization_id_seq OWNED BY audit_log_randomization.i
 
 
 --
--- TOC entry 3288 (class 0 OID 0)
+-- TOC entry 3294 (class 0 OID 0)
 -- Dependencies: 151
 -- Name: audit_log_randomization_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1327,7 +1327,7 @@ SELECT pg_catalog.setval('audit_log_randomization_id_seq', 1, false);
 
 
 --
--- TOC entry 152 (class 1259 OID 143882877)
+-- TOC entry 152 (class 1259 OID 143981569)
 -- Name: audit_user_login; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1344,7 +1344,7 @@ CREATE TABLE audit_user_login (
 ALTER TABLE public.audit_user_login OWNER TO clincapture;
 
 --
--- TOC entry 153 (class 1259 OID 143882880)
+-- TOC entry 153 (class 1259 OID 143981572)
 -- Name: audit_user_login_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1359,7 +1359,7 @@ CREATE SEQUENCE audit_user_login_id_seq
 ALTER TABLE public.audit_user_login_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3289 (class 0 OID 0)
+-- TOC entry 3295 (class 0 OID 0)
 -- Dependencies: 153
 -- Name: audit_user_login_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1368,16 +1368,16 @@ ALTER SEQUENCE audit_user_login_id_seq OWNED BY audit_user_login.id;
 
 
 --
--- TOC entry 3290 (class 0 OID 0)
+-- TOC entry 3296 (class 0 OID 0)
 -- Dependencies: 153
 -- Name: audit_user_login_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('audit_user_login_id_seq', 32, true);
+SELECT pg_catalog.setval('audit_user_login_id_seq', 33, true);
 
 
 --
--- TOC entry 154 (class 1259 OID 143882882)
+-- TOC entry 154 (class 1259 OID 143981574)
 -- Name: authorities; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1392,7 +1392,7 @@ CREATE TABLE authorities (
 ALTER TABLE public.authorities OWNER TO clincapture;
 
 --
--- TOC entry 155 (class 1259 OID 143882885)
+-- TOC entry 155 (class 1259 OID 143981577)
 -- Name: authorities_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1407,7 +1407,7 @@ CREATE SEQUENCE authorities_id_seq
 ALTER TABLE public.authorities_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3291 (class 0 OID 0)
+-- TOC entry 3297 (class 0 OID 0)
 -- Dependencies: 155
 -- Name: authorities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1416,7 +1416,7 @@ ALTER SEQUENCE authorities_id_seq OWNED BY authorities.id;
 
 
 --
--- TOC entry 3292 (class 0 OID 0)
+-- TOC entry 3298 (class 0 OID 0)
 -- Dependencies: 155
 -- Name: authorities_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1425,7 +1425,7 @@ SELECT pg_catalog.setval('authorities_id_seq', 8, true);
 
 
 --
--- TOC entry 156 (class 1259 OID 143882887)
+-- TOC entry 156 (class 1259 OID 143981579)
 -- Name: coded_item; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1449,7 +1449,7 @@ CREATE TABLE coded_item (
 ALTER TABLE public.coded_item OWNER TO clincapture;
 
 --
--- TOC entry 157 (class 1259 OID 143882893)
+-- TOC entry 157 (class 1259 OID 143981585)
 -- Name: coded_item_element; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1466,7 +1466,7 @@ CREATE TABLE coded_item_element (
 ALTER TABLE public.coded_item_element OWNER TO clincapture;
 
 --
--- TOC entry 158 (class 1259 OID 143882899)
+-- TOC entry 158 (class 1259 OID 143981591)
 -- Name: coded_item_element_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1481,7 +1481,7 @@ CREATE SEQUENCE coded_item_element_id_seq
 ALTER TABLE public.coded_item_element_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3293 (class 0 OID 0)
+-- TOC entry 3299 (class 0 OID 0)
 -- Dependencies: 158
 -- Name: coded_item_element_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1490,7 +1490,7 @@ ALTER SEQUENCE coded_item_element_id_seq OWNED BY coded_item_element.id;
 
 
 --
--- TOC entry 3294 (class 0 OID 0)
+-- TOC entry 3300 (class 0 OID 0)
 -- Dependencies: 158
 -- Name: coded_item_element_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1499,7 +1499,7 @@ SELECT pg_catalog.setval('coded_item_element_id_seq', 1, false);
 
 
 --
--- TOC entry 159 (class 1259 OID 143882901)
+-- TOC entry 159 (class 1259 OID 143981593)
 -- Name: coded_item_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1514,7 +1514,7 @@ CREATE SEQUENCE coded_item_id_seq
 ALTER TABLE public.coded_item_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3295 (class 0 OID 0)
+-- TOC entry 3301 (class 0 OID 0)
 -- Dependencies: 159
 -- Name: coded_item_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1523,7 +1523,7 @@ ALTER SEQUENCE coded_item_id_seq OWNED BY coded_item.id;
 
 
 --
--- TOC entry 3296 (class 0 OID 0)
+-- TOC entry 3302 (class 0 OID 0)
 -- Dependencies: 159
 -- Name: coded_item_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1532,7 +1532,7 @@ SELECT pg_catalog.setval('coded_item_id_seq', 1, false);
 
 
 --
--- TOC entry 160 (class 1259 OID 143882903)
+-- TOC entry 160 (class 1259 OID 143981595)
 -- Name: completion_status; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1547,7 +1547,7 @@ CREATE TABLE completion_status (
 ALTER TABLE public.completion_status OWNER TO clincapture;
 
 --
--- TOC entry 161 (class 1259 OID 143882909)
+-- TOC entry 161 (class 1259 OID 143981601)
 -- Name: completion_status_completion_status_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1562,7 +1562,7 @@ CREATE SEQUENCE completion_status_completion_status_id_seq
 ALTER TABLE public.completion_status_completion_status_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3297 (class 0 OID 0)
+-- TOC entry 3303 (class 0 OID 0)
 -- Dependencies: 161
 -- Name: completion_status_completion_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1571,7 +1571,7 @@ ALTER SEQUENCE completion_status_completion_status_id_seq OWNED BY completion_st
 
 
 --
--- TOC entry 3298 (class 0 OID 0)
+-- TOC entry 3304 (class 0 OID 0)
 -- Dependencies: 161
 -- Name: completion_status_completion_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1580,7 +1580,7 @@ SELECT pg_catalog.setval('completion_status_completion_status_id_seq', 1, false)
 
 
 --
--- TOC entry 162 (class 1259 OID 143882911)
+-- TOC entry 162 (class 1259 OID 143981603)
 -- Name: configuration; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1596,7 +1596,7 @@ CREATE TABLE configuration (
 ALTER TABLE public.configuration OWNER TO clincapture;
 
 --
--- TOC entry 163 (class 1259 OID 143882917)
+-- TOC entry 163 (class 1259 OID 143981609)
 -- Name: configuration_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1611,7 +1611,7 @@ CREATE SEQUENCE configuration_id_seq
 ALTER TABLE public.configuration_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3299 (class 0 OID 0)
+-- TOC entry 3305 (class 0 OID 0)
 -- Dependencies: 163
 -- Name: configuration_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1620,7 +1620,7 @@ ALTER SEQUENCE configuration_id_seq OWNED BY configuration.id;
 
 
 --
--- TOC entry 3300 (class 0 OID 0)
+-- TOC entry 3306 (class 0 OID 0)
 -- Dependencies: 163
 -- Name: configuration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1629,7 +1629,7 @@ SELECT pg_catalog.setval('configuration_id_seq', 10, true);
 
 
 --
--- TOC entry 164 (class 1259 OID 143882919)
+-- TOC entry 164 (class 1259 OID 143981611)
 -- Name: crf; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1652,7 +1652,7 @@ CREATE TABLE crf (
 ALTER TABLE public.crf OWNER TO clincapture;
 
 --
--- TOC entry 165 (class 1259 OID 143882926)
+-- TOC entry 165 (class 1259 OID 143981618)
 -- Name: crf_crf_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1667,7 +1667,7 @@ CREATE SEQUENCE crf_crf_id_seq
 ALTER TABLE public.crf_crf_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3301 (class 0 OID 0)
+-- TOC entry 3307 (class 0 OID 0)
 -- Dependencies: 165
 -- Name: crf_crf_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1676,16 +1676,16 @@ ALTER SEQUENCE crf_crf_id_seq OWNED BY crf.crf_id;
 
 
 --
--- TOC entry 3302 (class 0 OID 0)
+-- TOC entry 3308 (class 0 OID 0)
 -- Dependencies: 165
 -- Name: crf_crf_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('crf_crf_id_seq', 10, true);
+SELECT pg_catalog.setval('crf_crf_id_seq', 12, true);
 
 
 --
--- TOC entry 166 (class 1259 OID 143882928)
+-- TOC entry 166 (class 1259 OID 143981620)
 -- Name: crf_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1700,7 +1700,7 @@ CREATE SEQUENCE crf_oid_id_seq
 ALTER TABLE public.crf_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3303 (class 0 OID 0)
+-- TOC entry 3309 (class 0 OID 0)
 -- Dependencies: 166
 -- Name: crf_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1709,7 +1709,7 @@ SELECT pg_catalog.setval('crf_oid_id_seq', 1, false);
 
 
 --
--- TOC entry 167 (class 1259 OID 143882930)
+-- TOC entry 167 (class 1259 OID 143981622)
 -- Name: crf_version; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1731,7 +1731,7 @@ CREATE TABLE crf_version (
 ALTER TABLE public.crf_version OWNER TO clincapture;
 
 --
--- TOC entry 168 (class 1259 OID 143882936)
+-- TOC entry 168 (class 1259 OID 143981628)
 -- Name: crf_version_crf_version_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1746,7 +1746,7 @@ CREATE SEQUENCE crf_version_crf_version_id_seq
 ALTER TABLE public.crf_version_crf_version_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3304 (class 0 OID 0)
+-- TOC entry 3310 (class 0 OID 0)
 -- Dependencies: 168
 -- Name: crf_version_crf_version_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1755,16 +1755,16 @@ ALTER SEQUENCE crf_version_crf_version_id_seq OWNED BY crf_version.crf_version_i
 
 
 --
--- TOC entry 3305 (class 0 OID 0)
+-- TOC entry 3311 (class 0 OID 0)
 -- Dependencies: 168
 -- Name: crf_version_crf_version_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('crf_version_crf_version_id_seq', 10, true);
+SELECT pg_catalog.setval('crf_version_crf_version_id_seq', 12, true);
 
 
 --
--- TOC entry 169 (class 1259 OID 143882938)
+-- TOC entry 169 (class 1259 OID 143981630)
 -- Name: crf_version_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1779,7 +1779,7 @@ CREATE SEQUENCE crf_version_oid_id_seq
 ALTER TABLE public.crf_version_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3306 (class 0 OID 0)
+-- TOC entry 3312 (class 0 OID 0)
 -- Dependencies: 169
 -- Name: crf_version_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1788,7 +1788,7 @@ SELECT pg_catalog.setval('crf_version_oid_id_seq', 1, false);
 
 
 --
--- TOC entry 170 (class 1259 OID 143882940)
+-- TOC entry 170 (class 1259 OID 143981632)
 -- Name: crfs_masking; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1807,7 +1807,7 @@ CREATE TABLE crfs_masking (
 ALTER TABLE public.crfs_masking OWNER TO clincapture;
 
 --
--- TOC entry 171 (class 1259 OID 143882944)
+-- TOC entry 171 (class 1259 OID 143981636)
 -- Name: crfs_masking_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1822,7 +1822,7 @@ CREATE SEQUENCE crfs_masking_id_seq
 ALTER TABLE public.crfs_masking_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3307 (class 0 OID 0)
+-- TOC entry 3313 (class 0 OID 0)
 -- Dependencies: 171
 -- Name: crfs_masking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1831,7 +1831,7 @@ ALTER SEQUENCE crfs_masking_id_seq OWNED BY crfs_masking.id;
 
 
 --
--- TOC entry 3308 (class 0 OID 0)
+-- TOC entry 3314 (class 0 OID 0)
 -- Dependencies: 171
 -- Name: crfs_masking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1842,7 +1842,7 @@ SELECT pg_catalog.setval('crfs_masking_id_seq', 1, false);
 SET default_with_oids = false;
 
 --
--- TOC entry 172 (class 1259 OID 143882946)
+-- TOC entry 172 (class 1259 OID 143981638)
 -- Name: databasechangelog; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1866,7 +1866,7 @@ CREATE TABLE databasechangelog (
 ALTER TABLE public.databasechangelog OWNER TO clincapture;
 
 --
--- TOC entry 173 (class 1259 OID 143882952)
+-- TOC entry 173 (class 1259 OID 143981644)
 -- Name: databasechangeloglock; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1883,7 +1883,7 @@ ALTER TABLE public.databasechangeloglock OWNER TO clincapture;
 SET default_with_oids = true;
 
 --
--- TOC entry 174 (class 1259 OID 143882955)
+-- TOC entry 174 (class 1259 OID 143981647)
 -- Name: dataset; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1932,7 +1932,7 @@ CREATE TABLE dataset (
 ALTER TABLE public.dataset OWNER TO clincapture;
 
 --
--- TOC entry 175 (class 1259 OID 143882977)
+-- TOC entry 175 (class 1259 OID 143981669)
 -- Name: dataset_crf_version_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1945,7 +1945,7 @@ CREATE TABLE dataset_crf_version_map (
 ALTER TABLE public.dataset_crf_version_map OWNER TO clincapture;
 
 --
--- TOC entry 176 (class 1259 OID 143882980)
+-- TOC entry 176 (class 1259 OID 143981672)
 -- Name: dataset_dataset_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -1960,7 +1960,7 @@ CREATE SEQUENCE dataset_dataset_id_seq
 ALTER TABLE public.dataset_dataset_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3309 (class 0 OID 0)
+-- TOC entry 3315 (class 0 OID 0)
 -- Dependencies: 176
 -- Name: dataset_dataset_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -1969,7 +1969,7 @@ ALTER SEQUENCE dataset_dataset_id_seq OWNED BY dataset.dataset_id;
 
 
 --
--- TOC entry 3310 (class 0 OID 0)
+-- TOC entry 3316 (class 0 OID 0)
 -- Dependencies: 176
 -- Name: dataset_dataset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -1978,7 +1978,7 @@ SELECT pg_catalog.setval('dataset_dataset_id_seq', 1, false);
 
 
 --
--- TOC entry 177 (class 1259 OID 143882982)
+-- TOC entry 177 (class 1259 OID 143981674)
 -- Name: dataset_item_status; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -1992,7 +1992,7 @@ CREATE TABLE dataset_item_status (
 ALTER TABLE public.dataset_item_status OWNER TO clincapture;
 
 --
--- TOC entry 178 (class 1259 OID 143882985)
+-- TOC entry 178 (class 1259 OID 143981677)
 -- Name: dataset_item_status_dataset_item_status_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2007,7 +2007,7 @@ CREATE SEQUENCE dataset_item_status_dataset_item_status_id_seq
 ALTER TABLE public.dataset_item_status_dataset_item_status_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3311 (class 0 OID 0)
+-- TOC entry 3317 (class 0 OID 0)
 -- Dependencies: 178
 -- Name: dataset_item_status_dataset_item_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2016,7 +2016,7 @@ ALTER SEQUENCE dataset_item_status_dataset_item_status_id_seq OWNED BY dataset_i
 
 
 --
--- TOC entry 3312 (class 0 OID 0)
+-- TOC entry 3318 (class 0 OID 0)
 -- Dependencies: 178
 -- Name: dataset_item_status_dataset_item_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2025,7 +2025,7 @@ SELECT pg_catalog.setval('dataset_item_status_dataset_item_status_id_seq', 1, fa
 
 
 --
--- TOC entry 179 (class 1259 OID 143882987)
+-- TOC entry 179 (class 1259 OID 143981679)
 -- Name: dataset_study_group_class_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2038,7 +2038,7 @@ CREATE TABLE dataset_study_group_class_map (
 ALTER TABLE public.dataset_study_group_class_map OWNER TO clincapture;
 
 --
--- TOC entry 180 (class 1259 OID 143882990)
+-- TOC entry 180 (class 1259 OID 143981682)
 -- Name: dictionary; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2057,7 +2057,7 @@ CREATE TABLE dictionary (
 ALTER TABLE public.dictionary OWNER TO clincapture;
 
 --
--- TOC entry 181 (class 1259 OID 143882996)
+-- TOC entry 181 (class 1259 OID 143981688)
 -- Name: dictionary_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2072,7 +2072,7 @@ CREATE SEQUENCE dictionary_id_seq
 ALTER TABLE public.dictionary_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3313 (class 0 OID 0)
+-- TOC entry 3319 (class 0 OID 0)
 -- Dependencies: 181
 -- Name: dictionary_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2081,7 +2081,7 @@ ALTER SEQUENCE dictionary_id_seq OWNED BY dictionary.id;
 
 
 --
--- TOC entry 3314 (class 0 OID 0)
+-- TOC entry 3320 (class 0 OID 0)
 -- Dependencies: 181
 -- Name: dictionary_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2090,7 +2090,7 @@ SELECT pg_catalog.setval('dictionary_id_seq', 1, true);
 
 
 --
--- TOC entry 182 (class 1259 OID 143882998)
+-- TOC entry 182 (class 1259 OID 143981690)
 -- Name: discrepancy_description; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2108,7 +2108,7 @@ CREATE TABLE discrepancy_description (
 ALTER TABLE public.discrepancy_description OWNER TO clincapture;
 
 --
--- TOC entry 183 (class 1259 OID 143883004)
+-- TOC entry 183 (class 1259 OID 143981696)
 -- Name: discrepancy_description_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2123,7 +2123,7 @@ CREATE SEQUENCE discrepancy_description_id_seq
 ALTER TABLE public.discrepancy_description_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3315 (class 0 OID 0)
+-- TOC entry 3321 (class 0 OID 0)
 -- Dependencies: 183
 -- Name: discrepancy_description_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2132,7 +2132,7 @@ ALTER SEQUENCE discrepancy_description_id_seq OWNED BY discrepancy_description.i
 
 
 --
--- TOC entry 3316 (class 0 OID 0)
+-- TOC entry 3322 (class 0 OID 0)
 -- Dependencies: 183
 -- Name: discrepancy_description_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2141,7 +2141,7 @@ SELECT pg_catalog.setval('discrepancy_description_id_seq', 12, true);
 
 
 --
--- TOC entry 184 (class 1259 OID 143883006)
+-- TOC entry 184 (class 1259 OID 143981698)
 -- Name: discrepancy_note; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2163,7 +2163,7 @@ CREATE TABLE discrepancy_note (
 ALTER TABLE public.discrepancy_note OWNER TO clincapture;
 
 --
--- TOC entry 185 (class 1259 OID 143883012)
+-- TOC entry 185 (class 1259 OID 143981704)
 -- Name: discrepancy_note_discrepancy_note_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2178,7 +2178,7 @@ CREATE SEQUENCE discrepancy_note_discrepancy_note_id_seq
 ALTER TABLE public.discrepancy_note_discrepancy_note_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3317 (class 0 OID 0)
+-- TOC entry 3323 (class 0 OID 0)
 -- Dependencies: 185
 -- Name: discrepancy_note_discrepancy_note_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2187,7 +2187,7 @@ ALTER SEQUENCE discrepancy_note_discrepancy_note_id_seq OWNED BY discrepancy_not
 
 
 --
--- TOC entry 3318 (class 0 OID 0)
+-- TOC entry 3324 (class 0 OID 0)
 -- Dependencies: 185
 -- Name: discrepancy_note_discrepancy_note_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2196,7 +2196,7 @@ SELECT pg_catalog.setval('discrepancy_note_discrepancy_note_id_seq', 1, false);
 
 
 --
--- TOC entry 186 (class 1259 OID 143883014)
+-- TOC entry 186 (class 1259 OID 143981706)
 -- Name: discrepancy_note_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2210,7 +2210,7 @@ CREATE TABLE discrepancy_note_type (
 ALTER TABLE public.discrepancy_note_type OWNER TO clincapture;
 
 --
--- TOC entry 187 (class 1259 OID 143883017)
+-- TOC entry 187 (class 1259 OID 143981709)
 -- Name: discrepancy_note_type_discrepancy_note_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2225,7 +2225,7 @@ CREATE SEQUENCE discrepancy_note_type_discrepancy_note_type_id_seq
 ALTER TABLE public.discrepancy_note_type_discrepancy_note_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3319 (class 0 OID 0)
+-- TOC entry 3325 (class 0 OID 0)
 -- Dependencies: 187
 -- Name: discrepancy_note_type_discrepancy_note_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2234,7 +2234,7 @@ ALTER SEQUENCE discrepancy_note_type_discrepancy_note_type_id_seq OWNED BY discr
 
 
 --
--- TOC entry 3320 (class 0 OID 0)
+-- TOC entry 3326 (class 0 OID 0)
 -- Dependencies: 187
 -- Name: discrepancy_note_type_discrepancy_note_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2243,7 +2243,7 @@ SELECT pg_catalog.setval('discrepancy_note_type_discrepancy_note_type_id_seq', 1
 
 
 --
--- TOC entry 188 (class 1259 OID 143883019)
+-- TOC entry 188 (class 1259 OID 143981711)
 -- Name: dn_age_days; Type: VIEW; Schema: public; Owner: clincapture
 --
 
@@ -2254,7 +2254,7 @@ CREATE VIEW dn_age_days AS
 ALTER TABLE public.dn_age_days OWNER TO clincapture;
 
 --
--- TOC entry 189 (class 1259 OID 143883024)
+-- TOC entry 189 (class 1259 OID 143981716)
 -- Name: dn_event_crf_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2268,7 +2268,7 @@ CREATE TABLE dn_event_crf_map (
 ALTER TABLE public.dn_event_crf_map OWNER TO clincapture;
 
 --
--- TOC entry 190 (class 1259 OID 143883027)
+-- TOC entry 190 (class 1259 OID 143981719)
 -- Name: dn_item_data_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2283,7 +2283,7 @@ CREATE TABLE dn_item_data_map (
 ALTER TABLE public.dn_item_data_map OWNER TO clincapture;
 
 --
--- TOC entry 191 (class 1259 OID 143883030)
+-- TOC entry 191 (class 1259 OID 143981722)
 -- Name: dn_study_event_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2297,7 +2297,7 @@ CREATE TABLE dn_study_event_map (
 ALTER TABLE public.dn_study_event_map OWNER TO clincapture;
 
 --
--- TOC entry 192 (class 1259 OID 143883033)
+-- TOC entry 192 (class 1259 OID 143981725)
 -- Name: dn_study_subject_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2311,7 +2311,7 @@ CREATE TABLE dn_study_subject_map (
 ALTER TABLE public.dn_study_subject_map OWNER TO clincapture;
 
 --
--- TOC entry 193 (class 1259 OID 143883036)
+-- TOC entry 193 (class 1259 OID 143981728)
 -- Name: dn_subject_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2325,7 +2325,7 @@ CREATE TABLE dn_subject_map (
 ALTER TABLE public.dn_subject_map OWNER TO clincapture;
 
 --
--- TOC entry 194 (class 1259 OID 143883039)
+-- TOC entry 194 (class 1259 OID 143981731)
 -- Name: dyn_item_form_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2345,7 +2345,7 @@ CREATE TABLE dyn_item_form_metadata (
 ALTER TABLE public.dyn_item_form_metadata OWNER TO clincapture;
 
 --
--- TOC entry 195 (class 1259 OID 143883044)
+-- TOC entry 195 (class 1259 OID 143981736)
 -- Name: dyn_item_form_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2360,7 +2360,7 @@ CREATE SEQUENCE dyn_item_form_metadata_id_seq
 ALTER TABLE public.dyn_item_form_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3321 (class 0 OID 0)
+-- TOC entry 3327 (class 0 OID 0)
 -- Dependencies: 195
 -- Name: dyn_item_form_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2369,7 +2369,7 @@ ALTER SEQUENCE dyn_item_form_metadata_id_seq OWNED BY dyn_item_form_metadata.id;
 
 
 --
--- TOC entry 3322 (class 0 OID 0)
+-- TOC entry 3328 (class 0 OID 0)
 -- Dependencies: 195
 -- Name: dyn_item_form_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2378,7 +2378,7 @@ SELECT pg_catalog.setval('dyn_item_form_metadata_id_seq', 1, false);
 
 
 --
--- TOC entry 196 (class 1259 OID 143883046)
+-- TOC entry 196 (class 1259 OID 143981738)
 -- Name: dyn_item_group_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2396,7 +2396,7 @@ CREATE TABLE dyn_item_group_metadata (
 ALTER TABLE public.dyn_item_group_metadata OWNER TO clincapture;
 
 --
--- TOC entry 197 (class 1259 OID 143883051)
+-- TOC entry 197 (class 1259 OID 143981743)
 -- Name: dyn_item_group_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2411,7 +2411,7 @@ CREATE SEQUENCE dyn_item_group_metadata_id_seq
 ALTER TABLE public.dyn_item_group_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3323 (class 0 OID 0)
+-- TOC entry 3329 (class 0 OID 0)
 -- Dependencies: 197
 -- Name: dyn_item_group_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2420,7 +2420,7 @@ ALTER SEQUENCE dyn_item_group_metadata_id_seq OWNED BY dyn_item_group_metadata.i
 
 
 --
--- TOC entry 3324 (class 0 OID 0)
+-- TOC entry 3330 (class 0 OID 0)
 -- Dependencies: 197
 -- Name: dyn_item_group_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2429,7 +2429,7 @@ SELECT pg_catalog.setval('dyn_item_group_metadata_id_seq', 1, false);
 
 
 --
--- TOC entry 198 (class 1259 OID 143883053)
+-- TOC entry 198 (class 1259 OID 143981745)
 -- Name: dynamic_event; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2451,7 +2451,7 @@ CREATE TABLE dynamic_event (
 ALTER TABLE public.dynamic_event OWNER TO clincapture;
 
 --
--- TOC entry 199 (class 1259 OID 143883059)
+-- TOC entry 199 (class 1259 OID 143981751)
 -- Name: dynamic_event_dynamic_event_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2466,7 +2466,7 @@ CREATE SEQUENCE dynamic_event_dynamic_event_id_seq
 ALTER TABLE public.dynamic_event_dynamic_event_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3325 (class 0 OID 0)
+-- TOC entry 3331 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: dynamic_event_dynamic_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2475,7 +2475,7 @@ ALTER SEQUENCE dynamic_event_dynamic_event_id_seq OWNED BY dynamic_event.dynamic
 
 
 --
--- TOC entry 3326 (class 0 OID 0)
+-- TOC entry 3332 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: dynamic_event_dynamic_event_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2484,7 +2484,7 @@ SELECT pg_catalog.setval('dynamic_event_dynamic_event_id_seq', 1, false);
 
 
 --
--- TOC entry 200 (class 1259 OID 143883061)
+-- TOC entry 200 (class 1259 OID 143981753)
 -- Name: edc_item_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2502,7 +2502,7 @@ CREATE TABLE edc_item_metadata (
 ALTER TABLE public.edc_item_metadata OWNER TO clincapture;
 
 --
--- TOC entry 201 (class 1259 OID 143883065)
+-- TOC entry 201 (class 1259 OID 143981757)
 -- Name: edc_item_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2517,7 +2517,7 @@ CREATE SEQUENCE edc_item_metadata_id_seq
 ALTER TABLE public.edc_item_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3327 (class 0 OID 0)
+-- TOC entry 3333 (class 0 OID 0)
 -- Dependencies: 201
 -- Name: edc_item_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
@@ -2526,7 +2526,7 @@ ALTER SEQUENCE edc_item_metadata_id_seq OWNED BY edc_item_metadata.id;
 
 
 --
--- TOC entry 3328 (class 0 OID 0)
+-- TOC entry 3334 (class 0 OID 0)
 -- Dependencies: 201
 -- Name: edc_item_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
@@ -2534,8 +2534,10 @@ ALTER SEQUENCE edc_item_metadata_id_seq OWNED BY edc_item_metadata.id;
 SELECT pg_catalog.setval('edc_item_metadata_id_seq', 1, false);
 
 
+SET default_with_oids = false;
+
 --
--- TOC entry 202 (class 1259 OID 143883067)
+-- TOC entry 338 (class 1259 OID 143984369)
 -- Name: email_log; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2563,7 +2565,7 @@ CREATE TABLE email_log (
 ALTER TABLE public.email_log OWNER TO clincapture;
 
 --
--- TOC entry 203 (class 1259 OID 143883073)
+-- TOC entry 337 (class 1259 OID 143984367)
 -- Name: email_log_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2578,8 +2580,8 @@ CREATE SEQUENCE email_log_id_seq
 ALTER TABLE public.email_log_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3329 (class 0 OID 0)
--- Dependencies: 203
+-- TOC entry 3335 (class 0 OID 0)
+-- Dependencies: 337
 -- Name: email_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2587,16 +2589,18 @@ ALTER SEQUENCE email_log_id_seq OWNED BY email_log.id;
 
 
 --
--- TOC entry 3330 (class 0 OID 0)
--- Dependencies: 203
+-- TOC entry 3336 (class 0 OID 0)
+-- Dependencies: 337
 -- Name: email_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
 SELECT pg_catalog.setval('email_log_id_seq', 1, false);
 
 
+SET default_with_oids = true;
+
 --
--- TOC entry 204 (class 1259 OID 143883075)
+-- TOC entry 202 (class 1259 OID 143981759)
 -- Name: event_crf; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2632,7 +2636,7 @@ CREATE TABLE event_crf (
 ALTER TABLE public.event_crf OWNER TO clincapture;
 
 --
--- TOC entry 205 (class 1259 OID 143883087)
+-- TOC entry 203 (class 1259 OID 143981771)
 -- Name: event_crf_event_crf_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2647,8 +2651,8 @@ CREATE SEQUENCE event_crf_event_crf_id_seq
 ALTER TABLE public.event_crf_event_crf_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3331 (class 0 OID 0)
--- Dependencies: 205
+-- TOC entry 3337 (class 0 OID 0)
+-- Dependencies: 203
 -- Name: event_crf_event_crf_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2656,8 +2660,8 @@ ALTER SEQUENCE event_crf_event_crf_id_seq OWNED BY event_crf.event_crf_id;
 
 
 --
--- TOC entry 3332 (class 0 OID 0)
--- Dependencies: 205
+-- TOC entry 3338 (class 0 OID 0)
+-- Dependencies: 203
 -- Name: event_crf_event_crf_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -2665,7 +2669,7 @@ SELECT pg_catalog.setval('event_crf_event_crf_id_seq', 3, true);
 
 
 --
--- TOC entry 206 (class 1259 OID 143883089)
+-- TOC entry 204 (class 1259 OID 143981773)
 -- Name: event_crf_section; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2681,7 +2685,7 @@ CREATE TABLE event_crf_section (
 ALTER TABLE public.event_crf_section OWNER TO clincapture;
 
 --
--- TOC entry 207 (class 1259 OID 143883092)
+-- TOC entry 205 (class 1259 OID 143981776)
 -- Name: event_crf_section_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2696,8 +2700,8 @@ CREATE SEQUENCE event_crf_section_id_seq
 ALTER TABLE public.event_crf_section_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3333 (class 0 OID 0)
--- Dependencies: 207
+-- TOC entry 3339 (class 0 OID 0)
+-- Dependencies: 205
 -- Name: event_crf_section_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2705,8 +2709,8 @@ ALTER SEQUENCE event_crf_section_id_seq OWNED BY event_crf_section.id;
 
 
 --
--- TOC entry 3334 (class 0 OID 0)
--- Dependencies: 207
+-- TOC entry 3340 (class 0 OID 0)
+-- Dependencies: 205
 -- Name: event_crf_section_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -2714,7 +2718,7 @@ SELECT pg_catalog.setval('event_crf_section_id_seq', 1, false);
 
 
 --
--- TOC entry 208 (class 1259 OID 143883094)
+-- TOC entry 206 (class 1259 OID 143981778)
 -- Name: event_definition_crf; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2751,7 +2755,7 @@ CREATE TABLE event_definition_crf (
 ALTER TABLE public.event_definition_crf OWNER TO clincapture;
 
 --
--- TOC entry 209 (class 1259 OID 143883105)
+-- TOC entry 207 (class 1259 OID 143981789)
 -- Name: event_definition_crf_event_definition_crf_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2766,8 +2770,8 @@ CREATE SEQUENCE event_definition_crf_event_definition_crf_id_seq
 ALTER TABLE public.event_definition_crf_event_definition_crf_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3335 (class 0 OID 0)
--- Dependencies: 209
+-- TOC entry 3341 (class 0 OID 0)
+-- Dependencies: 207
 -- Name: event_definition_crf_event_definition_crf_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2775,16 +2779,16 @@ ALTER SEQUENCE event_definition_crf_event_definition_crf_id_seq OWNED BY event_d
 
 
 --
--- TOC entry 3336 (class 0 OID 0)
--- Dependencies: 209
+-- TOC entry 3342 (class 0 OID 0)
+-- Dependencies: 207
 -- Name: event_definition_crf_event_definition_crf_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('event_definition_crf_event_definition_crf_id_seq', 24, true);
+SELECT pg_catalog.setval('event_definition_crf_event_definition_crf_id_seq', 30, true);
 
 
 --
--- TOC entry 210 (class 1259 OID 143883107)
+-- TOC entry 208 (class 1259 OID 143981791)
 -- Name: export_format; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2799,7 +2803,7 @@ CREATE TABLE export_format (
 ALTER TABLE public.export_format OWNER TO clincapture;
 
 --
--- TOC entry 211 (class 1259 OID 143883113)
+-- TOC entry 209 (class 1259 OID 143981797)
 -- Name: export_format_export_format_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2814,8 +2818,8 @@ CREATE SEQUENCE export_format_export_format_id_seq
 ALTER TABLE public.export_format_export_format_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3337 (class 0 OID 0)
--- Dependencies: 211
+-- TOC entry 3343 (class 0 OID 0)
+-- Dependencies: 209
 -- Name: export_format_export_format_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2823,8 +2827,8 @@ ALTER SEQUENCE export_format_export_format_id_seq OWNED BY export_format.export_
 
 
 --
--- TOC entry 3338 (class 0 OID 0)
--- Dependencies: 211
+-- TOC entry 3344 (class 0 OID 0)
+-- Dependencies: 209
 -- Name: export_format_export_format_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -2832,7 +2836,7 @@ SELECT pg_catalog.setval('export_format_export_format_id_seq', 1, false);
 
 
 --
--- TOC entry 212 (class 1259 OID 143883115)
+-- TOC entry 210 (class 1259 OID 143981799)
 -- Name: generic_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2847,8 +2851,8 @@ CREATE SEQUENCE generic_oid_id_seq
 ALTER TABLE public.generic_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3339 (class 0 OID 0)
--- Dependencies: 212
+-- TOC entry 3345 (class 0 OID 0)
+-- Dependencies: 210
 -- Name: generic_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -2856,7 +2860,7 @@ SELECT pg_catalog.setval('generic_oid_id_seq', 1, false);
 
 
 --
--- TOC entry 213 (class 1259 OID 143883117)
+-- TOC entry 211 (class 1259 OID 143981801)
 -- Name: group_class_types; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2870,7 +2874,7 @@ CREATE TABLE group_class_types (
 ALTER TABLE public.group_class_types OWNER TO clincapture;
 
 --
--- TOC entry 214 (class 1259 OID 143883123)
+-- TOC entry 212 (class 1259 OID 143981807)
 -- Name: group_class_types_group_class_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2885,8 +2889,8 @@ CREATE SEQUENCE group_class_types_group_class_type_id_seq
 ALTER TABLE public.group_class_types_group_class_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3340 (class 0 OID 0)
--- Dependencies: 214
+-- TOC entry 3346 (class 0 OID 0)
+-- Dependencies: 212
 -- Name: group_class_types_group_class_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2894,8 +2898,8 @@ ALTER SEQUENCE group_class_types_group_class_type_id_seq OWNED BY group_class_ty
 
 
 --
--- TOC entry 3341 (class 0 OID 0)
--- Dependencies: 214
+-- TOC entry 3347 (class 0 OID 0)
+-- Dependencies: 212
 -- Name: group_class_types_group_class_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -2903,7 +2907,7 @@ SELECT pg_catalog.setval('group_class_types_group_class_type_id_seq', 1, false);
 
 
 --
--- TOC entry 215 (class 1259 OID 143883125)
+-- TOC entry 213 (class 1259 OID 143981809)
 -- Name: item; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2928,7 +2932,7 @@ CREATE TABLE item (
 ALTER TABLE public.item OWNER TO clincapture;
 
 --
--- TOC entry 216 (class 1259 OID 143883131)
+-- TOC entry 214 (class 1259 OID 143981815)
 -- Name: item_data; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -2952,7 +2956,7 @@ CREATE TABLE item_data (
 ALTER TABLE public.item_data OWNER TO clincapture;
 
 --
--- TOC entry 217 (class 1259 OID 143883138)
+-- TOC entry 215 (class 1259 OID 143981822)
 -- Name: item_data_item_data_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -2967,8 +2971,8 @@ CREATE SEQUENCE item_data_item_data_id_seq
 ALTER TABLE public.item_data_item_data_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3342 (class 0 OID 0)
--- Dependencies: 217
+-- TOC entry 3348 (class 0 OID 0)
+-- Dependencies: 215
 -- Name: item_data_item_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -2976,8 +2980,8 @@ ALTER SEQUENCE item_data_item_data_id_seq OWNED BY item_data.item_data_id;
 
 
 --
--- TOC entry 3343 (class 0 OID 0)
--- Dependencies: 217
+-- TOC entry 3349 (class 0 OID 0)
+-- Dependencies: 215
 -- Name: item_data_item_data_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -2985,7 +2989,7 @@ SELECT pg_catalog.setval('item_data_item_data_id_seq', 1, false);
 
 
 --
--- TOC entry 218 (class 1259 OID 143883140)
+-- TOC entry 216 (class 1259 OID 143981824)
 -- Name: item_data_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3001,7 +3005,7 @@ CREATE TABLE item_data_type (
 ALTER TABLE public.item_data_type OWNER TO clincapture;
 
 --
--- TOC entry 219 (class 1259 OID 143883146)
+-- TOC entry 217 (class 1259 OID 143981830)
 -- Name: item_data_type_item_data_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3016,8 +3020,8 @@ CREATE SEQUENCE item_data_type_item_data_type_id_seq
 ALTER TABLE public.item_data_type_item_data_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3344 (class 0 OID 0)
--- Dependencies: 219
+-- TOC entry 3350 (class 0 OID 0)
+-- Dependencies: 217
 -- Name: item_data_type_item_data_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3025,8 +3029,8 @@ ALTER SEQUENCE item_data_type_item_data_type_id_seq OWNED BY item_data_type.item
 
 
 --
--- TOC entry 3345 (class 0 OID 0)
--- Dependencies: 219
+-- TOC entry 3351 (class 0 OID 0)
+-- Dependencies: 217
 -- Name: item_data_type_item_data_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3034,7 +3038,7 @@ SELECT pg_catalog.setval('item_data_type_item_data_type_id_seq', 1, false);
 
 
 --
--- TOC entry 220 (class 1259 OID 143883148)
+-- TOC entry 218 (class 1259 OID 143981832)
 -- Name: item_form_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3069,7 +3073,7 @@ CREATE TABLE item_form_metadata (
 ALTER TABLE public.item_form_metadata OWNER TO clincapture;
 
 --
--- TOC entry 221 (class 1259 OID 143883156)
+-- TOC entry 219 (class 1259 OID 143981840)
 -- Name: item_form_metadata_item_form_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3084,8 +3088,8 @@ CREATE SEQUENCE item_form_metadata_item_form_metadata_id_seq
 ALTER TABLE public.item_form_metadata_item_form_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3346 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 3352 (class 0 OID 0)
+-- Dependencies: 219
 -- Name: item_form_metadata_item_form_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3093,16 +3097,16 @@ ALTER SEQUENCE item_form_metadata_item_form_metadata_id_seq OWNED BY item_form_m
 
 
 --
--- TOC entry 3347 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 3353 (class 0 OID 0)
+-- Dependencies: 219
 -- Name: item_form_metadata_item_form_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('item_form_metadata_item_form_metadata_id_seq', 56, true);
+SELECT pg_catalog.setval('item_form_metadata_item_form_metadata_id_seq', 78, true);
 
 
 --
--- TOC entry 222 (class 1259 OID 143883158)
+-- TOC entry 220 (class 1259 OID 143981842)
 -- Name: item_group; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3122,7 +3126,7 @@ CREATE TABLE item_group (
 ALTER TABLE public.item_group OWNER TO clincapture;
 
 --
--- TOC entry 223 (class 1259 OID 143883161)
+-- TOC entry 221 (class 1259 OID 143981845)
 -- Name: item_group_item_group_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3137,8 +3141,8 @@ CREATE SEQUENCE item_group_item_group_id_seq
 ALTER TABLE public.item_group_item_group_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3348 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 3354 (class 0 OID 0)
+-- Dependencies: 221
 -- Name: item_group_item_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3146,16 +3150,16 @@ ALTER SEQUENCE item_group_item_group_id_seq OWNED BY item_group.item_group_id;
 
 
 --
--- TOC entry 3349 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 3355 (class 0 OID 0)
+-- Dependencies: 221
 -- Name: item_group_item_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('item_group_item_group_id_seq', 14, true);
+SELECT pg_catalog.setval('item_group_item_group_id_seq', 17, true);
 
 
 --
--- TOC entry 224 (class 1259 OID 143883163)
+-- TOC entry 222 (class 1259 OID 143981847)
 -- Name: item_group_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3181,7 +3185,7 @@ CREATE TABLE item_group_metadata (
 ALTER TABLE public.item_group_metadata OWNER TO clincapture;
 
 --
--- TOC entry 225 (class 1259 OID 143883171)
+-- TOC entry 223 (class 1259 OID 143981855)
 -- Name: item_group_metadata_item_group_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3196,8 +3200,8 @@ CREATE SEQUENCE item_group_metadata_item_group_metadata_id_seq
 ALTER TABLE public.item_group_metadata_item_group_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3350 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 3356 (class 0 OID 0)
+-- Dependencies: 223
 -- Name: item_group_metadata_item_group_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3205,16 +3209,16 @@ ALTER SEQUENCE item_group_metadata_item_group_metadata_id_seq OWNED BY item_grou
 
 
 --
--- TOC entry 3351 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 3357 (class 0 OID 0)
+-- Dependencies: 223
 -- Name: item_group_metadata_item_group_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('item_group_metadata_item_group_metadata_id_seq', 56, true);
+SELECT pg_catalog.setval('item_group_metadata_item_group_metadata_id_seq', 78, true);
 
 
 --
--- TOC entry 226 (class 1259 OID 143883173)
+-- TOC entry 224 (class 1259 OID 143981857)
 -- Name: item_group_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3229,16 +3233,16 @@ CREATE SEQUENCE item_group_oid_id_seq
 ALTER TABLE public.item_group_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3352 (class 0 OID 0)
--- Dependencies: 226
+-- TOC entry 3358 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: item_group_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('item_group_oid_id_seq', 5, true);
+SELECT pg_catalog.setval('item_group_oid_id_seq', 7, true);
 
 
 --
--- TOC entry 227 (class 1259 OID 143883175)
+-- TOC entry 225 (class 1259 OID 143981859)
 -- Name: item_item_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3253,8 +3257,8 @@ CREATE SEQUENCE item_item_id_seq
 ALTER TABLE public.item_item_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3353 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 3359 (class 0 OID 0)
+-- Dependencies: 225
 -- Name: item_item_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3262,16 +3266,16 @@ ALTER SEQUENCE item_item_id_seq OWNED BY item.item_id;
 
 
 --
--- TOC entry 3354 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 3360 (class 0 OID 0)
+-- Dependencies: 225
 -- Name: item_item_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('item_item_id_seq', 56, true);
+SELECT pg_catalog.setval('item_item_id_seq', 78, true);
 
 
 --
--- TOC entry 228 (class 1259 OID 143883177)
+-- TOC entry 226 (class 1259 OID 143981861)
 -- Name: item_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3286,8 +3290,8 @@ CREATE SEQUENCE item_oid_id_seq
 ALTER TABLE public.item_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3355 (class 0 OID 0)
--- Dependencies: 228
+-- TOC entry 3361 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: item_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3295,7 +3299,7 @@ SELECT pg_catalog.setval('item_oid_id_seq', 1, false);
 
 
 --
--- TOC entry 229 (class 1259 OID 143883179)
+-- TOC entry 227 (class 1259 OID 143981863)
 -- Name: item_reference_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3309,7 +3313,7 @@ CREATE TABLE item_reference_type (
 ALTER TABLE public.item_reference_type OWNER TO clincapture;
 
 --
--- TOC entry 230 (class 1259 OID 143883185)
+-- TOC entry 228 (class 1259 OID 143981869)
 -- Name: item_reference_type_item_reference_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3324,8 +3328,8 @@ CREATE SEQUENCE item_reference_type_item_reference_type_id_seq
 ALTER TABLE public.item_reference_type_item_reference_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3356 (class 0 OID 0)
--- Dependencies: 230
+-- TOC entry 3362 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: item_reference_type_item_reference_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3333,8 +3337,8 @@ ALTER SEQUENCE item_reference_type_item_reference_type_id_seq OWNED BY item_refe
 
 
 --
--- TOC entry 3357 (class 0 OID 0)
--- Dependencies: 230
+-- TOC entry 3363 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: item_reference_type_item_reference_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3342,7 +3346,7 @@ SELECT pg_catalog.setval('item_reference_type_item_reference_type_id_seq', 1, fa
 
 
 --
--- TOC entry 231 (class 1259 OID 143883187)
+-- TOC entry 229 (class 1259 OID 143981871)
 -- Name: item_render_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3359,7 +3363,7 @@ CREATE TABLE item_render_metadata (
 ALTER TABLE public.item_render_metadata OWNER TO clincapture;
 
 --
--- TOC entry 232 (class 1259 OID 143883190)
+-- TOC entry 230 (class 1259 OID 143981874)
 -- Name: item_render_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3374,8 +3378,8 @@ CREATE SEQUENCE item_render_metadata_id_seq
 ALTER TABLE public.item_render_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3358 (class 0 OID 0)
--- Dependencies: 232
+-- TOC entry 3364 (class 0 OID 0)
+-- Dependencies: 230
 -- Name: item_render_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3383,8 +3387,8 @@ ALTER SEQUENCE item_render_metadata_id_seq OWNED BY item_render_metadata.id;
 
 
 --
--- TOC entry 3359 (class 0 OID 0)
--- Dependencies: 232
+-- TOC entry 3365 (class 0 OID 0)
+-- Dependencies: 230
 -- Name: item_render_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3392,7 +3396,7 @@ SELECT pg_catalog.setval('item_render_metadata_id_seq', 1, false);
 
 
 --
--- TOC entry 233 (class 1259 OID 143883192)
+-- TOC entry 231 (class 1259 OID 143981876)
 -- Name: measurement_unit; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3408,7 +3412,7 @@ CREATE TABLE measurement_unit (
 ALTER TABLE public.measurement_unit OWNER TO clincapture;
 
 --
--- TOC entry 234 (class 1259 OID 143883195)
+-- TOC entry 232 (class 1259 OID 143981879)
 -- Name: measurement_unit_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3423,8 +3427,8 @@ CREATE SEQUENCE measurement_unit_id_seq
 ALTER TABLE public.measurement_unit_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3360 (class 0 OID 0)
--- Dependencies: 234
+-- TOC entry 3366 (class 0 OID 0)
+-- Dependencies: 232
 -- Name: measurement_unit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3432,16 +3436,16 @@ ALTER SEQUENCE measurement_unit_id_seq OWNED BY measurement_unit.id;
 
 
 --
--- TOC entry 3361 (class 0 OID 0)
--- Dependencies: 234
+-- TOC entry 3367 (class 0 OID 0)
+-- Dependencies: 232
 -- Name: measurement_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('measurement_unit_id_seq', 2, true);
+SELECT pg_catalog.setval('measurement_unit_id_seq', 3, true);
 
 
 --
--- TOC entry 235 (class 1259 OID 143883197)
+-- TOC entry 233 (class 1259 OID 143981881)
 -- Name: measurement_unit_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3456,16 +3460,16 @@ CREATE SEQUENCE measurement_unit_oid_id_seq
 ALTER TABLE public.measurement_unit_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3362 (class 0 OID 0)
--- Dependencies: 235
+-- TOC entry 3368 (class 0 OID 0)
+-- Dependencies: 233
 -- Name: measurement_unit_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('measurement_unit_oid_id_seq', 1, false);
+SELECT pg_catalog.setval('measurement_unit_oid_id_seq', 1, true);
 
 
 --
--- TOC entry 236 (class 1259 OID 143883199)
+-- TOC entry 234 (class 1259 OID 143981883)
 -- Name: null_value_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3481,7 +3485,7 @@ CREATE TABLE null_value_type (
 ALTER TABLE public.null_value_type OWNER TO clincapture;
 
 --
--- TOC entry 237 (class 1259 OID 143883205)
+-- TOC entry 235 (class 1259 OID 143981889)
 -- Name: null_value_type_null_value_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3496,8 +3500,8 @@ CREATE SEQUENCE null_value_type_null_value_type_id_seq
 ALTER TABLE public.null_value_type_null_value_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3363 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 3369 (class 0 OID 0)
+-- Dependencies: 235
 -- Name: null_value_type_null_value_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3505,8 +3509,8 @@ ALTER SEQUENCE null_value_type_null_value_type_id_seq OWNED BY null_value_type.n
 
 
 --
--- TOC entry 3364 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 3370 (class 0 OID 0)
+-- Dependencies: 235
 -- Name: null_value_type_null_value_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3514,7 +3518,7 @@ SELECT pg_catalog.setval('null_value_type_null_value_type_id_seq', 1, false);
 
 
 --
--- TOC entry 238 (class 1259 OID 143883207)
+-- TOC entry 236 (class 1259 OID 143981891)
 -- Name: oc_qrtz_blob_triggers; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3529,7 +3533,7 @@ CREATE TABLE oc_qrtz_blob_triggers (
 ALTER TABLE public.oc_qrtz_blob_triggers OWNER TO clincapture;
 
 --
--- TOC entry 239 (class 1259 OID 143883214)
+-- TOC entry 237 (class 1259 OID 143981898)
 -- Name: oc_qrtz_calendars; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3543,7 +3547,7 @@ CREATE TABLE oc_qrtz_calendars (
 ALTER TABLE public.oc_qrtz_calendars OWNER TO clincapture;
 
 --
--- TOC entry 240 (class 1259 OID 143883221)
+-- TOC entry 238 (class 1259 OID 143981905)
 -- Name: oc_qrtz_cron_triggers; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3559,7 +3563,7 @@ CREATE TABLE oc_qrtz_cron_triggers (
 ALTER TABLE public.oc_qrtz_cron_triggers OWNER TO clincapture;
 
 --
--- TOC entry 241 (class 1259 OID 143883228)
+-- TOC entry 239 (class 1259 OID 143981912)
 -- Name: oc_qrtz_fired_triggers; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3583,7 +3587,7 @@ CREATE TABLE oc_qrtz_fired_triggers (
 ALTER TABLE public.oc_qrtz_fired_triggers OWNER TO clincapture;
 
 --
--- TOC entry 242 (class 1259 OID 143883235)
+-- TOC entry 240 (class 1259 OID 143981919)
 -- Name: oc_qrtz_job_details; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3604,7 +3608,7 @@ CREATE TABLE oc_qrtz_job_details (
 ALTER TABLE public.oc_qrtz_job_details OWNER TO clincapture;
 
 --
--- TOC entry 243 (class 1259 OID 143883242)
+-- TOC entry 241 (class 1259 OID 143981926)
 -- Name: oc_qrtz_locks; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3617,7 +3621,7 @@ CREATE TABLE oc_qrtz_locks (
 ALTER TABLE public.oc_qrtz_locks OWNER TO clincapture;
 
 --
--- TOC entry 244 (class 1259 OID 143883246)
+-- TOC entry 242 (class 1259 OID 143981930)
 -- Name: oc_qrtz_paused_trigger_grps; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3630,7 +3634,7 @@ CREATE TABLE oc_qrtz_paused_trigger_grps (
 ALTER TABLE public.oc_qrtz_paused_trigger_grps OWNER TO clincapture;
 
 --
--- TOC entry 245 (class 1259 OID 143883250)
+-- TOC entry 243 (class 1259 OID 143981934)
 -- Name: oc_qrtz_scheduler_state; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3645,7 +3649,7 @@ CREATE TABLE oc_qrtz_scheduler_state (
 ALTER TABLE public.oc_qrtz_scheduler_state OWNER TO clincapture;
 
 --
--- TOC entry 246 (class 1259 OID 143883254)
+-- TOC entry 244 (class 1259 OID 143981938)
 -- Name: oc_qrtz_simple_triggers; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3662,7 +3666,7 @@ CREATE TABLE oc_qrtz_simple_triggers (
 ALTER TABLE public.oc_qrtz_simple_triggers OWNER TO clincapture;
 
 --
--- TOC entry 247 (class 1259 OID 143883261)
+-- TOC entry 245 (class 1259 OID 143981945)
 -- Name: oc_qrtz_simprop_triggers; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3687,7 +3691,7 @@ CREATE TABLE oc_qrtz_simprop_triggers (
 ALTER TABLE public.oc_qrtz_simprop_triggers OWNER TO clincapture;
 
 --
--- TOC entry 248 (class 1259 OID 143883267)
+-- TOC entry 246 (class 1259 OID 143981951)
 -- Name: oc_qrtz_triggers; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3714,7 +3718,7 @@ CREATE TABLE oc_qrtz_triggers (
 ALTER TABLE public.oc_qrtz_triggers OWNER TO clincapture;
 
 --
--- TOC entry 249 (class 1259 OID 143883274)
+-- TOC entry 247 (class 1259 OID 143981958)
 -- Name: openclinica_version; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3730,7 +3734,7 @@ CREATE TABLE openclinica_version (
 ALTER TABLE public.openclinica_version OWNER TO clincapture;
 
 --
--- TOC entry 250 (class 1259 OID 143883280)
+-- TOC entry 248 (class 1259 OID 143981964)
 -- Name: openclinica_version_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3745,8 +3749,8 @@ CREATE SEQUENCE openclinica_version_id_seq
 ALTER TABLE public.openclinica_version_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3365 (class 0 OID 0)
--- Dependencies: 250
+-- TOC entry 3371 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: openclinica_version_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3754,16 +3758,16 @@ ALTER SEQUENCE openclinica_version_id_seq OWNED BY openclinica_version.id;
 
 
 --
--- TOC entry 3366 (class 0 OID 0)
--- Dependencies: 250
+-- TOC entry 3372 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: openclinica_version_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('openclinica_version_id_seq', 7, true);
+SELECT pg_catalog.setval('openclinica_version_id_seq', 8, true);
 
 
 --
--- TOC entry 251 (class 1259 OID 143883282)
+-- TOC entry 249 (class 1259 OID 143981966)
 -- Name: password; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3780,7 +3784,7 @@ CREATE TABLE password (
 ALTER TABLE public.password OWNER TO clincapture;
 
 --
--- TOC entry 252 (class 1259 OID 143883288)
+-- TOC entry 250 (class 1259 OID 143981972)
 -- Name: password_passwd_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3795,8 +3799,8 @@ CREATE SEQUENCE password_passwd_id_seq
 ALTER TABLE public.password_passwd_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3367 (class 0 OID 0)
--- Dependencies: 252
+-- TOC entry 3373 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: password_passwd_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3804,8 +3808,8 @@ ALTER SEQUENCE password_passwd_id_seq OWNED BY password.passwd_id;
 
 
 --
--- TOC entry 3368 (class 0 OID 0)
--- Dependencies: 252
+-- TOC entry 3374 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: password_passwd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3813,7 +3817,7 @@ SELECT pg_catalog.setval('password_passwd_id_seq', 8, true);
 
 
 --
--- TOC entry 253 (class 1259 OID 143883290)
+-- TOC entry 251 (class 1259 OID 143981974)
 -- Name: resolution_status; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3827,7 +3831,7 @@ CREATE TABLE resolution_status (
 ALTER TABLE public.resolution_status OWNER TO clincapture;
 
 --
--- TOC entry 254 (class 1259 OID 143883293)
+-- TOC entry 252 (class 1259 OID 143981977)
 -- Name: resolution_status_resolution_status_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3842,8 +3846,8 @@ CREATE SEQUENCE resolution_status_resolution_status_id_seq
 ALTER TABLE public.resolution_status_resolution_status_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3369 (class 0 OID 0)
--- Dependencies: 254
+-- TOC entry 3375 (class 0 OID 0)
+-- Dependencies: 252
 -- Name: resolution_status_resolution_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3851,8 +3855,8 @@ ALTER SEQUENCE resolution_status_resolution_status_id_seq OWNED BY resolution_st
 
 
 --
--- TOC entry 3370 (class 0 OID 0)
--- Dependencies: 254
+-- TOC entry 3376 (class 0 OID 0)
+-- Dependencies: 252
 -- Name: resolution_status_resolution_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3860,7 +3864,7 @@ SELECT pg_catalog.setval('resolution_status_resolution_status_id_seq', 1, false)
 
 
 --
--- TOC entry 255 (class 1259 OID 143883295)
+-- TOC entry 253 (class 1259 OID 143981979)
 -- Name: response_set; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3877,7 +3881,7 @@ CREATE TABLE response_set (
 ALTER TABLE public.response_set OWNER TO clincapture;
 
 --
--- TOC entry 256 (class 1259 OID 143883301)
+-- TOC entry 254 (class 1259 OID 143981985)
 -- Name: response_set_response_set_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3892,8 +3896,8 @@ CREATE SEQUENCE response_set_response_set_id_seq
 ALTER TABLE public.response_set_response_set_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3371 (class 0 OID 0)
--- Dependencies: 256
+-- TOC entry 3377 (class 0 OID 0)
+-- Dependencies: 254
 -- Name: response_set_response_set_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3901,16 +3905,16 @@ ALTER SEQUENCE response_set_response_set_id_seq OWNED BY response_set.response_s
 
 
 --
--- TOC entry 3372 (class 0 OID 0)
--- Dependencies: 256
+-- TOC entry 3378 (class 0 OID 0)
+-- Dependencies: 254
 -- Name: response_set_response_set_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('response_set_response_set_id_seq', 36, true);
+SELECT pg_catalog.setval('response_set_response_set_id_seq', 48, true);
 
 
 --
--- TOC entry 257 (class 1259 OID 143883303)
+-- TOC entry 255 (class 1259 OID 143981987)
 -- Name: response_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3924,7 +3928,7 @@ CREATE TABLE response_type (
 ALTER TABLE public.response_type OWNER TO clincapture;
 
 --
--- TOC entry 258 (class 1259 OID 143883309)
+-- TOC entry 256 (class 1259 OID 143981993)
 -- Name: response_type_response_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -3939,8 +3943,8 @@ CREATE SEQUENCE response_type_response_type_id_seq
 ALTER TABLE public.response_type_response_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3373 (class 0 OID 0)
--- Dependencies: 258
+-- TOC entry 3379 (class 0 OID 0)
+-- Dependencies: 256
 -- Name: response_type_response_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -3948,8 +3952,8 @@ ALTER SEQUENCE response_type_response_type_id_seq OWNED BY response_type.respons
 
 
 --
--- TOC entry 3374 (class 0 OID 0)
--- Dependencies: 258
+-- TOC entry 3380 (class 0 OID 0)
+-- Dependencies: 256
 -- Name: response_type_response_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -3957,7 +3961,7 @@ SELECT pg_catalog.setval('response_type_response_type_id_seq', 1, false);
 
 
 --
--- TOC entry 259 (class 1259 OID 143883311)
+-- TOC entry 257 (class 1259 OID 143981995)
 -- Name: rule; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -3981,7 +3985,7 @@ CREATE TABLE rule (
 ALTER TABLE public.rule OWNER TO clincapture;
 
 --
--- TOC entry 260 (class 1259 OID 143883317)
+-- TOC entry 258 (class 1259 OID 143982001)
 -- Name: rule_action; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4005,7 +4009,7 @@ CREATE TABLE rule_action (
 ALTER TABLE public.rule_action OWNER TO clincapture;
 
 --
--- TOC entry 261 (class 1259 OID 143883323)
+-- TOC entry 259 (class 1259 OID 143982007)
 -- Name: rule_action_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4020,8 +4024,8 @@ CREATE SEQUENCE rule_action_id_seq
 ALTER TABLE public.rule_action_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3375 (class 0 OID 0)
--- Dependencies: 261
+-- TOC entry 3381 (class 0 OID 0)
+-- Dependencies: 259
 -- Name: rule_action_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4029,8 +4033,8 @@ ALTER SEQUENCE rule_action_id_seq OWNED BY rule_action.id;
 
 
 --
--- TOC entry 3376 (class 0 OID 0)
--- Dependencies: 261
+-- TOC entry 3382 (class 0 OID 0)
+-- Dependencies: 259
 -- Name: rule_action_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4038,7 +4042,7 @@ SELECT pg_catalog.setval('rule_action_id_seq', 1, false);
 
 
 --
--- TOC entry 262 (class 1259 OID 143883325)
+-- TOC entry 260 (class 1259 OID 143982009)
 -- Name: rule_action_property; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4055,7 +4059,7 @@ CREATE TABLE rule_action_property (
 ALTER TABLE public.rule_action_property OWNER TO clincapture;
 
 --
--- TOC entry 263 (class 1259 OID 143883331)
+-- TOC entry 261 (class 1259 OID 143982015)
 -- Name: rule_action_property_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4070,8 +4074,8 @@ CREATE SEQUENCE rule_action_property_id_seq
 ALTER TABLE public.rule_action_property_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3377 (class 0 OID 0)
--- Dependencies: 263
+-- TOC entry 3383 (class 0 OID 0)
+-- Dependencies: 261
 -- Name: rule_action_property_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4079,8 +4083,8 @@ ALTER SEQUENCE rule_action_property_id_seq OWNED BY rule_action_property.id;
 
 
 --
--- TOC entry 3378 (class 0 OID 0)
--- Dependencies: 263
+-- TOC entry 3384 (class 0 OID 0)
+-- Dependencies: 261
 -- Name: rule_action_property_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4088,7 +4092,7 @@ SELECT pg_catalog.setval('rule_action_property_id_seq', 1, false);
 
 
 --
--- TOC entry 264 (class 1259 OID 143883333)
+-- TOC entry 262 (class 1259 OID 143982017)
 -- Name: rule_action_run; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4106,7 +4110,7 @@ CREATE TABLE rule_action_run (
 ALTER TABLE public.rule_action_run OWNER TO clincapture;
 
 --
--- TOC entry 265 (class 1259 OID 143883336)
+-- TOC entry 263 (class 1259 OID 143982020)
 -- Name: rule_action_run_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4121,8 +4125,8 @@ CREATE SEQUENCE rule_action_run_id_seq
 ALTER TABLE public.rule_action_run_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3379 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3385 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: rule_action_run_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4130,8 +4134,8 @@ ALTER SEQUENCE rule_action_run_id_seq OWNED BY rule_action_run.id;
 
 
 --
--- TOC entry 3380 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3386 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: rule_action_run_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4139,7 +4143,7 @@ SELECT pg_catalog.setval('rule_action_run_id_seq', 1, false);
 
 
 --
--- TOC entry 266 (class 1259 OID 143883338)
+-- TOC entry 264 (class 1259 OID 143982022)
 -- Name: rule_action_run_log; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4156,7 +4160,7 @@ CREATE TABLE rule_action_run_log (
 ALTER TABLE public.rule_action_run_log OWNER TO clincapture;
 
 --
--- TOC entry 267 (class 1259 OID 143883344)
+-- TOC entry 265 (class 1259 OID 143982028)
 -- Name: rule_action_run_log_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4171,8 +4175,8 @@ CREATE SEQUENCE rule_action_run_log_id_seq
 ALTER TABLE public.rule_action_run_log_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3381 (class 0 OID 0)
--- Dependencies: 267
+-- TOC entry 3387 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: rule_action_run_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4180,8 +4184,8 @@ ALTER SEQUENCE rule_action_run_log_id_seq OWNED BY rule_action_run_log.id;
 
 
 --
--- TOC entry 3382 (class 0 OID 0)
--- Dependencies: 267
+-- TOC entry 3388 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: rule_action_run_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4189,7 +4193,7 @@ SELECT pg_catalog.setval('rule_action_run_log_id_seq', 1, false);
 
 
 --
--- TOC entry 268 (class 1259 OID 143883346)
+-- TOC entry 266 (class 1259 OID 143982030)
 -- Name: rule_expression; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4211,7 +4215,7 @@ CREATE TABLE rule_expression (
 ALTER TABLE public.rule_expression OWNER TO clincapture;
 
 --
--- TOC entry 269 (class 1259 OID 143883352)
+-- TOC entry 267 (class 1259 OID 143982036)
 -- Name: rule_expression_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4226,8 +4230,8 @@ CREATE SEQUENCE rule_expression_id_seq
 ALTER TABLE public.rule_expression_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3383 (class 0 OID 0)
--- Dependencies: 269
+-- TOC entry 3389 (class 0 OID 0)
+-- Dependencies: 267
 -- Name: rule_expression_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4235,8 +4239,8 @@ ALTER SEQUENCE rule_expression_id_seq OWNED BY rule_expression.id;
 
 
 --
--- TOC entry 3384 (class 0 OID 0)
--- Dependencies: 269
+-- TOC entry 3390 (class 0 OID 0)
+-- Dependencies: 267
 -- Name: rule_expression_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4244,7 +4248,7 @@ SELECT pg_catalog.setval('rule_expression_id_seq', 1, false);
 
 
 --
--- TOC entry 270 (class 1259 OID 143883354)
+-- TOC entry 268 (class 1259 OID 143982038)
 -- Name: rule_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4259,8 +4263,8 @@ CREATE SEQUENCE rule_id_seq
 ALTER TABLE public.rule_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3385 (class 0 OID 0)
--- Dependencies: 270
+-- TOC entry 3391 (class 0 OID 0)
+-- Dependencies: 268
 -- Name: rule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4268,8 +4272,8 @@ ALTER SEQUENCE rule_id_seq OWNED BY rule.id;
 
 
 --
--- TOC entry 3386 (class 0 OID 0)
--- Dependencies: 270
+-- TOC entry 3392 (class 0 OID 0)
+-- Dependencies: 268
 -- Name: rule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4277,7 +4281,7 @@ SELECT pg_catalog.setval('rule_id_seq', 1, false);
 
 
 --
--- TOC entry 271 (class 1259 OID 143883356)
+-- TOC entry 269 (class 1259 OID 143982040)
 -- Name: rule_set; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4302,7 +4306,7 @@ CREATE TABLE rule_set (
 ALTER TABLE public.rule_set OWNER TO clincapture;
 
 --
--- TOC entry 272 (class 1259 OID 143883359)
+-- TOC entry 270 (class 1259 OID 143982043)
 -- Name: rule_set_audit; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4319,7 +4323,7 @@ CREATE TABLE rule_set_audit (
 ALTER TABLE public.rule_set_audit OWNER TO clincapture;
 
 --
--- TOC entry 273 (class 1259 OID 143883362)
+-- TOC entry 271 (class 1259 OID 143982046)
 -- Name: rule_set_audit_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4334,8 +4338,8 @@ CREATE SEQUENCE rule_set_audit_id_seq
 ALTER TABLE public.rule_set_audit_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3387 (class 0 OID 0)
--- Dependencies: 273
+-- TOC entry 3393 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: rule_set_audit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4343,8 +4347,8 @@ ALTER SEQUENCE rule_set_audit_id_seq OWNED BY rule_set_audit.id;
 
 
 --
--- TOC entry 3388 (class 0 OID 0)
--- Dependencies: 273
+-- TOC entry 3394 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: rule_set_audit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4352,7 +4356,7 @@ SELECT pg_catalog.setval('rule_set_audit_id_seq', 1, false);
 
 
 --
--- TOC entry 274 (class 1259 OID 143883364)
+-- TOC entry 272 (class 1259 OID 143982048)
 -- Name: rule_set_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4367,8 +4371,8 @@ CREATE SEQUENCE rule_set_id_seq
 ALTER TABLE public.rule_set_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3389 (class 0 OID 0)
--- Dependencies: 274
+-- TOC entry 3395 (class 0 OID 0)
+-- Dependencies: 272
 -- Name: rule_set_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4376,8 +4380,8 @@ ALTER SEQUENCE rule_set_id_seq OWNED BY rule_set.id;
 
 
 --
--- TOC entry 3390 (class 0 OID 0)
--- Dependencies: 274
+-- TOC entry 3396 (class 0 OID 0)
+-- Dependencies: 272
 -- Name: rule_set_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4385,7 +4389,7 @@ SELECT pg_catalog.setval('rule_set_id_seq', 1, false);
 
 
 --
--- TOC entry 275 (class 1259 OID 143883366)
+-- TOC entry 273 (class 1259 OID 143982050)
 -- Name: rule_set_rule; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4405,7 +4409,7 @@ CREATE TABLE rule_set_rule (
 ALTER TABLE public.rule_set_rule OWNER TO clincapture;
 
 --
--- TOC entry 276 (class 1259 OID 143883369)
+-- TOC entry 274 (class 1259 OID 143982053)
 -- Name: rule_set_rule_audit; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4422,7 +4426,7 @@ CREATE TABLE rule_set_rule_audit (
 ALTER TABLE public.rule_set_rule_audit OWNER TO clincapture;
 
 --
--- TOC entry 277 (class 1259 OID 143883372)
+-- TOC entry 275 (class 1259 OID 143982056)
 -- Name: rule_set_rule_audit_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4437,8 +4441,8 @@ CREATE SEQUENCE rule_set_rule_audit_id_seq
 ALTER TABLE public.rule_set_rule_audit_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3391 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 3397 (class 0 OID 0)
+-- Dependencies: 275
 -- Name: rule_set_rule_audit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4446,8 +4450,8 @@ ALTER SEQUENCE rule_set_rule_audit_id_seq OWNED BY rule_set_rule_audit.id;
 
 
 --
--- TOC entry 3392 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 3398 (class 0 OID 0)
+-- Dependencies: 275
 -- Name: rule_set_rule_audit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4455,7 +4459,7 @@ SELECT pg_catalog.setval('rule_set_rule_audit_id_seq', 1, false);
 
 
 --
--- TOC entry 278 (class 1259 OID 143883374)
+-- TOC entry 276 (class 1259 OID 143982058)
 -- Name: rule_set_rule_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4470,8 +4474,8 @@ CREATE SEQUENCE rule_set_rule_id_seq
 ALTER TABLE public.rule_set_rule_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3393 (class 0 OID 0)
--- Dependencies: 278
+-- TOC entry 3399 (class 0 OID 0)
+-- Dependencies: 276
 -- Name: rule_set_rule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4479,8 +4483,8 @@ ALTER SEQUENCE rule_set_rule_id_seq OWNED BY rule_set_rule.id;
 
 
 --
--- TOC entry 3394 (class 0 OID 0)
--- Dependencies: 278
+-- TOC entry 3400 (class 0 OID 0)
+-- Dependencies: 276
 -- Name: rule_set_rule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4488,7 +4492,7 @@ SELECT pg_catalog.setval('rule_set_rule_id_seq', 1, false);
 
 
 --
--- TOC entry 279 (class 1259 OID 143883376)
+-- TOC entry 277 (class 1259 OID 143982060)
 -- Name: scd_item_metadata; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4506,7 +4510,7 @@ CREATE TABLE scd_item_metadata (
 ALTER TABLE public.scd_item_metadata OWNER TO clincapture;
 
 --
--- TOC entry 280 (class 1259 OID 143883382)
+-- TOC entry 278 (class 1259 OID 143982066)
 -- Name: scd_item_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4521,8 +4525,8 @@ CREATE SEQUENCE scd_item_metadata_id_seq
 ALTER TABLE public.scd_item_metadata_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3395 (class 0 OID 0)
--- Dependencies: 280
+-- TOC entry 3401 (class 0 OID 0)
+-- Dependencies: 278
 -- Name: scd_item_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4530,8 +4534,8 @@ ALTER SEQUENCE scd_item_metadata_id_seq OWNED BY scd_item_metadata.id;
 
 
 --
--- TOC entry 3396 (class 0 OID 0)
--- Dependencies: 280
+-- TOC entry 3402 (class 0 OID 0)
+-- Dependencies: 278
 -- Name: scd_item_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4539,7 +4543,7 @@ SELECT pg_catalog.setval('scd_item_metadata_id_seq', 5, true);
 
 
 --
--- TOC entry 281 (class 1259 OID 143883384)
+-- TOC entry 279 (class 1259 OID 143982068)
 -- Name: section; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4565,7 +4569,7 @@ CREATE TABLE section (
 ALTER TABLE public.section OWNER TO clincapture;
 
 --
--- TOC entry 282 (class 1259 OID 143883390)
+-- TOC entry 280 (class 1259 OID 143982074)
 -- Name: section_section_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4580,8 +4584,8 @@ CREATE SEQUENCE section_section_id_seq
 ALTER TABLE public.section_section_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3397 (class 0 OID 0)
--- Dependencies: 282
+-- TOC entry 3403 (class 0 OID 0)
+-- Dependencies: 280
 -- Name: section_section_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4589,16 +4593,16 @@ ALTER SEQUENCE section_section_id_seq OWNED BY section.section_id;
 
 
 --
--- TOC entry 3398 (class 0 OID 0)
--- Dependencies: 282
+-- TOC entry 3404 (class 0 OID 0)
+-- Dependencies: 280
 -- Name: section_section_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('section_section_id_seq', 11, true);
+SELECT pg_catalog.setval('section_section_id_seq', 13, true);
 
 
 --
--- TOC entry 283 (class 1259 OID 143883392)
+-- TOC entry 281 (class 1259 OID 143982076)
 -- Name: status; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4612,7 +4616,7 @@ CREATE TABLE status (
 ALTER TABLE public.status OWNER TO clincapture;
 
 --
--- TOC entry 284 (class 1259 OID 143883398)
+-- TOC entry 282 (class 1259 OID 143982082)
 -- Name: status_status_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4627,8 +4631,8 @@ CREATE SEQUENCE status_status_id_seq
 ALTER TABLE public.status_status_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3399 (class 0 OID 0)
--- Dependencies: 284
+-- TOC entry 3405 (class 0 OID 0)
+-- Dependencies: 282
 -- Name: status_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4636,8 +4640,8 @@ ALTER SEQUENCE status_status_id_seq OWNED BY status.status_id;
 
 
 --
--- TOC entry 3400 (class 0 OID 0)
--- Dependencies: 284
+-- TOC entry 3406 (class 0 OID 0)
+-- Dependencies: 282
 -- Name: status_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4645,7 +4649,7 @@ SELECT pg_catalog.setval('status_status_id_seq', 1, false);
 
 
 --
--- TOC entry 285 (class 1259 OID 143883400)
+-- TOC entry 283 (class 1259 OID 143982084)
 -- Name: study; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4714,7 +4718,7 @@ CREATE TABLE study (
 ALTER TABLE public.study OWNER TO clincapture;
 
 --
--- TOC entry 286 (class 1259 OID 143883409)
+-- TOC entry 284 (class 1259 OID 143982093)
 -- Name: study_event; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4745,7 +4749,7 @@ CREATE TABLE study_event (
 ALTER TABLE public.study_event OWNER TO clincapture;
 
 --
--- TOC entry 287 (class 1259 OID 143883419)
+-- TOC entry 285 (class 1259 OID 143982103)
 -- Name: study_event_definition; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4776,7 +4780,7 @@ CREATE TABLE study_event_definition (
 ALTER TABLE public.study_event_definition OWNER TO clincapture;
 
 --
--- TOC entry 288 (class 1259 OID 143883427)
+-- TOC entry 286 (class 1259 OID 143982111)
 -- Name: study_event_definition_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4791,8 +4795,8 @@ CREATE SEQUENCE study_event_definition_oid_id_seq
 ALTER TABLE public.study_event_definition_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3401 (class 0 OID 0)
--- Dependencies: 288
+-- TOC entry 3407 (class 0 OID 0)
+-- Dependencies: 286
 -- Name: study_event_definition_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4800,7 +4804,7 @@ SELECT pg_catalog.setval('study_event_definition_oid_id_seq', 1, false);
 
 
 --
--- TOC entry 289 (class 1259 OID 143883429)
+-- TOC entry 287 (class 1259 OID 143982113)
 -- Name: study_event_definition_study_event_definition_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4815,8 +4819,8 @@ CREATE SEQUENCE study_event_definition_study_event_definition_id_seq
 ALTER TABLE public.study_event_definition_study_event_definition_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3402 (class 0 OID 0)
--- Dependencies: 289
+-- TOC entry 3408 (class 0 OID 0)
+-- Dependencies: 287
 -- Name: study_event_definition_study_event_definition_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4824,8 +4828,8 @@ ALTER SEQUENCE study_event_definition_study_event_definition_id_seq OWNED BY stu
 
 
 --
--- TOC entry 3403 (class 0 OID 0)
--- Dependencies: 289
+-- TOC entry 3409 (class 0 OID 0)
+-- Dependencies: 287
 -- Name: study_event_definition_study_event_definition_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4833,7 +4837,7 @@ SELECT pg_catalog.setval('study_event_definition_study_event_definition_id_seq',
 
 
 --
--- TOC entry 290 (class 1259 OID 143883431)
+-- TOC entry 288 (class 1259 OID 143982115)
 -- Name: study_event_study_event_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4848,8 +4852,8 @@ CREATE SEQUENCE study_event_study_event_id_seq
 ALTER TABLE public.study_event_study_event_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3404 (class 0 OID 0)
--- Dependencies: 290
+-- TOC entry 3410 (class 0 OID 0)
+-- Dependencies: 288
 -- Name: study_event_study_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4857,16 +4861,16 @@ ALTER SEQUENCE study_event_study_event_id_seq OWNED BY study_event.study_event_i
 
 
 --
--- TOC entry 3405 (class 0 OID 0)
--- Dependencies: 290
+-- TOC entry 3411 (class 0 OID 0)
+-- Dependencies: 288
 -- Name: study_event_study_event_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('study_event_study_event_id_seq', 2, true);
+SELECT pg_catalog.setval('study_event_study_event_id_seq', 3, true);
 
 
 --
--- TOC entry 291 (class 1259 OID 143883433)
+-- TOC entry 289 (class 1259 OID 143982117)
 -- Name: study_group; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4881,7 +4885,7 @@ CREATE TABLE study_group (
 ALTER TABLE public.study_group OWNER TO clincapture;
 
 --
--- TOC entry 292 (class 1259 OID 143883439)
+-- TOC entry 290 (class 1259 OID 143982123)
 -- Name: study_group_class; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4904,7 +4908,7 @@ CREATE TABLE study_group_class (
 ALTER TABLE public.study_group_class OWNER TO clincapture;
 
 --
--- TOC entry 293 (class 1259 OID 143883444)
+-- TOC entry 291 (class 1259 OID 143982128)
 -- Name: study_group_class_study_group_class_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4919,8 +4923,8 @@ CREATE SEQUENCE study_group_class_study_group_class_id_seq
 ALTER TABLE public.study_group_class_study_group_class_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3406 (class 0 OID 0)
--- Dependencies: 293
+-- TOC entry 3412 (class 0 OID 0)
+-- Dependencies: 291
 -- Name: study_group_class_study_group_class_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4928,8 +4932,8 @@ ALTER SEQUENCE study_group_class_study_group_class_id_seq OWNED BY study_group_c
 
 
 --
--- TOC entry 3407 (class 0 OID 0)
--- Dependencies: 293
+-- TOC entry 3413 (class 0 OID 0)
+-- Dependencies: 291
 -- Name: study_group_class_study_group_class_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4937,7 +4941,7 @@ SELECT pg_catalog.setval('study_group_class_study_group_class_id_seq', 1, false)
 
 
 --
--- TOC entry 294 (class 1259 OID 143883446)
+-- TOC entry 292 (class 1259 OID 143982130)
 -- Name: study_group_study_group_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -4952,8 +4956,8 @@ CREATE SEQUENCE study_group_study_group_id_seq
 ALTER TABLE public.study_group_study_group_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3408 (class 0 OID 0)
--- Dependencies: 294
+-- TOC entry 3414 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: study_group_study_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -4961,8 +4965,8 @@ ALTER SEQUENCE study_group_study_group_id_seq OWNED BY study_group.study_group_i
 
 
 --
--- TOC entry 3409 (class 0 OID 0)
--- Dependencies: 294
+-- TOC entry 3415 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: study_group_study_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -4970,7 +4974,7 @@ SELECT pg_catalog.setval('study_group_study_group_id_seq', 1, false);
 
 
 --
--- TOC entry 295 (class 1259 OID 143883448)
+-- TOC entry 293 (class 1259 OID 143982132)
 -- Name: study_module_status; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -4996,7 +5000,7 @@ CREATE TABLE study_module_status (
 ALTER TABLE public.study_module_status OWNER TO clincapture;
 
 --
--- TOC entry 296 (class 1259 OID 143883458)
+-- TOC entry 294 (class 1259 OID 143982142)
 -- Name: study_module_status_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5011,8 +5015,8 @@ CREATE SEQUENCE study_module_status_id_seq
 ALTER TABLE public.study_module_status_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3410 (class 0 OID 0)
--- Dependencies: 296
+-- TOC entry 3416 (class 0 OID 0)
+-- Dependencies: 294
 -- Name: study_module_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5020,8 +5024,8 @@ ALTER SEQUENCE study_module_status_id_seq OWNED BY study_module_status.id;
 
 
 --
--- TOC entry 3411 (class 0 OID 0)
--- Dependencies: 296
+-- TOC entry 3417 (class 0 OID 0)
+-- Dependencies: 294
 -- Name: study_module_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5029,7 +5033,7 @@ SELECT pg_catalog.setval('study_module_status_id_seq', 1, false);
 
 
 --
--- TOC entry 297 (class 1259 OID 143883460)
+-- TOC entry 295 (class 1259 OID 143982144)
 -- Name: study_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5044,8 +5048,8 @@ CREATE SEQUENCE study_oid_id_seq
 ALTER TABLE public.study_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3412 (class 0 OID 0)
--- Dependencies: 297
+-- TOC entry 3418 (class 0 OID 0)
+-- Dependencies: 295
 -- Name: study_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5053,7 +5057,7 @@ SELECT pg_catalog.setval('study_oid_id_seq', 1, false);
 
 
 --
--- TOC entry 298 (class 1259 OID 143883462)
+-- TOC entry 296 (class 1259 OID 143982146)
 -- Name: study_parameter; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5071,7 +5075,7 @@ CREATE TABLE study_parameter (
 ALTER TABLE public.study_parameter OWNER TO clincapture;
 
 --
--- TOC entry 299 (class 1259 OID 143883466)
+-- TOC entry 297 (class 1259 OID 143982150)
 -- Name: study_parameter_study_parameter_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5086,8 +5090,8 @@ CREATE SEQUENCE study_parameter_study_parameter_id_seq
 ALTER TABLE public.study_parameter_study_parameter_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3413 (class 0 OID 0)
--- Dependencies: 299
+-- TOC entry 3419 (class 0 OID 0)
+-- Dependencies: 297
 -- Name: study_parameter_study_parameter_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5095,8 +5099,8 @@ ALTER SEQUENCE study_parameter_study_parameter_id_seq OWNED BY study_parameter.s
 
 
 --
--- TOC entry 3414 (class 0 OID 0)
--- Dependencies: 299
+-- TOC entry 3420 (class 0 OID 0)
+-- Dependencies: 297
 -- Name: study_parameter_study_parameter_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5104,7 +5108,7 @@ SELECT pg_catalog.setval('study_parameter_study_parameter_id_seq', 1, false);
 
 
 --
--- TOC entry 300 (class 1259 OID 143883468)
+-- TOC entry 298 (class 1259 OID 143982152)
 -- Name: study_parameter_value; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5119,7 +5123,7 @@ CREATE TABLE study_parameter_value (
 ALTER TABLE public.study_parameter_value OWNER TO clincapture;
 
 --
--- TOC entry 301 (class 1259 OID 143883471)
+-- TOC entry 299 (class 1259 OID 143982155)
 -- Name: study_parameter_value_study_parameter_value_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5134,8 +5138,8 @@ CREATE SEQUENCE study_parameter_value_study_parameter_value_id_seq
 ALTER TABLE public.study_parameter_value_study_parameter_value_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3415 (class 0 OID 0)
--- Dependencies: 301
+-- TOC entry 3421 (class 0 OID 0)
+-- Dependencies: 299
 -- Name: study_parameter_value_study_parameter_value_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5143,8 +5147,8 @@ ALTER SEQUENCE study_parameter_value_study_parameter_value_id_seq OWNED BY study
 
 
 --
--- TOC entry 3416 (class 0 OID 0)
--- Dependencies: 301
+-- TOC entry 3422 (class 0 OID 0)
+-- Dependencies: 299
 -- Name: study_parameter_value_study_parameter_value_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5152,7 +5156,7 @@ SELECT pg_catalog.setval('study_parameter_value_study_parameter_value_id_seq', 1
 
 
 --
--- TOC entry 302 (class 1259 OID 143883473)
+-- TOC entry 300 (class 1259 OID 143982157)
 -- Name: study_study_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5167,8 +5171,8 @@ CREATE SEQUENCE study_study_id_seq
 ALTER TABLE public.study_study_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3417 (class 0 OID 0)
--- Dependencies: 302
+-- TOC entry 3423 (class 0 OID 0)
+-- Dependencies: 300
 -- Name: study_study_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5176,8 +5180,8 @@ ALTER SEQUENCE study_study_id_seq OWNED BY study.study_id;
 
 
 --
--- TOC entry 3418 (class 0 OID 0)
--- Dependencies: 302
+-- TOC entry 3424 (class 0 OID 0)
+-- Dependencies: 300
 -- Name: study_study_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5185,7 +5189,7 @@ SELECT pg_catalog.setval('study_study_id_seq', 4, true);
 
 
 --
--- TOC entry 303 (class 1259 OID 143883475)
+-- TOC entry 301 (class 1259 OID 143982159)
 -- Name: study_subject; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5213,7 +5217,7 @@ CREATE TABLE study_subject (
 ALTER TABLE public.study_subject OWNER TO clincapture;
 
 --
--- TOC entry 304 (class 1259 OID 143883481)
+-- TOC entry 302 (class 1259 OID 143982165)
 -- Name: study_subject_id; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5228,7 +5232,7 @@ CREATE TABLE study_subject_id (
 ALTER TABLE public.study_subject_id OWNER TO clincapture;
 
 --
--- TOC entry 305 (class 1259 OID 143883485)
+-- TOC entry 303 (class 1259 OID 143982169)
 -- Name: study_subject_id_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5243,8 +5247,8 @@ CREATE SEQUENCE study_subject_id_id_seq
 ALTER TABLE public.study_subject_id_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3419 (class 0 OID 0)
--- Dependencies: 305
+-- TOC entry 3425 (class 0 OID 0)
+-- Dependencies: 303
 -- Name: study_subject_id_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5252,8 +5256,8 @@ ALTER SEQUENCE study_subject_id_id_seq OWNED BY study_subject_id.id;
 
 
 --
--- TOC entry 3420 (class 0 OID 0)
--- Dependencies: 305
+-- TOC entry 3426 (class 0 OID 0)
+-- Dependencies: 303
 -- Name: study_subject_id_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5261,7 +5265,7 @@ SELECT pg_catalog.setval('study_subject_id_id_seq', 1, false);
 
 
 --
--- TOC entry 306 (class 1259 OID 143883487)
+-- TOC entry 304 (class 1259 OID 143982171)
 -- Name: study_subject_oid_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5276,8 +5280,8 @@ CREATE SEQUENCE study_subject_oid_id_seq
 ALTER TABLE public.study_subject_oid_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3421 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 3427 (class 0 OID 0)
+-- Dependencies: 304
 -- Name: study_subject_oid_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5285,7 +5289,7 @@ SELECT pg_catalog.setval('study_subject_oid_id_seq', 5, true);
 
 
 --
--- TOC entry 307 (class 1259 OID 143883489)
+-- TOC entry 305 (class 1259 OID 143982173)
 -- Name: study_subject_study_subject_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5300,8 +5304,8 @@ CREATE SEQUENCE study_subject_study_subject_id_seq
 ALTER TABLE public.study_subject_study_subject_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3422 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 3428 (class 0 OID 0)
+-- Dependencies: 305
 -- Name: study_subject_study_subject_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5309,8 +5313,8 @@ ALTER SEQUENCE study_subject_study_subject_id_seq OWNED BY study_subject.study_s
 
 
 --
--- TOC entry 3423 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 3429 (class 0 OID 0)
+-- Dependencies: 305
 -- Name: study_subject_study_subject_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5318,7 +5322,7 @@ SELECT pg_catalog.setval('study_subject_study_subject_id_seq', 6, true);
 
 
 --
--- TOC entry 308 (class 1259 OID 143883491)
+-- TOC entry 306 (class 1259 OID 143982175)
 -- Name: study_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5332,7 +5336,7 @@ CREATE TABLE study_type (
 ALTER TABLE public.study_type OWNER TO clincapture;
 
 --
--- TOC entry 309 (class 1259 OID 143883497)
+-- TOC entry 307 (class 1259 OID 143982181)
 -- Name: study_type_study_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5347,8 +5351,8 @@ CREATE SEQUENCE study_type_study_type_id_seq
 ALTER TABLE public.study_type_study_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3424 (class 0 OID 0)
--- Dependencies: 309
+-- TOC entry 3430 (class 0 OID 0)
+-- Dependencies: 307
 -- Name: study_type_study_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5356,8 +5360,8 @@ ALTER SEQUENCE study_type_study_type_id_seq OWNED BY study_type.study_type_id;
 
 
 --
--- TOC entry 3425 (class 0 OID 0)
--- Dependencies: 309
+-- TOC entry 3431 (class 0 OID 0)
+-- Dependencies: 307
 -- Name: study_type_study_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5365,27 +5369,29 @@ SELECT pg_catalog.setval('study_type_study_type_id_seq', 1, false);
 
 
 --
--- TOC entry 310 (class 1259 OID 143883499)
+-- TOC entry 308 (class 1259 OID 143982183)
 -- Name: study_user_role; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
 CREATE TABLE study_user_role (
     role_name character varying(40),
-    study_id integer,
+    study_id integer NOT NULL,
     status_id integer,
     owner_id integer,
     date_created timestamp with time zone,
     date_updated timestamp with time zone,
     update_id integer,
     user_name character varying(64),
-    study_user_role_id integer NOT NULL
+    study_user_role_id integer NOT NULL,
+    token text,
+    token_generation_date timestamp with time zone
 );
 
 
 ALTER TABLE public.study_user_role OWNER TO clincapture;
 
 --
--- TOC entry 311 (class 1259 OID 143883502)
+-- TOC entry 309 (class 1259 OID 143982186)
 -- Name: study_user_role_study_user_role_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5400,8 +5406,8 @@ CREATE SEQUENCE study_user_role_study_user_role_id_seq
 ALTER TABLE public.study_user_role_study_user_role_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3426 (class 0 OID 0)
--- Dependencies: 311
+-- TOC entry 3432 (class 0 OID 0)
+-- Dependencies: 309
 -- Name: study_user_role_study_user_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5409,8 +5415,8 @@ ALTER SEQUENCE study_user_role_study_user_role_id_seq OWNED BY study_user_role.s
 
 
 --
--- TOC entry 3427 (class 0 OID 0)
--- Dependencies: 311
+-- TOC entry 3433 (class 0 OID 0)
+-- Dependencies: 309
 -- Name: study_user_role_study_user_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5418,7 +5424,7 @@ SELECT pg_catalog.setval('study_user_role_study_user_role_id_seq', 8, true);
 
 
 --
--- TOC entry 312 (class 1259 OID 143883504)
+-- TOC entry 310 (class 1259 OID 143982188)
 -- Name: subject; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5441,7 +5447,7 @@ CREATE TABLE subject (
 ALTER TABLE public.subject OWNER TO clincapture;
 
 --
--- TOC entry 313 (class 1259 OID 143883507)
+-- TOC entry 311 (class 1259 OID 143982191)
 -- Name: subject_event_status; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5455,7 +5461,7 @@ CREATE TABLE subject_event_status (
 ALTER TABLE public.subject_event_status OWNER TO clincapture;
 
 --
--- TOC entry 314 (class 1259 OID 143883513)
+-- TOC entry 312 (class 1259 OID 143982197)
 -- Name: subject_event_status_subject_event_status_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5470,8 +5476,8 @@ CREATE SEQUENCE subject_event_status_subject_event_status_id_seq
 ALTER TABLE public.subject_event_status_subject_event_status_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3428 (class 0 OID 0)
--- Dependencies: 314
+-- TOC entry 3434 (class 0 OID 0)
+-- Dependencies: 312
 -- Name: subject_event_status_subject_event_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5479,8 +5485,8 @@ ALTER SEQUENCE subject_event_status_subject_event_status_id_seq OWNED BY subject
 
 
 --
--- TOC entry 3429 (class 0 OID 0)
--- Dependencies: 314
+-- TOC entry 3435 (class 0 OID 0)
+-- Dependencies: 312
 -- Name: subject_event_status_subject_event_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5488,7 +5494,7 @@ SELECT pg_catalog.setval('subject_event_status_subject_event_status_id_seq', 1, 
 
 
 --
--- TOC entry 315 (class 1259 OID 143883515)
+-- TOC entry 313 (class 1259 OID 143982199)
 -- Name: subject_group_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5509,7 +5515,7 @@ CREATE TABLE subject_group_map (
 ALTER TABLE public.subject_group_map OWNER TO clincapture;
 
 --
--- TOC entry 316 (class 1259 OID 143883518)
+-- TOC entry 314 (class 1259 OID 143982202)
 -- Name: subject_group_map_subject_group_map_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5524,8 +5530,8 @@ CREATE SEQUENCE subject_group_map_subject_group_map_id_seq
 ALTER TABLE public.subject_group_map_subject_group_map_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3430 (class 0 OID 0)
--- Dependencies: 316
+-- TOC entry 3436 (class 0 OID 0)
+-- Dependencies: 314
 -- Name: subject_group_map_subject_group_map_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5533,8 +5539,8 @@ ALTER SEQUENCE subject_group_map_subject_group_map_id_seq OWNED BY subject_group
 
 
 --
--- TOC entry 3431 (class 0 OID 0)
--- Dependencies: 316
+-- TOC entry 3437 (class 0 OID 0)
+-- Dependencies: 314
 -- Name: subject_group_map_subject_group_map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5542,7 +5548,7 @@ SELECT pg_catalog.setval('subject_group_map_subject_group_map_id_seq', 1, false)
 
 
 --
--- TOC entry 317 (class 1259 OID 143883520)
+-- TOC entry 315 (class 1259 OID 143982204)
 -- Name: subject_subject_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5557,8 +5563,8 @@ CREATE SEQUENCE subject_subject_id_seq
 ALTER TABLE public.subject_subject_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3432 (class 0 OID 0)
--- Dependencies: 317
+-- TOC entry 3438 (class 0 OID 0)
+-- Dependencies: 315
 -- Name: subject_subject_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5566,8 +5572,8 @@ ALTER SEQUENCE subject_subject_id_seq OWNED BY subject.subject_id;
 
 
 --
--- TOC entry 3433 (class 0 OID 0)
--- Dependencies: 317
+-- TOC entry 3439 (class 0 OID 0)
+-- Dependencies: 315
 -- Name: subject_subject_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5577,7 +5583,7 @@ SELECT pg_catalog.setval('subject_subject_id_seq', 6, true);
 SET default_with_oids = false;
 
 --
--- TOC entry 318 (class 1259 OID 143883522)
+-- TOC entry 316 (class 1259 OID 143982206)
 -- Name: system; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5607,7 +5613,7 @@ CREATE TABLE system (
 ALTER TABLE public.system OWNER TO clincapture;
 
 --
--- TOC entry 319 (class 1259 OID 143883544)
+-- TOC entry 317 (class 1259 OID 143982228)
 -- Name: system_group; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5623,7 +5629,7 @@ CREATE TABLE system_group (
 ALTER TABLE public.system_group OWNER TO clincapture;
 
 --
--- TOC entry 320 (class 1259 OID 143883550)
+-- TOC entry 318 (class 1259 OID 143982234)
 -- Name: system_group_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5638,8 +5644,8 @@ CREATE SEQUENCE system_group_id_seq
 ALTER TABLE public.system_group_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3434 (class 0 OID 0)
--- Dependencies: 320
+-- TOC entry 3440 (class 0 OID 0)
+-- Dependencies: 318
 -- Name: system_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5647,8 +5653,8 @@ ALTER SEQUENCE system_group_id_seq OWNED BY system_group.id;
 
 
 --
--- TOC entry 3435 (class 0 OID 0)
--- Dependencies: 320
+-- TOC entry 3441 (class 0 OID 0)
+-- Dependencies: 318
 -- Name: system_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5656,7 +5662,7 @@ SELECT pg_catalog.setval('system_group_id_seq', 1, false);
 
 
 --
--- TOC entry 321 (class 1259 OID 143883552)
+-- TOC entry 319 (class 1259 OID 143982236)
 -- Name: system_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5671,8 +5677,8 @@ CREATE SEQUENCE system_id_seq
 ALTER TABLE public.system_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3436 (class 0 OID 0)
--- Dependencies: 321
+-- TOC entry 3442 (class 0 OID 0)
+-- Dependencies: 319
 -- Name: system_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5680,8 +5686,8 @@ ALTER SEQUENCE system_id_seq OWNED BY system.id;
 
 
 --
--- TOC entry 3437 (class 0 OID 0)
--- Dependencies: 321
+-- TOC entry 3443 (class 0 OID 0)
+-- Dependencies: 319
 -- Name: system_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5691,7 +5697,7 @@ SELECT pg_catalog.setval('system_id_seq', 63, true);
 SET default_with_oids = true;
 
 --
--- TOC entry 322 (class 1259 OID 143883554)
+-- TOC entry 320 (class 1259 OID 143982238)
 -- Name: term; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5710,7 +5716,7 @@ CREATE TABLE term (
 ALTER TABLE public.term OWNER TO clincapture;
 
 --
--- TOC entry 323 (class 1259 OID 143883560)
+-- TOC entry 321 (class 1259 OID 143982244)
 -- Name: term_element; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5727,7 +5733,7 @@ CREATE TABLE term_element (
 ALTER TABLE public.term_element OWNER TO clincapture;
 
 --
--- TOC entry 324 (class 1259 OID 143883566)
+-- TOC entry 322 (class 1259 OID 143982250)
 -- Name: term_element_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5742,8 +5748,8 @@ CREATE SEQUENCE term_element_id_seq
 ALTER TABLE public.term_element_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3438 (class 0 OID 0)
--- Dependencies: 324
+-- TOC entry 3444 (class 0 OID 0)
+-- Dependencies: 322
 -- Name: term_element_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5751,8 +5757,8 @@ ALTER SEQUENCE term_element_id_seq OWNED BY term_element.id;
 
 
 --
--- TOC entry 3439 (class 0 OID 0)
--- Dependencies: 324
+-- TOC entry 3445 (class 0 OID 0)
+-- Dependencies: 322
 -- Name: term_element_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5760,7 +5766,7 @@ SELECT pg_catalog.setval('term_element_id_seq', 1, false);
 
 
 --
--- TOC entry 325 (class 1259 OID 143883568)
+-- TOC entry 323 (class 1259 OID 143982252)
 -- Name: term_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5775,8 +5781,8 @@ CREATE SEQUENCE term_id_seq
 ALTER TABLE public.term_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3440 (class 0 OID 0)
--- Dependencies: 325
+-- TOC entry 3446 (class 0 OID 0)
+-- Dependencies: 323
 -- Name: term_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5784,8 +5790,8 @@ ALTER SEQUENCE term_id_seq OWNED BY term.id;
 
 
 --
--- TOC entry 3441 (class 0 OID 0)
--- Dependencies: 325
+-- TOC entry 3447 (class 0 OID 0)
+-- Dependencies: 323
 -- Name: term_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5793,7 +5799,7 @@ SELECT pg_catalog.setval('term_id_seq', 1, false);
 
 
 --
--- TOC entry 326 (class 1259 OID 143883570)
+-- TOC entry 324 (class 1259 OID 143982254)
 -- Name: usage_statistics_data; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5809,7 +5815,7 @@ CREATE TABLE usage_statistics_data (
 ALTER TABLE public.usage_statistics_data OWNER TO clincapture;
 
 --
--- TOC entry 327 (class 1259 OID 143883576)
+-- TOC entry 325 (class 1259 OID 143982260)
 -- Name: usage_statistics_data_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5824,8 +5830,8 @@ CREATE SEQUENCE usage_statistics_data_id_seq
 ALTER TABLE public.usage_statistics_data_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3442 (class 0 OID 0)
--- Dependencies: 327
+-- TOC entry 3448 (class 0 OID 0)
+-- Dependencies: 325
 -- Name: usage_statistics_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5833,16 +5839,16 @@ ALTER SEQUENCE usage_statistics_data_id_seq OWNED BY usage_statistics_data.id;
 
 
 --
--- TOC entry 3443 (class 0 OID 0)
--- Dependencies: 327
+-- TOC entry 3449 (class 0 OID 0)
+-- Dependencies: 325
 -- Name: usage_statistics_data_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
-SELECT pg_catalog.setval('usage_statistics_data_id_seq', 8, true);
+SELECT pg_catalog.setval('usage_statistics_data_id_seq', 9, true);
 
 
 --
--- TOC entry 328 (class 1259 OID 143883578)
+-- TOC entry 326 (class 1259 OID 143982262)
 -- Name: user_account; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5879,7 +5885,7 @@ CREATE TABLE user_account (
 ALTER TABLE public.user_account OWNER TO clincapture;
 
 --
--- TOC entry 329 (class 1259 OID 143883588)
+-- TOC entry 327 (class 1259 OID 143982272)
 -- Name: user_account_user_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5894,8 +5900,8 @@ CREATE SEQUENCE user_account_user_id_seq
 ALTER TABLE public.user_account_user_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3444 (class 0 OID 0)
--- Dependencies: 329
+-- TOC entry 3450 (class 0 OID 0)
+-- Dependencies: 327
 -- Name: user_account_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5903,8 +5909,8 @@ ALTER SEQUENCE user_account_user_id_seq OWNED BY user_account.user_id;
 
 
 --
--- TOC entry 3445 (class 0 OID 0)
--- Dependencies: 329
+-- TOC entry 3451 (class 0 OID 0)
+-- Dependencies: 327
 -- Name: user_account_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5912,7 +5918,7 @@ SELECT pg_catalog.setval('user_account_user_id_seq', 8, true);
 
 
 --
--- TOC entry 330 (class 1259 OID 143883590)
+-- TOC entry 328 (class 1259 OID 143982274)
 -- Name: user_role; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5927,7 +5933,7 @@ CREATE TABLE user_role (
 ALTER TABLE public.user_role OWNER TO clincapture;
 
 --
--- TOC entry 331 (class 1259 OID 143883596)
+-- TOC entry 329 (class 1259 OID 143982280)
 -- Name: user_role_role_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5942,8 +5948,8 @@ CREATE SEQUENCE user_role_role_id_seq
 ALTER TABLE public.user_role_role_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3446 (class 0 OID 0)
--- Dependencies: 331
+-- TOC entry 3452 (class 0 OID 0)
+-- Dependencies: 329
 -- Name: user_role_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5951,8 +5957,8 @@ ALTER SEQUENCE user_role_role_id_seq OWNED BY user_role.role_id;
 
 
 --
--- TOC entry 3447 (class 0 OID 0)
--- Dependencies: 331
+-- TOC entry 3453 (class 0 OID 0)
+-- Dependencies: 329
 -- Name: user_role_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -5960,7 +5966,7 @@ SELECT pg_catalog.setval('user_role_role_id_seq', 1, false);
 
 
 --
--- TOC entry 332 (class 1259 OID 143883598)
+-- TOC entry 330 (class 1259 OID 143982282)
 -- Name: user_type; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -5973,7 +5979,7 @@ CREATE TABLE user_type (
 ALTER TABLE public.user_type OWNER TO clincapture;
 
 --
--- TOC entry 333 (class 1259 OID 143883601)
+-- TOC entry 331 (class 1259 OID 143982285)
 -- Name: user_type_user_type_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -5988,8 +5994,8 @@ CREATE SEQUENCE user_type_user_type_id_seq
 ALTER TABLE public.user_type_user_type_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3448 (class 0 OID 0)
--- Dependencies: 333
+-- TOC entry 3454 (class 0 OID 0)
+-- Dependencies: 331
 -- Name: user_type_user_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -5997,8 +6003,8 @@ ALTER SEQUENCE user_type_user_type_id_seq OWNED BY user_type.user_type_id;
 
 
 --
--- TOC entry 3449 (class 0 OID 0)
--- Dependencies: 333
+-- TOC entry 3455 (class 0 OID 0)
+-- Dependencies: 331
 -- Name: user_type_user_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -6006,7 +6012,7 @@ SELECT pg_catalog.setval('user_type_user_type_id_seq', 1, false);
 
 
 --
--- TOC entry 334 (class 1259 OID 143883603)
+-- TOC entry 332 (class 1259 OID 143982287)
 -- Name: versioning_map; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -6019,7 +6025,7 @@ CREATE TABLE versioning_map (
 ALTER TABLE public.versioning_map OWNER TO clincapture;
 
 --
--- TOC entry 335 (class 1259 OID 143883606)
+-- TOC entry 333 (class 1259 OID 143982290)
 -- Name: widget; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -6039,7 +6045,7 @@ CREATE TABLE widget (
 ALTER TABLE public.widget OWNER TO clincapture;
 
 --
--- TOC entry 336 (class 1259 OID 143883612)
+-- TOC entry 334 (class 1259 OID 143982296)
 -- Name: widget_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -6054,8 +6060,8 @@ CREATE SEQUENCE widget_id_seq
 ALTER TABLE public.widget_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3450 (class 0 OID 0)
--- Dependencies: 336
+-- TOC entry 3456 (class 0 OID 0)
+-- Dependencies: 334
 -- Name: widget_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -6063,8 +6069,8 @@ ALTER SEQUENCE widget_id_seq OWNED BY widget.id;
 
 
 --
--- TOC entry 3451 (class 0 OID 0)
--- Dependencies: 336
+-- TOC entry 3457 (class 0 OID 0)
+-- Dependencies: 334
 -- Name: widget_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -6072,7 +6078,7 @@ SELECT pg_catalog.setval('widget_id_seq', 10, true);
 
 
 --
--- TOC entry 337 (class 1259 OID 143883614)
+-- TOC entry 335 (class 1259 OID 143982298)
 -- Name: widgets_layout; Type: TABLE; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -6089,7 +6095,7 @@ CREATE TABLE widgets_layout (
 ALTER TABLE public.widgets_layout OWNER TO clincapture;
 
 --
--- TOC entry 338 (class 1259 OID 143883617)
+-- TOC entry 336 (class 1259 OID 143982301)
 -- Name: widgets_layout_id_seq; Type: SEQUENCE; Schema: public; Owner: clincapture
 --
 
@@ -6104,8 +6110,8 @@ CREATE SEQUENCE widgets_layout_id_seq
 ALTER TABLE public.widgets_layout_id_seq OWNER TO clincapture;
 
 --
--- TOC entry 3452 (class 0 OID 0)
--- Dependencies: 338
+-- TOC entry 3458 (class 0 OID 0)
+-- Dependencies: 336
 -- Name: widgets_layout_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: clincapture
 --
 
@@ -6113,8 +6119,8 @@ ALTER SEQUENCE widgets_layout_id_seq OWNED BY widgets_layout.id;
 
 
 --
--- TOC entry 3453 (class 0 OID 0)
--- Dependencies: 338
+-- TOC entry 3459 (class 0 OID 0)
+-- Dependencies: 336
 -- Name: widgets_layout_id_seq; Type: SEQUENCE SET; Schema: public; Owner: clincapture
 --
 
@@ -6122,7 +6128,7 @@ SELECT pg_catalog.setval('widgets_layout_id_seq', 53, true);
 
 
 --
--- TOC entry 2469 (class 2604 OID 143883619)
+-- TOC entry 2470 (class 2604 OID 143982303)
 -- Name: archived_dataset_file_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6130,7 +6136,7 @@ ALTER TABLE ONLY archived_dataset_file ALTER COLUMN archived_dataset_file_id SET
 
 
 --
--- TOC entry 2470 (class 2604 OID 143883620)
+-- TOC entry 2471 (class 2604 OID 143982304)
 -- Name: audit_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6138,7 +6144,7 @@ ALTER TABLE ONLY audit_event ALTER COLUMN audit_id SET DEFAULT nextval('audit_ev
 
 
 --
--- TOC entry 2471 (class 2604 OID 143883621)
+-- TOC entry 2472 (class 2604 OID 143982305)
 -- Name: audit_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6146,7 +6152,7 @@ ALTER TABLE ONLY audit_log_event ALTER COLUMN audit_id SET DEFAULT nextval('audi
 
 
 --
--- TOC entry 2472 (class 2604 OID 143883622)
+-- TOC entry 2473 (class 2604 OID 143982306)
 -- Name: audit_log_event_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6154,7 +6160,7 @@ ALTER TABLE ONLY audit_log_event_type ALTER COLUMN audit_log_event_type_id SET D
 
 
 --
--- TOC entry 2473 (class 2604 OID 143883623)
+-- TOC entry 2474 (class 2604 OID 143982307)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6162,7 +6168,7 @@ ALTER TABLE ONLY audit_log_randomization ALTER COLUMN id SET DEFAULT nextval('au
 
 
 --
--- TOC entry 2474 (class 2604 OID 143883624)
+-- TOC entry 2475 (class 2604 OID 143982308)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6170,7 +6176,7 @@ ALTER TABLE ONLY audit_user_login ALTER COLUMN id SET DEFAULT nextval('audit_use
 
 
 --
--- TOC entry 2475 (class 2604 OID 143883625)
+-- TOC entry 2476 (class 2604 OID 143982309)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6178,7 +6184,7 @@ ALTER TABLE ONLY authorities ALTER COLUMN id SET DEFAULT nextval('authorities_id
 
 
 --
--- TOC entry 2476 (class 2604 OID 143883626)
+-- TOC entry 2477 (class 2604 OID 143982310)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6186,7 +6192,7 @@ ALTER TABLE ONLY coded_item ALTER COLUMN id SET DEFAULT nextval('coded_item_id_s
 
 
 --
--- TOC entry 2477 (class 2604 OID 143883627)
+-- TOC entry 2478 (class 2604 OID 143982311)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6194,7 +6200,7 @@ ALTER TABLE ONLY coded_item_element ALTER COLUMN id SET DEFAULT nextval('coded_i
 
 
 --
--- TOC entry 2478 (class 2604 OID 143883628)
+-- TOC entry 2479 (class 2604 OID 143982312)
 -- Name: completion_status_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6202,7 +6208,7 @@ ALTER TABLE ONLY completion_status ALTER COLUMN completion_status_id SET DEFAULT
 
 
 --
--- TOC entry 2479 (class 2604 OID 143883629)
+-- TOC entry 2480 (class 2604 OID 143982313)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6210,7 +6216,7 @@ ALTER TABLE ONLY configuration ALTER COLUMN id SET DEFAULT nextval('configuratio
 
 
 --
--- TOC entry 2481 (class 2604 OID 143883630)
+-- TOC entry 2482 (class 2604 OID 143982314)
 -- Name: crf_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6218,7 +6224,7 @@ ALTER TABLE ONLY crf ALTER COLUMN crf_id SET DEFAULT nextval('crf_crf_id_seq'::r
 
 
 --
--- TOC entry 2482 (class 2604 OID 143883631)
+-- TOC entry 2483 (class 2604 OID 143982315)
 -- Name: crf_version_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6226,7 +6232,7 @@ ALTER TABLE ONLY crf_version ALTER COLUMN crf_version_id SET DEFAULT nextval('cr
 
 
 --
--- TOC entry 2484 (class 2604 OID 143883632)
+-- TOC entry 2485 (class 2604 OID 143982316)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6234,7 +6240,7 @@ ALTER TABLE ONLY crfs_masking ALTER COLUMN id SET DEFAULT nextval('crfs_masking_
 
 
 --
--- TOC entry 2501 (class 2604 OID 143883633)
+-- TOC entry 2502 (class 2604 OID 143982317)
 -- Name: dataset_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6242,7 +6248,7 @@ ALTER TABLE ONLY dataset ALTER COLUMN dataset_id SET DEFAULT nextval('dataset_da
 
 
 --
--- TOC entry 2502 (class 2604 OID 143883634)
+-- TOC entry 2503 (class 2604 OID 143982318)
 -- Name: dataset_item_status_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6250,7 +6256,7 @@ ALTER TABLE ONLY dataset_item_status ALTER COLUMN dataset_item_status_id SET DEF
 
 
 --
--- TOC entry 2503 (class 2604 OID 143883635)
+-- TOC entry 2504 (class 2604 OID 143982319)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6258,7 +6264,7 @@ ALTER TABLE ONLY dictionary ALTER COLUMN id SET DEFAULT nextval('dictionary_id_s
 
 
 --
--- TOC entry 2504 (class 2604 OID 143883636)
+-- TOC entry 2505 (class 2604 OID 143982320)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6266,7 +6272,7 @@ ALTER TABLE ONLY discrepancy_description ALTER COLUMN id SET DEFAULT nextval('di
 
 
 --
--- TOC entry 2505 (class 2604 OID 143883637)
+-- TOC entry 2506 (class 2604 OID 143982321)
 -- Name: discrepancy_note_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6274,7 +6280,7 @@ ALTER TABLE ONLY discrepancy_note ALTER COLUMN discrepancy_note_id SET DEFAULT n
 
 
 --
--- TOC entry 2506 (class 2604 OID 143883638)
+-- TOC entry 2507 (class 2604 OID 143982322)
 -- Name: discrepancy_note_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6282,7 +6288,7 @@ ALTER TABLE ONLY discrepancy_note_type ALTER COLUMN discrepancy_note_type_id SET
 
 
 --
--- TOC entry 2509 (class 2604 OID 143883639)
+-- TOC entry 2510 (class 2604 OID 143982323)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6290,7 +6296,7 @@ ALTER TABLE ONLY dyn_item_form_metadata ALTER COLUMN id SET DEFAULT nextval('dyn
 
 
 --
--- TOC entry 2512 (class 2604 OID 143883640)
+-- TOC entry 2513 (class 2604 OID 143982324)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6298,7 +6304,7 @@ ALTER TABLE ONLY dyn_item_group_metadata ALTER COLUMN id SET DEFAULT nextval('dy
 
 
 --
--- TOC entry 2513 (class 2604 OID 143883641)
+-- TOC entry 2514 (class 2604 OID 143982325)
 -- Name: dynamic_event_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6306,7 +6312,7 @@ ALTER TABLE ONLY dynamic_event ALTER COLUMN dynamic_event_id SET DEFAULT nextval
 
 
 --
--- TOC entry 2515 (class 2604 OID 143883642)
+-- TOC entry 2516 (class 2604 OID 143982326)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6314,7 +6320,7 @@ ALTER TABLE ONLY edc_item_metadata ALTER COLUMN id SET DEFAULT nextval('edc_item
 
 
 --
--- TOC entry 2516 (class 2604 OID 143883643)
+-- TOC entry 2647 (class 2604 OID 143984372)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6322,7 +6328,7 @@ ALTER TABLE ONLY email_log ALTER COLUMN id SET DEFAULT nextval('email_log_id_seq
 
 
 --
--- TOC entry 2523 (class 2604 OID 143883644)
+-- TOC entry 2523 (class 2604 OID 143982327)
 -- Name: event_crf_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6330,7 +6336,7 @@ ALTER TABLE ONLY event_crf ALTER COLUMN event_crf_id SET DEFAULT nextval('event_
 
 
 --
--- TOC entry 2524 (class 2604 OID 143883645)
+-- TOC entry 2524 (class 2604 OID 143982328)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6338,7 +6344,7 @@ ALTER TABLE ONLY event_crf_section ALTER COLUMN id SET DEFAULT nextval('event_cr
 
 
 --
--- TOC entry 2530 (class 2604 OID 143883646)
+-- TOC entry 2530 (class 2604 OID 143982329)
 -- Name: event_definition_crf_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6346,7 +6352,7 @@ ALTER TABLE ONLY event_definition_crf ALTER COLUMN event_definition_crf_id SET D
 
 
 --
--- TOC entry 2531 (class 2604 OID 143883647)
+-- TOC entry 2531 (class 2604 OID 143982330)
 -- Name: export_format_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6354,7 +6360,7 @@ ALTER TABLE ONLY export_format ALTER COLUMN export_format_id SET DEFAULT nextval
 
 
 --
--- TOC entry 2532 (class 2604 OID 143883648)
+-- TOC entry 2532 (class 2604 OID 143982331)
 -- Name: group_class_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6362,7 +6368,7 @@ ALTER TABLE ONLY group_class_types ALTER COLUMN group_class_type_id SET DEFAULT 
 
 
 --
--- TOC entry 2533 (class 2604 OID 143883649)
+-- TOC entry 2533 (class 2604 OID 143982332)
 -- Name: item_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6370,7 +6376,7 @@ ALTER TABLE ONLY item ALTER COLUMN item_id SET DEFAULT nextval('item_item_id_seq
 
 
 --
--- TOC entry 2535 (class 2604 OID 143883650)
+-- TOC entry 2535 (class 2604 OID 143982333)
 -- Name: item_data_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6378,7 +6384,7 @@ ALTER TABLE ONLY item_data ALTER COLUMN item_data_id SET DEFAULT nextval('item_d
 
 
 --
--- TOC entry 2536 (class 2604 OID 143883651)
+-- TOC entry 2536 (class 2604 OID 143982334)
 -- Name: item_data_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6386,7 +6392,7 @@ ALTER TABLE ONLY item_data_type ALTER COLUMN item_data_type_id SET DEFAULT nextv
 
 
 --
--- TOC entry 2539 (class 2604 OID 143883652)
+-- TOC entry 2539 (class 2604 OID 143982335)
 -- Name: item_form_metadata_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6394,7 +6400,7 @@ ALTER TABLE ONLY item_form_metadata ALTER COLUMN item_form_metadata_id SET DEFAU
 
 
 --
--- TOC entry 2540 (class 2604 OID 143883653)
+-- TOC entry 2540 (class 2604 OID 143982336)
 -- Name: item_group_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6402,7 +6408,7 @@ ALTER TABLE ONLY item_group ALTER COLUMN item_group_id SET DEFAULT nextval('item
 
 
 --
--- TOC entry 2543 (class 2604 OID 143883654)
+-- TOC entry 2543 (class 2604 OID 143982337)
 -- Name: item_group_metadata_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6410,7 +6416,7 @@ ALTER TABLE ONLY item_group_metadata ALTER COLUMN item_group_metadata_id SET DEF
 
 
 --
--- TOC entry 2544 (class 2604 OID 143883655)
+-- TOC entry 2544 (class 2604 OID 143982338)
 -- Name: item_reference_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6418,7 +6424,7 @@ ALTER TABLE ONLY item_reference_type ALTER COLUMN item_reference_type_id SET DEF
 
 
 --
--- TOC entry 2545 (class 2604 OID 143883656)
+-- TOC entry 2545 (class 2604 OID 143982339)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6426,7 +6432,7 @@ ALTER TABLE ONLY item_render_metadata ALTER COLUMN id SET DEFAULT nextval('item_
 
 
 --
--- TOC entry 2546 (class 2604 OID 143883657)
+-- TOC entry 2546 (class 2604 OID 143982340)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6434,7 +6440,7 @@ ALTER TABLE ONLY measurement_unit ALTER COLUMN id SET DEFAULT nextval('measureme
 
 
 --
--- TOC entry 2547 (class 2604 OID 143883658)
+-- TOC entry 2547 (class 2604 OID 143982341)
 -- Name: null_value_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6442,7 +6448,7 @@ ALTER TABLE ONLY null_value_type ALTER COLUMN null_value_type_id SET DEFAULT nex
 
 
 --
--- TOC entry 2558 (class 2604 OID 143883659)
+-- TOC entry 2558 (class 2604 OID 143982342)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6450,7 +6456,7 @@ ALTER TABLE ONLY openclinica_version ALTER COLUMN id SET DEFAULT nextval('opencl
 
 
 --
--- TOC entry 2559 (class 2604 OID 143883660)
+-- TOC entry 2559 (class 2604 OID 143982343)
 -- Name: passwd_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6458,7 +6464,7 @@ ALTER TABLE ONLY password ALTER COLUMN passwd_id SET DEFAULT nextval('password_p
 
 
 --
--- TOC entry 2560 (class 2604 OID 143883661)
+-- TOC entry 2560 (class 2604 OID 143982344)
 -- Name: resolution_status_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6466,7 +6472,7 @@ ALTER TABLE ONLY resolution_status ALTER COLUMN resolution_status_id SET DEFAULT
 
 
 --
--- TOC entry 2561 (class 2604 OID 143883662)
+-- TOC entry 2561 (class 2604 OID 143982345)
 -- Name: response_set_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6474,7 +6480,7 @@ ALTER TABLE ONLY response_set ALTER COLUMN response_set_id SET DEFAULT nextval('
 
 
 --
--- TOC entry 2562 (class 2604 OID 143883663)
+-- TOC entry 2562 (class 2604 OID 143982346)
 -- Name: response_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6482,7 +6488,7 @@ ALTER TABLE ONLY response_type ALTER COLUMN response_type_id SET DEFAULT nextval
 
 
 --
--- TOC entry 2563 (class 2604 OID 143883664)
+-- TOC entry 2563 (class 2604 OID 143982347)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6490,7 +6496,7 @@ ALTER TABLE ONLY rule ALTER COLUMN id SET DEFAULT nextval('rule_id_seq'::regclas
 
 
 --
--- TOC entry 2564 (class 2604 OID 143883665)
+-- TOC entry 2564 (class 2604 OID 143982348)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6498,7 +6504,7 @@ ALTER TABLE ONLY rule_action ALTER COLUMN id SET DEFAULT nextval('rule_action_id
 
 
 --
--- TOC entry 2565 (class 2604 OID 143883666)
+-- TOC entry 2565 (class 2604 OID 143982349)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6506,7 +6512,7 @@ ALTER TABLE ONLY rule_action_property ALTER COLUMN id SET DEFAULT nextval('rule_
 
 
 --
--- TOC entry 2566 (class 2604 OID 143883667)
+-- TOC entry 2566 (class 2604 OID 143982350)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6514,7 +6520,7 @@ ALTER TABLE ONLY rule_action_run ALTER COLUMN id SET DEFAULT nextval('rule_actio
 
 
 --
--- TOC entry 2567 (class 2604 OID 143883668)
+-- TOC entry 2567 (class 2604 OID 143982351)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6522,7 +6528,7 @@ ALTER TABLE ONLY rule_action_run_log ALTER COLUMN id SET DEFAULT nextval('rule_a
 
 
 --
--- TOC entry 2568 (class 2604 OID 143883669)
+-- TOC entry 2568 (class 2604 OID 143982352)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6530,7 +6536,7 @@ ALTER TABLE ONLY rule_expression ALTER COLUMN id SET DEFAULT nextval('rule_expre
 
 
 --
--- TOC entry 2569 (class 2604 OID 143883670)
+-- TOC entry 2569 (class 2604 OID 143982353)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6538,7 +6544,7 @@ ALTER TABLE ONLY rule_set ALTER COLUMN id SET DEFAULT nextval('rule_set_id_seq':
 
 
 --
--- TOC entry 2570 (class 2604 OID 143883671)
+-- TOC entry 2570 (class 2604 OID 143982354)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6546,7 +6552,7 @@ ALTER TABLE ONLY rule_set_audit ALTER COLUMN id SET DEFAULT nextval('rule_set_au
 
 
 --
--- TOC entry 2571 (class 2604 OID 143883672)
+-- TOC entry 2571 (class 2604 OID 143982355)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6554,7 +6560,7 @@ ALTER TABLE ONLY rule_set_rule ALTER COLUMN id SET DEFAULT nextval('rule_set_rul
 
 
 --
--- TOC entry 2572 (class 2604 OID 143883673)
+-- TOC entry 2572 (class 2604 OID 143982356)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6562,7 +6568,7 @@ ALTER TABLE ONLY rule_set_rule_audit ALTER COLUMN id SET DEFAULT nextval('rule_s
 
 
 --
--- TOC entry 2573 (class 2604 OID 143883674)
+-- TOC entry 2573 (class 2604 OID 143982357)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6570,7 +6576,7 @@ ALTER TABLE ONLY scd_item_metadata ALTER COLUMN id SET DEFAULT nextval('scd_item
 
 
 --
--- TOC entry 2574 (class 2604 OID 143883675)
+-- TOC entry 2574 (class 2604 OID 143982358)
 -- Name: section_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6578,7 +6584,7 @@ ALTER TABLE ONLY section ALTER COLUMN section_id SET DEFAULT nextval('section_se
 
 
 --
--- TOC entry 2575 (class 2604 OID 143883676)
+-- TOC entry 2575 (class 2604 OID 143982359)
 -- Name: status_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6586,7 +6592,7 @@ ALTER TABLE ONLY status ALTER COLUMN status_id SET DEFAULT nextval('status_statu
 
 
 --
--- TOC entry 2579 (class 2604 OID 143883677)
+-- TOC entry 2579 (class 2604 OID 143982360)
 -- Name: study_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6594,7 +6600,7 @@ ALTER TABLE ONLY study ALTER COLUMN study_id SET DEFAULT nextval('study_study_id
 
 
 --
--- TOC entry 2584 (class 2604 OID 143883678)
+-- TOC entry 2584 (class 2604 OID 143982361)
 -- Name: study_event_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6602,7 +6608,7 @@ ALTER TABLE ONLY study_event ALTER COLUMN study_event_id SET DEFAULT nextval('st
 
 
 --
--- TOC entry 2587 (class 2604 OID 143883679)
+-- TOC entry 2587 (class 2604 OID 143982362)
 -- Name: study_event_definition_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6610,7 +6616,7 @@ ALTER TABLE ONLY study_event_definition ALTER COLUMN study_event_definition_id S
 
 
 --
--- TOC entry 2588 (class 2604 OID 143883680)
+-- TOC entry 2588 (class 2604 OID 143982363)
 -- Name: study_group_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6618,7 +6624,7 @@ ALTER TABLE ONLY study_group ALTER COLUMN study_group_id SET DEFAULT nextval('st
 
 
 --
--- TOC entry 2591 (class 2604 OID 143883681)
+-- TOC entry 2591 (class 2604 OID 143982364)
 -- Name: study_group_class_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6626,7 +6632,7 @@ ALTER TABLE ONLY study_group_class ALTER COLUMN study_group_class_id SET DEFAULT
 
 
 --
--- TOC entry 2599 (class 2604 OID 143883682)
+-- TOC entry 2599 (class 2604 OID 143982365)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6634,7 +6640,7 @@ ALTER TABLE ONLY study_module_status ALTER COLUMN id SET DEFAULT nextval('study_
 
 
 --
--- TOC entry 2601 (class 2604 OID 143883683)
+-- TOC entry 2601 (class 2604 OID 143982366)
 -- Name: study_parameter_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6642,7 +6648,7 @@ ALTER TABLE ONLY study_parameter ALTER COLUMN study_parameter_id SET DEFAULT nex
 
 
 --
--- TOC entry 2602 (class 2604 OID 143883684)
+-- TOC entry 2602 (class 2604 OID 143982367)
 -- Name: study_parameter_value_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6650,7 +6656,7 @@ ALTER TABLE ONLY study_parameter_value ALTER COLUMN study_parameter_value_id SET
 
 
 --
--- TOC entry 2606 (class 2604 OID 143883685)
+-- TOC entry 2606 (class 2604 OID 143982368)
 -- Name: study_subject_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6658,7 +6664,7 @@ ALTER TABLE ONLY study_subject ALTER COLUMN study_subject_id SET DEFAULT nextval
 
 
 --
--- TOC entry 2608 (class 2604 OID 143883686)
+-- TOC entry 2608 (class 2604 OID 143982369)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6666,7 +6672,7 @@ ALTER TABLE ONLY study_subject_id ALTER COLUMN id SET DEFAULT nextval('study_sub
 
 
 --
--- TOC entry 2609 (class 2604 OID 143883687)
+-- TOC entry 2609 (class 2604 OID 143982370)
 -- Name: study_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6674,7 +6680,7 @@ ALTER TABLE ONLY study_type ALTER COLUMN study_type_id SET DEFAULT nextval('stud
 
 
 --
--- TOC entry 2610 (class 2604 OID 143883688)
+-- TOC entry 2610 (class 2604 OID 143982371)
 -- Name: study_user_role_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6682,7 +6688,7 @@ ALTER TABLE ONLY study_user_role ALTER COLUMN study_user_role_id SET DEFAULT nex
 
 
 --
--- TOC entry 2611 (class 2604 OID 143883689)
+-- TOC entry 2611 (class 2604 OID 143982372)
 -- Name: subject_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6690,7 +6696,7 @@ ALTER TABLE ONLY subject ALTER COLUMN subject_id SET DEFAULT nextval('subject_su
 
 
 --
--- TOC entry 2612 (class 2604 OID 143883690)
+-- TOC entry 2612 (class 2604 OID 143982373)
 -- Name: subject_event_status_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6698,7 +6704,7 @@ ALTER TABLE ONLY subject_event_status ALTER COLUMN subject_event_status_id SET D
 
 
 --
--- TOC entry 2613 (class 2604 OID 143883691)
+-- TOC entry 2613 (class 2604 OID 143982374)
 -- Name: subject_group_map_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6706,7 +6712,7 @@ ALTER TABLE ONLY subject_group_map ALTER COLUMN subject_group_map_id SET DEFAULT
 
 
 --
--- TOC entry 2630 (class 2604 OID 143883692)
+-- TOC entry 2630 (class 2604 OID 143982375)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6714,7 +6720,7 @@ ALTER TABLE ONLY system ALTER COLUMN id SET DEFAULT nextval('system_id_seq'::reg
 
 
 --
--- TOC entry 2634 (class 2604 OID 143883693)
+-- TOC entry 2634 (class 2604 OID 143982376)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6722,7 +6728,7 @@ ALTER TABLE ONLY system_group ALTER COLUMN id SET DEFAULT nextval('system_group_
 
 
 --
--- TOC entry 2635 (class 2604 OID 143883694)
+-- TOC entry 2635 (class 2604 OID 143982377)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6730,7 +6736,7 @@ ALTER TABLE ONLY term ALTER COLUMN id SET DEFAULT nextval('term_id_seq'::regclas
 
 
 --
--- TOC entry 2636 (class 2604 OID 143883695)
+-- TOC entry 2636 (class 2604 OID 143982378)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6738,7 +6744,7 @@ ALTER TABLE ONLY term_element ALTER COLUMN id SET DEFAULT nextval('term_element_
 
 
 --
--- TOC entry 2637 (class 2604 OID 143883696)
+-- TOC entry 2637 (class 2604 OID 143982379)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6746,7 +6752,7 @@ ALTER TABLE ONLY usage_statistics_data ALTER COLUMN id SET DEFAULT nextval('usag
 
 
 --
--- TOC entry 2642 (class 2604 OID 143883697)
+-- TOC entry 2642 (class 2604 OID 143982380)
 -- Name: user_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6754,7 +6760,7 @@ ALTER TABLE ONLY user_account ALTER COLUMN user_id SET DEFAULT nextval('user_acc
 
 
 --
--- TOC entry 2643 (class 2604 OID 143883698)
+-- TOC entry 2643 (class 2604 OID 143982381)
 -- Name: role_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6762,7 +6768,7 @@ ALTER TABLE ONLY user_role ALTER COLUMN role_id SET DEFAULT nextval('user_role_r
 
 
 --
--- TOC entry 2644 (class 2604 OID 143883699)
+-- TOC entry 2644 (class 2604 OID 143982382)
 -- Name: user_type_id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6770,7 +6776,7 @@ ALTER TABLE ONLY user_type ALTER COLUMN user_type_id SET DEFAULT nextval('user_t
 
 
 --
--- TOC entry 2645 (class 2604 OID 143883700)
+-- TOC entry 2645 (class 2604 OID 143982383)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6778,7 +6784,7 @@ ALTER TABLE ONLY widget ALTER COLUMN id SET DEFAULT nextval('widget_id_seq'::reg
 
 
 --
--- TOC entry 2646 (class 2604 OID 143883701)
+-- TOC entry 2646 (class 2604 OID 143982384)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: clincapture
 --
 
@@ -6786,7 +6792,7 @@ ALTER TABLE ONLY widgets_layout ALTER COLUMN id SET DEFAULT nextval('widgets_lay
 
 
 --
--- TOC entry 3166 (class 0 OID 143882831)
+-- TOC entry 3172 (class 0 OID 143981523)
 -- Dependencies: 140
 -- Data for Name: archived_dataset_file; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6794,7 +6800,7 @@ ALTER TABLE ONLY widgets_layout ALTER COLUMN id SET DEFAULT nextval('widgets_lay
 
 
 --
--- TOC entry 3167 (class 0 OID 143882839)
+-- TOC entry 3173 (class 0 OID 143981531)
 -- Dependencies: 142
 -- Data for Name: audit_event; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6802,7 +6808,7 @@ ALTER TABLE ONLY widgets_layout ALTER COLUMN id SET DEFAULT nextval('widgets_lay
 
 
 --
--- TOC entry 3168 (class 0 OID 143882847)
+-- TOC entry 3174 (class 0 OID 143981539)
 -- Dependencies: 144
 -- Data for Name: audit_event_context; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6810,7 +6816,7 @@ ALTER TABLE ONLY widgets_layout ALTER COLUMN id SET DEFAULT nextval('widgets_lay
 
 
 --
--- TOC entry 3169 (class 0 OID 143882850)
+-- TOC entry 3175 (class 0 OID 143981542)
 -- Dependencies: 145
 -- Data for Name: audit_event_values; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6818,7 +6824,7 @@ ALTER TABLE ONLY widgets_layout ALTER COLUMN id SET DEFAULT nextval('widgets_lay
 
 
 --
--- TOC entry 3170 (class 0 OID 143882856)
+-- TOC entry 3176 (class 0 OID 143981548)
 -- Dependencies: 146
 -- Data for Name: audit_log_event; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6838,7 +6844,7 @@ INSERT INTO audit_log_event VALUES (14, '2016-06-23 15:25:59.382', 'study_subjec
 
 
 --
--- TOC entry 3171 (class 0 OID 143882864)
+-- TOC entry 3177 (class 0 OID 143981556)
 -- Dependencies: 148
 -- Data for Name: audit_log_event_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6883,7 +6889,7 @@ INSERT INTO audit_log_event_type VALUES (54, 'event_crf_deleted');
 
 
 --
--- TOC entry 3172 (class 0 OID 143882869)
+-- TOC entry 3178 (class 0 OID 143981561)
 -- Dependencies: 150
 -- Data for Name: audit_log_randomization; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6891,7 +6897,7 @@ INSERT INTO audit_log_event_type VALUES (54, 'event_crf_deleted');
 
 
 --
--- TOC entry 3173 (class 0 OID 143882877)
+-- TOC entry 3179 (class 0 OID 143981569)
 -- Dependencies: 152
 -- Data for Name: audit_user_login; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6928,10 +6934,11 @@ INSERT INTO audit_user_login VALUES (29, 'demo_crc', 5, '2016-06-14 15:23:18.645
 INSERT INTO audit_user_login VALUES (30, 'demo_crc', 5, '2016-06-16 13:18:08.411', 1, 0);
 INSERT INTO audit_user_login VALUES (31, 'root', 1, '2016-06-16 13:59:51.648', 1, 0);
 INSERT INTO audit_user_login VALUES (32, 'demo_crc', 5, '2016-06-23 15:24:33.141', 1, 0);
+INSERT INTO audit_user_login VALUES (33, 'root', 1, '2016-06-29 12:28:33.585', 1, 0);
 
 
 --
--- TOC entry 3174 (class 0 OID 143882882)
+-- TOC entry 3180 (class 0 OID 143981574)
 -- Dependencies: 154
 -- Data for Name: authorities; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6947,7 +6954,7 @@ INSERT INTO authorities VALUES (8, 'demo_eval', 'ROLE_USER', 0);
 
 
 --
--- TOC entry 3175 (class 0 OID 143882887)
+-- TOC entry 3181 (class 0 OID 143981579)
 -- Dependencies: 156
 -- Data for Name: coded_item; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6955,7 +6962,7 @@ INSERT INTO authorities VALUES (8, 'demo_eval', 'ROLE_USER', 0);
 
 
 --
--- TOC entry 3176 (class 0 OID 143882893)
+-- TOC entry 3182 (class 0 OID 143981585)
 -- Dependencies: 157
 -- Data for Name: coded_item_element; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6963,7 +6970,7 @@ INSERT INTO authorities VALUES (8, 'demo_eval', 'ROLE_USER', 0);
 
 
 --
--- TOC entry 3177 (class 0 OID 143882903)
+-- TOC entry 3183 (class 0 OID 143981595)
 -- Dependencies: 160
 -- Data for Name: completion_status; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6972,7 +6979,7 @@ INSERT INTO completion_status VALUES (1, 1, 'completion status', 'place filler f
 
 
 --
--- TOC entry 3178 (class 0 OID 143882911)
+-- TOC entry 3184 (class 0 OID 143981603)
 -- Dependencies: 162
 -- Data for Name: configuration; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -6990,7 +6997,7 @@ INSERT INTO configuration VALUES (4, 'pwd.chars.max', '0', 'Password maximum len
 
 
 --
--- TOC entry 3179 (class 0 OID 143882919)
+-- TOC entry 3185 (class 0 OID 143981611)
 -- Dependencies: 164
 -- Data for Name: crf; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -7005,10 +7012,12 @@ INSERT INTO crf VALUES (7, 1, 'CRF_SCD', 'CRF_SCD', 1, '2016-06-14 13:13:51.524+
 INSERT INTO crf VALUES (8, 1, 'CRF_Data_type_Ungrouped', 'CRF_Data_type_Ungrouped', 1, '2016-06-14 13:14:11.979+03', '2016-06-14 13:14:12.025+03', 1, 'F_CRF_DATA_TYPE_UNGROUPED', 1, true, 'excel');
 INSERT INTO crf VALUES (9, 1, 'CRF_One_section', 'CRF_One_section', 1, '2016-06-16 14:40:30.701+03', '2016-06-16 14:40:30.773+03', 1, 'F_CRF_ONE_SECTION', 1, true, 'excel');
 INSERT INTO crf VALUES (10, 1, 'CRF_Two_sections', 'CRF_Two_sections', 1, '2016-06-16 14:40:45.238+03', '2016-06-16 14:40:45.289+03', 1, 'F_CRF_TWO_SECTIONS', 1, true, 'excel');
+INSERT INTO crf VALUES (11, 1, 'CRF_Default_values_Ungrouped', 'CRF_Default_values_Ungrouped', 1, '2016-06-29 12:31:42.706+03', '2016-06-29 12:31:42.791+03', 1, 'F_CRF_DEFAULT_VALUES_UNGROU', 1, true, 'excel');
+INSERT INTO crf VALUES (12, 1, 'CRF_Default_values_Grouped', 'CRF_Default_values_Grouped', 1, '2016-06-29 12:32:42.435+03', '2016-06-29 12:32:42.48+03', 1, 'F_CRF_DEFAULT_VALUES_GROUPE', 1, true, 'excel');
 
 
 --
--- TOC entry 3180 (class 0 OID 143882930)
+-- TOC entry 3186 (class 0 OID 143981622)
 -- Dependencies: 167
 -- Data for Name: crf_version; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -7023,10 +7032,12 @@ INSERT INTO crf_version VALUES (7, 7, '1', 'CRF_007', 'CRF SCD AT', 1, '2016-06-
 INSERT INTO crf_version VALUES (8, 8, 'v. 1.0', 'Test CRF', 'For testing purpose', 1, '2016-06-14 13:14:11.979+03', NULL, 1, NULL, 'F_TESTCRF_V10');
 INSERT INTO crf_version VALUES (9, 9, '1.0', 'CRF_001', 'root', 1, '2016-06-16 14:40:30.701+03', NULL, 1, NULL, 'F_CRF_001_10');
 INSERT INTO crf_version VALUES (10, 10, '1.0', 'v1.0', 'root', 1, '2016-06-16 14:40:45.238+03', NULL, 1, NULL, 'F_V10_10');
+INSERT INTO crf_version VALUES (11, 11, '1', 'Default values Ungrouped', 'Default values Ungrouped AT', 1, '2016-06-29 12:31:42.706+03', NULL, 1, NULL, 'F_DEFAULTVALUESUNGROUPED_1');
+INSERT INTO crf_version VALUES (12, 12, '1', 'CRF Default values Grouped', 'CRF Default values Grouped AT', 1, '2016-06-29 12:32:42.435+03', NULL, 1, NULL, 'F_CRFDEFAULTVALUESGROUPED_1');
 
 
 --
--- TOC entry 3181 (class 0 OID 143882940)
+-- TOC entry 3187 (class 0 OID 143981632)
 -- Dependencies: 170
 -- Data for Name: crfs_masking; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -7034,7 +7045,7 @@ INSERT INTO crf_version VALUES (10, 10, '1.0', 'v1.0', 'root', 1, '2016-06-16 14
 
 
 --
--- TOC entry 3182 (class 0 OID 143882946)
+-- TOC entry 3188 (class 0 OID 143981638)
 -- Dependencies: 172
 -- Data for Name: databasechangelog; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8284,10 +8295,21 @@ INSERT INTO databasechangelog VALUES ('2016-04-29-TICKET3010-01', 'aram', 'migra
 INSERT INTO databasechangelog VALUES ('2016-04-29-TICKET3010-02', 'aram', 'migration/clincaptrue/2016-04-29-TICKET3010.xml', '2016-06-13 18:57:16.818', 1237, 'EXECUTED', '7:1be7ea7c25983bf9dfad343b4d8ce7dd', 'dropColumn', 'Drop unused field decision_condition_id from the item_form_metadata.', NULL, '3.4.2', NULL, NULL);
 INSERT INTO databasechangelog VALUES ('2016-05-05-TICKET3019-01', 'skirpichenok', 'migration/clincaptrue/2016-05-05-TICKET3019.xml', '2016-06-13 18:57:16.83', 1238, 'EXECUTED', '7:f47587638ad72c67d330a768c5b550c2', 'dropForeignKeyConstraint (x2), sql', 'replace constraints in dn_event_crf_map and dn_item_data_map tables', NULL, '3.4.2', NULL, NULL);
 INSERT INTO databasechangelog VALUES ('2016-06-01-TICKET2985', 'aram', 'migration/clincaptrue/2016-06-01-TICKET2985.xml', '2016-06-13 18:57:16.834', 1239, 'EXECUTED', '7:a5109ed7eba817c8a00cc12d57c02135', 'update', 'Change client default logo.', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2014-01-16-TICKET863-18', 'skirpichenok', 'classpath:migration/clincaptrue/2014-01-16-TICKET863.xml', '2016-06-29 12:26:40.461', 1240, 'EXECUTED', '7:7b1476be8ec2cb77e27a676a69061b27', 'insert', 'Add tokenExpirationDate parameter into the system table', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2014-01-16-TICKET863-19', 'skirpichenok', 'classpath:migration/clincaptrue/2014-01-16-TICKET863.xml', '2016-06-29 12:26:40.479', 1241, 'EXECUTED', '7:fa26c9133463ec12f50b701d797ecc01', 'sql', 'Rename tokenExpirationDate parameter to the tokenExpirationInHours', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-04-29-TICKET3120-0', 'denis', 'migration/clincaptrue/2016-04-29-TICKET3120.xml', '2016-06-29 12:26:52.058', 1242, 'EXECUTED', '7:edae708e3e4092eded0d22168e7c50ff', 'createTable', 'Add new entity email_log.', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-04-29-TICKET3120-1', 'denis', 'migration/clincaptrue/2016-04-29-TICKET3120.xml', '2016-06-29 12:26:52.08', 1243, 'EXECUTED', '7:de623f8189179ceee1318fd06a833114', 'addForeignKeyConstraint (x2), addNotNullConstraint', 'Add constrains for email_log table.', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-1', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.09', 1244, 'EXECUTED', '7:a754baed6ae97ce810e7f8d1dce674ad', 'createProcedure', 'Create function create_roles_for_root_user', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-2', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.099', 1245, 'EXECUTED', '7:bb0565778a019a95ac45bb525bddf4ba', 'sql', 'Create function study_insert_trigger', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-3', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.11', 1246, 'EXECUTED', '7:b669bfc153f380de33759c9bd64518fb', 'sql', 'Drop all records for root user from study_user_role table then execute and drop function create_roles_for_root_user', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-4', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.123', 1247, 'EXECUTED', '7:e38588a2e4fd9c9dfe67c6d849bc6eb0', 'addColumn', 'Add new fields into the study_user_role table that are used for token based authentication on REST API side', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-5', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.13', 1248, 'EXECUTED', '7:01ad485d6601dd9982ab94fb2635f92a', 'sql', 'Delete all records from study_user_role table where study_id is null', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-6', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.137', 1249, 'EXECUTED', '7:bbc9091497110e6c2b8ad4fd7e8921da', 'addNotNullConstraint', 'Add not null constraint for study_id in study_user_role table', NULL, '3.4.2', NULL, NULL);
+INSERT INTO databasechangelog VALUES ('2016-06-07-TICKET3031-7', 'skirpichenok', 'migration/clincaptrue/postgres/2016-06-07-TICKET3031.xml', '2016-06-29 12:26:52.149', 1250, 'EXECUTED', '7:e3b82024f4623fe0b55f0f750aa42535', 'dropColumn, addColumn', 'Drop token_expiration_date and add token_generation_date into the study_user_role table', NULL, '3.4.2', NULL, NULL);
 
 
 --
--- TOC entry 3183 (class 0 OID 143882952)
+-- TOC entry 3189 (class 0 OID 143981644)
 -- Dependencies: 173
 -- Data for Name: databasechangeloglock; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8296,7 +8318,7 @@ INSERT INTO databasechangeloglock VALUES (1, false, NULL, NULL);
 
 
 --
--- TOC entry 3184 (class 0 OID 143882955)
+-- TOC entry 3190 (class 0 OID 143981647)
 -- Dependencies: 174
 -- Data for Name: dataset; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8304,7 +8326,7 @@ INSERT INTO databasechangeloglock VALUES (1, false, NULL, NULL);
 
 
 --
--- TOC entry 3185 (class 0 OID 143882977)
+-- TOC entry 3191 (class 0 OID 143981669)
 -- Dependencies: 175
 -- Data for Name: dataset_crf_version_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8312,7 +8334,7 @@ INSERT INTO databasechangeloglock VALUES (1, false, NULL, NULL);
 
 
 --
--- TOC entry 3186 (class 0 OID 143882982)
+-- TOC entry 3192 (class 0 OID 143981674)
 -- Dependencies: 177
 -- Data for Name: dataset_item_status; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8323,7 +8345,7 @@ INSERT INTO dataset_item_status VALUES (3, 'completed_and_non_completed', 'Data 
 
 
 --
--- TOC entry 3187 (class 0 OID 143882987)
+-- TOC entry 3193 (class 0 OID 143981679)
 -- Dependencies: 179
 -- Data for Name: dataset_study_group_class_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8331,7 +8353,7 @@ INSERT INTO dataset_item_status VALUES (3, 'completed_and_non_completed', 'Data 
 
 
 --
--- TOC entry 3188 (class 0 OID 143882990)
+-- TOC entry 3194 (class 0 OID 143981682)
 -- Dependencies: 180
 -- Data for Name: dictionary; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8340,7 +8362,7 @@ INSERT INTO dictionary VALUES (1, 2, 0, 'alias', 'Automatically created by the s
 
 
 --
--- TOC entry 3189 (class 0 OID 143882998)
+-- TOC entry 3195 (class 0 OID 143981690)
 -- Dependencies: 182
 -- Data for Name: discrepancy_description; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8360,7 +8382,7 @@ INSERT INTO discrepancy_description VALUES (12, 'Information was not available',
 
 
 --
--- TOC entry 3190 (class 0 OID 143883006)
+-- TOC entry 3196 (class 0 OID 143981698)
 -- Dependencies: 184
 -- Data for Name: discrepancy_note; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8368,7 +8390,7 @@ INSERT INTO discrepancy_description VALUES (12, 'Information was not available',
 
 
 --
--- TOC entry 3191 (class 0 OID 143883014)
+-- TOC entry 3197 (class 0 OID 143981706)
 -- Dependencies: 186
 -- Data for Name: discrepancy_note_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8383,7 +8405,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3192 (class 0 OID 143883024)
+-- TOC entry 3198 (class 0 OID 143981716)
 -- Dependencies: 189
 -- Data for Name: dn_event_crf_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8391,7 +8413,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3193 (class 0 OID 143883027)
+-- TOC entry 3199 (class 0 OID 143981719)
 -- Dependencies: 190
 -- Data for Name: dn_item_data_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8399,7 +8421,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3194 (class 0 OID 143883030)
+-- TOC entry 3200 (class 0 OID 143981722)
 -- Dependencies: 191
 -- Data for Name: dn_study_event_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8407,7 +8429,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3195 (class 0 OID 143883033)
+-- TOC entry 3201 (class 0 OID 143981725)
 -- Dependencies: 192
 -- Data for Name: dn_study_subject_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8415,7 +8437,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3196 (class 0 OID 143883036)
+-- TOC entry 3202 (class 0 OID 143981728)
 -- Dependencies: 193
 -- Data for Name: dn_subject_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8423,7 +8445,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3197 (class 0 OID 143883039)
+-- TOC entry 3203 (class 0 OID 143981731)
 -- Dependencies: 194
 -- Data for Name: dyn_item_form_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8431,7 +8453,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3198 (class 0 OID 143883046)
+-- TOC entry 3204 (class 0 OID 143981738)
 -- Dependencies: 196
 -- Data for Name: dyn_item_group_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8439,7 +8461,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3199 (class 0 OID 143883053)
+-- TOC entry 3205 (class 0 OID 143981745)
 -- Dependencies: 198
 -- Data for Name: dynamic_event; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8447,7 +8469,7 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3200 (class 0 OID 143883061)
+-- TOC entry 3206 (class 0 OID 143981753)
 -- Dependencies: 200
 -- Data for Name: edc_item_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
@@ -8455,16 +8477,16 @@ INSERT INTO discrepancy_note_type VALUES (7, 'Unclear/Unreadable', '');
 
 
 --
--- TOC entry 3201 (class 0 OID 143883067)
--- Dependencies: 202
+-- TOC entry 3277 (class 0 OID 143984369)
+-- Dependencies: 338
 -- Data for Name: email_log; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3202 (class 0 OID 143883075)
--- Dependencies: 204
+-- TOC entry 3207 (class 0 OID 143981759)
+-- Dependencies: 202
 -- Data for Name: event_crf; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8474,48 +8496,54 @@ INSERT INTO event_crf VALUES (3, 2, 8, NULL, '', 1, 1, '', NULL, NULL, NULL, NUL
 
 
 --
--- TOC entry 3203 (class 0 OID 143883089)
--- Dependencies: 206
+-- TOC entry 3208 (class 0 OID 143981773)
+-- Dependencies: 204
 -- Data for Name: event_crf_section; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3204 (class 0 OID 143883094)
--- Dependencies: 208
+-- TOC entry 3209 (class 0 OID 143981778)
+-- Dependencies: 206
 -- Data for Name: event_definition_crf; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO event_definition_crf VALUES (1, 1, 1, 8, true, false, false, false, '', 8, 1, 1, '2016-06-14 13:15:59.798+03', '2016-06-16 14:42:00.118+03', 1, 1, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (4, 1, 1, 3, true, false, false, false, '', 3, 1, 1, '2016-06-14 13:15:59.818+03', '2016-06-16 14:42:00.12+03', 1, 2, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (7, 1, 1, 5, true, false, false, false, '', 5, 1, 1, '2016-06-14 13:15:59.825+03', '2016-06-16 14:42:00.121+03', 1, 3, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (10, 1, 1, 2, true, false, false, false, '', 2, 1, 1, '2016-06-14 13:15:59.831+03', '2016-06-16 14:42:00.121+03', 1, 4, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (13, 1, 1, 1, true, false, false, false, '', 1, 1, 1, '2016-06-14 13:15:59.837+03', '2016-06-16 14:42:00.122+03', 1, 5, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (16, 1, 1, 7, true, false, false, false, '', 7, 1, 1, '2016-06-14 13:15:59.844+03', '2016-06-16 14:42:00.125+03', 1, 6, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (19, 1, 1, 9, true, false, false, false, '', 9, 1, 1, '2016-06-16 14:42:00.127+03', NULL, NULL, 7, false, false, 3, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (20, 1, 3, 9, true, false, false, false, '', 9, 1, 1, '2016-06-16 14:42:00.135+03', NULL, NULL, 7, false, false, 3, '', 19, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (21, 1, 4, 9, true, false, false, false, '', 9, 1, 1, '2016-06-16 14:42:00.136+03', NULL, NULL, 7, false, false, 3, '', 19, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (22, 1, 1, 10, true, false, false, false, '', 10, 1, 1, '2016-06-16 14:42:00.137+03', NULL, NULL, 8, false, false, 3, '', NULL, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (23, 1, 3, 10, true, false, false, false, '', 10, 1, 1, '2016-06-16 14:42:00.139+03', NULL, NULL, 8, false, false, 3, '', 22, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (24, 1, 4, 10, true, false, false, false, '', 10, 1, 1, '2016-06-16 14:42:00.14+03', NULL, NULL, 8, false, false, 3, '', 22, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (2, 1, 3, 8, true, false, false, false, '', 8, 1, 1, '2016-06-14 13:15:59.813+03', '2016-06-16 14:42:00.14+03', 1, 1, false, false, 1, '', 1, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (3, 1, 4, 8, true, false, false, false, '', 8, 1, 1, '2016-06-14 13:15:59.816+03', '2016-06-16 14:42:00.141+03', 1, 1, false, false, 1, '', 1, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (5, 1, 3, 3, true, false, false, false, '', 3, 1, 1, '2016-06-14 13:15:59.821+03', '2016-06-16 14:42:00.142+03', 1, 2, false, false, 1, '', 4, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (6, 1, 4, 3, true, false, false, false, '', 3, 1, 1, '2016-06-14 13:15:59.823+03', '2016-06-16 14:42:00.143+03', 1, 2, false, false, 1, '', 4, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (8, 1, 3, 5, true, false, false, false, '', 5, 1, 1, '2016-06-14 13:15:59.828+03', '2016-06-16 14:42:00.144+03', 1, 3, false, false, 1, '', 7, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (9, 1, 4, 5, true, false, false, false, '', 5, 1, 1, '2016-06-14 13:15:59.829+03', '2016-06-16 14:42:00.145+03', 1, 3, false, false, 1, '', 7, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (11, 1, 3, 2, true, false, false, false, '', 2, 1, 1, '2016-06-14 13:15:59.833+03', '2016-06-16 14:42:00.146+03', 1, 4, false, false, 1, '', 10, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (12, 1, 4, 2, true, false, false, false, '', 2, 1, 1, '2016-06-14 13:15:59.835+03', '2016-06-16 14:42:00.147+03', 1, 4, false, false, 1, '', 10, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (14, 1, 3, 1, true, false, false, false, '', 1, 1, 1, '2016-06-14 13:15:59.839+03', '2016-06-16 14:42:00.148+03', 1, 5, false, false, 1, '', 13, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (15, 1, 4, 1, true, false, false, false, '', 1, 1, 1, '2016-06-14 13:15:59.842+03', '2016-06-16 14:42:00.15+03', 1, 5, false, false, 1, '', 13, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (17, 1, 3, 7, true, false, false, false, '', 7, 1, 1, '2016-06-14 13:15:59.846+03', '2016-06-16 14:42:00.151+03', 1, 6, false, false, 1, '', 16, '', '', false, 'leftToRight', false);
-INSERT INTO event_definition_crf VALUES (18, 1, 4, 7, true, false, false, false, '', 7, 1, 1, '2016-06-14 13:15:59.848+03', '2016-06-16 14:42:00.152+03', 1, 6, false, false, 1, '', 16, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (1, 1, 1, 8, true, false, false, false, '', 8, 1, 1, '2016-06-14 13:15:59.798+03', '2016-06-29 12:33:52.637+03', 1, 1, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (4, 1, 1, 3, true, false, false, false, '', 3, 1, 1, '2016-06-14 13:15:59.818+03', '2016-06-29 12:33:52.64+03', 1, 2, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (7, 1, 1, 5, true, false, false, false, '', 5, 1, 1, '2016-06-14 13:15:59.825+03', '2016-06-29 12:33:52.642+03', 1, 3, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (10, 1, 1, 2, true, false, false, false, '', 2, 1, 1, '2016-06-14 13:15:59.831+03', '2016-06-29 12:33:52.643+03', 1, 4, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (13, 1, 1, 1, true, false, false, false, '', 1, 1, 1, '2016-06-14 13:15:59.837+03', '2016-06-29 12:33:52.644+03', 1, 5, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (16, 1, 1, 7, true, false, false, false, '', 7, 1, 1, '2016-06-14 13:15:59.844+03', '2016-06-29 12:33:52.646+03', 1, 6, false, false, 1, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (19, 1, 1, 9, true, false, false, false, '', 9, 1, 1, '2016-06-16 14:42:00.127+03', '2016-06-29 12:33:52.647+03', 1, 7, false, false, 3, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (22, 1, 1, 10, true, false, false, false, '', 10, 1, 1, '2016-06-16 14:42:00.137+03', '2016-06-29 12:33:52.648+03', 1, 8, false, false, 3, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (25, 1, 1, 12, true, false, false, false, '', 12, 1, 1, '2016-06-29 12:33:52.649+03', NULL, NULL, 9, false, false, 3, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (26, 1, 3, 12, true, false, false, false, '', 12, 1, 1, '2016-06-29 12:33:52.658+03', NULL, NULL, 9, false, false, 3, '', 25, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (27, 1, 4, 12, true, false, false, false, '', 12, 1, 1, '2016-06-29 12:33:52.659+03', NULL, NULL, 9, false, false, 3, '', 25, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (28, 1, 1, 11, true, false, false, false, '', 11, 1, 1, '2016-06-29 12:33:52.66+03', NULL, NULL, 10, false, false, 3, '', NULL, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (29, 1, 3, 11, true, false, false, false, '', 11, 1, 1, '2016-06-29 12:33:52.662+03', NULL, NULL, 10, false, false, 3, '', 28, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (30, 1, 4, 11, true, false, false, false, '', 11, 1, 1, '2016-06-29 12:33:52.663+03', NULL, NULL, 10, false, false, 3, '', 28, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (2, 1, 3, 8, true, false, false, false, '', 8, 1, 1, '2016-06-14 13:15:59.813+03', '2016-06-29 12:33:52.664+03', 1, 1, false, false, 1, '', 1, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (3, 1, 4, 8, true, false, false, false, '', 8, 1, 1, '2016-06-14 13:15:59.816+03', '2016-06-29 12:33:52.665+03', 1, 1, false, false, 1, '', 1, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (6, 1, 4, 3, true, false, false, false, '', 3, 1, 1, '2016-06-14 13:15:59.823+03', '2016-06-29 12:33:52.666+03', 1, 2, false, false, 1, '', 4, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (5, 1, 3, 3, true, false, false, false, '', 3, 1, 1, '2016-06-14 13:15:59.821+03', '2016-06-29 12:33:52.668+03', 1, 2, false, false, 1, '', 4, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (9, 1, 4, 5, true, false, false, false, '', 5, 1, 1, '2016-06-14 13:15:59.829+03', '2016-06-29 12:33:52.67+03', 1, 3, false, false, 1, '', 7, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (8, 1, 3, 5, true, false, false, false, '', 5, 1, 1, '2016-06-14 13:15:59.828+03', '2016-06-29 12:33:52.671+03', 1, 3, false, false, 1, '', 7, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (11, 1, 3, 2, true, false, false, false, '', 2, 1, 1, '2016-06-14 13:15:59.833+03', '2016-06-29 12:33:52.672+03', 1, 4, false, false, 1, '', 10, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (12, 1, 4, 2, true, false, false, false, '', 2, 1, 1, '2016-06-14 13:15:59.835+03', '2016-06-29 12:33:52.673+03', 1, 4, false, false, 1, '', 10, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (14, 1, 3, 1, true, false, false, false, '', 1, 1, 1, '2016-06-14 13:15:59.839+03', '2016-06-29 12:33:52.674+03', 1, 5, false, false, 1, '', 13, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (15, 1, 4, 1, true, false, false, false, '', 1, 1, 1, '2016-06-14 13:15:59.842+03', '2016-06-29 12:33:52.675+03', 1, 5, false, false, 1, '', 13, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (18, 1, 4, 7, true, false, false, false, '', 7, 1, 1, '2016-06-14 13:15:59.848+03', '2016-06-29 12:33:52.677+03', 1, 6, false, false, 1, '', 16, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (17, 1, 3, 7, true, false, false, false, '', 7, 1, 1, '2016-06-14 13:15:59.846+03', '2016-06-29 12:33:52.677+03', 1, 6, false, false, 1, '', 16, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (21, 1, 4, 9, true, false, false, false, '', 9, 1, 1, '2016-06-16 14:42:00.136+03', '2016-06-29 12:33:52.678+03', 1, 7, false, false, 3, '', 19, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (20, 1, 3, 9, true, false, false, false, '', 9, 1, 1, '2016-06-16 14:42:00.135+03', '2016-06-29 12:33:52.68+03', 1, 7, false, false, 3, '', 19, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (23, 1, 3, 10, true, false, false, false, '', 10, 1, 1, '2016-06-16 14:42:00.139+03', '2016-06-29 12:33:52.681+03', 1, 8, false, false, 3, '', 22, '', '', false, 'leftToRight', false);
+INSERT INTO event_definition_crf VALUES (24, 1, 4, 10, true, false, false, false, '', 10, 1, 1, '2016-06-16 14:42:00.14+03', '2016-06-29 12:33:52.682+03', 1, 8, false, false, 3, '', 22, '', '', false, 'leftToRight', false);
 
 
 --
--- TOC entry 3205 (class 0 OID 143883107)
--- Dependencies: 210
+-- TOC entry 3210 (class 0 OID 143981791)
+-- Dependencies: 208
 -- Data for Name: export_format; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8527,8 +8555,8 @@ INSERT INTO export_format VALUES (5, 'text/plain', 'Default export format for SA
 
 
 --
--- TOC entry 3206 (class 0 OID 143883117)
--- Dependencies: 213
+-- TOC entry 3211 (class 0 OID 143981801)
+-- Dependencies: 211
 -- Data for Name: group_class_types; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8540,8 +8568,8 @@ INSERT INTO group_class_types VALUES (4, 'Dynamic Group', NULL);
 
 
 --
--- TOC entry 3207 (class 0 OID 143883125)
--- Dependencies: 215
+-- TOC entry 3212 (class 0 OID 143981809)
+-- Dependencies: 213
 -- Data for Name: item; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8601,19 +8629,41 @@ INSERT INTO item VALUES (53, 'QS6', 'QS6', '', false, 6, 1, 1, 1, '2016-06-16 14
 INSERT INTO item VALUES (54, 'QS7', 'QS7', '', false, 11, 1, 1, 1, '2016-06-16 14:40:45.238+03', NULL, NULL, 'I_CRF_T_QS7', 'QS7');
 INSERT INTO item VALUES (55, 'QS8', 'QS8', '', false, 9, 1, 1, 1, '2016-06-16 14:40:45.238+03', NULL, NULL, 'I_CRF_T_QS8', 'QS8');
 INSERT INTO item VALUES (56, 'QS9', 'QS9', '', false, 10, 1, 1, 1, '2016-06-16 14:40:45.238+03', NULL, NULL, 'I_CRF_T_QS9', 'QS9');
+INSERT INTO item VALUES (57, 'DEVAS1', 'text', 'Units', false, 5, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS1', 'DEVAS1');
+INSERT INTO item VALUES (58, 'DEVAS2', 'textarea', 'Units', false, 5, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS2', 'DEVAS2');
+INSERT INTO item VALUES (59, 'DEVAS3', 'single-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS3', 'DEVAS3');
+INSERT INTO item VALUES (60, 'DEVAS4', 'single-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS4', 'DEVAS4');
+INSERT INTO item VALUES (61, 'DEVAS5', 'single-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS5', 'DEVAS5');
+INSERT INTO item VALUES (62, 'DEVAS6', 'multi-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS6', 'DEVAS6');
+INSERT INTO item VALUES (63, 'DEVAS7', 'multi-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS7', 'DEVAS7');
+INSERT INTO item VALUES (64, 'DEVAS8', 'multi-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS8', 'DEVAS8');
+INSERT INTO item VALUES (65, 'DEVAS9', 'checkbox', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS9', 'DEVAS9');
+INSERT INTO item VALUES (66, 'DEVAS10', 'checkbox', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS10', 'DEVAS10');
+INSERT INTO item VALUES (67, 'DEVAS11', 'checkbox', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:31:42.706+03', NULL, NULL, 'I_CRF_D_DEVAS11', 'DEVAS11');
+INSERT INTO item VALUES (68, 'DEFVG1', 'text', 'Units', false, 5, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG1', 'DEFVG1');
+INSERT INTO item VALUES (69, 'DEFVG2', 'textarea', 'Units', false, 5, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG2', 'DEFVG2');
+INSERT INTO item VALUES (70, 'DEFVG3', 'single-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG3', 'DEFVG3');
+INSERT INTO item VALUES (71, 'DEFVG4', 'single-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG4', 'DEFVG4');
+INSERT INTO item VALUES (72, 'DEFVG5', 'single-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG5', 'DEFVG5');
+INSERT INTO item VALUES (73, 'DEFVG6', 'multi-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG6', 'DEFVG6');
+INSERT INTO item VALUES (74, 'DEFVG7', 'multi-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG7', 'DEFVG7');
+INSERT INTO item VALUES (75, 'DEFVG8', 'multi-select', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG8', 'DEFVG8');
+INSERT INTO item VALUES (76, 'DEFVG9', 'checkbox', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG9', 'DEFVG9');
+INSERT INTO item VALUES (77, 'DEFVG10', 'checkbox', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG10', 'DEFVG10');
+INSERT INTO item VALUES (78, 'DEFVG11', 'checkbox', 'Units', false, 6, 1, 1, 1, '2016-06-29 12:32:42.435+03', NULL, NULL, 'I_CRF_D_DEFVG11', 'DEFVG11');
 
 
 --
--- TOC entry 3208 (class 0 OID 143883131)
--- Dependencies: 216
+-- TOC entry 3213 (class 0 OID 143981815)
+-- Dependencies: 214
 -- Data for Name: item_data; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3209 (class 0 OID 143883140)
--- Dependencies: 218
+-- TOC entry 3214 (class 0 OID 143981824)
+-- Dependencies: 216
 -- Data for Name: item_data_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8634,8 +8684,8 @@ INSERT INTO item_data_type VALUES (14, 'LABEL', 'Label', 'Type to be label', NUL
 
 
 --
--- TOC entry 3210 (class 0 OID 143883148)
--- Dependencies: 220
+-- TOC entry 3215 (class 0 OID 143981832)
+-- Dependencies: 218
 -- Data for Name: item_form_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8695,11 +8745,33 @@ INSERT INTO item_form_metadata VALUES (53, 53, 10, '', '', 0, '', 1, '', '', 'ch
 INSERT INTO item_form_metadata VALUES (54, 54, 10, '', '', 0, '', 1, '', '', 'file', '', 11, 32, '', '', 16, false, '', '', '', true, '', 0);
 INSERT INTO item_form_metadata VALUES (55, 55, 10, '', '', 0, '', 1, '', '', 'Date', '', 11, 29, '', '', 17, false, '', '', '', true, '', 0);
 INSERT INTO item_form_metadata VALUES (56, 56, 10, '', '', 0, '', 1, '', '', 'Pdate', '', 11, 29, '', '', 18, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (57, 57, 11, '', '', 0, '', 1, '', '1.', 'text', 'Right item text', 12, 37, '', '', 1, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (58, 58, 11, '', '', 0, '', 1, '', '1.', 'textarea', 'Right item text', 12, 38, '', '', 2, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (59, 59, 11, '', '', 0, '', 1, '', '1.', 'single-select', 'with default', 12, 39, '', '', 3, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (60, 60, 11, '', '', 0, '', 1, '', '1.', 'single-select', 'no default', 12, 39, '', '', 4, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (61, 61, 11, '', '', 0, '', 1, '', '1.', 'single-select', 'with empty', 12, 40, '', '', 5, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (62, 62, 11, '', '', 0, '', 1, '', '1.', 'multi-select', '2 default', 12, 41, '', '', 6, false, 'NA,No', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (63, 63, 11, '', '', 0, '', 1, '', '1.', 'multi-select', '1 default', 12, 41, '', '', 7, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (64, 64, 11, '', '', 0, '', 1, '', '1.', 'multi-select', 'no default', 12, 41, '', '', 8, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (65, 65, 11, '', '', 0, '', 1, '', '1.', 'checkbox', '2 default', 12, 42, '', '', 9, false, 'Yes,No', 'Vertical', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (66, 66, 11, '', '', 0, '', 1, '', '1.', 'checkbox', '1 default', 12, 42, '', '', 10, false, 'Yes', 'Vertical', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (67, 67, 11, '', '', 0, '', 1, '', '1.', 'checkbox', 'no default', 12, 42, '', '', 11, false, '', 'Vertical', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (68, 68, 12, '', '', 0, '', 1, '', '1.', 'text', 'Right item text', 13, 43, '', '', 1, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (69, 69, 12, '', '', 0, '', 1, '', '1.', 'textarea', 'Right item text', 13, 44, '', '', 2, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (70, 70, 12, '', '', 0, '', 1, '', '1.', 'single-select', 'with default', 13, 45, '', '', 3, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (71, 71, 12, '', '', 0, '', 1, '', '1.', 'single-select', 'no default', 13, 45, '', '', 4, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (72, 72, 12, '', '', 0, '', 1, '', '1.', 'single-select', 'with empty', 13, 46, '', '', 5, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (73, 73, 12, '', '', 0, '', 1, '', '1.', 'multi-select', '2 default', 13, 47, '', '', 6, false, 'NA,No', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (74, 74, 12, '', '', 0, '', 1, '', '1.', 'multi-select', '1 default', 13, 47, '', '', 7, false, 'NA', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (75, 75, 12, '', '', 0, '', 1, '', '1.', 'multi-select', 'no default', 13, 47, '', '', 8, false, '', '', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (76, 76, 12, '', '', 0, '', 1, '', '1.', 'checkbox', '2 default', 13, 48, '', '', 9, false, 'Yes,No', 'Vertical', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (77, 77, 12, '', '', 0, '', 1, '', '1.', 'checkbox', '1 default', 13, 48, '', '', 10, false, 'Yes', 'Vertical', '', true, '', 0);
+INSERT INTO item_form_metadata VALUES (78, 78, 12, '', '', 0, '', 1, '', '1.', 'checkbox', 'no default', 13, 48, '', '', 11, false, '', 'Vertical', '', true, '', 0);
 
 
 --
--- TOC entry 3211 (class 0 OID 143883158)
--- Dependencies: 222
+-- TOC entry 3216 (class 0 OID 143981842)
+-- Dependencies: 220
 -- Data for Name: item_group; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8717,11 +8789,14 @@ INSERT INTO item_group VALUES (11, 'Ungrouped', 8, 1, '2016-06-14 13:14:11.979+0
 INSERT INTO item_group VALUES (12, 'Ungrouped', 9, 1, '2016-06-16 14:40:30.701+03', NULL, 1, NULL, 'IG_CRF_O_UNGROUPED');
 INSERT INTO item_group VALUES (13, 'Ungrouped', 10, 1, '2016-06-16 14:40:45.238+03', NULL, 1, NULL, 'IG_CRF_T_UNGROUPED');
 INSERT INTO item_group VALUES (14, 'Pain', 10, 1, '2016-06-16 14:40:45.238+03', NULL, 1, NULL, 'IG_CRF_T_PAIN');
+INSERT INTO item_group VALUES (15, 'Ungrouped', 11, 1, '2016-06-29 12:31:42.706+03', NULL, 1, NULL, 'IG_CRF_D_UNGROUPED_0000006');
+INSERT INTO item_group VALUES (16, 'Ungrouped', 12, 1, '2016-06-29 12:32:42.435+03', NULL, 1, NULL, 'IG_CRF_D_UNGROUPED_0000007');
+INSERT INTO item_group VALUES (17, 'Group 1', 12, 1, '2016-06-29 12:32:42.435+03', NULL, 1, NULL, 'IG_CRF_D_GROUP1');
 
 
 --
--- TOC entry 3212 (class 0 OID 143883163)
--- Dependencies: 224
+-- TOC entry 3217 (class 0 OID 143981847)
+-- Dependencies: 222
 -- Data for Name: item_group_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8781,11 +8856,33 @@ INSERT INTO item_group_metadata VALUES (53, 14, '', '', '', 1, 10, '', 0, 10, 53
 INSERT INTO item_group_metadata VALUES (54, 14, '', '', '', 1, 10, '', 0, 10, 54, 16, 0, true, true);
 INSERT INTO item_group_metadata VALUES (55, 14, '', '', '', 1, 10, '', 0, 10, 55, 17, 0, true, true);
 INSERT INTO item_group_metadata VALUES (56, 14, '', '', '', 1, 10, '', 0, 10, 56, 18, 0, true, true);
+INSERT INTO item_group_metadata VALUES (57, 15, '', '', '', 1, 1, '', 0, 11, 57, 1, 0, true, false);
+INSERT INTO item_group_metadata VALUES (58, 15, '', '', '', 1, 1, '', 0, 11, 58, 2, 0, true, false);
+INSERT INTO item_group_metadata VALUES (59, 15, '', '', '', 1, 1, '', 0, 11, 59, 3, 0, true, false);
+INSERT INTO item_group_metadata VALUES (60, 15, '', '', '', 1, 1, '', 0, 11, 60, 4, 0, true, false);
+INSERT INTO item_group_metadata VALUES (61, 15, '', '', '', 1, 1, '', 0, 11, 61, 5, 0, true, false);
+INSERT INTO item_group_metadata VALUES (62, 15, '', '', '', 1, 1, '', 0, 11, 62, 6, 0, true, false);
+INSERT INTO item_group_metadata VALUES (63, 15, '', '', '', 1, 1, '', 0, 11, 63, 7, 0, true, false);
+INSERT INTO item_group_metadata VALUES (64, 15, '', '', '', 1, 1, '', 0, 11, 64, 8, 0, true, false);
+INSERT INTO item_group_metadata VALUES (65, 15, '', '', '', 1, 1, '', 0, 11, 65, 9, 0, true, false);
+INSERT INTO item_group_metadata VALUES (66, 15, '', '', '', 1, 1, '', 0, 11, 66, 10, 0, true, false);
+INSERT INTO item_group_metadata VALUES (67, 15, '', '', '', 1, 1, '', 0, 11, 67, 11, 0, true, false);
+INSERT INTO item_group_metadata VALUES (68, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 68, 1, 0, true, true);
+INSERT INTO item_group_metadata VALUES (69, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 69, 2, 0, true, true);
+INSERT INTO item_group_metadata VALUES (70, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 70, 3, 0, true, true);
+INSERT INTO item_group_metadata VALUES (71, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 71, 4, 0, true, true);
+INSERT INTO item_group_metadata VALUES (72, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 72, 5, 0, true, true);
+INSERT INTO item_group_metadata VALUES (73, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 73, 6, 0, true, true);
+INSERT INTO item_group_metadata VALUES (74, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 74, 7, 0, true, true);
+INSERT INTO item_group_metadata VALUES (75, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 75, 8, 0, true, true);
+INSERT INTO item_group_metadata VALUES (76, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 76, 9, 0, true, true);
+INSERT INTO item_group_metadata VALUES (77, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 77, 10, 0, true, true);
+INSERT INTO item_group_metadata VALUES (78, 17, 'Header 1', '', '', 1, 10, '', 0, 12, 78, 11, 0, true, true);
 
 
 --
--- TOC entry 3213 (class 0 OID 143883179)
--- Dependencies: 229
+-- TOC entry 3218 (class 0 OID 143981863)
+-- Dependencies: 227
 -- Data for Name: item_reference_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8793,26 +8890,27 @@ INSERT INTO item_reference_type VALUES (1, 'literal', NULL);
 
 
 --
--- TOC entry 3214 (class 0 OID 143883187)
--- Dependencies: 231
+-- TOC entry 3219 (class 0 OID 143981871)
+-- Dependencies: 229
 -- Data for Name: item_render_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3215 (class 0 OID 143883192)
--- Dependencies: 233
+-- TOC entry 3220 (class 0 OID 143981876)
+-- Dependencies: 231
 -- Data for Name: measurement_unit; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 INSERT INTO measurement_unit VALUES (1, 'MU_DDMMYYYY', 'dd-mm-yyyy', '', 0);
 INSERT INTO measurement_unit VALUES (2, 'MU_UNITS', 'UNITS', '', 0);
+INSERT INTO measurement_unit VALUES (3, 'MU_UNITS_0000001', 'Units', '', 0);
 
 
 --
--- TOC entry 3216 (class 0 OID 143883199)
--- Dependencies: 236
+-- TOC entry 3221 (class 0 OID 143981883)
+-- Dependencies: 234
 -- Data for Name: null_value_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8831,40 +8929,40 @@ INSERT INTO null_value_type VALUES (12, 'NPE', 'not performed', NULL, NULL);
 
 
 --
--- TOC entry 3217 (class 0 OID 143883207)
--- Dependencies: 238
+-- TOC entry 3222 (class 0 OID 143981891)
+-- Dependencies: 236
 -- Data for Name: oc_qrtz_blob_triggers; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3218 (class 0 OID 143883214)
--- Dependencies: 239
+-- TOC entry 3223 (class 0 OID 143981898)
+-- Dependencies: 237
 -- Data for Name: oc_qrtz_calendars; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3219 (class 0 OID 143883221)
--- Dependencies: 240
+-- TOC entry 3224 (class 0 OID 143981905)
+-- Dependencies: 238
 -- Data for Name: oc_qrtz_cron_triggers; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3220 (class 0 OID 143883228)
--- Dependencies: 241
+-- TOC entry 3225 (class 0 OID 143981912)
+-- Dependencies: 239
 -- Data for Name: oc_qrtz_fired_triggers; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3221 (class 0 OID 143883235)
--- Dependencies: 242
+-- TOC entry 3226 (class 0 OID 143981919)
+-- Dependencies: 240
 -- Data for Name: oc_qrtz_job_details; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8872,8 +8970,8 @@ INSERT INTO oc_qrtz_job_details VALUES ('legacyJobDetail', 'DEFAULT', NULL, 'org
 
 
 --
--- TOC entry 3222 (class 0 OID 143883242)
--- Dependencies: 243
+-- TOC entry 3227 (class 0 OID 143981926)
+-- Dependencies: 241
 -- Data for Name: oc_qrtz_locks; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8885,59 +8983,57 @@ INSERT INTO oc_qrtz_locks VALUES ('MISFIRE_ACCESS', 'schedulerFactoryBean');
 
 
 --
--- TOC entry 3223 (class 0 OID 143883246)
--- Dependencies: 244
+-- TOC entry 3228 (class 0 OID 143981930)
+-- Dependencies: 242
 -- Data for Name: oc_qrtz_paused_trigger_grps; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3224 (class 0 OID 143883250)
--- Dependencies: 245
+-- TOC entry 3229 (class 0 OID 143981934)
+-- Dependencies: 243
 -- Data for Name: oc_qrtz_scheduler_state; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3225 (class 0 OID 143883254)
--- Dependencies: 246
+-- TOC entry 3230 (class 0 OID 143981938)
+-- Dependencies: 244
 -- Data for Name: oc_qrtz_simple_triggers; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO oc_qrtz_simple_triggers VALUES ('legacyJobTrigger', 'legacyJobConverter', 0, 0, 0, 'schedulerFactoryBean');
 
 
 --
--- TOC entry 3226 (class 0 OID 143883261)
--- Dependencies: 247
+-- TOC entry 3231 (class 0 OID 143981945)
+-- Dependencies: 245
 -- Data for Name: oc_qrtz_simprop_triggers; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3227 (class 0 OID 143883267)
--- Dependencies: 248
+-- TOC entry 3232 (class 0 OID 143981951)
+-- Dependencies: 246
 -- Data for Name: oc_qrtz_triggers; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO oc_qrtz_triggers VALUES ('legacyJobTrigger', 'legacyJobConverter', 'legacyJobDetail', 'DEFAULT', NULL, 1466685526696, -1, 0, 'WAITING', 'SIMPLE', 1466685526696, 0, NULL, 0, '', 'schedulerFactoryBean');
 
 
 --
--- TOC entry 3228 (class 0 OID 143883274)
--- Dependencies: 249
+-- TOC entry 3233 (class 0 OID 143981958)
+-- Dependencies: 247
 -- Data for Name: openclinica_version; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO openclinica_version VALUES (7, '', NULL, 0, '2016-06-23 15:23:51.182');
+INSERT INTO openclinica_version VALUES (8, '', NULL, 0, '2016-06-29 12:26:57.646');
 
 
 --
--- TOC entry 3229 (class 0 OID 143883282)
--- Dependencies: 251
+-- TOC entry 3234 (class 0 OID 143981966)
+-- Dependencies: 249
 -- Data for Name: password; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8947,13 +9043,13 @@ INSERT INTO password VALUES (4, 'demo_pi', 4, 'e87a5c9fedfc56215404c524d83a96230
 INSERT INTO password VALUES (6, 'demo_site_mon', 6, 'b341cd74513df82c77179e3390450dfd33c4d631', '2016-06-13 00:00:00', '2016-06-13 00:00:00');
 INSERT INTO password VALUES (7, 'demo_coder', 7, 'a8ba01865814a0dd10cbd242ad3ddb9d29626507', '2016-06-13 00:00:00', '2016-06-13 00:00:00');
 INSERT INTO password VALUES (8, 'demo_eval', 8, 'c4f015167b0d478e3d47a219965ba58aa9c9732c', '2016-06-13 00:00:00', '2016-06-13 00:00:00');
-INSERT INTO password VALUES (1, 'root', 1, '5480b8cacfd06a9220cf1e52500d4bcc5c8936c9', '2016-06-13 00:00:00', '2016-06-16 00:00:00');
 INSERT INTO password VALUES (5, 'demo_crc', 5, '01177ef74ddb339406edbe8ad4902f5df57b15c3', '2016-06-13 00:00:00', '2016-06-23 00:00:00');
+INSERT INTO password VALUES (1, 'root', 1, '5480b8cacfd06a9220cf1e52500d4bcc5c8936c9', '2016-06-13 00:00:00', '2016-06-29 00:00:00');
 
 
 --
--- TOC entry 3230 (class 0 OID 143883290)
--- Dependencies: 253
+-- TOC entry 3235 (class 0 OID 143981974)
+-- Dependencies: 251
 -- Data for Name: resolution_status; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -8966,8 +9062,8 @@ INSERT INTO resolution_status VALUES (6, 'new_dcf', '');
 
 
 --
--- TOC entry 3231 (class 0 OID 143883295)
--- Dependencies: 255
+-- TOC entry 3236 (class 0 OID 143981979)
+-- Dependencies: 253
 -- Data for Name: response_set; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9007,11 +9103,23 @@ INSERT INTO response_set VALUES (33, 5, 'qs1', 'Male,Female', '1,2', 10);
 INSERT INTO response_set VALUES (34, 6, 'qs3', 'Post-Menopausal,Surgically Sterilized,Other', '1,2,3', 10);
 INSERT INTO response_set VALUES (35, 7, 'qs5', 'American Indian or Alaska Native,Asian,Black or African American,Native Hawaiian or other Pacific Islander,White,Other,Not Reported', '1,2,3,4,5,6,7', 10);
 INSERT INTO response_set VALUES (36, 3, 'qs6', 'No', '0', 10);
+INSERT INTO response_set VALUES (37, 1, 'text', 'text', 'text', 11);
+INSERT INTO response_set VALUES (38, 2, 'textarea', 'textarea', 'textarea', 11);
+INSERT INTO response_set VALUES (39, 6, 'single-select', 'Yes, No, NA, Other', '1,2,3,4', 11);
+INSERT INTO response_set VALUES (40, 6, 'ss', ',Yes, No, NA, Other', ',1,2,3,4', 11);
+INSERT INTO response_set VALUES (41, 7, 'multi-select', 'Yes, No, NA, Other', '1,2,3,4', 11);
+INSERT INTO response_set VALUES (42, 3, 'checkbox', 'Yes, No, NA, Other', '1,2,3,4', 11);
+INSERT INTO response_set VALUES (43, 1, 'text', 'text', 'text', 12);
+INSERT INTO response_set VALUES (44, 2, 'textarea', 'textarea', 'textarea', 12);
+INSERT INTO response_set VALUES (45, 6, 'single-select', 'Yes, No, NA, Other', '1,2,3,4', 12);
+INSERT INTO response_set VALUES (46, 6, 'ss', ',Yes, No, NA, Other', ',1,2,3,4', 12);
+INSERT INTO response_set VALUES (47, 7, 'multi-select', 'Yes, No, NA, Other', '1,2,3,4', 12);
+INSERT INTO response_set VALUES (48, 3, 'checkbox', 'Yes, No, NA, Other', '1,2,3,4', 12);
 
 
 --
--- TOC entry 3232 (class 0 OID 143883303)
--- Dependencies: 257
+-- TOC entry 3237 (class 0 OID 143981987)
+-- Dependencies: 255
 -- Data for Name: response_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9028,88 +9136,88 @@ INSERT INTO response_type VALUES (10, 'instant-calculation', 'for barcode');
 
 
 --
--- TOC entry 3233 (class 0 OID 143883311)
--- Dependencies: 259
+-- TOC entry 3238 (class 0 OID 143981995)
+-- Dependencies: 257
 -- Data for Name: rule; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3234 (class 0 OID 143883317)
--- Dependencies: 260
+-- TOC entry 3239 (class 0 OID 143982001)
+-- Dependencies: 258
 -- Data for Name: rule_action; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3235 (class 0 OID 143883325)
--- Dependencies: 262
+-- TOC entry 3240 (class 0 OID 143982009)
+-- Dependencies: 260
 -- Data for Name: rule_action_property; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3236 (class 0 OID 143883333)
--- Dependencies: 264
+-- TOC entry 3241 (class 0 OID 143982017)
+-- Dependencies: 262
 -- Data for Name: rule_action_run; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3237 (class 0 OID 143883338)
--- Dependencies: 266
+-- TOC entry 3242 (class 0 OID 143982022)
+-- Dependencies: 264
 -- Data for Name: rule_action_run_log; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3238 (class 0 OID 143883346)
--- Dependencies: 268
+-- TOC entry 3243 (class 0 OID 143982030)
+-- Dependencies: 266
 -- Data for Name: rule_expression; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3239 (class 0 OID 143883356)
--- Dependencies: 271
+-- TOC entry 3244 (class 0 OID 143982040)
+-- Dependencies: 269
 -- Data for Name: rule_set; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3240 (class 0 OID 143883359)
--- Dependencies: 272
+-- TOC entry 3245 (class 0 OID 143982043)
+-- Dependencies: 270
 -- Data for Name: rule_set_audit; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3241 (class 0 OID 143883366)
--- Dependencies: 275
+-- TOC entry 3246 (class 0 OID 143982050)
+-- Dependencies: 273
 -- Data for Name: rule_set_rule; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3242 (class 0 OID 143883369)
--- Dependencies: 276
+-- TOC entry 3247 (class 0 OID 143982053)
+-- Dependencies: 274
 -- Data for Name: rule_set_rule_audit; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3243 (class 0 OID 143883376)
--- Dependencies: 279
+-- TOC entry 3248 (class 0 OID 143982060)
+-- Dependencies: 277
 -- Data for Name: scd_item_metadata; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9121,8 +9229,8 @@ INSERT INTO scd_item_metadata VALUES (5, 26, 25, 'VSTSCMHYN', '1', 'Specify reas
 
 
 --
--- TOC entry 3244 (class 0 OID 143883384)
--- Dependencies: 281
+-- TOC entry 3249 (class 0 OID 143982068)
+-- Dependencies: 279
 -- Data for Name: section; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9147,11 +9255,13 @@ span#unit{
     font-style:italic;
 }
 </style>', '', '', 2, 0, '2016-06-16 14:40:45.238+03', NULL, 1, NULL, 0);
+INSERT INTO section VALUES (12, 11, 1, 'Section 1', 'Title', 'Test Subtitle', 'Test Instructions', '', 1, 0, '2016-06-29 12:31:42.706+03', NULL, 1, NULL, 0);
+INSERT INTO section VALUES (13, 12, 1, 'Section 1', 'Title', 'Test Subtitle', 'Test Instructions', '', 1, 0, '2016-06-29 12:32:42.435+03', NULL, 1, NULL, 0);
 
 
 --
--- TOC entry 3245 (class 0 OID 143883392)
--- Dependencies: 283
+-- TOC entry 3250 (class 0 OID 143982076)
+-- Dependencies: 281
 -- Data for Name: status; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9170,8 +9280,8 @@ INSERT INTO status VALUES (18, 'partial_double_data_entry', 'indicates that CRF 
 
 
 --
--- TOC entry 3246 (class 0 OID 143883400)
--- Dependencies: 285
+-- TOC entry 3251 (class 0 OID 143982084)
+-- Dependencies: 283
 -- Data for Name: study; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9181,51 +9291,52 @@ INSERT INTO study VALUES (4, 1, 'TS2', '', 'Test Site2', '', NULL, NULL, '2016-0
 
 
 --
--- TOC entry 3247 (class 0 OID 143883409)
--- Dependencies: 286
+-- TOC entry 3252 (class 0 OID 143982093)
+-- Dependencies: 284
 -- Data for Name: study_event; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO study_event VALUES (1, 1, 1, '', 1, '2016-06-14 14:30:08.504', NULL, 5, 1, '2016-06-14 14:30:08.505+03', '2016-06-16 14:42:00.161+03', 1, 2, false, false, 0, 0, '\\254\\355\\000\\005sr\\000\\021java.util.HashMap\\005\\007\\332\\301\\303\\026`\\321\\003\\000\\002F\\000\\012loadFactorI\\000\\011thresholdxp?@\\000\\000\\000\\000\\000\\000w\\010\\000\\000\\000\\001\\000\\000\\000\\000x', 1, '0,0,0');
-INSERT INTO study_event VALUES (2, 1, 4, '', 1, '2016-06-16 14:02:02.293', NULL, 1, 1, '2016-06-16 14:02:02.294+03', '2016-06-16 14:42:00.165+03', 1, 2, false, false, 0, 0, '\\254\\355\\000\\005sr\\000\\021java.util.HashMap\\005\\007\\332\\301\\303\\026`\\321\\003\\000\\002F\\000\\012loadFactorI\\000\\011thresholdxp?@\\000\\000\\000\\000\\000\\000w\\010\\000\\000\\000\\001\\000\\000\\000\\000x', 1, '0,0,0');
+INSERT INTO study_event VALUES (1, 1, 1, '', 1, '2016-06-14 14:30:08.504', NULL, 5, 1, '2016-06-14 14:30:08.505+03', '2016-06-29 12:33:52.696+03', 1, 2, false, false, 0, 0, '\\254\\355\\000\\005sr\\000\\021java.util.HashMap\\005\\007\\332\\301\\303\\026`\\321\\003\\000\\002F\\000\\012loadFactorI\\000\\011thresholdxp?@\\000\\000\\000\\000\\000\\000w\\010\\000\\000\\000\\001\\000\\000\\000\\000x', 1, '0,0,0');
+INSERT INTO study_event VALUES (2, 1, 4, '', 1, '2016-06-16 14:02:02.293', NULL, 1, 1, '2016-06-16 14:02:02.294+03', '2016-06-29 12:33:52.706+03', 1, 2, false, false, 0, 0, '\\254\\355\\000\\005sr\\000\\021java.util.HashMap\\005\\007\\332\\301\\303\\026`\\321\\003\\000\\002F\\000\\012loadFactorI\\000\\011thresholdxp?@\\000\\000\\000\\000\\000\\000w\\010\\000\\000\\000\\001\\000\\000\\000\\000x', 1, '0,0,0');
+INSERT INTO study_event VALUES (3, 1, 6, '', 1, '2016-06-29 12:28:54.721', NULL, 1, 1, '2016-06-29 12:28:54.721+03', '2016-06-29 12:33:52.711+03', 1, 2, false, false, 0, 0, '\\254\\355\\000\\005sr\\000\\021java.util.HashMap\\005\\007\\332\\301\\303\\026`\\321\\003\\000\\002F\\000\\012loadFactorI\\000\\011thresholdxp?@\\000\\000\\000\\000\\000\\014w\\010\\000\\000\\000\\020\\000\\000\\000\\000x', 1, '0,0,0');
 
 
 --
--- TOC entry 3248 (class 0 OID 143883419)
--- Dependencies: 287
+-- TOC entry 3253 (class 0 OID 143982103)
+-- Dependencies: 285
 -- Data for Name: study_event_definition; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO study_event_definition VALUES (1, 1, 'TestEvent A', '', false, 'unscheduled', '', 1, 1, '2016-06-14 13:15:59.791+03', '2016-06-16 14:42:00.114+03', 1, 1, 'SE_TESTEVENTA', 0, 0, 0, 0, false, 1);
+INSERT INTO study_event_definition VALUES (1, 1, 'TestEvent A', '', false, 'unscheduled', '', 1, 1, '2016-06-14 13:15:59.791+03', '2016-06-29 12:33:52.637+03', 1, 1, 'SE_TESTEVENTA', 0, 0, 0, 0, false, 1);
 
 
 --
--- TOC entry 3249 (class 0 OID 143883433)
--- Dependencies: 291
+-- TOC entry 3254 (class 0 OID 143982117)
+-- Dependencies: 289
 -- Data for Name: study_group; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3250 (class 0 OID 143883439)
--- Dependencies: 292
+-- TOC entry 3255 (class 0 OID 143982123)
+-- Dependencies: 290
 -- Data for Name: study_group_class; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3251 (class 0 OID 143883448)
--- Dependencies: 295
+-- TOC entry 3256 (class 0 OID 143982132)
+-- Dependencies: 293
 -- Data for Name: study_module_status; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3252 (class 0 OID 143883462)
--- Dependencies: 298
+-- TOC entry 3257 (class 0 OID 143982146)
+-- Dependencies: 296
 -- Data for Name: study_parameter; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9295,8 +9406,8 @@ INSERT INTO study_parameter VALUES (90, 'medicalCoding', 'medicalCoding', NULL, 
 
 
 --
--- TOC entry 3253 (class 0 OID 143883468)
--- Dependencies: 300
+-- TOC entry 3258 (class 0 OID 143982152)
+-- Dependencies: 298
 -- Data for Name: study_parameter_value; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9486,8 +9597,8 @@ INSERT INTO study_parameter_value VALUES (169, 4, 'no', 'randomization');
 
 
 --
--- TOC entry 3254 (class 0 OID 143883475)
--- Dependencies: 303
+-- TOC entry 3259 (class 0 OID 143982159)
+-- Dependencies: 301
 -- Data for Name: study_subject; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9500,16 +9611,16 @@ INSERT INTO study_subject VALUES (6, 'TestSubject_6', '', 6, 3, 1, '2016-06-23 1
 
 
 --
--- TOC entry 3255 (class 0 OID 143883481)
--- Dependencies: 304
+-- TOC entry 3260 (class 0 OID 143982165)
+-- Dependencies: 302
 -- Data for Name: study_subject_id; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3256 (class 0 OID 143883491)
--- Dependencies: 308
+-- TOC entry 3261 (class 0 OID 143982175)
+-- Dependencies: 306
 -- Data for Name: study_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9518,24 +9629,24 @@ INSERT INTO study_type VALUES (2, 'non-genetic', NULL);
 
 
 --
--- TOC entry 3257 (class 0 OID 143883499)
--- Dependencies: 310
+-- TOC entry 3262 (class 0 OID 143982183)
+-- Dependencies: 308
 -- Data for Name: study_user_role; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
-INSERT INTO study_user_role VALUES ('system_administrator', NULL, 1, 1, '2016-06-13 00:00:00+03', '2016-06-13 00:00:00+03', NULL, 'root', 1);
-INSERT INTO study_user_role VALUES ('study_administrator', 1, 1, 1, '2016-06-13 19:05:22.85+03', NULL, NULL, 'demo_admin', 2);
-INSERT INTO study_user_role VALUES ('study_monitor', 1, 1, 1, '2016-06-13 19:05:48.402+03', NULL, NULL, 'demo_mon', 3);
-INSERT INTO study_user_role VALUES ('investigator', 3, 1, 1, '2016-06-13 19:06:50.605+03', NULL, NULL, 'demo_pi', 4);
-INSERT INTO study_user_role VALUES ('clinical_research_coordinator', 3, 1, 1, '2016-06-13 19:07:13.486+03', NULL, NULL, 'demo_crc', 5);
-INSERT INTO study_user_role VALUES ('site_monitor', 3, 1, 1, '2016-06-13 19:07:35.505+03', NULL, NULL, 'demo_site_mon', 6);
-INSERT INTO study_user_role VALUES ('study_coder', 1, 1, 1, '2016-06-13 19:08:22.63+03', NULL, NULL, 'demo_coder', 7);
-INSERT INTO study_user_role VALUES ('study_evaluator', 1, 1, 1, '2016-06-13 19:08:44.398+03', NULL, NULL, 'demo_eval', 8);
+INSERT INTO study_user_role VALUES ('study_administrator', 1, 1, 1, '2016-06-13 19:05:22.85+03', NULL, NULL, 'demo_admin', 2, NULL, NULL);
+INSERT INTO study_user_role VALUES ('study_monitor', 1, 1, 1, '2016-06-13 19:05:48.402+03', NULL, NULL, 'demo_mon', 3, NULL, NULL);
+INSERT INTO study_user_role VALUES ('investigator', 3, 1, 1, '2016-06-13 19:06:50.605+03', NULL, NULL, 'demo_pi', 4, NULL, NULL);
+INSERT INTO study_user_role VALUES ('clinical_research_coordinator', 3, 1, 1, '2016-06-13 19:07:13.486+03', NULL, NULL, 'demo_crc', 5, NULL, NULL);
+INSERT INTO study_user_role VALUES ('site_monitor', 3, 1, 1, '2016-06-13 19:07:35.505+03', NULL, NULL, 'demo_site_mon', 6, NULL, NULL);
+INSERT INTO study_user_role VALUES ('study_coder', 1, 1, 1, '2016-06-13 19:08:22.63+03', NULL, NULL, 'demo_coder', 7, NULL, NULL);
+INSERT INTO study_user_role VALUES ('study_evaluator', 1, 1, 1, '2016-06-13 19:08:44.398+03', NULL, NULL, 'demo_eval', 8, NULL, NULL);
+INSERT INTO study_user_role VALUES ('system_administrator', 1, 1, 1, '2016-06-13 00:00:00+03', '2016-06-13 00:00:00+03', NULL, 'root', 1, NULL, NULL);
 
 
 --
--- TOC entry 3258 (class 0 OID 143883504)
--- Dependencies: 312
+-- TOC entry 3263 (class 0 OID 143982188)
+-- Dependencies: 310
 -- Data for Name: subject; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9548,8 +9659,8 @@ INSERT INTO subject VALUES (6, NULL, NULL, 1, '1997-06-20 00:00:00+03', 'f', '',
 
 
 --
--- TOC entry 3259 (class 0 OID 143883507)
--- Dependencies: 313
+-- TOC entry 3264 (class 0 OID 143982191)
+-- Dependencies: 311
 -- Data for Name: subject_event_status; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9566,16 +9677,16 @@ INSERT INTO subject_event_status VALUES (10, 'removed', '');
 
 
 --
--- TOC entry 3260 (class 0 OID 143883515)
--- Dependencies: 315
+-- TOC entry 3265 (class 0 OID 143982199)
+-- Dependencies: 313
 -- Data for Name: subject_group_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3261 (class 0 OID 143883522)
--- Dependencies: 318
+-- TOC entry 3266 (class 0 OID 143982206)
+-- Dependencies: 316
 -- Data for Name: system; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9647,11 +9758,12 @@ INSERT INTO system VALUES (78, 'bioontologyUsername', '', 'STRING', false, 'TEXT
 INSERT INTO system VALUES (70, 'medicalCodingApiKey', '1cfae05f-9e67-486f-820b-b393dec5764b', 'STRING', false, 'TEXT', '', 60, false, false, false, 10, 'HIDDEN', 'HIDDEN', 'HIDDEN', 'READ', 'WRITE', 3, 1);
 INSERT INTO system VALUES (71, 'autoCodeDictionaryName', '', 'STRING', false, 'TEXT', '', 60, false, false, false, 10, 'HIDDEN', 'HIDDEN', 'HIDDEN', 'WRITE', 'WRITE', 4, 1);
 INSERT INTO system VALUES (77, 'system.language', 'en', 'STRING', false, 'COMBOBOX', 'en,ru,es_MX,zh', 80, false, true, false, 120, 'HIDDEN', 'HIDDEN', 'HIDDEN', 'WRITE', 'WRITE', 1, 1);
+INSERT INTO system VALUES (79, 'tokenExpirationInHours', '1', 'INTEGER', true, 'TEXT', '', 4, false, true, false, 4, 'READ', 'READ', 'READ', 'READ', 'WRITE', 5, 1);
 
 
 --
--- TOC entry 3262 (class 0 OID 143883544)
--- Dependencies: 319
+-- TOC entry 3267 (class 0 OID 143982228)
+-- Dependencies: 317
 -- Data for Name: system_group; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9679,24 +9791,24 @@ INSERT INTO system_group VALUES (120, 'language', 1, 8, 1);
 
 
 --
--- TOC entry 3263 (class 0 OID 143883554)
--- Dependencies: 322
+-- TOC entry 3268 (class 0 OID 143982238)
+-- Dependencies: 320
 -- Data for Name: term; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3264 (class 0 OID 143883560)
--- Dependencies: 323
+-- TOC entry 3269 (class 0 OID 143982244)
+-- Dependencies: 321
 -- Data for Name: term_element; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
 
 
 --
--- TOC entry 3265 (class 0 OID 143883570)
--- Dependencies: 326
+-- TOC entry 3270 (class 0 OID 143982254)
+-- Dependencies: 324
 -- Data for Name: usage_statistics_data; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9708,11 +9820,12 @@ INSERT INTO usage_statistics_data VALUES (5, 'oc_start_time', '2016-06-14 14:28:
 INSERT INTO usage_statistics_data VALUES (6, 'oc_start_time', '2016-06-14 15:21:30.655', '2016-06-14 15:21:30.655', 0);
 INSERT INTO usage_statistics_data VALUES (7, 'oc_start_time', '2016-06-16 13:45:41.361', '2016-06-16 13:45:41.361', 0);
 INSERT INTO usage_statistics_data VALUES (8, 'oc_start_time', '2016-06-23 15:23:51.301', '2016-06-23 15:23:51.301', 0);
+INSERT INTO usage_statistics_data VALUES (9, 'oc_start_time', '2016-06-29 12:26:57.767', '2016-06-29 12:26:57.767', 0);
 
 
 --
--- TOC entry 3266 (class 0 OID 143883578)
--- Dependencies: 328
+-- TOC entry 3271 (class 0 OID 143982262)
+-- Dependencies: 326
 -- Data for Name: user_account; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9722,13 +9835,13 @@ INSERT INTO user_account VALUES (3, 'demo_mon', '2840b231e74042b94c69adbcc0890dd
 INSERT INTO user_account VALUES (7, 'demo_coder', 'a8ba01865814a0dd10cbd242ad3ddb9d29626507', 'Rob', 'StudyCoder', 'study_coder@google.com', 1, 'B', 1, 1, '2016-06-13 19:08:22.627+03', '2016-06-13 19:08:28.92+03', '2016-06-13 19:08:28.92', '2016-06-13 19:08:28.898+03', 'Favorite Animal', 'C', '+375295002050', 1, 7, true, true, 0, false, NULL, NULL, 'Europe/Helsinki');
 INSERT INTO user_account VALUES (4, 'demo_pi', 'e87a5c9fedfc56215404c524d83a962305bfb1d7', 'Jake', 'PrimaryInvest', 'prim_investigator@google.com', 3, 'C', 1, 1, '2016-06-13 19:06:50.603+03', '2016-06-13 19:06:56.962+03', '2016-06-13 19:06:56.962', '2016-06-13 19:06:56.93+03', 'Favorite Animal', 'A', '+375295002030', 2, 4, true, true, 0, false, NULL, NULL, 'Europe/Helsinki');
 INSERT INTO user_account VALUES (8, 'demo_eval', 'c4f015167b0d478e3d47a219965ba58aa9c9732c', 'Nob', 'StudyMon', 'study_evaluator@google.com', 1, 'B', 1, 1, '2016-06-13 19:08:44.396+03', '2016-06-13 19:08:50.625+03', '2016-06-13 19:08:50.625', '2016-06-13 19:08:50.6+03', 'Favorite Animal', 'B', '+375295002020', 1, 8, true, true, 0, false, NULL, NULL, 'Europe/Helsinki');
-INSERT INTO user_account VALUES (1, 'root', '5480b8cacfd06a9220cf1e52500d4bcc5c8936c9', 'Root', 'User', 'clincapture@example.com', 1, 'Clinovo', 1, 1, NULL, '2016-06-16 13:59:51.785+03', '2016-06-16 13:59:51.784', '2016-06-13 18:57:46.987+03', 'Favorite Animal', 'A', '888 317 7517', 1, 1, true, true, 0, false, NULL, NULL, 'Europe/Helsinki');
 INSERT INTO user_account VALUES (5, 'demo_crc', '01177ef74ddb339406edbe8ad4902f5df57b15c3', 'Denis', 'ClinicalResearcher', 'clin_research@google.com', 3, 'D', 1, 1, '2016-06-13 19:07:13.485+03', '2016-06-23 15:24:33.28+03', '2016-06-23 15:24:33.279', '2016-06-13 19:07:19.996+03', 'Favorite Animal', 'A', '+375295002040', 2, 5, true, true, 0, false, NULL, NULL, 'Europe/Helsinki');
+INSERT INTO user_account VALUES (1, 'root', '5480b8cacfd06a9220cf1e52500d4bcc5c8936c9', 'Root', 'User', 'clincapture@example.com', 1, 'Clinovo', 1, 1, NULL, '2016-06-29 12:28:33.732+03', '2016-06-29 12:28:33.732', '2016-06-13 18:57:46.987+03', 'Favorite Animal', 'A', '888 317 7517', 1, 1, true, true, 0, false, NULL, NULL, 'Europe/Helsinki');
 
 
 --
--- TOC entry 3267 (class 0 OID 143883590)
--- Dependencies: 330
+-- TOC entry 3272 (class 0 OID 143982274)
+-- Dependencies: 328
 -- Data for Name: user_role; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9742,8 +9855,8 @@ INSERT INTO user_role VALUES (7, 'study_coder', 1, 'This role allows a user to p
 
 
 --
--- TOC entry 3268 (class 0 OID 143883598)
--- Dependencies: 332
+-- TOC entry 3273 (class 0 OID 143982282)
+-- Dependencies: 330
 -- Data for Name: user_type; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9753,8 +9866,8 @@ INSERT INTO user_type VALUES (3, 'tech-admin');
 
 
 --
--- TOC entry 3269 (class 0 OID 143883603)
--- Dependencies: 334
+-- TOC entry 3274 (class 0 OID 143982287)
+-- Dependencies: 332
 -- Data for Name: versioning_map; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9814,11 +9927,33 @@ INSERT INTO versioning_map VALUES (10, 53);
 INSERT INTO versioning_map VALUES (10, 54);
 INSERT INTO versioning_map VALUES (10, 55);
 INSERT INTO versioning_map VALUES (10, 56);
+INSERT INTO versioning_map VALUES (11, 57);
+INSERT INTO versioning_map VALUES (11, 58);
+INSERT INTO versioning_map VALUES (11, 59);
+INSERT INTO versioning_map VALUES (11, 60);
+INSERT INTO versioning_map VALUES (11, 61);
+INSERT INTO versioning_map VALUES (11, 62);
+INSERT INTO versioning_map VALUES (11, 63);
+INSERT INTO versioning_map VALUES (11, 64);
+INSERT INTO versioning_map VALUES (11, 65);
+INSERT INTO versioning_map VALUES (11, 66);
+INSERT INTO versioning_map VALUES (11, 67);
+INSERT INTO versioning_map VALUES (12, 68);
+INSERT INTO versioning_map VALUES (12, 69);
+INSERT INTO versioning_map VALUES (12, 70);
+INSERT INTO versioning_map VALUES (12, 71);
+INSERT INTO versioning_map VALUES (12, 72);
+INSERT INTO versioning_map VALUES (12, 73);
+INSERT INTO versioning_map VALUES (12, 74);
+INSERT INTO versioning_map VALUES (12, 75);
+INSERT INTO versioning_map VALUES (12, 76);
+INSERT INTO versioning_map VALUES (12, 77);
+INSERT INTO versioning_map VALUES (12, 78);
 
 
 --
--- TOC entry 3270 (class 0 OID 143883606)
--- Dependencies: 335
+-- TOC entry 3275 (class 0 OID 143982290)
+-- Dependencies: 333
 -- Data for Name: widget; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9836,8 +9971,8 @@ INSERT INTO widget VALUES (14, 3, 'Enrollment Status per Site', NULL, '1,2,6,10'
 
 
 --
--- TOC entry 3271 (class 0 OID 143883614)
--- Dependencies: 337
+-- TOC entry 3276 (class 0 OID 143982298)
+-- Dependencies: 335
 -- Data for Name: widgets_layout; Type: TABLE DATA; Schema: public; Owner: clincapture
 --
 
@@ -9897,7 +10032,7 @@ INSERT INTO widgets_layout VALUES (53, 8, 1, 15, 1, 0);
 
 
 --
--- TOC entry 2678 (class 2606 OID 143884609)
+-- TOC entry 2679 (class 2606 OID 143983304)
 -- Name: configuration_key_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9906,7 +10041,7 @@ ALTER TABLE ONLY configuration
 
 
 --
--- TOC entry 2817 (class 2606 OID 143884611)
+-- TOC entry 2816 (class 2606 OID 143983306)
 -- Name: measurement_unit_name_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9915,7 +10050,7 @@ ALTER TABLE ONLY measurement_unit
 
 
 --
--- TOC entry 2819 (class 2606 OID 143884613)
+-- TOC entry 2818 (class 2606 OID 143983308)
 -- Name: measurement_unit_oc_oid_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9924,7 +10059,7 @@ ALTER TABLE ONLY measurement_unit
 
 
 --
--- TOC entry 2826 (class 2606 OID 143884615)
+-- TOC entry 2825 (class 2606 OID 143983310)
 -- Name: oc_qrtz_blob_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9933,7 +10068,7 @@ ALTER TABLE ONLY oc_qrtz_blob_triggers
 
 
 --
--- TOC entry 2828 (class 2606 OID 143884617)
+-- TOC entry 2827 (class 2606 OID 143983312)
 -- Name: oc_qrtz_calendars_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9942,7 +10077,7 @@ ALTER TABLE ONLY oc_qrtz_calendars
 
 
 --
--- TOC entry 2830 (class 2606 OID 143884619)
+-- TOC entry 2829 (class 2606 OID 143983314)
 -- Name: oc_qrtz_cron_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9951,7 +10086,7 @@ ALTER TABLE ONLY oc_qrtz_cron_triggers
 
 
 --
--- TOC entry 2838 (class 2606 OID 143884621)
+-- TOC entry 2837 (class 2606 OID 143983316)
 -- Name: oc_qrtz_fired_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9960,7 +10095,7 @@ ALTER TABLE ONLY oc_qrtz_fired_triggers
 
 
 --
--- TOC entry 2842 (class 2606 OID 143884623)
+-- TOC entry 2841 (class 2606 OID 143983318)
 -- Name: oc_qrtz_job_details_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9969,7 +10104,7 @@ ALTER TABLE ONLY oc_qrtz_job_details
 
 
 --
--- TOC entry 2844 (class 2606 OID 143884625)
+-- TOC entry 2843 (class 2606 OID 143983320)
 -- Name: oc_qrtz_locks_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9978,7 +10113,7 @@ ALTER TABLE ONLY oc_qrtz_locks
 
 
 --
--- TOC entry 2846 (class 2606 OID 143884627)
+-- TOC entry 2845 (class 2606 OID 143983322)
 -- Name: oc_qrtz_paused_trigger_grps_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9987,7 +10122,7 @@ ALTER TABLE ONLY oc_qrtz_paused_trigger_grps
 
 
 --
--- TOC entry 2848 (class 2606 OID 143884629)
+-- TOC entry 2847 (class 2606 OID 143983324)
 -- Name: oc_qrtz_scheduler_state_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -9996,7 +10131,7 @@ ALTER TABLE ONLY oc_qrtz_scheduler_state
 
 
 --
--- TOC entry 2850 (class 2606 OID 143884631)
+-- TOC entry 2849 (class 2606 OID 143983326)
 -- Name: oc_qrtz_simple_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10005,7 +10140,7 @@ ALTER TABLE ONLY oc_qrtz_simple_triggers
 
 
 --
--- TOC entry 2852 (class 2606 OID 143884633)
+-- TOC entry 2851 (class 2606 OID 143983328)
 -- Name: oc_qrtz_simprop_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10014,7 +10149,7 @@ ALTER TABLE ONLY oc_qrtz_simprop_triggers
 
 
 --
--- TOC entry 2866 (class 2606 OID 143884635)
+-- TOC entry 2865 (class 2606 OID 143983330)
 -- Name: oc_qrtz_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10023,7 +10158,7 @@ ALTER TABLE ONLY oc_qrtz_triggers
 
 
 --
--- TOC entry 2648 (class 2606 OID 143884637)
+-- TOC entry 2649 (class 2606 OID 143983332)
 -- Name: pk_archived_dataset_file; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10032,7 +10167,7 @@ ALTER TABLE ONLY archived_dataset_file
 
 
 --
--- TOC entry 2653 (class 2606 OID 143884639)
+-- TOC entry 2654 (class 2606 OID 143983334)
 -- Name: pk_audit_event; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10041,7 +10176,7 @@ ALTER TABLE ONLY audit_event
 
 
 --
--- TOC entry 2663 (class 2606 OID 143884641)
+-- TOC entry 2664 (class 2606 OID 143983336)
 -- Name: pk_audit_log_event; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10050,7 +10185,7 @@ ALTER TABLE ONLY audit_log_event
 
 
 --
--- TOC entry 2665 (class 2606 OID 143884643)
+-- TOC entry 2666 (class 2606 OID 143983338)
 -- Name: pk_audit_log_event_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10059,7 +10194,7 @@ ALTER TABLE ONLY audit_log_event_type
 
 
 --
--- TOC entry 2667 (class 2606 OID 143884645)
+-- TOC entry 2668 (class 2606 OID 143983340)
 -- Name: pk_audit_log_randomization; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10068,7 +10203,7 @@ ALTER TABLE ONLY audit_log_randomization
 
 
 --
--- TOC entry 2669 (class 2606 OID 143884647)
+-- TOC entry 2670 (class 2606 OID 143983342)
 -- Name: pk_audit_user_login; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10077,7 +10212,7 @@ ALTER TABLE ONLY audit_user_login
 
 
 --
--- TOC entry 2671 (class 2606 OID 143884649)
+-- TOC entry 2672 (class 2606 OID 143983344)
 -- Name: pk_coded_item; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10086,7 +10221,7 @@ ALTER TABLE ONLY coded_item
 
 
 --
--- TOC entry 2673 (class 2606 OID 143884651)
+-- TOC entry 2674 (class 2606 OID 143983346)
 -- Name: pk_coded_item_element; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10095,7 +10230,7 @@ ALTER TABLE ONLY coded_item_element
 
 
 --
--- TOC entry 2676 (class 2606 OID 143884653)
+-- TOC entry 2677 (class 2606 OID 143983348)
 -- Name: pk_completion_status; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10104,7 +10239,7 @@ ALTER TABLE ONLY completion_status
 
 
 --
--- TOC entry 2681 (class 2606 OID 143884655)
+-- TOC entry 2682 (class 2606 OID 143983350)
 -- Name: pk_configuration; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10113,7 +10248,7 @@ ALTER TABLE ONLY configuration
 
 
 --
--- TOC entry 2687 (class 2606 OID 143884657)
+-- TOC entry 2688 (class 2606 OID 143983352)
 -- Name: pk_crf; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10122,7 +10257,7 @@ ALTER TABLE ONLY crf
 
 
 --
--- TOC entry 2694 (class 2606 OID 143884659)
+-- TOC entry 2695 (class 2606 OID 143983354)
 -- Name: pk_crf_version; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10131,7 +10266,7 @@ ALTER TABLE ONLY crf_version
 
 
 --
--- TOC entry 2704 (class 2606 OID 143884661)
+-- TOC entry 2705 (class 2606 OID 143983356)
 -- Name: pk_crfs_masking; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10140,7 +10275,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 2706 (class 2606 OID 143884663)
+-- TOC entry 2707 (class 2606 OID 143983358)
 -- Name: pk_databasechangeloglock; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10149,7 +10284,7 @@ ALTER TABLE ONLY databasechangeloglock
 
 
 --
--- TOC entry 2709 (class 2606 OID 143884665)
+-- TOC entry 2710 (class 2606 OID 143983360)
 -- Name: pk_dataset; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10158,7 +10293,7 @@ ALTER TABLE ONLY dataset
 
 
 --
--- TOC entry 2713 (class 2606 OID 143884667)
+-- TOC entry 2714 (class 2606 OID 143983362)
 -- Name: pk_dataset_item_status; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10167,7 +10302,7 @@ ALTER TABLE ONLY dataset_item_status
 
 
 --
--- TOC entry 2717 (class 2606 OID 143884669)
+-- TOC entry 2718 (class 2606 OID 143983364)
 -- Name: pk_dictionary; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10176,7 +10311,7 @@ ALTER TABLE ONLY dictionary
 
 
 --
--- TOC entry 2719 (class 2606 OID 143884671)
+-- TOC entry 2720 (class 2606 OID 143983366)
 -- Name: pk_discrepancy_description_id; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10185,7 +10320,7 @@ ALTER TABLE ONLY discrepancy_description
 
 
 --
--- TOC entry 2727 (class 2606 OID 143884673)
+-- TOC entry 2728 (class 2606 OID 143983368)
 -- Name: pk_discrepancy_note; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10194,7 +10329,7 @@ ALTER TABLE ONLY discrepancy_note
 
 
 --
--- TOC entry 2729 (class 2606 OID 143884675)
+-- TOC entry 2730 (class 2606 OID 143983370)
 -- Name: pk_discrepancy_note_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10203,7 +10338,7 @@ ALTER TABLE ONLY discrepancy_note_type
 
 
 --
--- TOC entry 2741 (class 2606 OID 143884677)
+-- TOC entry 2742 (class 2606 OID 143983372)
 -- Name: pk_dyn_item_form_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10212,7 +10347,7 @@ ALTER TABLE ONLY dyn_item_form_metadata
 
 
 --
--- TOC entry 2743 (class 2606 OID 143884679)
+-- TOC entry 2744 (class 2606 OID 143983374)
 -- Name: pk_dyn_item_group_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10221,7 +10356,7 @@ ALTER TABLE ONLY dyn_item_group_metadata
 
 
 --
--- TOC entry 2745 (class 2606 OID 143884681)
+-- TOC entry 2746 (class 2606 OID 143983376)
 -- Name: pk_dynamic_event; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10230,7 +10365,7 @@ ALTER TABLE ONLY dynamic_event
 
 
 --
--- TOC entry 2747 (class 2606 OID 143884683)
+-- TOC entry 2748 (class 2606 OID 143983378)
 -- Name: pk_edc_item_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10239,7 +10374,7 @@ ALTER TABLE ONLY edc_item_metadata
 
 
 --
--- TOC entry 2749 (class 2606 OID 143884685)
+-- TOC entry 3020 (class 2606 OID 143984377)
 -- Name: pk_email_log; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10248,7 +10383,7 @@ ALTER TABLE ONLY email_log
 
 
 --
--- TOC entry 2761 (class 2606 OID 143884687)
+-- TOC entry 2760 (class 2606 OID 143983380)
 -- Name: pk_event_crf; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10257,7 +10392,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 2763 (class 2606 OID 143884689)
+-- TOC entry 2762 (class 2606 OID 143983382)
 -- Name: pk_event_crf_section; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10266,7 +10401,7 @@ ALTER TABLE ONLY event_crf_section
 
 
 --
--- TOC entry 2772 (class 2606 OID 143884691)
+-- TOC entry 2771 (class 2606 OID 143983384)
 -- Name: pk_event_definition_crf; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10275,7 +10410,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 2774 (class 2606 OID 143884693)
+-- TOC entry 2773 (class 2606 OID 143983386)
 -- Name: pk_export_format; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10284,7 +10419,7 @@ ALTER TABLE ONLY export_format
 
 
 --
--- TOC entry 2776 (class 2606 OID 143884695)
+-- TOC entry 2775 (class 2606 OID 143983388)
 -- Name: pk_group_class_types; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10293,7 +10428,7 @@ ALTER TABLE ONLY group_class_types
 
 
 --
--- TOC entry 2783 (class 2606 OID 143884697)
+-- TOC entry 2782 (class 2606 OID 143983390)
 -- Name: pk_item; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10302,7 +10437,7 @@ ALTER TABLE ONLY item
 
 
 --
--- TOC entry 2791 (class 2606 OID 143884699)
+-- TOC entry 2790 (class 2606 OID 143983392)
 -- Name: pk_item_data; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10311,7 +10446,7 @@ ALTER TABLE ONLY item_data
 
 
 --
--- TOC entry 2793 (class 2606 OID 143884701)
+-- TOC entry 2792 (class 2606 OID 143983394)
 -- Name: pk_item_data_new; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10320,7 +10455,7 @@ ALTER TABLE ONLY item_data
 
 
 --
--- TOC entry 2795 (class 2606 OID 143884703)
+-- TOC entry 2794 (class 2606 OID 143983396)
 -- Name: pk_item_data_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10329,7 +10464,7 @@ ALTER TABLE ONLY item_data_type
 
 
 --
--- TOC entry 2800 (class 2606 OID 143884705)
+-- TOC entry 2799 (class 2606 OID 143983398)
 -- Name: pk_item_form_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10338,7 +10473,7 @@ ALTER TABLE ONLY item_form_metadata
 
 
 --
--- TOC entry 2804 (class 2606 OID 143884707)
+-- TOC entry 2803 (class 2606 OID 143983400)
 -- Name: pk_item_group; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10347,7 +10482,7 @@ ALTER TABLE ONLY item_group
 
 
 --
--- TOC entry 2811 (class 2606 OID 143884709)
+-- TOC entry 2810 (class 2606 OID 143983402)
 -- Name: pk_item_group_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10356,7 +10491,7 @@ ALTER TABLE ONLY item_group_metadata
 
 
 --
--- TOC entry 2813 (class 2606 OID 143884711)
+-- TOC entry 2812 (class 2606 OID 143983404)
 -- Name: pk_item_reference_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10365,7 +10500,7 @@ ALTER TABLE ONLY item_reference_type
 
 
 --
--- TOC entry 2815 (class 2606 OID 143884713)
+-- TOC entry 2814 (class 2606 OID 143983406)
 -- Name: pk_item_render_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10374,7 +10509,7 @@ ALTER TABLE ONLY item_render_metadata
 
 
 --
--- TOC entry 2821 (class 2606 OID 143884715)
+-- TOC entry 2820 (class 2606 OID 143983408)
 -- Name: pk_measurement_unit; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10383,7 +10518,7 @@ ALTER TABLE ONLY measurement_unit
 
 
 --
--- TOC entry 2824 (class 2606 OID 143884717)
+-- TOC entry 2823 (class 2606 OID 143983410)
 -- Name: pk_null_value_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10392,7 +10527,7 @@ ALTER TABLE ONLY null_value_type
 
 
 --
--- TOC entry 2868 (class 2606 OID 143884719)
+-- TOC entry 2867 (class 2606 OID 143983412)
 -- Name: pk_openclinica_version; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10401,7 +10536,7 @@ ALTER TABLE ONLY openclinica_version
 
 
 --
--- TOC entry 2870 (class 2606 OID 143884721)
+-- TOC entry 2869 (class 2606 OID 143983414)
 -- Name: pk_password; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10410,7 +10545,7 @@ ALTER TABLE ONLY password
 
 
 --
--- TOC entry 2872 (class 2606 OID 143884723)
+-- TOC entry 2871 (class 2606 OID 143983416)
 -- Name: pk_resolution_status; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10419,7 +10554,7 @@ ALTER TABLE ONLY resolution_status
 
 
 --
--- TOC entry 2874 (class 2606 OID 143884725)
+-- TOC entry 2873 (class 2606 OID 143983418)
 -- Name: pk_response_set; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10428,7 +10563,7 @@ ALTER TABLE ONLY response_set
 
 
 --
--- TOC entry 2876 (class 2606 OID 143884727)
+-- TOC entry 2875 (class 2606 OID 143983420)
 -- Name: pk_response_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10437,7 +10572,7 @@ ALTER TABLE ONLY response_type
 
 
 --
--- TOC entry 2881 (class 2606 OID 143884729)
+-- TOC entry 2880 (class 2606 OID 143983422)
 -- Name: pk_rule; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10446,7 +10581,7 @@ ALTER TABLE ONLY rule
 
 
 --
--- TOC entry 2886 (class 2606 OID 143884731)
+-- TOC entry 2885 (class 2606 OID 143983424)
 -- Name: pk_rule_action; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10455,7 +10590,7 @@ ALTER TABLE ONLY rule_action
 
 
 --
--- TOC entry 2888 (class 2606 OID 143884733)
+-- TOC entry 2887 (class 2606 OID 143983426)
 -- Name: pk_rule_action_property; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10464,7 +10599,7 @@ ALTER TABLE ONLY rule_action_property
 
 
 --
--- TOC entry 2890 (class 2606 OID 143884735)
+-- TOC entry 2889 (class 2606 OID 143983428)
 -- Name: pk_rule_action_run; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10473,7 +10608,7 @@ ALTER TABLE ONLY rule_action_run
 
 
 --
--- TOC entry 2892 (class 2606 OID 143884737)
+-- TOC entry 2891 (class 2606 OID 143983430)
 -- Name: pk_rule_action_run_log; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10482,7 +10617,7 @@ ALTER TABLE ONLY rule_action_run_log
 
 
 --
--- TOC entry 2895 (class 2606 OID 143884739)
+-- TOC entry 2894 (class 2606 OID 143983432)
 -- Name: pk_rule_expression; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10491,7 +10626,7 @@ ALTER TABLE ONLY rule_expression
 
 
 --
--- TOC entry 2903 (class 2606 OID 143884741)
+-- TOC entry 2902 (class 2606 OID 143983434)
 -- Name: pk_rule_set; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10500,7 +10635,7 @@ ALTER TABLE ONLY rule_set
 
 
 --
--- TOC entry 2907 (class 2606 OID 143884743)
+-- TOC entry 2906 (class 2606 OID 143983436)
 -- Name: pk_rule_set_audit; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10509,7 +10644,7 @@ ALTER TABLE ONLY rule_set_audit
 
 
 --
--- TOC entry 2912 (class 2606 OID 143884745)
+-- TOC entry 2911 (class 2606 OID 143983438)
 -- Name: pk_rule_set_rule; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10518,7 +10653,7 @@ ALTER TABLE ONLY rule_set_rule
 
 
 --
--- TOC entry 2916 (class 2606 OID 143884747)
+-- TOC entry 2915 (class 2606 OID 143983440)
 -- Name: pk_rule_set_rule_audit; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10527,7 +10662,7 @@ ALTER TABLE ONLY rule_set_rule_audit
 
 
 --
--- TOC entry 2918 (class 2606 OID 143884749)
+-- TOC entry 2917 (class 2606 OID 143983442)
 -- Name: pk_scd_item_metadata; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10536,7 +10671,7 @@ ALTER TABLE ONLY scd_item_metadata
 
 
 --
--- TOC entry 2923 (class 2606 OID 143884751)
+-- TOC entry 2922 (class 2606 OID 143983444)
 -- Name: pk_section; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10545,7 +10680,7 @@ ALTER TABLE ONLY section
 
 
 --
--- TOC entry 2925 (class 2606 OID 143884753)
+-- TOC entry 2924 (class 2606 OID 143983446)
 -- Name: pk_status; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10554,7 +10689,7 @@ ALTER TABLE ONLY status
 
 
 --
--- TOC entry 2933 (class 2606 OID 143884755)
+-- TOC entry 2932 (class 2606 OID 143983448)
 -- Name: pk_study; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10563,7 +10698,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 2943 (class 2606 OID 143884757)
+-- TOC entry 2942 (class 2606 OID 143983450)
 -- Name: pk_study_event; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10572,7 +10707,7 @@ ALTER TABLE ONLY study_event
 
 
 --
--- TOC entry 2948 (class 2606 OID 143884759)
+-- TOC entry 2947 (class 2606 OID 143983452)
 -- Name: pk_study_event_definition; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10581,7 +10716,7 @@ ALTER TABLE ONLY study_event_definition
 
 
 --
--- TOC entry 2952 (class 2606 OID 143884761)
+-- TOC entry 2951 (class 2606 OID 143983454)
 -- Name: pk_study_group; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10590,7 +10725,7 @@ ALTER TABLE ONLY study_group
 
 
 --
--- TOC entry 2956 (class 2606 OID 143884763)
+-- TOC entry 2955 (class 2606 OID 143983456)
 -- Name: pk_study_group_class; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10599,7 +10734,7 @@ ALTER TABLE ONLY study_group_class
 
 
 --
--- TOC entry 2958 (class 2606 OID 143884765)
+-- TOC entry 2957 (class 2606 OID 143983458)
 -- Name: pk_study_module_status; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10608,7 +10743,7 @@ ALTER TABLE ONLY study_module_status
 
 
 --
--- TOC entry 2960 (class 2606 OID 143884767)
+-- TOC entry 2959 (class 2606 OID 143983460)
 -- Name: pk_study_parameter; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10617,7 +10752,7 @@ ALTER TABLE ONLY study_parameter
 
 
 --
--- TOC entry 2969 (class 2606 OID 143884769)
+-- TOC entry 2968 (class 2606 OID 143983462)
 -- Name: pk_study_subject; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10626,7 +10761,7 @@ ALTER TABLE ONLY study_subject
 
 
 --
--- TOC entry 2973 (class 2606 OID 143884771)
+-- TOC entry 2972 (class 2606 OID 143983464)
 -- Name: pk_study_subject_id; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10635,7 +10770,7 @@ ALTER TABLE ONLY study_subject_id
 
 
 --
--- TOC entry 2977 (class 2606 OID 143884773)
+-- TOC entry 2976 (class 2606 OID 143983466)
 -- Name: pk_study_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10644,7 +10779,7 @@ ALTER TABLE ONLY study_type
 
 
 --
--- TOC entry 2986 (class 2606 OID 143884775)
+-- TOC entry 2987 (class 2606 OID 143983468)
 -- Name: pk_subject; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10653,7 +10788,7 @@ ALTER TABLE ONLY subject
 
 
 --
--- TOC entry 2988 (class 2606 OID 143884777)
+-- TOC entry 2989 (class 2606 OID 143983470)
 -- Name: pk_subject_event_status; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10662,7 +10797,7 @@ ALTER TABLE ONLY subject_event_status
 
 
 --
--- TOC entry 2992 (class 2606 OID 143884779)
+-- TOC entry 2993 (class 2606 OID 143983472)
 -- Name: pk_subject_group_map; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10671,7 +10806,7 @@ ALTER TABLE ONLY subject_group_map
 
 
 --
--- TOC entry 2994 (class 2606 OID 143884781)
+-- TOC entry 2995 (class 2606 OID 143983474)
 -- Name: pk_system; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10680,7 +10815,7 @@ ALTER TABLE ONLY system
 
 
 --
--- TOC entry 2998 (class 2606 OID 143884783)
+-- TOC entry 2999 (class 2606 OID 143983476)
 -- Name: pk_system_group; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10689,7 +10824,7 @@ ALTER TABLE ONLY system_group
 
 
 --
--- TOC entry 3002 (class 2606 OID 143884785)
+-- TOC entry 3003 (class 2606 OID 143983478)
 -- Name: pk_term; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10698,7 +10833,7 @@ ALTER TABLE ONLY term
 
 
 --
--- TOC entry 3004 (class 2606 OID 143884787)
+-- TOC entry 3005 (class 2606 OID 143983480)
 -- Name: pk_term_element; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10707,7 +10842,7 @@ ALTER TABLE ONLY term_element
 
 
 --
--- TOC entry 3006 (class 2606 OID 143884789)
+-- TOC entry 3007 (class 2606 OID 143983482)
 -- Name: pk_usage_statistics_data; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10716,7 +10851,7 @@ ALTER TABLE ONLY usage_statistics_data
 
 
 --
--- TOC entry 3009 (class 2606 OID 143884791)
+-- TOC entry 3010 (class 2606 OID 143983484)
 -- Name: pk_user_account; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10725,7 +10860,7 @@ ALTER TABLE ONLY user_account
 
 
 --
--- TOC entry 3011 (class 2606 OID 143884793)
+-- TOC entry 3012 (class 2606 OID 143983486)
 -- Name: pk_user_role; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10734,7 +10869,7 @@ ALTER TABLE ONLY user_role
 
 
 --
--- TOC entry 3013 (class 2606 OID 143884795)
+-- TOC entry 3014 (class 2606 OID 143983488)
 -- Name: pk_user_type; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10743,7 +10878,7 @@ ALTER TABLE ONLY user_type
 
 
 --
--- TOC entry 3015 (class 2606 OID 143884797)
+-- TOC entry 3016 (class 2606 OID 143983490)
 -- Name: pk_widget; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10752,7 +10887,7 @@ ALTER TABLE ONLY widget
 
 
 --
--- TOC entry 3017 (class 2606 OID 143884799)
+-- TOC entry 3018 (class 2606 OID 143983492)
 -- Name: pk_widgets_layout; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10761,7 +10896,7 @@ ALTER TABLE ONLY widgets_layout
 
 
 --
--- TOC entry 2962 (class 2606 OID 143884801)
+-- TOC entry 2961 (class 2606 OID 143983494)
 -- Name: study_parameter_handle_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10770,7 +10905,7 @@ ALTER TABLE ONLY study_parameter
 
 
 --
--- TOC entry 2975 (class 2606 OID 143884803)
+-- TOC entry 2974 (class 2606 OID 143983496)
 -- Name: study_subject_id_name_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10779,7 +10914,7 @@ ALTER TABLE ONLY study_subject_id
 
 
 --
--- TOC entry 2980 (class 2606 OID 143884805)
+-- TOC entry 2979 (class 2606 OID 143983498)
 -- Name: study_user_role_pkey; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10788,7 +10923,16 @@ ALTER TABLE ONLY study_user_role
 
 
 --
--- TOC entry 3000 (class 2606 OID 143884807)
+-- TOC entry 2981 (class 2606 OID 143984394)
+-- Name: study_user_role_token_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
+--
+
+ALTER TABLE ONLY study_user_role
+    ADD CONSTRAINT study_user_role_token_key UNIQUE (token);
+
+
+--
+-- TOC entry 3001 (class 2606 OID 143983500)
 -- Name: system_group_name_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10797,7 +10941,7 @@ ALTER TABLE ONLY system_group
 
 
 --
--- TOC entry 2996 (class 2606 OID 143884809)
+-- TOC entry 2997 (class 2606 OID 143983502)
 -- Name: system_name_key; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10806,7 +10950,7 @@ ALTER TABLE ONLY system
 
 
 --
--- TOC entry 2689 (class 2606 OID 143884811)
+-- TOC entry 2690 (class 2606 OID 143983504)
 -- Name: uniq_crf_oc_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10815,7 +10959,7 @@ ALTER TABLE ONLY crf
 
 
 --
--- TOC entry 2696 (class 2606 OID 143884813)
+-- TOC entry 2697 (class 2606 OID 143983506)
 -- Name: uniq_crf_version_oc_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10824,7 +10968,7 @@ ALTER TABLE ONLY crf_version
 
 
 --
--- TOC entry 2806 (class 2606 OID 143884815)
+-- TOC entry 2805 (class 2606 OID 143983508)
 -- Name: uniq_item_group_oc_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10833,7 +10977,7 @@ ALTER TABLE ONLY item_group
 
 
 --
--- TOC entry 2785 (class 2606 OID 143884817)
+-- TOC entry 2784 (class 2606 OID 143983510)
 -- Name: uniq_item_oc_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10842,7 +10986,7 @@ ALTER TABLE ONLY item
 
 
 --
--- TOC entry 2950 (class 2606 OID 143884819)
+-- TOC entry 2949 (class 2606 OID 143983512)
 -- Name: uniq_study_event_def_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10851,7 +10995,7 @@ ALTER TABLE ONLY study_event_definition
 
 
 --
--- TOC entry 2935 (class 2606 OID 143884821)
+-- TOC entry 2934 (class 2606 OID 143983514)
 -- Name: uniq_study_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10860,7 +11004,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 2971 (class 2606 OID 143884823)
+-- TOC entry 2970 (class 2606 OID 143983516)
 -- Name: uniq_study_subject_oid; Type: CONSTRAINT; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10869,7 +11013,7 @@ ALTER TABLE ONLY study_subject
 
 
 --
--- TOC entry 2649 (class 1259 OID 143884824)
+-- TOC entry 2650 (class 1259 OID 143983517)
 -- Name: i_audit_event_audit_table; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10877,7 +11021,7 @@ CREATE INDEX i_audit_event_audit_table ON audit_event USING btree (audit_table);
 
 
 --
--- TOC entry 2654 (class 1259 OID 143884825)
+-- TOC entry 2655 (class 1259 OID 143983518)
 -- Name: i_audit_event_context_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10885,7 +11029,7 @@ CREATE INDEX i_audit_event_context_study_id ON audit_event_context USING btree (
 
 
 --
--- TOC entry 2650 (class 1259 OID 143884826)
+-- TOC entry 2651 (class 1259 OID 143983519)
 -- Name: i_audit_event_entity_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10893,7 +11037,7 @@ CREATE INDEX i_audit_event_entity_id ON audit_event USING btree (entity_id);
 
 
 --
--- TOC entry 2651 (class 1259 OID 143884827)
+-- TOC entry 2652 (class 1259 OID 143983520)
 -- Name: i_audit_event_user_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10901,7 +11045,7 @@ CREATE INDEX i_audit_event_user_id ON audit_event USING btree (user_id);
 
 
 --
--- TOC entry 2655 (class 1259 OID 143884828)
+-- TOC entry 2656 (class 1259 OID 143983521)
 -- Name: i_audit_log_event_audit_log_event_type_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10909,7 +11053,7 @@ CREATE INDEX i_audit_log_event_audit_log_event_type_id ON audit_log_event USING 
 
 
 --
--- TOC entry 2656 (class 1259 OID 143884829)
+-- TOC entry 2657 (class 1259 OID 143983522)
 -- Name: i_audit_log_event_audit_table; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10917,7 +11061,7 @@ CREATE INDEX i_audit_log_event_audit_table ON audit_log_event USING btree (audit
 
 
 --
--- TOC entry 2657 (class 1259 OID 143884830)
+-- TOC entry 2658 (class 1259 OID 143983523)
 -- Name: i_audit_log_event_entity_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10925,7 +11069,7 @@ CREATE INDEX i_audit_log_event_entity_id ON audit_log_event USING btree (entity_
 
 
 --
--- TOC entry 2658 (class 1259 OID 143884831)
+-- TOC entry 2659 (class 1259 OID 143983524)
 -- Name: i_audit_log_event_event_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10933,7 +11077,7 @@ CREATE INDEX i_audit_log_event_event_crf_id ON audit_log_event USING btree (even
 
 
 --
--- TOC entry 2659 (class 1259 OID 143884832)
+-- TOC entry 2660 (class 1259 OID 143983525)
 -- Name: i_audit_log_event_event_crf_version_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10941,7 +11085,7 @@ CREATE INDEX i_audit_log_event_event_crf_version_id ON audit_log_event USING btr
 
 
 --
--- TOC entry 2660 (class 1259 OID 143884833)
+-- TOC entry 2661 (class 1259 OID 143983526)
 -- Name: i_audit_log_event_study_event_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10949,7 +11093,7 @@ CREATE INDEX i_audit_log_event_study_event_id ON audit_log_event USING btree (st
 
 
 --
--- TOC entry 2661 (class 1259 OID 143884834)
+-- TOC entry 2662 (class 1259 OID 143983527)
 -- Name: i_audit_log_event_user_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10957,7 +11101,7 @@ CREATE INDEX i_audit_log_event_user_id ON audit_log_event USING btree (user_id);
 
 
 --
--- TOC entry 2674 (class 1259 OID 143884835)
+-- TOC entry 2675 (class 1259 OID 143983528)
 -- Name: i_completion_status_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10965,7 +11109,7 @@ CREATE INDEX i_completion_status_status_id ON completion_status USING btree (sta
 
 
 --
--- TOC entry 2682 (class 1259 OID 143884836)
+-- TOC entry 2683 (class 1259 OID 143983529)
 -- Name: i_crf_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10973,7 +11117,7 @@ CREATE INDEX i_crf_name ON crf USING btree (name);
 
 
 --
--- TOC entry 2683 (class 1259 OID 143884837)
+-- TOC entry 2684 (class 1259 OID 143983530)
 -- Name: i_crf_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10981,7 +11125,7 @@ CREATE INDEX i_crf_oc_oid ON crf USING btree (oc_oid);
 
 
 --
--- TOC entry 2684 (class 1259 OID 143884838)
+-- TOC entry 2685 (class 1259 OID 143983531)
 -- Name: i_crf_owner_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10989,7 +11133,7 @@ CREATE INDEX i_crf_owner_id ON crf USING btree (owner_id);
 
 
 --
--- TOC entry 2685 (class 1259 OID 143884839)
+-- TOC entry 2686 (class 1259 OID 143983532)
 -- Name: i_crf_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -10997,7 +11141,7 @@ CREATE INDEX i_crf_status_id ON crf USING btree (status_id);
 
 
 --
--- TOC entry 2690 (class 1259 OID 143884840)
+-- TOC entry 2691 (class 1259 OID 143983533)
 -- Name: i_crf_version_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11005,7 +11149,7 @@ CREATE INDEX i_crf_version_name ON crf_version USING btree (name);
 
 
 --
--- TOC entry 2691 (class 1259 OID 143884841)
+-- TOC entry 2692 (class 1259 OID 143983534)
 -- Name: i_crf_version_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11013,7 +11157,7 @@ CREATE INDEX i_crf_version_oc_oid ON crf_version USING btree (oc_oid);
 
 
 --
--- TOC entry 2692 (class 1259 OID 143884842)
+-- TOC entry 2693 (class 1259 OID 143983535)
 -- Name: i_crf_version_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11021,7 +11165,7 @@ CREATE INDEX i_crf_version_status_id ON crf_version USING btree (status_id);
 
 
 --
--- TOC entry 2697 (class 1259 OID 143884843)
+-- TOC entry 2698 (class 1259 OID 143983536)
 -- Name: i_crfs_masking_event_definition_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11029,7 +11173,7 @@ CREATE INDEX i_crfs_masking_event_definition_crf_id ON crfs_masking USING btree 
 
 
 --
--- TOC entry 2698 (class 1259 OID 143884844)
+-- TOC entry 2699 (class 1259 OID 143983537)
 -- Name: i_crfs_masking_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11037,7 +11181,7 @@ CREATE INDEX i_crfs_masking_status_id ON crfs_masking USING btree (status_id);
 
 
 --
--- TOC entry 2699 (class 1259 OID 143884845)
+-- TOC entry 2700 (class 1259 OID 143983538)
 -- Name: i_crfs_masking_study_event_definition_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11045,7 +11189,7 @@ CREATE INDEX i_crfs_masking_study_event_definition_id ON crfs_masking USING btre
 
 
 --
--- TOC entry 2700 (class 1259 OID 143884846)
+-- TOC entry 2701 (class 1259 OID 143983539)
 -- Name: i_crfs_masking_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11053,7 +11197,7 @@ CREATE INDEX i_crfs_masking_study_id ON crfs_masking USING btree (study_id);
 
 
 --
--- TOC entry 2701 (class 1259 OID 143884847)
+-- TOC entry 2702 (class 1259 OID 143983540)
 -- Name: i_crfs_masking_study_user_role_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11061,7 +11205,7 @@ CREATE INDEX i_crfs_masking_study_user_role_id ON crfs_masking USING btree (stud
 
 
 --
--- TOC entry 2702 (class 1259 OID 143884848)
+-- TOC entry 2703 (class 1259 OID 143983541)
 -- Name: i_crfs_masking_user_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11069,7 +11213,7 @@ CREATE INDEX i_crfs_masking_user_id ON crfs_masking USING btree (user_id);
 
 
 --
--- TOC entry 2710 (class 1259 OID 143884849)
+-- TOC entry 2711 (class 1259 OID 143983542)
 -- Name: i_dataset_crf_version_map_dataset_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11077,7 +11221,7 @@ CREATE INDEX i_dataset_crf_version_map_dataset_id ON dataset_crf_version_map USI
 
 
 --
--- TOC entry 2711 (class 1259 OID 143884850)
+-- TOC entry 2712 (class 1259 OID 143983543)
 -- Name: i_dataset_crf_version_map_event_definition_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11085,7 +11229,7 @@ CREATE INDEX i_dataset_crf_version_map_event_definition_crf_id ON dataset_crf_ve
 
 
 --
--- TOC entry 2707 (class 1259 OID 143884851)
+-- TOC entry 2708 (class 1259 OID 143983544)
 -- Name: i_dataset_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11093,7 +11237,7 @@ CREATE INDEX i_dataset_status_id ON dataset USING btree (status_id);
 
 
 --
--- TOC entry 2714 (class 1259 OID 143884852)
+-- TOC entry 2715 (class 1259 OID 143983545)
 -- Name: i_dataset_study_group_class_map_dataset_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11101,7 +11245,7 @@ CREATE INDEX i_dataset_study_group_class_map_dataset_id ON dataset_study_group_c
 
 
 --
--- TOC entry 2715 (class 1259 OID 143884853)
+-- TOC entry 2716 (class 1259 OID 143983546)
 -- Name: i_dataset_study_group_class_map_study_group_class_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11109,7 +11253,7 @@ CREATE INDEX i_dataset_study_group_class_map_study_group_class_id ON dataset_stu
 
 
 --
--- TOC entry 2720 (class 1259 OID 143884854)
+-- TOC entry 2721 (class 1259 OID 143983547)
 -- Name: i_discrepancy_note_discrepancy_note_type_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11117,7 +11261,7 @@ CREATE INDEX i_discrepancy_note_discrepancy_note_type_id ON discrepancy_note USI
 
 
 --
--- TOC entry 2721 (class 1259 OID 143884855)
+-- TOC entry 2722 (class 1259 OID 143983548)
 -- Name: i_discrepancy_note_entity_type; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11125,7 +11269,7 @@ CREATE INDEX i_discrepancy_note_entity_type ON discrepancy_note USING btree (ent
 
 
 --
--- TOC entry 2722 (class 1259 OID 143884856)
+-- TOC entry 2723 (class 1259 OID 143983549)
 -- Name: i_discrepancy_note_owner_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11133,7 +11277,7 @@ CREATE INDEX i_discrepancy_note_owner_id ON discrepancy_note USING btree (owner_
 
 
 --
--- TOC entry 2723 (class 1259 OID 143884857)
+-- TOC entry 2724 (class 1259 OID 143983550)
 -- Name: i_discrepancy_note_parent_dn_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11141,7 +11285,7 @@ CREATE INDEX i_discrepancy_note_parent_dn_id ON discrepancy_note USING btree (pa
 
 
 --
--- TOC entry 2724 (class 1259 OID 143884858)
+-- TOC entry 2725 (class 1259 OID 143983551)
 -- Name: i_discrepancy_note_resolution_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11149,7 +11293,7 @@ CREATE INDEX i_discrepancy_note_resolution_status_id ON discrepancy_note USING b
 
 
 --
--- TOC entry 2725 (class 1259 OID 143884859)
+-- TOC entry 2726 (class 1259 OID 143983552)
 -- Name: i_discrepancy_note_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11157,7 +11301,7 @@ CREATE INDEX i_discrepancy_note_study_id ON discrepancy_note USING btree (study_
 
 
 --
--- TOC entry 2730 (class 1259 OID 143884860)
+-- TOC entry 2731 (class 1259 OID 143983553)
 -- Name: i_dn_event_crf_map_discrepancy_note_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11165,7 +11309,7 @@ CREATE INDEX i_dn_event_crf_map_discrepancy_note_id ON dn_event_crf_map USING bt
 
 
 --
--- TOC entry 2731 (class 1259 OID 143884861)
+-- TOC entry 2732 (class 1259 OID 143983554)
 -- Name: i_dn_event_crf_map_event_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11173,7 +11317,7 @@ CREATE INDEX i_dn_event_crf_map_event_crf_id ON dn_event_crf_map USING btree (ev
 
 
 --
--- TOC entry 2732 (class 1259 OID 143884862)
+-- TOC entry 2733 (class 1259 OID 143983555)
 -- Name: i_dn_item_data_map_discrepancy_note_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11181,7 +11325,7 @@ CREATE INDEX i_dn_item_data_map_discrepancy_note_id ON dn_item_data_map USING bt
 
 
 --
--- TOC entry 2733 (class 1259 OID 143884863)
+-- TOC entry 2734 (class 1259 OID 143983556)
 -- Name: i_dn_item_data_map_item_data_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11189,7 +11333,7 @@ CREATE INDEX i_dn_item_data_map_item_data_id ON dn_item_data_map USING btree (it
 
 
 --
--- TOC entry 2734 (class 1259 OID 143884864)
+-- TOC entry 2735 (class 1259 OID 143983557)
 -- Name: i_dn_study_event_map_discrepancy_note_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11197,7 +11341,7 @@ CREATE INDEX i_dn_study_event_map_discrepancy_note_id ON dn_study_event_map USIN
 
 
 --
--- TOC entry 2735 (class 1259 OID 143884865)
+-- TOC entry 2736 (class 1259 OID 143983558)
 -- Name: i_dn_study_event_map_study_event_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11205,7 +11349,7 @@ CREATE INDEX i_dn_study_event_map_study_event_id ON dn_study_event_map USING btr
 
 
 --
--- TOC entry 2736 (class 1259 OID 143884866)
+-- TOC entry 2737 (class 1259 OID 143983559)
 -- Name: i_dn_study_subject_map_discrepancy_note_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11213,7 +11357,7 @@ CREATE INDEX i_dn_study_subject_map_discrepancy_note_id ON dn_study_subject_map 
 
 
 --
--- TOC entry 2737 (class 1259 OID 143884867)
+-- TOC entry 2738 (class 1259 OID 143983560)
 -- Name: i_dn_study_subject_map_study_subject_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11221,7 +11365,7 @@ CREATE INDEX i_dn_study_subject_map_study_subject_id ON dn_study_subject_map USI
 
 
 --
--- TOC entry 2738 (class 1259 OID 143884868)
+-- TOC entry 2739 (class 1259 OID 143983561)
 -- Name: i_dn_subject_map_discrepancy_note_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11229,7 +11373,7 @@ CREATE INDEX i_dn_subject_map_discrepancy_note_id ON dn_subject_map USING btree 
 
 
 --
--- TOC entry 2739 (class 1259 OID 143884869)
+-- TOC entry 2740 (class 1259 OID 143983562)
 -- Name: i_dn_subject_map_subject_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11237,7 +11381,7 @@ CREATE INDEX i_dn_subject_map_subject_id ON dn_subject_map USING btree (subject_
 
 
 --
--- TOC entry 2750 (class 1259 OID 143884870)
+-- TOC entry 2749 (class 1259 OID 143983563)
 -- Name: i_event_crf_completion_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11245,7 +11389,7 @@ CREATE INDEX i_event_crf_completion_status_id ON event_crf USING btree (completi
 
 
 --
--- TOC entry 2751 (class 1259 OID 143884871)
+-- TOC entry 2750 (class 1259 OID 143983564)
 -- Name: i_event_crf_crf_version; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11253,7 +11397,7 @@ CREATE INDEX i_event_crf_crf_version ON event_crf USING btree (crf_version_id);
 
 
 --
--- TOC entry 2752 (class 1259 OID 143884872)
+-- TOC entry 2751 (class 1259 OID 143983565)
 -- Name: i_event_crf_date_interviewed; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11261,7 +11405,7 @@ CREATE INDEX i_event_crf_date_interviewed ON event_crf USING btree (date_intervi
 
 
 --
--- TOC entry 2753 (class 1259 OID 143884873)
+-- TOC entry 2752 (class 1259 OID 143983566)
 -- Name: i_event_crf_interviewer_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11269,7 +11413,7 @@ CREATE INDEX i_event_crf_interviewer_name ON event_crf USING btree (interviewer_
 
 
 --
--- TOC entry 2754 (class 1259 OID 143884874)
+-- TOC entry 2753 (class 1259 OID 143983567)
 -- Name: i_event_crf_owner_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11277,7 +11421,7 @@ CREATE INDEX i_event_crf_owner_id ON event_crf USING btree (owner_id);
 
 
 --
--- TOC entry 2755 (class 1259 OID 143884875)
+-- TOC entry 2754 (class 1259 OID 143983568)
 -- Name: i_event_crf_sdv_status; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11285,7 +11429,7 @@ CREATE INDEX i_event_crf_sdv_status ON event_crf USING btree (sdv_status);
 
 
 --
--- TOC entry 2756 (class 1259 OID 143884876)
+-- TOC entry 2755 (class 1259 OID 143983569)
 -- Name: i_event_crf_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11293,7 +11437,7 @@ CREATE INDEX i_event_crf_status_id ON event_crf USING btree (status_id);
 
 
 --
--- TOC entry 2757 (class 1259 OID 143884877)
+-- TOC entry 2756 (class 1259 OID 143983570)
 -- Name: i_event_crf_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11301,7 +11445,7 @@ CREATE INDEX i_event_crf_study_id ON event_crf USING btree (study_event_id);
 
 
 --
--- TOC entry 2758 (class 1259 OID 143884878)
+-- TOC entry 2757 (class 1259 OID 143983571)
 -- Name: i_event_crf_study_subject_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11309,7 +11453,7 @@ CREATE INDEX i_event_crf_study_subject_id ON event_crf USING btree (study_subjec
 
 
 --
--- TOC entry 2759 (class 1259 OID 143884879)
+-- TOC entry 2758 (class 1259 OID 143983572)
 -- Name: i_event_crf_validator_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11317,7 +11461,7 @@ CREATE INDEX i_event_crf_validator_id ON event_crf USING btree (validator_id);
 
 
 --
--- TOC entry 2764 (class 1259 OID 143884880)
+-- TOC entry 2763 (class 1259 OID 143983573)
 -- Name: i_event_definition_crf_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11325,7 +11469,7 @@ CREATE INDEX i_event_definition_crf_crf_id ON event_definition_crf USING btree (
 
 
 --
--- TOC entry 2765 (class 1259 OID 143884881)
+-- TOC entry 2764 (class 1259 OID 143983574)
 -- Name: i_event_definition_crf_default_version_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11333,7 +11477,7 @@ CREATE INDEX i_event_definition_crf_default_version_id ON event_definition_crf U
 
 
 --
--- TOC entry 2766 (class 1259 OID 143884882)
+-- TOC entry 2765 (class 1259 OID 143983575)
 -- Name: i_event_definition_crf_electronic_signature; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11341,7 +11485,7 @@ CREATE INDEX i_event_definition_crf_electronic_signature ON event_definition_crf
 
 
 --
--- TOC entry 2767 (class 1259 OID 143884883)
+-- TOC entry 2766 (class 1259 OID 143983576)
 -- Name: i_event_definition_crf_ordinal; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11349,7 +11493,7 @@ CREATE INDEX i_event_definition_crf_ordinal ON event_definition_crf USING btree 
 
 
 --
--- TOC entry 2768 (class 1259 OID 143884884)
+-- TOC entry 2767 (class 1259 OID 143983577)
 -- Name: i_event_definition_crf_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11357,7 +11501,7 @@ CREATE INDEX i_event_definition_crf_status_id ON event_definition_crf USING btre
 
 
 --
--- TOC entry 2769 (class 1259 OID 143884885)
+-- TOC entry 2768 (class 1259 OID 143983578)
 -- Name: i_event_definition_crf_study_event_definition_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11365,7 +11509,7 @@ CREATE INDEX i_event_definition_crf_study_event_definition_id ON event_definitio
 
 
 --
--- TOC entry 2770 (class 1259 OID 143884886)
+-- TOC entry 2769 (class 1259 OID 143983579)
 -- Name: i_event_definition_crf_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11373,7 +11517,7 @@ CREATE INDEX i_event_definition_crf_study_id ON event_definition_crf USING btree
 
 
 --
--- TOC entry 2786 (class 1259 OID 143884887)
+-- TOC entry 2785 (class 1259 OID 143983580)
 -- Name: i_item_data_event_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11381,7 +11525,7 @@ CREATE INDEX i_item_data_event_crf_id ON item_data USING btree (event_crf_id);
 
 
 --
--- TOC entry 2787 (class 1259 OID 143884888)
+-- TOC entry 2786 (class 1259 OID 143983581)
 -- Name: i_item_data_item_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11389,7 +11533,7 @@ CREATE INDEX i_item_data_item_id ON item_data USING btree (item_id);
 
 
 --
--- TOC entry 2788 (class 1259 OID 143884889)
+-- TOC entry 2787 (class 1259 OID 143983582)
 -- Name: i_item_data_ordinal; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11397,7 +11541,7 @@ CREATE INDEX i_item_data_ordinal ON item_data USING btree (ordinal);
 
 
 --
--- TOC entry 2789 (class 1259 OID 143884890)
+-- TOC entry 2788 (class 1259 OID 143983583)
 -- Name: i_item_data_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11405,7 +11549,7 @@ CREATE INDEX i_item_data_status_id ON item_data USING btree (status_id);
 
 
 --
--- TOC entry 2796 (class 1259 OID 143884891)
+-- TOC entry 2795 (class 1259 OID 143983584)
 -- Name: i_item_form_metadata_ordinal; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11413,7 +11557,7 @@ CREATE INDEX i_item_form_metadata_ordinal ON item_form_metadata USING btree (ord
 
 
 --
--- TOC entry 2797 (class 1259 OID 143884892)
+-- TOC entry 2796 (class 1259 OID 143983585)
 -- Name: i_item_form_metadata_parent_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11421,7 +11565,7 @@ CREATE INDEX i_item_form_metadata_parent_id ON item_form_metadata USING btree (p
 
 
 --
--- TOC entry 2801 (class 1259 OID 143884893)
+-- TOC entry 2800 (class 1259 OID 143983586)
 -- Name: i_item_group_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11429,7 +11573,7 @@ CREATE INDEX i_item_group_crf_id ON item_group USING btree (crf_id);
 
 
 --
--- TOC entry 2807 (class 1259 OID 143884894)
+-- TOC entry 2806 (class 1259 OID 143983587)
 -- Name: i_item_group_metadata_crf_version_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11437,7 +11581,7 @@ CREATE INDEX i_item_group_metadata_crf_version_id ON item_group_metadata USING b
 
 
 --
--- TOC entry 2808 (class 1259 OID 143884895)
+-- TOC entry 2807 (class 1259 OID 143983588)
 -- Name: i_item_group_metadata_item_group_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11445,7 +11589,7 @@ CREATE INDEX i_item_group_metadata_item_group_id ON item_group_metadata USING bt
 
 
 --
--- TOC entry 2809 (class 1259 OID 143884896)
+-- TOC entry 2808 (class 1259 OID 143983589)
 -- Name: i_item_group_metadata_item_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11453,7 +11597,7 @@ CREATE INDEX i_item_group_metadata_item_id ON item_group_metadata USING btree (i
 
 
 --
--- TOC entry 2802 (class 1259 OID 143884897)
+-- TOC entry 2801 (class 1259 OID 143983590)
 -- Name: i_item_group_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11461,7 +11605,7 @@ CREATE INDEX i_item_group_status_id ON item_group USING btree (status_id);
 
 
 --
--- TOC entry 2777 (class 1259 OID 143884898)
+-- TOC entry 2776 (class 1259 OID 143983591)
 -- Name: i_item_item_data_type_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11469,7 +11613,7 @@ CREATE INDEX i_item_item_data_type_id ON item USING btree (item_data_type_id);
 
 
 --
--- TOC entry 2778 (class 1259 OID 143884899)
+-- TOC entry 2777 (class 1259 OID 143983592)
 -- Name: i_item_item_reference_type_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11477,7 +11621,7 @@ CREATE INDEX i_item_item_reference_type_id ON item USING btree (item_reference_t
 
 
 --
--- TOC entry 2779 (class 1259 OID 143884900)
+-- TOC entry 2778 (class 1259 OID 143983593)
 -- Name: i_item_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11485,7 +11629,7 @@ CREATE INDEX i_item_name ON item USING btree (name);
 
 
 --
--- TOC entry 2780 (class 1259 OID 143884901)
+-- TOC entry 2779 (class 1259 OID 143983594)
 -- Name: i_item_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11493,7 +11637,7 @@ CREATE INDEX i_item_oc_oid ON item USING btree (oc_oid);
 
 
 --
--- TOC entry 2781 (class 1259 OID 143884902)
+-- TOC entry 2780 (class 1259 OID 143983595)
 -- Name: i_item_units; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11501,7 +11645,7 @@ CREATE INDEX i_item_units ON item USING btree (units);
 
 
 --
--- TOC entry 2798 (class 1259 OID 143884903)
+-- TOC entry 2797 (class 1259 OID 143983596)
 -- Name: i_itm_form_metadata_crf_ver_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11509,7 +11653,7 @@ CREATE INDEX i_itm_form_metadata_crf_ver_id ON item_form_metadata USING btree (c
 
 
 --
--- TOC entry 2679 (class 1259 OID 143884904)
+-- TOC entry 2680 (class 1259 OID 143983597)
 -- Name: i_key_index; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11517,7 +11661,7 @@ CREATE INDEX i_key_index ON configuration USING btree (key);
 
 
 --
--- TOC entry 2822 (class 1259 OID 143884905)
+-- TOC entry 2821 (class 1259 OID 143983598)
 -- Name: i_null_value_type_code; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11525,7 +11669,7 @@ CREATE INDEX i_null_value_type_code ON null_value_type USING btree (code);
 
 
 --
--- TOC entry 2882 (class 1259 OID 143884906)
+-- TOC entry 2881 (class 1259 OID 143983599)
 -- Name: i_rule_action_action_type; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11533,7 +11677,7 @@ CREATE INDEX i_rule_action_action_type ON rule_action USING btree (action_type);
 
 
 --
--- TOC entry 2883 (class 1259 OID 143884907)
+-- TOC entry 2882 (class 1259 OID 143983600)
 -- Name: i_rule_action_rule_set_rule_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11541,7 +11685,7 @@ CREATE INDEX i_rule_action_rule_set_rule_id ON rule_action USING btree (rule_set
 
 
 --
--- TOC entry 2884 (class 1259 OID 143884908)
+-- TOC entry 2883 (class 1259 OID 143983601)
 -- Name: i_rule_action_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11549,7 +11693,7 @@ CREATE INDEX i_rule_action_status_id ON rule_action USING btree (status_id);
 
 
 --
--- TOC entry 2893 (class 1259 OID 143884909)
+-- TOC entry 2892 (class 1259 OID 143983602)
 -- Name: i_rule_expression_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11557,7 +11701,7 @@ CREATE INDEX i_rule_expression_status_id ON rule_expression USING btree (status_
 
 
 --
--- TOC entry 2877 (class 1259 OID 143884910)
+-- TOC entry 2876 (class 1259 OID 143983603)
 -- Name: i_rule_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11565,7 +11709,7 @@ CREATE INDEX i_rule_oc_oid ON rule USING btree (oc_oid);
 
 
 --
--- TOC entry 2878 (class 1259 OID 143884911)
+-- TOC entry 2877 (class 1259 OID 143983604)
 -- Name: i_rule_rule_expression_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11573,7 +11717,7 @@ CREATE INDEX i_rule_rule_expression_id ON rule USING btree (rule_expression_id);
 
 
 --
--- TOC entry 2904 (class 1259 OID 143884912)
+-- TOC entry 2903 (class 1259 OID 143983605)
 -- Name: i_rule_set_audit_rule_set_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11581,7 +11725,7 @@ CREATE INDEX i_rule_set_audit_rule_set_id ON rule_set_audit USING btree (rule_se
 
 
 --
--- TOC entry 2905 (class 1259 OID 143884913)
+-- TOC entry 2904 (class 1259 OID 143983606)
 -- Name: i_rule_set_audit_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11589,7 +11733,7 @@ CREATE INDEX i_rule_set_audit_status_id ON rule_set_audit USING btree (status_id
 
 
 --
--- TOC entry 2896 (class 1259 OID 143884914)
+-- TOC entry 2895 (class 1259 OID 143983607)
 -- Name: i_rule_set_crf_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11597,7 +11741,7 @@ CREATE INDEX i_rule_set_crf_id ON rule_set USING btree (crf_id);
 
 
 --
--- TOC entry 2897 (class 1259 OID 143884915)
+-- TOC entry 2896 (class 1259 OID 143983608)
 -- Name: i_rule_set_crf_version_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11605,7 +11749,7 @@ CREATE INDEX i_rule_set_crf_version_id ON rule_set USING btree (crf_version_id);
 
 
 --
--- TOC entry 2913 (class 1259 OID 143884916)
+-- TOC entry 2912 (class 1259 OID 143983609)
 -- Name: i_rule_set_rule_audit_rule_set_rule_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11613,7 +11757,7 @@ CREATE INDEX i_rule_set_rule_audit_rule_set_rule_id ON rule_set_rule_audit USING
 
 
 --
--- TOC entry 2914 (class 1259 OID 143884917)
+-- TOC entry 2913 (class 1259 OID 143983610)
 -- Name: i_rule_set_rule_audit_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11621,7 +11765,7 @@ CREATE INDEX i_rule_set_rule_audit_status_id ON rule_set_rule_audit USING btree 
 
 
 --
--- TOC entry 2898 (class 1259 OID 143884918)
+-- TOC entry 2897 (class 1259 OID 143983611)
 -- Name: i_rule_set_rule_expression_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11629,7 +11773,7 @@ CREATE INDEX i_rule_set_rule_expression_id ON rule_set USING btree (rule_express
 
 
 --
--- TOC entry 2908 (class 1259 OID 143884919)
+-- TOC entry 2907 (class 1259 OID 143983612)
 -- Name: i_rule_set_rule_rule_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11637,7 +11781,7 @@ CREATE INDEX i_rule_set_rule_rule_id ON rule_set_rule USING btree (rule_id);
 
 
 --
--- TOC entry 2909 (class 1259 OID 143884920)
+-- TOC entry 2908 (class 1259 OID 143983613)
 -- Name: i_rule_set_rule_rule_set_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11645,7 +11789,7 @@ CREATE INDEX i_rule_set_rule_rule_set_id ON rule_set_rule USING btree (rule_set_
 
 
 --
--- TOC entry 2910 (class 1259 OID 143884921)
+-- TOC entry 2909 (class 1259 OID 143983614)
 -- Name: i_rule_set_rule_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11653,7 +11797,7 @@ CREATE INDEX i_rule_set_rule_status_id ON rule_set_rule USING btree (status_id);
 
 
 --
--- TOC entry 2899 (class 1259 OID 143884922)
+-- TOC entry 2898 (class 1259 OID 143983615)
 -- Name: i_rule_set_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11661,7 +11805,7 @@ CREATE INDEX i_rule_set_status_id ON rule_set USING btree (status_id);
 
 
 --
--- TOC entry 2900 (class 1259 OID 143884923)
+-- TOC entry 2899 (class 1259 OID 143983616)
 -- Name: i_rule_set_study_event_definition_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11669,7 +11813,7 @@ CREATE INDEX i_rule_set_study_event_definition_id ON rule_set USING btree (study
 
 
 --
--- TOC entry 2901 (class 1259 OID 143884924)
+-- TOC entry 2900 (class 1259 OID 143983617)
 -- Name: i_rule_set_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11677,7 +11821,7 @@ CREATE INDEX i_rule_set_study_id ON rule_set USING btree (study_id);
 
 
 --
--- TOC entry 2879 (class 1259 OID 143884925)
+-- TOC entry 2878 (class 1259 OID 143983618)
 -- Name: i_rule_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11685,7 +11829,7 @@ CREATE INDEX i_rule_status_id ON rule USING btree (status_id);
 
 
 --
--- TOC entry 2919 (class 1259 OID 143884926)
+-- TOC entry 2918 (class 1259 OID 143983619)
 -- Name: i_section_ordinal; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11693,7 +11837,7 @@ CREATE INDEX i_section_ordinal ON section USING btree (ordinal);
 
 
 --
--- TOC entry 2920 (class 1259 OID 143884927)
+-- TOC entry 2919 (class 1259 OID 143983620)
 -- Name: i_section_parent_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11701,7 +11845,7 @@ CREATE INDEX i_section_parent_id ON section USING btree (parent_id);
 
 
 --
--- TOC entry 2921 (class 1259 OID 143884928)
+-- TOC entry 2920 (class 1259 OID 143983621)
 -- Name: i_section_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11709,7 +11853,7 @@ CREATE INDEX i_section_status_id ON section USING btree (status_id);
 
 
 --
--- TOC entry 2936 (class 1259 OID 143884929)
+-- TOC entry 2935 (class 1259 OID 143983622)
 -- Name: i_study_event_date_end; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11717,7 +11861,7 @@ CREATE INDEX i_study_event_date_end ON study_event USING btree (date_end);
 
 
 --
--- TOC entry 2937 (class 1259 OID 143884930)
+-- TOC entry 2936 (class 1259 OID 143983623)
 -- Name: i_study_event_date_start; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11725,7 +11869,7 @@ CREATE INDEX i_study_event_date_start ON study_event USING btree (date_start);
 
 
 --
--- TOC entry 2944 (class 1259 OID 143884931)
+-- TOC entry 2943 (class 1259 OID 143983624)
 -- Name: i_study_event_definition_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11733,7 +11877,7 @@ CREATE INDEX i_study_event_definition_oc_oid ON study_event_definition USING btr
 
 
 --
--- TOC entry 2945 (class 1259 OID 143884932)
+-- TOC entry 2944 (class 1259 OID 143983625)
 -- Name: i_study_event_definition_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11741,7 +11885,7 @@ CREATE INDEX i_study_event_definition_status_id ON study_event_definition USING 
 
 
 --
--- TOC entry 2946 (class 1259 OID 143884933)
+-- TOC entry 2945 (class 1259 OID 143983626)
 -- Name: i_study_event_definition_update_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11749,7 +11893,7 @@ CREATE INDEX i_study_event_definition_update_id ON study_event_definition USING 
 
 
 --
--- TOC entry 2938 (class 1259 OID 143884934)
+-- TOC entry 2937 (class 1259 OID 143983627)
 -- Name: i_study_event_sample_ordinal; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11757,7 +11901,7 @@ CREATE INDEX i_study_event_sample_ordinal ON study_event USING btree (sample_ord
 
 
 --
--- TOC entry 2939 (class 1259 OID 143884935)
+-- TOC entry 2938 (class 1259 OID 143983628)
 -- Name: i_study_event_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11765,7 +11909,7 @@ CREATE INDEX i_study_event_status_id ON study_event USING btree (status_id);
 
 
 --
--- TOC entry 2940 (class 1259 OID 143884936)
+-- TOC entry 2939 (class 1259 OID 143983629)
 -- Name: i_study_event_study_event_definition_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11773,7 +11917,7 @@ CREATE INDEX i_study_event_study_event_definition_id ON study_event USING btree 
 
 
 --
--- TOC entry 2941 (class 1259 OID 143884937)
+-- TOC entry 2940 (class 1259 OID 143983630)
 -- Name: i_study_event_subject_event_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11781,7 +11925,7 @@ CREATE INDEX i_study_event_subject_event_status_id ON study_event USING btree (s
 
 
 --
--- TOC entry 2953 (class 1259 OID 143884938)
+-- TOC entry 2952 (class 1259 OID 143983631)
 -- Name: i_study_group_class_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11789,7 +11933,7 @@ CREATE INDEX i_study_group_class_status_id ON study_group_class USING btree (sta
 
 
 --
--- TOC entry 2954 (class 1259 OID 143884939)
+-- TOC entry 2953 (class 1259 OID 143983632)
 -- Name: i_study_group_class_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11797,7 +11941,7 @@ CREATE INDEX i_study_group_class_study_id ON study_group_class USING btree (stud
 
 
 --
--- TOC entry 2926 (class 1259 OID 143884940)
+-- TOC entry 2925 (class 1259 OID 143983633)
 -- Name: i_study_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11805,7 +11949,7 @@ CREATE INDEX i_study_oc_oid ON study USING btree (oc_oid);
 
 
 --
--- TOC entry 2927 (class 1259 OID 143884941)
+-- TOC entry 2926 (class 1259 OID 143983634)
 -- Name: i_study_owner_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11813,7 +11957,7 @@ CREATE INDEX i_study_owner_id ON study USING btree (owner_id);
 
 
 --
--- TOC entry 2963 (class 1259 OID 143884942)
+-- TOC entry 2962 (class 1259 OID 143983635)
 -- Name: i_study_parameter_value_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11821,7 +11965,7 @@ CREATE INDEX i_study_parameter_value_study_id ON study_parameter_value USING btr
 
 
 --
--- TOC entry 2928 (class 1259 OID 143884943)
+-- TOC entry 2927 (class 1259 OID 143983636)
 -- Name: i_study_parent_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11829,7 +11973,7 @@ CREATE INDEX i_study_parent_study_id ON study USING btree (parent_study_id);
 
 
 --
--- TOC entry 2929 (class 1259 OID 143884944)
+-- TOC entry 2928 (class 1259 OID 143983637)
 -- Name: i_study_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11837,7 +11981,7 @@ CREATE INDEX i_study_status_id ON study USING btree (status_id);
 
 
 --
--- TOC entry 2964 (class 1259 OID 143884945)
+-- TOC entry 2963 (class 1259 OID 143983638)
 -- Name: i_study_subject_label; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11845,7 +11989,7 @@ CREATE INDEX i_study_subject_label ON study_subject USING btree (label);
 
 
 --
--- TOC entry 2965 (class 1259 OID 143884946)
+-- TOC entry 2964 (class 1259 OID 143983639)
 -- Name: i_study_subject_oc_oid; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11853,7 +11997,7 @@ CREATE INDEX i_study_subject_oc_oid ON study_subject USING btree (oc_oid);
 
 
 --
--- TOC entry 2966 (class 1259 OID 143884947)
+-- TOC entry 2965 (class 1259 OID 143983640)
 -- Name: i_study_subject_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11861,7 +12005,7 @@ CREATE INDEX i_study_subject_status_id ON study_subject USING btree (status_id);
 
 
 --
--- TOC entry 2967 (class 1259 OID 143884948)
+-- TOC entry 2966 (class 1259 OID 143983641)
 -- Name: i_study_subject_study_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11869,7 +12013,7 @@ CREATE INDEX i_study_subject_study_id ON study_subject USING btree (study_id);
 
 
 --
--- TOC entry 2930 (class 1259 OID 143884949)
+-- TOC entry 2929 (class 1259 OID 143983642)
 -- Name: i_study_type_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11877,7 +12021,7 @@ CREATE INDEX i_study_type_id ON study USING btree (type_id);
 
 
 --
--- TOC entry 2931 (class 1259 OID 143884950)
+-- TOC entry 2930 (class 1259 OID 143983643)
 -- Name: i_study_unique_identifier; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11885,7 +12029,7 @@ CREATE INDEX i_study_unique_identifier ON study USING btree (name);
 
 
 --
--- TOC entry 2978 (class 1259 OID 143884951)
+-- TOC entry 2977 (class 1259 OID 143983644)
 -- Name: i_study_user_role_user_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11893,7 +12037,7 @@ CREATE INDEX i_study_user_role_user_name ON study_user_role USING btree (user_na
 
 
 --
--- TOC entry 2981 (class 1259 OID 143884952)
+-- TOC entry 2982 (class 1259 OID 143983645)
 -- Name: i_subject_date_created; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11901,7 +12045,7 @@ CREATE INDEX i_subject_date_created ON subject USING btree (date_created);
 
 
 --
--- TOC entry 2982 (class 1259 OID 143884953)
+-- TOC entry 2983 (class 1259 OID 143983646)
 -- Name: i_subject_date_of_birth; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11909,7 +12053,7 @@ CREATE INDEX i_subject_date_of_birth ON subject USING btree (date_of_birth);
 
 
 --
--- TOC entry 2983 (class 1259 OID 143884954)
+-- TOC entry 2984 (class 1259 OID 143983647)
 -- Name: i_subject_gender; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11917,7 +12061,7 @@ CREATE INDEX i_subject_gender ON subject USING btree (gender);
 
 
 --
--- TOC entry 2989 (class 1259 OID 143884955)
+-- TOC entry 2990 (class 1259 OID 143983648)
 -- Name: i_subject_group_map_status_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11925,7 +12069,7 @@ CREATE INDEX i_subject_group_map_status_id ON subject_group_map USING btree (sta
 
 
 --
--- TOC entry 2990 (class 1259 OID 143884956)
+-- TOC entry 2991 (class 1259 OID 143983649)
 -- Name: i_subject_group_map_study_group_class_id; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11933,7 +12077,7 @@ CREATE INDEX i_subject_group_map_study_group_class_id ON subject_group_map USING
 
 
 --
--- TOC entry 2984 (class 1259 OID 143884957)
+-- TOC entry 2985 (class 1259 OID 143983650)
 -- Name: i_subject_unique_identifier; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11941,7 +12085,7 @@ CREATE INDEX i_subject_unique_identifier ON subject USING btree (unique_identifi
 
 
 --
--- TOC entry 3007 (class 1259 OID 143884958)
+-- TOC entry 3008 (class 1259 OID 143983651)
 -- Name: i_user_account_user_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11949,7 +12093,7 @@ CREATE INDEX i_user_account_user_name ON user_account USING btree (user_name);
 
 
 --
--- TOC entry 2831 (class 1259 OID 143884959)
+-- TOC entry 2830 (class 1259 OID 143983652)
 -- Name: idx_oc_qrtz_ft_inst_job_req_rcvry; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11957,7 +12101,7 @@ CREATE INDEX idx_oc_qrtz_ft_inst_job_req_rcvry ON oc_qrtz_fired_triggers USING b
 
 
 --
--- TOC entry 2832 (class 1259 OID 143884960)
+-- TOC entry 2831 (class 1259 OID 143983653)
 -- Name: idx_oc_qrtz_ft_j_g; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11965,7 +12109,7 @@ CREATE INDEX idx_oc_qrtz_ft_j_g ON oc_qrtz_fired_triggers USING btree (sched_nam
 
 
 --
--- TOC entry 2833 (class 1259 OID 143884961)
+-- TOC entry 2832 (class 1259 OID 143983654)
 -- Name: idx_oc_qrtz_ft_jg; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11973,7 +12117,7 @@ CREATE INDEX idx_oc_qrtz_ft_jg ON oc_qrtz_fired_triggers USING btree (sched_name
 
 
 --
--- TOC entry 2834 (class 1259 OID 143884962)
+-- TOC entry 2833 (class 1259 OID 143983655)
 -- Name: idx_oc_qrtz_ft_t_g; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11981,7 +12125,7 @@ CREATE INDEX idx_oc_qrtz_ft_t_g ON oc_qrtz_fired_triggers USING btree (sched_nam
 
 
 --
--- TOC entry 2835 (class 1259 OID 143884963)
+-- TOC entry 2834 (class 1259 OID 143983656)
 -- Name: idx_oc_qrtz_ft_tg; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11989,7 +12133,7 @@ CREATE INDEX idx_oc_qrtz_ft_tg ON oc_qrtz_fired_triggers USING btree (sched_name
 
 
 --
--- TOC entry 2836 (class 1259 OID 143884964)
+-- TOC entry 2835 (class 1259 OID 143983657)
 -- Name: idx_oc_qrtz_ft_trig_inst_name; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -11997,7 +12141,7 @@ CREATE INDEX idx_oc_qrtz_ft_trig_inst_name ON oc_qrtz_fired_triggers USING btree
 
 
 --
--- TOC entry 2839 (class 1259 OID 143884965)
+-- TOC entry 2838 (class 1259 OID 143983658)
 -- Name: idx_oc_qrtz_j_grp; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12005,7 +12149,7 @@ CREATE INDEX idx_oc_qrtz_j_grp ON oc_qrtz_job_details USING btree (sched_name, j
 
 
 --
--- TOC entry 2840 (class 1259 OID 143884966)
+-- TOC entry 2839 (class 1259 OID 143983659)
 -- Name: idx_oc_qrtz_j_req_recovery; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12013,7 +12157,7 @@ CREATE INDEX idx_oc_qrtz_j_req_recovery ON oc_qrtz_job_details USING btree (sche
 
 
 --
--- TOC entry 2853 (class 1259 OID 143884967)
+-- TOC entry 2852 (class 1259 OID 143983660)
 -- Name: idx_oc_qrtz_t_c; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12021,7 +12165,7 @@ CREATE INDEX idx_oc_qrtz_t_c ON oc_qrtz_triggers USING btree (sched_name, calend
 
 
 --
--- TOC entry 2854 (class 1259 OID 143884968)
+-- TOC entry 2853 (class 1259 OID 143983661)
 -- Name: idx_oc_qrtz_t_g; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12029,7 +12173,7 @@ CREATE INDEX idx_oc_qrtz_t_g ON oc_qrtz_triggers USING btree (sched_name, trigge
 
 
 --
--- TOC entry 2855 (class 1259 OID 143884969)
+-- TOC entry 2854 (class 1259 OID 143983662)
 -- Name: idx_oc_qrtz_t_j; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12037,7 +12181,7 @@ CREATE INDEX idx_oc_qrtz_t_j ON oc_qrtz_triggers USING btree (sched_name, job_na
 
 
 --
--- TOC entry 2856 (class 1259 OID 143884970)
+-- TOC entry 2855 (class 1259 OID 143983663)
 -- Name: idx_oc_qrtz_t_jg; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12045,7 +12189,7 @@ CREATE INDEX idx_oc_qrtz_t_jg ON oc_qrtz_triggers USING btree (sched_name, job_g
 
 
 --
--- TOC entry 2857 (class 1259 OID 143884971)
+-- TOC entry 2856 (class 1259 OID 143983664)
 -- Name: idx_oc_qrtz_t_n_g_state; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12053,7 +12197,7 @@ CREATE INDEX idx_oc_qrtz_t_n_g_state ON oc_qrtz_triggers USING btree (sched_name
 
 
 --
--- TOC entry 2858 (class 1259 OID 143884972)
+-- TOC entry 2857 (class 1259 OID 143983665)
 -- Name: idx_oc_qrtz_t_n_state; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12061,7 +12205,7 @@ CREATE INDEX idx_oc_qrtz_t_n_state ON oc_qrtz_triggers USING btree (sched_name, 
 
 
 --
--- TOC entry 2859 (class 1259 OID 143884973)
+-- TOC entry 2858 (class 1259 OID 143983666)
 -- Name: idx_oc_qrtz_t_next_fire_time; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12069,7 +12213,7 @@ CREATE INDEX idx_oc_qrtz_t_next_fire_time ON oc_qrtz_triggers USING btree (sched
 
 
 --
--- TOC entry 2860 (class 1259 OID 143884974)
+-- TOC entry 2859 (class 1259 OID 143983667)
 -- Name: idx_oc_qrtz_t_nft_misfire; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12077,7 +12221,7 @@ CREATE INDEX idx_oc_qrtz_t_nft_misfire ON oc_qrtz_triggers USING btree (sched_na
 
 
 --
--- TOC entry 2861 (class 1259 OID 143884975)
+-- TOC entry 2860 (class 1259 OID 143983668)
 -- Name: idx_oc_qrtz_t_nft_st; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12085,7 +12229,7 @@ CREATE INDEX idx_oc_qrtz_t_nft_st ON oc_qrtz_triggers USING btree (sched_name, t
 
 
 --
--- TOC entry 2862 (class 1259 OID 143884976)
+-- TOC entry 2861 (class 1259 OID 143983669)
 -- Name: idx_oc_qrtz_t_nft_st_misfire; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12093,7 +12237,7 @@ CREATE INDEX idx_oc_qrtz_t_nft_st_misfire ON oc_qrtz_triggers USING btree (sched
 
 
 --
--- TOC entry 2863 (class 1259 OID 143884977)
+-- TOC entry 2862 (class 1259 OID 143983670)
 -- Name: idx_oc_qrtz_t_nft_st_misfire_grp; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12101,7 +12245,7 @@ CREATE INDEX idx_oc_qrtz_t_nft_st_misfire_grp ON oc_qrtz_triggers USING btree (s
 
 
 --
--- TOC entry 2864 (class 1259 OID 143884978)
+-- TOC entry 2863 (class 1259 OID 143983671)
 -- Name: idx_oc_qrtz_t_state; Type: INDEX; Schema: public; Owner: clincapture; Tablespace: 
 --
 
@@ -12109,7 +12253,7 @@ CREATE INDEX idx_oc_qrtz_t_state ON oc_qrtz_triggers USING btree (sched_name, tr
 
 
 --
--- TOC entry 3153 (class 2620 OID 143884979)
+-- TOC entry 3158 (class 2620 OID 143983672)
 -- Name: didm_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12120,7 +12264,7 @@ CREATE TRIGGER didm_update
 
 
 --
--- TOC entry 3154 (class 2620 OID 143884980)
+-- TOC entry 3159 (class 2620 OID 143983673)
 -- Name: event_crf_delete; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12131,7 +12275,7 @@ CREATE TRIGGER event_crf_delete
 
 
 --
--- TOC entry 3155 (class 2620 OID 143884981)
+-- TOC entry 3160 (class 2620 OID 143983674)
 -- Name: event_crf_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12142,7 +12286,7 @@ CREATE TRIGGER event_crf_update
 
 
 --
--- TOC entry 3157 (class 2620 OID 143884982)
+-- TOC entry 3162 (class 2620 OID 143983675)
 -- Name: event_definition_crf_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12153,7 +12297,7 @@ CREATE TRIGGER event_definition_crf_update
 
 
 --
--- TOC entry 3164 (class 2620 OID 143884983)
+-- TOC entry 3170 (class 2620 OID 143983676)
 -- Name: global_subject_insert_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12164,7 +12308,7 @@ CREATE TRIGGER global_subject_insert_update
 
 
 --
--- TOC entry 3158 (class 2620 OID 143884984)
+-- TOC entry 3163 (class 2620 OID 143983677)
 -- Name: item_data_initial; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12175,7 +12319,7 @@ CREATE TRIGGER item_data_initial
 
 
 --
--- TOC entry 3159 (class 2620 OID 143884985)
+-- TOC entry 3164 (class 2620 OID 143983678)
 -- Name: item_data_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12186,7 +12330,7 @@ CREATE TRIGGER item_data_update
 
 
 --
--- TOC entry 3160 (class 2620 OID 143884986)
+-- TOC entry 3165 (class 2620 OID 143983679)
 -- Name: repeating_data_insert; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12197,7 +12341,7 @@ CREATE TRIGGER repeating_data_insert
 
 
 --
--- TOC entry 3161 (class 2620 OID 143884987)
+-- TOC entry 3167 (class 2620 OID 143983680)
 -- Name: study_event_delete; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12208,7 +12352,7 @@ CREATE TRIGGER study_event_delete
 
 
 --
--- TOC entry 3162 (class 2620 OID 143884988)
+-- TOC entry 3168 (class 2620 OID 143983681)
 -- Name: study_event_insert_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12219,7 +12363,18 @@ CREATE TRIGGER study_event_insert_update
 
 
 --
--- TOC entry 3163 (class 2620 OID 143884989)
+-- TOC entry 3166 (class 2620 OID 143984389)
+-- Name: study_insert_trigger; Type: TRIGGER; Schema: public; Owner: clincapture
+--
+
+CREATE TRIGGER study_insert_trigger
+    AFTER INSERT ON study
+    FOR EACH ROW
+    EXECUTE PROCEDURE study_insert_trigger();
+
+
+--
+-- TOC entry 3169 (class 2620 OID 143983682)
 -- Name: study_subject_insert_updare; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12230,7 +12385,7 @@ CREATE TRIGGER study_subject_insert_updare
 
 
 --
--- TOC entry 3165 (class 2620 OID 143884990)
+-- TOC entry 3171 (class 2620 OID 143983683)
 -- Name: subject_group_map_insert_update; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12241,7 +12396,7 @@ CREATE TRIGGER subject_group_map_insert_update
 
 
 --
--- TOC entry 3156 (class 2620 OID 143884991)
+-- TOC entry 3161 (class 2620 OID 143983684)
 -- Name: update_event_crf_status_trigger; Type: TRIGGER; Schema: public; Owner: clincapture
 --
 
@@ -12252,7 +12407,7 @@ CREATE TRIGGER update_event_crf_status_trigger
 
 
 --
--- TOC entry 3032 (class 2606 OID 143884992)
+-- TOC entry 3035 (class 2606 OID 143983685)
 -- Name: crfs_masking_fk_event_definition_crf_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12261,7 +12416,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 3033 (class 2606 OID 143884997)
+-- TOC entry 3036 (class 2606 OID 143983690)
 -- Name: crfs_masking_fk_study_event_definition_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12270,7 +12425,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 3034 (class 2606 OID 143885002)
+-- TOC entry 3037 (class 2606 OID 143983695)
 -- Name: crfs_masking_fk_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12279,7 +12434,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 3035 (class 2606 OID 143885007)
+-- TOC entry 3038 (class 2606 OID 143983700)
 -- Name: crfs_masking_fk_study_user_role_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12288,7 +12443,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 3036 (class 2606 OID 143885012)
+-- TOC entry 3039 (class 2606 OID 143983705)
 -- Name: crfs_masking_fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12297,7 +12452,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 3038 (class 2606 OID 143885017)
+-- TOC entry 3041 (class 2606 OID 143983710)
 -- Name: dataset_fk_dataset_item_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12306,7 +12461,7 @@ ALTER TABLE ONLY dataset
 
 
 --
--- TOC entry 3046 (class 2606 OID 143885022)
+-- TOC entry 3049 (class 2606 OID 143983715)
 -- Name: discrepancy_note_asn_u_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12315,7 +12470,7 @@ ALTER TABLE ONLY discrepancy_note
 
 
 --
--- TOC entry 3047 (class 2606 OID 143885027)
+-- TOC entry 3050 (class 2606 OID 143983720)
 -- Name: discrepancy_note_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12324,7 +12479,7 @@ ALTER TABLE ONLY discrepancy_note
 
 
 --
--- TOC entry 3048 (class 2606 OID 143885032)
+-- TOC entry 3051 (class 2606 OID 143983725)
 -- Name: discrepancy_note_study_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12333,7 +12488,7 @@ ALTER TABLE ONLY discrepancy_note
 
 
 --
--- TOC entry 3049 (class 2606 OID 143885037)
+-- TOC entry 3052 (class 2606 OID 143983730)
 -- Name: dn_discrepancy_note_type_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12342,7 +12497,7 @@ ALTER TABLE ONLY discrepancy_note
 
 
 --
--- TOC entry 3052 (class 2606 OID 143885042)
+-- TOC entry 3055 (class 2606 OID 143983735)
 -- Name: dn_event_crf_map_dn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12351,7 +12506,7 @@ ALTER TABLE ONLY dn_event_crf_map
 
 
 --
--- TOC entry 3051 (class 2606 OID 143885047)
+-- TOC entry 3054 (class 2606 OID 143983740)
 -- Name: dn_evnt_crf_map_evnt_crf_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12360,7 +12515,7 @@ ALTER TABLE ONLY dn_event_crf_map
 
 
 --
--- TOC entry 3054 (class 2606 OID 143885052)
+-- TOC entry 3057 (class 2606 OID 143983745)
 -- Name: dn_item_data_map_dn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12369,7 +12524,7 @@ ALTER TABLE ONLY dn_item_data_map
 
 
 --
--- TOC entry 3053 (class 2606 OID 143885057)
+-- TOC entry 3056 (class 2606 OID 143983750)
 -- Name: dn_itm_data_map_itm_data_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12378,7 +12533,7 @@ ALTER TABLE ONLY dn_item_data_map
 
 
 --
--- TOC entry 3050 (class 2606 OID 143885062)
+-- TOC entry 3053 (class 2606 OID 143983755)
 -- Name: dn_resolution_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12387,7 +12542,7 @@ ALTER TABLE ONLY discrepancy_note
 
 
 --
--- TOC entry 3056 (class 2606 OID 143885067)
+-- TOC entry 3059 (class 2606 OID 143983760)
 -- Name: dn_sem_study_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12396,7 +12551,7 @@ ALTER TABLE ONLY dn_study_event_map
 
 
 --
--- TOC entry 3058 (class 2606 OID 143885072)
+-- TOC entry 3061 (class 2606 OID 143983765)
 -- Name: dn_ssm_study_subject_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12405,7 +12560,7 @@ ALTER TABLE ONLY dn_study_subject_map
 
 
 --
--- TOC entry 3055 (class 2606 OID 143885077)
+-- TOC entry 3058 (class 2606 OID 143983770)
 -- Name: dn_study_event_map_dn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12414,7 +12569,7 @@ ALTER TABLE ONLY dn_study_event_map
 
 
 --
--- TOC entry 3057 (class 2606 OID 143885082)
+-- TOC entry 3060 (class 2606 OID 143983775)
 -- Name: dn_study_subject_map_dn_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12423,7 +12578,7 @@ ALTER TABLE ONLY dn_study_subject_map
 
 
 --
--- TOC entry 3060 (class 2606 OID 143885087)
+-- TOC entry 3063 (class 2606 OID 143983780)
 -- Name: dn_subject_map_dn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12432,7 +12587,7 @@ ALTER TABLE ONLY dn_subject_map
 
 
 --
--- TOC entry 3059 (class 2606 OID 143885092)
+-- TOC entry 3062 (class 2606 OID 143983785)
 -- Name: dn_subject_map_subject_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12441,7 +12596,7 @@ ALTER TABLE ONLY dn_subject_map
 
 
 --
--- TOC entry 3071 (class 2606 OID 143885097)
+-- TOC entry 3074 (class 2606 OID 143983790)
 -- Name: event_crf_section_fk_event_crf_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12450,7 +12605,7 @@ ALTER TABLE ONLY event_crf_section
 
 
 --
--- TOC entry 3072 (class 2606 OID 143885102)
+-- TOC entry 3075 (class 2606 OID 143983795)
 -- Name: event_crf_section_fk_section_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12459,7 +12614,7 @@ ALTER TABLE ONLY event_crf_section
 
 
 --
--- TOC entry 3083 (class 2606 OID 143885107)
+-- TOC entry 3086 (class 2606 OID 143983800)
 -- Name: fk_answer_reference_item; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12468,7 +12623,7 @@ ALTER TABLE ONLY item_data
 
 
 --
--- TOC entry 3018 (class 2606 OID 143885112)
+-- TOC entry 3021 (class 2606 OID 143983805)
 -- Name: fk_archived_reference_dataset; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12477,7 +12632,7 @@ ALTER TABLE ONLY archived_dataset_file
 
 
 --
--- TOC entry 3019 (class 2606 OID 143885117)
+-- TOC entry 3022 (class 2606 OID 143983810)
 -- Name: fk_archived_reference_export_f; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12486,7 +12641,7 @@ ALTER TABLE ONLY archived_dataset_file
 
 
 --
--- TOC entry 3020 (class 2606 OID 143885122)
+-- TOC entry 3023 (class 2606 OID 143983815)
 -- Name: fk_audit_ev_reference_audit_ev; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12495,7 +12650,7 @@ ALTER TABLE ONLY audit_event_context
 
 
 --
--- TOC entry 3021 (class 2606 OID 143885127)
+-- TOC entry 3024 (class 2606 OID 143983820)
 -- Name: fk_audit_lo_ref_audit_lo; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12504,7 +12659,7 @@ ALTER TABLE ONLY audit_event_values
 
 
 --
--- TOC entry 3024 (class 2606 OID 143885132)
+-- TOC entry 3027 (class 2606 OID 143983825)
 -- Name: fk_audit_user_login_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12513,7 +12668,7 @@ ALTER TABLE ONLY audit_user_login
 
 
 --
--- TOC entry 3025 (class 2606 OID 143885137)
+-- TOC entry 3028 (class 2606 OID 143983830)
 -- Name: fk_completi_fk_comple_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12522,7 +12677,7 @@ ALTER TABLE ONLY completion_status
 
 
 --
--- TOC entry 3026 (class 2606 OID 143885142)
+-- TOC entry 3029 (class 2606 OID 143983835)
 -- Name: fk_crf_crf_user_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12531,7 +12686,7 @@ ALTER TABLE ONLY crf
 
 
 --
--- TOC entry 3027 (class 2606 OID 143885147)
+-- TOC entry 3030 (class 2606 OID 143983840)
 -- Name: fk_crf_fk_crf_fk_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12540,7 +12695,7 @@ ALTER TABLE ONLY crf
 
 
 --
--- TOC entry 3093 (class 2606 OID 143885152)
+-- TOC entry 3096 (class 2606 OID 143983845)
 -- Name: fk_crf_metadata; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12549,7 +12704,7 @@ ALTER TABLE ONLY item_group_metadata
 
 
 --
--- TOC entry 3029 (class 2606 OID 143885157)
+-- TOC entry 3032 (class 2606 OID 143983850)
 -- Name: fk_crf_vers_crf_versi_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12558,7 +12713,7 @@ ALTER TABLE ONLY crf_version
 
 
 --
--- TOC entry 3030 (class 2606 OID 143885162)
+-- TOC entry 3033 (class 2606 OID 143983855)
 -- Name: fk_crf_vers_fk_crf_ve_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12567,7 +12722,7 @@ ALTER TABLE ONLY crf_version
 
 
 --
--- TOC entry 3061 (class 2606 OID 143885167)
+-- TOC entry 3064 (class 2606 OID 143983860)
 -- Name: fk_crf_version; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12576,7 +12731,7 @@ ALTER TABLE ONLY edc_item_metadata
 
 
 --
--- TOC entry 3037 (class 2606 OID 143885172)
+-- TOC entry 3040 (class 2606 OID 143983865)
 -- Name: fk_crfs_masking_status_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12585,7 +12740,7 @@ ALTER TABLE ONLY crfs_masking
 
 
 --
--- TOC entry 3043 (class 2606 OID 143885177)
+-- TOC entry 3046 (class 2606 OID 143983870)
 -- Name: fk_dataset__ref_event_event_de; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12594,7 +12749,7 @@ ALTER TABLE ONLY dataset_crf_version_map
 
 
 --
--- TOC entry 3042 (class 2606 OID 143885182)
+-- TOC entry 3045 (class 2606 OID 143983875)
 -- Name: fk_dataset_crf_ref_dataset; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12603,7 +12758,7 @@ ALTER TABLE ONLY dataset_crf_version_map
 
 
 --
--- TOC entry 3039 (class 2606 OID 143885187)
+-- TOC entry 3042 (class 2606 OID 143983880)
 -- Name: fk_dataset_fk_datase_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12612,7 +12767,7 @@ ALTER TABLE ONLY dataset
 
 
 --
--- TOC entry 3040 (class 2606 OID 143885192)
+-- TOC entry 3043 (class 2606 OID 143983885)
 -- Name: fk_dataset_fk_datase_study; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12621,7 +12776,7 @@ ALTER TABLE ONLY dataset
 
 
 --
--- TOC entry 3041 (class 2606 OID 143885197)
+-- TOC entry 3044 (class 2606 OID 143983890)
 -- Name: fk_dataset_fk_datase_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12630,7 +12785,7 @@ ALTER TABLE ONLY dataset
 
 
 --
--- TOC entry 3045 (class 2606 OID 143885202)
+-- TOC entry 3048 (class 2606 OID 143983895)
 -- Name: fk_dataset_ref_study_grp_class; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12639,7 +12794,7 @@ ALTER TABLE ONLY dataset_study_group_class_map
 
 
 --
--- TOC entry 3044 (class 2606 OID 143885207)
+-- TOC entry 3047 (class 2606 OID 143983900)
 -- Name: fk_dataset_study_ref_dataset; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12648,7 +12803,7 @@ ALTER TABLE ONLY dataset_study_group_class_map
 
 
 --
--- TOC entry 3065 (class 2606 OID 143885212)
+-- TOC entry 3068 (class 2606 OID 143983905)
 -- Name: fk_event_cr_fk_event__completi; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12657,7 +12812,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 3066 (class 2606 OID 143885217)
+-- TOC entry 3069 (class 2606 OID 143983910)
 -- Name: fk_event_cr_fk_event__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12666,7 +12821,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 3067 (class 2606 OID 143885222)
+-- TOC entry 3070 (class 2606 OID 143983915)
 -- Name: fk_event_cr_fk_event__study_ev; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12675,7 +12830,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 3068 (class 2606 OID 143885227)
+-- TOC entry 3071 (class 2606 OID 143983920)
 -- Name: fk_event_cr_fk_event__user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12684,7 +12839,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 3069 (class 2606 OID 143885232)
+-- TOC entry 3072 (class 2606 OID 143983925)
 -- Name: fk_event_cr_reference_study_su; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12693,7 +12848,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 3073 (class 2606 OID 143885237)
+-- TOC entry 3076 (class 2606 OID 143983930)
 -- Name: fk_event_de_fk_study__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12702,7 +12857,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 3074 (class 2606 OID 143885242)
+-- TOC entry 3077 (class 2606 OID 143983935)
 -- Name: fk_event_de_reference_study_ev; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12711,7 +12866,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 3075 (class 2606 OID 143885247)
+-- TOC entry 3078 (class 2606 OID 143983940)
 -- Name: fk_event_de_study_crf_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12720,7 +12875,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 3062 (class 2606 OID 143885252)
+-- TOC entry 3065 (class 2606 OID 143983945)
 -- Name: fk_event_definition_crf; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12729,7 +12884,7 @@ ALTER TABLE ONLY edc_item_metadata
 
 
 --
--- TOC entry 3121 (class 2606 OID 143885257)
+-- TOC entry 3124 (class 2606 OID 143983950)
 -- Name: fk_group_class_study_group; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12738,7 +12893,7 @@ ALTER TABLE ONLY study_group
 
 
 --
--- TOC entry 3094 (class 2606 OID 143885262)
+-- TOC entry 3097 (class 2606 OID 143983955)
 -- Name: fk_item; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12747,7 +12902,7 @@ ALTER TABLE ONLY item_group_metadata
 
 
 --
--- TOC entry 3063 (class 2606 OID 143885267)
+-- TOC entry 3066 (class 2606 OID 143983960)
 -- Name: fk_item; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12756,7 +12911,7 @@ ALTER TABLE ONLY edc_item_metadata
 
 
 --
--- TOC entry 3084 (class 2606 OID 143885272)
+-- TOC entry 3087 (class 2606 OID 143983965)
 -- Name: fk_item_dat_fk_item_d_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12765,7 +12920,7 @@ ALTER TABLE ONLY item_data
 
 
 --
--- TOC entry 3085 (class 2606 OID 143885277)
+-- TOC entry 3088 (class 2606 OID 143983970)
 -- Name: fk_item_dat_fk_item_d_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12774,7 +12929,7 @@ ALTER TABLE ONLY item_data
 
 
 --
--- TOC entry 3079 (class 2606 OID 143885282)
+-- TOC entry 3082 (class 2606 OID 143983975)
 -- Name: fk_item_fk_item_f_item_ref; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12783,7 +12938,7 @@ ALTER TABLE ONLY item
 
 
 --
--- TOC entry 3080 (class 2606 OID 143885287)
+-- TOC entry 3083 (class 2606 OID 143983980)
 -- Name: fk_item_fk_item_i_item_dat; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12792,7 +12947,7 @@ ALTER TABLE ONLY item
 
 
 --
--- TOC entry 3081 (class 2606 OID 143885292)
+-- TOC entry 3084 (class 2606 OID 143983985)
 -- Name: fk_item_fk_item_s_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12801,7 +12956,7 @@ ALTER TABLE ONLY item
 
 
 --
--- TOC entry 3082 (class 2606 OID 143885297)
+-- TOC entry 3085 (class 2606 OID 143983990)
 -- Name: fk_item_fk_item_u_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12810,7 +12965,7 @@ ALTER TABLE ONLY item
 
 
 --
--- TOC entry 3090 (class 2606 OID 143885302)
+-- TOC entry 3093 (class 2606 OID 143983995)
 -- Name: fk_item_gro_fk_item_g_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12819,7 +12974,7 @@ ALTER TABLE ONLY item_group
 
 
 --
--- TOC entry 3091 (class 2606 OID 143885307)
+-- TOC entry 3094 (class 2606 OID 143984000)
 -- Name: fk_item_gro_fk_item_g_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12828,7 +12983,7 @@ ALTER TABLE ONLY item_group
 
 
 --
--- TOC entry 3095 (class 2606 OID 143885312)
+-- TOC entry 3098 (class 2606 OID 143984005)
 -- Name: fk_item_group; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12837,7 +12992,7 @@ ALTER TABLE ONLY item_group_metadata
 
 
 --
--- TOC entry 3092 (class 2606 OID 143885317)
+-- TOC entry 3095 (class 2606 OID 143984010)
 -- Name: fk_item_group_crf; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12846,7 +13001,7 @@ ALTER TABLE ONLY item_group
 
 
 --
--- TOC entry 3087 (class 2606 OID 143885322)
+-- TOC entry 3090 (class 2606 OID 143984015)
 -- Name: fk_item_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12855,7 +13010,7 @@ ALTER TABLE ONLY item_form_metadata
 
 
 --
--- TOC entry 3086 (class 2606 OID 143885327)
+-- TOC entry 3089 (class 2606 OID 143984020)
 -- Name: fk_item_reference_subject; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12864,7 +13019,7 @@ ALTER TABLE ONLY item_data
 
 
 --
--- TOC entry 3109 (class 2606 OID 143885332)
+-- TOC entry 3112 (class 2606 OID 143984025)
 -- Name: fk_old_status_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12873,7 +13028,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 3132 (class 2606 OID 143885337)
+-- TOC entry 3135 (class 2606 OID 143984030)
 -- Name: fk_person_role_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12882,7 +13037,7 @@ ALTER TABLE ONLY study_user_role
 
 
 --
--- TOC entry 3128 (class 2606 OID 143885342)
+-- TOC entry 3131 (class 2606 OID 143984035)
 -- Name: fk_project__reference_study2; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12891,7 +13046,7 @@ ALTER TABLE ONLY study_subject
 
 
 --
--- TOC entry 3103 (class 2606 OID 143885347)
+-- TOC entry 3106 (class 2606 OID 143984040)
 -- Name: fk_response_fk_respon_response; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12900,7 +13055,7 @@ ALTER TABLE ONLY response_set
 
 
 --
--- TOC entry 3088 (class 2606 OID 143885352)
+-- TOC entry 3091 (class 2606 OID 143984045)
 -- Name: fk_rs_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12909,7 +13064,7 @@ ALTER TABLE ONLY item_form_metadata
 
 
 --
--- TOC entry 3089 (class 2606 OID 143885357)
+-- TOC entry 3092 (class 2606 OID 143984050)
 -- Name: fk_sec_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12918,7 +13073,7 @@ ALTER TABLE ONLY item_form_metadata
 
 
 --
--- TOC entry 3106 (class 2606 OID 143885362)
+-- TOC entry 3109 (class 2606 OID 143984055)
 -- Name: fk_section_fk_sectio_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12927,7 +13082,7 @@ ALTER TABLE ONLY section
 
 
 --
--- TOC entry 3107 (class 2606 OID 143885367)
+-- TOC entry 3110 (class 2606 OID 143984060)
 -- Name: fk_section_fk_sectio_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12936,7 +13091,7 @@ ALTER TABLE ONLY section
 
 
 --
--- TOC entry 3108 (class 2606 OID 143885372)
+-- TOC entry 3111 (class 2606 OID 143984065)
 -- Name: fk_section_version; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12945,7 +13100,7 @@ ALTER TABLE ONLY section
 
 
 --
--- TOC entry 3028 (class 2606 OID 143885377)
+-- TOC entry 3031 (class 2606 OID 143984070)
 -- Name: fk_source_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12954,7 +13109,7 @@ ALTER TABLE ONLY crf
 
 
 --
--- TOC entry 3114 (class 2606 OID 143885382)
+-- TOC entry 3117 (class 2606 OID 143984075)
 -- Name: fk_study_ev_fk_study__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12963,7 +13118,7 @@ ALTER TABLE ONLY study_event
 
 
 --
--- TOC entry 3118 (class 2606 OID 143885387)
+-- TOC entry 3121 (class 2606 OID 143984080)
 -- Name: fk_study_ev_fk_study__study; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12972,7 +13127,7 @@ ALTER TABLE ONLY study_event_definition
 
 
 --
--- TOC entry 3115 (class 2606 OID 143885392)
+-- TOC entry 3118 (class 2606 OID 143984085)
 -- Name: fk_study_ev_fk_study__study_ev; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12981,7 +13136,7 @@ ALTER TABLE ONLY study_event
 
 
 --
--- TOC entry 3116 (class 2606 OID 143885397)
+-- TOC entry 3119 (class 2606 OID 143984090)
 -- Name: fk_study_ev_fk_study__user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12990,7 +13145,7 @@ ALTER TABLE ONLY study_event
 
 
 --
--- TOC entry 3119 (class 2606 OID 143885402)
+-- TOC entry 3122 (class 2606 OID 143984095)
 -- Name: fk_study_ev_fk_studye_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -12999,7 +13154,7 @@ ALTER TABLE ONLY study_event_definition
 
 
 --
--- TOC entry 3120 (class 2606 OID 143885407)
+-- TOC entry 3123 (class 2606 OID 143984100)
 -- Name: fk_study_ev_fk_studye_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13008,7 +13163,7 @@ ALTER TABLE ONLY study_event_definition
 
 
 --
--- TOC entry 3117 (class 2606 OID 143885412)
+-- TOC entry 3120 (class 2606 OID 143984105)
 -- Name: fk_study_ev_reference_study_su; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13017,7 +13172,7 @@ ALTER TABLE ONLY study_event
 
 
 --
--- TOC entry 3064 (class 2606 OID 143885417)
+-- TOC entry 3067 (class 2606 OID 143984110)
 -- Name: fk_study_event_definition; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13026,7 +13181,7 @@ ALTER TABLE ONLY edc_item_metadata
 
 
 --
--- TOC entry 3110 (class 2606 OID 143885422)
+-- TOC entry 3113 (class 2606 OID 143984115)
 -- Name: fk_study_fk_study__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13035,7 +13190,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 3111 (class 2606 OID 143885427)
+-- TOC entry 3114 (class 2606 OID 143984120)
 -- Name: fk_study_fk_study__user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13044,7 +13199,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 3122 (class 2606 OID 143885432)
+-- TOC entry 3125 (class 2606 OID 143984125)
 -- Name: fk_study_gr_fk_study__group_ty; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13053,7 +13208,7 @@ ALTER TABLE ONLY study_group_class
 
 
 --
--- TOC entry 3123 (class 2606 OID 143885437)
+-- TOC entry 3126 (class 2606 OID 143984130)
 -- Name: fk_study_gr_fk_study__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13062,7 +13217,7 @@ ALTER TABLE ONLY study_group_class
 
 
 --
--- TOC entry 3124 (class 2606 OID 143885442)
+-- TOC entry 3127 (class 2606 OID 143984135)
 -- Name: fk_study_gr_fk_study__user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13071,7 +13226,7 @@ ALTER TABLE ONLY study_group_class
 
 
 --
--- TOC entry 3022 (class 2606 OID 143885447)
+-- TOC entry 3025 (class 2606 OID 143984140)
 -- Name: fk_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13080,7 +13235,16 @@ ALTER TABLE ONLY audit_log_randomization
 
 
 --
--- TOC entry 3076 (class 2606 OID 143885452)
+-- TOC entry 3157 (class 2606 OID 143984378)
+-- Name: fk_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
+--
+
+ALTER TABLE ONLY email_log
+    ADD CONSTRAINT fk_study_id FOREIGN KEY (study_id) REFERENCES study(study_id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3079 (class 2606 OID 143984145)
 -- Name: fk_study_inst_reference; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13089,7 +13253,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 3125 (class 2606 OID 143885457)
+-- TOC entry 3128 (class 2606 OID 143984150)
 -- Name: fk_study_module_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13098,7 +13262,7 @@ ALTER TABLE ONLY study_module_status
 
 
 --
--- TOC entry 3077 (class 2606 OID 143885462)
+-- TOC entry 3080 (class 2606 OID 143984155)
 -- Name: fk_study_reference_instrument; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13107,7 +13271,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 3129 (class 2606 OID 143885467)
+-- TOC entry 3132 (class 2606 OID 143984160)
 -- Name: fk_study_reference_subject; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13116,7 +13280,7 @@ ALTER TABLE ONLY study_subject
 
 
 --
--- TOC entry 3130 (class 2606 OID 143885472)
+-- TOC entry 3133 (class 2606 OID 143984165)
 -- Name: fk_study_su_fk_study__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13125,7 +13289,7 @@ ALTER TABLE ONLY study_subject
 
 
 --
--- TOC entry 3131 (class 2606 OID 143885477)
+-- TOC entry 3134 (class 2606 OID 143984170)
 -- Name: fk_study_su_fk_study__user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13134,7 +13298,7 @@ ALTER TABLE ONLY study_subject
 
 
 --
--- TOC entry 3023 (class 2606 OID 143885482)
+-- TOC entry 3026 (class 2606 OID 143984175)
 -- Name: fk_study_subject_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13143,7 +13307,7 @@ ALTER TABLE ONLY audit_log_randomization
 
 
 --
--- TOC entry 3112 (class 2606 OID 143885487)
+-- TOC entry 3115 (class 2606 OID 143984180)
 -- Name: fk_study_type; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13152,7 +13316,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 3133 (class 2606 OID 143885492)
+-- TOC entry 3136 (class 2606 OID 143984185)
 -- Name: fk_study_us_fk_study__status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13161,7 +13325,7 @@ ALTER TABLE ONLY study_user_role
 
 
 --
--- TOC entry 3134 (class 2606 OID 143885497)
+-- TOC entry 3137 (class 2606 OID 143984190)
 -- Name: fk_study_us_study_use_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13170,7 +13334,7 @@ ALTER TABLE ONLY study_user_role
 
 
 --
--- TOC entry 3139 (class 2606 OID 143885502)
+-- TOC entry 3142 (class 2606 OID 143984195)
 -- Name: fk_subject__fk_sub_gr_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13179,7 +13343,7 @@ ALTER TABLE ONLY subject_group_map
 
 
 --
--- TOC entry 3140 (class 2606 OID 143885507)
+-- TOC entry 3143 (class 2606 OID 143984200)
 -- Name: fk_subject__fk_subjec_group_ro; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13188,7 +13352,7 @@ ALTER TABLE ONLY subject_group_map
 
 
 --
--- TOC entry 3141 (class 2606 OID 143885512)
+-- TOC entry 3144 (class 2606 OID 143984205)
 -- Name: fk_subject__fk_subjec_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13197,7 +13361,7 @@ ALTER TABLE ONLY subject_group_map
 
 
 --
--- TOC entry 3142 (class 2606 OID 143885517)
+-- TOC entry 3145 (class 2606 OID 143984210)
 -- Name: fk_subject__fk_subjec_study_gr; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13206,7 +13370,7 @@ ALTER TABLE ONLY subject_group_map
 
 
 --
--- TOC entry 3143 (class 2606 OID 143885522)
+-- TOC entry 3146 (class 2606 OID 143984215)
 -- Name: fk_subject__subject_g_study_su; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13215,7 +13379,7 @@ ALTER TABLE ONLY subject_group_map
 
 
 --
--- TOC entry 3135 (class 2606 OID 143885527)
+-- TOC entry 3138 (class 2606 OID 143984220)
 -- Name: fk_subject_fk_subjec_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13224,7 +13388,7 @@ ALTER TABLE ONLY subject
 
 
 --
--- TOC entry 3136 (class 2606 OID 143885532)
+-- TOC entry 3139 (class 2606 OID 143984225)
 -- Name: fk_subject_fk_subjec_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13233,7 +13397,7 @@ ALTER TABLE ONLY subject
 
 
 --
--- TOC entry 3070 (class 2606 OID 143885537)
+-- TOC entry 3073 (class 2606 OID 143984230)
 -- Name: fk_subject_referenc_instrument; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13242,7 +13406,7 @@ ALTER TABLE ONLY event_crf
 
 
 --
--- TOC entry 3144 (class 2606 OID 143885542)
+-- TOC entry 3147 (class 2606 OID 143984235)
 -- Name: fk_user_acc_fk_user_f_user_acc; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13251,7 +13415,7 @@ ALTER TABLE ONLY user_account
 
 
 --
--- TOC entry 3145 (class 2606 OID 143885547)
+-- TOC entry 3148 (class 2606 OID 143984240)
 -- Name: fk_user_acc_ref_user__user_typ; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13260,7 +13424,7 @@ ALTER TABLE ONLY user_account
 
 
 --
--- TOC entry 3146 (class 2606 OID 143885552)
+-- TOC entry 3149 (class 2606 OID 143984245)
 -- Name: fk_user_acc_status_re_status; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13269,7 +13433,7 @@ ALTER TABLE ONLY user_account
 
 
 --
--- TOC entry 3147 (class 2606 OID 143885557)
+-- TOC entry 3150 (class 2606 OID 143984250)
 -- Name: fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13278,7 +13442,16 @@ ALTER TABLE ONLY user_account
 
 
 --
--- TOC entry 3149 (class 2606 OID 143885562)
+-- TOC entry 3156 (class 2606 OID 143984383)
+-- Name: fk_user_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
+--
+
+ALTER TABLE ONLY email_log
+    ADD CONSTRAINT fk_user_id FOREIGN KEY (sent_by) REFERENCES user_account(user_id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3152 (class 2606 OID 143984255)
 -- Name: fk_versioni_fk_versio_crf_vers; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13287,7 +13460,7 @@ ALTER TABLE ONLY versioning_map
 
 
 --
--- TOC entry 3148 (class 2606 OID 143885567)
+-- TOC entry 3151 (class 2606 OID 143984260)
 -- Name: fk_versioni_fk_versio_item; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13296,7 +13469,7 @@ ALTER TABLE ONLY versioning_map
 
 
 --
--- TOC entry 3031 (class 2606 OID 143885572)
+-- TOC entry 3034 (class 2606 OID 143984265)
 -- Name: fk_versioni_reference_instrume; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13305,7 +13478,7 @@ ALTER TABLE ONLY crf_version
 
 
 --
--- TOC entry 3078 (class 2606 OID 143885577)
+-- TOC entry 3081 (class 2606 OID 143984270)
 -- Name: fk_versioning_study_inst; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13314,7 +13487,7 @@ ALTER TABLE ONLY event_definition_crf
 
 
 --
--- TOC entry 3137 (class 2606 OID 143885582)
+-- TOC entry 3140 (class 2606 OID 143984275)
 -- Name: has_father; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13323,7 +13496,7 @@ ALTER TABLE ONLY subject
 
 
 --
--- TOC entry 3138 (class 2606 OID 143885587)
+-- TOC entry 3141 (class 2606 OID 143984280)
 -- Name: has_mother; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13332,7 +13505,7 @@ ALTER TABLE ONLY subject
 
 
 --
--- TOC entry 3096 (class 2606 OID 143885592)
+-- TOC entry 3099 (class 2606 OID 143984285)
 -- Name: item_render_metadata_fk_crf_version_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13341,7 +13514,7 @@ ALTER TABLE ONLY item_render_metadata
 
 
 --
--- TOC entry 3097 (class 2606 OID 143885597)
+-- TOC entry 3100 (class 2606 OID 143984290)
 -- Name: item_render_metadata_fk_item_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13350,7 +13523,7 @@ ALTER TABLE ONLY item_render_metadata
 
 
 --
--- TOC entry 3098 (class 2606 OID 143885602)
+-- TOC entry 3101 (class 2606 OID 143984295)
 -- Name: oc_qrtz_blob_triggers_sched_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13359,7 +13532,7 @@ ALTER TABLE ONLY oc_qrtz_blob_triggers
 
 
 --
--- TOC entry 3099 (class 2606 OID 143885607)
+-- TOC entry 3102 (class 2606 OID 143984300)
 -- Name: oc_qrtz_cron_triggers_sched_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13368,7 +13541,7 @@ ALTER TABLE ONLY oc_qrtz_cron_triggers
 
 
 --
--- TOC entry 3100 (class 2606 OID 143885612)
+-- TOC entry 3103 (class 2606 OID 143984305)
 -- Name: oc_qrtz_simple_triggers_sched_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13377,7 +13550,7 @@ ALTER TABLE ONLY oc_qrtz_simple_triggers
 
 
 --
--- TOC entry 3101 (class 2606 OID 143885617)
+-- TOC entry 3104 (class 2606 OID 143984310)
 -- Name: oc_qrtz_simprop_triggers_sched_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13386,7 +13559,7 @@ ALTER TABLE ONLY oc_qrtz_simprop_triggers
 
 
 --
--- TOC entry 3102 (class 2606 OID 143885622)
+-- TOC entry 3105 (class 2606 OID 143984315)
 -- Name: oc_qrtz_triggers_sched_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13395,7 +13568,7 @@ ALTER TABLE ONLY oc_qrtz_triggers
 
 
 --
--- TOC entry 3113 (class 2606 OID 143885627)
+-- TOC entry 3116 (class 2606 OID 143984320)
 -- Name: project_is_contained_within_pa; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13404,7 +13577,7 @@ ALTER TABLE ONLY study
 
 
 --
--- TOC entry 3104 (class 2606 OID 143885632)
+-- TOC entry 3107 (class 2606 OID 143984325)
 -- Name: scd_meta_fk_control_meta_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13413,7 +13586,7 @@ ALTER TABLE ONLY scd_item_metadata
 
 
 --
--- TOC entry 3105 (class 2606 OID 143885637)
+-- TOC entry 3108 (class 2606 OID 143984330)
 -- Name: scd_meta_fk_scd_form_meta_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13422,7 +13595,7 @@ ALTER TABLE ONLY scd_item_metadata
 
 
 --
--- TOC entry 3127 (class 2606 OID 143885642)
+-- TOC entry 3130 (class 2606 OID 143984335)
 -- Name: study_param_value_param_fkey; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13431,7 +13604,7 @@ ALTER TABLE ONLY study_parameter_value
 
 
 --
--- TOC entry 3126 (class 2606 OID 143885647)
+-- TOC entry 3129 (class 2606 OID 143984340)
 -- Name: study_param_value_study_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13440,7 +13613,7 @@ ALTER TABLE ONLY study_parameter_value
 
 
 --
--- TOC entry 3150 (class 2606 OID 143885652)
+-- TOC entry 3153 (class 2606 OID 143984345)
 -- Name: widgets_layout_fk_study_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13449,7 +13622,7 @@ ALTER TABLE ONLY widgets_layout
 
 
 --
--- TOC entry 3151 (class 2606 OID 143885657)
+-- TOC entry 3154 (class 2606 OID 143984350)
 -- Name: widgets_layout_fk_users_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13458,7 +13631,7 @@ ALTER TABLE ONLY widgets_layout
 
 
 --
--- TOC entry 3152 (class 2606 OID 143885662)
+-- TOC entry 3155 (class 2606 OID 143984355)
 -- Name: widgets_layout_fk_widget_id; Type: FK CONSTRAINT; Schema: public; Owner: clincapture
 --
 
@@ -13467,7 +13640,7 @@ ALTER TABLE ONLY widgets_layout
 
 
 --
--- TOC entry 3278 (class 0 OID 0)
+-- TOC entry 3284 (class 0 OID 0)
 -- Dependencies: 6
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
@@ -13478,7 +13651,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2016-06-23 15:29:03
+-- Completed on 2016-06-29 12:37:16
 
 --
 -- PostgreSQL database dump complete
