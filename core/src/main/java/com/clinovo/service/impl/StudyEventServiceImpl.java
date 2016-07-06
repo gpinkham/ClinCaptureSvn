@@ -12,9 +12,9 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -22,10 +22,16 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +44,7 @@ import com.clinovo.util.SubjectEventStatusUtil;
  * StudyEventServiceImpl.
  */
 @Service
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class StudyEventServiceImpl implements StudyEventService {
 
 	@Autowired
@@ -210,5 +216,63 @@ public class StudyEventServiceImpl implements StudyEventService {
 	 */
 	public void unlockStudyEvents(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception {
 		enableStudyEvents(studySubjectBean, updater, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteStudyEvent(StudyEventDefinitionBean studyEventDefinitionBean, StudySubjectBean studySubjectBean,
+			StudyEventBean studyEventBean, UserAccountBean userAccountBean) {
+		StudyEventDAO sedao = getStudyEventDAO();
+		ItemDataDAO iddao = new ItemDataDAO(dataSource);
+		EventCRFDAO ecdao = new EventCRFDAO(dataSource);
+		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
+
+		for (Object eventCRFObject : ecdao.findAllByStudyEvent(studyEventBean)) {
+			EventCRFBean eventCRF = (EventCRFBean) eventCRFObject;
+			ArrayList itemData = iddao.findAllByEventCRFId(eventCRF.getId());
+			for (Object anItemData : itemData) {
+				ItemDataBean item = (ItemDataBean) anItemData;
+				ArrayList discrepancyList = dndao.findExistingNotesForItemData(item.getId());
+				iddao.deleteDnMap(item.getId());
+				for (Object aDiscrepancyList : discrepancyList) {
+					DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
+					dndao.deleteNotes(noteBean.getId());
+				}
+				item.setUpdater(userAccountBean);
+				iddao.updateUser(item);
+				iddao.delete(item.getId());
+			}
+			ecdao.deleteEventCRFDNMap(eventCRF.getId());
+			ecdao.delete(eventCRF.getId());
+		}
+
+		List<Integer> dnIdList = dndao.findAllDnIdsByStudyEvent(studyEventBean.getId());
+		sedao.deleteStudyEventDNMap(studyEventBean.getId());
+		for (Integer dnId : dnIdList) {
+			dndao.deleteNotes(dnId);
+		}
+
+		// update user id before deleting
+		studyEventBean.setUpdater(userAccountBean);
+		sedao.update(studyEventBean);
+		// delete
+		sedao.deleteByPK(studyEventBean.getId());
+
+		updateOrdinalsForEventOccurrences(studyEventDefinitionBean, studySubjectBean);
+	}
+
+	private void updateOrdinalsForEventOccurrences(StudyEventDefinitionBean studyEventDefinitionBean,
+			StudySubjectBean studySubjectBean) {
+		int ordinal = 1;
+		StudyEventDAO studyEventDao = getStudyEventDAO();
+		List<StudyEventBean> studyEvents = (List<StudyEventBean>) studyEventDao
+				.findAllByDefinitionAndSubjectOrderByOrdinal(studyEventDefinitionBean, studySubjectBean);
+		for (StudyEventBean event : studyEvents) {
+			event.setSampleOrdinal(ordinal++);
+		}
+		for (StudyEventBean event : studyEvents) {
+			studyEventDao.update(event);
+		}
 	}
 }

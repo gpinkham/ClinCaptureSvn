@@ -3,8 +3,10 @@ package org.akaza.openclinica.control.managestudy;
 import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.Status;
@@ -46,12 +48,14 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
 import com.clinovo.i18n.LocaleResolver;
+import com.clinovo.service.CRFMaskingService;
 import com.clinovo.util.DAOWrapper;
+import com.clinovo.util.SDVUtil;
 import com.clinovo.util.SignUtil;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Status.class, UpdateStudyEventServlet.class, FormProcessor.class, StudySubjectDAO.class,
-		SignUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class,
+		SignUtil.class, SDVUtil.class, DAOWrapper.class, StudyEventDefinitionDAO.class, EventCRFDAO.class,
 		StudyEventDefinitionUtil.class})
 public class UpdateStudyEventServletTest {
 
@@ -84,6 +88,8 @@ public class UpdateStudyEventServletTest {
 	@Mock
 	private StudySubjectBean studySubjectBean;
 	@Mock
+	private CRFMaskingService maskingService;
+	@Mock
 	private StudyEventBean studyEventBean;
 	@Mock
 	private ResourceBundle resterm;
@@ -108,6 +114,10 @@ public class UpdateStudyEventServletTest {
 	private List<Integer> studyEventDefinitionIds;
 	private List<StudyEventBean> studyEvents;
 	private StudySubjectBean studySubjectToUpdate;
+	private List<Object> fullCrfList = new ArrayList<Object>();
+	private Map<Integer, String> notedMap = new HashMap<Integer, String>();
+	private ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
+	private ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = new ArrayList<EventDefinitionCRFBean>();
 
 	@Before
 	public void setUp() throws Exception {
@@ -120,6 +130,7 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(Locale.ENGLISH).when(session).getAttribute(LocaleResolver.CURRENT_SESSION_LOCALE);
 		PowerMockito.mockStatic(Status.class);
 		PowerMockito.mockStatic(SignUtil.class);
+		PowerMockito.mockStatic(SDVUtil.class);
 		PowerMockito.mockStatic(StudyEventDefinitionUtil.class);
 		PowerMockito.doCallRealMethod().when(updateStudyEventServlet).processRequest(request, response);
 		PowerMockito.doReturn(userAccountBean).when(updateStudyEventServlet).getUserAccountBean(request);
@@ -131,22 +142,28 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(sessionManager).when(updateStudyEventServlet).getSessionManager(request);
 		PowerMockito.doReturn(studyEventDAO).when(updateStudyEventServlet).getStudyEventDAO();
 		PowerMockito.doReturn(eventCRFDAO).when(updateStudyEventServlet).getEventCRFDAO();
+		PowerMockito.doReturn(studyDAO).when(updateStudyEventServlet).getStudyDAO();
 		PowerMockito.doReturn(configurationDao).when(updateStudyEventServlet).getConfigurationDao();
 		PowerMockito.doReturn(eventDefinitionCRFDAO).when(updateStudyEventServlet).getEventDefinitionCRFDAO();
+		PowerMockito.doReturn(maskingService).when(updateStudyEventServlet).getMaskingService();
 		PowerMockito.doReturn(session).when(request).getSession();
 		Whitebox.setInternalState(updateStudyEventServlet, "logger", PowerMockito.mock(Logger.class));
 		PowerMockito.doReturn(currentStudyLocked).when(respage).getString("current_study_locked");
 		PowerMockito.whenNew(FormProcessor.class).withAnyArguments().thenReturn(formProcessor);
-		PowerMockito.whenNew(StudyEventDefinitionDAO.class).withAnyArguments().thenReturn(studyEventDefinitionDAO);
-		PowerMockito.whenNew(StudyDAO.class).withAnyArguments().thenReturn(studyDAO);
+		PowerMockito.doReturn(studyEventDefinitionDAO).when(updateStudyEventServlet).getStudyEventDefinitionDAO();
 		PowerMockito.whenNew(EventCRFDAO.class).withAnyArguments().thenReturn(eventCRFDAO);
+		PowerMockito.whenNew(StudyDAO.class).withAnyArguments().thenReturn(studyDAO);
 		PowerMockito.whenNew(DAOWrapper.class).withAnyArguments().thenReturn(daoWrapper);
-		PowerMockito.when(SignUtil.permitSign(studyEventBean, studyBean, daoWrapper)).thenReturn(true);
 		initStudyEventLists();
 		studySubjectToUpdate = new StudySubjectBean();
 		PowerMockito.doReturn(studySubjectBean).when(studySubjectDAO).update(studySubjectToUpdate);
 		PowerMockito.when(studyEventDAO.findAllByStudySubject(Mockito.any(StudySubjectBean.class)))
 				.thenReturn((ArrayList<StudyEventBean>) studyEvents);
+		PowerMockito.when(SignUtil.permitSign(studyEventBean, studyBean, daoWrapper)).thenReturn(true);
+		PowerMockito.doReturn(fullCrfList).when(updateStudyEventServlet).prepareFullCrfList(studyBean, studySubjectBean,
+				studyEventBean, eventCRFBeans, eventDefinitionCRFs);
+		PowerMockito.when(updateStudyEventServlet.prepareNodeMapForFullCrfList(fullCrfList, studySubjectBean,
+				studyEventDefinitionBean.getName(), studyEventBean.getId())).thenReturn(notedMap);
 	}
 
 	private void initStudyEventLists() {
@@ -174,7 +191,6 @@ public class UpdateStudyEventServletTest {
 	public void testThatEventCRFBeanStatusDoesNotReset() throws Exception {
 		EventCRFBean eventCRFBean = new EventCRFBean();
 		eventCRFBean.setStatus(Status.AVAILABLE);
-		List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
 		eventCRFBeans.add(eventCRFBean);
 		PowerMockito.doReturn(true).when(userAccountBean).isSysAdmin();
 		PowerMockito.doReturn(Status.AVAILABLE).when(studySubjectBean).getStatus();
@@ -184,20 +200,26 @@ public class UpdateStudyEventServletTest {
 		PowerMockito.doReturn(5).when(formProcessor).getInt("statusId");
 		PowerMockito.doReturn("").when(formProcessor).getDateTimeInputString(Mockito.anyString());
 		PowerMockito.doReturn("").when(formProcessor).getString(Mockito.contains("start"));
-		PowerMockito.whenNew(StudySubjectDAO.class).withAnyArguments().thenReturn(studySubjectDAO);
+		PowerMockito.doReturn(studySubjectDAO).when(updateStudyEventServlet).getStudySubjectDAO();
 		PowerMockito.doReturn(studySubjectBean).when(studySubjectDAO).findByPK(1);
 		PowerMockito.doReturn(studyEventBean).when(studyEventDAO).findByPK(1);
 		PowerMockito.doReturn(SubjectEventStatus.DATA_ENTRY_STARTED).when(studyEventBean).getSubjectEventStatus();
 		PowerMockito.doReturn(eventCRFBeans).when(eventCRFDAO).findAllByStudyEvent(studyEventBean);
+		PowerMockito.doReturn(eventDefinitionCRFs).when(eventDefinitionCRFDAO)
+				.findAllActiveByEventDefinitionId(studyBean, 1);
 		PowerMockito.doReturn(studyBean).when(studyDAO).findByPK(1);
 		PowerMockito.doReturn(studyEventDefinitionBean).when(studyEventDefinitionDAO).findByPK(1);
+		PowerMockito.doReturn(1).when(studyEventBean).getStudyEventDefinitionId();
 		PowerMockito.doReturn(1).when(studyEventBean).getStudySubjectId();
 		PowerMockito.doReturn(1).when(studyEventBean).getStudyEventDefinitionId();
+		PowerMockito.doReturn(new StudyParameterConfig()).when(studyBean).getStudyParameterConfig();
 		PowerMockito
 				.when(eventDefinitionCRFDAO.findAllByDefinition(studyBean, studyEventBean.getStudyEventDefinitionId()))
 				.thenReturn(new ArrayList<EventDefinitionCRFBean>());
 		PowerMockito.doNothing().when(updateStudyEventServlet).checkStudyLocked(Page.MENU_SERVLET, currentStudyLocked,
 				request, response);
+		PowerMockito.when(SDVUtil.permitSDV(studyEventBean, 1, daoWrapper, false, notedMap, 0, maskingService))
+				.thenReturn(true);
 		updateStudyEventServlet.processRequest(request, response);
 		assertFalse(eventCRFBean.getStatus().equals(Status.UNAVAILABLE));
 	}

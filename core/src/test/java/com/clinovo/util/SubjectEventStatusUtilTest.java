@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -21,6 +23,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -493,5 +496,332 @@ public class SubjectEventStatusUtilTest {
 				getEventDefinitionCRFBean(Status.AVAILABLE, false, true, SourceDataVerification.NOTREQUIRED));
 		SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, daoWrapper);
 		assertTrue(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusNotScheduledAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.NOT_SCHEDULED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(4, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.NOT_SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusScheduledAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SCHEDULED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(5, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.NOT_SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SKIPPED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusSkippedAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SKIPPED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(4, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SKIPPED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusDESAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(4, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.DATA_ENTRY_STARTED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.STOPPED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusStoppedAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.STOPPED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(4, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.DATA_ENTRY_STARTED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.STOPPED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusCompletedAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.COMPLETED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(3, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.COMPLETED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusSDVedAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SOURCE_DATA_VERIFIED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(4, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SOURCE_DATA_VERIFIED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusSignedAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SIGNED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(3, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SIGNED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusLockedAndRoleAdmin() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.LOCKED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.STUDY_ADMINISTRATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(2, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.UNLOCK));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusNotScheduledAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.NOT_SCHEDULED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(2, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.NOT_SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SCHEDULED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusScheduledAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SCHEDULED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(3, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.NOT_SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SKIPPED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusSkippedAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SKIPPED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(2, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SCHEDULED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SKIPPED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusDESAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(2, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.DATA_ENTRY_STARTED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.STOPPED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusStoppedAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.STOPPED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(2, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.DATA_ENTRY_STARTED));
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.STOPPED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusCompletedAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.COMPLETED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(1, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.COMPLETED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusSDVedAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SOURCE_DATA_VERIFIED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(2, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SOURCE_DATA_VERIFIED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusSignedAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.SIGNED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(1, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.SIGNED));
+	}
+
+	@Test
+	public void testThatGetAvailableStatusesForManualTransitionReturnsCorrectSetOfStatusesForCurrentStatusLockedAndRoleCRC() {
+
+		// SETUP
+		SubjectEventStatus currentStatus = SubjectEventStatus.LOCKED;
+		StudyUserRoleBean updaterRole = new StudyUserRoleBean();
+		updaterRole.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
+
+		// TEST
+		List<SubjectEventStatus> availableStatuses = SubjectEventStatusUtil
+				.getAvailableStatusesForManualTransition(currentStatus, updaterRole, false, false);
+
+		// VERIFY
+		Assert.assertEquals(1, availableStatuses.size());
+		Assert.assertTrue(availableStatuses.contains(SubjectEventStatus.LOCKED));
 	}
 }

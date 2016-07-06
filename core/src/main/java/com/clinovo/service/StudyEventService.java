@@ -12,7 +12,6 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  *******************************************************************************/
-
 package com.clinovo.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -146,4 +145,18 @@ public interface StudyEventService {
 	 */
 	void unlockStudyEvents(StudySubjectBean studySubjectBean, UserAccountBean updater) throws Exception;
 
+	/**
+	 * Deletes study event with all related data.
+	 * 
+	 * @param studyEventDefinitionBean
+	 *            StudyEventDefinitionBean
+	 * @param studySubjectBean
+	 *            StudySubjectBean
+	 * @param studyEventBean
+	 *            StudyEventBean
+	 * @param userAccountBean
+	 *            UserAccountBean
+	 */
+	void deleteStudyEvent(StudyEventDefinitionBean studyEventDefinitionBean, StudySubjectBean studySubjectBean,
+			StudyEventBean studyEventBean, UserAccountBean userAccountBean);
 }

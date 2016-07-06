@@ -13,169 +13,84 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SpringServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.service.EventService;
-import org.akaza.openclinica.service.EventServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
  * This servlet handles delete study event operations.
  *
  */
-@SuppressWarnings("rawtypes")
 @Component
 public class DeleteStudyEventServlet extends SpringServlet {
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, getResPage().getString("current_study_frozen"), request, response);
 
-		if (ub.isSysAdmin()) {
+		if (ub.isSysAdmin() || Role.STUDY_ADMINISTRATOR.equals(currentRole.getRole())) {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
-			return;
-		}
-
-		addPageMessage(
-				getResPage().getString("no_have_correct_privilege_current_study")
-						+ getResPage().getString("change_study_contact_sysadmin"), request);
-		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"), "1");
-
+		addPageMessage(getResPage().getString("no_have_correct_privilege_current_study")
+				+ getResPage().getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.MENU_SERVLET, getResException().getString("not_study_director"),
+				"1");
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean();
 		FormProcessor fp = new FormProcessor(request);
+
 		int studyEventId = fp.getInt("id"); // studyEventId
 		int studySubId = fp.getInt("studySubId"); // studySubjectId
-
-		if (request.getAttribute("deletedDurringUpdateStudyEvent") != null) {
-			studyEventId = fp.getInt("event_id", true);
-			studySubId = fp.getInt("id", true);
-		}
-
-		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
 
 		if (studyEventId == 0) {
 			addPageMessage(getResPage().getString("please_choose_a_SE_to_remove"), request);
 			request.setAttribute("id", Integer.toString(studySubId));
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {
-			ItemDataDAO iddao = getItemDataDAO();
-			EventCRFDAO ecdao = getEventCRFDAO();
-			StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
-
-			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-			request.setAttribute("studySub", studySub);
-
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
+			StudySubjectBean studySub = getStudySubjectDAO().findByPK(studySubId);
+			StudyEventBean event = (StudyEventBean) getStudyEventDAO().findByPK(studyEventId);
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO()
 					.findByPK(event.getStudyEventDefinitionId());
+
 			event.setStudyEventDefinition(sed);
-
+			request.setAttribute("studySub", studySub);
 			String action = request.getParameter("action");
-			if ("confirm".equalsIgnoreCase(action)) {
 
+			if ("confirm".equalsIgnoreCase(action)) {
 				// construct info needed on view study event page
 				DisplayStudyEventBean de = new DisplayStudyEventBean();
 				de.setStudyEvent(event);
-
 				request.setAttribute("displayEvent", de);
-
 				forwardPage(Page.DELETE_STUDY_EVENT, request, response);
 			} else {
 				logger.info("submit to delete the event from study");
 				// delete event from study
-
-				DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-
-				for (Object eventCRFObject : ecdao.findAllByStudyEvent(event)) {
-					EventCRFBean eventCRF = (EventCRFBean) eventCRFObject;
-					ArrayList itemData = iddao.findAllByEventCRFId(eventCRF.getId());
-					for (Object anItemData : itemData) {
-						ItemDataBean item = (ItemDataBean) anItemData;
-						ArrayList discrepancyList = dndao.findExistingNotesForItemData(item.getId());
-						iddao.deleteDnMap(item.getId());
-						for (Object aDiscrepancyList : discrepancyList) {
-							DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
-							dndao.deleteNotes(noteBean.getId());
-						}
-						item.setUpdater(ub);
-						iddao.updateUser(item);
-						iddao.delete(item.getId());
-					}
-					ecdao.deleteEventCRFDNMap(eventCRF.getId());
-					ecdao.delete(eventCRF.getId());
-				}
-
-				List<Integer> dnIdList = dndao.findAllDnIdsByStudyEvent(event.getId());
-				sedao.deleteStudyEventDNMap(event.getId());
-				for (Integer dnId : dnIdList) {
-					dndao.deleteNotes(dnId);
-				}
-
-				// update user id before deleting
-				event.setUpdater(ub);
-				sedao.update(event);
-				// delete
-				sedao.deleteByPK(event.getId());
-
-				updateOrdinalsForEventOccurrences(event, sedao, studySub, sed);
-
-				if (request.getAttribute("deletedDurringUpdateStudyEvent") != null) {
-					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
-				} else {
-					response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName()
-							+ "?id=" + studySubId);
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void updateOrdinalsForEventOccurrences(StudyEventBean studyEvent, StudyEventDAO sedao,
-			StudySubjectBean studySub, StudyEventDefinitionBean sed) {
-		EventServiceInterface eventService = new EventService(getDataSource());
-		List<StudyEventBean> eventOccurrences = (List<StudyEventBean>) sedao
-				.findAllByDefinitionAndSubjectOrderByOrdinal(sed, studySub);
-		if (eventOccurrences != null) {
-			eventService.regenerateStudyEventOrdinals(eventOccurrences);
-			for (StudyEventBean event : eventOccurrences) {
-				sedao.update(event);
+				getStudyEventService().deleteStudyEvent(sed, studySub, event, ub);
+				response.sendRedirect(
+						request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + studySubId);
 			}
 		}
 	}

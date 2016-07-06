@@ -20,8 +20,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -103,9 +105,8 @@ public final class SubjectEventStatusUtil {
 				url.append("<img src='").append(imageIconPaths.get(SubjectEventStatus.LOCKED.getId()))
 						.append("' title='").append(txt).append("' alt='").append(txt)
 						.append("' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
-			} else
-				if (studySubjectBean.getStatus().isDeleted()
-						&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
+			} else if (studySubjectBean.getStatus().isDeleted()
+					&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("removed");
 				url.append("<img src='").append(imageIconPaths.get(SubjectEventStatus.REMOVED.getId()))
 						.append("' title='").append(txt).append("' alt='").append(txt)
@@ -152,39 +153,6 @@ public final class SubjectEventStatusUtil {
 			url.append("<img src='")
 					.append(imageIconPaths.get((status == null ? SubjectEventStatus.SCHEDULED : status).getId()))
 					.append("' border='0' style='position: relative;'>");
-		}
-	}
-
-	/**
-	 * Method prepares the possible subject event statuses that we can set for study event.
-	 * 
-	 * @param events
-	 *            List<EventCRFBean>
-	 * @param statuses
-	 *            List<SubjectEventStatus>
-	 */
-	public static void preparePossibleSubjectEventStates(List<EventCRFBean> events, List<SubjectEventStatus> statuses) {
-		// TODO + add the checking of rights
-		int countOfSDVd = 0;
-		int countOfDeleted = 0;
-		int countOfStarted = 0;
-		for (EventCRFBean eventCRFBean : events) {
-			if (!eventCRFBean.isNotStarted()) {
-				countOfStarted++;
-				if (eventCRFBean.isSdvStatus() && eventCRFBean.getStatus() != Status.AVAILABLE
-						&& eventCRFBean.getStatus() != Status.INVALID) {
-					countOfSDVd++;
-				}
-				if (eventCRFBean.getStatus() == Status.DELETED) {
-					countOfDeleted++;
-				}
-			}
-		}
-		if (countOfStarted == 0 || countOfSDVd < countOfStarted) {
-			statuses.remove(SubjectEventStatus.SOURCE_DATA_VERIFIED);
-		}
-		if (countOfStarted == 0 || countOfDeleted < countOfStarted) {
-			statuses.remove(SubjectEventStatus.REMOVED);
 		}
 	}
 
@@ -522,5 +490,79 @@ public final class SubjectEventStatusUtil {
 				eventCRF.setDoubleDataOwner((UserAccountBean) udao.findByPK(eventCRF.getValidatorId()));
 			}
 		}
+	}
+
+	/**
+	 * Determines the list of available statuses for manual transition for a study event entity, based on its current
+	 * status and updater's role.
+	 *
+	 * @param currentStatus
+	 *            current status of a study event
+	 * @param updaterRole
+	 *            updater role
+	 * @param permitSign
+	 *            boolean
+	 * @param permitSDV
+	 *            boolean
+	 * @return list of available statuses for manual transition, including the current status
+	 */
+	public static List<SubjectEventStatus> getAvailableStatusesForManualTransition(SubjectEventStatus currentStatus,
+			StudyUserRoleBean updaterRole, boolean permitSign, boolean permitSDV) {
+
+		boolean addSDV = false;
+		boolean addSign = false;
+
+		permitSign = permitSign && Role.INVESTIGATOR.equals(updaterRole.getRole());
+		permitSDV = permitSDV && (Role.STUDY_ADMINISTRATOR.equals(updaterRole.getRole())
+				|| Role.SYSTEM_ADMINISTRATOR.equals(updaterRole.getRole())
+				|| Role.STUDY_MONITOR.equals(updaterRole.getRole()));
+
+		List<SubjectEventStatus> statusesForTransition = new ArrayList<SubjectEventStatus>();
+		statusesForTransition.add(currentStatus);
+
+		if (currentStatus.isNotScheduled()) {
+			statusesForTransition.add(SubjectEventStatus.SCHEDULED);
+		} else if (currentStatus.isScheduled()) {
+			statusesForTransition.add(SubjectEventStatus.NOT_SCHEDULED);
+			statusesForTransition.add(SubjectEventStatus.SKIPPED);
+		} else if (currentStatus.isDE_Started()) {
+			statusesForTransition.add(SubjectEventStatus.STOPPED);
+		} else if (currentStatus.isStopped()) {
+			addSDV = permitSDV;
+			addSign = permitSign;
+			statusesForTransition.add(SubjectEventStatus.DATA_ENTRY_STARTED);
+		} else if (currentStatus.isSkipped()) {
+			statusesForTransition.add(SubjectEventStatus.SCHEDULED);
+		} else if (currentStatus.isSigned()) {
+			addSDV = permitSDV;
+		} else if (currentStatus.isSourceDataVerified()) {
+			addSign = permitSign;
+			statusesForTransition.add(SubjectEventStatus.COMPLETED);
+		} else if (currentStatus.isCompleted()) {
+			addSDV = permitSDV;
+			addSign = permitSign;
+		}
+
+		if (addSDV) {
+			statusesForTransition.add(SubjectEventStatus.SOURCE_DATA_VERIFIED);
+		}
+
+		if (addSign) {
+			statusesForTransition.add(SubjectEventStatus.SIGNED);
+		}
+
+		if (Role.STUDY_ADMINISTRATOR.equals(updaterRole.getRole())
+				|| Role.SYSTEM_ADMINISTRATOR.equals(updaterRole.getRole())) {
+			if (currentStatus.isLocked()) {
+				statusesForTransition.add(SubjectEventStatus.UNLOCK);
+			} else if (currentStatus.isRemoved()) {
+				statusesForTransition.add(SubjectEventStatus.RESTORE);
+			} else {
+				statusesForTransition.add(SubjectEventStatus.LOCKED);
+				statusesForTransition.add(SubjectEventStatus.REMOVED);
+			}
+		}
+
+		return statusesForTransition;
 	}
 }
