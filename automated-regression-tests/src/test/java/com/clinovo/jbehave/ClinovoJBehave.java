@@ -423,8 +423,8 @@ public class ClinovoJBehave {
 		commonSteps.filter_SDV_page(values);
 	}
 
-	@Given(value = "User clicks 'Save' button on CRF page", priority=1)
-    @When(value = "User clicks 'Save' button on CRF page", priority=1)
+	@Given(value = "User clicks 'Save' button on DE page", priority=1)
+    @When(value = "User clicks 'Save' button on DE page", priority=1)
 	public void userClicksSaveButton() {
     	commonSteps.click_save_button_on_CRF_page();
     }
@@ -1010,10 +1010,13 @@ public class ClinovoJBehave {
     	commonSteps.leave_CRF_without_saving();
     }    
     
-	@Then("User verifies error message \"$errorMessage\" on CRF page")
+	@Then("User verifies error message \"$errorMessage\" on DE page")
 	public void verifyErrorMessage(String errorMessage) {
 		commonSteps.verify_error_message_on_CRF(errorMessage);
 	}
+	
+	@Given("...")
+	public void userDoesNothing() {}
 
 	private void userChecksSignEventStatus(Map<String, String> values) {
 		commonSteps.check_sign_event_status(values);

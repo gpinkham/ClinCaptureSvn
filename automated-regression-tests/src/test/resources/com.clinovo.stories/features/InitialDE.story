@@ -38,12 +38,12 @@ And User goes to SM page
 When User fills in CRF:
 |Study Subject ID  |Event Name |CRF Name        |input39(R)|input40(T)|input41(Sv)|
 |<Study Subject ID>|TestEvent A|CRF_Two_sections|1         |test 1    |2          |
-And User clicks 'Save' button on CRF page
+And User clicks 'Save' button on DE page
 And User fills in CRF:
 |CRF Name        |Add Rows|IG_CRF_T_PAIN_0input50(Sv)|IG_CRF_T_PAIN_0input52(Mv)|IG_CRF_T_PAIN_1input49(T)|IG_CRF_T_PAIN_2input51(T)|
 |CRF_Two_sections|2       |1                         |1,2,6                     |test 1                   |test 2                   |
 
-And User clicks 'Save' button on CRF page
+And User clicks 'Save' button on DE page
 Then User is on SM page
 And User verifies "Your data has been saved." message in 'Alerts&Messages' section
 Examples:
@@ -187,6 +187,75 @@ Examples:
 |Study Admin|TestSubject_3     | 
 
 
+Scenario: (precondition) 3.1 "Study Admin" sets Study properties "Collect Interviewer Name" - "no", "Collect Interview Date" - "no"
+
+GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{id2:scenario_2}
+Given ...
+
+
+Scenario: 3.1 User is able to perform Data Entry if Interviewer Name / Date are optional
+
+Given User logs in as "<User>"
+And User goes to SM page
+When User fills in and saves CRF:
+|Study Subject ID  |Event Name |CRF Name       |input30(R)|input31(T)                |input32(Sv)|
+|<Study Subject ID>|TestEvent A|CRF_One_section|2         |Testing Initial Data Entry|2          |
+Then User is on SM page
+And User verifies "Your data has been saved." message in 'Alerts&Messages' section
+Examples:
+{scope=Scenario}
+|User       |<Study Subject ID>|
+|CRC        |TestSubject_7     |
+|PI         |TestSubject_8     |
+|Study Admin|TestSubject_9     |
+
+
+Scenario: (precondition) 3.2 "Study Admin" sets Study properties "Collect Interviewer Name" - "yes", "Collect Interview Date" - "yes"
+
+GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{id3:scenario_3}
+Given ...
+
+
+Scenario: 3.2.1 User is able to perform Data Entry if Interviewer Name / Date are required
+
+Given User logs in as "<User>"
+And User goes to SM page
+When User fills in and saves CRF:
+|Study Subject ID  |Event Name |CRF Name       |input33(T)|input34(Mv)|input35(C)|input37(T)  |input38(T) |
+|<Study Subject ID>|TestEvent A|CRF_One_section|Test      |2,5        |0         |20-Jun-2016 |05-Jul-2016|
+Then User verifies error message "This field cannot be blank." on DE page
+And User leaves CRF without saving
+Examples:
+{scope=Scenario}
+|User       |<Study Subject ID>|
+|CRC        |TestSubject_7     |
+|PI         |TestSubject_8     |
+|Study Admin|TestSubject_9     |
+
+
+Scenario: 3.2.2 User is able to perform Data Entry if Interviewer Name / Date are required
+
+Given User logs in as "<User>"
+And User goes to SM page
+When User fills in and saves CRF:
+|Study Subject ID  |Event Name |CRF Name       |interviewer(T) |interviewDate(T)|input33(T)|input34(Mv)|input35(C)|input37(T)  |input38(T) |
+|<Study Subject ID>|TestEvent A|CRF_One_section|TestInterviewer|22-Jun-2016     |Test      |2,5        |0         |20-Jun-2016 |05-Jul-2016|
+Then User is on SM page
+And User verifies "Your data has been saved." message in 'Alerts&Messages' section
+Examples:
+{scope=Scenario}
+|User       |<Study Subject ID>|
+|CRC        |TestSubject_7     |
+|PI         |TestSubject_8     |
+|Study Admin|TestSubject_9     |
+
+
+Scenario: (postcondition) 3.2 "Study Admin" sets Study properties "Collect Interviewer Name" - "no", "Collect Interview Date" - "no"
+
+GivenStories: com.clinovo.stories/preconditions/Preconditions.story#{id2:scenario_2}
+Given ...
+
+
 Scenario: 6.1 User is not able to save CRF, if required items are not filled
 
 Given User logs in as "<User>"
@@ -194,7 +263,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name                    |input1(R)|input2(T)|
 |TestSubject_4   |TestEvent A|CRF_Required_items_Ungrouped|2        |test     |
-Then User verifies error message "Missing data in a required field" on CRF page
+Then User verifies error message "Missing data in a required field" on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
@@ -214,7 +283,7 @@ And User fills in CRF:
 And User creates DNs in CRF:
 |Item  |Type      |Description    |Detailed Note   |
 |input3|Annotation|Information ...|peace of text...|
-When User clicks 'Save' button on CRF page
+When User clicks 'Save' button on DE page
 Then User is on SM page
 Examples:
 {scope=Scenario}
@@ -247,7 +316,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name               |input29(T)|
 |TestSubject_4   |TestEvent A|CRF_Data_type_Ungrouped|test      |
-Then User verifies error message "The input you provided is not an integer." on CRF page
+Then User verifies error message "The input you provided is not an integer." on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
@@ -264,7 +333,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name               |input23(T)|
 |TestSubject_4   |TestEvent A|CRF_Data_type_Ungrouped|05-Mar-   |
-Then User verifies error message "The input you provided is not a valid date in DD-MMM-YYYY format." on CRF page
+Then User verifies error message "The input you provided is not a valid date in DD-MMM-YYYY format." on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
@@ -281,7 +350,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name                  |IG_CRF_R_2ND_0input5(T)|IG_CRF_R_2ND_0input6(T)|
 |TestSubject_4   |TestEvent A|CRF_Required_items_Grouped|test                   |05-Mar-2014            |
-Then User verifies error message "Missing data in a required field" on CRF page
+Then User verifies error message "Missing data in a required field" on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
@@ -298,7 +367,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name                        |input11(T)|
 |TestSubject_4   |TestEvent A|CRF_Regular_expression_Ungrouped|1234      |
-Then User verifies error message "Must be in the range between (00.00) and (23.59)" on CRF page
+Then User verifies error message "Must be in the range between (00.00) and (23.59)" on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
@@ -315,7 +384,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name                        |input12(T)|
 |TestSubject_4   |TestEvent A|CRF_Regular_expression_Ungrouped|a test    |
-Then User verifies error message "Must be String 2-5 character long." on CRF page
+Then User verifies error message "Must be String 2-5 character long." on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
@@ -332,7 +401,7 @@ And User goes to SM page
 When User fills in and saves CRF:
 |Study Subject ID|Event Name |CRF Name|(2)input19(C)|(1)input20(T)|
 |TestSubject_4   |TestEvent A|CRF_SCD |(3)          |test         |
-Then User verifies error message "Third option is not selected in check boxes but value is provided." on CRF page
+Then User verifies error message "Third option is not selected in check boxes but value is provided." on DE page
 And User leaves CRF without saving
 Examples:
 {scope=Scenario}
