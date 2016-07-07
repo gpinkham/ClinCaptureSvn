@@ -126,16 +126,23 @@
 	</query>
 	<query>
 		<name>create</name>
-		<sql>INSERT INTO STUDY_EVENT_DEFINITION (study_event_definition_id ,
-		STUDY_ID, NAME,DESCRIPTION, REPEATING, TYPE, CATEGORY, OWNER_ID,
-		 STATUS_ID,	DATE_CREATED,ordinal,oc_oid,day_min,day_max,day_email,schedule_day,reference_visit,email_user_id)
-		VALUES (?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?)</sql>
+		<sql>
+			INSERT INTO study_event_definition (study_event_definition_id, study_id, name, description, repeating, type,
+												category, owner_id, status_id, date_created, ordinal, oc_oid, day_min,
+												day_max, day_email, schedule_day, reference_visit, email_user_id,
+												reminder_email_recipients, other_study_users)
+			VALUES (?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?,?,?)
+		</sql>
 	</query>
 	<query>
 		<name>update</name>
-		<sql>UPDATE STUDY_EVENT_DEFINITION SET STUDY_ID=?,NAME=?,
-		DESCRIPTION=?,REPEATING=?,TYPE=?,CATEGORY=?,STATUS_ID=?,
-		DATE_UPDATED=NOW(),UPDATE_ID=?, ordinal=?, day_min=?,day_max=?,day_email=?,schedule_day=?,reference_visit=?,email_user_id=? WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
+		<sql>
+			UPDATE study_event_definition
+			SET study_id=?, name=?, description=?, repeating=?, type=?, category=?, status_id=?, date_updated=NOW(),
+				update_id=?, ordinal=?, day_min=?, day_max=?, day_email=?, schedule_day=?, reference_visit=?,
+				email_user_id=?, reminder_email_recipients=?, other_study_users=?
+			WHERE study_event_definition_id=?
+		</sql>
 	</query>
 	<query>
 		<name>updateStatus</name>

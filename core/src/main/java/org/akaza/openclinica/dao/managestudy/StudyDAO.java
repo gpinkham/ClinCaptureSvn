@@ -350,7 +350,8 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 		String oid;
 		try {
-			oid = sb.getOid() != null ? sb.getOid() : sb.getOidGenerator(ds).generateOid(sb.getIdentifier());
+			oid = sb.getOid() != null ? sb.getOid()
+					: sb.getOidGenerator(getDataSource()).generateOid(sb.getIdentifier());
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
@@ -363,7 +364,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		logger.info("*** " + oid);
 		String oidPreRandomization = oid;
 		while (findByOid(oid) != null) {
-			oid = sb.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+			oid = sb.getOidGenerator(getDataSource()).randomizeOid(oidPreRandomization);
 		}
 		logger.info("returning the following oid: " + oid);
 		return oid;

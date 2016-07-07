@@ -892,7 +892,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @return boolean to tell us if it's required or not.
 	 */
 	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent) {
-		StudyBean study = new StudyDAO(this.ds).findByStudySubjectId(studyEvent.getStudySubjectId());
+		StudyBean study = new StudyDAO(getDataSource()).findByStudySubjectId(studyEvent.getStudySubjectId());
 		int studyEventId = studyEvent.getId();
 
 		/*

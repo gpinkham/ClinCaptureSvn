@@ -486,7 +486,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * @return Returns the dataType.
 	 */
 	public ItemDataType getDataType(int itemId) {
-		ItemDAO itemDAO = new ItemDAO(this.getDs());
+		ItemDAO itemDAO = new ItemDAO(getDataSource());
 		ItemBean itemBean = (ItemBean) itemDAO.findByPK(itemId);
 		return itemBean.getDataType();
 	}

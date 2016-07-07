@@ -105,6 +105,14 @@
 
     <xs:element name="StudyEventDefinition" type="studyEventDefinitionBean"/>
 
+	<xs:simpleType name="ReminderEmailRecipient">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DATA_ENTRY_USER"/>
+			<xs:enumeration value="FACILITY_CONTACT"/>
+			<xs:enumeration value="OTHER_STUDY_USERS"/>
+		</xs:restriction>
+	</xs:simpleType>
+
     <xs:element name="EventName" type="xs:string"/>
     <xs:element name="EventDescription" type="xs:string"/>
     <xs:element name="Repeating" type="xs:boolean"/>
@@ -117,6 +125,8 @@
     <xs:element name="SchDay" type="xs:int"/>
     <xs:element name="UserEmailId" type="xs:int"/>
     <xs:element name="IsReference" type="xs:boolean"/>
+    <xs:element name="reminderEmailRecipient" type="ReminderEmailRecipient"/>
+    <xs:element name="otherStudyUser" type="xs:string"/>
 
     <xs:complexType name="studyEventDefinitionBean">
         <xs:sequence>
@@ -132,6 +142,8 @@
             <xs:element ref="MaxDay" minOccurs="0"/>
             <xs:element ref="EmailDay" minOccurs="0"/>
             <xs:element ref="SchDay" minOccurs="0"/>
+			<xs:element ref="reminderEmailRecipient" minOccurs="0" maxOccurs="3"/>
+			<xs:element ref="otherStudyUser" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="UserEmailId" minOccurs="0"/>
             <xs:element ref="IsReference" minOccurs="0"/>
             <xs:element ref="EventDefinitionCrf" minOccurs="0" maxOccurs="unbounded"/>

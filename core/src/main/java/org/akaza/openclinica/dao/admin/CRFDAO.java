@@ -629,7 +629,7 @@ public class CRFDAO extends AuditableEntityDAO {
 		logger.info(oid);
 		String oidPreRandomization = oid;
 		while (findAllByOid(oid).size() > 0) {
-			oid = crfBean.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+			oid = crfBean.getOidGenerator(getDataSource()).randomizeOid(oidPreRandomization);
 		}
 		return oid;
 	}
@@ -647,7 +647,8 @@ public class CRFDAO extends AuditableEntityDAO {
 
 		String oid;
 		try {
-			oid = crfBean.getOid() != null ? crfBean.getOid() : crfBean.getOidGenerator(ds).generateOid(crfName);
+			oid = crfBean.getOid() != null ? crfBean.getOid()
+					: crfBean.getOidGenerator(getDataSource()).generateOid(crfName);
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");

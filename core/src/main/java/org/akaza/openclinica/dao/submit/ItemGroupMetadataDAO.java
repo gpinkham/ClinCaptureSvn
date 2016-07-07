@@ -381,7 +381,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 		PreparedStatement ps = null;
 
 		try {
-			con = ds.getConnection();
+			con = getDataSource().getConnection();
 			if (con.isClosed()) {
 				if (logger.isWarnEnabled()) {
 					logger.warn("Connection is closed: GenericDAO.select!");
@@ -393,12 +393,12 @@ public class ItemGroupMetadataDAO extends EntityDAO {
 
 			ps = psf.generate(ps); // enter variables here!
 			key = ps.toString();
-			results = (ArrayList) cache.get(key);
+			results = (ArrayList) getCache().get(key);
 			if (results == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {
-					cache.put(key, results);
+					getCache().put(key, results);
 				}
 			}
 

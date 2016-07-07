@@ -480,7 +480,7 @@ public class AuditDAO extends EntityDAO {
 			variables.put(index, auditItemMap.get("event_crf_id"));
 
 			String sql = digester.getQuery("insert");
-			this.execute(sql, variables, nullVars, con);
+			this.execute(sql, variables, nullVars, getConnection());
 		}
 	}
 

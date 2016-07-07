@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import com.clinovo.enums.eventdefenition.ReminderEmailRecipient;
+import com.clinovo.util.CollectionUtil;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * StudyEventDefinitionDAO.
@@ -111,7 +114,6 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.BOOL);
 		this.setTypeExpected(ind++, TypeNames.STRING);
 		this.setTypeExpected(ind++, TypeNames.STRING);
-		// int int date date int
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.TIMESTAMP);
@@ -119,13 +121,14 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.STRING);
-		// Clinovo Ticket #65
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.INT);
 		this.setTypeExpected(ind++, TypeNames.BOOL);
-		this.setTypeExpected(ind, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.INT);
+		this.setTypeExpected(ind++, TypeNames.STRING);
+		this.setTypeExpected(ind, TypeNames.STRING);
 	}
 
 	/**
@@ -151,7 +154,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 
 		String oid;
 		try {
-			oid = sedb.getOid() != null ? sedb.getOid() : sedb.getOidGenerator(ds).generateOid(sedb.getName());
+			oid = sedb.getOid() != null ? sedb.getOid() : sedb.getOidGenerator(getDataSource()).generateOid(sedb.getName());
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
@@ -164,7 +167,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		logger.info(oid);
 		String oidPreRandomization = oid;
 		while (findByOid(oid) != null) {
-			oid = sedb.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+			oid = sedb.getOidGenerator(getDataSource()).randomizeOid(oidPreRandomization);
 		}
 		return oid;
 
@@ -173,15 +176,12 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public EntityBean create(EntityBean eb) {
-		// study_event_definition_id ,
-		// STUDY_ID, NAME,DESCRIPTION, REPEATING, TYPE, CATEGORY, OWNER_ID,
-		// STATUS_ID, DATE_CREATED,ordinal,oid
+	public StudyEventDefinitionBean create(EntityBean eb) {
+
 		int ind = 1;
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) eb;
 		sedb.setId(this.findNextKey());
 		sedb.setOid(getValidOid(sedb));
-		logger.info("***id:" + sedb.getId());
 		HashMap variables = new HashMap();
 		variables.put(ind++, sedb.getId());
 		variables.put(ind++, sedb.getStudyId());
@@ -199,16 +199,18 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		variables.put(ind++, sedb.getEmailDay());
 		variables.put(ind++, sedb.getScheduleDay());
 		variables.put(ind++, sedb.getReferenceVisit());
-		variables.put(ind, sedb.getUserEmailId());
+		variables.put(ind++, sedb.getUserEmailId());
+		variables.put(ind++, CollectionUtil.collectionToString(sedb.getReminderEmailRecipients()));
+		variables.put(ind, CollectionUtil.collectionToString(sedb.getOtherStudyUsers()));
 		this.execute(digester.getQuery("create"), variables);
-
 		return sedb;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public EntityBean update(EntityBean eb) {
+	public StudyEventDefinitionBean update(EntityBean eb) {
+
 		int ind = 1;
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) eb;
 		HashMap variables = new HashMap();
@@ -227,9 +229,11 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		variables.put(ind++, sedb.getScheduleDay());
 		variables.put(ind++, sedb.getReferenceVisit());
 		variables.put(ind++, sedb.getUserEmailId());
+		variables.put(ind++, CollectionUtil.collectionToString(sedb.getReminderEmailRecipients()));
+		variables.put(ind++, CollectionUtil.collectionToString(sedb.getOtherStudyUsers()));
 		variables.put(ind, sedb.getId());
 		this.execute(digester.getQuery("update"), variables);
-		return eb;
+		return sedb;
 	}
 
 	/**
@@ -250,30 +254,23 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getEntityFromHashMap(HashMap hm) {
-		StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
+	public StudyEventDefinitionBean getEntityFromHashMap(HashMap hm) {
 
+		StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
 		this.setEntityAuditInformation(eb, hm);
-		// set dates and ints first, then strings
-		// create a sub-function in auditable entity dao that can do this?
 		Integer sedId = (Integer) hm.get("study_event_definition_id");
 		eb.setId(sedId);
-
 		Integer studyId = (Integer) hm.get("study_id");
 		eb.setStudyId(studyId);
 		Integer ordinal = (Integer) hm.get("ordinal");
 		eb.setOrdinal(ordinal);
 		Boolean repeating = (Boolean) hm.get("repeating");
 		eb.setRepeating(repeating);
-
-		// below functions changed by get entity audit information functions
-
 		eb.setName((String) hm.get("name"));
 		eb.setDescription((String) hm.get("description"));
 		eb.setType((String) hm.get("type"));
 		eb.setCategory((String) hm.get("category"));
 		eb.setOid((String) hm.get("oc_oid"));
-		// Clinovo #65 start
 		Integer dayMin = (Integer) hm.get("day_min");
 		eb.setMinDay((dayMin));
 		Integer dayMax = (Integer) hm.get("day_max");
@@ -286,7 +283,16 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		eb.setReferenceVisit(referenceVisit);
 		Integer emailuserId = (Integer) hm.get("email_user_id");
 		eb.setUserEmailId(emailuserId);
-		// end
+
+		String rmdEmailRecipientsString = (String) hm.get("reminder_email_recipients");
+		Set<ReminderEmailRecipient> rmdEmailRecipientsSet = CollectionUtil.stringToEnumSet(ReminderEmailRecipient.class,
+				rmdEmailRecipientsString);
+		eb.setReminderEmailRecipients(rmdEmailRecipientsSet);
+
+		String otherStudyUsersString = (String) hm.get("other_study_users");
+		Set<String> otherStudyUsersSet = CollectionUtil.stringToStringSet(otherStudyUsersString);
+		eb.setOtherStudyUsers(otherStudyUsersSet);
+
 		return eb;
 	}
 
@@ -308,7 +314,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			return (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			return this.getEntityFromHashMap((HashMap) it.next());
 		} else {
 			return null;
 		}
@@ -347,7 +353,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			return (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			return this.getEntityFromHashMap((HashMap) it.next());
 		} else {
 			logger.info("WARNING: cannot find sed bean by oid " + oid + " and study id " + studyId);
 			return null;
@@ -361,7 +367,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	@Deprecated
 	public ArrayList findAllByStudy(StudyBean study) {
 
-		StudyDAO studyDao = new StudyDAO(this.getDs());
+		StudyDAO studyDao = new StudyDAO(this.getDataSource());
 
 		if (study.getParentStudyId() > 0) {
 			// If the study has a parent than it is a site, in this case we
@@ -388,8 +394,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List<Map<String, Object>> dbRecords = this.select(digester.getQuery("findAllByStudyId"), variables);
 		List<StudyEventDefinitionBean> eventDefinitions = new ArrayList<StudyEventDefinitionBean>();
 		for (Map<String, Object> record : dbRecords) {
-			StudyEventDefinitionBean eb
-					= (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap<String, Object>) record);
+			StudyEventDefinitionBean eb = this.getEntityFromHashMap((HashMap<String, Object>) record);
 			eventDefinitions.add(eb);
 		}
 		return eventDefinitions;
@@ -419,7 +424,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllAvailableByStudy"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -447,7 +452,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		}
 		ArrayList alist = this.select(digester.getQuery(queryName), variables);
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			seds.add(seb);
 		}
 		return seds;
@@ -471,7 +476,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllWithStudyEvent"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -495,7 +500,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllByCrf"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -519,7 +524,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List alist = this.select(digester.getQuery("findAllOrderedByStudyGroupClassId"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -543,7 +548,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List alist = this.select(digester.getQuery("findAllAvailableAndOrderedByStudyGroupClassId"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 		return answer;
@@ -560,7 +565,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	 */
 	public List findAllActiveBySubjectFromActiveDynGroupAndStudyId(StudySubjectBean ssb, int studyId) {
 		List<StudyEventDefinitionBean> defsFromActiveGroup = new ArrayList();
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDataSource());
 		if (ssb.getDynamicGroupClassId() == 0) {
 			StudyGroupClassBean sgc = sgcdao.findDefaultByStudyId(studyId);
 			if (sgc.getId() > 0) {
@@ -590,7 +595,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	public List findAllActiveBySubjectAndStudyId(StudySubjectBean ssb, int studyId) {
 		List<StudyEventDefinitionBean> defsFromGroup = new ArrayList();
 		if (ssb.getDynamicGroupClassId() == 0) {
-			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDataSource());
 			StudyGroupClassBean sgc = sgcdao.findDefaultByStudyId(studyId);
 			if (sgc.getId() > 0) {
 				defsFromGroup = findAllActiveOrderedByStudyGroupClassId(sgc.getId());
@@ -618,7 +623,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List alist = this.select(digester.getQuery("findAllActiveNotClassGroupedAndFromRemovedGroupsByStudyId"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 		return answer;
@@ -638,7 +643,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List alist = this.select(digester.getQuery("findAllActiveNotClassGroupedByStudyId"), variables);
 
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean seb = this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 		return answer;
@@ -670,7 +675,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List alist = this.select(digester.getQuery("findAll"));
 		List al = new ArrayList();
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -686,7 +691,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public EntityBean findByPK(int id) {
+	public StudyEventDefinitionBean findByPK(int id) {
 
 		StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
 		this.setTypesExpected();
@@ -700,7 +705,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			eb = this.getEntityFromHashMap((HashMap) it.next());
 		}
 		return eb;
 	}
@@ -726,7 +731,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			eb = this.getEntityFromHashMap((HashMap) it.next());
 		}
 		return eb;
 	}
@@ -763,7 +768,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		Iterator it = alist.iterator();
 
 		if (it.hasNext()) {
-			answer = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			answer = this.getEntityFromHashMap((HashMap) it.next());
 		}
 
 		return answer;
@@ -796,7 +801,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		List alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
 		List<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			if (filterOnCalendar && eb.getType().equalsIgnoreCase("calendared_visit")) {
 				// al.add(eb);
 				logger.trace("found calendared visit");
@@ -821,7 +826,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyIdOrderedByGroupClass"), variables);
 		ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
 		for (Object anAlist : alist) {
-			seds.add((StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist));
+			seds.add(this.getEntityFromHashMap((HashMap) anAlist));
 		}
 		return seds;
 	}
@@ -843,9 +848,8 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
 		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			if (idsToHide.contains(Integer.valueOf(eb.getId()))) {
-				// al.add(eb);
 				logger.trace("found visit contained in dynamic group, not adding");
 			} else {
 				al.add(eb);
@@ -864,7 +868,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findReferenceVisitBeans"));
 		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -911,7 +915,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByStudyIdAndCRFId"), variables);
 		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
 		for (Object anAlist : alist) {
-			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) anAlist);
+			StudyEventDefinitionBean eb = this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 

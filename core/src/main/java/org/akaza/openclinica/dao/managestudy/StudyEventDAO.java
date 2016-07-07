@@ -1252,8 +1252,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(1, seb.getStudyEventDefinitionId());
 		ArrayList alist = this.select(digester.getQuery("findCRFsByStudyEvent"), variables);
 		Iterator it = alist.iterator();
-		CRFDAO cdao = new CRFDAO(this.ds);
-		CRFVersionDAO cvdao = new CRFVersionDAO(this.ds);
+		CRFDAO cdao = new CRFDAO(getDataSource());
+		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
 		while (it.hasNext()) {
 			HashMap answers = (HashMap) it.next();
 			logger.warn("***First CRF ID: " + answers.get("crf_id"));

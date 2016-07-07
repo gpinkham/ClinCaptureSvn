@@ -14,8 +14,10 @@ package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.clinovo.enums.eventdefenition.ReminderEmailRecipient;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
@@ -36,7 +39,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "StudyEventDefinition", namespace = "http://www.cdisc.org/ns/odm/v1.3")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, creatorVisibility = JsonAutoDetect.Visibility.NONE,
+		getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE,
+		setterVisibility = JsonAutoDetect.Visibility.NONE)
 @SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventDefinitionBean extends AuditableEntityBean implements Comparable {
 
@@ -60,7 +65,7 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	@XmlElement(name = "EventType", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private String type = "";
 
-	private int studyId; // fk for study table
+	private int studyId;
 
 	private String studyName = ""; // not in DB
 
@@ -69,10 +74,6 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	private int crfNum = 0; // number of crfs, not in DB
 
 	private int ordinal = 1;
-
-	private boolean lockable = false; // not in the DB, check whether we can
-	// show
-	// lock link on the JSP
 
 	private boolean populated = false; // not in DB
 
@@ -85,22 +86,35 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	private String oid;
 
 	private OidGenerator oidGenerator;
-	// Clinovo #62 start
+
 	@JsonProperty("minDay")
 	@XmlElement(name = "MinDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int minDay = 0;
+
 	@JsonProperty("maxDay")
 	@XmlElement(name = "MaxDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int maxDay = 0;
+
 	@JsonProperty("emailDay")
 	@XmlElement(name = "EmailDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int emailDay = 0;
+
 	@JsonProperty("schDay")
 	@XmlElement(name = "SchDay", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int scheduleDay = 0;
+
+	@JsonProperty("reminderEmailRecipients")
+	@XmlElement(name = "reminderEmailRecipient", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private Set<ReminderEmailRecipient> reminderEmailRecipients = new HashSet<ReminderEmailRecipient>();
+
+	@JsonProperty("otherStudyUsers")
+	@XmlElement(name = "otherStudyUser", namespace = "http://www.cdisc.org/ns/odm/v1.3")
+	private Set<String> otherStudyUsers = new HashSet<String>();
+
 	@JsonProperty("userEmailId")
 	@XmlElement(name = "UserEmailId", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private int userEmailId = 0;
+
 	@JsonProperty("isReference")
 	@XmlElement(name = "IsReference", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	private boolean referenceVisit = false;
@@ -138,9 +152,8 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
 	/**
 	 * Returns oid generator.
-	 * 
-	 * @param ds
-	 *            DataSource
+	 *
+	 * @param ds DataSource
 	 * @return OidGenerator
 	 */
 	public OidGenerator getOidGenerator(DataSource ds) {
@@ -154,152 +167,74 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		this.oidGenerator = oidGenerator;
 	}
 
-	/**
-	 * @return Returns the category.
-	 */
 	public String getCategory() {
 		return category;
 	}
 
-	/**
-	 * @param category
-	 *            The category to set.
-	 */
 	public void setCategory(String category) {
 		this.category = category;
 	}
 
-	/**
-	 * @return Returns the crfs.
-	 */
 	public ArrayList getCrfs() {
 		return crfs;
 	}
 
-	/**
-	 * @param crfs
-	 *            The crfs to set.
-	 */
 	public void setCrfs(ArrayList crfs) {
 		this.crfs = crfs;
 	}
 
-	/**
-	 * @return Returns the description.
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * @param description
-	 *            The description to set.
-	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/**
-	 * @return Returns the repeating.
-	 */
 	public boolean isRepeating() {
 		return repeating;
 	}
 
-	/**
-	 * @param repeating
-	 *            The repeating to set.
-	 */
 	public void setRepeating(boolean repeating) {
 		this.repeating = repeating;
 	}
 
-	/**
-	 * @return Returns the studyId.
-	 */
 	public int getStudyId() {
 		return studyId;
 	}
 
-	/**
-	 * @param studyId
-	 *            The studyId to set.
-	 */
 	public void setStudyId(int studyId) {
 		this.studyId = studyId;
 	}
 
-	/**
-	 * @return Returns the type.
-	 */
 	public String getType() {
 		return type;
 	}
 
-	/**
-	 * @param type
-	 *            The type to set.
-	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return Returns the lockable.
-	 */
-	public boolean isLockable() {
-		return lockable;
-	}
-
-	/**
-	 * @param lockable
-	 *            The lockable to set.
-	 */
-	public void setLockable(boolean lockable) {
-		this.lockable = lockable;
-	}
-
-	/**
-	 * @return Returns the populated.
-	 */
 	public boolean isPopulated() {
 		return populated;
 	}
 
-	/**
-	 * @param populated
-	 *            The isPopulated to set.
-	 */
 	public void setPopulated(boolean populated) {
 		this.populated = populated;
 	}
 
-	/**
-	 * @return Returns the ordinal.
-	 */
 	public int getOrdinal() {
 		return ordinal;
 	}
 
-	/**
-	 * @param ordinal
-	 *            The ordinal to set.
-	 */
 	public void setOrdinal(int ordinal) {
 		this.ordinal = ordinal;
 	}
 
-	/**
-	 * @return Returns the crfNum.
-	 */
 	public int getCrfNum() {
 		return crfNum;
 	}
 
-	/**
-	 * @param crfNum
-	 *            The crfNum to set.
-	 */
 	public void setCrfNum(int crfNum) {
 		this.crfNum = crfNum;
 	}
@@ -338,8 +273,6 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		return id;
 	}
 
-	// Clinovo ticket #65
-
 	public int getMinDay() {
 		return minDay;
 	}
@@ -372,6 +305,22 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		this.scheduleDay = scheduleDay;
 	}
 
+	public Set<ReminderEmailRecipient> getReminderEmailRecipients() {
+		return new HashSet<ReminderEmailRecipient>(this.reminderEmailRecipients);
+	}
+
+	public void setReminderEmailRecipients(Set<ReminderEmailRecipient> reminderEmailRecipients) {
+		this.reminderEmailRecipients = new HashSet<ReminderEmailRecipient>(reminderEmailRecipients);
+	}
+
+	public Set<String> getOtherStudyUsers() {
+		return new HashSet<String>(this.otherStudyUsers);
+	}
+
+	public void setOtherStudyUsers(Set<String> otherStudyUsers) {
+		this.otherStudyUsers = new HashSet<String>(otherStudyUsers);
+	}
+
 	public int getUserEmailId() {
 		return userEmailId;
 	}
@@ -384,8 +333,8 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		return referenceVisit;
 	}
 
-	public void setReferenceVisit(boolean isRevernseVisit) {
-		referenceVisit = isRevernseVisit;
+	public void setReferenceVisit(boolean isReferenceVisit) {
+		referenceVisit = isReferenceVisit;
 	}
 
 	public String getStudyName() {

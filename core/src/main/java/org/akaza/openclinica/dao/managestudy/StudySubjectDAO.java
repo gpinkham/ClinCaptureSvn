@@ -892,7 +892,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 			sb.setId(getLatestPK());
 		}
 
-		SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(ds);
+		SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
 		ArrayList groupMaps = sb.getStudyGroupMaps();
 		for (Object groupMap : groupMaps) {
 			SubjectGroupMapBean sgmb = (SubjectGroupMapBean) groupMap;
@@ -938,7 +938,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
 		String oid;
 		try {
-			oid = ssb.getOid() != null ? ssb.getOid() : ssb.getOidGenerator(ds).generateOid(ssb.getLabel());
+			oid = ssb.getOid() != null ? ssb.getOid() : ssb.getOidGenerator(getDataSource()).generateOid(ssb.getLabel());
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
@@ -951,7 +951,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		logger.info(oid);
 		String oidPreRandomization = oid;
 		while (findByOid(oid) != null) {
-			oid = ssb.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+			oid = ssb.getOidGenerator(getDataSource()).randomizeOid(oidPreRandomization);
 		}
 		return oid;
 

@@ -20,6 +20,10 @@
  */
 package org.akaza.openclinica.dao.extract;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -37,11 +41,15 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
@@ -57,6 +65,12 @@ import com.clinovo.util.OdmExtractUtil;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DatasetDAO extends AuditableEntityDAO {
+
+	private static final int QUERY_FETCH_SIZE = 50;
+
+	private static final int DATE_RANGE_LOWER_BOUND_INDEX = 1;
+
+	private static final int DATE_RANGE_UPPER_BOUND_INDEX = 3;
 
 	@Override
 	protected void setDigesterName() {
@@ -234,7 +248,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		for (String key : (Set<String>) db.getItemMap().keySet()) {
 			ItemBean ib = (ItemBean) db.getItemMap().get(key);
 			if (!ib.isSelected()) {
-				excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
+				excludeItems = excludeItems.concat(excludeItems.isEmpty() ? "" : ",").concat(key);
 			}
 			sedIdAndCrfIdPairs = addSedIdAndCRFIdIfUnique(sedIdAndCrfIdPairs, key);
 		}
@@ -444,7 +458,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		for (HashMap map : mapList) {
 			DatasetBean eb = (DatasetBean) getEntityFromHashMap(map);
 			eb.setStudyBean(eb.getStudyId() != studyBean.getId()
-					? (StudyBean) new StudyDAO(ds).findByPK(eb.getStudyId())
+					? (StudyBean) new StudyDAO(getDataSource()).findByPK(eb.getStudyId())
 					: studyBean);
 			result.add(eb);
 		}
@@ -472,7 +486,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		for (HashMap map : mapList) {
 			DatasetBean eb = (DatasetBean) getEntityFromHashMap(map);
 			eb.setStudyBean(eb.getStudyId() != studyBean.getId()
-					? (StudyBean) new StudyDAO(ds).findByPK(eb.getStudyId())
+					? (StudyBean) new StudyDAO(getDataSource()).findByPK(eb.getStudyId())
 					: studyBean);
 			result.add(eb);
 		}
@@ -577,8 +591,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 		eb.setHmInKeys(nhInHelpKeys);
 		// Get the arrays of ArrayList for SQL BASE There are split in two querries for perfomance
 		eb.resetArrayListEntryBASE_ITEMGROUPSIDE();
-		loadBASE_EVENTINSIDEHashMap(currentstudyid, parentstudyid, stSedIn, stItemidIn, eb);
-		loadBASE_ITEMGROUPSIDEHashMap(currentstudyid, parentstudyid, stSedIn, stItemidIn, eb);
+		loadBaseEventInsideHashMap(currentstudyid, parentstudyid, stSedIn, stItemidIn, eb);
+		loadBaseItemGroupSideHashMap(currentstudyid, parentstudyid, stSedIn, stItemidIn, eb);
 		// add study_event data
 		eb.addStudyEventData();
 		// add item_data
@@ -637,7 +651,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		for (HashMap map : mapList) {
 			DatasetBean eb = (DatasetBean) getEntityFromHashMap(map);
 			eb.setStudyBean(eb.getStudyId() != studyBean.getId()
-					? (StudyBean) new StudyDAO(ds).findByPK(eb.getStudyId())
+					? (StudyBean) new StudyDAO(getDataSource()).findByPK(eb.getStudyId())
 					: studyBean);
 			result.add(eb);
 		}
@@ -712,7 +726,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		for (String key : (Set<String>) db.getItemMap().keySet()) {
 			ItemBean ib = (ItemBean) db.getItemMap().get(key);
 			if (!ib.isSelected()) {
-				excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
+				excludeItems = excludeItems.concat(excludeItems.isEmpty() ? "" : ",").concat(key);
 			}
 			sedIdAndCrfIdPairs = addSedIdAndCRFIdIfUnique(sedIdAndCrfIdPairs, key);
 		}
@@ -792,13 +806,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		boolean success = true;
 
 		ArrayList<Integer> sgcIds = this.getGroupIds(db.getId());
-		if (sgcIds == null) {
-			sgcIds = new ArrayList<Integer>();
-		}
 		ArrayList<Integer> dbSgcIds = (ArrayList<Integer>) db.getSubjectGroupIds().clone();
-		if (dbSgcIds == null) {
-			dbSgcIds = new ArrayList<Integer>();
-		}
 		if (sgcIds.size() > 0) {
 			for (Integer id : sgcIds) {
 				if (!dbSgcIds.contains(id)) {
@@ -955,14 +963,14 @@ public class DatasetDAO extends AuditableEntityDAO {
 		for (int ij = 0; ij < sedvec.size(); ij++) {
 			stsedIn = stsedIn + sedvec.get(ij).toString();
 			if (ij != sedvec.size() - 1) {
-				stsedIn = stsedIn + ",";
+				stsedIn = stsedIn.concat(",");
 			}
 		}
 		String stitIn = "";
 		for (int ij = 0; ij < itvec.size(); ij++) {
 			stitIn = stitIn + itvec.get(ij).toString();
 			if (ij != itvec.size() - 1) {
-				stitIn = stitIn + ",";
+				stitIn = stitIn.concat(",");
 			}
 		}
 		stsedIn = "(" + stsedIn + ")";
@@ -973,5 +981,878 @@ public class DatasetDAO extends AuditableEntityDAO {
 		} else {
 			return stitIn;
 		}
+	}
+
+	/**
+	 * Selects study subjects.
+	 *
+	 * @param pairList           List
+	 * @param sedin              String
+	 * @param itIn               String
+	 * @param dateConstraint     String
+	 * @param ecStatusConstraint String
+	 * @param itStatusConstraint String
+	 * @param studySubjectNumber int
+	 * @return Map
+	 */
+	public Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> selectStudySubjects(
+			List<Map<Integer, Integer>> pairList, String sedin, String itIn, String dateConstraint,
+			String ecStatusConstraint, String itStatusConstraint, int studySubjectNumber) {
+
+		clearSignals();
+		String query = getSQLSubjectStudySubjectDataset(pairList, sedin, itIn, dateConstraint, ecStatusConstraint,
+				itStatusConstraint);
+		logger.error("sqlSubjectStudySubjectDataset=" + query);
+		Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> mapOfStudySubjectsHolderList = new HashMap<Integer, List<OdmExtractUtil.StudySubjectsHolder>>();
+		ResultSet rs = null;
+		Connection connection = null;
+		Statement ps = null;
+		try {
+			connection = getDataSource().getConnection();
+			connection.setAutoCommit(false);
+			if (connection.isClosed()) {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Connection is closed: DatasetDAO.select!");
+				}
+				throw new SQLException();
+			}
+			final int fetchSize = 50;
+			ps = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			ps.setFetchSize(fetchSize);
+			rs = ps.executeQuery(query);
+			if (logger.isInfoEnabled()) {
+				logger.trace("Executing static query, DatasetDAO.select: " + query);
+			}
+			signalSuccess();
+			mapOfStudySubjectsHolderList = this.processStudySubjects(rs, studySubjectNumber);
+		} catch (SQLException sqle) {
+			signalFailure(sqle);
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exeception while executing static query, DatasetDAO.select: " + query + ": "
+						+ sqle.getMessage());
+				sqle.printStackTrace();
+			}
+		} finally {
+			this.closeIfNecessary(connection, rs, ps);
+		}
+		return mapOfStudySubjectsHolderList;
+	}
+
+	/**
+	 * Processes StudySubjects.
+	 *
+	 * @param rs                 ResultSet
+	 * @param studySubjectNumber int
+	 * @return ArrayList
+	 */
+	protected Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> processStudySubjects(ResultSet rs,
+			int studySubjectNumber) {
+		Map<Integer, List<OdmExtractUtil.StudySubjectsHolder>> mapOfStudySubjectsHolderList = new HashMap<Integer, List<OdmExtractUtil.StudySubjectsHolder>>();
+		try {
+			while (rs.next()) {
+				int studyId = rs.getInt("study_id");
+
+				List<OdmExtractUtil.StudySubjectsHolder> studySubjectsHolderList = mapOfStudySubjectsHolderList
+						.get(studyId);
+				if (studySubjectsHolderList == null) {
+					studySubjectsHolderList = new ArrayList<OdmExtractUtil.StudySubjectsHolder>();
+					mapOfStudySubjectsHolderList.put(studyId, studySubjectsHolderList);
+				}
+				OdmExtractUtil.StudySubjectsHolder studySubjectsHolder;
+				if (studySubjectsHolderList.size() == 0) {
+					studySubjectsHolder = new OdmExtractUtil.StudySubjectsHolder();
+					studySubjectsHolderList.add(studySubjectsHolder);
+				} else {
+					studySubjectsHolder = studySubjectsHolderList.get(studySubjectsHolderList.size() - 1);
+				}
+				if (studySubjectNumber > 0 && studySubjectsHolder.getStudySubjectList().size() == studySubjectNumber) {
+					studySubjectsHolder = new OdmExtractUtil.StudySubjectsHolder();
+					studySubjectsHolderList.add(studySubjectsHolder);
+				}
+
+				StudySubjectBean obj = new StudySubjectBean();
+
+				obj.setId(rs.getInt("study_subject_id"));
+				if (rs.wasNull()) {
+					obj.setId(0);
+				}
+
+				obj.setSubjectId(rs.getInt("subject_id"));
+				if (rs.wasNull()) {
+					obj.setSubjectId(0);
+				}
+
+				// old subject_identifier
+				obj.setLabel(rs.getString("label"));
+				if (rs.wasNull()) {
+					obj.setLabel("");
+				}
+
+				obj.setDateOfBirth(rs.getDate("date_of_birth"));
+
+				String gender = rs.getString("gender");
+				if (gender != null && gender.length() > 0) {
+					obj.setGender(gender.charAt(0));
+				} else {
+					obj.setGender(' ');
+				}
+
+				obj.setUniqueIdentifier(rs.getString("unique_identifier"));
+				if (rs.wasNull()) {
+					obj.setUniqueIdentifier("");
+				}
+
+				if (CoreResources.getDBType().equals("oracle")) {
+					obj.setDobCollected(rs.getString("dob_collected").equals("1"));
+				} else {
+					obj.setDobCollected(rs.getBoolean("dob_collected"));
+				}
+				if (rs.wasNull()) {
+					obj.setDobCollected(false);
+				}
+
+				Integer subjectStatusId = rs.getInt("status_id");
+				if (rs.wasNull()) {
+					subjectStatusId = 0;
+				}
+				obj.setStatus(Status.get(subjectStatusId));
+
+				obj.setSecondaryLabel(rs.getString("secondary_label"));
+				if (rs.wasNull()) {
+					obj.setSecondaryLabel("");
+				}
+
+				studySubjectsHolder.addStudySubject(obj);
+			}
+		} catch (SQLException sqle) {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while processing result rows, EntityDAO.processStudySubjects: " + ": "
+						+ sqle.getMessage() + ": array length: " + mapOfStudySubjectsHolderList.size());
+				sqle.printStackTrace();
+			}
+		}
+		return mapOfStudySubjectsHolderList;
+	}
+
+	protected String getSQLSubjectStudySubjectDataset(List<Map<Integer, Integer>> pairList, String eventDefIDConstraints,
+			String itemIDConstraints, String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
+
+		return " SELECT   "
+				+ " DISTINCT study_subject.study_subject_id, study_subject.study_id, study_subject.label,  study_subject.subject_id, "
+				+ "  subject.date_of_birth, subject.gender, subject.unique_identifier, subject.dob_collected,  "
+				+ "  subject.status_id, study_subject.secondary_label  "
+				+ "  FROM  "
+				+ "   study_subject "
+				+ "  JOIN subject ON (study_subject.subject_id = subject.subject_id)  "
+				+ "  JOIN study_event ON (study_subject.study_subject_id = study_event.study_subject_id) "
+				+ "  WHERE  "
+				+ "   study_subject.study_subject_id IN  "
+				+ "  ( "
+				+ "SELECT DISTINCT studysubjectid FROM "
+				+ "( "
+				+ getSQLDatasetBaseEventSide(pairList, eventDefIDConstraints, itemIDConstraints, dateConstraint,
+				ecStatusConstraint, itStatusConstraint) + " ) AS SBQTWO "
+				+ "  ) order by study_subject.study_id, study_subject.study_subject_id";
+	}
+
+	protected boolean loadBaseItemGroupSideHashMap(int studyID, int parentID, String eventDefIDConstraints,
+			String itemIDConstraints, ExtractBean eb) {
+
+		clearSignals();
+		int datasetItemStatusId = eb.getDataset().getDatasetItemStatus().getId();
+		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
+		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
+		String query = getSQLDatasetBaseItemGroupSide(studyID, parentID, eventDefIDConstraints, itemIDConstraints,
+				genDatabaseDateConstraint(eb), ecStatusConstraint, itStatusConstraint);
+		logger.error("sqlDatasetBase_itemGroupside=" + query);
+		boolean bret = false;
+		ResultSet rs = null;
+		Connection connection = null;
+		Statement ps = null;
+		try {
+			connection = getDataSource().getConnection();
+			connection.setAutoCommit(false);
+			if (connection.isClosed()) {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Connection is closed: DatasetDAO.select!");	
+				}
+				throw new SQLException();
+			}
+			ps = connection.createStatement();
+			ps.setFetchSize(QUERY_FETCH_SIZE);
+
+			rs = ps.executeQuery(query);
+			if (logger.isInfoEnabled()) {
+				logger.trace("Executing static query, DatasetDAO.select: " + query);
+			}
+			signalSuccess();
+			System.out.println("*** query that runs before we fill the ItemGroupSide: " + query);
+			processBaseItemGroupSideRecords(rs, eb);
+			bret = true;
+
+		} catch (SQLException sqle) {
+			signalFailure(sqle);
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exeception while executing static query, DatasetDAO.select: " + query + ": "
+						+ sqle.getMessage());
+				sqle.printStackTrace();
+			}
+		} finally {
+			this.closeIfNecessary(connection, rs, ps);
+		}
+		return bret;
+	}
+
+	protected boolean loadBaseEventInsideHashMap(int studyID, int parentID, String eventDefIDConstraints,
+			String itemIDConstraints, ExtractBean eb) {
+
+		clearSignals();
+		int datasetItemStatusId = eb.getDataset().getDatasetItemStatus().getId();
+		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
+		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
+		String query = getSQLDatasetBaseEventSide(OdmExtractUtil.pairList(studyID, parentID), eventDefIDConstraints,
+				itemIDConstraints, this.genDatabaseDateConstraint(eb),
+				ecStatusConstraint, itStatusConstraint);
+		logger.error("sqlDatasetBase_eventside=" + query);
+		boolean bret = false;
+		ResultSet rs = null;
+		Connection connection = null;
+		Statement ps = null;
+		try {
+			connection = getDataSource().getConnection();
+			connection.setAutoCommit(false);
+			if (connection.isClosed()) {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Connection is closed: DatasetDAO.select!");	
+				}
+				throw new SQLException();
+			}
+			ps = connection.createStatement();
+			ps.setFetchSize(QUERY_FETCH_SIZE);
+
+			rs = ps.executeQuery(query);
+			if (logger.isInfoEnabled()) {
+				logger.trace("Executing static query, DatasetDAO.select: " + query);
+			}
+			signalSuccess();
+			System.out.println("*** query that generates the event side records " + query);
+			bret = processBaseEventSideRecords(rs, eb);
+			bret = true;
+
+		} catch (SQLException sqle) {
+			signalFailure(sqle);
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while executing static query, DatasetDAO.select: " + query + ": "
+						+ sqle.getMessage());
+				sqle.printStackTrace();
+			}
+		} finally {
+			this.closeIfNecessary(connection, rs, ps);
+		}
+		return bret;
+	}
+
+	protected boolean processBaseItemGroupSideRecords(ResultSet rs, ExtractBean eb) {
+
+		try {
+			while (rs.next()) {
+
+				Integer vitemdataid = rs.getInt("itemdataid");
+				Integer vitemdataordinal = rs.getInt("itemdataordinal");
+				Integer itemGroupID = rs.getInt("item_group_id");
+
+				String vitemgroupname = rs.getString("name");
+				if (rs.wasNull()) {
+					vitemgroupname = "";
+				}
+
+				if ("ungrouped".equalsIgnoreCase(vitemgroupname) && vitemdataordinal <= 0) {
+					vitemdataordinal = 1;
+				}
+
+				String vitemdesc = rs.getString("itemdesc");
+				if (rs.wasNull()) {
+					vitemdesc = "";
+				}
+
+				String vitemname = rs.getString("itemname");
+				if (rs.wasNull()) {
+					vitemname = "";
+				}
+
+				String vitemvalue = rs.getString("itemvalue");
+				if (rs.wasNull()) {
+					vitemvalue = Utils.convertedItemDateValue("", oc_df_string, local_df_string);
+				}
+
+				String vitemunits = rs.getString("itemunits");
+				if (rs.wasNull()) {
+					vitemunits = "";
+				}
+
+				String vcrfversioname = rs.getString("crfversioname");
+				if (rs.wasNull()) {
+					vcrfversioname = "";
+				}
+
+				Integer vcrfversionstatusid = rs.getInt("crfversionstatusid");
+				java.sql.Date vdateinterviewed = rs.getDate("dateinterviewed");
+
+				String vinterviewername = rs.getString("interviewername");
+				if (rs.wasNull()) {
+					vinterviewername = "";
+				}
+
+				Timestamp veventcrfdatecompleted = rs.getTimestamp("eventcrfdatecompleted");
+				Timestamp veventcrfdatevalidatecompleted = rs.getTimestamp("eventcrfdatevalidatecompleted");
+				Integer veventcrfcompletionstatusid = rs.getInt("eventcrfcompletionstatusid");
+				Integer repeatNumber = rs.getInt("repeat_number");
+				Integer vcrfid = rs.getInt("crfid");
+				Integer vstudysubjectid = rs.getInt("studysubjectid");
+				Integer veventcrfid = rs.getInt("eventcrfid");
+				Integer vitemid = rs.getInt("itemid");
+				Integer vcrfversionid = rs.getInt("crfversionid");
+				Integer eventcrfstatusid = rs.getInt("eventcrfstatusid");
+				Integer itemdatatypeid = rs.getInt("itemDataTypeId");
+
+				// add it to the HashMap
+				eb.addEntryBASE_ITEMGROUPSIDE(
+				/* Integer pitemDataId */vitemdataid,
+				/* Integer vitemdataordinal */vitemdataordinal,
+				/* Integer pitemGroupId */itemGroupID,
+				/* String pitemGroupName */vitemgroupname, itemdatatypeid,
+				/* String pitemDescription */vitemdesc,
+				/* String pitemName */vitemname,
+				/* String pitemValue */vitemvalue,
+				/* String pitemUnits */vitemunits,
+				/* String pcrfVersionName */vcrfversioname,
+				/* Integer pcrfVersionStatusId */vcrfversionstatusid,
+				/* Date pdateInterviewed */vdateinterviewed,
+				/* String pinterviewerName, */vinterviewername,
+				/* Timestamp peventCrfDateCompleted */veventcrfdatecompleted,
+				/* Timestamp peventCrfDateValidateCompleted */veventcrfdatevalidatecompleted,
+				/* Integer peventCrfCompletionStatusId */veventcrfcompletionstatusid,
+				/* Integer repeat_number */repeatNumber,
+				/* Integer crfId */vcrfid,
+				/* Integer pstudySubjectId */vstudysubjectid,
+				/* Integer peventCrfId */veventcrfid,
+				/* Integer pitemId */vitemid,
+				/* Integer pcrfVersionId */vcrfversionid, eventcrfstatusid);
+
+			}
+		} catch (SQLException sqle) {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while processing result rows, EntityDAO.addHashMapEntryBASE_ITEMGROUPSIDE: "
+						+ ": " + sqle.getMessage() + ": array length: " + eb.getHBASE_ITEMGROUPSIDE().size());
+				sqle.printStackTrace();
+			}
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.trace("Loaded addHashMapEntryBASE_ITEMGROUPSIDE: " + eb.getHBASE_EVENTSIDE().size());
+		}
+		return true;
+	}
+
+	protected boolean processBaseEventSideRecords(ResultSet rs, ExtractBean eb) {
+
+		try {
+			while (rs.next()) {
+
+				Integer vitemdataid = rs.getInt("itemdataid");
+				Integer vstudysubjectid = rs.getInt("studysubjectid");
+				Integer sampleOrdinal = rs.getInt("sample_ordinal");
+				Integer studyEventDefID = rs.getInt("study_event_definition_id");
+
+				String vname = rs.getString("name");
+				if (rs.wasNull()) {
+					vname = "";
+				}
+
+				String vlocation = rs.getString("location");
+				if (rs.wasNull()) {
+					vlocation = "";
+				}
+
+				Timestamp dateStart = rs.getTimestamp("date_start");
+				Timestamp dateEnd = rs.getTimestamp("date_end");
+
+				Boolean startTimeFlag;
+				if (CoreResources.getDBType().equals("oracle")) {
+					startTimeFlag = rs.getString("start_time_flag").equals("1");
+					if (rs.wasNull()) {
+						startTimeFlag = false;
+					}
+				} else {
+					startTimeFlag = rs.getBoolean("start_time_flag");
+					if (rs.wasNull()) {
+						startTimeFlag = false;
+					}
+				}
+
+				Boolean endTimeFlag;
+				if (CoreResources.getDBType().equals("oracle")) {
+					endTimeFlag = rs.getString("end_time_flag").equals("1");
+					if (rs.wasNull()) {
+						endTimeFlag = false;
+					}
+				} else {
+					endTimeFlag = rs.getBoolean("end_time_flag");
+					if (rs.wasNull()) {
+						endTimeFlag = false;
+					}
+				}
+
+				Integer statusID = rs.getInt("status_id");
+				Integer subjectEventStatusID = rs.getInt("subject_event_status_id");
+				Integer vstudyeventid = rs.getInt("studyeventid");
+				Integer veventcrfid = rs.getInt("eventcrfid");
+				Integer vitemid = rs.getInt("itemid");
+				Integer vcrfversionid = rs.getInt("crfversionid");
+
+				// add it to the HashMap
+				eb.addEntryBASE_EVENTSIDE(
+				/* Integer pitemDataId */vitemdataid,
+				/* Integer pstudySubjectId */vstudysubjectid,
+				/* Integer psampleOrdinal */sampleOrdinal,
+				/* Integer pstudyEvenetDefinitionId */studyEventDefID,
+				/* String pstudyEventDefinitionName */vname,
+				/* String pstudyEventLoacation */vlocation,
+				/* Timestamp pstudyEventDateStart */dateStart,
+				/* Timestamp pstudyEventDateEnd */dateEnd,
+				/* Boolean pstudyEventStartTimeFlag */startTimeFlag,
+				/* Boolean pstudyEventEndTimeFlag */endTimeFlag,
+				/* Integer pstudyEventStatusId */statusID,
+				/* Integer pstudyEventSubjectEventStatusId */subjectEventStatusID,
+				/* Integer pitemId */vitemid,
+				/* Integer pcrfVersionId */vcrfversionid,
+				/* Integer peventCrfId */veventcrfid,
+				/* Integer pstudyEventId */vstudyeventid);
+
+				eb.addItemDataIdEntry(vitemdataid);
+			}
+		} catch (SQLException sqle) {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while processing result rows, EntityDAO.processBaseEventSideRecords: " + ": "
+						+ sqle.getMessage() + ": array length: " + eb.getHBASE_EVENTSIDE().size());
+				sqle.printStackTrace();
+			}
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.trace("Loaded addHashMapEntryBASE_EVENTSIDE: " + eb.getHBASE_EVENTSIDE().size());
+		}
+		return true;
+	}
+	
+	protected String getSQLDatasetBaseEventSide(List<Map<Integer, Integer>> pairList, String eventDefIDConstraints, 
+			String itemIDConstraints, String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
+
+		return " SELECT  "
+				+ " itemdataid,  "
+				+ " studysubjectid, study_event.sample_ordinal,  "
+				+ " study_event.study_event_definition_id,   "
+				+ " study_event_definition.name, study_event.location, study_event.date_start, study_event.date_end, "
+				+ " study_event.start_time_flag , study_event.end_time_flag , study_event.status_id, study_event.subject_event_status_id, "
+				+ " itemid,  crfversionid,  eventcrfid, studyeventid "
+				+ " FROM "
+				+ " ( "
+				+ "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname, item.description AS itemdesc,  "
+				+ "   item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
+				+ "   event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid "
+				+ "   FROM item_data, item, event_crf "
+				+ "   JOIN crf_version  ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "   WHERE  "
+				+ "   item_data.item_id = item.item_id "
+				+ "   AND "
+				+ "   item_data.event_crf_id = event_crf.event_crf_id "
+				+ "   AND "
+				+ "   item_data.item_id IN "
+				+ itemIDConstraints
+				+ "   AND item_data.event_crf_id IN  "
+				+ "   ( "
+				+ "       SELECT event_crf_id FROM event_crf "
+				+ "       WHERE  "
+				+ "           event_crf.study_event_id IN  "
+				+ "           ( "
+				+ "               SELECT study_event_id FROM study_event  "
+				+ "               WHERE "
+				+ "                   study_event.study_event_definition_id IN "
+				+ eventDefIDConstraints
+				+ "                  AND  "
+				+ "                   (   study_event.sample_ordinal IS NOT NULL AND "
+				+ "                       study_event.date_start IS NOT NULL  "
+				+ "                   ) "
+				+ "                  AND "
+				+ "                   study_event.study_subject_id IN "
+				+ "                  ( "
+				+ "                   SELECT DISTINCT study_subject.study_subject_id "
+				+ "                    FROM   study_subject   "
+				+ "                    JOIN   study           ON ( "
+				+ "                                       study.study_id = study_subject.study_id  "
+				+ "                                      AND "
+				+ "                                       (study.study_id in "
+				+ OdmExtractUtil.keysAsSql(pairList)
+				+ "OR study.parent_study_id in "
+				+ OdmExtractUtil.valuesAsSql(pairList)
+				+ ") "
+				+ "                                      ) "
+				+ "                    JOIN   subject         ON study_subject.subject_id = subject.subject_id "
+				+ "                    JOIN   study_event_definition  ON ( "
+				+ "                                       study.study_id = study_event_definition.study_id "
+				+ "                                       OR "
+				+ "                                       study.parent_study_id = study_event_definition.study_id "
+				+ "                                      ) "
+				+ "                    JOIN   study_event         ON ( "
+				+ "                                       study_subject.study_subject_id = study_event.study_subject_id  "
+				+ "                                      AND "
+				+ "                                       study_event_definition.study_event_definition_id = study_event.study_event_definition_id  "
+				+ "                                      ) "
+				+ "                    JOIN   event_crf       ON ( "
+				+ "                                       study_event.study_event_id = event_crf.study_event_id  "
+				+ "                                      AND  "
+				+ "                                       study_event.study_subject_id = event_crf.study_subject_id  "
+				+ "                                      AND "
+				+ "                                       (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "                                      ) "
+				+ "                   WHERE "
+				+ dateConstraint
+				+ "                       AND "
+				+ "                       study_event_definition.study_event_definition_id IN "
+				+ eventDefIDConstraints
+				+ "                  )  "
+				+ "           ) "
+				+ "           AND study_subject_id IN ( "
+				+ "               SELECT DISTINCT study_subject.study_subject_id "
+				+ "                FROM   study_subject   "
+				+ "                JOIN   study           ON ( "
+				+ "                                   study.study_id = study_subject.study_id  "
+				+ "                                  AND "
+				+ "                                   (study.study_id in "
+				+ OdmExtractUtil.keysAsSql(pairList)
+				+ " OR study.parent_study_id in "
+				+ OdmExtractUtil.valuesAsSql(pairList)
+				+ ") "
+				+ "                                  ) "
+				+ "                JOIN   subject         ON study_subject.subject_id = subject.subject_id "
+				+ "                JOIN   study_event_definition  ON ( "
+				+ "                                   study.study_id = study_event_definition.study_id  "
+				+ "                                   OR  "
+				+ "                                   study.parent_study_id = study_event_definition.study_id "
+				+ "                                  ) "
+				+ "                JOIN   study_event         ON ( "
+				+ "                                   study_subject.study_subject_id = study_event.study_subject_id  "
+				+ "                                  AND "
+				+ "                                   study_event_definition.study_event_definition_id = study_event.study_event_definition_id  "
+				+ "                                  ) "
+				+ "                JOIN   event_crf       ON ( "
+				+ "                                   study_event.study_event_id = event_crf.study_event_id  "
+				+ "                                  AND  "
+				+ "                                   study_event.study_subject_id = event_crf.study_subject_id  "
+				+ "                                  AND "
+				+ "                                   (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "                                  ) "
+				+ "               WHERE "
+				+ dateConstraint
+				+ "                   AND "
+				+ "                   study_event_definition.study_event_definition_id IN "
+				+ eventDefIDConstraints
+				+ "           ) "
+				+ "           AND "
+				+ "           (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "   )  "
+				+ "   AND  "
+				+ "   (item_data.status_id "
+				+ itStatusConstraint
+				+ ")  "
+				+ " ) AS SBQONE, study_event, study_event_definition "
+				+ " WHERE  "
+				+ " (study_event.study_event_id = SBQONE.studyeventid) "
+				+ " AND "
+				+ " (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) "
+				+ " ORDER BY itemdataid asc ";
+	}
+	
+	protected String getSQLDatasetBaseItemGroupSide(int studyID, int studyParentID, String eventDefIDConstraints, 
+			String itemIDConstraints, String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
+
+		return " SELECT  "
+				+ " itemdataid,  itemdataordinal,"
+				+ " item_group_metadata.item_group_id , item_group.name, itemdatatypeid, itemdesc, itemname, itemvalue, itemunits, "
+				+ " crfversioname, crfversionstatusid, crfid, item_group_metadata.repeat_number, "
+				+ " dateinterviewed, interviewername, eventcrfdatevalidatecompleted, eventcrfdatecompleted, eventcrfcompletionstatusid, "
+				+ " studysubjectid, eventcrfid, itemid, crfversionid, eventcrfstatusid "
+				+ " FROM "
+				+ " ( "
+				+ "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item_data.ordinal AS itemdataordinal, item.item_data_type_id AS itemdatatypeid, item.name AS itemname, item.description AS itemdesc,  "
+				+ "   item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
+				+ "   event_crf.study_subject_id as studysubjectid, crf_version.status_id AS crfversionstatusid, crf_version.crf_id AS crfid, "
+				+ "   event_crf.date_interviewed AS dateinterviewed, event_crf.interviewer_name AS interviewername, event_crf.date_completed AS eventcrfdatecompleted, "
+				+ "   event_crf.date_validate_completed AS eventcrfdatevalidatecompleted, event_crf.completion_status_id AS eventcrfcompletionstatusid, event_crf.status_id AS eventcrfstatusid "
+				+ "   FROM item_data, item, event_crf "
+				+ "   join crf_version  ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "   WHERE  "
+				+ "   item_data.item_id = item.item_id "
+				+ "   AND "
+				+ "   item_data.event_crf_id = event_crf.event_crf_id "
+				+ "   AND "
+				+ "   item_data.item_id IN "
+				+ itemIDConstraints
+				+ "   AND item_data.event_crf_id IN "
+				+ "   ( "
+				+ "       SELECT event_crf_id FROM event_crf "
+				+ "       WHERE  "
+				+ "           event_crf.study_event_id IN  "
+				+ "           ( "
+				+ "               SELECT study_event_id FROM study_event  "
+				+ "               WHERE "
+				+ "                   study_event.study_event_definition_id IN "
+				+ eventDefIDConstraints
+				+ "                  AND  "
+				+ "                   (   study_event.sample_ordinal IS NOT NULL AND "
+				+ "                       study_event.location IS NOT NULL AND "
+				+ "                       study_event.date_start IS NOT NULL  "
+				+ "                   ) "
+				+ "                  AND "
+				+ "                   study_event.study_subject_id IN "
+				+ "                  ( "
+				+ "                   SELECT DISTINCT study_subject.study_subject_id "
+				+ "                    FROM   study_subject   "
+				+ "                    JOIN   study           ON ( "
+				+ "                                       study.study_id = study_subject.study_id  "
+				+ "                                      AND "
+				+ "                                       (study.study_id="
+				+ studyID
+				+ " OR study.parent_study_id= "
+				+ studyParentID
+				+ ") "
+				+ "                                      ) "
+				+ "                    JOIN   subject         ON study_subject.subject_id = subject.subject_id "
+				+ "                    JOIN   study_event_definition  ON ( "
+				+ "                                       study.study_id = study_event_definition.study_id  "
+				+ "                                       OR  "
+				+ "                                       study.parent_study_id = study_event_definition.study_id "
+				+ "                                      ) "
+				+ "                    JOIN   study_event         ON ( "
+				+ "                                       study_subject.study_subject_id = study_event.study_subject_id  "
+				+ "                                      AND "
+				+ "                                       study_event_definition.study_event_definition_id = study_event.study_event_definition_id  "
+				+ "                                      ) "
+				+ "                    JOIN   event_crf       ON ( "
+				+ "                                       study_event.study_event_id = event_crf.study_event_id  "
+				+ "                                      AND  "
+				+ "                                       study_event.study_subject_id = event_crf.study_subject_id  "
+				+ "                                      AND "
+				+ "                                       (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "                                      ) "
+				+ "                   WHERE "
+				+ dateConstraint
+				+ "                       AND "
+				+ "                       study_event_definition.study_event_definition_id IN "
+				+ eventDefIDConstraints
+				+ "                  )  "
+				+ "           ) "
+				+ "           AND study_subject_id IN ( "
+				+ "               SELECT DISTINCT study_subject.study_subject_id "
+				+ "                FROM   study_subject   "
+				+ "                JOIN   study           ON ( "
+				+ "                                   study.study_id = study_subject.study_id  "
+				+ "                                  AND "
+				+ "                                   (study.study_id="
+				+ studyID
+				+ " OR study.parent_study_id= "
+				+ studyParentID
+				+ " )"
+				+ "                                  ) "
+				+ "                JOIN   subject         ON study_subject.subject_id = subject.subject_id "
+				+ "                JOIN   study_event_definition  ON ( "
+				+ "                                   study.study_id = study_event_definition.study_id  "
+				+ "                                   OR  "
+				+ "                                   study.parent_study_id = study_event_definition.study_id "
+				+ "                                  ) "
+				+ "                JOIN   study_event         ON ( "
+				+ "                                   study_subject.study_subject_id = study_event.study_subject_id  "
+				+ "                                  AND "
+				+ "                                   study_event_definition.study_event_definition_id = study_event.study_event_definition_id  "
+				+ "                                  ) "
+				+ "                JOIN   event_crf       ON ( "
+				+ "                                   study_event.study_event_id = event_crf.study_event_id  "
+				+ "                                  AND  "
+				+ "                                   study_event.study_subject_id = event_crf.study_subject_id  "
+				+ "                                  AND "
+				+ "                                   (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "                                  ) "
+				+ "               WHERE "
+				+ dateConstraint
+				+ "                   AND "
+				+ "                   study_event_definition.study_event_definition_id IN "
+				+ eventDefIDConstraints
+				+ "           ) "
+				+ "           AND "
+				+ "           (event_crf.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ "   )  "
+				+ "   AND  "
+				+ "   (item_data.status_id "
+				+ itStatusConstraint
+				+ ")  "
+				+ " ) AS SBQONE, item_group_metadata, item_group "
+				+ " WHERE  "
+				+ " (item_group_metadata.item_id = SBQONE.itemid AND item_group_metadata.crf_version_id = SBQONE.crfversionid) "
+				+ " AND "
+				+ " (item_group.item_group_id = item_group_metadata.item_group_id) "
+				+ "  ORDER BY itemdataid asc ";
+	}
+	
+	protected String getSQLInKeyDatasetHelper(int studyID, int studyParentID, String eventDefIDConstraints, 
+			String itemIDConstraints, String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
+
+		return "   SELECT DISTINCT  "
+				+ "   study_event.study_event_definition_id,  "
+				+ "   study_event.sample_ordinal,  "
+				+ "   crfv.crf_id,  "
+				+ "   it.item_id,  "
+				+ "   ig.name AS item_group_name  "
+				+ "    FROM  "
+				+ "   event_crf ec  "
+				+ " JOIN crf_version crfv ON ec.crf_version_id = crfv.crf_version_id AND (ec.status_id "
+				+ ecStatusConstraint
+				+ ") "
+				+ " JOIN item_form_metadata ifm ON crfv.crf_version_id = ifm.crf_version_id  "
+				+ " LEFT JOIN item_group_metadata igm ON ifm.item_id = igm.item_id AND crfv.crf_version_id = igm.crf_version_id  "
+				+ " LEFT JOIN item_group ig ON igm.item_group_id = ig.item_group_id  "
+				+ " JOIN item it ON ifm.item_id = it.item_id  "
+				+ " JOIN study_event ON study_event.study_event_id = ec.study_event_id AND study_event.study_subject_id = ec.study_subject_id   "
+				+ " WHERE ec.event_crf_id IN  "
+				+ " (  "
+				+ "   SELECT DISTINCT eventcrfid FROM  "
+				+ "   (     "
+				+ getSQLDatasetBaseEventSide(OdmExtractUtil.pairList(studyID, studyParentID), eventDefIDConstraints,
+				itemIDConstraints, dateConstraint,
+				ecStatusConstraint, itStatusConstraint) + "   ) AS SBQTWO " + " ) ";
+	}
+	
+	protected HashMap setHashMapInKeysHelper(int studyID, int parentID, String eventDefIDConstraints, 
+			String itemIDConstraints, String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
+
+		clearSignals();
+		String query = getSQLInKeyDatasetHelper(studyID, parentID, eventDefIDConstraints, itemIDConstraints, 
+				dateConstraint, ecStatusConstraint, itStatusConstraint);
+		HashMap results = new HashMap();
+		ResultSet rs = null;
+		Connection connection = null;
+		Statement ps = null;
+		try {
+			connection = getDataSource().getConnection();
+			if (connection.isClosed()) {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Connection is closed: setHashMapInKeysHelper.select!");
+				}
+				throw new SQLException();
+			}
+			ps = connection.createStatement();
+			rs = ps.executeQuery(query);
+			if (logger.isInfoEnabled()) {
+				logger.trace("Executing static query, setHashMapInKeysHelper.select: " + query);
+			}
+			signalSuccess();
+			results = this.processInKeyDataset(rs);
+
+		} catch (SQLException sqle) {
+			signalFailure(sqle);
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while executing static query, DatasetDAO.select: " + query + ": "
+						+ sqle.getMessage());
+				sqle.printStackTrace();
+			}
+		} finally {
+			this.closeIfNecessary(connection, rs, ps);
+		}
+		return results;
+	}
+	
+	protected HashMap processInKeyDataset(ResultSet rs) {
+		
+		HashMap al = new HashMap();
+		try {
+			while (rs.next()) {
+				String stsed;
+				stsed = ((Integer) rs.getInt("study_event_definition_id")).toString();
+				if (rs.wasNull()) {
+					stsed = "";
+				}
+
+				String stso;
+				stso = ((Integer) rs.getInt("sample_ordinal")).toString();
+				if (rs.wasNull()) {
+					stso = "";
+				}
+
+				String stcrf;
+				stcrf = ((Integer) rs.getInt("crf_id")).toString();
+				if (rs.wasNull()) {
+					stcrf = "";
+				}
+
+				String stitem;
+				stitem = ((Integer) rs.getInt("item_id")).toString();
+				if (rs.wasNull()) {
+					stitem = "";
+				}
+
+				String stgn;
+				stgn = rs.getString("item_group_name");
+				if (rs.wasNull()) {
+					stgn = "";
+				}
+
+				String key = stsed + "_" + stso + "_" + stcrf + "_" + stitem + "_" + stgn;
+				al.put(key, true);
+			}
+		} catch (SQLException sqle) {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while processing result rows, EntityDAO.loadExtractStudySubject: " + ": "
+						+ sqle.getMessage() + ": array length: " + al.size());
+				sqle.printStackTrace();
+			}
+		}
+		return al;
+	}
+
+	/**
+	 * Constructs data base date constraints.
+	 *
+	 * @param eb ExtractBean object
+	 * @return date constraint string
+	 */
+	public String genDatabaseDateConstraint(ExtractBean eb) {
+		
+		String dateConstraint = "";
+		String dbName = CoreResources.getDBType();
+		String sql = eb.getDataset().getSQLStatement();
+		String[] os = sql.split("'");
+		if ("postgres".equalsIgnoreCase(dbName)) {
+			dateConstraint = " (date(study_subject.enrollment_date) >= date('" + os[DATE_RANGE_LOWER_BOUND_INDEX]
+					+ "')) and (date(study_subject.enrollment_date) <= date('" + os[DATE_RANGE_UPPER_BOUND_INDEX] + "'))";
+		} else if ("oracle".equalsIgnoreCase(dbName)) {
+			dateConstraint = " trunc(study_subject.enrollment_date) >= to_date('" + os[DATE_RANGE_LOWER_BOUND_INDEX]
+					+ "') and trunc(study_subject.enrollment_date) <= to_date('" + os[DATE_RANGE_UPPER_BOUND_INDEX] + "')";
+		}
+		return dateConstraint;
 	}
 }

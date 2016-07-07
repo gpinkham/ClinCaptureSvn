@@ -274,7 +274,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			theItem.put("subject", subjectBean);
 			theItem.put("subject.charGender", subjectBean.getGender());
 
-			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO().getDs())));
+			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean,
+					new DAOWrapper(getStudyDAO().getDataSource())));
 
 			// study group classes
 			SubjectGroupMapBean subjectGroupMapBean;
@@ -933,7 +934,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 			return ListStudySubjectTableFactory.getSubjectActionsColumnContent(item, getCurrentUser(), getCurrentRole(),
-					getStudyBean(), studyBeanMap, new DAOWrapper(getStudyDAO().getDs()), resword, getRequest());
+					getStudyBean(), studyBeanMap, new DAOWrapper(getStudyDAO().getDataSource()), resword, getRequest());
 		}
 	}
 

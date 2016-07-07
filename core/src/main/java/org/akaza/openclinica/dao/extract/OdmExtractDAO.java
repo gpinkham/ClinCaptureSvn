@@ -2440,8 +2440,8 @@ public class OdmExtractDAO extends DatasetDAO {
         String seprev = "";
         String formprev = "";
         String oidPos = "";
-        StudyBean parentStudy = study.getParentStudyId() > 0 ? (StudyBean) new StudyDAO(this.ds).findByPK(study
-                .getParentStudyId()) : study;
+        StudyBean parentStudy = study.getParentStudyId() > 0
+                ? (StudyBean) new StudyDAO(getDataSource()).findByPK(study.getParentStudyId()) : study;
         setStudyParemeterConfig(parentStudy);
         HashSet<Integer> sgcIdSet = new HashSet<Integer>();
         HashMap<String, String> subOidPoses = new HashMap<String, String>();
@@ -2702,7 +2702,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setStudyParemeterConfig(StudyBean study) {
-        StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getId(),
+        StudyParameterValueBean param = new StudyParameterValueDAO(getDataSource()).findByHandleAndStudy(study.getId(),
                 "collectDob");
         study.getStudyParameterConfig().setCollectDob(param.getValue());
     }
@@ -3371,7 +3371,7 @@ public class OdmExtractDAO extends DatasetDAO {
     public void getODMMetadataForForm(MetaDataVersionBean metadata, String formVersionOID, String odmVersion) {
         FormDefBean formDef = new FormDefBean();
         String cvIds = "";
-        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(this.ds);
+        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(getDataSource());
         CRFVersionBean crfVersionBean = crfVersionDAO.findByOid(formVersionOID);
         cvIds = crfVersionBean.getId() + "";
 
@@ -3832,7 +3832,7 @@ public class OdmExtractDAO extends DatasetDAO {
         variables.put(new Integer(1), new Integer(crfVId));
         ArrayList<SectionDetails> sectionBeans = new ArrayList<SectionDetails>();
 
-        SectionDAO secdao = new SectionDAO(this.ds);
+        SectionDAO secdao = new SectionDAO(getDataSource());
         ArrayList sections = secdao.findAllByCRFVersionId(crfVId);
         Iterator iter = sections.iterator();
         while (iter.hasNext()) {

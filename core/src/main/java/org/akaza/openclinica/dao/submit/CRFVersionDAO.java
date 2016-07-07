@@ -575,7 +575,7 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		try {
 			oid = crfVersion.getOid() != null
 					? crfVersion.getOid()
-					: crfVersion.getOidGenerator(ds).generateOid(crfName, crfVersionName);
+					: crfVersion.getOidGenerator(getDataSource()).generateOid(crfName, crfVersionName);
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
@@ -588,7 +588,7 @@ public class CRFVersionDAO extends AuditableEntityDAO implements ICRFVersionDAO 
 		logger.info(oid);
 		String oidPreRandomization = oid;
 		while (findAllByOid(oid).size() > 0) {
-			oid = crfVersion.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+			oid = crfVersion.getOidGenerator(getDataSource()).randomizeOid(oidPreRandomization);
 		}
 		return oid;
 	}

@@ -119,19 +119,19 @@ public class AuditEventDAO extends AuditableEntityDAO {
 
 	public AuditEventBean setStudyAndSubjectInfo(AuditEventBean aeb) {
 		if (aeb.getStudyId() > 0) {
-			StudyDAO sdao = new StudyDAO(this.ds);
+			StudyDAO sdao = new StudyDAO(getDataSource());
 			StudyBean sbean = (StudyBean) sdao.findByPK(aeb.getStudyId());
 			aeb.setStudyName(sbean.getName());
 		}
 		if (aeb.getSubjectId() > 0) {
 			SubjectBean subbean = new SubjectBean();
-			SubjectDAO subdao = new SubjectDAO(this.ds);
+			SubjectDAO subdao = new SubjectDAO(getDataSource());
 			subbean = (SubjectBean) subdao.findByPK(aeb.getSubjectId());
 			aeb.setSubjectName(subbean.getName());
 		}
 		if (aeb.getUserId() > 0) {
 			UserAccountBean updater = new UserAccountBean();
-			UserAccountDAO uadao = new UserAccountDAO(this.ds);
+			UserAccountDAO uadao = new UserAccountDAO(getDataSource());
 			updater = (UserAccountBean) uadao.findByPK(aeb.getUserId());
 			aeb.setUpdater(updater);
 		}

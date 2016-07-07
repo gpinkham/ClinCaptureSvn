@@ -349,7 +349,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			List<StudyEventBean> allStudyEventsForStudySubject = getStudyEventDAO()
 					.findAllByStudySubject(studySubjectBean);
 			HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
-			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean, new DAOWrapper(getStudyDAO().getDs())));
+			theItem.put("isSignable", SignUtil.permitSign(studySubjectBean,
+					new DAOWrapper(getStudyDAO().getDataSource())));
 
 			for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
 				if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {
@@ -962,7 +963,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private class ActionsCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 			return getSubjectActionsColumnContent(item, currentUser, getCurrentRole(), getStudyBean(), studyBeanMap,
-					new DAOWrapper(getStudyDAO().getDs()), resword, getRequest());
+					new DAOWrapper(getStudyDAO().getDataSource()), resword, getRequest());
 		}
 	}
 

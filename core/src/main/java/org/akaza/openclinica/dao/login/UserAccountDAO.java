@@ -754,7 +754,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
 		ArrayList answer = new ArrayList();
 
-		StudyDAO sdao = new StudyDAO(ds);
+		StudyDAO sdao = new StudyDAO(getDataSource());
 
 		HashMap childrenByParentId = sdao.getChildrenByParentIds(allStudies);
 

@@ -246,7 +246,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			eb.setEventCRFId((Integer) hm.get("event_crf_id"));
 		}
 		if (eb.getAssignedUserId() > 0) {
-			UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
+			UserAccountDAO userAccountDAO = new UserAccountDAO(getDataSource());
 			UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(eb.getAssignedUserId());
 			eb.setAssignedUser(assignedUser);
 		}
@@ -2340,7 +2340,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 * @return AuditableEntityBean
 	 */
 	public AuditableEntityBean findEntity(DiscrepancyNoteBean note) {
-		AuditableEntityDAO aedao = getAEDAO(note, ds);
+		AuditableEntityDAO aedao = getAEDAO(note, getDataSource());
 		try {
 			if (aedao != null) {
 				return (AuditableEntityBean) aedao.findByPK(note.getEntityId());

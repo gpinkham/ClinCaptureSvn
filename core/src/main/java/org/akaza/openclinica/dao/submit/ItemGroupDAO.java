@@ -214,7 +214,7 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		try {
 			oid = itemGroupBean.getOid() != null
 					? itemGroupBean.getOid()
-					: itemGroupBean.getOidGenerator(ds).generateOid(crfName, itemGroupLabel);
+					: itemGroupBean.getOidGenerator(getDataSource()).generateOid(crfName, itemGroupLabel);
 			return oid;
 		} catch (Exception e) {
 			throw new RuntimeException("CANNOT GENERATE OID");
@@ -241,7 +241,7 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		logger.info(oid);
 		String oidPreRandomization = oid;
 		while (findByOid(oid) != null || oidList.contains(oid)) {
-			oid = itemGroup.getOidGenerator(ds).randomizeOid(oidPreRandomization);
+			oid = itemGroup.getOidGenerator(getDataSource()).randomizeOid(oidPreRandomization);
 		}
 		return oid;
 	}
@@ -731,7 +731,7 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 		PreparedStatement ps = null;
 
 		try {
-			con = ds.getConnection();
+			con = getDataSource().getConnection();
 			if (con.isClosed()) {
 				if (logger.isWarnEnabled()) {
 					logger.warn("Connection is closed: GenericDAO.select!");
@@ -743,12 +743,12 @@ public class ItemGroupDAO extends AuditableEntityDAO {
 
 			ps = psf.generate(ps); // enter variables here!
 			key = ps.toString();
-			results = (ArrayList) cache.get(key);
+			results = (ArrayList) getCache().get(key);
 			if (results == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {
-					cache.put(key, results);
+					getCache().put(key, results);
 				}
 			}
 

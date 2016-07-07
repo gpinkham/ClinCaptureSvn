@@ -14,6 +14,10 @@
             <MaxDay>3</MaxDay>
             <EmailDay>2</EmailDay>
             <SchDay>2</SchDay>
+			<reminderEmailRecipient>DATA_ENTRY_USER</reminderEmailRecipient>
+			<reminderEmailRecipient>OTHER_STUDY_USERS</reminderEmailRecipient>
+			<otherStudyUser>root</otherStudyUser>
+			<otherStudyUser>admAA</otherStudyUser>
             <UserEmailId>1</UserEmailId>
             <IsReference>true</IsReference>
             <EventDefinitionCrf>

@@ -68,7 +68,7 @@ public class SubjectTransferDAO extends EntityDAO {
 	}
 
 	private UserAccountDAO getUserAccountDao() {
-		return new UserAccountDAO(ds);
+		return new UserAccountDAO(getDataSource());
 	}
 
 	@Override
