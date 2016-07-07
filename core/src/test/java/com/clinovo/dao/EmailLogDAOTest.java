@@ -14,6 +14,11 @@ public class EmailLogDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindAllByStudyReturnsCorrectResult() {
-		assertEquals(2, emailLogDAO.findAllByStudyId(1).size());
+		assertEquals(2, emailLogDAO.findAllParentsByStudyId(1).size());
+	}
+
+	@Test
+	public void testThatFindAllByParentIdReturnsCorrectResult() {
+		assertEquals(1, emailLogDAO.findAllByParentId(1).size());
 	}
 }

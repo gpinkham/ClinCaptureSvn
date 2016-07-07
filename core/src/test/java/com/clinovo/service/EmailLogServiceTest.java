@@ -1,5 +1,6 @@
 package com.clinovo.service;
 
+import com.clinovo.bean.EmailDetails;
 import com.clinovo.dao.EmailLogDAO;
 import com.clinovo.model.EmailLog;
 import com.clinovo.service.impl.EmailLogServiceImpl;
@@ -35,13 +36,19 @@ public class EmailLogServiceTest {
 
 	@Test
 	public void testThatFindAllByStudyCallsCorrectDaoMethod() {
-		emailLogService.findAllByStudyId(1);
-		Mockito.verify(emailLogDAO).findAllByStudyId(1);
+		emailLogService.findAllParentsByStudyId(1);
+		Mockito.verify(emailLogDAO).findAllParentsByStudyId(1);
 	}
 
 	@Test
 	public void testThatFindByIdReturnsEntityWithUserAccountBean() {
 		emailLogService.findById(1);
 		Mockito.verify(userAccountDAO).findByPK(0);
+	}
+
+	@Test
+	public void testThatFindAllByParentIdCallsCorrectDaoMethod() {
+		emailLogService.findAllByParentId(1);
+		Mockito.verify(emailLogDAO).findAllByParentId(1);
 	}
 }

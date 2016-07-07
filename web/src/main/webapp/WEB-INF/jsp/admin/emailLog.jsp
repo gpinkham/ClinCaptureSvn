@@ -7,6 +7,7 @@
 <ui:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 
+<jsp:include page="/includes/js/pages/emailLog.js.jsp" />
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 <jsp:include page="../include/sideAlert.jsp" />
 
@@ -55,7 +56,7 @@
 	</span>
 </h1>
 
-<form action="${pageContext.request.contextPath}/pages/EmailLog" style="clear:left; float:left;">
+<form action="${pageContext.request.contextPath}/pages/EmailLog">
 	${dataTable}
 </form>
 

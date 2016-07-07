@@ -18,11 +18,11 @@ public interface EmailLogService {
 
 
 	/**
-	 * Find all Audit Log entities for the specific study.
+	 * Find all parent Audit Log entities for the specific study.
 	 * @param studyId int
 	 * @return List of AuditLogEmail.
 	 */
-	List<EmailLog> findAllByStudyId(int studyId);
+	List<EmailLog> findAllParentsByStudyId(int studyId);
 
 
 	/**
@@ -31,4 +31,11 @@ public interface EmailLogService {
 	 * @return AuditLogEntry
 	 */
 	EmailLog findById(int id);
+
+	/**
+	 * Find all child entries by parentId.
+	 * @param id int
+	 * @return List of child entries
+	 */
+	List<EmailLog> findAllByParentId(int id);
 }

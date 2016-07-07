@@ -5,6 +5,7 @@ import com.clinovo.enums.BooleanEnum;
 import com.clinovo.model.EmailLog;
 import com.clinovo.service.EmailLogService;
 import com.clinovo.service.EmailService;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,10 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -33,6 +36,9 @@ public class EmailServiceImpl implements EmailService {
 	@Autowired
 	private EmailLogService emailLogService;
 
+	@Autowired
+	private DataSource dataSource;
+
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	/**
@@ -43,20 +49,7 @@ public class EmailServiceImpl implements EmailService {
 		EmailLog emailLog = new EmailLog(emailDetails);
 
 		try {
-			MimeMessage mimeMessage = mailSender.createMimeMessage();
-			MimeMessageHelper helper = getMimeMessageHelper(mimeMessage, emailLog.htmlEmail());
-			helper.setFrom(emailLog.getSender());
-			helper.setTo(processMultipleEmailAddresses(emailLog.getRecipient().trim()));
-			helper.setSubject(emailLog.getSubject());
-			helper.setText(emailLog.getMessage(), true);
-
-			if (emailLog.getFileAttachments() != null) {
-				String[] attachments = emailLog.getFileAttachments().split(",");
-				for (String filePath : attachments) {
-					FileSystemResource file = new FileSystemResource(filePath);
-					helper.addAttachment(file.getFilename(), file);
-				}
-			}
+			MimeMessage mimeMessage = createMimeMessage(emailLog);
 			mailSender.send(mimeMessage);
 			logger.debug("Email sent successfully on {}", new Date());
 		} catch (Exception me) {
@@ -65,6 +58,66 @@ public class EmailServiceImpl implements EmailService {
 			emailLog.setError(me.getMessage());
 		}
 		emailLogService.saveOrUpdate(emailLog);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Async
+	public void resendEmail(EmailLog emailLog, String sender, int sendBy) {
+		List<EmailLog> childEntries = emailLogService.findAllByParentId(emailLog.getId());
+		// Create clone of the parent entity to store it's error and state.
+		if (childEntries == null || childEntries.size() == 0) {
+			EmailLog parentClone = new EmailLog(emailLog, emailLog.getSender(), emailLog.getSentBy());
+			parentClone.setWasShown(BooleanEnum.TRUE);
+			emailLogService.saveOrUpdate(parentClone);
+		}
+		EmailLog childEntry = new EmailLog(emailLog, sender, sendBy);
+		childEntry.setDateSent(new Date());
+		emailLog.setSentBy(sendBy);
+		emailLog.setDateSent(new Date());
+		emailLog.setSender(sender);
+		try {
+			MimeMessage mimeMessage = createMimeMessage(childEntry);
+			mailSender.send(mimeMessage);
+			logger.debug("Email sent successfully on {}", new Date());
+
+			childEntry.setWasSent(BooleanEnum.TRUE);
+			childEntry.setError("");
+			emailLog.setWasSent(BooleanEnum.TRUE);
+			emailLog.setError("");
+		} catch (Exception ex) {
+			childEntry.setWasSent(BooleanEnum.FALSE);
+			childEntry.setError(ex.getMessage());
+			emailLog.setWasSent(BooleanEnum.FALSE);
+			emailLog.setError(ex.getMessage());
+		}
+		emailLogService.saveOrUpdate(emailLog);
+		emailLogService.saveOrUpdate(childEntry);
+	}
+
+	/**
+	 * Create MimeMessageHelper.
+	 * @param emailLog EmailLog
+	 * @throws MessagingException in case if error was thrown while creation of helper.
+	 * @return MimeMessage
+	 */
+	public MimeMessage createMimeMessage(EmailLog emailLog) throws MessagingException {
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, emailLog.htmlEmail());
+		helper.setFrom(emailLog.getSender());
+		helper.setTo(processMultipleEmailAddresses(emailLog.getRecipient().trim()));
+		helper.setSubject(emailLog.getSubject());
+		helper.setText(emailLog.getMessage(), true);
+
+		if (emailLog.getFileAttachments() != null) {
+			String[] attachments = emailLog.getFileAttachments().split(",");
+			for (String filePath : attachments) {
+				FileSystemResource file = new FileSystemResource(filePath);
+				helper.addAttachment(file.getFilename(), file);
+			}
+		}
+		return mimeMessage;
 	}
 
 	/**
@@ -90,14 +143,10 @@ public class EmailServiceImpl implements EmailService {
 	}
 
 	/**
-	 * Get MimeMessageHelper.
-	 * @param mimeMessage mimeMessage
-	 * @param htmlEmail htmlEmail
-	 * @return MimeMessageHelper
-	 * @throws MessagingException in case of error
+	 * Get UserAccountDAO.
+	 * @return UserAccountDAO.
 	 */
-	public MimeMessageHelper getMimeMessageHelper(MimeMessage mimeMessage, boolean htmlEmail)
-			throws MessagingException {
-		return new MimeMessageHelper(mimeMessage, htmlEmail);
+	public UserAccountDAO getUserAccountDAO() {
+		return new UserAccountDAO(dataSource);
 	}
 }

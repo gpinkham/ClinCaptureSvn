@@ -20,14 +20,28 @@ public class EmailLogDAO extends AbstractDomainDao<EmailLog> {
 	}
 
 	/**
-	 * Find all Audit Log entities for the specific study.
+	 * Find all parent Audit Log entities for the specific study.
 	 * @param studyId int
 	 * @return List of AuditLogEmail.
 	 */
-	public List<EmailLog> findAllByStudyId(int studyId) {
-		String query = "from  " + this.getDomainClassName() + " eal where eal.studyId = :studyId";
+	public List<EmailLog> findAllParentsByStudyId(int studyId) {
+		String query = "from  " + this.getDomainClassName() + " eal where eal.studyId = :studyId "
+				+ "and eal.parentId = 0";
 		Query q = this.getCurrentSession().createQuery(query);
 		q.setInteger("studyId", studyId);
+		return (List<EmailLog>) q.setCacheable(true).list();
+	}
+
+	/**
+	 * Find all child Audit Log entities.
+	 * @param parentId int
+	 * @return List of AuditLogEmail.
+	 */
+	public List<EmailLog> findAllByParentId(int parentId) {
+		String query = "from  " + this.getDomainClassName() + " eal where eal.parentId = :parentId "
+				+ " order by eal.dateSent";
+		Query q = this.getCurrentSession().createQuery(query);
+		q.setInteger("parentId", parentId);
 
 		return (List<EmailLog>) q.setCacheable(true).list();
 	}

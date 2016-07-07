@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/tlds/ui/ui.tld" prefix="ui" %>
@@ -6,10 +7,21 @@
 
 <ui:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 
+<jsp:include page="/includes/js/pages/emailLog.js.jsp" />
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 <jsp:include page="../include/sideAlert.jsp" />
 
+<link rel="stylesheet" href="<c:url value='/includes/jmesa/jmesa.css?r=${revisionNumber}'/>" type="text/css">
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jmesa.js?r=${revisionNumber}'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.jmesa.js?r=${revisionNumber}'/>"></script>
+
 <jsp:include page="../include/sideInfo.jsp" />
+
+<script type="text/javascript">
+	function onInvokeAction(id) {
+		createHiddenInputFieldsForLimitAndSubmit(id);
+	}
+</script>
 
 <!-- Page content start -->
 
@@ -49,13 +61,28 @@
 	</c:if>
 </table>
 
-<br>
+<br/>
 
-<div style="clear:left; float:left">
+<h3>
+	<fmt:message bundle="${resword}" key="resend_attempts"/>
+</h3>
+
+<form action="${pageContext.request.contextPath}/pages/EmailLogDetails">
+	<input type="hidden" name="id" value="${logEntry.id}"/>
+	${dataTable}
+</form>
+
+<br/>
+
+<div>
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 		   value="<fmt:message key="back" bundle="${resword}"/>"
 		   class="button_medium medium_back"
-		   onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
+		   onClick="goBackSmart('${navigationURL}', '${defaultURL}');"/>
+	<input type="button" name="resend_email_button" id="resend_email_button"
+		   value="<fmt:message key="resend" bundle="${resword}"/>"
+		   class="button_medium"
+		   onClick="resendEmail(${logEntry.id}, ${sentFromAdminEmail})"/>
 </div>
 
 <jsp:include page="../include/footer.jsp" />

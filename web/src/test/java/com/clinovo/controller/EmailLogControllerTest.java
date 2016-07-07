@@ -55,7 +55,7 @@ public class EmailLogControllerTest extends BaseControllerTest  {
 	@Test
 	public void testThatEmailLogDetailsPageCallReturnsModelWithAllAttributes() throws Exception {
 		this.mockMvc.perform(get(DETAILS_URL).param("id", "1").session(session)).andExpect(
-				MockMvcResultMatchers.model().attributeExists("logEntry"));
+				MockMvcResultMatchers.model().attributeExists("logEntry", "dataTable", "sentFromAdminEmail"));
 	}
 
 	@Test

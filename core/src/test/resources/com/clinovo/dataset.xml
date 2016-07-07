@@ -1138,10 +1138,12 @@
 	<email_log id="1" version="0" study_id="1" action="CASEBOOK_GENERATED" recipient="test@recipient.com"
 					 cc="" sender="test@sender.com" date_sent="2015-04-10" parent_id="0"
 					 sent_by="1" subject="Some email" was_sent="TRUE" message="Test message 1"/>
-
-
 	<email_log id="2" version="0" study_id="1" action="CASEBOOK_GENERATED" recipient="test@recipient.com"
 					 cc="" sender="test@sender.com" date_sent="2015-04-10" parent_id="0"
 					 sent_by="1" subject="Some email" was_sent="FALSE" message="Test message 2"
 					 error="Test error"/>
+	<email_log id="3" version="0" study_id="1" action="CASEBOOK_GENERATED" recipient="test@recipient.com"
+			   cc="" sender="test@sender_2.com" date_sent="2015-04-10" parent_id="1"
+			   sent_by="1" subject="Some email" was_sent="FALSE" message="Test message 2"
+			   error="Test error"/>
 </dataset>

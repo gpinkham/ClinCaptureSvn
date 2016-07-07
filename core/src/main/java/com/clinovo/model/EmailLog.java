@@ -45,9 +45,28 @@ public class EmailLog extends AbstractMutableDomainObject {
 	private UserAccountBean senderAccount;
 
 	/**
-	 * Default constructor.
+	 * Create child entry.
+	 * @param emailLog EmailLog
+	 * @param sender String
+	 * @param sentBy int
 	 */
-	public EmailLog() {
+	public EmailLog(EmailLog emailLog, String sender, int sentBy) {
+		this.studyId = emailLog.getStudyId();
+		this.action = emailLog.getAction();
+		this.recipient = emailLog.getRecipient();
+		this.cc = emailLog.getCc();
+		this.dateSent = emailLog.getDateSent();
+		this.sentBy = sentBy;
+		this.subject = emailLog.getSubject();
+		this.message = emailLog.getMessage();
+		this.wasSent = emailLog.getWasSent();
+		this.htmlEmail = emailLog.getHtmlEmail();
+		this.wasShown = BooleanEnum.FALSE;
+		this.fileAttachments = emailLog.getFileAttachments();
+		this.sender = sender;
+		this.parentId = emailLog.getId();
+		this.error = emailLog.getError();
+		this.wasSent = emailLog.getWasSent();
 	}
 
 	/**
@@ -75,6 +94,12 @@ public class EmailLog extends AbstractMutableDomainObject {
 		} else {
 			this.sender = emailDetails.getFrom();
 		}
+	}
+
+	/**
+	 * Default constructor.
+	 */
+	public EmailLog() {
 	}
 
 	@Enumerated(EnumType.STRING)

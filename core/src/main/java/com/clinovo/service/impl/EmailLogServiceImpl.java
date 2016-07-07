@@ -35,8 +35,8 @@ public class EmailLogServiceImpl implements EmailLogService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<EmailLog> findAllByStudyId(int studyId) {
-		return emailLogDAO.findAllByStudyId(studyId);
+	public List<EmailLog> findAllParentsByStudyId(int studyId) {
+		return emailLogDAO.findAllParentsByStudyId(studyId);
 	}
 
 	/**
@@ -47,6 +47,13 @@ public class EmailLogServiceImpl implements EmailLogService {
 		UserAccountDAO userAccountDAO = getUserAccountDao();
 		emailLog.setSenderAccount((UserAccountBean) userAccountDAO.findByPK(emailLog.getSentBy()));
 		return emailLog;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<EmailLog> findAllByParentId(int id) {
+		return emailLogDAO.findAllByParentId(id);
 	}
 
 	/**

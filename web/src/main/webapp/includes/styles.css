@@ -3050,3 +3050,7 @@ table td.crf_shortcuts_de {
 #emailAuditLogTableName {
 	width: 1200px;
 }
+
+#emailAuditLogChildTableName {
+	width: 1000px;
+}
